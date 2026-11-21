@@ -14,7 +14,7 @@ bun run lint       # Biome alone; bun run typecheck: tsc alone (both are part of
 bun run previews   # the menus' pictures of the games, see „Menus show pictures from the games“
 bun run voice ...  # recordings with ElevenLabs (paid, only when asked), see Rules for every game
 bun run image ...  # picture with Gemini, see /bild-erzeugen
-bun run paid       # every approved paid request at once (voice queue, cheap pictures) – in a Claude cloud session, outside Zscaler, see Working here
+bun run paid       # every approved paid request at once (voice queue, cheap pictures, lists the sounds) – only in a Claude cloud session (/paid-queue), see Working here
 bun run song ...   # measure a song from Suno, see /musik-erzeugen
 bun run perf ...   # how smoothly the games run on a ten-year-old Android phone, see Language and style
 bun run video intro # the YouTube videos' intro as an MP4 into video-out/, frame by frame, see src/video/CLAUDE.md
@@ -110,25 +110,32 @@ In a fresh worktree run `bun install` first.
   generate on the platform?“ in the help center, the service-specific terms) – read there, never assumed.
 - **This Mac reaches neither ElevenLabs nor Gemini** (user decision, 21 November 2026): the company's Zscaler answers
   every request to api.elevenlabs.io and generativelanguage.googleapis.com with „Website blocked“, for good. So never
-  start a paid run here (`bun run voice make`, `try`, `clone`, `credits`, `bun run image` with a prompt, `queue --make`)
-  and never look for a way round the filter. What the user approves goes into a queue instead, in the same commit as
-  the work that needs it: recordings as a job in `src/content/voiceQueue.ts` (parts, languages, the account and clone
-  its voice lives in – `voiceQueue.test.ts` checks them), pictures into `src/content/pictureQueue.ts` as always. Then
-  merge into local main (pushing stays the user’s move). **Handing Gemini and ElevenLabs to a Claude cloud session is
-  the recommended default way past Zscaler** (claude.ai/code, user decision, 21 November 2026, first run that day) –
-  not a workaround on the Mac, not a VPN or proxy, not another computer unless no cloud session is at hand: its container is outside Zscaler and its environment holds
-  `ELEVENLABS_API_KEY`, `ELEVENLABS_API_KEY_2` and `GEMINI_API_KEY` as secrets, so once main is pushed the user starts a
-  cloud session on the repo and says `/paid-queue` (`.claude/skills/paid-queue/`: `bun run paid --dry`, `bun run paid`,
-  look at every picture made, take the made jobs and pictures out of their queues in the commit that brings their files,
-  `bun run verify`, `bun run ship`). It should happen by itself (user request, 21 November 2026): a scheduled
-  task starting a fresh cloud session each evening with „Run /paid-queue“ – scheduled tasks are off for the organization
-  so far (an admin turns them on under Organization settings → Capabilities); create it once they are on. Whether
-  anything is open for Claude Cloud is the first thing on `/management/` (`CloudQueueStatus`, right under the title,
-  `CloudQueueStatus.test.ts`), with the queues' details further down. Another computer outside the filter works
-  the same way (pull, `bun install`, the keys in its shell). `scripts/paid-queue.mjs` refuses to start where the filter
-  answers. A cloud session asked to work on the queue may start the paid run there – the rule against paid runs is
-  for this Mac. The free parts still run here (`bun run voice make --dry`, `bun run image queue`, `bun run paid --dry`).
-  Both queues are on `/management/`. A job or picture leaves its queue in the commit that brings its files.
+  start a paid run here (`bun run voice make`, `try`, `clone`, `credits`, `bun run image` with a prompt, `queue --make`,
+  a `curl` to ElevenLabs' sound effects) and never look for a way round the filter; the scripts ask before their first
+  request and stop with a pointer to the queue (`scripts/networkFilter.mjs`). Every prompt that would go to Gemini or
+  ElevenLabs – a picture, a recording, a sound effect – goes into a queue instead, in the same commit as the work that
+  needs it: pictures into `src/content/pictureQueue.ts` as always, recordings as a job in `src/content/voiceQueue.ts`
+  (parts, languages, the account and clone its voice lives in – `voiceQueue.test.ts` checks them), sound effects into
+  `src/content/soundQueue.ts` (prompt, seconds, influence, the file; `soundQueue.test.ts`). The game's code is wired up
+  before (a picture plays once its file is there, what still waits for it stays out of the built site), and what is
+  left to do once the file comes – a crop, a line of code, `bun run previews`, a placeholder to take out – goes into the
+  entry's `after`, so the session that makes it finishes the task without this conversation. Then merge into local main
+  (pushing stays the user's move). **The queue is made only in a Claude cloud session** (claude.ai/code, user decision,
+  21 November 2026): its container is outside Zscaler and its environment holds `ELEVENLABS_API_KEY`,
+  `ELEVENLABS_API_KEY_2` and `GEMINI_API_KEY` as secrets, so once main is pushed the user starts a cloud session on the
+  repo and says `/paid-queue` (`.claude/skills/paid-queue/`: `bun run paid --dry`, `bun run paid`, the sound effects,
+  look at everything made and redo what is wrong, do each `after`, take what was made out of its queue in the commit
+  that brings its files, `bun run verify`, `bun run ship`). Running `bun run paid` on another computer (the user's
+  Windows PC) as a bare script without Claude is deprecated (user decision, 21 November 2026): nobody looks at the
+  pictures there, redoes a wrong one or finishes the work round it – never suggest it again, nor a VPN or proxy. It
+  should happen by itself (user request, 21 November 2026): a scheduled task starting a fresh cloud session each
+  evening with „Run /paid-queue“ – scheduled tasks are off for the organization so far (an admin turns them on under
+  Organization settings → Capabilities); create it once they are on. Whether anything is open for Claude Cloud is the
+  first thing on `/management/` (`CloudQueueStatus`, right under the title, `CloudQueueStatus.test.ts`), with the
+  queues' details further down. `scripts/paid-queue.mjs` refuses to start where the filter answers. A cloud session
+  asked to work on the queue may start the paid run there – the rule against paid runs is for this Mac. The free parts
+  still run here (`bun run voice make --dry`, `bun run image queue`, `bun run paid --dry`). A job, picture or sound
+  leaves its queue in the commit that brings its files.
 - **Every game with many scenes or rounds names the one on screen in the dev server** (user request, November 2026): a
   `<DevTag code id />` (`src/components/DevTag.tsx`) in the bottom right corner, visible only when `DEV`, with a short
   code (topic letter + number, „C07“) and the full id, so feedback can say exactly which scene is meant. A new game of

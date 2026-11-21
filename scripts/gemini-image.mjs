@@ -33,6 +33,7 @@ import { basename, dirname, extname, join, relative, resolve } from "node:path";
 import { plugin } from "bun";
 import sharp from "sharp";
 import { appPlugin } from "../tools/appPlugin.ts";
+import { requireReachable } from "./networkFilter.mjs";
 
 // The queue gathers prompts kept by the games (the Belohnungstafel's, the Gefühle days'), whose data imports like the
 // app's (`…?glob`): the app's plugin comes first, then the queue – a static import would load it before the plugin
@@ -290,6 +291,7 @@ function buildRequest(job) {
 async function call(path, init = {}) {
   const apiKey = process.env.GEMINI_API_KEY;
   if (!apiKey) fail("GEMINI_API_KEY is not set (create a key in Google AI Studio and export it in ~/.zshrc)");
+  await requireReachable("Gemini", `${API}/models`, "src/content/pictureQueue.ts");
   const res = await fetch(`${API}/${path}`, {
     ...init,
     headers: { "x-goog-api-key": apiKey, "content-type": "application/json" },

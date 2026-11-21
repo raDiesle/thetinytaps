@@ -115,6 +115,10 @@ unless the search address ends in `&g=0`: add it, or whole packs of fitting reco
 
 ## Made with ElevenLabs
 
+On the Mac behind Zscaler no request reaches ElevenLabs: a sound asked for there goes into `src/content/soundQueue.ts`
+(prompt, seconds, influence, file, what is left to do in `after`), and a Claude cloud session makes it as below with
+`/paid-queue` (root CLAUDE.md, „Working here“).
+
 Animal calls Freesound has none of are made with ElevenLabs' sound effects (`POST /v1/sound-generation`, model
 `eleven_text_to_sound_v2`) on the first account (`ELEVENLABS_API_KEY`; paid plans may use them commercially). They
 are **not free**: about 11 credits a second asked for (a 1.5 s call cost 17, a 2 s one 22, November 2026), counted

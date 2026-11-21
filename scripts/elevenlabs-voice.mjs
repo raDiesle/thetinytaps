@@ -30,6 +30,7 @@ import { existsSync, mkdirSync, readdirSync, readFileSync, rmSync, writeFileSync
 import { join, resolve } from "node:path";
 import { pathToFileURL } from "node:url";
 import { plugin } from "bun";
+import { requireReachable } from "./networkFilter.mjs";
 
 const API = "https://api.elevenlabs.io/v1";
 const ADVENTURE = "src/games/adventure";
@@ -153,6 +154,7 @@ const ANSWER_LIMIT_MS = 10 * 60_000;
  */
 async function call(path, { body, query, soft = false } = {}) {
   const url = `${API}${path}${query ? `?${new URLSearchParams(query)}` : ""}`;
+  await requireReachable("ElevenLabs", `${API}/models`, "src/content/voiceQueue.ts");
   /** @type {Response} */
   let response;
   for (let attempt = 0; ; attempt++) {
@@ -348,6 +350,7 @@ async function clone() {
   form.append("remove_background_noise", "false");
   form.append("description", "Clone of Tapsi Coach (Voice Design, first account), made from its own recordings.");
   for (const file of files) form.append("files", new Blob([readFileSync(file)], { type: "audio/mpeg" }), file.split("/").pop());
+  await requireReachable("ElevenLabs", `${API}/models`, "src/content/voiceQueue.ts");
   const response = await fetch(`${API}/voices/add`, { method: "POST", headers: { "xi-api-key": apiKey() }, body: form });
   if (!response.ok) fail(`/voices/add: ${response.status} ${await response.text()}`);
   const { voice_id } = await response.json();

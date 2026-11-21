@@ -69,6 +69,12 @@ export interface QueuedPicture {
    * and keep their whole cells, so they line up (`--frames`).
    */
   panels?: { file: string; prompt: string }[];
+  /**
+   * What is left to do once it is made, beyond saving it at `file` (and its panels' files) – a crop, a line in a game's
+   * code, `bun run previews <folder>`, a placeholder to take out –, so the Claude cloud session that makes it (Zscaler
+   * blocks Gemini on the Mac, root CLAUDE.md) finishes the work too. Left out where the picture plays as soon as its file is there.
+   */
+  after?: string;
   /** Why it must be drawn alone, so it never shares a sheet – only a reason from `ALONE_REASONS`. */
   alone?: AloneReason;
   /** When it was asked for, YYYY-MM-DD. */
