@@ -44,7 +44,7 @@ export type SurpriseKind = (typeof SURPRISE_KINDS)[number];
 /** How surprises are kept from piling up while a child hammers keys (`surprises.test.ts` keeps them few). */
 export const SURPRISE = {
   /** A new surprise comes at most this often; presses between only ripple. */
-  gapMs: 600,
+  gapMs: 250,
   /** At most this many on screen at once. */
   maxAtOnce: 3,
   /** How long each kind stays, in ms – its CSS animations end within it. */

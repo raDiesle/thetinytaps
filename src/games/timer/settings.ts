@@ -4,12 +4,15 @@ import type { OwnTime } from "./time";
  * What runs down while the child watches: a train going to the station, an apple tree harvested into a cart, an hourglass, a
  * caterpillar eating a leaf, a flower growing (H-53), a candle, the sunrise (H-54), a red disc, a pizza eaten slice by slice (H-47), a children's
  * digital alarm clock counting down (H-70) – or „Abwechseln“ (H-52), two children taking
- * turns with a toy, turn after turn, or the same as two children playing tennis (H-71).
+ * turns with a toy, turn after turn, or the same on a seesaw (H-109).
  */
-export type TimerPicture = "train" | "apple" | "sand" | "caterpillar" | "flower" | "candle" | "sunset" | "disc" | "pizza" | "clock" | TurnPicture;
+export type TimerPicture = "train" | "apple" | "sand" | "caterpillar" | "flower" | "candle" | "sunset" | "disc" | "pizza" | "clock" | "tidy" | TurnPicture;
 
-/** The pictures of taking turns, which run on without end: the toy between two cushions, and tennis. */
-export type TurnPicture = "swap" | "tennis";
+/**
+ * The pictures of taking turns, which run on without end: the toy between two cushions, and the seesaw carrying it
+ * (H-109; Tennis, H-71, was taken out).
+ */
+export type TurnPicture = "swap" | "seesaw";
 
 /** The toy the two children take turns with in „Abwechseln“, picked behind ⚙️. */
 export type SwapToy = "bobbycar" | "doll" | "ball";
@@ -27,11 +30,11 @@ export const TIMER_SECONDS = [10, 30, 60, 120, 180, 300, 600] as const;
 export interface TimerSettings {
   /** The picture played last, marked on its card; „Weiter“ goes on with the next. */
   picture: TimerPicture;
-  /** How long the timer runs in seconds, one of `TIMER_SECONDS`, unless `useOwn`. */
+  /** How long the timer runs in seconds, one of `TIMER_SECONDS`, unless `useOwn`. Chosen per visit, never stored: each visit starts at 5 minutes. */
   seconds: number;
   /** The time a grown-up set last behind „Andere …“ (H-59, H-60): it stays as a slip of its own in the row until another comes. */
   own: OwnTime | null;
-  /** Whether that own time is the one chosen, instead of `seconds`. */
+  /** Whether that own time is the one chosen, instead of `seconds`. Per visit like `seconds`, never stored. */
   useOwn: boolean;
   /** The toy in „Abwechseln“ (H-52). */
   toy: SwapToy;

@@ -14,7 +14,7 @@ bun run lint       # Biome alone; bun run typecheck: tsc alone (both are part of
 bun run previews   # the menus' pictures of the games, see „Menus show pictures from the games“
 bun run voice ...  # recordings with ElevenLabs (paid, only when asked), see Rules for every game
 bun run image ...  # picture with Gemini, see /bild-erzeugen
-bun run paid       # every approved paid request at once (voice queue, cheap pictures) – in a Claude cloud session, outside Zscaler, see Working here
+bun run paid       # every approved paid request at once (voice queue, cheap pictures, lists the sounds) – only in a Claude cloud session (/paid-queue), see Working here
 bun run song ...   # measure a song from Suno, see /musik-erzeugen
 bun run perf ...   # how smoothly the games run on a ten-year-old Android phone, see Language and style
 bun run video intro # the YouTube videos' intro as an MP4 into video-out/, frame by frame, see src/video/CLAUDE.md
@@ -110,25 +110,31 @@ In a fresh worktree run `bun install` first.
   generate on the platform?“ in the help center, the service-specific terms) – read there, never assumed.
 - **This Mac reaches neither ElevenLabs nor Gemini** (user decision, 21 November 2026): the company's Zscaler answers
   every request to api.elevenlabs.io and generativelanguage.googleapis.com with „Website blocked“, for good. So never
-  start a paid run here (`bun run voice make`, `try`, `clone`, `credits`, `bun run image` with a prompt, `queue --make`)
-  and never look for a way round the filter. What the user approves goes into a queue instead, in the same commit as
-  the work that needs it: recordings as a job in `src/content/voiceQueue.ts` (parts, languages, the account and clone
-  its voice lives in – `voiceQueue.test.ts` checks them), pictures into `src/content/pictureQueue.ts` as always. Then
-  merge into local main (pushing stays the user’s move). **Handing Gemini and ElevenLabs to a Claude cloud session is
-  the recommended default way past Zscaler** (claude.ai/code, user decision, 21 November 2026, first run that day) –
-  not a workaround on the Mac, not a VPN or proxy, not another computer unless no cloud session is at hand: its container is outside Zscaler and its environment holds
-  `ELEVENLABS_API_KEY`, `ELEVENLABS_API_KEY_2` and `GEMINI_API_KEY` as secrets, so once main is pushed the user starts a
-  cloud session on the repo and says `/paid-queue` (`.claude/skills/paid-queue/`: `bun run paid --dry`, `bun run paid`,
-  look at every picture made, take the made jobs and pictures out of their queues in the commit that brings their files,
-  `bun run verify`, `bun run ship`). It should happen by itself (user request, 21 November 2026): a scheduled
-  task starting a fresh cloud session each evening with „Run /paid-queue“ – scheduled tasks are off for the organization
-  so far (an admin turns them on under Organization settings → Capabilities); create it once they are on. Whether
-  anything is open for Claude Cloud is the first thing on `/management/` (`CloudQueueStatus`, right under the title,
-  `CloudQueueStatus.test.ts`), with the queues' details further down. Another computer outside the filter works
-  the same way (pull, `bun install`, the keys in its shell). `scripts/paid-queue.mjs` refuses to start where the filter
-  answers. A cloud session asked to work on the queue may start the paid run there – the rule against paid runs is
-  for this Mac. The free parts still run here (`bun run voice make --dry`, `bun run image queue`, `bun run paid --dry`).
-  Both queues are on `/management/`. A job or picture leaves its queue in the commit that brings its files.
+  start a paid run here (`bun run voice make`, `try`, `clone`, `credits`, `bun run image` with a prompt, `queue --make`,
+  a `curl` to ElevenLabs' sound effects) and never look for a way round the filter; the scripts ask before their first
+  request and stop with a pointer to the queue (`scripts/networkFilter.mjs`). Every prompt that would go to Gemini or
+  ElevenLabs – a picture, a recording, a sound effect – goes into a queue instead, in the same commit as the work that
+  needs it: pictures into `src/content/pictureQueue.ts` as always, recordings as a job in `src/content/voiceQueue.ts`
+  (parts, languages, the account and clone its voice lives in – `voiceQueue.test.ts` checks them), sound effects into
+  `src/content/soundQueue.ts` (prompt, seconds, influence, the file; `soundQueue.test.ts`). The game's code is wired up
+  before (a picture plays once its file is there, what still waits for it stays out of the built site), and what is
+  left to do once the file comes – a crop, a line of code, `bun run previews`, a placeholder to take out – goes into the
+  entry's `after`, so the session that makes it finishes the task without this conversation. Then merge into local main
+  (pushing stays the user's move). **The queue is made only in a Claude cloud session** (claude.ai/code, user decision,
+  21 November 2026): its container is outside Zscaler and its environment holds `ELEVENLABS_API_KEY`,
+  `ELEVENLABS_API_KEY_2` and `GEMINI_API_KEY` as secrets, so once main is pushed the user starts a cloud session on the
+  repo and says `/paid-queue` (`.claude/skills/paid-queue/`: `bun run paid --dry`, `bun run paid`, the sound effects,
+  look at everything made and redo what is wrong, do each `after`, take what was made out of its queue in the commit
+  that brings its files, `bun run verify`, `bun run ship`). Running `bun run paid` on another computer (the user's
+  Windows PC) as a bare script without Claude is deprecated (user decision, 21 November 2026): nobody looks at the
+  pictures there, redoes a wrong one or finishes the work round it – never suggest it again, nor a VPN or proxy. It
+  should happen by itself (user request, 21 November 2026): a scheduled task starting a fresh cloud session each
+  evening with „Run /paid-queue“ – scheduled tasks are off for the organization so far (an admin turns them on under
+  Organization settings → Capabilities); create it once they are on. Whether anything is open for Claude Cloud is the
+  first thing on `/management/` (`CloudQueueStatus`, right under the title, `CloudQueueStatus.test.ts`), each queue there one short line folded open to its whole list (🎙️ Stimmen, 🔊 Geräusche, 🖼️ Offene Bilder; user request, 21 November 2026: never a section of its own further down again). `scripts/paid-queue.mjs` refuses to start where the filter answers. A cloud session
+  asked to work on the queue may start the paid run there – the rule against paid runs is for this Mac. The free parts
+  still run here (`bun run voice make --dry`, `bun run image queue`, `bun run paid --dry`). A job, picture or sound
+  leaves its queue in the commit that brings its files.
 - **Every game with many scenes or rounds names the one on screen in the dev server** (user request, November 2026): a
   `<DevTag code id />` (`src/components/DevTag.tsx`) in the bottom right corner, visible only when `DEV`, with a short
   code (topic letter + number, „C07“) and the full id, so feedback can say exactly which scene is meant. A new game of
@@ -440,12 +446,20 @@ In a fresh worktree run `bun install` first.
   was hardly seen): big in the middle of the screen with „Geschafft!“ under it, then shrinking onto its little wooden
   board beside the buttons – into the collection – and only then the buttons come (`AWARD_MS`, a tap on it lands it at
   once; one transform, measured from its board, `GameEnd.test.ts`); a new `GameEnd` passes `level` (the level's or story's id; without it the game has one trophy).
+  Landed it stays big (`--trophy-h` in `game-end.css`, a good part of the screen's height, also in an `inline` end) and
+  plainly something to tap: the shared `TapHint`'s golden ring and hand round it (`TrophyHint`, the hand left of it or
+  above where the screen's edge is too close), stopped at its first stage (`upTo`) so it never darkens „Weiter“ beside
+  it; its count („3×“) on a light plate on the foot, big enough to read at a glance (user feedback, November 2026: it
+  wasn't clear the trophy can be tapped, the trophy was small and its number hard to read; `GameEnd.test.ts`).
   Each looks like no other (`Trophy.tsx`: its metal by the game, form, handles, lid and foot by the level, the level's
   own picture in its medallion, `trophyPictures.ts`), drawn still, handed over once slowly – never shining, sparkling or
   bouncing. They stand in the trophy room, a page of its own at `/pokale/` (`TrophyMuseum`, user request, November
-  2026), never in the bookshelf (between its books a trophy stood as if in the wall) nor in a popup: reached by a paper
-  sign with a big golden cup, nailed onto the post at the bottom right of the picture books' compartment (the second
-  board on a wide shelf) and reaching left into it over the books spine out (`TrophySign`, only once a trophy is won;
+  2026), never in the bookshelf (between its books a trophy stood as if in the wall) nor in a popup: reached by a little
+  wooden board in 3D (grain, bevelled edges, its thickness seen below and right of it) with a big golden cup on it,
+  sitting right in the bottom right corner of the picture books' compartment (the second board on a wide shelf) – its
+  foot on the board, its right edge against the post, never hanging in the air above the board – held by three nails in
+  its corners (the top two and the bottom left; user request, November 2026: the paper sign hanging there looked flat
+  and loose) and reaching left over the books spine out (`TrophySign`, only once a trophy is won;
   user feedback, November 2026: a small sign with a cup in a doorway above the loudspeaker was hardly recognised – it is
   sized by the books, `--trophy-sign`, and is the one thing on the shelf that moves by itself: two small glints flash on
   the cup now and then, gently, as a trophy does in a game, each a tiny layer of its own, never a glow or a bounce) – a tap
@@ -487,7 +501,9 @@ A game may give it before its end where reaching the goal once is enough (Ketten
   buttons with room to spare, a loud topic bubble; `choiceRows` in `src/lib/rounds.ts`).
 - Silent and still until the child acts: no sound without a tap/hover/key, no idle
   animation unless the parent turns it on (`document.getAnimations()` is empty after load; only a `TapHint` left
-  waiting starts to move after its first stage, and on the shelf the trophy sign's two glints). In a game that plays
+  waiting starts to move after its first stage, on the shelf the trophy sign's two glints, and in Lebendige Bilder a
+  few items waving one after the other before the first tap, B-15 – each with its own sound, softly, the one sound
+  allowed before a tap, user decision, November 2026). In a game that plays
   at once (`startMode`), the tap on its card is that act: it may start moving and sounding right away – but never
   while the book still opens or a page turns (user feedback, November 2026: Aufs Töpfchen and Zähne putzen talked and
   moved during it). The new screen is drawn before the motion, and everything that starts by itself waits for it to lie
@@ -509,7 +525,7 @@ A game may give it before its end where reaching the goal once is enough (Ketten
   (`VoiceSwitch` in `src/components/`, user decisions, November 2026) – Gefühle's „Alltagssituationen“ and the chapter
   books read aloud by Tapsi's voice (`ChapterBook`'s `voice`: Abstillen, Schnullerfee, Kita-Start, one switch for all
   three) – only there, never as a pattern for other games (`VoiceSwitch.test.ts`). Recordings are made only when the user asks (see Language).
-  What still waits for its recording is listed on `/management/` (🎙️ Stimmen), read from the games' own data by
+  What still waits for its recording is listed on `/management/` (🎙️ Stimmen, a folded line in the Claude Cloud status at the top), read from the games' own data by
   `src/content/voiceLines.ts`: a game that says something new adds where it comes from there, never a call of the
   browser's voice (`voiceLines.test.ts` fails when anything but `src/lib/voice.ts` takes `speak` from the speech module,
   and on a game with the fallback that is not on its list). Lines that wait for their recording and are said by nothing
@@ -601,18 +617,24 @@ A game may give it before its end where reaching the goal once is enough (Ketten
   Tied, they are one block: pressed close and standing upright – never leaning, which looked unnatural for tied books –
   and one ribbon runs round all of them with its bow in their middle – never a band on each book, which looked like
   three small ribbons (user feedback, November 2026). The single books stand thick enough to hit with a finger on a
-  phone (`DAILY_SPINE`, widened again in November 2026 when they were still hard to hit), and lean a little differently, as books do. The Alltagshelfer are what parents
+  phone (`DAILY_SPINE`, widened again in November 2026 when they were still hard to hit), and lean a little differently, as books do.
+  Their row is as wide as its board allows, so they grow in height instead: taller than the picture books, as high as
+  their compartment lets them be taken out (`DAILY_TALL`), and the picture on each spine takes nearly its whole width,
+  since that picture is what a child knows the book by (user feedback, November 2026: books and pictures too small to
+  recognise; `shelfLayout.test.ts`). The Alltagshelfer are what parents
   need most, so they stand first, top left (first in `CATEGORIES`), and that bundle is the eye-catcher of the shelf:
   glowing brightest, the Belohnungstafel in it bound in gold – still, nothing idles. Every book stands on its board like
   its neighbours, never in a box or pulled out further than they: a slipcase round the two, pulled out and tipped, looked
   as if it floated (user feedback, November 2026). What can be taken is
   plainly unlike what only fills the shelf (user feedback, November 2026): books to take are bright, with paper labels
   or covers, standing at the front and glowing; books only filling it are dull and dim, never a paper label or a glow,
-  and answer a tap by rocking with a soft knock (`nudge`), so a child sees the tap was felt. The group is marked as one by a small wooden sign with its
-  name screwed onto the board's edge under it (`DailyGroup`; a label from four drafts – bookend, sign, paper band – user
-  decision, November 2026, made of wood so it looks mounted, user feedback, November 2026), and the picture books
-  standing together on one board just so by „Lernspiele“ on the board under them (`labelOf`); such a sign hangs only a
-  little below its board, never over a book on the board below. Beside the helpers words carved into the back panel tell grown-ups in short what
+  and answer a tap by rocking with a soft knock (`nudge`), so a child sees the tap was felt. The group is marked as one by a wooden sign with its
+  name hanging big from a brass rail along the board's edge under all of its books, the rail's ends turned up round the
+  first and the last (`GroupSign`; a label from four drafts – bookend, sign, paper band – user decision, November 2026,
+  made of wood so it looks mounted; the small sign alone was hardly seen, nor that it named every book on the board, so
+  it grew and got the rail, user feedback, November 2026), and the picture books standing together on one board just so
+  by „Lernspiele“ on the board under them (`labelOf`); such a sign hangs only a little below its board, never over a
+  book on the board below (measure it at 844×390, where it comes closest). Before the helpers words carved into the back panel tell grown-ups in short what
   the shelf is for – „Für Groß & Klein“ – then that it is the first step into the digital world taken together, with
   learning games and little helpers for the day – and nothing else: no „Alles kostenlos.“, no „Seite an Seite“, no „die die Kommunikation fördern“, no „von Eltern für Eltern“ (each tried and
   taken out again, user feedback, November 2026), no pointer to one game („Ein Blick in die
@@ -622,9 +644,13 @@ A game may give it before its end where reaching the goal once is enough (Ketten
   words big enough to read, else a narrow one – never none, since „mehr …“ is the way to those texts (`CARVINGS`). Its
   sentence under the first line stands wherever it fits whole, measured in the page, and is left out only where it
   doesn't (a phone on its side has the room: only „Für Groß & Klein“ there left the board empty, user feedback, November
-  2026). Its place is only as wide as its words need: a wider one left a gap beside them, and the picture
-  book beside it stands close to its words, not a finger's gap away (only „mehr …“ in their middle takes a tap, user
-  feedback, November 2026);
+  2026). Its place is only as wide as its words need (a wider one left a gap beside them), plus the room the first
+  helper's top needs where it leans left towards them (`LEAN_CLEAR`, `--lean-clear`: it reached over the sentence);
+  it stands out by its place at the far left, a brighter light and colour (its first line in the book's red), never by
+  room made for it: its letters grow only into the room that is there anyway – from the board up to under the sign,
+  as wide as its place – (`cqw`, `cqh` of `.shelf-carving`, capped by the books' height), while the plan never widens
+  its place for them (user feedback, November 2026, twice: a heading that widened its place took the books' room;
+  `shelfLayout.test.ts` keeps the books nearly as big as without it);
   words added to it widen its place (`CARVINGS`), never spill past the board – measure its first and last line against
   its box at 1280×720 and 1920×1080 (the 3D push makes it look smaller than it is laid out). Every picture book's cover shows a picture painted for its
   book (`src/components/bilder/cover-<category>.webp`, made with `/bild-erzeugen`, user decision, October 2026), never
@@ -919,7 +945,10 @@ src/lib/                 speech, sfx (synthesized + recorded sounds), storage, d
   On each board the books stand together in the middle with just `BOOK_GAP` between them, and books spine out fill the
   ends up to them – never spread over a wide board with big empty room between them (on a big monitor they looked lost,
   user feedback, November 2026; `.shelf-row`, `endsFor`).
-  The picture books are as big as the shelf allows (`TAKE_OUT`, little room above them, user feedback, October 2026) and
+  The picture books are as big as the shelf allows (`TAKE_OUT`, little room above them, user feedback, October 2026) –
+  each board's books as big as its own width and height allow (`ShelfCell.bh`, set as the compartment's `--bh`), never
+  all as small as the full board of the everyday helpers makes its books (on a tablet the picture books below were
+  half the size they could be, user feedback, November 2026) – and
   show that they are there to be taken: they stand at the board's front edge, before the books spine out, their tops
   tipped forwards as a hand takes a book out, with a warm glow round the cover; a mouse over one tips it further out.
   A tap on a book takes it out (`takeOutBook`, `bookTravel.ts`): it comes off its board, into the middle, its cover swings open
@@ -953,11 +982,19 @@ src/lib/                 speech, sfx (synthesized + recorded sounds), storage, d
   feedback, November 2026), leaving the bottom's middle to the floor, and the app's name is a painted sign hanging
   on its two little chains in front of the shelf, down into its top compartment (`SIGN_DIP`; standing on the floor at
   the bottom left it was taken out again, user feedback, November 2026): over the carved words, which begin below it
-  and stand centred under it, moved right where it hangs right of their place (`ShelfLayout.wordsShift`),
-  the plan keeping room for it there (`ShelfCell.trail`, `ShelfLayout.sign`), so it never covers a book to take nor the
-  wall with the stickers, and the foxes on its o stay on the screen (`shelfLayout.test.ts`). Sign and words hang far right, at the
-  wall with the stickers, so the top board's books come towards the shelf's middle (the trail shrinks, `signOver`; user
-  feedback, November 2026 – hanging them in the shelf's middle pushed the books to the left wall). On an upright screen it
+  and stand centred under it. **Sign and words come first, at the top board's far left**, a gap from the post, and the
+  everyday helpers follow at their right (user request, November 2026: a visitor looks at the left first, and this is
+  what they should see first; at the far right by the stickers' wall it was found last): the plan keeps room for the sign
+  where it is wider than the words (`ShelfCell.lead`, `ShelfLayout.sign`, `signOver`) – after letting it reach half over
+  the left post (`SIGN_OVER_POST`) and narrowing the words at their right so they stay centred under it (`pull`), since
+  that room would come off the books – so it never covers a book to take – the first helper leans towards it
+  (`LEAN_CLEAR`) –; where the top compartment is tall enough (a tablet), it hangs above the helpers' books instead, clear
+  over their tops (`ShelfCell.tall`, `UNDER_SIGN`), and they get its room – only where that makes them clearly wider
+  (`ABOVE_GAIN`), since under it they stand lower, and with a breath of room left beside the words (`WORDS_BREATH`;
+  user feedback, November 2026: beside the sign on a tablet the spines were too thin for their pictures) – and the books spine out keep clear of the wall with the stickers (`STICKERS_ROOM`), the foxes on its o stay on the screen (`shelfLayout.test.ts`), and the books spine out fill only the
+  board's right end (`data-leads`). A brighter, still light falls on sign and words (`.shelf-light.lead`) so they stand
+  out, and the plan takes the sign's measured width (`SIGN_EMS`), never a wide guess, since every px it reserves comes
+  off the books. Upright, the words stand before the helpers too. On an upright screen it
   hangs above the shelf, never touching it. A new option becomes such a thing in the shelf too (`SHELF_THINGS`); their
   menus open outside the shelf's 3D (`MenuButton` portals them), since a transform would hold them in. The wall's picture (`bilder/buch-cover.webp`,
   only where there is room beside the shelf) shows one family of each mascot: a fox parent with a fox child and a bear parent
@@ -983,8 +1020,10 @@ src/lib/                 speech, sfx (synthesized + recorded sounds), storage, d
   up into the room the top row leaves. On a phone the sun, clouds and a room's window are left out too. A new kind of button gets its paper look in `book.css` with the others, never shiny plastic; a card is a picture taped onto the page without a ▶ on it (the whole card is tapped, so it is lower than its row), and the level row's choices are slips of paper lying askew, the chosen one yellow and taped down like a card (user feedback, October 2026). The fullscreen button and ⚙️ are
   small notes of plain paper with a paperclip over the edge they hang from – the page's top edge in a menu's top right
   corner, the picture's top edge while playing (user decision, October 2026: quieter than buttons or taped tabs, and
-  findable on dark pictures). While playing, ⚙️'s note is the big one, its gear large, as the symbol alone – never
-  „Einstellungen“ or „halten“ written on it, on any device (user feedback, November 2026; its name is only read out) – and as play starts it lights up softly twice,
+  findable on dark pictures). While playing, ⚙️'s note looks exactly like the fullscreen note beside it – the same size, paper and clip, its gear
+  drawn in the same ink line as the fullscreen sign (`.play-options-icon`), never an emoji and never a bigger note of its
+  own (user feedback, November 2026) – the symbol alone, never „Einstellungen“ or „halten“ written on it, on any device
+  (its name is only read out) – and as play starts it lights up softly twice,
   then stands still – never a glow that keeps going or comes back while playing (user feedback, November 2026: the small
   grey gear wasn't seen; `look.test.ts`). A game with many
   ways to play behind it says so as play starts with `PlayOptions intro`: a note under ⚙️ for grown-ups, telling what can
@@ -1023,7 +1062,9 @@ src/lib/                 speech, sfx (synthesized + recorded sounds), storage, d
   start screens' cards still being built), opens only where `canTestUnfinished` holds – elsewhere its line is pale and
   takes no tap –, keeps `noindex`, and its ✕ leads back to its book. Its
   rows in the tables (languages, mascots, voice) stay. Removing the mark publishes it; never hide a game by deleting its
-  entry or route. `content.test.ts` checks it.
+  entry or route. `content.test.ts` checks it. A volume of a game still being built (a second story of a book, H-104's
+  night story in Abstillen) is marked on its line in `volumes` (`Volume.unfinished`, with its blurb for the management
+  page): no book on the shelf (`shelfVolumes`, a single book left stands alone), `noindex`, reached from „🚧 In Arbeit“.
 - A new game needs: folder, page, route in `App.tsx`, entry in `CATEGORIES`
   (`src/content/games.ts`, with its `blurb`), a row in `src/content/ideas/languageStatus.ts`, an entry in `src/content/seo.ts` and its translations in `seo.<lang>.ts` – use `/neues-spiel`.
 - The app is called „Fun for Both“ and lives at www.funforboth.com (its main address since November 2026, user decision;
@@ -1079,7 +1120,7 @@ src/lib/                 speech, sfx (synthesized + recorded sounds), storage, d
   a page there in every language that sends on at once with a canonical link, which Google takes as a redirect – without
   it GitHub Pages answers 404 and the page's place in Google is lost (`content.test.ts`). Pages that must stay out of results get a
   `noindex` tag (`NO_INDEX_PATHS`), never a `Disallow` in robots.txt, which hides the tag from Google. No
-  `<meta name="keywords">` (ignored by Google, a spam hint for Bing): the searched words go into title, description and text. Heavy downloads (service worker copy,
+  `<meta name="keywords">` (ignored by Google, a spam hint for Bing; `metaKeywords.test.ts`): the searched words go into title, description and text, and never another product's name, hidden or as our own (a competitor's name in metatags infringes its sign, BGH „Impuls“; study `tinyfingers-marke`). Heavy downloads (service worker copy,
   songs) start only after the page has loaded (`afterLoad` in `src/lib/pwa.ts`).
 - Visits are counted only by Cloudflare Web Analytics (the build adds it with the repository variable
   `CF_BEACON_TOKEN`) and how the app is used by Umami Cloud (`src/lib/analytics.ts`: pages by itself, plus a few events –
@@ -1099,7 +1140,7 @@ src/lib/                 speech, sfx (synthesized + recorded sounds), storage, d
   and its `PRIVACY_UPDATED` in the same commit (`tracking.test.ts` checks the main ones). Both stay out of search results.
 - A new Lebendige-Bilder picture: `/neue-szene`. A new Kleine-Abenteuer level: `/neues-abenteuer`. A generated picture: `/bild-erzeugen`
   – always as cheap as it can be (user decision, November 2026): every picture asked for goes into the queue
-  (`src/content/pictureQueue.ts`, shown on `/management/` under „Offene Bilder“) and `bun run image queue` makes only
+  (`src/content/pictureQueue.ts`, shown on `/management/` under „Offene Bilder“, folded in the Claude Cloud status at the top) and `bun run image queue` makes only
   what is already as cheap as it gets; a picture whose shared sheet isn't full waits for later sessions, unless
   the user, asked in the session with the number of pictures short of their sheet, says to make it now. Never a
   picture generated alone where a sheet can hold it – unless the user says to make it faster (user decision, 12

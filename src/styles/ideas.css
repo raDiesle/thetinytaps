@@ -732,3 +732,25 @@ button.idea-id {
 .voice-lines li {
   break-inside: avoid;
 }
+
+/* Each paid queue in the Claude Cloud status: one short line, opened to its whole list. */
+.ideas-cloud-queue {
+  margin: 0 0 6px;
+}
+
+.ideas-cloud-queue > summary {
+  font-weight: 600;
+  cursor: pointer;
+}
+
+.ideas-cloud-queue > summary small {
+  font-weight: 400;
+  opacity: 0.75;
+}
+
+.ideas-cloud-list {
+  margin: 8px 0 16px;
+  padding: 12px 16px;
+  border-radius: 16px;
+  background: #fff;
+}

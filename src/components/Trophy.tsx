@@ -236,15 +236,16 @@ function handle(rim: number, rx: number) {
 }
 
 /**
- * The plate on the foot's front, and on it how often the trophy was won, from the second time on: engraved, in the
- * book's serif.
+ * The plate on the foot's front, and on it how often the trophy was won, from the second time on: big and dark on a
+ * light plate filling the foot's front, in the book's serif (user feedback, November 2026: the small engraved number
+ * was hardly seen). `width` is as much as the foot's front gives.
  */
-function Plate({ y, metal, wins }: { y: number; metal: Metal; wins: number }) {
+function Plate({ y, metal, wins, width = 50 }: { y: number; metal: Metal; wins: number; width?: number }) {
   if (wins < 2) return <rect x="38" y={y} width="24" height="8" rx="1.5" fill={metal.base} strokeWidth="1" />;
   return (
     <g className="trophy-wins">
-      <rect x="33" y={y - 3} width="34" height="14" rx="2" fill={metal.light} strokeWidth="1" />
-      <text x="50" y={y + 8.2} textAnchor="middle" fontSize="11.5" fontWeight="700" fontFamily="Georgia, 'Times New Roman', serif" fill={INK} stroke="none">
+      <rect x={50 - width / 2} y={y - 4.5} width={width} height="17" rx="2.5" fill="#fffaf0" strokeWidth="1.2" />
+      <text x="50" y={y + 9.6} textAnchor="middle" fontSize="16.5" fontWeight="700" fontFamily="Georgia, 'Times New Roman', serif" fill={INK} stroke="none">
         {wins}×
       </text>
     </g>
@@ -259,7 +260,7 @@ function Foot({ kind, metal, fill, wood, wins }: { kind: TrophyLook["foot"]; met
         <path d="M22 146 L32 121 H68 L78 146 Z" fill={fill} />
         <ellipse cx="50" cy="121" rx="18" ry="3.5" fill={metal.light} />
         <path d="M22 146 H78" />
-        {wins >= 2 && <Plate y={131} metal={metal} wins={wins} />}
+        {wins >= 2 && <Plate y={131} metal={metal} wins={wins} width={40} />}
       </g>
     );
   return (

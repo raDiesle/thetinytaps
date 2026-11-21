@@ -299,10 +299,9 @@
   display: flex;
   flex: none;
   align-items: flex-end;
-  width: calc(var(--bh) * 0.82 * var(--span, 1));
+  /* With the room kept for the sign hanging over the carved words (`ShelfCell.lead`), which the words' place takes. */
+  width: calc(var(--bh) * 0.82 * var(--span, 1) + var(--lead, 0px));
   height: var(--bh);
-  /* The carved words take no tap but „mehr …“ in their middle: the picture book beside them comes close, not a finger's gap away. */
-  margin-right: calc(var(--bh) * -0.12);
   transform: translateZ(calc(var(--d) * 0.17));
 }
 
@@ -314,7 +313,14 @@
  * alike (user feedback, November 2026), so the gaps open towards their tops and none touches its neighbour; the books
  * tied together stand upright (`.shelf-bundle`). Taken out, a book straightens as it lifts (bookTravel.ts).
  */
+/*
+ * They stand taller than the picture books (`DAILY_TALL`), as high as their compartment lets them be taken out
+ * (`TAKE_OUT` of its height, `--ch`) and, where the sign hangs above them, no higher than keeps them clear under it
+ * (`--tall`, `ShelfCell.tall`): their row is as wide as the board allows, so only their height can grow, and the room
+ * above them stood empty while their pictures and names were too small to recognise (user feedback, November 2026).
+ */
 .shelf-daily-books {
+  --sh: min(var(--ch, var(--bh)) * 0.9, var(--bh) * var(--daily-tall, 1), var(--tall, 100vh));
   position: relative;
   display: flex;
   flex: none;
@@ -329,7 +335,7 @@
   display: block;
   flex: 1 1 0;
   min-width: 0;
-  height: calc(var(--bh) * 0.97);
+  height: calc(var(--sh) * 0.97);
   color: var(--ink);
   text-decoration: none;
   transform-origin: 0 100%;
@@ -346,6 +352,15 @@
   --lean: -10.5deg;
 }
 
+/*
+ * The first leans towards the carved words, which keep `LEAN_CLEAR` free for a book about a picture book high: standing
+ * taller (`--sh`), its foot moves right by what it leans further, or its top reached into „Für Groß & Klein“ on a tablet
+ * (November 2026).
+ */
+.shelf-daily-books > :first-child {
+  margin-left: max(0px, calc((var(--sh) - var(--bh)) * 0.3));
+}
+
 /* A book right of the tied books, which stand upright, leans on them less and stands off at its foot so as not to lean into them (`LEAN_ROOM`). */
 .shelf-daily-books > .shelf-bundle + .shelf-daily {
   --lean: -6deg;
@@ -353,15 +368,15 @@
 }
 
 .shelf-daily:nth-child(4n + 2) {
-  height: calc(var(--bh) * 0.92);
+  height: calc(var(--sh) * 0.92);
 }
 
 .shelf-daily:nth-child(4n + 3) {
-  height: var(--bh);
+  height: var(--sh);
 }
 
 .shelf-daily:nth-child(4n + 4) {
-  height: calc(var(--bh) * 0.94);
+  height: calc(var(--sh) * 0.94);
 }
 
 /* Bright cloth with gold bands at its ends, clear of the label, and a warm glow: unlike the dull books only filling the shelf. */
@@ -477,8 +492,13 @@
 }
 
 /*
- * Words carved into the shelf's back panel beside the everyday helpers: cut into the wood (dark, with a lit lower lip),
- * yet big and plain enough to read. On the back panel, moved like what is stuck there (`--sx`, `--sy`, Compartment).
+ * Words carved into the shelf's back panel before the everyday helpers, at the board's far left where a visitor looks
+ * first (user request, November 2026): cut into the wood (dark, with a lit lower lip), yet big and plain enough to read
+ * – grown only into the room they have, never given more (user feedback, November 2026: grown to a heading, their
+ * place took the books' room). On the back
+ * panel, moved like what is stuck there (`--sx`, `--sy`, Compartment). At their right they keep room for the first
+ * book's top, which leans towards them (`LEAN_CLEAR`, `--lean-clear`), and stand narrower by `--pull`, so they stay
+ * centred under the sign reaching left over the post (`ShelfCell.pull`).
  */
 .shelf-carving {
   display: flex;
@@ -488,7 +508,7 @@
   gap: 0.2em;
   align-self: center;
   height: 98%;
-  padding: 0 0 0 calc(var(--bh) * 0.1);
+  padding: 0 calc(var(--bh) * var(--lean-clear, 0) + var(--pull, 0px)) 0 0;
   color: #5b3a1c;
   font-family: Georgia, "Times New Roman", serif;
   font-size: calc(var(--bh) * 0.078);
@@ -499,7 +519,7 @@
   text-shadow:
     0 1px 0 #f6dcaecc,
     0 -1px 0 #2a170866;
-  transform: translate(calc(var(--sx) + var(--words-shift, 0px)), var(--sy)) translateZ(calc(var(--d) * -0.97 + 2px));
+  transform: translate(var(--sx), var(--sy)) translateZ(calc(var(--d) * -0.97 + 2px));
   pointer-events: none;
 }
 
@@ -558,39 +578,123 @@
   font-size: max(1em, 8px);
 }
 
+/*
+ * The first line a little bigger and cut deeper than the sentence under it, in the book's red, so it stands out from
+ * the wood by its colour (user feedback, November 2026: highlighted by colour, never by taking the books' room).
+ */
 .shelf-carving-big {
   font-size: 1.45em;
   font-weight: 700;
   font-style: normal;
+  color: #9a2814;
+  text-shadow:
+    0 1.5px 0 #fbe6bef0,
+    0 -1px 0 #3a0f0699;
+}
+
+.shelf-carving-words {
+  color: #4a2a0e;
 }
 
 /*
- * Below the sign hanging down into the compartment in front of a wide shelf (`SIGN_DIP` of its height, `--ch`): the
- * words begin under its bottom edge.
+ * In front of a wide shelf the words use the room that is there anyway (user feedback, November 2026): from the board
+ * up to under the sign hanging into the compartment (`SIGN_DIP` of its height, `--ch`), and as wide as their place,
+ * which the sign's width sets – their letters grow into it (`cqw`, `cqh` of the carving), never below their size in a
+ * low compartment and never past a share of the books' height. No room is made for them: the plan's place stays as it is.
  */
 .room-scene[data-plan="wide"] .shelf-carving {
+  container-type: size;
+  align-self: flex-end;
+  height: max(calc(var(--bh) * 0.98), calc(var(--ch) * 0.68));
   padding-top: max(0px, calc(var(--bh) * 1.04 - var(--ch) * 0.7));
+}
+
+.room-scene[data-plan="wide"] .shelf-carving > * {
+  --fit: clamp(calc(var(--bh) * 0.078), min(6cqw, 9cqh), calc(var(--bh) * 0.15));
+}
+
+.room-scene[data-plan="wide"] .shelf-carving > .shelf-carving-big {
+  font-size: calc(var(--fit) * 1.45);
+}
+
+.room-scene[data-plan="wide"] .shelf-carving > .shelf-carving-words,
+.room-scene[data-plan="wide"] .shelf-carving > .home-menu {
+  font-size: max(var(--fit), 8px);
 }
 
 /* A narrow place (a phone): as big as the books' names, so it can still be read, and closer to its sides. */
 .shelf-carving[data-narrow] {
-  padding-inline: calc(var(--bh) * 0.08);
+  padding-left: calc(var(--bh) * 0.04);
   font-size: calc(var(--bh) * 0.075);
 }
 
 /*
- * A group's name: a small wooden sign screwed onto the front edge of the board under its books, a screw at each end,
- * its letters painted on in cream (user feedback, November 2026) – „Alltagshelfer“ under the everyday helpers,
- * „Lernspiele“ on the plinth under the picture books. It hangs only a little below the board, never over the books on
- * the board below.
+ * A group's sign (`GroupSign`): a brass rail along the front edge of the board under all of its books, its ends turned
+ * up round the first and the last, and the group's name big on a wooden sign hanging from the rail's middle, its
+ * letters painted on in cream – „Alltagshelfer“ under the everyday helpers, „Lernspiele“ under the picture books (user
+ * feedback, November 2026: a small sign alone was hardly seen, nor that it named every book on the board). It hangs
+ * only a little below the board, never over the books on the board below.
  */
-.shelf-group-label {
-  --screw: calc(var(--bh) * 0.03);
+.shelf-group {
+  --screw: calc(var(--bh) * 0.036);
+  --rail: calc(var(--bh) * 0.042);
   position: absolute;
   top: 100%;
+  left: calc(var(--bh) * -0.02);
+  right: calc(var(--bh) * -0.02);
+  height: 0;
+  transform: translateZ(calc(var(--d) * 0.03 + 3px));
+  pointer-events: none;
+}
+
+/* „Lernspiele“ on the compartment's own board below (the plinth), under the picture books standing in its middle. */
+.shelf-group.board {
+  right: auto;
+  margin-left: calc(var(--bh) * -0.02);
+  padding-right: calc(var(--bh) * 0.04);
+  transform: translateZ(3px);
+}
+
+.shelf-group-rail {
+  position: absolute;
+  top: calc(var(--bh) * 0.018);
+  left: 0;
+  right: 0;
+  height: var(--rail);
+  border-radius: var(--rail);
+  background: linear-gradient(#fff3c4, #d9b25e 40%, #9c7330 75%, #6e4f1e);
+  box-shadow:
+    0 0 0 1px #4a3214aa,
+    0 2px 3px #2a170899;
+}
+
+/* Its ends, turned up round the group's first and last book. */
+.shelf-group-rail::before,
+.shelf-group-rail::after {
+  content: "";
+  position: absolute;
+  bottom: 0;
+  left: 0;
+  width: var(--rail);
+  height: calc(var(--bh) * 0.17);
+  border-radius: var(--rail) var(--rail) 0 0;
+  background: linear-gradient(90deg, #fff3c4, #d9b25e 45%, #8a6428);
+  box-shadow:
+    0 0 0 1px #4a3214aa,
+    2px 0 3px #2a170866;
+}
+
+.shelf-group-rail::after {
+  right: 0;
+  left: auto;
+}
+
+.shelf-group-label {
+  position: absolute;
+  top: 0;
   left: 50%;
-  padding: 0.06em calc(var(--screw) * 2 + 0.45em) 0.1em;
-  border-radius: calc(var(--bh) * 0.012);
+  padding: 0.08em calc(var(--screw) * 2 + 0.5em) 0.12em;
+  border-radius: calc(var(--bh) * 0.014);
   background:
     linear-gradient(#ffffff3d, #0000 22%, #0000 72%, #0000004d),
     var(--wood-grain-h) 0 0 / 700px 210px,
@@ -599,20 +703,20 @@
     inset 0 0 0 1px #3d22104d,
     inset 0 1px 0 #ffffff47,
     inset 0 -1px 0 #00000040,
-    0 calc(var(--bh) * 0.008) 0 #5a3418,
-    0 3px 4px #2a170866;
-  color: #fbf0d6;
+    0 0 0 calc(var(--bh) * 0.008) #d9b25e,
+    0 calc(var(--bh) * 0.012) 0 calc(var(--bh) * 0.004) #5a3418,
+    0 4px 6px #2a170880;
+  color: #fff6de;
   font-family: Georgia, "Times New Roman", serif;
-  font-size: calc(var(--bh) * 0.08);
+  font-size: calc(var(--bh) * 0.13);
   font-weight: 700;
   line-height: 1.1;
-  letter-spacing: 0.02em;
+  letter-spacing: 0.03em;
   white-space: nowrap;
   text-shadow:
     0 -1px 0 #2a170899,
     0 1px 0 #ffffff26;
-  transform: translateX(-50%) translateZ(calc(var(--d) * 0.03 + 3px));
-  pointer-events: none;
+  transform: translateX(-50%);
 }
 
 /* Its two screws: brass heads with a slot, a little shadow where each sits in the wood. */
@@ -634,11 +738,6 @@
   right: calc(var(--screw) * 0.8);
   left: auto;
   rotate: 70deg;
-}
-
-/* „Lernspiele“ on the compartment's own board below (the plinth), under the picture books standing in its middle. */
-.shelf-board-label {
-  transform: translateX(-50%) translateZ(3px);
 }
 
 @media (hover: hover) {
@@ -665,10 +764,14 @@
     linear-gradient(90deg, #00000040, #ffffff2e 45%, #0000001f 70%, #00000047), var(--c);
 }
 
-/* The paper label between the gold bands: a small picture from the game on top, the name running down below it in one line. */
+/*
+ * The paper label between the gold bands: a picture from the game on top, the name running down below it in one line.
+ * The picture is what a child recognises the book by, so the label takes nearly the spine's whole width and the picture
+ * nearly the label's (user feedback, November 2026: too small to recognise).
+ */
 .shelf-daily-label {
   position: absolute;
-  inset: 8% 9%;
+  inset: 7% 4%;
   display: flex;
   flex-direction: column;
   align-items: center;
@@ -685,10 +788,10 @@
 /* Its size in the label's own units (`cqw`), which only the label's children can use. */
 .shelf-daily-picture {
   flex: none;
-  width: 78cqw;
+  width: 96cqw;
   aspect-ratio: 1;
-  margin-block: 8cqw 4cqw;
-  border-radius: 10cqw;
+  margin-block: 2cqw 4cqw;
+  border-radius: 8cqw;
   object-fit: cover;
   pointer-events: none;
 }
@@ -699,7 +802,7 @@
   min-height: 0;
   margin-bottom: 6cqw;
   overflow: hidden;
-  font-size: min(48cqw, calc((100cqh - 90cqw) / var(--len) * var(--per-letter, 1.65)));
+  font-size: min(48cqw, calc((100cqh - 106cqw) / var(--len) * var(--per-letter, 1.65)));
   font-weight: 700;
   line-height: 1.3;
   text-align: center;

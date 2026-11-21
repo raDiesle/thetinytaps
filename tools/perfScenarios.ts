@@ -41,6 +41,9 @@ export interface Budget {
 
 export const BUDGET: Budget = { p95: 34, stuttersPerS: 0.5, busy: 0.6, rasterScreensPerS: 30 };
 
+/** Lebendige Bilder: the items of the picture, and a finger landing on one (an `eval` step defines `tapItem` with it). */
+const TAP_ITEMS = `((window.tapItem = (el) => { const r = el.getBoundingClientRect(); el.dispatchEvent(new PointerEvent("pointerdown", { bubbles: true, clientX: r.x + r.width / 2, clientY: r.y + r.height / 2, pointerType: "touch", isPrimary: true })); }), [...document.querySelectorAll("[data-item]")])`;
+
 /** Something done before a stretch is measured. */
 export type Step = { wait: number } | { waitFor: string } | { tap: string; optional?: boolean } | { key: string } | { eval: string };
 
@@ -176,7 +179,28 @@ export const SCENARIOS: Scenario[] = [
     path: "/zusammen/",
     parts: [{ label: "Was gehört zusammen?", before: [{ wait: 1500 }], ms: 9000, tap: { selector: '[data-tap="goal"]', every: 700 } }],
   },
-  { name: "bilder", path: "/bilder/flughafen/", parts: [{ label: "Flughafen antippen", before: [{ wait: 2000 }], ms: 10000, tap: TAPS }] },
+  {
+    name: "bilder",
+    path: "/bilder/flughafen/",
+    parts: [
+      { label: "Flughafen antippen", before: [{ wait: 2000 }], ms: 10000, tap: TAPS },
+      // The end once all is found (B-21): the evening light fades in and everything bows in turn. From a reload, all
+      // items but one tapped and left to finish their own animations, then the last one, as a child finds it.
+      {
+        label: "Ende: Abendlicht und Verbeugung",
+        before: [
+          { eval: "location.reload()" },
+          { wait: 2500 },
+          { tap: ".screen-hint-button", optional: true },
+          { eval: `${TAP_ITEMS}.slice(1).forEach(tapItem)` },
+          { wait: 4000 },
+          { eval: `tapItem(${TAP_ITEMS}[0])` },
+          { wait: 700 },
+        ],
+        ms: 6000,
+      },
+    ],
+  },
   { name: "toepfchen", path: "/toepfchen/", parts: [{ label: "Geschichte", before: [{ wait: 1500 }], ms: 8000, tap: TAPS }] },
   { name: "abstillen", path: "/abstillen/", parts: [{ label: "Inhalt, dann Geschichte blättern", before: [{ wait: 1500 }], ms: 8000, tap: TAPS }] },
   { name: "kita", path: "/kita/", parts: [{ label: "Inhalt, dann Geschichte blättern", before: [{ wait: 1500 }], ms: 8000, tap: TAPS }] },
@@ -184,9 +208,10 @@ export const SCENARIOS: Scenario[] = [
   { name: "belohnungstafel", path: "/belohnungstafel/", parts: [{ label: "Sterne kleben", before: [START, { wait: 1500 }], ms: 6000, tap: TAPS }] },
   // The timer's pictures in their order on its start screen, each running for a while with a tap now and then (the
   // steam, the twinkling, the flame, what is left lighting up), the moon setting and the sun rising, the pizza's slices
-  // lifted off, the ladybug crawling round the red disc, the alarm clock's digits ticking and in „Abwechseln“ the
-  // lamps drawing who begins and the hourglass running, in „Tennis“ the sides lighting up in turn and the ball hopping
-  // on a racket while the board's lights go out. Each card is tapped by its name (its tooltip), so the cards' order and groups may change.
+  // lifted off, the ladybug crawling round the red disc, the alarm clock's digits ticking, the toy crane carrying toys
+  // into the box, in „Abwechseln“ the lamps drawing who begins and the hourglass running, and on the Wippe the sides
+  // drawing and the seesaw tipping slowly with the toy bouncing on its seat. Each card is tapped by its name (its
+  // tooltip), so the cards' order and groups may change.
   ...(
     [
       ["scheibe", "Rote Scheibe"],
@@ -196,11 +221,13 @@ export const SCENARIOS: Scenario[] = [
       ["blume", "Blume"],
       ["pizza", "Pizza"],
       ["wecker", "Wecker"],
+      // Tidy Up is English only so far, so its card is named so in the German app too.
+      ["aufraeumen", "Tidy Up"],
       ["zug", "Zug zum Bahnhof"],
       ["raupe", "Raupe"],
       ["sonne", "Sonnenaufgang"],
       ["abwechseln", "Abwechseln"],
-      ["tennis", "Tennis"],
+      ["wippe", "Seesaw"],
     ] as const
   ).map(([name, title]) => ({
     name: `timer-${name}`,
@@ -221,13 +248,12 @@ export const SCENARIOS: Scenario[] = [
       },
     ],
   },
-  // „Tennis“ with short turns: the sides drawing who begins, the racket swinging, the ball flying over the net and the
-  // shade changing sides as it crosses.
+  // The Wippe with short turns: the seat touching down, the toy hopping up onto the other seat and the plank turning back.
   {
-    name: "timer-tennis-wechsel",
+    name: "timer-wippe-wechsel",
     path: "/timer/?sekunden=5",
     parts: [
-      { label: "Auslosen und Wechsel", before: [{ tap: `.mode-card[title^="Tennis"]` }, { wait: 500 }], ms: 10000, tap: { selector: ".tm-play", every: 1500 } },
+      { label: "Auslosen und Wechsel", before: [{ tap: `.mode-card[title^="Seesaw"]` }, { wait: 500 }], ms: 10000, tap: { selector: ".tm-play", every: 1500 } },
     ],
   },
   // The Apfelbaum's harvest, sped up: bees buzzing, apples ripening and falling into the cart the bear child pushes.

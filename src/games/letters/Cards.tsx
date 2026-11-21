@@ -229,6 +229,23 @@ export function NumberCard({
   );
 }
 
+/** A one-digit number's things, all at once, in the rows `NumberCard` lays them in („Wo ist die 3?“). */
+export function CountThings({ n, thing }: { n: number; thing: Countable }) {
+  return (
+    <div className={`count-grid count-${n}`} aria-label={`${n} × ${thing.singular}`}>
+      {ROWS[n].map((perRow, row) => (
+        <div key={row} className="count-row">
+          {Array.from({ length: perRow }, (_, j) => (
+            <span key={j} className="count-item">
+              {thing.emoji}
+            </span>
+          ))}
+        </div>
+      ))}
+    </div>
+  );
+}
+
 /**
  * A two-digit number's things, all at once: a row for each ten, each row two groups of five as on a counting frame,
  * and the rest in a last row – so 23 shows two full rows and three more.
