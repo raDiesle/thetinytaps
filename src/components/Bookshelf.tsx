@@ -447,7 +447,7 @@ function DailyGroup({
         {books.map((book) =>
           book.volumes ? <BookBundle key={book.id} volumes={book.volumes} take={take} /> : <SpineBook key={book.id} book={book} onClick={take(book)} />,
         )}
-        <span className="shelf-group-label">{name}</span>
+        <GroupSign name={name} />
       </span>
     </span>
   );
@@ -486,6 +486,28 @@ function RibbonBow() {
       <rect x="16.5" y="12.5" width="7" height="7" rx="2" fill="#b0262d" stroke="#7a1a1f" strokeWidth="1.2" />
     </svg>
   );
+}
+
+/**
+ * A group's sign: a brass rail along the board's front edge under all of its books, from the first to the last, with
+ * its ends turned up round them, and the wooden sign with the group's name hanging big from the rail's middle – so it
+ * is plain at a glance that the name stands for every book on that board (user feedback, November 2026: the small sign
+ * alone was hardly seen, and not that it named all the books).
+ */
+function GroupSign({ name, board, style }: { name: string; board?: boolean; style?: CSSProperties }) {
+  return (
+    <span className={`shelf-group${board ? " board" : ""}`} style={style}>
+      <span className="shelf-group-rail" />
+      <span className="shelf-group-label">{name}</span>
+    </span>
+  );
+}
+
+/** Where a compartment's picture books stand, from the first to the last, standing together in its middle. */
+function groupWidth(cell: ShelfCell, bh: number, spans: number[]): CSSProperties {
+  const books = cell.books ?? [];
+  const width = books.reduce((sum, b) => sum + spans[b], 0) * bh * BOOK_ASPECT + (books.length - 1) * BOOK_GAP * bh;
+  return { left: (cell.w - width) / 2, width };
 }
 
 /** The name of the picture books' group (the everyday helpers' is their category's, `DailyGroup`). */
@@ -591,7 +613,7 @@ function Compartment({
           </span>
         </div>
       )}
-      {label && <span className="shelf-group-label shelf-board-label">{t(label)}</span>}
+      {label && cell.books && <GroupSign name={t(label)} board style={groupWidth(cell, bh, spans)} />}
       {things.includes("figure") && (
         // The stickers of the child's figure, stuck on the compartment's right wall, and „Wer spielt?“ written small on
         // that wall right above the fox's head (user feedback, November 2026).

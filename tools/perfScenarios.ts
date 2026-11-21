@@ -208,8 +208,9 @@ export const SCENARIOS: Scenario[] = [
   { name: "belohnungstafel", path: "/belohnungstafel/", parts: [{ label: "Sterne kleben", before: [START, { wait: 1500 }], ms: 6000, tap: TAPS }] },
   // The timer's pictures in their order on its start screen, each running for a while with a tap now and then (the
   // steam, the twinkling, the flame, what is left lighting up), the moon setting and the sun rising, the pizza's slices
-  // lifted off, the ladybug crawling round the red disc, the alarm clock's digits ticking and in „Abwechseln“ the
-  // lamps drawing who begins and the hourglass running. Each card is tapped by its name (its tooltip), so the cards' order and groups may change.
+  // lifted off, the ladybug crawling round the red disc, the alarm clock's digits ticking, the toy crane carrying toys
+  // into the box and in „Abwechseln“ the lamps drawing who begins and the hourglass running. Each card is tapped by its
+  // name (its tooltip), so the cards' order and groups may change.
   ...(
     [
       ["scheibe", "Rote Scheibe"],
@@ -219,6 +220,8 @@ export const SCENARIOS: Scenario[] = [
       ["blume", "Blume"],
       ["pizza", "Pizza"],
       ["wecker", "Wecker"],
+      // Tidy Up is English only so far, so its card is named so in the German app too.
+      ["aufraeumen", "Tidy Up"],
       ["zug", "Zug zum Bahnhof"],
       ["raupe", "Raupe"],
       ["sonne", "Sonnenaufgang"],

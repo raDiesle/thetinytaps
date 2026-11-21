@@ -628,11 +628,13 @@ A game may give it before its end where reaching the goal once is enough (Ketten
   as if it floated (user feedback, November 2026). What can be taken is
   plainly unlike what only fills the shelf (user feedback, November 2026): books to take are bright, with paper labels
   or covers, standing at the front and glowing; books only filling it are dull and dim, never a paper label or a glow,
-  and answer a tap by rocking with a soft knock (`nudge`), so a child sees the tap was felt. The group is marked as one by a small wooden sign with its
-  name screwed onto the board's edge under it (`DailyGroup`; a label from four drafts – bookend, sign, paper band – user
-  decision, November 2026, made of wood so it looks mounted, user feedback, November 2026), and the picture books
-  standing together on one board just so by „Lernspiele“ on the board under them (`labelOf`); such a sign hangs only a
-  little below its board, never over a book on the board below. Before the helpers words carved into the back panel tell grown-ups in short what
+  and answer a tap by rocking with a soft knock (`nudge`), so a child sees the tap was felt. The group is marked as one by a wooden sign with its
+  name hanging big from a brass rail along the board's edge under all of its books, the rail's ends turned up round the
+  first and the last (`GroupSign`; a label from four drafts – bookend, sign, paper band – user decision, November 2026,
+  made of wood so it looks mounted; the small sign alone was hardly seen, nor that it named every book on the board, so
+  it grew and got the rail, user feedback, November 2026), and the picture books standing together on one board just so
+  by „Lernspiele“ on the board under them (`labelOf`); such a sign hangs only a little below its board, never over a
+  book on the board below (measure it at 844×390, where it comes closest). Before the helpers words carved into the back panel tell grown-ups in short what
   the shelf is for – „Für Groß & Klein“ – then that it is the first step into the digital world taken together, with
   learning games and little helpers for the day – and nothing else: no „Alles kostenlos.“, no „Seite an Seite“, no „die die Kommunikation fördern“, no „von Eltern für Eltern“ (each tried and
   taken out again, user feedback, November 2026), no pointer to one game („Ein Blick in die

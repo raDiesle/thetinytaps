@@ -74,6 +74,13 @@ export const LANGUAGE_STATUS: LanguageStatusRow[] = [
         recorded: true,
         note: "Was jedes Bild am Anfang und am Ende sagt, „Gleich ist es so weit!“ zur Glocke, und bei Abwechseln „Wer fängt an?“, wer anfängt und „Tauschen! …“ (H-72, voice.ts, 7. November 2026): in alle Sprachen übersetzt (timerSaid) und außer Russisch von ElevenLabs gesprochen (7./8. November 2026); Russisch fehlt noch (die Credits des Monats waren aufgebraucht) und bleibt bis dahin still, keine Browserstimme. Russisch am 12. November 2026 von ElevenLabs gesprochen mit dem Klon von Tapsis Stimme aus ihren russischen Aufnahmen („Tapsi Coach (Klon ru)“, zweites Konto).",
       },
+      {
+        label: "🧸 Tidy Up",
+        languages: { en: "text" },
+        recorded: true,
+        note: "Das Bild fürs Aufräumen mit dem Spielzeugkran (H-118, tidy.tsx, 21. November 2026), Englisch zuerst geschrieben: sein Name „Tidy Up“ und seine zwei Sätze am Anfang und am Ende (tidyNames.ts). Übersetzt wird erst auf Wunsch, Deutsch eingeschlossen – bis dahin heißt es auch in den anderen Sprachen „Tidy Up“. Aufgenommen ist noch nichts (bun run voice make --only timer, nur Englisch), bis dahin bleibt es still. Die Texte für Suchmaschinen nennen es in allen sieben Sprachen.",
+        files: ["src/games/timer/tidyNames.ts"],
+      },
     ],
   },
   {

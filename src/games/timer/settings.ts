@@ -6,7 +6,7 @@ import type { OwnTime } from "./time";
  * digital alarm clock counting down (H-70) – or „Abwechseln“ (H-52), two children taking
  * turns with a toy, turn after turn.
  */
-export type TimerPicture = "train" | "apple" | "sand" | "caterpillar" | "flower" | "candle" | "sunset" | "disc" | "pizza" | "clock" | TurnPicture;
+export type TimerPicture = "train" | "apple" | "sand" | "caterpillar" | "flower" | "candle" | "sunset" | "disc" | "pizza" | "clock" | "tidy" | TurnPicture;
 
 /** The picture of taking turns, which runs on without end: the toy between two cushions (Tennis, H-71, was taken out). */
 export type TurnPicture = "swap";

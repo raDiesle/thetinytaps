@@ -1,11 +1,11 @@
 import { describe, expect, test } from "bun:test";
-import { APP_LANGUAGES } from "@/lib/language";
+import { APP_LANGUAGES, firstLanguage, pick } from "@/lib/language";
 import { nextPicture, PICTURES, TIMED_PICTURES } from "./content";
 import { APPLE_FLOOR, appleRadius, BEE, BEES, CART, CART_MIDDLE, CROWN, HEAP_R, HEAP_ROWS, heapSlot, treeApples } from "./apples";
 import { BAR, CLOCK, CLOCK_FLOOR, clockText, DIGITS } from "./clock";
 import { BITE_R, BUTTERFLY, biteSpot, bodyFront, frontAfter, LEAF, LEAF_FLOOR, leafLeft, leafShape, leafSpan, planBites, REACH } from "./caterpillar";
 import { DISC, DOTS, dotAt } from "./disc";
-import { timerSaid } from "./voice";
+import { PICTURE_LINES, SOON_LINE, TURN_LINES, timerSaid } from "./voice";
 import { BLOOM, FLOWER_FLOOR, GROWN_AT, HOLDER, SPOUT, SPROUT, SPROUT_SIZE, STAKE, STALK, TAP } from "./flower";
 import { PIZZA, PIZZA_FLOOR, slice, SLICES, SLICE_SECONDS } from "./pizza";
 import { FLOWERS, MOON, MOON_SET_AT, ridgeAt, SKY_CUT, STARS, SUN, SUN_FROM } from "./sunset";
@@ -34,15 +34,35 @@ import { bulbBelow, CANDLE, FLAME_H, GLASS, HOURGLASS_BOX, PLATE, SAND_FLOOR, ST
 import { DRAW_STEPS } from "./SwapPlay";
 import { LAMP, SWAP_FLOOR, SWAP_SEATS, TOY } from "./swap";
 import { DEFAULT_TIMER_SETTINGS, TIMER_SECONDS } from "./settings";
+import {
+  BEAM,
+  BOX,
+  CARRY_BOTTOM,
+  CLAW,
+  FALL_MS,
+  gripTop,
+  HEAP_ROWS as TOY_HEAP_ROWS,
+  HEAP_SCALE,
+  heapSlot as toySlot,
+  MAX_TOYS,
+  MIN_TOYS,
+  POSTS,
+  TOY as TOY_SIZE,
+  TOY_PLACES,
+  tidyTimes,
+  tidyToys,
+  toyCount,
+} from "./tidy";
 
 describe("Timer", () => {
   const RIGHT_EDGE = 1340;
 
-  test("every picture has its own id, an emoji and a German name, they stand in the order the user asked for and „Weiter“ goes round all but Abwechseln", () => {
+  test("every picture has its own id, an emoji and a name, they stand in the order the user asked for and „Weiter“ goes round all but Abwechseln", () => {
     expect(new Set(PICTURES.map((p) => p.id)).size).toBe(PICTURES.length);
     for (const p of PICTURES) {
       expect(p.emoji).not.toBe("");
-      expect(p.name.de.trim()).not.toBe("");
+      // The older pictures are named German first, a new one (Tidy Up) English first.
+      expect(pick(p.name, firstLanguage(p.name)).trim()).not.toBe("");
     }
     // The order the user asked for (November 2026): Rote Scheibe, Sanduhr, Kerze, Apfelbaum, Blume, Pizza, Wecker, and
     // Abwechseln last, in a group of its own. Tennis (H-71) stood beside it and was taken out (user request, 21 November
@@ -412,6 +432,75 @@ describe("Timer", () => {
     }
   });
 
+  test("Tidy Up: fifteen toys at five minutes, always many, the crane taking one at a time, the last landing as the time is up (H-118)", () => {
+    expect(toyCount(5 * 60_000)).toBe(15);
+    expect(MAX_TOYS).toBe(15);
+    expect(toyCount(10_000)).toBe(MIN_TOYS);
+    expect(toyCount(3 * 3600_000)).toBe(MAX_TOYS);
+    for (const total of [10_000, 60_000, 5 * 60_000, 3 * 3600_000]) {
+      const count = toyCount(total);
+      const times = tidyTimes(total, count);
+      let before = 0;
+      for (const t of times) {
+        // Each toy is finished before the crane sets off for the next, and each step follows the one before.
+        const steps = [t.leave, t.over, t.down, t.gripped, t.up, t.open, t.land];
+        expect(steps[0]).toBeGreaterThanOrEqual(before);
+        for (let i = 1; i < steps.length; i++) expect(steps[i]).toBeGreaterThan(steps[i - 1]);
+        expect(t.land - t.open).toBeLessThanOrEqual(FALL_MS + 1e-6);
+        before = t.land;
+      }
+      expect(times.at(-1)?.land).toBeCloseTo(total);
+      // Nearest the box first, so the empty floor grows from the box outwards; never two on one place.
+      const toys = tidyToys(count);
+      expect(toys).toHaveLength(count);
+      expect(new Set(toys.map((t) => `${t.x},${t.y}`)).size).toBe(count);
+      for (let i = 1; i < count; i++) expect(toys[i].x).toBeLessThan(toys[i - 1].x);
+    }
+  });
+
+  test("Tidy Up: the toys lie between the posts and left of the box, each lands on its own in the heap, and the claw stays on the screen (H-118)", () => {
+    const half = TOY_SIZE / 2;
+    for (const place of TOY_PLACES) {
+      expect(place.x - half).toBeGreaterThanOrEqual(POSTS.xs[0] + POSTS.w);
+      expect(place.x + half).toBeLessThanOrEqual(BOX.left);
+      expect(place.y).toBeLessThanOrEqual(820);
+      // The claw goes down to each toy.
+      expect(gripTop(place)).toBeGreaterThan(CLAW.rest);
+    }
+    expect(TOY_HEAP_ROWS.reduce((a, b) => a + b, 0)).toBe(MAX_TOYS);
+    const small = (HEAP_SCALE * TOY_SIZE) / 2;
+    const heapTop = Math.min(...Array.from({ length: MAX_TOYS }, (_, n) => toySlot(n).y - 2 * small));
+    // A toy carried over the box passes above the full heap, never through it.
+    expect(CARRY_BOTTOM).toBeLessThanOrEqual(heapTop);
+    expect(heapTop).toBeGreaterThanOrEqual(80 + CLAW.h);
+    for (let n = 0; n < MAX_TOYS; n++) {
+      const slot = toySlot(n);
+      expect(slot.x - small).toBeGreaterThanOrEqual(BOX.left);
+      expect(slot.x + small).toBeLessThanOrEqual(BOX.right);
+      // Each shows above the box's front, the bottom row too.
+      expect(slot.y - 2 * small).toBeLessThan(BOX.rim);
+      // The claw over it and the trolley stay inside the beam and the screen's right edge.
+      expect(slot.x + CLAW.w / 2).toBeLessThanOrEqual(RIGHT_EDGE);
+      expect(slot.x + CLAW.w / 2).toBeLessThanOrEqual(BEAM.right);
+      for (let m = 0; m < n; m++) {
+        const other = toySlot(m);
+        expect(Math.hypot(slot.x - other.x, slot.y - other.y)).toBeGreaterThanOrEqual(0.3 * TOY_SIZE);
+      }
+    }
+    expect(Math.min(...TOY_PLACES.map((p) => p.x)) - CLAW.w / 2).toBeGreaterThanOrEqual(BEAM.left);
+  });
+
+  test("Tidy Up: a toy falls straight down from the open claw into the box, and every part snaps to its place at the end (H-118)", async () => {
+    const code = await Bun.file(new URL("./tidy.tsx", import.meta.url)).text();
+    // The fall's start (still in the claw) and its end (in the box) share the same sideways move.
+    expect(code).toContain("carried(((toy.slot.x - toy.x) / TOY) * 100)");
+    expect(code).toContain("const dx = ((toy.slot.x - toy.x) / TOY) * 100;");
+    expect(code).not.toMatch(/clip-?[pP]ath/);
+    const css = await Bun.file(new URL("./timer.css", import.meta.url)).text();
+    for (const part of ["toy", "tidy-trolley", "tidy-rope", "tidy-claw", "tidy-sway", "tidy-finger"])
+      expect(css, part).toMatch(new RegExp(`\\.tm-done \\.tm-${part}[,\\s{]`));
+  });
+
   // User feedback, November 2026: the drawn fox and bear children in the timer's pictures (holding the basket and the
   // hose, blowing out the candle, taking turns) looked odd, and were taken out of every picture. The pictures tell
   // their story by themselves; Abwechseln's children are the real ones, their places two cushions.
@@ -571,11 +660,18 @@ describe("Timer", () => {
 
 // What the Timer says comes in every app language (H-72): no line falls back to German in another language, and Russian,
 // Chinese, Hindi and Arabic have no Latin letters in theirs.
-test("every line the Timer says is translated into every app language", () => {
+test("every line the Timer says is in every app language, but a new picture's English-first lines until they are asked for", () => {
+  const lines = [...Object.values(PICTURE_LINES).flatMap((p) => [p.start, p.end]), SOON_LINE, ...TURN_LINES];
+  // The older lines are German first and translated into every language; an English-first one (Tidy Up, H-118) has
+  // English, and the languages it lacks are marked in languageStatus.ts until translations are asked for.
+  for (const line of lines) {
+    if (firstLanguage(line) === "de") expect(APP_LANGUAGES.filter((language) => line[language] === undefined)).toEqual([]);
+    else expect(line.en?.trim()).toBeTruthy();
+  }
   const german = new Set(timerSaid("de"));
   for (const language of APP_LANGUAGES) {
     const said = timerSaid(language);
-    expect(said.length, language).toBe(german.size);
+    expect(said.length, language).toBe(new Set(lines.filter((line) => line[language] !== undefined).map((line) => line[language])).size);
     if (language === "de") continue;
     for (const line of said) {
       expect(german.has(line), `${language}: ${line}`).toBe(false);

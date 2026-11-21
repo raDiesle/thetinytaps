@@ -71,7 +71,7 @@ import { PICTURE_LINES, SOON_LINE, TURN_LINES } from "@/games/timer/voice";
 import { caseLetters, SMALL_PROMPT } from "@/games/letters/CasePlay";
 import { STOMP_INVITE } from "@/games/letters/MovePlay";
 import { TWO_DIGIT_NUMBERS, TWO_DIGIT_WORDS } from "@/games/letters/twoDigits";
-import { type Localized, pick } from "@/lib/language";
+import { type Localized, pick, type Texts } from "@/lib/language";
 import { voiceId } from "@/lib/voiceName";
 import goodNightFiles from "../components/stimme/*.mp3?glob";
 import kitaFiles from "../games/kitastory/stimme/*.mp3?glob";
@@ -386,15 +386,16 @@ function chapterBook(
 }
 
 function timer(language: TargetLanguageId): VoiceGroup[] {
-  const said = (line: Localized) => pick(line, language);
+  // A new picture's lines come English first and are left out of a language they are not translated into yet (Tidy Up).
+  const said = (lines: Texts[]) => once(lines.filter((line) => line[language] !== undefined).map((line) => pick(line, language)));
   const pictures = Object.values(PICTURE_LINES);
   return [
-    { label: "Am Anfang eines Bildes", lines: once(pictures.map((p) => said(p.start))) },
-    { label: "Kurz vor dem Ende", lines: [said(SOON_LINE)], note: "Zur Glocke, eine Minute vor dem Ende oder im letzten Fünftel einer kurzen Zeit (H-49)." },
-    { label: "Am Ende eines Bildes", lines: once(pictures.map((p) => said(p.end))) },
+    { label: "Am Anfang eines Bildes", lines: said(pictures.map((p) => p.start)) },
+    { label: "Kurz vor dem Ende", lines: said([SOON_LINE]), note: "Zur Glocke, eine Minute vor dem Ende oder im letzten Fünftel einer kurzen Zeit (H-49)." },
+    { label: "Am Ende eines Bildes", lines: said(pictures.map((p) => p.end)) },
     {
       label: "Abwechseln",
-      lines: once(TURN_LINES.map(said)),
+      lines: said(TURN_LINES),
       note: "„Wer fängt an?“, während die Lampen auslosen, dann wer anfängt; „Tauschen! …“ bei jedem Wechsel.",
     },
   ];
