@@ -68,10 +68,16 @@ export const TEETH_PER_SIDE = TEETH.length;
 
 /** Half width and depth of the outer arch curve. */
 const ARCH = { lower: { a: 108, b: 100 }, upper: { a: 114, b: 106 } };
+/**
+ * How much wider than deep the whole mouth is drawn – arches, teeth, gums, tongue, palate and lips alike: the mirror
+ * is seen on a screen held sideways, and a wider mouth fills more of it, so the teeth and the brushing show bigger
+ * (user request, November 2026). The teeth grow wider with it, never taller.
+ */
+export const MOUTH_WIDE = 1.3;
 const UPPER_SCALE = 1.15;
 /** How far the upper front teeth reach down over the lower ones when biting. */
 const OVERBITE = 7;
-const GAP_OPEN = 124;
+const GAP_OPEN = 104;
 const GUM = 18;
 const SAMPLES = 4;
 /**
@@ -153,7 +159,7 @@ function levels(jaw: Jaw, n: number, open: number) {
 /** A point on the arch at angle `t` (degrees from the front, negative is screen-left), `inset` in from the cheek side. */
 function archPoint(jaw: Jaw, t: number, inset: number, y: number): Vec3 {
   const { a, b } = ARCH[jaw];
-  return [(a - inset) * Math.sin(rad(t)), y, (b - inset) * Math.cos(rad(t))];
+  return [MOUTH_WIDE * (a - inset) * Math.sin(rad(t)), y, (b - inset) * Math.cos(rad(t))];
 }
 
 /** Angles from one end of a tooth to the other, in screen order. */
@@ -264,14 +270,14 @@ export function buildMouth(open: number): MouthModel {
   const gums = JAWS.flatMap((jaw) => SIDES.flatMap((side) => TEETH.map((_, n) => buildGum(jaw, side, n, open))));
   const lowerFloor = levels("lower", 3, open).base;
   const upperRoof = levels("upper", 3, open).base;
-  const tongue = ring(28, (s) => [70 * Math.cos(s), lowerFloor + 8 + 6 * Math.max(0, Math.sin(s)), 30 + 58 * Math.sin(s)]);
-  const palate = ring(28, (s) => [82 * Math.cos(s), upperRoof + 4, 22 + 66 * Math.sin(s)]);
+  const tongue = ring(28, (s) => [MOUTH_WIDE * 70 * Math.cos(s), lowerFloor + 8 + 6 * Math.max(0, Math.sin(s)), 30 + 58 * Math.sin(s)]);
+  const palate = ring(28, (s) => [MOUTH_WIDE * 82 * Math.cos(s), upperRoof + 4, 22 + 66 * Math.sin(s)]);
 
   // The lips: a wide grin when biting, a big round "Aaah" when open. The corners sit further back.
   // Wide enough that a band of gum shows above and below the teeth, past the lips' thick outline.
-  const width = 150 + 6 * open;
-  const above = 64 + 64 * open;
-  const below = 60 + 62 * open;
+  const width = MOUTH_WIDE * (150 + 6 * open);
+  const above = 64 + 50 * open;
+  const below = 60 + 48 * open;
   const boxy = 3.4 - 1 * open;
   const lips = ring(40, (s) => {
     const c = Math.cos(s);
@@ -499,7 +505,7 @@ export function projector(view: View) {
 
 export type Projector = ReturnType<typeof projector>;
 
-const TIPPED_OFFSET = 34;
+const TIPPED_OFFSET = 30;
 const TIPPED_GROWTH = 0.15;
 
 /** One projector for the face and lips, and one for each jaw, tipped about the middle of its chewing surface. */

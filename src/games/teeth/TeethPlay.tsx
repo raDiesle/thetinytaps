@@ -1,4 +1,4 @@
-import { useCallback, useEffect, useLayoutEffect, useMemo, useRef, useState, type PointerEvent } from "react";
+import { type CSSProperties, useCallback, useEffect, useLayoutEffect, useMemo, useRef, useState, type PointerEvent } from "react";
 import { ControlIcon } from "@/components/ControlIcon";
 import { GameEnd } from "@/components/GameEnd";
 import { GO_ON, PAUSE, SPACE_OR_TAP_TO_GO_ON, TAP_TO_GO_ON } from "@/lib/sharedTexts";
@@ -430,9 +430,15 @@ export function TeethPlay({ settings }: { settings: TeethSettings }) {
   /** Tapping or dragging on the progress bar jumps to that point, before or while brushing. */
   const seekFromPointer = (e: PointerEvent<HTMLDivElement>) => {
     const parts = [...e.currentTarget.children];
-    const i = parts.findIndex((s, k) => k === parts.length - 1 || e.clientX < s.getBoundingClientRect().right);
+    // Standing at the picture's side on a wide screen (teeth.css), the bar runs from top to bottom.
+    const upright = getComputedStyle(e.currentTarget).flexDirection === "column";
+    const along = upright ? e.clientY : e.clientX;
+    const i = parts.findIndex((s, k) => {
+      const r = s.getBoundingClientRect();
+      return k === parts.length - 1 || along < (upright ? r.bottom : r.right);
+    });
     const rect = parts[i].getBoundingClientRect();
-    const k = Math.max(0, Math.min(1, (e.clientX - rect.left) / rect.width));
+    const k = Math.max(0, Math.min(1, upright ? (e.clientY - rect.top) / rect.height : (e.clientX - rect.left) / rect.width));
     const [start, length] = segments[i];
     // Stop just short of the end, so dragging to the right edge doesn't finish at once.
     seek(Math.min(start + k * length, introMs + totalMs - SEEK_END_MS));
@@ -569,7 +575,7 @@ export function TeethPlay({ settings }: { settings: TeethSettings }) {
             >
               {/* Before the brushing: the story, the sink and the first look in the mirror, a part of its own with its own time. */}
               <span className={`teeth-segment intro${before ? " now" : ""}`} title={prelude.map((p) => t(PRELUDE[p].title)).join(" · ")}>
-                <span style={{ transform: `scaleX(${Math.max(0, Math.min(1, elapsed / introMs))})` }} />
+                <span style={{ "--done": Math.max(0, Math.min(1, elapsed / introMs)) } as CSSProperties} />
               </span>
               {STEPS.map((s, i) => (
                 <span
@@ -577,7 +583,7 @@ export function TeethPlay({ settings }: { settings: TeethSettings }) {
                   className={`teeth-segment ${s.surface}${i === phase ? " now" : ""}`}
                   title={`${stepText(s, "title", language).text} · ${stepText(s, "hint", language).text}`}
                 >
-                  <span style={{ transform: `scaleX(${Math.max(0, Math.min(1, (brushed - stepStarts[i]) / stepLength(i)))})` }} />
+                  <span style={{ "--done": Math.max(0, Math.min(1, (brushed - stepStarts[i]) / stepLength(i))) } as CSSProperties} />
                 </span>
               ))}
             </div>

@@ -520,6 +520,7 @@
   /* A soft shine along the top, so the colour looks filled in rather than flat. */
   background: linear-gradient(#ffffff73 0 30%, #fff0 55%), var(--fill, #6fcf9d);
   /* Grows by scaling, not by its width: a width that changes lays out the bar again in every frame of its glide. */
+  transform: scaleX(var(--done, 0));
   transform-origin: left;
   transition: transform 0.2s linear;
 }
@@ -545,6 +546,80 @@
     inset 0 2px 3px #3d304529,
     0 0 0 3px #ffc61a,
     0 2px 6px 2px #2a1e5c40;
+}
+
+/* On a screen wider than tall – a phone on its side, a tablet, a computer – the controls stand as a slim, quiet strip
+   along the left edge under the ✕, and the mouth gets the whole height beside them (user request, November 2026: the
+   teeth and the brushing as big as the screen allows, the controls out of the way). The bar runs from top to bottom
+   there; held upright, the strip lies along the bottom as before. */
+@media (orientation: landscape) {
+  .teeth-play {
+    flex-direction: row;
+    align-items: stretch;
+    gap: clamp(6px, 1.4vmin, 14px);
+  }
+
+  .teeth-controls {
+    order: -1;
+    flex-direction: column;
+    align-self: flex-start;
+    gap: clamp(5px, 1.2vmin, 10px);
+    width: auto;
+    height: calc(100% - var(--corner-clear, 0px));
+    max-height: 640px;
+    margin-top: var(--corner-clear, 0px);
+    padding: 6px 4px;
+    border-color: #3d304533;
+    background: var(--paper-grain), color-mix(in srgb, var(--paper, #fbf4e3) 55%, #fff0);
+    box-shadow: 0 4px 12px -6px #2a1e5c40;
+  }
+
+  .teeth-button {
+    width: clamp(38px, 7vmin, 52px);
+    height: clamp(38px, 7vmin, 52px);
+    border-width: 2px;
+  }
+
+  .teeth-progress {
+    flex-direction: column;
+    align-self: stretch;
+    align-items: center;
+    gap: clamp(3px, 0.7vmin, 6px);
+    min-height: 0;
+    /* Room beside the thin bar, so a finger hits it easily. */
+    padding: 4px 0;
+  }
+
+  .teeth-segment {
+    width: clamp(11px, 2.2vmin, 18px);
+    height: auto;
+    min-height: 0;
+    border-width: 1.5px;
+  }
+
+  .teeth-segment > span {
+    width: 100%;
+    transform: scaleY(var(--done, 0));
+    transform-origin: top;
+  }
+
+  .teeth-segment.now {
+    width: clamp(16px, 3.2vmin, 26px);
+    height: auto;
+    border-width: 2px;
+  }
+
+  .teeth-time {
+    min-width: 0;
+    padding: 0.1em 0.3em;
+    border-width: 2px;
+    font-size: clamp(0.8rem, 2.8vmin, 1.2rem);
+  }
+
+  .teeth-time,
+  .teeth-time.intro {
+    display: block;
+  }
 }
 
 /* Pause: brush, monsters and glow stand still under a big button that goes on. */
@@ -1439,6 +1514,89 @@
   align-items: center;
   justify-content: center;
   gap: 2vmin 4vmin;
+}
+
+/* The end's sheet of paper (user request, November 2026: under the head the week, the trophy and „Menü“ were squeezed
+   into one row, ran off a narrow screen and „Heute“ lay on the chin): the week with its new star above the trophy and
+   „Menü“. The same sheet shows the week at the sink before brushing. What lies on it is sized by the sheet's width
+   (cqw), so the whole week always fits. On a wide screen the end is two halves, the laughing head filling the left and
+   the sheet on the right; held upright, the sheet lies under the head. */
+.teeth-end,
+.teeth-week-before {
+  container-type: inline-size;
+  flex: none;
+  flex-direction: column;
+  flex-wrap: nowrap;
+  align-self: center;
+  gap: clamp(6px, 2.2vmin, 24px);
+  width: min(100%, 40rem);
+  padding: clamp(6px, 2vmin, 22px) clamp(8px, 2vmin, 18px);
+  border: 1px solid #3d304533;
+  border-radius: 18px;
+  background: var(--paper-grain), color-mix(in srgb, var(--paper, #fbf4e3) 82%, #fff);
+  box-shadow:
+    0 2px 0 #5a3c1f1f,
+    0 10px 24px -10px #2a1e5c66;
+  rotate: 0.6deg;
+}
+
+@media (orientation: landscape) {
+  .teeth-end,
+  .teeth-week-before {
+    width: min(50%, 40rem);
+    /* Clear of ⚙️ and the fullscreen note hanging from the top right corner. */
+    max-height: calc(100% - var(--corner-clear, 0px));
+    margin-top: var(--corner-clear, 0px);
+  }
+}
+
+.teeth-end .teeth-week,
+.teeth-week-before .teeth-week {
+  justify-content: center;
+  gap: 1.2cqw;
+  /* Room above for today's „Heute“ tag, which stands over its column. */
+  padding-top: clamp(1.5rem, 8cqw, 3.2rem);
+}
+
+.teeth-end .teeth-day,
+.teeth-week-before .teeth-day {
+  min-width: 2.3em;
+  padding: 3px 1.1cqw;
+  border-width: 2.5px;
+  font-size: clamp(0.8rem, 3.9cqw, 1.8rem);
+}
+
+.teeth-end .teeth-day.today,
+.teeth-week-before .teeth-day.today {
+  margin: 0 1cqw;
+  padding: 5px 2cqw;
+  border-width: 3.5px;
+  outline-width: 5px;
+  font-size: clamp(1.1rem, 6.6cqw, 3.1rem);
+}
+
+.teeth-end .teeth-today-tag,
+.teeth-week-before .teeth-today-tag {
+  font-size: clamp(0.8rem, 3.6cqw, 1.5rem);
+}
+
+/* The trophy and „Menü“ never grow wider than the sheet either (held upright, „Menü“ ran off the screen). */
+.teeth-end .game-end.inline {
+  --teeth-trophy: min(clamp(72px, 20vh, 170px), 24cqw);
+  max-width: 100%;
+}
+
+.teeth-end .game-end.inline .game-end-trophy {
+  height: var(--teeth-trophy);
+}
+
+.teeth-end .game-end.inline .game-end-board {
+  width: calc(var(--teeth-trophy) * 0.95);
+  height: calc(var(--teeth-trophy) * 0.07);
+}
+
+.teeth-end .game-end.inline .game-end-button {
+  font-size: min(clamp(1.4rem, 8vh, 2.8rem), 6.5cqw);
 }
 
 .teeth-week {
