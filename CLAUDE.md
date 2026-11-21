@@ -930,7 +930,7 @@ src/lib/                 speech, sfx (synthesized + recorded sounds), storage, d
   then stands still – never a glow that keeps going or comes back while playing (user feedback, November 2026: the small
   grey gear wasn't seen; `look.test.ts`). A game with many
   ways to play behind it says so as play starts with `PlayOptions intro`: a note under ⚙️ for grown-ups, telling what can
-  be chosen there, that fades by itself after a few seconds, goes once the options were opened and lets taps through
+  be chosen there, that fades by itself after about four seconds (`INTRO_MS`; nine lingered far too long, user feedback, November 2026), goes once the options were opened and lets taps through
   (`PlayOptions.test.ts`). What is on – ⚙️ while its options are open or held, and the chosen choice inside the
   grown-ups' options (`.settings`) – is marked by a highlighter stroke drawn across it as it comes on
   (`book-highlight`), never by yellow paper and tape like the level row's chosen slip (user feedback, October 2026;
