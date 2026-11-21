@@ -144,7 +144,7 @@ export const scenesIdeas: IdeaArea = {
       effort: "S",
       done: true,
       partial:
-        "Umgesetzt beim Entdecken und Ausmalen (hello.ts): Tippt nach dem Start 6 Sekunden niemand, wiegt sich ein Ding sanft zweimal auf seinem Fuß – erst die Tiere, die der Bildmitte am nächsten sind –, danach alle 12 Sekunden ein anderes, höchstens drei. Der erste Tipp oder Tastendruck beendet es. Ohne „Hallo!“: Die Bilder sprechen nicht (keine Stimme in Lebendige Bilder) und klingen nie ohne Tippen.",
+        "Umgesetzt beim Entdecken und Ausmalen (hello.ts): Tippt nach dem Start 6 Sekunden niemand, wiegt sich ein Ding sanft zweimal auf seinem Fuß – erst die Tiere, die der Bildmitte am nächsten sind –, danach alle 12 Sekunden ein anderes, höchstens drei. Dabei macht es leise sein eigenes Geräusch (im Gute-Nacht-Bild nicht). Der erste Tipp oder Tastendruck beendet es. Ohne „Hallo!“: Die Bilder sprechen nicht (keine Stimme in Lebendige Bilder).",
     },
     {
       id: "B-16",

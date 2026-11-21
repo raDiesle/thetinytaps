@@ -16,6 +16,7 @@ export {
   recordingReady,
   recordingSeconds,
   setSfxVolume,
+  softly,
   unlockAudio,
 } from "./core";
 export * from "./animals";
