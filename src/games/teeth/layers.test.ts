@@ -80,3 +80,15 @@ test("a brushed monster dissolves as HTML layers: its sprite's body and the grai
   expect(css).not.toMatch(/\.sugar-monster\.gone \.monster-(body|puff) \{[^}]*animation/);
   expect(mouth).not.toContain("monster-puff");
 });
+
+// The end's sparkle on the teeth (user feedback, November 2026): first too plain, then gold and quick flashes over a
+// tooth and a half were too strong. White light only, small, slow, each glint a Sprite whose HTML moves.
+test("the end's glints are white, small and slow Sprites", () => {
+  const glint = mouth.match(/function Glint\(\)[\s\S]*?\n\}/)?.[0] ?? "";
+  expect(glint).not.toMatch(/#f[0-9a-f]c[0-9a-f]00|#ffd|gold/i);
+  expect(glint).not.toMatch(/\p{Extended_Pictographic}/u);
+  expect(Number(mouth.match(/const GLINT_SIZE = ([\d.]+);/)?.[1])).toBeLessThanOrEqual(1.4);
+  expect(mouth).toMatch(/<Sprite\b[^>]*className="tooth-glint"/);
+  const seconds = Number(css.match(/\.tooth-glint > div \{[^}]*animation: teeth-glint ([\d.]+)s/)?.[1]);
+  expect(seconds).toBeGreaterThanOrEqual(8);
+});

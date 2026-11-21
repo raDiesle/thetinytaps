@@ -28,20 +28,37 @@ type HintStyle = CSSProperties & Record<`--${string}`, string>;
  * at it, the longer the child waits the clearer (`TAP_HINT_STAGES_MS`). An HTML layer laid over the picture: `x`, `y`
  * and `r` are in pixels of the nearest positioned parent (the picture's box), so the rings and the hand move as layers
  * of their own and the picture under them is never painted again. Taps go through it. Mount it anew (a `key`) for a new
- * spot, so it starts calm again; `hand={false}` leaves the hand out until the first stage.
+ * spot, so it starts calm again; `hand={false}` leaves the hand out until the first stage. `upTo` stops it at an earlier
+ * stage, where the spot is one choice beside others and must not darken them (the trophy beside „Weiter“, GameEnd).
  */
-export function TapHint({ x, y, r, side = "below", hand = true, size }: { x: number; y: number; r: number; side?: HintSide; hand?: boolean; size?: number }) {
+export function TapHint({
+  x,
+  y,
+  r,
+  side = "below",
+  hand = true,
+  size,
+  upTo = TAP_HINT_STAGES_MS.length,
+}: {
+  x: number;
+  y: number;
+  r: number;
+  side?: HintSide;
+  hand?: boolean;
+  size?: number;
+  upTo?: number;
+}) {
   const [stage, setStage] = useState(0);
   useEffect(() => {
     let timers: number[] = [];
     const cancel = afterPageMotion(() => {
-      timers = TAP_HINT_STAGES_MS.map((ms, i) => window.setTimeout(() => setStage(i + 1), ms));
+      timers = TAP_HINT_STAGES_MS.slice(0, upTo).map((ms, i) => window.setTimeout(() => setStage(i + 1), ms));
     });
     return () => {
       cancel();
       for (const timer of timers) clearTimeout(timer);
     };
-  }, []);
+  }, [upTo]);
 
   const dir = SIDE[side];
   const len = Math.hypot(dir.x, dir.y);

@@ -331,7 +331,44 @@
 
 @keyframes teeth-shine-breathe {
   50% {
-    opacity: 0.55;
+    opacity: 0.75;
+  }
+}
+
+/* All clean: white glints of light come and go slowly on the front teeth in turn (mouth.tsx, `Glint`), one two beats
+   after the other, each for about four beats, and round again every four bars – quicker and gold was too strong (user
+   feedback, November 2026). Each a small HTML layer of its own (`Sprite`) whose HTML grows,
+   turns a little and fades, never something inside its svg. They start once the shine has come up. */
+.tooth-glint {
+  pointer-events: none;
+}
+
+.tooth-glint > div {
+  opacity: 0;
+  will-change: transform, opacity;
+  animation: teeth-glint 8.58s ease-in-out calc(1.07s + var(--turn) * 1.07s) infinite;
+}
+
+.tooth-glint svg {
+  display: block;
+  width: 100%;
+  height: 100%;
+  overflow: visible;
+}
+
+@keyframes teeth-glint {
+  0% {
+    opacity: 0;
+    transform: scale(0.2) rotate(-25deg);
+  }
+  12% {
+    opacity: 0.85;
+    transform: scale(1) rotate(0deg);
+  }
+  26%,
+  100% {
+    opacity: 0;
+    transform: scale(0.4) rotate(12deg);
   }
 }
 
@@ -753,6 +790,12 @@
   .zone-glow,
   .teeth-shine,
   .monster-glow {
+    animation: none;
+  }
+
+  /* The glints stand still, lit. */
+  .tooth-glint > div {
+    opacity: 0.85;
     animation: none;
   }
 }
@@ -1605,17 +1648,25 @@
 
 /* The trophy and „Menü“ never grow wider than the sheet either (held upright, „Menü“ ran off the screen). */
 .teeth-end .game-end.inline {
-  --teeth-trophy: min(clamp(72px, 20vh, 170px), 24cqw);
+  --trophy-h: min(clamp(110px, 36vh, 280px), 40cqw);
   max-width: 100%;
 }
 
-.teeth-end .game-end.inline .game-end-trophy {
-  height: var(--teeth-trophy);
-}
+/* On a wide screen the sheet is the right half's height, and the trophy as big as the room under the week allows
+   (user feedback, November 2026: the trophy much bigger) – the room is a size container, so the trophy measures it. */
+@media (orientation: landscape) {
+  .teeth-end {
+    height: calc(100% - var(--corner-clear, 0px));
+  }
 
-.teeth-end .game-end.inline .game-end-board {
-  width: calc(var(--teeth-trophy) * 0.95);
-  height: calc(var(--teeth-trophy) * 0.07);
+  .teeth-end .game-end.inline {
+    container-type: size;
+    flex: 1 1 0;
+    width: 100%;
+    min-height: 0;
+    justify-content: center;
+    --trophy-h: min(300px, 42cqw, 90cqh);
+  }
 }
 
 .teeth-end .game-end.inline .game-end-button {

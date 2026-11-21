@@ -406,6 +406,11 @@ In a fresh worktree run `bun install` first.
   was hardly seen): big in the middle of the screen with „Geschafft!“ under it, then shrinking onto its little wooden
   board beside the buttons – into the collection – and only then the buttons come (`AWARD_MS`, a tap on it lands it at
   once; one transform, measured from its board, `GameEnd.test.ts`); a new `GameEnd` passes `level` (the level's or story's id; without it the game has one trophy).
+  Landed it stays big (`--trophy-h` in `game-end.css`, a good part of the screen's height, also in an `inline` end) and
+  plainly something to tap: the shared `TapHint`'s golden ring and hand round it (`TrophyHint`, the hand left of it or
+  above where the screen's edge is too close), stopped at its first stage (`upTo`) so it never darkens „Weiter“ beside
+  it; its count („3×“) on a light plate on the foot, big enough to read at a glance (user feedback, November 2026: it
+  wasn't clear the trophy can be tapped, the trophy was small and its number hard to read; `GameEnd.test.ts`).
   Each looks like no other (`Trophy.tsx`: its metal by the game, form, handles, lid and foot by the level, the level's
   own picture in its medallion, `trophyPictures.ts`), drawn still, handed over once slowly – never shining, sparkling or
   bouncing. They stand in the trophy room, a page of its own at `/pokale/` (`TrophyMuseum`, user request, November
@@ -949,8 +954,10 @@ src/lib/                 speech, sfx (synthesized + recorded sounds), storage, d
   up into the room the top row leaves. On a phone the sun, clouds and a room's window are left out too. A new kind of button gets its paper look in `book.css` with the others, never shiny plastic; a card is a picture taped onto the page without a ▶ on it (the whole card is tapped, so it is lower than its row), and the level row's choices are slips of paper lying askew, the chosen one yellow and taped down like a card (user feedback, October 2026). The fullscreen button and ⚙️ are
   small notes of plain paper with a paperclip over the edge they hang from – the page's top edge in a menu's top right
   corner, the picture's top edge while playing (user decision, October 2026: quieter than buttons or taped tabs, and
-  findable on dark pictures). While playing, ⚙️'s note is the big one, its gear large, as the symbol alone – never
-  „Einstellungen“ or „halten“ written on it, on any device (user feedback, November 2026; its name is only read out) – and as play starts it lights up softly twice,
+  findable on dark pictures). While playing, ⚙️'s note looks exactly like the fullscreen note beside it – the same size, paper and clip, its gear
+  drawn in the same ink line as the fullscreen sign (`.play-options-icon`), never an emoji and never a bigger note of its
+  own (user feedback, November 2026) – the symbol alone, never „Einstellungen“ or „halten“ written on it, on any device
+  (its name is only read out) – and as play starts it lights up softly twice,
   then stands still – never a glow that keeps going or comes back while playing (user feedback, November 2026: the small
   grey gear wasn't seen; `look.test.ts`). A game with many
   ways to play behind it says so as play starts with `PlayOptions intro`: a note under ⚙️ for grown-ups, telling what can
