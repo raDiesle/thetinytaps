@@ -2,6 +2,7 @@ import type { Research } from "./types";
 
 export const aehnlicheUmrisse: Research = {
   id: "aehnliche-umrisse",
+  area: "spiele",
   date: "2026-11-03",
   emoji: "☝️",
   title: "Schatten und Verstecke: Welche Bilder sehen sich zu ähnlich?",

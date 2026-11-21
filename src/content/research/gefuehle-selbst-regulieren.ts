@@ -2,6 +2,7 @@ import type { Research } from "./types";
 
 export const gefuehleSelbstRegulieren: Research = {
   id: "gefuehle-selbst-regulieren",
+  area: "kinder",
   date: "2026-11-02",
   emoji: "🐻",
   title: "Gefühle: Was ein Kleinkind selbst tun kann",

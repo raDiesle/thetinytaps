@@ -2,6 +2,7 @@ import type { Research } from "./types";
 
 export const seoPruefung: Research = {
   id: "seo-pruefung",
+  area: "technik",
   date: "2026-10-30",
   emoji: "🔎",
   title: "SEO-Prüfung: Was Google von toddlerfox.com sieht",

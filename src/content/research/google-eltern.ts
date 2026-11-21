@@ -2,6 +2,7 @@ import type { Research } from "./types";
 
 export const googleEltern: Research = {
   id: "google-eltern",
+  area: "suchen",
   date: "2026-10-26",
   emoji: "🔍",
   title: "Was Eltern von Kleinkindern bei Google suchen",

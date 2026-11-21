@@ -2,6 +2,7 @@ import type { Research } from "./types";
 
 export const abstillenKapitel: Research = {
   id: "abstillen-kapitel",
+  area: "kinder",
   date: "2026-11-09",
   emoji: "🤱",
   title: "Abstillen in Kapiteln: In welcher Reihenfolge, und was hilft dem Kind?",

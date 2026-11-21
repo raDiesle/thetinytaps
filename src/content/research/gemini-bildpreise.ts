@@ -2,6 +2,7 @@ import type { Research } from "./types";
 
 export const geminiBildpreise: Research = {
   id: "gemini-bildpreise",
+  area: "geld",
   date: "2026-11-11",
   emoji: "🍌",
   title: "Gemini-Bilder: Gibt es günstigere Modelle oder Wege, und was haben wir bisher ausgegeben?",

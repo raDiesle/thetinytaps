@@ -1,7 +1,10 @@
-// Research for grown-ups, shown on the hidden page /management/ next to the
-// ideas, one file per study. Newest first. Idea ids and game addresses are checked in content.test.ts.
+// Research for grown-ups, shown on the hidden page /management/recherchen/ by topic (`area`),
+// one file per study. Newest first. Idea ids and game addresses are checked in content.test.ts.
 
 import type { Research } from "./types";
+import { youtubeRechte } from "./youtube-rechte";
+import { youtubeKanal } from "./youtube-kanal";
+import { youtubeSuchen } from "./youtube-suchen";
 import { haareWaschen } from "./haare-waschen";
 import { geminiBildpreise } from "./gemini-bildpreise";
 import { kitaEingewoehnung } from "./kita-eingewoehnung";
@@ -24,9 +27,13 @@ import { belohnungstafel } from "./belohnungstafel";
 import { toepfchenOderHygiene } from "./toepfchen-oder-hygiene";
 import { googleEltern } from "./google-eltern";
 
-export type { Research, ResearchDomain, ResearchExclusion, ResearchGameMatch, ResearchTopic } from "./types";
+export { RESEARCH_AREAS } from "./types";
+export type { Research, ResearchArea, ResearchDomain, ResearchExclusion, ResearchGameMatch, ResearchTopic } from "./types";
 
 export const RESEARCH: Research[] = [
+  youtubeRechte,
+  youtubeSuchen,
+  youtubeKanal,
   haareWaschen,
   geminiBildpreise,
   kitaEingewoehnung,

@@ -2,6 +2,7 @@ import type { Research } from "./types";
 
 export const domainTafel: Research = {
   id: "domain-tafel",
+  area: "name",
   date: "2026-10-31",
   emoji: "🔗",
   title: "Adressen für Belohnungstafel und Tagesplan",

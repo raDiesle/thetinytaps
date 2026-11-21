@@ -34,6 +34,9 @@ export const youtubeIdeas: IdeaArea = {
       text: "Der Kanal heißt wie die Seite, „Fun for Both“ (nie „toddler“ oder „baby“ im Namen, wie bei der Domain), mit `@funforboth` als Handle. Darin feste Reihen mit eigenem Namen und gleichem Vorschaubild-Aufbau, zuerst auf Englisch: „Brush with Tapsi“ (Zähne putzen), „Potty time with Tapsi“ (Töpfchen), „Tapsi reads“ (Schnullerfee, Abstillen, Kita-Start), „Calm timers“ (Timer). Deutsch und die anderen Sprachen als Übersetzung, wenn gewünscht. Vorher prüfen, ob Handle und Reihennamen frei sind.",
       why: "Eine Reihe bringt Eltern zum nächsten Video derselben Art – und die Reihennamen sind genau das, was sie suchen.",
       effort: "S",
+      done: true,
+      partial:
+        "Geprüft am 21. November 2026 (Recherche „YouTube-Kanal“ auf /management/recherchen/): Unter @funforboth und ähnlichen Handles gibt es keinen öffentlichen Kanal und nirgends einen Kanal „Fun for Both“; „Brush with Tapsi“, „Potty time with Tapsi“ und „Tapsi reads“ sind unbelegt. „Calm timers“ ist ein Gattungsbegriff und @CalmTimers vergeben, daher „Calm timers with Tapsi“. Den Kanal legt der Betreiber selbst an – erst YouTube Studio zeigt, ob das Handle wirklich frei ist. Die Markenregister wurden nicht geprüft.",
     },
     {
       id: "Y-04",
@@ -160,6 +163,9 @@ export const youtubeIdeas: IdeaArea = {
       text: "Titel und Beschreibung jedes Videos entstehen aus den Texten für Suchmaschinen (`seo.ts` und `seo.<lang>.ts`), die schon in sieben Sprachen geschrieben sind: was das Spiel tut, die Adresse des Spiels oben, Kapitelmarken für die Schritte, dazu zwei Sätze aus „Ein paar Worte von uns“. Vorher eine kleine Suche nach den Wörtern, die Eltern auf YouTube eingeben (als Studie in `src/content/research/`).",
       why: "Gefunden wird ein Video über seinen Titel und die ersten Zeilen der Beschreibung; die Arbeit dafür ist großteils schon getan.",
       effort: "S",
+      done: true,
+      partial:
+        "Recherche „Was Eltern auf YouTube suchen“ (21. November 2026) mit Suchwörtern, Konkurrenz und Titeln je Alltagshelfer. Jede Video-Seite zeigt unter „📝 Text für YouTube“ Titel und Beschreibung zum Kopieren (`src/video/youtubeTexts.ts`): der Titel aus der Recherche (englisch, auf Deutsch der deutsche), die Beschreibung aus den Texten für Suchmaschinen in der Sprache des Regals mit der Adresse des Spiels darüber, dazu ob „speziell für Kinder“ und ob die KI-Musik anzugeben ist. Die zwei Sätze aus „Ein paar Worte von uns“ sind weggelassen (das Versprechen der Seite steht schon darin), Kapitelmarken sind Y-26.",
     },
     {
       id: "Y-19",
@@ -176,6 +182,9 @@ export const youtubeIdeas: IdeaArea = {
       text: "Vor dem Hochladen prüfen und hier festhalten: ob die Suno-Lieder mit einem Plan gemacht wurden, der Nutzung auf YouTube erlaubt; ob ElevenLabs-Aufnahmen (auch die Klone) auf YouTube dürfen; dass die Freesound-Geräusche CC0 sind; ob der Kanal ein Impressum braucht (in Deutschland für geschäftsmäßige Kanäle üblich) und wo es steht; und welche Videos „speziell für Kinder“ sind (Y-06 bis Y-10) und welche nicht (Y-11). Monetarisierung bleibt aus: Werbung vor einem Kindervideo passt nicht zu einer Seite „ohne Werbung“.",
       why: "Ein gesperrtes Video oder ein Lied mit Urheberrechts-Meldung kostet mehr als die Prüfung vorher.",
       effort: "S",
+      done: true,
+      partial:
+        "Recherche „YouTube: Was dürfen wir zeigen?“ (21. November 2026) auf /management/recherchen/: Suno-Lieder nur aus Pro oder Premier, ein späteres Abo wirkt nicht zurück; Freesound CC0 frei; KI-Musik bei YouTube angeben, gezeichnete Bilder nicht; „speziell für Kinder“ für Y-06 bis Y-10, nicht für Y-11 und Y-29; Impressum nach § 18 MStV als Link in der Kanalinfo; Monetarisierung bleibt aus. Was nicht lesbar war (ElevenLabs, die aktuellen Gemini-Bedingungen) und was nur der Betreiber weiß (welcher Suno-Plan je Lied), ist Y-31.",
     },
     {
       id: "Y-21",
@@ -267,6 +276,14 @@ export const youtubeIdeas: IdeaArea = {
       title: "Kurzes Sitzen im Töpfchen-Video: nach dem ersten Refrain",
       text: "Das Video aus Y-21 sitzt mindestens einen ganzen Durchlauf des Warte-Lieds, je nach Sprache 1:45 bis 2:12. Für eine ganze Geschichte in 1–2 Minuten (Shorts, eine kurze Fassung) endet das Sitzen stattdessen nach dem ersten Refrain: dafür in jeder der sieben Sprachen messen, wo der erste Refrain endet (`bun run song`, wie bei `LOOPS`), und dort als vierte Wahl „kurz“ anbieten.",
       why: "Ein Durchlauf des Lieds ist für ein kurzes Video zu lang, und mitten im Vers abbrechen soll es nie.",
+      effort: "S",
+    },
+    {
+      id: "Y-31",
+      emoji: "📋",
+      title: "Vor dem ersten Video selbst nachsehen: Suno-Plan, ElevenLabs, Gemini",
+      text: "Was die Recherche zu Y-20 nicht lesen konnte oder nur der Betreiber weiß: für jedes Lied im Video (Zahnputzlied, Warte-Lied, Hintergrundlied), ob beim Erzeugen und Herunterladen Suno Pro oder Premier aktiv war, mit Rechnung, Lied-ID und Datum als Beleg – sonst das Lied neu machen; die Bedingungen von ElevenLabs im Browser lesen (kommerzielle Nutzung im Starter-Plan, Rechte an der Voice-Design-Stimme und ihren Klonen auf dem zweiten Konto, Soundeffekte); die aktuellen Gemini-API-Bedingungen lesen, vor allem ob die Klausel gegen Dienste für unter 18-Jährige noch gilt und ob sie für vorab gemachte Bilder überhaupt greift. Das Ergebnis kommt in die Recherche.",
+      why: "Ein gesperrtes Video oder ein Content-ID-Anspruch kostet mehr als eine halbe Stunde Lesen – und bei Suno entscheidet allein der Plan beim Erzeugen.",
       effort: "S",
     },
   ],

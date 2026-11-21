@@ -2,6 +2,7 @@ import type { Research } from "./types";
 
 export const websiteDownload: Research = {
   id: "website-download",
+  area: "technik",
   date: "2026-11-03",
   emoji: "📶",
   title: "Wie viel lädt ein Besuch der Startseite herunter?",

@@ -2,6 +2,7 @@ import type { Research } from "./types";
 
 export const haareWaschen: Research = {
   id: "haare-waschen",
+  area: "kinder",
   date: "2026-11-13",
   emoji: "🛁",
   title: "Haare waschen ohne Drama: Was raten Fachstellen bei Kleinkindern?",

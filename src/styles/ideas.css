@@ -20,16 +20,6 @@
   font-weight: 600;
 }
 
-/* Links for trying things out (every trophy on the shelf), under the build date. */
-.ideas-test-links {
-  width: fit-content;
-  margin: 0 auto 12px;
-  padding: 4px 16px;
-  border-radius: 999px;
-  background: #ffffffd9;
-  font-weight: 700;
-}
-
 .ideas-panel {
   margin-bottom: 24px;
   padding: 20px 24px;
@@ -570,9 +560,92 @@ button.idea-id {
   text-decoration: none;
 }
 
-/* The link to the page of all pictures, a page of its own rather than a place on this one. */
-.ideas-contents a.ideas-contents-page {
+/*
+ * A page's table of contents (/management/ and its pages, `Contents`): headings with their lines side by side as far
+ * as the width allows, a page of its own marked ↗ on yellow.
+ */
+.ideas-toc {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(min(100%, 260px), 1fr));
+  gap: 12px 28px;
+  margin: 0 0 24px;
+  padding: 18px 24px;
+  border-radius: 24px;
+  background: #fff;
+}
+
+.ideas-toc h2 {
+  margin: 0 0 6px;
+  font-size: 1rem;
+}
+
+.ideas-toc ul {
+  margin: 0;
+  padding: 0;
+  list-style: none;
+  line-height: 1.5;
+}
+
+.ideas-toc li {
+  margin: 2px 0;
+}
+
+.ideas-toc a {
+  color: inherit;
+  font-weight: 700;
+}
+
+.ideas-toc a[href^="/"] {
+  padding: 0 6px;
+  border-radius: 6px;
   background: #fff3c4;
+  text-decoration: none;
+}
+
+.ideas-toc small {
+  opacity: 0.65;
+}
+
+/* Back up to the contents, bottom right, once they have scrolled away (`BackToContents`). */
+.ideas-back-to-toc {
+  position: fixed;
+  right: max(16px, env(safe-area-inset-right));
+  bottom: max(16px, env(safe-area-inset-bottom));
+  z-index: 5;
+  padding: 8px 16px;
+  border: 2px solid var(--ink);
+  border-radius: 99px;
+  background: #fff3c4;
+  box-shadow: 0 4px 12px #00000026;
+  font: inherit;
+  font-weight: 700;
+  cursor: pointer;
+}
+
+/* The newest research on /management/, and the way to all of it. */
+.ideas-research-newest {
+  margin: 0 0 12px;
+  padding-left: 20px;
+  line-height: 1.5;
+}
+
+.ideas-research-newest small {
+  opacity: 0.6;
+}
+
+.ideas-more {
+  display: inline-block;
+  padding: 4px 14px;
+  border-radius: 99px;
+  background: #fff3c4;
+  color: inherit;
+  font-weight: 700;
+  text-decoration: none;
+}
+
+/* A study on the research page: its folded panel keeps clear of the sticky search when opened from the contents. */
+.ideas-research-study {
+  scroll-margin-top: 90px;
 }
 
 /* Research: one folding panel per piece of research. */

@@ -2,6 +2,7 @@ import type { Research } from "./types";
 
 export const gefuehleGruppen: Research = {
   id: "gefuehle-gruppen",
+  area: "spiele",
   date: "2026-11-04",
   emoji: "🗂️",
   title: "Gefühle: Welche Gruppen fürs Menü, und welche Szenen fehlen?",

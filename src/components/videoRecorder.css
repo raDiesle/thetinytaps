@@ -116,3 +116,36 @@
   border-radius: 8px;
   background: #000;
 }
+
+/* Title and description to copy into YouTube Studio (`YouTubeTexts`), folded under the card. */
+.video-rec-youtube {
+  margin-top: 12px;
+  text-align: left;
+}
+
+.video-rec-youtube summary {
+  cursor: pointer;
+  font-weight: 700;
+}
+
+.video-rec-youtube h2 {
+  margin: 10px 0 4px;
+  font-size: 1rem;
+}
+
+.video-rec-youtube h2 small {
+  font-weight: 400;
+  opacity: 0.7;
+}
+
+.video-rec-youtube pre {
+  max-height: 14em;
+  margin: 0;
+  overflow: auto;
+  padding: 8px 10px;
+  border-radius: 8px;
+  background: #00000010;
+  font: inherit;
+  font-size: 0.85rem;
+  white-space: pre-wrap;
+}

@@ -3,11 +3,27 @@ import type { Research } from "@/content/research";
 import { pick } from "@/lib/language";
 import { GAME_BY_HREF, IdeaLink } from "./shared";
 
-/** One piece of research from content/research: question, method, findings, topics with their ideas, games, what was left out, sources. */
-export function ResearchPanel({ research, open, onShow }: { research: Research; open: boolean; onShow: (id: string) => void }) {
-  const date = new Date(`${research.date}T12:00:00`).toLocaleDateString("de-DE");
+/** A study's date as Germans write it. */
+export const researchDate = (research: Research) => new Date(`${research.date}T12:00:00`).toLocaleDateString("de-DE");
+
+/**
+ * One piece of research from content/research: question, method, findings, topics with their ideas, games, what was
+ * left out, sources. Its idea numbers lead to the idea on /management/ (`IdeaLink`).
+ */
+export function ResearchPanel({
+  research,
+  open,
+  onToggle,
+  onShow,
+}: {
+  research: Research;
+  open: boolean;
+  onToggle?: (open: boolean) => void;
+  onShow?: (id: string) => void;
+}) {
+  const date = researchDate(research);
   return (
-    <details className="ideas-panel" open={open}>
+    <details id={research.id} className="ideas-panel ideas-research-study" open={open} onToggle={(e) => onToggle?.(e.currentTarget.open)}>
       <summary>
         <h2>
           {research.emoji} {research.title}

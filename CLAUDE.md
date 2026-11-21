@@ -141,6 +141,14 @@ In a fresh worktree run `bun install` first.
   the list's own filters last only for the visit (a stored filter kept the list short for good, user feedback, November 2026). Research (searches,
   market or keyword analyses, measurements) is written into `src/content/research/` (one file per study, joined in its `index.ts`) with its date, method,
   findings and the ideas it led to – not only told in chat. `content.test.ts` checks that its ideas and games exist.
+  **Every result is documented on the management pages, never only in chat** (user request, November 2026): a study
+  there, what a built idea became in its `partial`, what is left or must be checked by the user as a new idea, and a new
+  page for grown-ups under `/management/` as a line in `TOOL_GROUPS` (`src/pages/management/tools.ts`, shown in the
+  page's contents; `tools.test.ts` fails on a route missing there). The research has a page of its own,
+  `/management/recherchen/`, grouped by topic (`area`, `RESEARCH_AREAS` in `src/content/research/types.ts`; a new kind
+  of study gets its topic there), while `/management/` names only the newest; both start with a table of contents
+  (`Contents`, with „↑ Inhalt“ to come back), and a new section of either gets its line there. An idea number on
+  another page links to `/management/#<id>`, a study to `/management/recherchen/#<id>`.
   What a conclusion rests on and you could not read (a price behind a configurator, a law's text) you read some other
   way or ask the user for before concluding, never guess or give an impression: guessed desk calendars at 4–7 € each
   were 0.72 €, and a flip calendar first called „eher kein Spielzeug“ is one by the EU's own guidance on books.

@@ -2,6 +2,7 @@ import type { Research } from "./types";
 
 export const tafelVerkaufen: Research = {
   id: "tafel-verkaufen",
+  area: "geld",
   date: "2026-10-31",
   emoji: "💶",
   title: "Wochenplaner und Belohnungstafel zum Kaufen – ein Geschäft?",

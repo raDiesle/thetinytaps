@@ -204,11 +204,11 @@ test("the families stand at the bottom of a menu's page, not in its head", () =>
 
 // User feedback, October 2026: headings carry no emoji („Lebendige Welten“, never „🌳 Lebendige Welten“). MenuHead takes
 // its title as plain text, and no heading the app shows starts with an emoji or an emoji's span (only the management
-// page, which only the makers see, keeps its signs).
+// pages, which only the makers see, keep their signs).
 test("headings carry no emoji", () => {
   const leading = /<h[1-6][^>]*>\s*(<span aria-hidden>|\{?[^\s<{}]*\p{Extended_Pictographic})/u;
   const offenders = sourceFiles()
-    .filter((file) => file.endsWith(".tsx") && !/ManagementPage|pages\/management\/|PictureQueue|VoiceList/.test(file))
+    .filter((file) => file.endsWith(".tsx") && !/ManagementPage|ResearchPage|pages\/management\/|PictureQueue|VoiceList/.test(file))
     .filter((file) => leading.test(read(join("src", file))));
   expect(offenders).toEqual([]);
   expect(read("src/components/MenuTop.tsx")).toMatch(/title: string; tools/);

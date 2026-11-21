@@ -2,6 +2,7 @@ import type { Research } from "./types";
 
 export const rituale: Research = {
   id: "rituale",
+  area: "kinder",
   date: "2026-11-04",
   emoji: "💛",
   title: "Rituale für den Tagesplan: Erzählen nach der Kita, Mutmach- und Gute-Nacht-Sätze",

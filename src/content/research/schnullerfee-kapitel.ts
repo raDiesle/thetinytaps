@@ -2,6 +2,7 @@ import type { Research } from "./types";
 
 export const schnullerfeeKapitel: Research = {
   id: "schnullerfee-kapitel",
+  area: "kinder",
   date: "2026-11-10",
   emoji: "🧚",
   title: "Schnuller abgewöhnen in Kapiteln: Welche Schritte empfehlen Fachstellen?",

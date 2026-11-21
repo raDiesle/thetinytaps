@@ -146,7 +146,7 @@ describe("trophies", () => {
         ).toBe(true);
     }
     expect(all.filter((trophy) => trophy.game === "/kettenreaktion/").length).toBeGreaterThan(10);
-    expect(readFileSync("src/pages/ManagementPage.tsx", "utf8")).toContain("ALL_TROPHIES");
+    expect(readFileSync("src/pages/management/tools.ts", "utf8")).toContain("ALL_TROPHIES");
   });
 
   test("the end of a level awards it, and the games with levels pass theirs", () => {

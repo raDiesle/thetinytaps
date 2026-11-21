@@ -39,6 +39,7 @@ export function TeethVideo() {
 
   return (
     <VideoRecorder
+      youtube="zaehne"
       title="Zähne putzen fürs Video"
       about="Spielt das ganze Zähneputzen einmal durch – Geschichte, Waschbecken, die sieben Strophen und das Ende – nur das Bild im Format 16 : 9, ohne Knöpfe, Wochenbild oder Pokal. Es zählt nichts: kein Stern, keine Spielzeit. Sprache und Kind stellt man im Regal um (🌐 und die Sticker)."
       facts={[

@@ -1,5 +1,5 @@
-// Research for grown-ups, shown on the hidden page /management/ next to the
-// ideas: what was looked up, how, what came out and which ideas it led to.
+// Research for grown-ups, shown on the hidden page /management/recherchen/ by topic: what was
+// looked up, how, what came out and which ideas it led to.
 // Newest first. Idea ids and game addresses are checked in content.test.ts.
 
 /** One topic parents search for, and what the app could answer it with. */
@@ -41,9 +41,29 @@ export interface ResearchDomain {
   why: string;
 }
 
+/**
+ * The topics the research page (/management/recherchen/) groups its studies by, in the order of its contents: a study
+ * is found by what it is about, not only by its date (user request, November 2026). A new kind of study gets its topic here.
+ */
+export const RESEARCH_AREAS = {
+  kinder: { emoji: "🧒", title: "Kinder und Erziehung", about: "Was Fachbücher und Fachstellen raten – Grundlage für Geschichten und Spiele." },
+  suchen: { emoji: "🔎", title: "Was Eltern suchen", about: "Suchwörter bei Google und YouTube, und welche Spiele sie schon beantworten." },
+  youtube: { emoji: "📺", title: "YouTube", about: "Kanal, Rechte und Suchwörter für die Videos aus den Spielen." },
+  spiele: { emoji: "🎨", title: "Spiele und Bilder prüfen", about: "Ob Inhalte der Spiele zueinander passen und sich unterscheiden lassen." },
+  name: { emoji: "🏷️", title: "Name und Adressen", about: "Domains und Namen, was frei war und warum gewählt." },
+  recht: { emoji: "⚖️", title: "Recht und Datenschutz", about: "Was erlaubt ist, was gemessen werden darf und was zu beachten ist." },
+  technik: { emoji: "⚙️", title: "Technik und Leistung", about: "Wie schnell und wie groß die Seite ist, und was Google von ihr sieht." },
+  geld: { emoji: "💶", title: "Kosten und Geschäft", about: "Was Bilder und Aufnahmen kosten, und was sich verkaufen ließe." },
+} as const;
+
+/** Key of a research topic in `RESEARCH_AREAS`. */
+export type ResearchArea = keyof typeof RESEARCH_AREAS;
+
 /** One piece of research with its results. */
 export interface Research {
   id: string;
+  /** What it is about, for the research page's contents. */
+  area: ResearchArea;
   /** When it was done, YYYY-MM-DD. */
   date: string;
   emoji: string;

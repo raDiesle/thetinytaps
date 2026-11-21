@@ -1,4 +1,6 @@
 import { type CSSProperties, type ReactNode, type RefObject, useCallback, useEffect, useRef, useState } from "react";
+import { YouTubeTexts } from "@/components/YouTubeTexts";
+import type { YouTubeVideoId } from "@/video/youtubeTexts";
 import { MenuTop } from "@/components/MenuTop";
 import { unlockAudio } from "@/lib/sfx";
 import { useTimers } from "@/lib/timers";
@@ -162,6 +164,7 @@ export function VideoRecorder({
   loading,
   fileName,
   stageStyle,
+  youtube,
   play,
 }: {
   /** The card's heading, German like the rest of /management/. */
@@ -180,6 +183,8 @@ export function VideoRecorder({
   fileName: (extension: "mp4" | "webm") => string;
   /** The stage's look before the play draws (its background), so the first frames are not black. */
   stageStyle?: CSSProperties;
+  /** Which video it is in `YOUTUBE_VIDEOS`, for its title and description to copy into YouTube Studio (Y-18). */
+  youtube?: YouTubeVideoId;
   /** The play, mounted on the stage while it runs; it calls `onFinished` when the video should end. */
   play: (onFinished: () => void) => ReactNode;
 }) {
@@ -299,6 +304,7 @@ export function VideoRecorder({
               : "Dieser Browser kann den Tab nicht selbst aufnehmen (das kann Chrome). "}
             ▶ spielt im Vollbild, für ein eigenes Aufnahmeprogramm. Esc bricht ab.
           </p>
+          {youtube && <YouTubeTexts video={youtube} />}
         </div>
       )}
 
@@ -330,6 +336,7 @@ export function VideoRecorder({
               Neue Aufnahme
             </button>
           </div>
+          {phase.saved && youtube && <YouTubeTexts video={youtube} />}
         </div>
       )}
     </div>

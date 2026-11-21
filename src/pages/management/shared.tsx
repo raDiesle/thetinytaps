@@ -1,4 +1,5 @@
 import { useState } from "react";
+import { Link } from "react-router";
 import { CATEGORIES } from "@/content/games";
 import { EFFORT_LABELS, IDEA_AREAS, type Effort, type Idea } from "@/content/ideas";
 
@@ -44,8 +45,11 @@ export function CopyCommand({ command }: { command: string }) {
   );
 }
 
-/** An idea number that shows the idea in the list below – or, for a built idea, which the list no longer holds, only its number with a tick. */
-export function IdeaLink({ id, onShow }: { id: string; onShow: (id: string) => void }) {
+/**
+ * An idea number that shows the idea in the list of /management/ – on that page by `onShow`, from another page (the
+ * research) as a link to it – or, for a built idea, which the list no longer holds, only its number with a tick.
+ */
+export function IdeaLink({ id, onShow }: { id: string; onShow?: (id: string) => void }) {
   const idea = IDEA_BY_ID.get(id);
   if (idea?.done)
     return (
@@ -53,8 +57,14 @@ export function IdeaLink({ id, onShow }: { id: string; onShow: (id: string) => v
         {id} ✓
       </span>
     );
+  if (!onShow)
+    return (
+      <Link className="idea-id" title={idea?.title} to={`/management/#${id}`}>
+        {id}
+      </Link>
+    );
   return (
-    <button type="button" className="idea-id" title={IDEA_BY_ID.get(id)?.title} onClick={() => onShow(id)}>
+    <button type="button" className="idea-id" title={idea?.title} onClick={() => onShow(id)}>
       {id}
     </button>
   );

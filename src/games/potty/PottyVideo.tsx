@@ -76,6 +76,7 @@ export function PottyVideo() {
 
   return (
     <VideoRecorder
+      youtube="toepfchen"
       title="Aufs Töpfchen fürs Video"
       about="Spielt die ganze Töpfchen-Geschichte einmal durch – Essen, muss mal, Mama und Papa rufen, ins Bad, Sitzen mit dem Warte-Lied und den Gedanken, was kommt, Abwischen, Abziehen, Händewaschen, Party – nur das Bild im Format 16 : 9, ohne Schrittleiste, Knöpfe, Wochensterne oder Pokal. Jeder Schritt geht weiter, wenn seine Zeile gesagt ist; das Sitzen endet nach den gewählten Durchläufen des Lieds, nie mitten in einem Vers. Es zählt nichts: kein Stern, keine Spielzeit. Die Sprache stellt man im Regal um (🌐)."
       facts={[

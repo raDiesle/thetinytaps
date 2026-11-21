@@ -2,6 +2,7 @@ import type { Research } from "./types";
 
 export const domainKids: Research = {
   id: "domain-kids",
+  area: "name",
   date: "2026-10-31",
   emoji: "📖",
   title: "Eine Domain ohne „toddler“: kids, Buch, gemeinsam",

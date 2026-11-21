@@ -1,8 +1,8 @@
 # Videos for YouTube (`src/video/`)
 
 What the YouTube videos are made of (ideas area Y on `/management/`, user request, November 2026). Nothing here is part
-of the site children see: each video has a page only for grown-ups under `/management/` (in `NO_INDEX_PATHS`, linked at
-the top of the management page), never a link from the shelf or a book, until the user decides otherwise.
+of the site children see: each video has a page only for grown-ups under `/management/` (in `NO_INDEX_PATHS`, linked from
+the management page's contents by `TOOL_GROUPS`), never a link from the shelf or a book, until the user decides otherwise.
 - Recording a page's own tab in Chrome is `VideoRecorder` (`src/components/VideoRecorder.tsx`), shared by every video
   page (the games' videos, the intro and the outro): a new video page gives it its play, never a recorder of its own.
 - `intro/`: the videos' intro (Y-01), at `/management/video-intro/`: the shelf of picture books, the Fun for Both book
@@ -18,6 +18,11 @@ the top of the management page), never a link from the shelf or a book, until th
   limit) and a QR code to the video's game in the video's language (`CODE_TARGETS`, `addressFor`; `uqr` draws it). 12 s.
   YouTube shows no end screen links on videos made for children, so all of it is in the picture.
   `bun run video outro --ziel /zaehne/ --sprache en` makes it for one game and language.
+- `youtubeTexts.ts` (Y-18): title and description of each video for YouTube Studio, shown to copy under „📝 Text für
+  YouTube“ on its page (`VideoRecorder youtube`): the title from the YouTube searches looked up (research „youtube-suchen“,
+  at most `TITLE_LIMIT` letters, English, German for a German video), the description from the game's texts for search
+  engines in the shelf's language with the game's address. A new video adds its line to `YOUTUBE_VIDEOS`, with
+  `forKids` and `song` (a Suno song is to be marked as AI-made on YouTube; research „youtube-rechte“).
 - `frames.tsx`, `sound.ts`, `canvas.ts`: what both share – the 1920 × 1080 canvas fitted to its stage, the live play
   (`LivePlay`), the render handle (`RenderPlay`, `window.__video`), and the notes and noises of their sounds.
 

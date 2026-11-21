@@ -2,7 +2,7 @@ import { lazy, Suspense, useState } from "react";
 import { Link } from "react-router";
 import { MenuTop } from "@/components/MenuTop";
 import { PictureQueue } from "@/components/PictureQueue";
-import { ALL_TROPHIES, MUSEUM_PATH } from "@/lib/museum";
+import { UNFINISHED } from "@/content/games";
 import { EFFORT_LABELS, IDEA_AREAS, TODDLER_RULES, TOP_PICKS, type Effort, type Idea, type IdeaArea, areaKey } from "@/content/ideas";
 import { RESEARCH } from "@/content/research";
 import { buildDate } from "@/lib/pwa";
@@ -14,7 +14,9 @@ import { Languages } from "./management/LanguageTable";
 import { Mascots } from "./management/MascotsPanel";
 import { NextPanel } from "./management/NextPanel";
 import { Overview } from "./management/Overview";
-import { ResearchPanel } from "./management/ResearchPanel";
+import { researchDate } from "./management/ResearchPanel";
+import { BackToContents, Contents, type ContentsEntry, useHashPlace } from "./management/Contents";
+import { TOOL_GROUPS } from "./management/tools";
 import {
   ALL_IDEAS,
   AREA_OF,
@@ -59,17 +61,25 @@ const FILTERS = {
   area: "" as string,
 };
 
-/** The page's parts, linked from the contents line at the top. */
-const CONTENTS: { id: string; label: string }[] = [
-  { id: "in-arbeit", label: "🚧 In Arbeit" },
-  { id: "uebersicht", label: "📊 Überblick" },
-  { id: "sprachen", label: "🌍 Sprachen" },
-  { id: "maskottchen", label: "🦊🐻 Fuchs & Bär" },
-  { id: "stimmen", label: "🎙️ Stimmen" },
-  { id: "recherchen", label: "🔍 Recherchen" },
-  { id: "offene-bilder", label: "🖼️ Offene Bilder" },
-  { id: "ideas-list", label: "💡 Alle Ideen" },
+/** The page's parts, for its contents at the top. */
+const PLACES: ContentsEntry[] = [
+  { id: "als-naechstes", label: "⭐ Als nächstes", note: "markierte Ideen, zum Kopieren" },
+  { id: "in-arbeit", label: "🚧 In Arbeit", note: "Spiele, die noch nicht im Regal stehen" },
+  { id: "uebersicht", label: "📊 Überblick", note: "offene Ideen nach Bereich und Aufwand" },
+  { id: "ideas-list", label: "💡 Alle Ideen", note: "suchen, filtern, markieren" },
 ];
+
+/** Tables of what is there and what is missing, per game. */
+const TABLES: ContentsEntry[] = [
+  { id: "sprachen", label: "🌍 Sprachen", note: "Übersetzungen und Aufnahmen" },
+  { id: "maskottchen", label: "🦊🐻 Fuchs & Bär", note: "wo die Maskottchen schon sind" },
+  { id: "stimmen", label: "🎙️ Stimmen", note: "was ElevenLabs noch aufnehmen muss" },
+  { id: "offene-bilder", label: "🖼️ Offene Bilder", note: "die Warteschlange für Gemini" },
+  { id: "recherchen", label: "🔍 Neue Recherchen", note: "die letzten, alle auf eigener Seite" },
+];
+
+/** How many of the newest studies the page names, above the link to all of them. */
+const NEWEST_RESEARCH = 4;
 
 /** The lines still to record: loaded after the page, since it reads the data of every game. */
 const VoiceList = lazy(() => import("@/components/VoiceList").then((module) => ({ default: module.VoiceList })));
@@ -77,7 +87,8 @@ const VoiceList = lazy(() => import("@/components/VoiceList").then((module) => (
 /**
  * Hidden page for grown-ups that collects everything that helps decide what to
  * do next: the idea collection from content/ideas, the language table and the
- * research from content/research. An overview table shows where the open work is
+ * newest research (all of it on /management/recherchen/), with contents at the top that also lead to the pages of
+ * their own (`TOOL_GROUPS`). An overview table shows where the open work is
  * (area × effort) and jumps to it in the list, filters narrow the list for this visit, and each idea can be marked
  * ⭐ / 🤔 / 👎. The ⭐ ones collect at the top, ready to copy as "mach N-01, …".
  * Reached by holding the "p" in the home page title.
@@ -104,7 +115,7 @@ export function ManagementPage() {
   };
 
   /** Shows an idea even when the filters hide it, then scrolls to it (a built one is not in the list to show). */
-  const showIdea = (id: string) => {
+  const showIdea = (id: string, instant = false) => {
     if (IDEA_BY_ID.get(id)?.done) return;
     if (!document.getElementById(id)) {
       setQuery("");
@@ -112,7 +123,7 @@ export function ManagementPage() {
     }
     setTimeout(() => {
       const el = document.getElementById(id);
-      el?.scrollIntoView({ behavior: "smooth", block: "center" });
+      el?.scrollIntoView({ behavior: instant ? "instant" : "smooth", block: "center" });
       el?.focus({ preventScroll: true });
     });
   };
@@ -131,6 +142,10 @@ export function ManagementPage() {
       (first || document.getElementById(`area-${area}`))?.scrollIntoView({ behavior: "smooth", block: first ? "center" : "start" });
     });
   };
+
+  // A link from another page (the research's idea numbers) names an idea after „#“: jumped to at once, since a smooth
+  // scroll over this long page did not get there in Chrome.
+  useHashPlace((id) => (IDEA_BY_ID.has(id) ? showIdea(id, true) : document.getElementById(id)?.scrollIntoView()));
 
   const words = query.toLowerCase().split(/\s+/).filter(Boolean);
   const visible = (idea: Idea) => {
@@ -169,45 +184,25 @@ export function ManagementPage() {
         <span aria-hidden>🧭</span> Management
       </h1>
       <p className="ideas-build">Stand: {buildDate()}</p>
-      {/* To look at every trophy in the trophy room without playing: shown only for this visit of the page, nothing is stored. */}
-      <p className="ideas-test-links">
-        <Link to={`${MUSEUM_PATH}?${ALL_TROPHIES}`}>🏆 Alle Pokale im Pokalzimmer ansehen (zum Testen)</Link>
-        {" · "}
-        <Link to="/management/video-zaehne/">🎬 Zähne putzen fürs Video aufnehmen</Link>
-        {" · "}
-        <Link to="/management/video-intro/">📖 Intro für die Videos</Link>
-        {" · "}
-        <Link to="/management/video-outro/">📚 Abspann für die Videos</Link>
-        {" · "}
-        <Link to="/management/video-toepfchen/">🎬 Aufs Töpfchen fürs Video aufnehmen</Link>
-        {" · "}
-        <Link to="/management/video-toepfchen-eltern/">🎬 Aufs Töpfchen: Video für Eltern aufnehmen</Link>
-      </p>
       <p className="home-subtitle">
         Alles, was beim Entscheiden hilft: Ideen, Sprachen, Recherchen, offene Bilder. {active - done} offene Ideen, {done} schon umgesetzt (nicht mehr
         aufgelistet), {rejected} abgelehnt. Die Nummern (z.&nbsp;B. <b>N-03</b>) bleiben fest, damit man sie nennen kann.
       </p>
       <Progress done={done} total={active} />
-      <nav className="ideas-contents" aria-label="Inhalt">
-        {CONTENTS.map(({ id, label }) => (
-          <a
-            key={id}
-            href={`#${id}`}
-            onClick={(e) => {
-              e.preventDefault();
-              const target = document.getElementById(id);
-              if (target instanceof HTMLDetailsElement) target.open = true;
-              target?.scrollIntoView({ behavior: "smooth", block: "start" });
-            }}
-          >
-            {label}
-          </a>
-        ))}
-        {/* A page of its own: every picture of the app at once, to check them without playing (PicturesPage). */}
-        <Link to="/management/bilder/" className="ideas-contents-page">
-          🖼️ Alle Bilder ansehen ↗
-        </Link>
-      </nav>
+      <Contents
+        groups={[
+          { title: "💡 Ideen", entries: PLACES.filter((place) => place.id !== "in-arbeit" || UNFINISHED.length > 0) },
+          { title: "📋 Tabellen und Listen", entries: TABLES },
+          ...TOOL_GROUPS.map((group) => ({
+            title: group.title,
+            entries: group.pages.map((page) => ({
+              to: page.to,
+              label: `${page.emoji} ${page.label}`,
+              note: page.ideas ? `${page.about} (${page.ideas.join(", ")})` : page.about,
+            })),
+          })),
+        ]}
+      />
 
       <NextPanel ideas={nextIdeas} noIdeas={noIdeas} onShow={showIdea} onMark={setMark} />
 
@@ -232,12 +227,27 @@ export function ManagementPage() {
         </Suspense>
       </details>
 
-      <section id="recherchen" className="ideas-research">
-        <h2>🔍 Recherchen</h2>
-        <p className="ideas-hint">Was nachgeschaut wurde, wie, und welche Ideen daraus kamen. Die neueste zuerst; eine Nummer zeigt die Idee unten.</p>
-        {RESEARCH.map((research, i) => (
-          <ResearchPanel key={research.id} research={research} open={i === 0} onShow={showIdea} />
-        ))}
+      <section id="recherchen" className="ideas-panel">
+        <h2>🔍 Neue Recherchen</h2>
+        <p className="ideas-hint">
+          Was nachgeschaut wurde, wie und welche Ideen daraus kamen, steht auf einer eigenen Seite, nach Thema geordnet. Die neuesten:
+        </p>
+        <ul className="ideas-research-newest">
+          {[...RESEARCH]
+            .sort((a, b) => b.date.localeCompare(a.date))
+            .slice(0, NEWEST_RESEARCH)
+            .map((research) => (
+              <li key={research.id}>
+                <Link to={`/management/recherchen/#${research.id}`}>
+                  {research.emoji} {research.title}
+                </Link>{" "}
+                <small>{researchDate(research)}</small>
+              </li>
+            ))}
+        </ul>
+        <Link to="/management/recherchen/" className="ideas-more">
+          Alle {RESEARCH.length} Recherchen nach Thema ↗
+        </Link>
       </section>
 
       <PictureQueue />
@@ -366,6 +376,7 @@ export function ManagementPage() {
           ),
       )}
       {shown.length === 0 && <p className="ideas-empty">Keine Idee passt zu diesen Filtern.</p>}
+      <BackToContents />
     </main>
   );
 }

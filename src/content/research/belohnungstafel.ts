@@ -2,6 +2,7 @@ import type { Research } from "./types";
 
 export const belohnungstafel: Research = {
   id: "belohnungstafel",
+  area: "suchen",
   date: "2026-10-28",
   emoji: "🌟",
   title: "Belohnungstafel – was Eltern brauchen",

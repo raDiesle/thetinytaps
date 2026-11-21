@@ -2,6 +2,7 @@ import type { Research } from "./types";
 
 export const kitaEingewoehnung: Research = {
   id: "kita-eingewoehnung",
+  area: "kinder",
   date: "2026-11-11",
   emoji: "🎒",
   title: "Kita-Eingewöhnung und Abschied am Morgen: Welche Schritte, und was hilft?",

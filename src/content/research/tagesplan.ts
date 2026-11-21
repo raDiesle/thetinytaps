@@ -2,6 +2,7 @@ import type { Research } from "./types";
 
 export const tagesplan: Research = {
   id: "tagesplan",
+  area: "suchen",
   date: "2026-10-28",
   emoji: "🗓️",
   title: "Tagesplan und Strukturtafel – wonach Eltern suchen",

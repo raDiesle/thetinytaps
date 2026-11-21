@@ -2,6 +2,7 @@ import type { Research } from "./types";
 
 export const toepfchenOderHygiene: Research = {
   id: "toepfchen-oder-hygiene",
+  area: "suchen",
   date: "2026-10-26",
   emoji: "🚽",
   title: "Töpfchen oder Hygiene – was wird mehr gesucht?",

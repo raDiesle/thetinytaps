@@ -2,6 +2,7 @@ import type { Research } from "./types";
 
 export const leistungAlteHandys: Research = {
   id: "leistung-alte-handys",
+  area: "technik",
   date: "2026-10-30",
   emoji: "🐢",
   title: "Laufen die Spiele flüssig auf einem zehn Jahre alten Android-Handy?",

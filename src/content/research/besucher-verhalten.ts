@@ -2,6 +2,7 @@ import type { Research } from "./types";
 
 export const besucherVerhalten: Research = {
   id: "besucher-verhalten",
+  area: "recht",
   date: "2026-11-07",
   emoji: "📊",
   title: "Womit sehen, was Besucher in der App tun – ohne Cookie-Banner?",

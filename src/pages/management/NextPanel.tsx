@@ -21,7 +21,7 @@ export function NextPanel({
   const efforts = EFFORTS.map((e) => [e, ideas.filter((i) => i.effort === e).length] as const).filter(([, n]) => n > 0);
 
   return (
-    <section className="ideas-panel ideas-next">
+    <section id="als-naechstes" className="ideas-panel ideas-next">
       <h2>⭐ Als nächstes ({ideas.length})</h2>
       {ideas.length === 0 ? (
         <p className="ideas-hint">Markiere Ideen mit ⭐, dann sammeln sie sich hier. 🤔 heißt „vielleicht“, 👎 „eher nicht“ (rutscht nach unten).</p>

@@ -41,6 +41,7 @@ const ImprintPage = page(() => import("@/pages/LegalPage"), "ImprintPage");
 const PrivacyPage = page(() => import("@/pages/LegalPage"), "PrivacyPage");
 const ManagementPage = page(() => import("@/pages/ManagementPage"), "ManagementPage");
 const PicturesPage = page(() => import("@/pages/PicturesPage"), "PicturesPage");
+const ResearchPage = page(() => import("@/pages/ResearchPage"), "ResearchPage");
 const TeethVideoPage = page(() => import("@/pages/TeethVideoPage"), "TeethVideoPage");
 const IntroVideoPage = page(() => import("@/pages/IntroVideoPage"), "IntroVideoPage");
 const OutroVideoPage = page(() => import("@/pages/OutroVideoPage"), "OutroVideoPage");
@@ -123,6 +124,7 @@ export function App() {
           <Route path="datenschutz" element={<PrivacyPage />} />
           <Route path="management" element={<ManagementPage />} />
           <Route path="management/bilder" element={<PicturesPage />} />
+          <Route path="management/recherchen" element={<ResearchPage />} />
           <Route path="management/video-zaehne" element={<TeethVideoPage />} />
           <Route path="management/video-intro" element={<IntroVideoPage />} />
           <Route path="management/video-outro" element={<OutroVideoPage />} />
