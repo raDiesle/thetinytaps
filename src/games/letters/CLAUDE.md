@@ -99,15 +99,26 @@ the page before it.
   (arrows and Backspace keep theirs), Space and Enter, or a tap beside the card, opens a surprise – Space and Enter do
   their own thing (the card's jump, the horn or whistle) only when no surprise can come now, pressed quickly again (user
   request, November 2026; `specialKey`; in step-by-step counting they still reveal the next part first). A surprise is a firework, a present
-  with a toy, an egg a baby animal hatches from, balloons that pop, flowers growing, soap bubbles, a rainbow – a tap
+  with a toy, an egg a baby animal hatches from, balloons that pop, flowers growing, soap bubbles, a shooting star, a
+  snowflake breaking into small ones, a mandala unfolding, a paint splash, a pinwheel, bouncing balls, and on a canvas
+  skyrockets with many bursts (chrysanthemum, palm, crossette, glitter, saturn, double), a spark fountain, a swirl of
+  sparks and a sparkler drawing a figure (heart, star, spiral …) – a tap
   right where the finger landed, a key somewhere on the stage clear of the card. The kinds take turns from a shuffled
   bag, never the same twice in a row, and each is drawn anew every time (colours, pattern, burst, what comes out), so
   every press brings something new. It appears, does its thing and goes again by itself within `SURPRISE.lifeMs`. Never a
   storm: a new one at most every `SURPRISE.gapMs` (¼ s), at most `SURPRISE.maxAtOnce` at once, presses between only ripple; its
   sound answers at once, a second one only as a spaced extra. Each is a few small HTML layers moved only by transform and
-  opacity (`surprises.test.ts`, perf stretch „Überraschungen“). Zählen and the other games keep their calm ripples: this
+  opacity, or one small canvas (`surpriseCanvas.ts`: side `CANVAS_BOX` × its size, pixels capped at `CANVAS_MAX_DPR`,
+  at most `MAX_SPARKS`, drawn by its own `requestAnimationFrame` loop, never by React, and ended within
+  `CANVAS_SECONDS`) (`surprises.test.ts`, perf stretch „Überraschungen“). The rainbow was taken out (user feedback,
+  November 2026: not cool) – never bring it back. Every kind added since is drawn by the app itself in SVG, CSS or on a
+  canvas, never with emojis (user request, November 2026; the test checks `SurpriseArt.tsx` and `surpriseCanvas.ts`);
+  the letters' and numbers' pictures keep theirs. A surprise's wrapper names its kind as `data-kind`, never as a class
+  `ft-<kind>`: that is the class its own drawing animates, and once ran the snowflake's grow-and-fade on the whole
+  surprise, so its small flakes never showed. Zählen and the other games keep their calm ripples: this
   is Frei tippen's own, never a pattern for other games' answers (root `CLAUDE.md`). A new kind goes into
-  `SURPRISE_KINDS`, its classes into the test's `CLASSES`.
+  `ART_KINDS` (`SurpriseArt.tsx`) or `CANVAS_KINDS` (`surpriseCanvas.ts`), its classes and latest delay into the
+  test's `CLASSES` and `LATEST_DELAY_MS`; in the dev server `__surprise("<kind>")` makes the next surprise that kind.
 - Choices show the plain value, not an example to decode: the word length is the number of letters (3, 4, 7).
 - „Wörter tippen“ has no settings of its own: no own letter case, picture reveal, „any key types“ or tablet keys;
   it uses the shared ones (pictures theme, letters, on-screen keys). Don't add them back. The one exception is how many
