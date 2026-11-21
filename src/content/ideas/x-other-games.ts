@@ -1,29 +1,12 @@
 import type { IdeaArea } from "./types";
 
-/** X: Ausbau der anderen Spiele. */
+/** X: Ausbau der anderen Spiele. Zähne putzen has an area of its own (`x-teeth.ts`), sharing the prefix: a new X idea takes the next free number of both. */
 export const otherGamesIdeas: IdeaArea = {
   prefix: "X",
   emoji: "🧰",
   title: "Ausbau der anderen Spiele",
-  intro: "Erweiterungen für Zähne putzen, Was gehört zum Tier?, Schatten finden, Laut und leise, Kugelbahn und Gefühle.",
+  intro: "Erweiterungen für Was gehört zum Tier?, Schatten finden, Laut und leise, Kugelbahn und Gefühle.",
   ideas: [
-    {
-      id: "X-01",
-      emoji: "🦖",
-      title: "Zähne vom Dino putzen",
-      text: "Vor dem eigenen Putzen putzt das Kind einem Dino, Krokodil oder Teddy die Zähne: Wischen schrubbt die Zuckermonster weg, der Dino lacht mit blitzblanken Zähnen. Dann ist das Kind selbst dran.",
-      why: "Kinder, die sich nicht putzen lassen wollen, machen es oft erst bei anderen gern.",
-      effort: "M",
-    },
-    {
-      id: "X-02",
-      emoji: "☀️",
-      title: "Morgens und abends",
-      text: "Zähne putzen sieht morgens anders aus (Sonne geht auf, Frühstückskrümel) als abends (Mond, Schlafanzug, danach Gute Nacht). Dazu ein Wochenbild mit zwei Sternen pro Tag.",
-      why: "Zweimal täglich wird sichtbar; abends direkter Übergang ins Bett.",
-      effort: "S",
-      done: true,
-    },
     {
       id: "X-03",
       emoji: "🐾",
@@ -112,14 +95,6 @@ export const otherGamesIdeas: IdeaArea = {
       done: true,
     },
     {
-      id: "X-13",
-      emoji: "🚒",
-      title: "Zahnputzlieder mit Thema",
-      text: "Zähne putzen bekommt mehr gesungene Lieder zum Aussuchen, jedes mit eigenem Bild: Feuerwehr spritzt die Zuckermonster weg, ein Krokodil hält das Maul auf, ein Bagger baggert. Gemacht wie das Zahnputzlied (/zahnputzlied), ein Vers pro Schritt.",
-      why: "Eltern suchen „zahnputzlied feuerwehr“, „zahnputzlied krokodil“ und „zahnputzlied lustig“. Ein neues Lied macht das tägliche Putzen wieder spannend.",
-      effort: "S",
-    },
-    {
       id: "X-14",
       emoji: "☝️",
       title: "Zuordnen: immer nur eine richtige Antwort",
@@ -134,14 +109,6 @@ export const otherGamesIdeas: IdeaArea = {
       title: "Socken-Paare: die Paare wandern in den Korb",
       text: "Ist eine Wäsche fertig, werden die Paare nacheinander gefaltet und wandern in den Wäschekorb, der Deckel geht zu – dann kommt die nächste Wäsche. Statt der aufsteigenden Herzen und Sterne. Gehört zu A-30.",
       why: "Ein Ende, das zum Aufräumen gehört, wie zu Hause.",
-      effort: "S",
-    },
-    {
-      id: "X-16",
-      emoji: "✨",
-      title: "Zähne putzen: ein Zahn blitzt, dann klebt der Stern",
-      text: "Am Ende blitzt ein sauberer Zahn einmal kurz auf, dann wird der Stern auf den Wochenplan geklebt, mit einem leisen Patsch. Sonst fliegt nichts. Gehört zu A-30.",
-      why: "Die Belohnung ist das, was geputzt wurde, und der Stern, der bleibt.",
       effort: "S",
     },
   ],
