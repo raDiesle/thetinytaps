@@ -61,7 +61,8 @@ the cup everywhere now, sometimes still thinks of the bottle and gets a cuddle, 
   first – they all hold here): every page is drawn from one picture of the other books (`PLACES`: the living room and
   the garden from „Abstillen“, the kitchen from its meal page, Tapsi's room from „Schnullerfee“), so the home stays the
   same. Each prompt says who stood where in that reference and that those places are empty now, and names who of the
-  reference is not in this picture at all (`absent`) – without it Mama stayed on Kita-Start's chair. In the kitchen Papa
+  reference is not in this picture at all (`absent`) – without it Mama stayed on Kita-Start's chair, and it also says that no head or face of theirs stays behind: in
+  the first „schrank“ Papa's head floated alone over the table where the kitchen reference has him (November 2026). In the kitchen Papa
   sits where the reference has him; Mama sits on the empty grown-up chair at the front left, never in Papa's place,
   where Gemini would give her his clothes. A box shown open has its lid lying beside it (a lid held over a box came back
   twice in Schnullerfee). The bottle, the green cup, the bunny and the box are described the same on every page and
@@ -69,15 +70,8 @@ the cup everywhere now, sometimes still thinks of the bottle and gets a cuddle, 
 
 ## Publishing
 
-All pictures wait in the queue (`src/content/pictureQueue.ts`, made in a Claude cloud session with `/paid-queue`), so
-the book is `unfinished: true` in `CATEGORIES`: off the shelf, `noindex`, reached from „🚧 In Arbeit“ on `/management/`.
-The dev server shows every page with its placeholder. Once the last picture is made (`AFTER`):
-1. Crop a 160×160 spine picture of the green cup in Tapsi's paws from `flasche-schluck.webp` to
-   `src/components/bilder/spine-flaeschchen.webp`, like `spine-haare-waschen.webp`, and run `bun run previews` for the
-   book's line.
-2. Drop `unfinished: true` from `/flaeschchen/` in `src/content/games.ts`, so the book stands among the Alltagshelfer
-   right of „Abstillen“, and add it to the Alltagshelfer order in `content.test.ts`.
-3. Add a perf scenario „flaeschchen“ in `tools/perfScenarios.ts` like „haare-waschen“ and run it.
-4. Name the bottle story in the home page's search text („/“ in `seo.ts` and every `seo.<lang>.ts`, like „fürs
-   Haarewaschen“), and in the book's own text if it changed.
-5. Look at it at 844×390 and 1024×768: the contents, a page, the end.
+Published on 21 November 2026, once every picture was made in a Claude cloud session (`/paid-queue`): the book stands
+among the Alltagshelfer right of „Abstillen“ (`content.test.ts` checks the order), its spine picture is
+`src/components/bilder/spine-flaeschchen.webp` (the green cup in Tapsi's paws, cut from `flasche-schluck.webp`), its perf
+scenario is „flaeschchen“, and the home page's search text names it in every language. A new page's picture goes
+into the queue as before; until it is made, `withPictures` leaves that page out of the built site.

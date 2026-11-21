@@ -5,8 +5,8 @@ Route `/grosses-bett/` · idea H-106 · research „grosses-bett“.
 The book „Big Bed“ among the Alltagshelfer, right of „Hair Washing“ (`BED_STORY_BOOK`, a spine book of its own once
 published, playing at once): a story about moving from the cot into a bed of one's own, in chapters like „Abstillen“,
 „Schnullerfee“, „Kita-Start“ and „Hair Washing“, read by a grown-up with the child in the days before the big bed comes
-and in its first evenings. It is `unfinished` in `games.ts` until its Gemini pictures are made (they wait in the picture
-queue, `bedStoryPictures.ts`): reached only from „🚧 In Arbeit“ on `/management/`, out of the sitemap and `noindex`.
+and in its first evenings. It is still `unfinished` in `games.ts`, though its pictures are all made (21 November 2026), until
+the user says to publish it: reached only from „🚧 In Arbeit“ on `/management/`, out of the sitemap and `noindex`.
 
 Tapsi the fox (the same family and home as in the other books) stretches in the cot and the feet bump the end, then
 climbs the bars – Papa is there and says Tapsi is growing. Mama reads a picture book about a mouse in a big bed, says
@@ -60,6 +60,7 @@ close and love Tapsi in the little bed and the big one.
   keeps a tiny round bear tail (checked; Mia came with a fox's tail), the night's clothes follow the page's words
   („Tapsi in pyjamas“, „Mama in her nightgown“, checked), and whoever lies in bed lies safely inside it (`SAFE_BED`,
   checked). Count the characters, each once, look for stray tails, and name faces, never „seriously“.
-- Once the last picture is made, each picture's `after` says what is left: the spine picture
-  (`src/components/bilder/spine-grosses-bett.webp`, 160×160 from „machen“), a perf scenario, and telling the user it can
-  be published – then `unfinished` goes, and the home page's and the Alltagshelfer's search texts name the book.
+- Every picture was made on 21 November 2026 (`/paid-queue`), with the spine picture
+  (`src/components/bilder/spine-grosses-bett.webp`, Tapsi with the bunny on the bed, cut from „machen“) and the perf
+  scenario „grosses-bett“. The book waits only for the user's word to publish it – then `unfinished` goes, and the home
+  page's and the Alltagshelfer's search texts name the book (never published without that word).

@@ -102,7 +102,7 @@ export const LANGUAGE_STATUS: LanguageStatusRow[] = [
         label: "🌙 The Milk Sleeps at Night",
         recorded: true,
         languages: { en: "text" },
-        note: 'Die Geschichte fürs nächtliche Abstillen (H-104, nightMilk.ts, /abstillen/nachts/, 21. November 2026), Englisch zuerst geschrieben (ChapterBook first="en"): Titel, Name des Bands und Satz fürs Regal (names.ts), Kapitel und Sätze. Übersetzt wird erst auf Wunsch, Deutsch eingeschlossen – bis dahin liest auch ein deutsches Kind sie auf Englisch; dann kommen Kapitel und Sätze in <Sprache>.ts im Ordner, geladen über texts-<Sprache>.ts, wie bei „Haare waschen“. Aufnahmen gibt es noch keine (bun run voice make --only abstillen-nachts, nur die englische Stimme), bis dahin bleibt es still. Die Texte für Suchmaschinen sind in allen sieben Sprachen da.',
+        note: 'Die Geschichte fürs nächtliche Abstillen (H-104, nightMilk.ts, /abstillen/nachts/, 21. November 2026), Englisch zuerst geschrieben (ChapterBook first="en"): Titel, Name des Bands und Satz fürs Regal (names.ts), Kapitel und Sätze. Übersetzt wird erst auf Wunsch, Deutsch eingeschlossen – bis dahin liest auch ein deutsches Kind sie auf Englisch; dann kommen Kapitel und Sätze in <Sprache>.ts im Ordner, geladen über texts-<Sprache>.ts, wie bei „Haare waschen“. Aufnahmen gibt es noch keine (bun run voice make --only abstillen-nachts, nur die englische Stimme), bis dahin bleibt es still. Die Texte für Suchmaschinen sind in allen sieben Sprachen da. Seit dem 21. November 2026 mit allen Bildern veröffentlicht: „Abstillen“ steht als zwei zusammengebundene Bücher im Regal.',
         files: [
           "src/games/nightmilk/names.ts",
           "src/games/nightmilk/NightMilkGame.tsx",

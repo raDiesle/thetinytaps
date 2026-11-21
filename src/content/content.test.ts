@@ -677,11 +677,12 @@ describe("Russian", () => {
 // right of Aufs Töpfchen in that order, „Wie lange warten?“ left of the Belohnungstafel, and the newer helpers after them
 // once they are finished. The Timer is the very first book, top left (user decision, November 2026), and „Abstillen“
 // stands right of it, left of Zähne putzen (user request, November 2026).
-test("the Alltagshelfer stand first on the shelf, the Timer top left, Abstillen beside it, the Schnullerfee, Kita-Start and Hair Washing beside that, Belohnungstafel & Zeitplan tied together right of Aufs Töpfchen", () => {
+test("the Alltagshelfer stand first on the shelf, the Timer top left, Abstillen and Bye-Bye, Bottle! beside it, the Schnullerfee, Kita-Start and Hair Washing beside that, Belohnungstafel & Zeitplan tied together right of Aufs Töpfchen", () => {
   expect(CATEGORIES[0].apart).toBe(true);
   expect(SHELF.filter((e) => e.category.id === CATEGORIES[0].id).map((e) => e.href)).toEqual([
     "/timer/",
     "/abstillen/",
+    "/flaeschchen/",
     "/schnullerfee/",
     "/kita/",
     "/haare-waschen/",
@@ -689,7 +690,9 @@ test("the Alltagshelfer stand first on the shelf, the Timer top left, Abstillen 
     "/toepfchen/",
     "/belohnungstafel/",
   ]);
-  expect(SHELF[7].game?.volumes?.map((v) => v.href)).toEqual(["/wie-lange-warten/", "/tagesplan/", "/belohnungstafel/"]);
+  expect(SHELF[8].game?.volumes?.map((v) => v.href)).toEqual(["/wie-lange-warten/", "/tagesplan/", "/belohnungstafel/"]);
+  // „Abstillen“ stands as two books tied together since the night story's pictures were made (H-104, 21 November 2026).
+  expect(shelfVolumes(SHELF[1].game!)?.map((v) => v.href)).toEqual(["/abstillen/", "/abstillen/nachts/"]);
 });
 
 // User decision, November 2026: a game still being built is reached only from the management page, so no child or

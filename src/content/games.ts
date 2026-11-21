@@ -2,7 +2,7 @@ import { ALLTAG_BLURB, ALLTAG_TITLE, BOOK_BLURB, BOOK_TITLE, MOOD_BLURB, MOOD_TI
 import { CAUSE_BLURB, CAUSE_TITLE } from "@/games/cause/names";
 import { TOWER_BLURB, TOWER_TITLE } from "@/games/tower/names";
 import { MILK_CHAIN_BLURB, MILK_CHAIN_BOOK } from "@/games/milkchain/names";
-import { NIGHT_MILK_BLURB, NIGHT_MILK_BOOK } from "@/games/nightmilk/names";
+import { NIGHT_MILK_BOOK } from "@/games/nightmilk/names";
 import { BOTTLE_STORY_BLURB, BOTTLE_STORY_BOOK } from "@/games/bottlestory/names";
 import { PACIFIER_STORY_BLURB, PACIFIER_STORY_BOOK } from "@/games/pacifierstory/names";
 import { KITA_STORY_BLURB, KITA_STORY_BOOK } from "@/games/kitastory/names";
@@ -123,8 +123,8 @@ export const CATEGORIES: Category[] = [
         // The book „Abstillen“ holds „Tapsis Milchkette“, the weaning story in chapters along the steps of gentle
         // weaning (src/games/milkchain; it replaced a first, shorter story, user decision, 9 November 2026), and tied to
         // it „The Milk Sleeps at Night“ for families who wean only at night (src/games/nightmilk, idea H-104), at an
-        // address of its own below it, so a video or a search lands right there. Until its pictures are made it is a
-        // volume still being built, and „Abstillen“ stands alone.
+        // address of its own below it, so a video or a search lands right there. Published once its pictures were made
+        // (21 November 2026): „Abstillen“ stands as two books tied together.
         href: "/abstillen/",
         also: ["/abstillen/nachts/"],
         emoji: "🤱",
@@ -132,19 +132,18 @@ export const CATEGORIES: Category[] = [
         blurb: MILK_CHAIN_BLURB,
         volumes: [
           { href: "/abstillen/", emoji: "🤱", title: MILK_CHAIN_BOOK },
-          { href: "/abstillen/nachts/", emoji: "🌙", title: NIGHT_MILK_BOOK, unfinished: { blurb: NIGHT_MILK_BLURB } },
+          { href: "/abstillen/nachts/", emoji: "🌙", title: NIGHT_MILK_BOOK },
         ],
       },
       {
         // The book „Bottle to Cup“ beside „Abstillen“ (idea H-105, user request, 21 November 2026): „Bye-Bye, Bottle!“, a
         // story in chapters along the guides' steps from the bottle to an open cup, for every child that drank from a
-        // bottle, breastfed or not (src/games/bottlestory), English first. Still being built while its pictures wait in
-        // the queue: the last one made drops `unfinished` (`AFTER` in bottleStoryPictures.ts).
+        // bottle, breastfed or not (src/games/bottlestory), English first. Published once its pictures were made (21
+        // November 2026).
         href: "/flaeschchen/",
         emoji: "🍼",
         title: BOTTLE_STORY_BOOK,
         blurb: BOTTLE_STORY_BLURB,
-        unfinished: true,
       },
       {
         // The book „Schnullerfee“ beside „Abstillen“ (user request, 10 November 2026): „Tapsi und die Schnullerfee“, a

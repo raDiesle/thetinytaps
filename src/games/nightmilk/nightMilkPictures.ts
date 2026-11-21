@@ -126,10 +126,25 @@ export function nightPicture(page: NightPage): QueuedPicture {
  * a picture only until then), so its volume is published and gets its spine.
  */
 const AFTER =
-  "Count the foxes on every picture (only the page's cast, each once, no stray tail) and look at every face; Tapsi's room must show no chain of milk drops over the bed. Once all twelve pages are made: add each id to MADE in src/games/nightmilk/nightMilkPictures.ts, cut the spine picture src/components/bilder/spine-abstillen-nachts.webp from nacht-weiter.webp (the moon and Tapsi asleep, cut like spine-abstillen.webp), drop `unfinished` from the volume /abstillen/nachts/ in src/content/games.ts (Abstillen then stands as two books tied together), mark the language row's note in languageStatus.ts and the root shelf test in content.test.ts, run bun run previews /abstillen/nachts/ and look at it.";
+  "Count the foxes on every picture (only the page's cast, each once, no stray tail) and look at every face; Tapsi's room must show no chain of milk drops over the bed. Once all twelve pages are made: add each id to MADE in src/games/nightmilk/nightMilkPictures.ts, cut the spine picture src/components/bilder/spine-abstillennachts.webp (bookIdOf drops the slashes, so not spine-abstillen-nachts) from nacht-weiter.webp (the moon and Tapsi asleep, cut like spine-abstillen.webp), drop `unfinished` from the volume /abstillen/nachts/ in src/content/games.ts (Abstillen then stands as two books tied together), mark the language row's note in languageStatus.ts and the root shelf test in content.test.ts, run bun run previews /abstillen/nachts/ and look at it.";
 
 /** The pages whose pictures are made (`bilder/nacht-<id>.webp`); the others wait in the queue. */
-const MADE = new Set<string>([]);
+const MADE = new Set<string>([
+  "abendmilch",
+  "einschlafen",
+  "lieb",
+  "morgenmilch",
+  "papa",
+  "sagen",
+  "tags",
+  "trinken",
+  "wach",
+  "wasser",
+  "weinen",
+  "weiter",
+  "wieder",
+  "winken",
+]);
 
 /** Every picture of the story still to make. */
 export const NIGHT_PICTURE_QUEUE: QueuedPicture[] = NIGHT_PAGES.filter((p) => !MADE.has(p.id)).map(nightPicture);

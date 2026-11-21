@@ -228,7 +228,42 @@ export function bedPicture(page: BedPage): QueuedPicture {
 }
 
 /** The pages whose pictures are made (`bilder/bett-<id>.webp`); the others wait in the queue. */
-const MADE = new Set<string>([]);
+const MADE = new Set<string>([
+  "abschied",
+  "aufwachen",
+  "aussuchen",
+  "bauen",
+  "bleiben",
+  "bruno-bett",
+  "bruno-familienbett",
+  "bruno-mittag",
+  "bruno-nacht",
+  "bruno-rufen",
+  "buch",
+  "eng",
+  "gelaender",
+  "geschichte",
+  "gutenacht",
+  "klettern",
+  "licht",
+  "lieb",
+  "lied",
+  "machen",
+  "mit",
+  "mittag",
+  "nachschauen",
+  "raus",
+  "stolz",
+  "stuhl",
+  "traum",
+  "tuer",
+  "wachsen",
+  "weiter",
+  "wo",
+  "zudecken",
+  "zuhoeren",
+  "zurueck",
+]);
 
 /** Every picture of the story still to make. */
 export const BED_PICTURE_QUEUE: QueuedPicture[] = BED_PAGES.filter((p) => !MADE.has(p.id)).map(bedPicture);

@@ -103,7 +103,7 @@ export function absent(page: BottlePage): string {
   if (!gone.length) return "";
   const names = gone.map((who) => NAMED[who]);
   const list = names.length === 1 ? names[0] : `${names.slice(0, -1).join(", ")} and ${names.at(-1)}`;
-  return `${list} ${names.length === 1 ? "is" : "are"} not in this picture at all: nobody else wears their clothes or looks like them, and where nobody is said to be, their place stays empty.`;
+  return `${list} ${names.length === 1 ? "is" : "are"} not in this picture at all: nobody else wears their clothes or looks like them, and where nobody is said to be, their place stays empty – no head, face or part of them left behind there, floating or peeking over the table.`;
 }
 
 /** The prompt of a page's picture, without the style block. */
@@ -148,7 +148,35 @@ export function bottlePicture(page: BottlePage): QueuedPicture {
 }
 
 /** The pages whose pictures are made (`bilder/flasche-<id>.webp`); the others wait in the queue. */
-const MADE = new Set<string>([]);
+const MADE = new Set<string>([
+  "abendmilch",
+  "aussuchen",
+  "baby",
+  "bett",
+  "einschlafen",
+  "gross",
+  "hase",
+  "kiste",
+  "kleckern",
+  "kuscheln",
+  "lieb",
+  "mittag",
+  "morgenmilch",
+  "regal",
+  "sagen",
+  "schluck",
+  "schrank",
+  "sonne",
+  "spielen",
+  "traurig",
+  "ueberall",
+  "vermissen",
+  "wach",
+  "waschen",
+  "wasser",
+  "will",
+  "zusammen",
+]);
 
 /** Every picture of the story still to make. */
 export const BOTTLE_PICTURE_QUEUE: QueuedPicture[] = BOTTLE_PAGES.filter((p) => !MADE.has(p.id)).map(bottlePicture);

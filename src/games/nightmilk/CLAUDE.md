@@ -32,9 +32,10 @@ wakes, sees the moon, hugs the teddy and sleeps on. Milk in the day, sleep at ni
   Washing“ (and `ChapterBook`'s `translations`, `voiceLines.ts`' `chapterBook(…)`, the row's part in
   `languageStatus.ts`). Its search texts are in all seven languages and say the story is so far in English: drop that
   sentence in every language when it is translated.
-- **Unfinished until its pictures are made** (`Volume.unfinished` in `games.ts`): a volume still being built is no book
-  on the shelf (`shelfVolumes` leaves it out, so Abstillen stands alone), its page has `noindex` and stays out of the
-  sitemap, and it is reached from „🚧 In Arbeit“ on `/management/`. The queue entries' `after` says what publishes it.
+- **Published since its pictures were made** (21 November 2026, a Claude cloud session's `/paid-queue`): the volume has
+  no `unfinished` in `games.ts` any more, so „Abstillen“ stands as two books tied together, its spine picture
+  `src/components/bilder/spine-abstillennachts.webp` (named by `bookIdOf`, which only drops the slashes) cut from „weiter“ (Tapsi asleep with the teddy, the moon left out:
+  with it the cut was too wide to know Tapsi on a spine). A picture drawn again replaces its file and changes nothing else.
 - **The chapters follow the guides' steps in their order** (`NIGHT_STEPS`, checked): tell beforehand, with one rule
   tied to dark and light and who comes at night; keep the evening's milk but end with a fixed ritual; comfort instead
   of milk at night – the other parent, water, carrying, humming; the milk comes back with the sun; the same night after

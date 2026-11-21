@@ -234,7 +234,7 @@ export const everydayHelpersIdeas: IdeaArea = {
       effort: "M",
       done: true,
       partial:
-        "Gebaut als Kapitelbuch „Bye-Bye, Bottle!“ (/flaeschchen/, Buch „Bottle to Cup“ bei den Alltagshelfern, 21. November 2026): acht Kapitel, 27 Seiten nach den Schritten der Fachstellen (Recherche „flasche-abgewoehnen“) – vorher erzählen, den offenen grünen Becher aussuchen und üben, die Flasche am Tag, dann am Morgen, die Abendflasche zuletzt, die Nacht mit Wasser und Trost, zum Schluss wäscht Tapsi die Flasche mit Papa und legt sie in eine Kiste, zur Erinnerung oder für ein Baby. Baby Tapsi bekommt die Flasche von Papa, nichts setzt Stillen voraus. Texte auf Englisch, Suchtexte in allen sieben Sprachen. Die Bilder warten in der Warteschlange (Claude Cloud); bis sie gemacht sind, steht das Buch unter „🚧 In Arbeit“, das letzte Bild veröffentlicht es (siehe src/games/bottlestory/CLAUDE.md, „Publishing“).",
+        "Gebaut als Kapitelbuch „Bye-Bye, Bottle!“ (/flaeschchen/, Buch „Bottle to Cup“ bei den Alltagshelfern, 21. November 2026): acht Kapitel, 27 Seiten nach den Schritten der Fachstellen (Recherche „flasche-abgewoehnen“) – vorher erzählen, den offenen grünen Becher aussuchen und üben, die Flasche am Tag, dann am Morgen, die Abendflasche zuletzt, die Nacht mit Wasser und Trost, zum Schluss wäscht Tapsi die Flasche mit Papa und legt sie in eine Kiste, zur Erinnerung oder für ein Baby. Baby Tapsi bekommt die Flasche von Papa, nichts setzt Stillen voraus. Texte auf Englisch, Suchtexte in allen sieben Sprachen. Am 21. November 2026 wurden alle Bilder gemacht und das Buch veröffentlicht: es steht bei den Alltagshelfern rechts neben „Abstillen“.",
     },
     {
       id: "H-106",
