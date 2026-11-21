@@ -1,5 +1,6 @@
 import type { TouchKeysMode } from "@/components/TouchKeyboard";
 import type { ThemeId } from "@/content/types";
+import type { BigKeysMode } from "./fewKeys";
 
 export type LetterCase = "upper" | "both" | "lower";
 
@@ -48,6 +49,8 @@ export interface LettersSettings {
   dark: boolean;
   /** Big letter keys on the screen, for tablets without a keyboard. */
   touchKeys: TouchKeysMode;
+  /** „Wörter tippen“ on a touch screen: a few big keys instead of the whole alphabet, and how many (W-02, `fewKeys.ts`). */
+  bigKeys: BigKeysMode;
   /** „Wörter tippen“: which words. */
   wordKind: WordKind;
   /** „Wörter tippen“: whole word, or the first letter's key („Wo ist das B?“). */
@@ -70,6 +73,7 @@ export const DEFAULT_LETTERS_SETTINGS: LettersSettings = {
   twoDigits: false,
   dark: false,
   touchKeys: "auto",
+  bigKeys: "auto",
   wordKind: "nouns",
   wordTyping: "spell",
   wordLength: "4",

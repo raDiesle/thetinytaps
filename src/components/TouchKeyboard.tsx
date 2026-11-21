@@ -1,4 +1,4 @@
-import type { CSSProperties, PointerEvent } from "react";
+import type { CSSProperties, PointerEvent, ReactNode } from "react";
 import { useDevice } from "@/lib/device";
 import { useT } from "@/lib/language";
 import { noPointerClick } from "@/lib/press";
@@ -77,8 +77,21 @@ export function TouchKeyboard({
   );
 }
 
-/** The parents' option for the on-screen keys; not shown on computers without a touch screen. */
-export function TouchKeysSetting({ value, onChange, anyTouch = false }: { value: TouchKeysMode; onChange: (mode: TouchKeysMode) => void; anyTouch?: boolean }) {
+/**
+ * The parents' option for the on-screen keys; not shown on computers without a touch screen. `children`: a game's own
+ * options for its keys, in the same group (Wörter tippen's few big keys).
+ */
+export function TouchKeysSetting({
+  value,
+  onChange,
+  anyTouch = false,
+  children,
+}: {
+  value: TouchKeysMode;
+  onChange: (mode: TouchKeysMode) => void;
+  anyTouch?: boolean;
+  children?: ReactNode;
+}) {
   const device = useDevice();
   const t = useT();
   if (!device.hasTouch) return null;
@@ -134,6 +147,7 @@ export function TouchKeysSetting({ value, onChange, anyTouch = false }: { value:
           },
         ]}
       />
+      {children}
     </SettingsGroup>
   );
 }

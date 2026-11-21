@@ -29,7 +29,16 @@ and one store of settings (`tinytaps.letters.v2`, so letters, pictures and keys 
   round only ripple; a tap on the child afterwards plays the same number again. No ⚙️: nothing to choose.
 - Wörter tippen, `/woerter/`: the whole word (`WordsPlay.tsx`: picture words, colour words, doing words or all of them
   mixed, all from the language pack), or the first letter, which plays „Wo ist das B?“ (`FindPlay.tsx`: find the key
-  for a shown letter).
+  for a shown letter). On a touch screen, where the on-screen keys show, both play with a few big keys instead of the
+  whole alphabet (W-02, `BigKeys.tsx`, `fewKeys.ts`, `bigKeys.css`): the right one and others that never type it too
+  (not A beside Ä, not ख beside क; `bigKeyChoices`, from `findableLetters`), beside the picture on a wide screen (one
+  column up to three keys, two for more, clear of the notes top right) and under it on an upright one (rows of up to
+  three). They are dealt anew for each letter and stay put while it is looked for. Their number finds itself
+  (`nextKeyLevel`): three at first, one more after `GROW_AFTER` letters found at the first tap, one less after a letter
+  found only after wrong taps, between 3 and 6 – more to tell apart, never faster. Grown-ups may fix it at 3, 4 or 6, or
+  go back to the whole keyboard, behind ⚙️ in the Tablet group (`bigKeys`, shown only where the on-screen keys show).
+  Among a few keys the right one is marked only after `HINT_AFTER_WRONG` wrong taps, still (`.hint`, never pulsing) –
+  lit at once there would be nothing to find; „Wo ist das B?“ presses it down and lights it once found (`.lit`).
 - Wo ist das kleine b?, `/gross-klein/` (`CasePlay.tsx`, `case.css`; L-23, published, playable from the menu): a big letter
   looks for its child among three small letters; the right one (tapped, or its key pressed) walks over in
   little hops and stands beside it, a wrong one shakes its head. Three rounds in a row found at the first tap bring
@@ -87,7 +96,8 @@ the page before it.
   `SURPRISE_KINDS`, its classes into the test's `CLASSES`.
 - Choices show the plain value, not an example to decode: the word length is the number of letters (3, 4, 7).
 - „Wörter tippen“ has no settings of its own: no own letter case, picture reveal, „any key types“ or tablet keys;
-  it uses the shared ones (pictures theme, letters, on-screen keys). Don't add them back. The letters
+  it uses the shared ones (pictures theme, letters, on-screen keys). Don't add them back. The one exception is how many
+  big keys a touch screen shows (W-02, above), which finds itself unless a grown-up fixes it. The letters
   (A / A a / a) are shared by Frei tippen and Wörter tippen – the words too („A a“ writes „Bär“).
 - On a phone on its side (Frei tippen and Zählen) letter, picture and word – or the things and the digit – stand side by
   side, not stacked: the on-screen keys leave little height, and stacked they would be tiny (`letters.css`, end).

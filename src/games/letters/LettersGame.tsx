@@ -22,6 +22,7 @@ import { LettersPlay } from "./LettersPlay";
 import { MovePlay } from "./MovePlay";
 import { type LettersWay, WAY_TITLES } from "./names";
 import { WordsPlay } from "./WordsPlay";
+import type { BigKeysMode } from "./fewKeys";
 
 /**
  * One of the book's games – Frei tippen, Zählen, Mitmachen, Wörter tippen or Wo ist das kleine b? –, each on its own page of the table of contents
@@ -124,10 +125,10 @@ export function LettersGame({ way }: { way: LettersWay }) {
     >
       {findLetter ? (
         // A new kind of pictures brings a new letter at once.
-        <FindPlay key={settings.theme} pack={pack} settings={play} />
+        <FindPlay key={`${settings.theme}-${settings.bigKeys}`} pack={pack} settings={play} />
       ) : way === "words" ? (
         // New words to type bring a new word at once.
-        <WordsPlay key={`${settings.wordKind}-${settings.wordLength}-${settings.theme}`} pack={pack} settings={play} />
+        <WordsPlay key={`${settings.wordKind}-${settings.wordLength}-${settings.theme}-${settings.bigKeys}`} pack={pack} settings={play} />
       ) : (
         <LettersPlay pack={pack} settings={play} numbersOnly={numbersOnly} />
       )}
@@ -420,7 +421,23 @@ export function LettersGame({ way }: { way: LettersWay }) {
           />
         </SettingsGroup>
 
-        <TouchKeysSetting value={settings.touchKeys} onChange={(touchKeys) => update({ touchKeys })} anyTouch={anyTouch} />
+        <TouchKeysSetting value={settings.touchKeys} onChange={(touchKeys) => update({ touchKeys })} anyTouch={anyTouch}>
+          {/* Wörter tippen: a few big keys instead of the whole alphabet (W-02), growing by themselves unless fixed here. */}
+          {way === "words" && touchKeys && (
+            <Choice<BigKeysMode>
+              label={t({ en: "How many keys" })}
+              value={settings.bigKeys}
+              onChange={(bigKeys) => update({ bigKeys })}
+              options={[
+                { value: "auto", label: t({ en: "Big keys, 3 to 6 by themselves" }) },
+                { value: "3", label: "3" },
+                { value: "4", label: "4" },
+                { value: "6", label: "6" },
+                { value: "all", label: t({ en: "All letters" }) },
+              ]}
+            />
+          )}
+        </TouchKeysSetting>
       </PlayOptions>
     </GameShell>
   );

@@ -22,6 +22,9 @@ export const wordsIdeas: IdeaArea = {
       text: "Auf dem Tablet statt Tastatur 3–6 riesige Buchstabenknöpfe: der richtige plus ein paar andere. Anzahl einstellbar.",
       why: "Tablet-tauglich und für Anfänger viel leichter als 26 Tasten.",
       effort: "M",
+      done: true,
+      partial:
+        "Umgesetzt am 21. November 2026 für ganze Wörter und „Wo ist das B?“: auf Touch-Bildschirmen (wo bisher die Bildschirm-Tastatur stand) große Tasten neben dem Bild (hochkant darunter) – die richtige und andere, die nie dieselbe Taste sind (Ä nicht neben A, Hindi क nicht neben ख). Die Anzahl wächst von selbst von 3 bis 6, wenn das Kind die Buchstaben beim ersten Tipp findet, und sinkt nach falschen Tipps; unter ⚙️ (Tablet) lässt sie sich auf 3, 4 oder 6 festlegen oder zurück auf die ganze Tastatur stellen. Die richtige Taste wird erst nach ein paar Fehlversuchen markiert. Die neuen Texte unter ⚙️ nur auf Englisch.",
     },
     {
       id: "W-03",
