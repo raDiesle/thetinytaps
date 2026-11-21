@@ -53,6 +53,7 @@ const MarblePage = page(() => import("@/pages/MarblePage"), "MarblePage", "/kett
 const PacifierStoryPage = page(() => import("@/pages/PacifierStoryPage"), "PacifierStoryPage", "/schnullerfee/");
 const KitaStoryPage = page(() => import("@/pages/KitaStoryPage"), "KitaStoryPage", "/kita/");
 const HairStoryPage = page(() => import("@/pages/HairStoryPage"), "HairStoryPage", "/haare-waschen/");
+const BottleStoryPage = page(() => import("@/pages/BottleStoryPage"), "BottleStoryPage", "/flaeschchen/");
 const BedStoryPage = page(() => import("@/pages/BedStoryPage"), "BedStoryPage", "/grosses-bett/");
 const PottyPage = page(() => import("@/pages/PottyPage"), "PottyPage", "/toepfchen/");
 const RewardsPage = page(() => import("@/pages/RewardsPage"), "RewardsPage", "/belohnungstafel/");
@@ -70,6 +71,7 @@ const TogetherPage = page(
 );
 const TimerPage = page(() => import("@/pages/TimerPage"), "TimerPage", "/timer/");
 const MilkChainPage = page(() => import("@/pages/MilkChainPage"), "MilkChainPage", "/abstillen/");
+const NightMilkPage = page(() => import("@/pages/NightMilkPage"), "NightMilkPage", "/abstillen/nachts/");
 const TrophyRoomPage = page(() => import("@/pages/TrophyRoomPage"), "TrophyRoomPage", "/pokale/");
 
 export function App() {
@@ -98,9 +100,11 @@ export function App() {
           <Route path="zaehne" element={<TeethPage />} />
           <Route path="toepfchen" element={<PottyPage />} />
           <Route path="abstillen" element={<MilkChainPage />} />
+          <Route path="abstillen/nachts" element={<NightMilkPage />} />
           <Route path="schnullerfee" element={<PacifierStoryPage />} />
           <Route path="kita" element={<KitaStoryPage />} />
           <Route path="haare-waschen" element={<HairStoryPage />} />
+          <Route path="flaeschchen" element={<BottleStoryPage />} />
           <Route path="grosses-bett" element={<BedStoryPage />} />
           <Route path="belohnungstafel" element={<RewardsPage />} />
           {/* The Tagesplan shares the Belohnungstafel's page; its own address opens it on a plan (and keeps its search entry). */}

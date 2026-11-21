@@ -2,6 +2,7 @@ import { describe, expect, test } from "bun:test";
 import {
   brushedPoints,
   buildMouth,
+  CHEWING_DEPTHS,
   cornerStretch,
   glideStretch,
   insideBy,
@@ -13,10 +14,21 @@ import {
   projectors,
   stretchLips,
   TOOTH_CLEAR,
+  profileOf,
   toothKey,
   type View,
+  viewedLips,
 } from "./jaw";
 import { GRIN_VIEW, STEPS } from "./steps";
+
+// From the two broad molars the next three teeth were all equally thin from above, a jump that looked odd (user
+// feedback, November 2026): from the last molar to the front tooth the chewing surface narrows step by step.
+test("the chewing surfaces narrow step by step from the back to the front", () => {
+  const steps = CHEWING_DEPTHS.slice(1).map((d, i) => d - CHEWING_DEPTHS[i]);
+  for (const step of steps) expect(step).toBeGreaterThan(0);
+  // No step much bigger than the others: the biggest at most twice the smallest.
+  expect(Math.max(...steps)).toBeLessThanOrEqual(2 * Math.min(...steps));
+});
 
 // The screen is held sideways, so the mouth is drawn wide: a tall open „Aaah“ left most of it to an empty palate and
 // drew the teeth small (user request, November 2026).
@@ -48,7 +60,7 @@ describe("the teeth being brushed", () => {
       const face = model.teeth.find((t) => t.key === toothKey(id))!.faces.find((f) => f.kind === step.surface)!;
       return all[id.jaw].facing(face.normal) > 0.03 ? midLine(face).map(all[id.jaw].point) : [];
     });
-    return { lips: model.lips.map(all.face.point), keep };
+    return { lips: viewedLips(model.lips, step.view).map(all.face.point), keep };
   };
 
   test.each(STEPS.map((s) => [s.id, s] as const))("%s: all of them show inside the lips, none behind a corner of the mouth", (_, step) => {
@@ -77,7 +89,7 @@ describe("the gum runs into the lips", () => {
   test.each(views)("%s: every cheek-side wall of gum that shows ends outside the lips", (_, view, zone) => {
     const model = buildMouth(view.open);
     const all = projectors(view);
-    const plain = model.lips.map(all.face.point);
+    const plain = viewedLips(model.lips, view).map(all.face.point);
     const lips = stretchLips(plain, zone ? cornerStretch(plain, brushedPoints(model, all, zone), TOOTH_CLEAR) : NO_STRETCH);
     const inside = model.gums.flatMap((gum) => {
       const wall = gum.faces.find((f) => f.kind === "outer")!;
@@ -97,7 +109,7 @@ describe("the lips while the head turns or the mouth opens", () => {
     if (!zone) return NO_STRETCH;
     const model = buildMouth(view.open);
     const all = projectors(view);
-    return cornerStretch(model.lips.map(all.face.point), brushedPoints(model, all, zone), TOOTH_CLEAR);
+    return cornerStretch(viewedLips(model.lips, view).map(all.face.point), brushedPoints(model, all, zone), TOOTH_CLEAR);
   };
   const ease = (k: number) => (k < 0.5 ? 2 * k * k : 1 - (-2 * k + 2) ** 2 / 2);
   const width = (lips: { x: number }[]) => Math.max(...lips.map((p) => p.x)) - Math.min(...lips.map((p) => p.x));
@@ -113,14 +125,17 @@ describe("the lips while the head turns or the mouth opens", () => {
     const start = stretchAt(from.view, from.zone);
     const end = stretchAt(to.view, to.zone);
     const FRAMES = 40;
-    const widths = Array.from({ length: FRAMES + 1 }, (_, i) => {
+    const frames = Array.from({ length: FRAMES + 1 }, (_, i) => {
       const k = ease(i / FRAMES);
       const view = lerpView(from.view, to.view, k);
-      return width(stretchLips(buildMouth(view.open).lips.map(projectors(view).face.point), glideStretch(start, end, k)));
+      const lips = viewedLips(buildMouth(view.open).lips, view).map(projectors(view).face.point);
+      return { plain: width(lips), stretched: width(stretchLips(lips, glideStretch(start, end, k))) };
     });
+    const biggest = (widths: number[]) => Math.max(...widths.slice(1).map((w, i) => Math.abs(w - widths[i])));
     // Worked out from each in-between picture, the turn onto the left outside jumped by 76 picture units in one frame.
-    const biggest = Math.max(...widths.slice(1).map((w, i) => Math.abs(w - widths[i])));
-    expect(biggest).toBeLessThan(12);
+    // The corners' stretch adds next to nothing to how fast the lips change as the head turns: a turn to the side
+    // narrows them by itself, the further the faster.
+    expect(biggest(frames.map((f) => f.stretched))).toBeLessThan(biggest(frames.map((f) => f.plain)) + 12);
   });
 });
 
@@ -143,5 +158,29 @@ describe("insideBy", () => {
 
   test("outside stays outside", () => {
     expect(insideBy({ x: 150, y: 50 }, square, 0)).toBe(false);
+  });
+});
+
+// Seen from the side the lips are seen from the side, pulled back onto the teeth, and the front teeth stand out past
+// them with no lip in front (user feedback, November 2026).
+describe("the mouth seen from the side", () => {
+  const sideways = STEPS.filter((s) => Math.abs(s.view.yaw) >= 60);
+
+  test("the outside steps of the back teeth are seen from the side", () => {
+    expect(sideways.map((s) => s.id).sort()).toEqual(["outer-left", "outer-right"]);
+    for (const step of sideways) expect(profileOf(step.view)).toBe(1);
+  });
+
+  test("from the front nothing changes", () => {
+    for (const view of [GRIN_VIEW, ...STEPS.filter((s) => s.view.yaw === 0).map((s) => s.view)]) expect(profileOf(view)).toBe(0);
+  });
+
+  test.each(sideways.map((s) => [s.id, s] as const))("%s: the lips end behind the front teeth's fronts", (_, step) => {
+    const model = buildMouth(step.view.open);
+    const fronts = model.teeth.filter((t) => t.id.n === 0).flatMap((t) => t.faces.flatMap((f) => f.points.map((p) => p[2])));
+    const lips = viewedLips(model.lips, step.view);
+    const middle = lips.filter((p) => Math.abs(p[0]) < 1e-6);
+    expect(middle).toHaveLength(2);
+    for (const p of middle) expect(p[2]).toBeLessThan(Math.max(...fronts) - 10);
   });
 });

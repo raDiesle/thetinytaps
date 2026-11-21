@@ -28,15 +28,20 @@ import {
   cheekSpots,
   HEAD_MIDDLE,
   HEAD_RADIUS,
+  headNormal,
+  onHead,
+  profileLine,
+  profileOf,
+  viewedLips,
 } from "./jaw";
+import { BROW, Ear, EyeBall, FACE, HAIR, Hair, HEAD_UNITS, type HeadMap, INK, Iris, LASHES, LIP, Nose, SkinGradient } from "./face";
 import { Brush, lerp3, type BrushAnchor } from "./brush";
 import type { Motion } from "./steps";
 
 // A child's face in a mirror, close up. The mouth is a small 3D model (see
 // jaw.ts), so the picture can turn and tilt to show exactly where to brush.
 
-export const INK = "#2a1e5c";
-export const SKIN = "#f7c9a1";
+export { INK, SKIN } from "./face";
 const TOOTH_FILLS: Record<FaceKind, string> = { outer: "#fffdf6", top: "#fbeed0", inner: "#f2e6d2", side: "#e6d8bd" };
 const GUM_FILLS: Record<FaceKind, string> = { outer: "#ff8fab", top: "#ffa6bc", inner: "#f27c9c", side: "#ff8fab" };
 /** The gum's edge round each tooth. */
@@ -50,8 +55,6 @@ const MOUTH_DARK = "#5c1430";
 const DARK_FROM = 0.3;
 /** Monsters still waiting for a later step only show where their side of the tooth clearly faces out of the mouth. */
 const WAITING_FACING = 0.25;
-/** The child's hair, also its eyebrows. */
-const HAIR = "#8a5a3c";
 /** Small enough that a monster sits on its tooth rather than covering it and its neighbours. */
 const MONSTER_SIZE = 0.58;
 /** How far inside the lips' outline a monster's middle has to be: past the thick lip (half its stroke) onto the teeth. */
@@ -273,18 +276,94 @@ function roundedPath(points: { x: number; y: number }[], radius = 3) {
 
 /** A smooth closed curve through the points (Catmull-Rom as cubic Béziers). */
 function smoothPath(points: { x: number; y: number }[]) {
+  return `${smoothPart(points, 0, points.length)}Z`;
+}
+
+/** A part of the smooth closed curve through `points`: from point `from` on, `count` pieces, exactly as `smoothPath` draws them. */
+function smoothPart(points: { x: number; y: number }[], from: number, count: number) {
   const n = points.length;
-  let d = `M${fmt(points[0])}`;
-  for (let i = 0; i < n; i++) {
-    const [p0, p1, p2, p3] = [points[(i - 1 + n) % n], points[i], points[(i + 1) % n], points[(i + 2) % n]];
+  const at = (i: number) => points[((i % n) + n) % n];
+  let d = `M${fmt(at(from))}`;
+  for (let i = from; i < from + count; i++) {
+    const [p0, p1, p2, p3] = [at(i - 1), at(i), at(i + 1), at(i + 2)];
     const c1 = { x: p1.x + (p2.x - p0.x) / 6, y: p1.y + (p2.y - p0.y) / 6 };
     const c2 = { x: p2.x - (p3.x - p1.x) / 6, y: p2.y - (p3.y - p1.y) / 6 };
     d += ` C${fmt(c1)} ${fmt(c2)} ${fmt(p2)}`;
   }
-  return `${d}Z`;
+  return d;
 }
 
 const facePath = (face: Face, project: Project, radius = 3) => roundedPath(face.points.map(project.point), radius);
+
+/** A tooth's crown: the faces that show, with the light on its front and the groove on a molar; `zone` the face to brush. */
+function Crown({ tooth: t, project, zone }: { tooth: MouthModel["teeth"][number]; project: Project; zone?: Surface }) {
+  const p = project.point;
+  return (
+    <>
+      {t.faces
+        // Slivers of the sides between teeth only add clutter.
+        .filter((f) => project.facing(f.normal) > (f.kind === "side" ? 0.3 : MIN_FACING))
+        .map((f, j) => (
+          <path
+            key={j}
+            d={facePath(f, project, f.kind === "outer" ? 7 : 3)}
+            fill={f.kind === zone ? ZONE_FILL : TOOTH_FILLS[f.kind]}
+            stroke={INK}
+            strokeWidth={2.2}
+            strokeLinejoin="round"
+          />
+        ))}
+      {project.facing(surfaceFace(t.faces, "outer").normal) > 0.55 && (
+        <path d={`M${fmt(p(t.shine[0]))} L${fmt(p(t.shine[1]))}`} stroke="#fff" strokeWidth={4} strokeLinecap="round" opacity={0.9} />
+      )}
+      {t.groove && project.facing(surfaceFace(t.faces, "top").normal) > 0.25 && (
+        <path d={`M${t.groove.map((g) => fmt(p(g))).join(" L")}`} fill="none" stroke="#d9c49a" strokeWidth={2} strokeLinecap="round" />
+      )}
+    </>
+  );
+}
+
+/** The mirror's glass behind the head. */
+const MIRROR_GLASS = "#dff6ff";
+
+/** What a profile needs on the screen: the face's outline, the region past it, the lips' near half and the front teeth. */
+interface ProfileParts {
+  /** The face's outline from the top of the head down (`profileLine`). */
+  line: Point2[];
+  /** The region past the face's front, not seen: as a path, and its outline. */
+  beyond: string;
+  ring: { x: number; y: number }[];
+  /** The near half of the lips, from the upper lip's end round the near corner to the lower one's: its index and pieces. */
+  nearFrom: number;
+  nearCount: number;
+  /** The near half's points and the front teeth's, for the camera. */
+  near: Point2[];
+  front: Point2[];
+}
+
+/**
+ * The profile's parts for lips (`lips3d`, as the view shows them) whose projection with their corners pulled is `lips`;
+ * `front` are the front teeth's corners on the screen.
+ */
+function profileParts(lips3d: Vec3[], lips: Point2[], face: Project, front: Point2[]): ProfileParts {
+  const line = profileLine(lips3d).map(face.point);
+  // Past the face's front, as far as the picture could reach: the direction its front faces on the screen.
+  const out = face.direction([0, 0, 1]);
+  const length = Math.hypot(out.x, out.y) || 1;
+  const far = 6000;
+  const away = (p: { x: number; y: number }, up: number) => ({ x: p.x + (out.x / length) * far, y: p.y + (out.y / length) * far + up });
+  const [first, last] = [line[0], line[line.length - 1]];
+  const ring = [...line, { x: last.x, y: last.y + far }, away(last, far), away(first, -far), { x: first.x, y: first.y - far }];
+  const beyond = `M${ring.map(fmt).join(" L")}Z`;
+  // The lips' ring runs from the right corner (0) over the top (a quarter) to the left corner and under it back:
+  // the near half is the side whose corner is nearer the eye.
+  const n = lips.length;
+  const quarter = n / 4;
+  const leftNear = lips[n / 2].depth > lips[0].depth;
+  const nearFrom = leftNear ? quarter : 3 * quarter;
+  const near = Array.from({ length: n / 2 + 1 }, (_, i) => lips[(nearFrom + i) % n]);
+  return { line, beyond, ring, nearFrom, nearCount: n / 2, near, front };
+}
 
 const surfaceFace = (faces: Face[], surface: Surface) => faces.find((f) => f.kind === surface)!;
 
@@ -330,19 +409,29 @@ export function Mouth({ view, zone, monsters, brush, happy, dazzled, action, gli
     if (!zone) return NO_STRETCH;
     const to = projectors(glide.to);
     const target = mouthAt(glide.to.open);
-    return cornerStretch(target.lips.map(to.face.point), brushedPoints(target, to, zone), TOOTH_CLEAR);
+    return cornerStretch(viewedLips(target.lips, glide.to).map(to.face.point), brushedPoints(target, to, zone), TOOTH_CLEAR);
   }, [glide.to, zone?.teeth, zone?.surface]);
   // The stretch shown last while the head held still: where the corners start from when it glides again.
   const heldStretch = useRef(settled);
   if (!gliding) heldStretch.current = settled;
   const stretch = gliding ? glideStretch(heldStretch.current, settled, glide.k) : settled;
-  const lipPoints = useMemo(() => stretchLips(model.lips.map(project.point), stretch), [model, project, stretch.left, stretch.right]);
+  const lips3d = useMemo(() => viewedLips(model.lips, view), [model, view]);
+  const lipPoints = useMemo(() => stretchLips(lips3d.map(project.point), stretch), [lips3d, project, stretch.left, stretch.right]);
   const lipsPath = useMemo(() => smoothPath(lipPoints), [lipPoints]);
+  // Seen from the side the head is a profile: what lies past the face's front is not seen (`profileOf`, `Profile`).
+  const profile = profileOf(view);
+  const side = useMemo(() => {
+    if (profile <= 0) return null;
+    const front = model.teeth.filter((t) => t.id.n <= 1).flatMap((t) => surfaceFace(t.faces, "outer").points.map(all[t.id.jaw].point));
+    return profileParts(lips3d, lipPoints, all.face, front);
+  }, [profile > 0, model, lips3d, lipPoints, all]);
 
   const svg = useRef<SVGSVGElement>(null);
   const room = useRoom(svg, free);
   // At the end the camera zooms out from the lips to the whole laughing head, along with the head's glide to the grin.
-  const lipFocus = mouthFocus(lipPoints, project.zoom, view.open);
+  // In a profile the lips' far half is not seen: the camera looks at the near half and the front teeth past it.
+  const ringFocus = mouthFocus(lipPoints, project.zoom, view.open);
+  const lipFocus = side ? blendBox(ringFocus, mouthFocus([...side.near, ...side.front], project.zoom, view.open), profile) : ringFocus;
   const focus = happy ? blendBox(lipFocus, faceFocus(project), gliding ? glide.k : 1) : lipFocus;
   const { box, unit } = fitBox(room, focus);
   const frame = screenFrame(box, unit);
@@ -406,25 +495,7 @@ export function Mouth({ view, zone, monsters, brush, happy, dazzled, action, gli
             return (
               <g key={t.key}>
                 {gumFaces(true)}
-                {t.faces
-                  // Slivers of the sides between teeth only add clutter.
-                  .filter((f) => project.facing(f.normal) > (f.kind === "side" ? 0.3 : MIN_FACING))
-                  .map((f, j) => (
-                    <path
-                      key={j}
-                      d={facePath(f, project, f.kind === "outer" ? 7 : 3)}
-                      fill={f.kind === zoneSurface && zoneKeys.has(t.key) ? ZONE_FILL : TOOTH_FILLS[f.kind]}
-                      stroke={INK}
-                      strokeWidth={2.2}
-                      strokeLinejoin="round"
-                    />
-                  ))}
-                {project.facing(surfaceFace(t.faces, "outer").normal) > 0.55 && (
-                  <path d={`M${fmt(p(t.shine[0]))} L${fmt(p(t.shine[1]))}`} stroke="#fff" strokeWidth={4} strokeLinecap="round" opacity={0.9} />
-                )}
-                {t.groove && project.facing(surfaceFace(t.faces, "top").normal) > 0.25 && (
-                  <path d={`M${t.groove.map((g) => fmt(p(g))).join(" L")}`} fill="none" stroke="#d9c49a" strokeWidth={2} strokeLinecap="round" />
-                )}
+                <Crown tooth={t} project={project} zone={zoneKeys.has(t.key) ? zoneSurface : undefined} />
                 {gumFaces(false)}
                 {rims.map((kind) => (
                   <path
@@ -470,6 +541,9 @@ export function Mouth({ view, zone, monsters, brush, happy, dazzled, action, gli
     const at = jaw.point(lift(alongFace(face, m.spot), face, 4));
     // Back teeth hidden behind the corners of the lips: their monsters would sit on the lip.
     if (!insideBy(at, lipPoints, LIP_EDGE)) return null;
+    // Seen from the side, the front teeth stand out past the face: only their sides show, so the waiting monsters on
+    // their fronts wait out of sight, rather than a crowd of them sticking out of the mouth.
+    if (m.waiting && side && insideBy(at, side.ring, 0)) return null;
     // The ones being brushed move, so each lies in a layer of its own (Sprite), placed on the screen.
     const spot = m.waiting ? { x: at.x, y: at.y, scale: MONSTER_SIZE * project.zoom } : onScreen(at, MONSTER_SIZE * project.zoom);
     return (
@@ -493,6 +567,45 @@ export function Mouth({ view, zone, monsters, brush, happy, dazzled, action, gli
     );
   };
 
+  // Seen from the side, over the lips: the far side of the head past the face's front is the mirror's glass, the face's
+  // outline runs down its front, the front teeth stand out past it (their crowns only: no gum or lip in front of them),
+  // and the lips' near half ends round at the front. It comes in as the head turns that far (`profile`), never at once.
+  const profileCut = useMemo(() => {
+    if (!side) return null;
+    const zoneKeys = new Set(zoneTeeth?.map(toothKey));
+    const crowns = jawOrder(view).map((jaw) => {
+      const p = all[jaw];
+      const teeth = model.teeth.filter((t) => t.id.jaw === jaw && t.id.n <= 2).sort((a, b) => p.point(a.center).depth - p.point(b.center).depth);
+      return (
+        <g key={jaw}>
+          {teeth.map((t) => (
+            <Crown key={t.key} tooth={t} project={p} zone={zoneKeys.has(t.key) ? zoneSurface : undefined} />
+          ))}
+        </g>
+      );
+    });
+    const near = smoothPart(lipPoints, side.nearFrom, side.nearCount);
+    return (
+      <g opacity={round(profile, 100)}>
+        <defs>
+          <clipPath id="profile-beyond">
+            <path d={side.beyond} />
+          </clipPath>
+          <clipPath id="profile-opening">
+            <path d={lipsPath} />
+          </clipPath>
+        </defs>
+        <path d={side.beyond} fill={MIRROR_GLASS} />
+        <path d={`M${side.line.map(fmt).join(" L")}`} fill="none" stroke={INK} strokeWidth={7} strokeLinejoin="round" strokeLinecap="round" />
+        <g clipPath="url(#profile-beyond)">
+          <g clipPath="url(#profile-opening)">{crowns}</g>
+        </g>
+        <path d={near} fill="none" stroke={INK} strokeWidth={34} strokeLinejoin="round" strokeLinecap="round" />
+        <path d={near} fill="none" stroke={LIP} strokeWidth={27} strokeLinejoin="round" strokeLinecap="round" />
+      </g>
+    );
+  }, [side, profile, view, all, model, lipPoints, lipsPath, zoneSurface, zoneTeeth]);
+
   // The lips over the glow's edge, in a layer of their own above it, so the glow stays inside them; with them the
   // monsters waiting for a later step, which stand still. While the head turns or the mouth opens there is no glow and
   // every layer with the picture's viewBox is drawn anew in every frame, so they join the still picture instead:
@@ -500,7 +613,8 @@ export function Mouth({ view, zone, monsters, brush, happy, dazzled, action, gli
   const lipsAndWaiting = (
     <>
       <path d={lipsPath} fill="none" stroke={INK} strokeWidth={34} strokeLinejoin="round" />
-      <path d={lipsPath} fill="none" stroke="#ff7088" strokeWidth={27} strokeLinejoin="round" />
+      <path d={lipsPath} fill="none" stroke={LIP} strokeWidth={27} strokeLinejoin="round" />
+      {profileCut}
       {monsters.filter((m) => m.waiting).map(placed)}
     </>
   );
@@ -928,33 +1042,28 @@ function LipArrows({
   ));
 }
 
-/** Where the girl's two lashes start on the outer top of an eye: sideways and up from its middle. */
-const LASHES = [
-  [10, 14],
-  [15, 4],
-];
-
+/**
+ * The child's head round the mouth, drawn with the story's parts (`face.tsx`) – the same hair, ears, eyes with their
+ * irises, brows and nose – placed on the round head and turned with it, so the mirror shows the child of the story.
+ */
 function KidFace({ project, head, happy, open, lips }: { project: Project; head: Point2; happy: boolean; open: number; lips: Point2[] }) {
-  const p = project.point;
-  const feature = (x: number, y: number, z: number) => ({ at: p([x, y, z]), facing: project.facing([x / 200, 0.1, 0.95]) });
-  const ears = [-1, 1].map((s) => ({ s, at: p([s * HEAD_RADIUS * 0.97, 70, -60]) }));
-  const eyes = [-1, 1].map((s) => feature(s * 66, 138, 120));
-  // The eyebrows go up with a wide open mouth.
-  const brows = [-1, 1].map((s) => feature(s * 70, 174 + 14 * open, 112));
+  /** Head units (the story's, round the head's middle, y down) to the picture. */
+  const at: HeadMap = (x, y) => project.point(onHead(x / HEAD_UNITS, y / HEAD_UNITS));
+  const facingAt = (x: number, y: number) => project.facing(headNormal(x / HEAD_UNITS, y / HEAD_UNITS));
+  /** Picture units per head unit: the parts grow with the head. */
+  const k = (HEAD_RADIUS * project.zoom) / HEAD_UNITS;
+  /** Outlines grow less than the head, so they stay as thick as the lips' and teeth's. */
+  const w = Math.min(k, 1.5);
+  const squash = (facing: number) => Math.max(0.25, Math.min(1, facing));
   // The cheeks keep clear of the lips: a wide mouth pushes them up and out instead of the blush touching its corners.
   const cheeks = cheekSpots(project, lips);
-  const nose = feature(0, 96, 148);
-  const squash = (facing: number) => Math.max(0.25, Math.min(1, facing));
   // The girl (👧 on the home page) has two pigtails above the ears, which turn with the head like the ears do, and
   // lashes at her eyes – the mirror is so close that often only the eyes show.
   const girl = useFigure() === "girl";
-  const pigtails = girl
-    ? [-1, 1].map((s) => ({
-        s,
-        tail: p([s * (HEAD_RADIUS + 60), 170, -90]),
-        band: { at: p([s * HEAD_RADIUS * 0.9, 200, -30]), facing: project.facing([s * 0.9, 0.4, 0.3]) },
-      }))
-    : [];
+  const { eyes, brows, nose, ears, pigtails, bands } = FACE;
+  const sides = [-1, 1] as const;
+  const noseFacing = facingAt(0, nose.y);
+  const noseTip = at(0, nose.y);
 
   return (
     <g>
@@ -965,85 +1074,92 @@ function KidFace({ project, head, happy, open, lips }: { project: Project; head:
           <stop offset="0.6" stopColor="#ff8fa3" stopOpacity={0.45} />
           <stop offset="1" stopColor="#ff8fa3" stopOpacity={0} />
         </radialGradient>
+        <SkinGradient id="kid-skin" />
       </defs>
-      {pigtails.map(({ s, tail }) => (
-        <ellipse
-          key={s}
-          cx={tail.x}
-          cy={tail.y}
-          rx={70 * project.zoom}
-          ry={115 * project.zoom}
-          transform={`rotate(${s * -35} ${tail.x} ${tail.y})`}
-          fill={HAIR}
-          stroke={INK}
-          strokeWidth={6}
-        />
-      ))}
-      {ears.map(({ s, at }) => (
-        <circle key={s} cx={at.x} cy={at.y} r={40 * project.zoom} fill={SKIN} stroke={INK} strokeWidth={5} />
-      ))}
-      <circle cx={head.x} cy={head.y} r={HEAD_RADIUS * project.zoom} fill={SKIN} stroke={INK} strokeWidth={6} />
-      <clipPath id="head-shape">
-        <circle cx={head.x} cy={head.y} r={HEAD_RADIUS * project.zoom} />
-      </clipPath>
-      {/* Hair: a fringe that moves with the head. */}
-      <ellipse
-        clipPath="url(#head-shape)"
-        cx={head.x}
-        cy={head.y - 250 * project.zoom}
-        rx={270 * project.zoom}
-        ry={110 * project.zoom}
-        fill={HAIR}
-        stroke={INK}
-        strokeWidth={6}
-      />
-      {pigtails.map(({ s, band }) =>
-        band.facing > 0 ? (
-          <circle key={s} cx={band.at.x} cy={band.at.y} r={26 * project.zoom} fill={clothesOf("girl").band} stroke={INK} strokeWidth={5} />
-        ) : null,
-      )}
+      {girl &&
+        sides.map((s) => {
+          const tail = at(s * pigtails.x, pigtails.y);
+          return (
+            <ellipse
+              key={s}
+              cx={tail.x}
+              cy={tail.y}
+              rx={pigtails.rx * k}
+              ry={pigtails.ry * k}
+              transform={`rotate(${s * -35} ${tail.x} ${tail.y})`}
+              fill={HAIR}
+              stroke={INK}
+              strokeWidth={5 * w}
+            />
+          );
+        })}
+      {sides.map((s) => {
+        const ear = at(s * ears.x, ears.y);
+        return <Ear key={s} x={ear.x} y={ear.y} r={ears.r * k} side={s} k={w} />;
+      })}
+      <circle cx={head.x} cy={head.y} r={HEAD_RADIUS * project.zoom} fill="url(#kid-skin)" stroke={INK} strokeWidth={5 * w} />
+      <Hair at={at} k={w} />
+      {girl &&
+        sides.map((s) => {
+          if (facingAt(s * bands.x * 0.6, bands.y) <= 0) return null;
+          const band = at(s * bands.x, bands.y);
+          return <circle key={s} cx={band.x} cy={band.y} r={bands.r * k} fill={clothesOf("girl").band} stroke={INK} strokeWidth={4 * w} />;
+        })}
       {cheeks.map((c, i) => (
         <ellipse key={i} cx={c.x} cy={c.y} rx={c.rx} ry={c.ry} fill="url(#kid-cheek)" />
       ))}
-      {eyes.map(({ at, facing }, i) =>
-        facing <= 0 ? null : happy ? (
-          <path
-            key={i}
-            d={`M${at.x - 15 * squash(facing)} ${at.y + 6} Q${at.x} ${at.y - 16} ${at.x + 15 * squash(facing)} ${at.y + 6}`}
-            fill="none"
-            stroke={INK}
-            strokeWidth={6}
-            strokeLinecap="round"
-          />
-        ) : (
-          // The eyes don't blink: the face is the still picture under the mirror, and anything moving in it has a phone paint it again.
-          <g key={i}>
+      {sides.map((s) => {
+        const facing = facingAt(s * eyes.x, eyes.y);
+        if (facing <= 0) return null;
+        const eye = at(s * eyes.x, eyes.y);
+        const sx = squash(facing);
+        // Happy at the end: the eyes closed into laughing arcs, as the story's child's while it chews.
+        if (happy)
+          return (
+            <path
+              key={s}
+              d={`M${eye.x - eyes.rx * k * sx} ${eye.y + 6 * k} Q${eye.x} ${eye.y - 18 * k} ${eye.x + eyes.rx * k * sx} ${eye.y + 6 * k}`}
+              fill="none"
+              stroke={INK}
+              strokeWidth={6 * w}
+              strokeLinecap="round"
+            />
+          );
+        // The eyes don't blink: the face is the still picture under the mirror, and anything moving in it has a phone paint it again.
+        return (
+          <g key={s}>
             {girl && (
               <path
-                d={LASHES.map(([a, b]) => `M${at.x + (i ? 1 : -1) * a * squash(facing)} ${at.y - b} l${(i ? 1 : -1) * 9 * squash(facing)} -9`).join(" ")}
+                d={LASHES.map(([x1, y1, x2, y2]) => `M${eye.x + s * x1 * k * sx} ${eye.y + y1 * k} L${eye.x + s * x2 * k * sx} ${eye.y + y2 * k}`).join(" ")}
                 stroke={INK}
-                strokeWidth={5}
+                strokeWidth={4 * w}
                 strokeLinecap="round"
               />
             )}
-            <ellipse cx={at.x} cy={at.y} rx={14 * squash(facing)} ry={19} fill={INK} />
-            <circle cx={at.x + 4 * squash(facing)} cy={at.y - 6} r={5} fill="#fff" />
+            <EyeBall x={eye.x} y={eye.y} rx={eyes.rx * k * sx} ry={eyes.ry * k} k={w} />
+            {/* Looking a little down, at the mouth in the mirror. */}
+            <Iris x={eye.x + 2 * k * sx} y={eye.y + 5 * k} r={eyes.iris * k} sx={sx} />
           </g>
-        ),
-      )}
-      {brows.map(({ at, facing }, i) =>
-        facing > 0 ? (
+        );
+      })}
+      {sides.map((s) => {
+        const facing = facingAt(s * brows.x, brows.y);
+        if (facing <= 0) return null;
+        // The brows go up with a wide open mouth.
+        const brow = at(s * brows.x, brows.y - 10 * open);
+        const half = 20 * k * squash(facing);
+        return (
           <path
-            key={i}
-            d={`M${at.x - 17 * squash(facing)} ${at.y + 4} Q${at.x} ${at.y - 7} ${at.x + 17 * squash(facing)} ${at.y + 4}`}
+            key={s}
+            d={`M${brow.x - half} ${brow.y + 3 * k} Q${brow.x} ${brow.y - 8 * k} ${brow.x + half} ${brow.y + 3 * k}`}
             fill="none"
-            stroke={HAIR}
-            strokeWidth={6}
+            stroke={BROW}
+            strokeWidth={6 * w}
             strokeLinecap="round"
           />
-        ) : null,
-      )}
-      {nose.facing > 0 && <ellipse cx={nose.at.x} cy={nose.at.y} rx={16 * squash(nose.facing)} ry={11} fill="#e8a982" />}
+        );
+      })}
+      {noseFacing > 0 && <Nose x={noseTip.x} y={noseTip.y} r={nose.r * k} sx={squash(noseFacing)} k={w} />}
     </g>
   );
 }
