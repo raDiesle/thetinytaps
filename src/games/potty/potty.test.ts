@@ -1,6 +1,7 @@
 import { existsSync, readdirSync, readFileSync } from "node:fs";
 import { describe, expect, it } from "bun:test";
 import { LANGUAGE_STATUS } from "@/content/ideas/languageStatus";
+import { voiceLines } from "@/content/voiceLines";
 import {
   expectedWent,
   NOTHING_STEPS,
@@ -360,6 +361,24 @@ describe("Symbols of the strips (Aufs Töpfchen, Zähne putzen)", () => {
   it("every step of the story shows a symbol there is", () => {
     for (const step of [...STEPS, ...NOTHING_STEPS]) {
       for (const name of symbolsFor(step, "both")) expect(name in SYMBOL_EMOJI, `${step.id}: ${name}`).toBe(true);
+    }
+  });
+});
+
+describe("recordings", () => {
+  it("lists every step's line of both stories for recording, the one when nothing came too", () => {
+    for (const language of ["de", "en"] as const) {
+      const listed = new Set(
+        voiceLines(language)
+          .find((g) => g.href === "/toepfchen/")
+          ?.groups.flatMap((g) => g.lines),
+      );
+      const texts = POTTY_TEXTS[language];
+      if (!texts) continue;
+      for (const step of [...STEPS, ...NOTHING_STEPS]) {
+        const line = texts.steps[step.id](language === "de" ? TAPSI.name.de : (TAPSI.name.en ?? TAPSI.name.de), "pipi");
+        expect(listed.has(line), `${language} ${step.id}: ${line}`).toBe(true);
+      }
     }
   });
 });

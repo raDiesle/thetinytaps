@@ -47,7 +47,7 @@ import { buildNight } from "@/games/marbles/night";
 import { buildSpace } from "@/games/marbles/space";
 import { buildTidy } from "@/games/marbles/tidy";
 import { buildWater } from "@/games/marbles/water";
-import { POTTY_TEXTS, STEPS as POTTY_STEPS, TAPSI, WAIT_SCENES } from "@/games/potty/content";
+import { NOTHING_STEPS as POTTY_NOTHING_STEPS, POTTY_TEXTS, STEPS as POTTY_STEPS, TAPSI, WAIT_SCENES } from "@/games/potty/content";
 import { ACTIVITIES, REWARDS, TASKS } from "@/games/rewards/catalog";
 import { REWARD_LINES } from "@/games/rewards/lines";
 import { SCENES } from "@/games/scenes";
@@ -516,7 +516,8 @@ function potty(language: TargetLanguageId): VoiceGroup[] {
   return [
     {
       label: "Schritte",
-      lines: once(POTTY_STEPS.flatMap((s) => which.map((w) => texts.steps[s.id](name, w)))),
+      // Both stories: the one when nothing came ends on a step of its own (Tapsi playing), which went unrecorded for weeks.
+      lines: once([...POTTY_STEPS, ...POTTY_NOTHING_STEPS].flatMap((s) => which.map((w) => texts.steps[s.id](name, w)))),
       built: "Satz mit Tapsis Namen, je nach Pipi oder Kaka",
     },
     { label: "Gedanken beim Warten", lines: once(WAIT_SCENES.map((s) => texts.scenes[s.id])) },

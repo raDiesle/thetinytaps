@@ -228,7 +228,7 @@ export const youtubeIdeas: IdeaArea = {
       effort: "S",
       done: true,
       partial:
-        "Umgesetzt am 21. November 2026: „nichts“ als dritte Wahl unter „Im Töpfchen“ auf /management/video-toepfchen/ spielt die zweite Geschichte (`NOTHING_STEPS`) bis Tapsi spielt und Mama und Papa an der Tür fragen, dann endet das Video. Titel unter „toepfchen-nichts“. Die letzte Zeile („Tapsi spielt. Mama und Papa schauen rein …“) hat noch in keiner Sprache eine Aufnahme und bleibt bis dahin stumm (steht unter 🎙️ Stimmen).",
+        "Umgesetzt am 21. November 2026: „nichts“ als dritte Wahl unter „Im Töpfchen“ auf /management/video-toepfchen/ spielt die zweite Geschichte (`NOTHING_STEPS`) bis Tapsi spielt und Mama und Papa an der Tür fragen, dann endet das Video. Titel unter „toepfchen-nichts“. Die letzte Zeile („Tapsi spielt. Mama und Papa schauen rein …“) hat noch in keiner Sprache eine Aufnahme und bleibt bis dahin stumm: Die Liste der Aufnahmen las nur die Schritte der üblichen Geschichte und hatte sie nie (jetzt beide Geschichten, `potty.test.ts`); sie steht unter 🎙️ Stimmen und kommt mit `bun run voice make --only toepfchen` (Russisch mit dem Klon „Tapsi Coach (Klon ru)“, `--voice wlDm46LsfSYnFAMs48Uv`). Am 21. November 2026 sperrte das Firmennetz (Zscaler) ElevenLabs, daher noch nicht aufgenommen.",
     },
     {
       id: "Y-25",
