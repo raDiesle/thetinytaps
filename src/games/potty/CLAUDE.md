@@ -26,14 +26,14 @@ Enter is the ✓ of what the child said). The first steps (eating, the need, cal
 by themselves, and there „Weiter“ ▶ swells and sends out a ring, since everybody waits for it. Sitting down goes on
 into the waiting by itself and „fertig“ to wiping (`Step.auto`). „Weiter“ is on every step but sitting, where the ✓
 are, and while the buttons for what the child said show.
-While Tapsi calls Mama and Papa, a framed group „Was muss dein Kind?“ with three buttons (`SAID`: 💧, 💩, 💧💩) asks a
+While Tapsi calls Mama and Papa, a framed group „Was muss dein Kind?“ with three buttons (`SAID`: pipi, kaka, both – their symbols, both side by side) asks a
 grown-up what the child said: a tap on one keeps the pick and begins the next step at once. So there is no „Weiter“
 then; the three are yellow like it, each with its ▶, swelling one after the other. A tap on the picture still goes on,
 with nothing picked. There is no ❓:
 not knowing is the same as both (the user's choice), so `unsure` – the state before anybody picked, and after jumping
 past calling in the row, when the group asks again on the way to the bathroom – plays like both, only saying „muss mal“.
 The steps: eating and drinking, the bladder presses or the tummy rumbles (`need`; when
-unsure – before calling, nobody has said anything yet – Tapsi „muss mal“, the bladder and the tummy picture take turns as frames, `picturesFor`, and the row shows ❓),
+unsure – before calling, nobody has said anything yet – Tapsi „muss mal“, the bladder and the tummy picture take turns as frames, `picturesFor`, and the row shows both symbols, `symbolsFor`),
 calling „Mama! Papa!“ – they come in together and stay in every picture from then on – into the bathroom together,
 trousers down, sit down, then the waiting, done (whatever the grown-up's ✓ chose is in the potty, the parents cheer),
 wipe, trousers up, flush, wash hands, party, the week's stars (`stars`, see below), then `GameEnd` with „Menü“ only (`menu`: one story, so no „Weiter“, and once on the potty the child is done, so no
@@ -49,7 +49,12 @@ drawn from `rufen` for the three, see `bilder/README.md`); a tap there ends with
 shows that story's steps; jumping back to sitting or before takes the usual story again. A fox instead of a child, so „Hose runter“
 shows only fur.
 
-The row of step icons at the bottom is a row of buttons (`jump`): a tap on one jumps there at once, also while a step
+The strip at the bottom (user request, November 2026: it looked poor) is one strip of paper like Zähne putzen's: the
+row of steps as small paper discs (done ones green-tinted, the one now yellow with a golden ring, a bit bigger), and
+the grown-ups' choices as square tiles on a paper card with their question. Every step and button shows a small
+Gemini symbol (`bilder/symbole/<name>.webp`, `StripSymbol.tsx`, queued in `symbolPictures.ts` as one set with Zähne
+putzen's bar), the trousers with a drawn blue arrow down or up (`StepArrow`); until a symbol's picture is made it shows
+its emoji (`SYMBOL_EMOJI`). The row of step symbols is a row of buttons (`jump`): a tap on one jumps there at once, also while a step
 still plays (its pending sounds stop). Jumping to „fertig“ or later without a ✓ takes what the child said as what came
 (both when nobody knew); jumping back before it forgets the ✓. They are plain buttons without `data-tap`, so only a tap
 right on one jumps: a tap beside the row goes on with the story, and the grown-ups' buttons next to it keep their reach.
@@ -161,12 +166,16 @@ The waiting song (`waitMusic.ts`, `useWaitingMusic`): `musik/musik-toepfchen-war
   buttons for what the child said, see above); all in one row where it fits (a computer), else the group stands on the
   right above „Weiter“, reaching up from the bottom. Only the way on moves on the first steps („Weiter“, or the buttons
   for what the child said); everything else there stays still, the child looks at the story.
+- The strip's symbols are pictures of one set, painted with Gemini (`StripSymbol.tsx`, `bilder/symbole/`), never a mix of
+  emoji and drawings: an emoji stands in only until its picture is made. A new symbol goes into `SYMBOL_EMOJI` and its
+  picture into the queue (`symbolPictures.ts`), in the same style line (`ICON`); `potty.test.ts` checks every symbol
+  has its picture or waits for it.
 - A grown-up can jump to any step at any time by tapping it in the row; keep every step reachable that way. The row
   is small and right at the bottom (the user's choice): it is for the grown-up, the picture is the story.
 - The end of the story keeps its picture free: „Menü“ with its shelf label small in the bottom corner (`corners`,
   `menu`), never big in the middle over the party, and no „Nochmal“ (user request, November 2026).
 - What the child has to do is chosen inside the story, never on the start screen (neither a card each nor a choice
-  above the cards): „Muss mal!“ starts at once, what the child said is picked while Tapsi calls (💧, 💩, 💧💩)
+  above the cards): „Muss mal!“ starts at once, what the child said is picked while Tapsi calls (pipi, kaka, both)
   and once more on the way when calling was jumped past – the next step, never a jump further; what came on the
   two ✓ while sitting (pipi, kaka) – a child saying „Pipi“ may still do kaka.
 - What the child really does (sitting on the potty) has no fixed length: it never ends on a timer or on an ordinary

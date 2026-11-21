@@ -493,10 +493,14 @@
 }
 
 .teeth-progress {
+  --gap: clamp(4px, 0.9vmin, 8px);
+  position: relative;
   flex: 1;
   display: flex;
   align-items: center;
-  gap: clamp(4px, 0.9vmin, 8px);
+  gap: var(--gap);
+  /* The toothbrush riding along measures the bar's width in cqw. */
+  container-type: inline-size;
   /* Room above and below the thin bar, so a finger hits it easily. */
   padding: 12px 0;
   cursor: pointer;
@@ -545,6 +549,41 @@
     inset 0 2px 3px #3d304529,
     0 0 0 3px #ffc61a,
     0 2px 6px 2px #2a1e5c40;
+}
+
+/* The sweet at the start of the bar and the clean tooth at its end, small pictures from Gemini (`symbols.ts`). */
+.teeth-symbol {
+  flex: none;
+  width: clamp(34px, 7vmin, 50px);
+  height: clamp(34px, 7vmin, 50px);
+  object-fit: contain;
+  pointer-events: none;
+  filter: drop-shadow(0 1px 1px #3d304540);
+}
+
+/* The toothbrush riding along the bar: a layer as small as the brush, moved by its transform to where the clock is
+   (`--at` parts of `--parts` equally wide ones, with the gaps between them), its head on that point. */
+.teeth-runner {
+  position: absolute;
+  top: 50%;
+  left: 0;
+  width: 0;
+  height: 0;
+  pointer-events: none;
+  will-change: transform;
+  transform: translateX(calc((100cqw - var(--gap) * (var(--parts) - 1)) * var(--at) / var(--parts) + var(--gap) * var(--part)));
+  transition: transform 0.2s linear;
+}
+
+.teeth-runner > img {
+  position: absolute;
+  left: 0;
+  top: 0;
+  width: clamp(44px, 9vmin, 68px);
+  height: clamp(44px, 9vmin, 68px);
+  object-fit: contain;
+  translate: -82% -62%;
+  filter: drop-shadow(0 2px 2px #3d304559);
 }
 
 /* Pause: brush, monsters and glow stand still under a big button that goes on. */

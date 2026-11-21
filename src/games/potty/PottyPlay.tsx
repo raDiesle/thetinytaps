@@ -36,7 +36,6 @@ import {
 import { loadRealSounds, playGiggle } from "@/lib/realSounds";
 import {
   expectedWent,
-  iconFor,
   type Need,
   picturesFor,
   POTTY_TEXTS,
@@ -48,6 +47,8 @@ import {
   scenesFor,
   STEPS,
   storyFor,
+  symbolsFor,
+  symbolsOf,
   TAPSI,
   THOUGHT_FRAME_MS,
   WAIT_SCENE_MS,
@@ -57,6 +58,7 @@ import { CALL_PICTURE, CallBubble } from "./CallBubble";
 import { framesFor, preloadImages } from "./images";
 import { addStar, loadStars, saveStars, type StarLog } from "./stars";
 import { StoryPicture } from "./StoryPicture";
+import { StepArrow, StripSymbol } from "./StripSymbol";
 import { pottyVoice } from "./voice";
 import { WaitClock } from "./WaitClock";
 import { WaitMouse } from "./WaitMouse";
@@ -85,7 +87,6 @@ interface At {
 const START: At = { step: 0, scene: -1, nothing: false };
 
 const NEEDS: Need[] = ["pipi", "kaka"];
-const NEED_EMOJI: Record<Need, string> = { pipi: "💧", kaka: "💩" };
 const DONE = STEPS.findIndex((s) => s.id === "done");
 const SIT = STEPS.findIndex((s) => s.id === "sit");
 
@@ -524,8 +525,12 @@ export function PottyPlay() {
                   jump(i);
                 }}
               >
-                {iconFor(s, i >= DONE ? (went ?? said) : said)}
-                {s.arrow && <span className="pt-arrow">{s.arrow}</span>}
+                <span className="pt-step-symbols">
+                  {symbolsFor(s, i >= DONE ? (went ?? said) : said).map((name) => (
+                    <StripSymbol key={name} name={name} />
+                  ))}
+                </span>
+                {s.arrow && <StepArrow way={s.arrow} />}
               </button>
             </li>
           ))}
@@ -538,20 +543,24 @@ export function PottyPlay() {
             <div className="pt-choice pt-ask" role="group" aria-label={texts.askSaid}>
               <span className="pt-choice-label">{texts.askSaid}</span>
               <div className="pt-choice-buttons">
-                {SAID.map((s) => (
+                {SAID.map((choice) => (
                   <button
-                    key={s.id}
+                    key={choice}
                     type="button"
-                    className={`pt-said${s.id === said ? " picked" : ""}`}
+                    className={`pt-said${choice === said ? " picked" : ""}`}
                     data-tap
-                    aria-label={texts.said[s.id]}
-                    aria-pressed={s.id === said}
+                    aria-label={texts.said[choice]}
+                    aria-pressed={choice === said}
                     onPointerDown={(e) => {
                       e.stopPropagation();
-                      pick(s.id, e);
+                      pick(choice, e);
                     }}
                   >
-                    {s.emoji}
+                    <span className="pt-tile-symbols">
+                      {symbolsOf(choice).map((name) => (
+                        <StripSymbol key={name} name={name} />
+                      ))}
+                    </span>
                     <span className="pt-said-next">▶</span>
                   </button>
                 ))}
@@ -594,8 +603,10 @@ export function PottyPlay() {
                       finish(n);
                     }}
                   >
+                    <span className="pt-tile-symbols">
+                      <StripSymbol name={n} />
+                    </span>
                     <span className="pt-finish-check">✓</span>
-                    <span className="pt-finish-need">{NEED_EMOJI[n]}</span>
                   </button>
                 ))}
                 {/* Nothing came: a story of its own, so it looks unlike the ✓, and says so in a word for the grown-up. */}
@@ -610,7 +621,10 @@ export function PottyPlay() {
                     finishWithNothing();
                   }}
                 >
-                  {texts.nothingButton}
+                  <span className="pt-tile-symbols">
+                    <StripSymbol name="toepfchen" />
+                  </span>
+                  <span className="pt-nothing-word">{texts.nothingButton}</span>
                 </button>
               </div>
             </div>

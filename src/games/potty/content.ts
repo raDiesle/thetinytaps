@@ -1,4 +1,5 @@
 import type { Localized } from "@/lib/language";
+import type { SymbolName } from "./StripSymbol";
 
 // Who goes to the potty, the steps of the story and what is said. An animal rather
 // than a child: it has fur, so „Hose runter“ shows nothing a parent would mind, and
@@ -32,15 +33,14 @@ export type Said = Went | "unsure";
 /** What a step is about: what the child said before the ✓, what came after it. */
 export type Which = Said | Went;
 
+/** The symbols that stand for what the child has to do or did: the drop, the kaka, or both side by side. */
+export const symbolsOf = (which: Went): SymbolName[] => (which === "both" ? ["pipi", "kaka"] : [which]);
+
 /**
- * The buttons for what the child said, in their order; the emoji stands for it. No ❓: not knowing is
- * the same as both (the user's choice), so 💧💩 is that button.
+ * The buttons for what the child said, in their order; their symbols stand for it. No ❓: not knowing is
+ * the same as both (the user's choice), so the drop and the kaka together are that button.
  */
-export const SAID: { id: Went; emoji: string }[] = [
-  { id: "pipi", emoji: "💧" },
-  { id: "kaka", emoji: "💩" },
-  { id: "both", emoji: "💧💩" },
-];
+export const SAID: Went[] = ["pipi", "kaka", "both"];
 
 /** What the ✓ of what the child said is, and what came when a grown-up skips the ✓: both when nobody knew. */
 export const expectedWent = (said: Said): Went => (said === "unsure" ? "both" : said);
@@ -50,10 +50,10 @@ export type StepId = "eat" | "need" | "call" | "go" | "down" | "sit" | "done" | 
 
 export interface Step {
   id: StepId;
-  /** Its picture in the row of steps at the bottom, for each need (see `iconFor`). */
-  icon: string | Record<Need, string>;
-  /** A small arrow next to the icon, for trousers down and up. */
-  arrow?: "↓" | "↑";
+  /** Its symbol in the row of steps at the bottom (`bilder/symbole/`), for each need (see `symbolsFor`). */
+  symbol: SymbolName | Record<Need, SymbolName>;
+  /** A small drawn arrow on the symbol, for trousers down and up. */
+  arrow?: "down" | "up";
   /** Its picture's name after the animal's (`fox-essen`), for each need; several take turns as its frames. */
   picture: string | string[] | Record<Need, string>;
   /** Pictures played once before `picture`, one after the other: a tiny animation of what happens (trousers going down). */
@@ -100,24 +100,24 @@ export const MOUSE_AGAIN_MS = 45000;
 
 export const STEPS: Step[] = [
   // Eating and drinking take turns as the step's frames, moving from the start; the first steps wait for „Weiter“.
-  { id: "eat", icon: "🍝", picture: ["essen", "trinken"], ms: 2000, nudge: true },
-  { id: "need", icon: { pipi: "💦", kaka: "🌀" }, picture: { pipi: "blase", kaka: "bauch" }, ms: 1600, nudge: true },
+  { id: "eat", symbol: "essen", picture: ["essen", "trinken"], ms: 2000, nudge: true },
+  { id: "need", symbol: { pipi: "pipi", kaka: "kaka" }, picture: { pipi: "blase", kaka: "bauch" }, ms: 1600, nudge: true },
   // Here (and on the way, while nothing was picked) a grown-up taps what the child said, and only that goes on.
-  { id: "call", icon: "📣", picture: "rufen", ms: 1800, nudge: true },
-  { id: "go", icon: "🚪", picture: "bad", ms: 1800, nudge: true },
+  { id: "call", symbol: "rufen", picture: "rufen", ms: 1800, nudge: true },
+  { id: "go", symbol: "bad", picture: "bad", ms: 1800, nudge: true },
   // The child takes its own trousers down: no timer, „Weiter“ when it's done.
   // The trousers go down again and again, so the child sees what to do while it does it.
-  { id: "down", icon: "👖", arrow: "↓", picture: "runter", moves: ["runter-1", "runter-2"], again: 1500, ms: 1200 },
+  { id: "down", symbol: "hose", arrow: "down", picture: "runter", moves: ["runter-1", "runter-2"], again: 1500, ms: 1200 },
   // Sitting down goes on by itself into the waiting, which has no fixed length: thought after thought until the ✓ (see WAIT_SCENES).
-  { id: "sit", icon: "⏳", picture: "sitzen", moves: ["sitzen-1"], ms: SIT_GUARD_MS, auto: 3000 },
-  { id: "done", icon: { pipi: "💧", kaka: "💩" }, picture: { pipi: "fertig-pipi", kaka: "fertig-kaka" }, ms: 2000, auto: 3500 },
-  { id: "wipe", icon: "🧻", picture: "abwischen", ms: 1600 },
-  { id: "up", icon: "👖", arrow: "↑", picture: "hoch", ms: 1200 },
-  { id: "flush", icon: "🚽", picture: "abziehen", ms: 2600 },
-  { id: "wash", icon: "🧼", picture: "waschen", ms: 2400 },
-  { id: "party", icon: "🎉", picture: "party", ms: 2400 },
+  { id: "sit", symbol: "toepfchen", picture: "sitzen", moves: ["sitzen-1"], ms: SIT_GUARD_MS, auto: 3000 },
+  { id: "done", symbol: { pipi: "pipi", kaka: "kaka" }, picture: { pipi: "fertig-pipi", kaka: "fertig-kaka" }, ms: 2000, auto: 3500 },
+  { id: "wipe", symbol: "klopapier", picture: "abwischen", ms: 1600 },
+  { id: "up", symbol: "hose", arrow: "up", picture: "hoch", ms: 1200 },
+  { id: "flush", symbol: "klo", picture: "abziehen", ms: 2600 },
+  { id: "wash", symbol: "seife", picture: "waschen", ms: 2400 },
+  { id: "party", symbol: "party", picture: "party", ms: 2400 },
   // The end: this week's stars over the party picture, with a new one today when a grown-up tapped a ✓ (PottyPlay.tsx).
-  { id: "stars", icon: "⭐", picture: "party", ms: 2400 },
+  { id: "stars", symbol: "stern", picture: "party", ms: 2400 },
 ];
 
 const SIT = STEPS.findIndex((s) => s.id === "sit");
@@ -129,18 +129,18 @@ const SIT = STEPS.findIndex((s) => s.id === "sit");
 export const NOTHING_STEPS: Step[] = [
   ...STEPS.slice(0, SIT + 1),
   ...STEPS.filter((s) => s.id === "wash"),
-  { id: "play", icon: "🧸", picture: "spielen", ms: 2400 },
+  { id: "play", symbol: "spielen", picture: "spielen", ms: 2400 },
 ];
 
 /** The steps of the story: the usual one, or the one when nothing came. */
 export const storyFor = (nothing: boolean) => (nothing ? NOTHING_STEPS : STEPS);
 
-/** A step's icon in the row: ❓ where it depends on the need and nobody knows it yet, both icons when both came. */
-export function iconFor(step: Step, which: Which): string {
-  const { icon } = step;
-  if (typeof icon === "string") return icon;
-  if (which === "unsure") return "❓";
-  return which === "both" ? icon.pipi + icon.kaka : icon[which];
+/** A step's symbols in the row: both needs where it depends on the need and nobody knows it yet or both came. */
+export function symbolsFor(step: Step, which: Which): SymbolName[] {
+  const { symbol } = step;
+  if (typeof symbol === "string") return [symbol];
+  const needs: Need[] = which === "unsure" || which === "both" ? ["pipi", "kaka"] : [which];
+  return needs.map((need) => symbol[need]);
 }
 
 /**

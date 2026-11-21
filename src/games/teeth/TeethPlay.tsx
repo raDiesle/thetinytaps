@@ -1,4 +1,4 @@
-import { useCallback, useEffect, useLayoutEffect, useMemo, useRef, useState, type PointerEvent } from "react";
+import { type CSSProperties, useCallback, useEffect, useLayoutEffect, useMemo, useRef, useState, type PointerEvent } from "react";
 import { ControlIcon } from "@/components/ControlIcon";
 import { GameEnd } from "@/components/GameEnd";
 import { GO_ON, PAUSE, SPACE_OR_TAP_TO_GO_ON, TAP_TO_GO_ON } from "@/lib/sharedTexts";
@@ -25,6 +25,7 @@ import { Prep, PREP_CUES, PREP_MS, PREP_RECORDINGS, TIDY_RECORDINGS } from "./pr
 import type { TeethSettings } from "./settings";
 import { GRIN_VIEW, STEPS, stepText } from "./steps";
 import { sungLanguageFor } from "./sung";
+import { teethSymbol } from "./symbols";
 import { Week } from "./week";
 import voiceFiles from "./stimme/**/*.mp3?glob";
 import "./teeth.css";
@@ -427,9 +428,21 @@ export function TeethPlay({ settings }: { settings: TeethSettings }) {
   /** The progress bar's parts on the clock, as [start, length] in ms: the time before the brushing (story, sink, mirror), then each step. */
   const segments: [number, number][] = [[0, introMs], ...STEPS.map((_, k): [number, number] => [introMs + stepStarts[k], stepLength(k)])];
 
+  /**
+   * Where the toothbrush rides on the bar: the part it is in and how far through it, as one number (2.5 is halfway
+   * through the third part). The parts are equally wide, so `teeth.css` turns it into a place without measuring.
+   */
+  const runnerPart = before ? 0 : done ? segments.length - 1 : phase + 1;
+  const runnerShare = before ? elapsed / introMs : done ? 1 : (brushed - stepStarts[phase]) / stepLength(phase);
+  const runnerAt = {
+    "--parts": segments.length,
+    "--part": runnerPart,
+    "--at": Math.round((runnerPart + Math.max(0, Math.min(1, runnerShare))) * 1000) / 1000,
+  } as CSSProperties;
+
   /** Tapping or dragging on the progress bar jumps to that point, before or while brushing. */
   const seekFromPointer = (e: PointerEvent<HTMLDivElement>) => {
-    const parts = [...e.currentTarget.children];
+    const parts = [...e.currentTarget.querySelectorAll(":scope > .teeth-segment")];
     const i = parts.findIndex((s, k) => k === parts.length - 1 || e.clientX < s.getBoundingClientRect().right);
     const rect = parts[i].getBoundingClientRect();
     const k = Math.max(0, Math.min(1, (e.clientX - rect.left) / rect.width));
@@ -552,6 +565,7 @@ export function TeethPlay({ settings }: { settings: TeethSettings }) {
             >
               <ControlIcon kind="again" className="teeth-button-icon" />
             </button>
+            {teethSymbol("bonbon") && <img className="teeth-symbol" src={teethSymbol("bonbon")} alt="" draggable={false} aria-hidden />}
             <div
               className="teeth-progress"
               role="slider"
@@ -580,7 +594,14 @@ export function TeethPlay({ settings }: { settings: TeethSettings }) {
                   <span style={{ transform: `scaleX(${Math.max(0, Math.min(1, (brushed - stepStarts[i]) / stepLength(i)))})` }} />
                 </span>
               ))}
+              {/* The toothbrush rides along the bar to where the clock is: an HTML layer moved by its transform. */}
+              {teethSymbol("zahnbuerste") && (
+                <span className="teeth-runner" style={runnerAt} aria-hidden>
+                  <img src={teethSymbol("zahnbuerste")} alt="" draggable={false} />
+                </span>
+              )}
             </div>
+            {teethSymbol("zahn") && <img className="teeth-symbol goal" src={teethSymbol("zahn")} alt="" draggable={false} aria-hidden />}
             {/* For the grown-up, only where the screen is wide enough (teeth.css): before the brushing the time until it
                 starts, then the brushing time left – two clocks in one place. */}
             {before ? (

@@ -126,21 +126,24 @@
   gap: 10px;
 }
 
-/* One either-or choice: a white frame with its question on top and the buttons side by side, all alike. */
+/* One either-or choice: a card of the book's paper with its question on top and its buttons side by side, all alike –
+   tiles with the choice's picture, so a grown-up sees at a glance what each one means. */
 .pt-choice {
   display: flex;
   flex-direction: column;
   align-items: center;
-  gap: 4px;
-  padding: 4px 8px 8px;
-  border: 3px solid #2a1e5c;
-  border-radius: 20px;
-  background: #ffffffe6;
-  box-shadow: 0 4px 12px #0003;
+  gap: clamp(3px, 0.8vmin, 6px);
+  padding: clamp(4px, 0.9vmin, 7px) clamp(7px, 1.4vmin, 11px) clamp(8px, 1.6vmin, 12px);
+  border: 2px solid #3d3045;
+  border-radius: clamp(14px, 2.6vmin, 20px);
+  background: var(--paper-grain, none), color-mix(in srgb, var(--paper, #fbf4e3) 75%, #fff);
+  box-shadow:
+    0 2px 0 #5a3c1f22,
+    0 10px 20px -8px #2a1e5c73;
 }
 
 .pt-choice-label {
-  color: #2a1e5c;
+  color: #3d3045;
   font-size: clamp(12px, 2.8vmin, 16px);
   font-weight: 800;
   white-space: nowrap;
@@ -148,7 +151,7 @@
 
 .pt-choice-buttons {
   display: flex;
-  gap: 6px;
+  gap: clamp(6px, 1.3vmin, 10px);
 }
 
 /* The grown-ups' buttons are plainly buttons (outlined, raised, pressed in on a tap) but mid-sized, in the corner:
@@ -161,11 +164,11 @@
   justify-content: center;
   gap: 2px;
   padding: 0 8px;
-  border: 3px solid #2a1e5c;
+  border: 2.5px solid #3d3045;
   border-radius: 999px;
   background: #fff;
   box-shadow:
-    0 4px 0 #2a1e5c,
+    0 4px 0 #3d3045,
     0 6px 12px #0003;
   line-height: 1;
   white-space: nowrap;
@@ -181,19 +184,48 @@
 .pt-finish:active {
   transform: translateY(3px);
   box-shadow:
-    0 1px 0 #2a1e5c,
+    0 1px 0 #3d3045,
     0 2px 6px #0003;
 }
 
-/* What the child said (💧, 💩, 💧💩): the only way on there, so each is a „Weiter“ – yellow like it, with its ▶ –
+/* A choice's tile: a rounded square of paper with its picture big in the middle. */
+.pt-said,
+.pt-finish {
+  position: relative;
+  flex-direction: column;
+  width: clamp(52px, 12.5vmin, 78px);
+  height: clamp(52px, 12.5vmin, 78px);
+  padding: clamp(3px, 0.8vmin, 6px);
+  border-radius: clamp(12px, 2.6vmin, 18px);
+}
+
+/* The picture (or two side by side, for both) fills the tile. */
+.pt-tile-symbols {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 100%;
+  min-height: 0;
+  flex: 1;
+}
+
+.pt-tile-symbols .pt-symbol {
+  width: 100%;
+  height: 100%;
+  min-width: 0;
+  object-fit: contain;
+  font-size: clamp(22px, 5.4vmin, 34px);
+}
+
+.pt-tile-symbols .pt-symbol + .pt-symbol {
+  margin-left: -18%;
+}
+
+/* What the child said: the only way on there, so each is a „Weiter“ – yellow like it, with its ▶ –
    and they swell one after the other, the way „Weiter“ calls on the first steps. The picked one has a dark ring. */
 .pt-said {
-  position: relative;
-  min-width: clamp(54px, 13vmin, 80px);
-  height: clamp(48px, 11vmin, 66px);
-  background: #ffd23f;
-  color: #2a1e5c;
-  font-size: clamp(18px, 4.4vmin, 28px);
+  background: radial-gradient(circle at 40% 30%, #fff3b8, #ffd23f 70%);
+  color: #3d3045;
   animation: pt-nudge 1.4s ease-in-out infinite;
 }
 
@@ -210,23 +242,24 @@
 }
 
 .pt-said.picked {
-  outline: 4px solid #2a1e5c;
+  outline: 4px solid #3d3045;
   outline-offset: 2px;
 }
 
-/* „Weiter“'s ▶ as a badge on the corner, so it takes no room from the emoji on a phone. */
+/* „Weiter“'s ▶ as a badge on the corner, so it takes no room from the picture. */
 .pt-said-next {
   position: absolute;
-  right: -7px;
-  bottom: -7px;
+  right: -8px;
+  bottom: -8px;
   display: flex;
   align-items: center;
   justify-content: center;
   width: clamp(18px, 4.4vmin, 26px);
   height: clamp(18px, 4.4vmin, 26px);
   padding-left: 2px;
+  border: 2px solid #fff;
   border-radius: 50%;
-  background: #2a1e5c;
+  background: #3d3045;
   color: #ffd23f;
   font-size: clamp(9px, 2.2vmin, 13px);
 }
@@ -236,7 +269,7 @@
   height: clamp(54px, 13vmin, 80px);
   padding: 0;
   background: #ffd23f;
-  color: #2a1e5c;
+  color: #3d3045;
   font-size: clamp(22px, 5.4vmin, 34px);
 }
 
@@ -250,69 +283,70 @@
   100% {
     transform: scale(1);
     box-shadow:
-      0 4px 0 #2a1e5c,
+      0 4px 0 #3d3045,
       0 6px 12px #0003,
       0 0 0 0 #ffd23fcc;
   }
   50% {
     transform: scale(1.12);
     box-shadow:
-      0 4px 0 #2a1e5c,
+      0 4px 0 #3d3045,
       0 6px 12px #0003,
       0 0 0 14px #ffd23f00;
   }
 }
 
-/* While sitting: two ✓ say „fertig“ – for pipi or kaka, told apart by the need next to the ✓. Green, so a
-   grown-up finds them at once; the one the child said has a yellow ring. */
+/* While sitting: what is in the potty, pipi or kaka, each a white tile with its picture and a green ✓ stuck on its
+   corner, so a grown-up finds them at once; the one the child said has a yellow ring. */
 .pt-finish {
-  height: clamp(42px, 10vmin, 62px);
-  background: #3ec300;
+  background: radial-gradient(circle at 40% 30%, #fff, #f3f9ec 70%);
 }
 
 .pt-finish.expected {
-  outline: 4px solid #ffd23f;
+  outline: 4px solid #ffc61a;
+  outline-offset: 2px;
 }
 
 .pt-finish-check {
+  position: absolute;
+  right: -8px;
+  bottom: -8px;
+  display: grid;
+  place-items: center;
+  width: clamp(20px, 4.8vmin, 28px);
+  height: clamp(20px, 4.8vmin, 28px);
+  border: 2px solid #fff;
+  border-radius: 50%;
+  background: #3ea31f;
   color: #fff;
-  font-size: clamp(22px, 5vmin, 34px);
+  font-size: clamp(12px, 2.8vmin, 17px);
   font-weight: 900;
+  box-shadow: 0 1px 3px #0004;
 }
 
-.pt-finish-need {
-  font-size: clamp(16px, 3.8vmin, 24px);
-}
-
-/* Nothing came: white with the word „nichts“, unlike the green ✓, since it leads to a story of its own. */
+/* Nothing came: the empty potty with the word „nichts“ under it and no ✓, since it leads to a story of its own. */
 .pt-finish.pt-nothing {
-  padding: 0 12px;
-  background: #fff;
-  color: #2a1e5c;
-  font-size: clamp(14px, 3.4vmin, 20px);
-  font-weight: 800;
+  gap: 1px;
+  background: var(--paper-grain, none), #fffaf0;
 }
 
-/* Too narrow for one row (phones on their side, tablets): the choice stands above „Weiter“, its buttons two by two. */
+.pt-nothing .pt-tile-symbols {
+  opacity: 0.85;
+}
+
+.pt-nothing-word {
+  color: #3d3045;
+  font-size: clamp(10px, 2.4vmin, 14px);
+  font-weight: 800;
+  line-height: 1.1;
+}
+
+/* Too narrow for one row (phones on their side, tablets): the choice stands above „Weiter“; its tiles are small
+   enough to stay side by side. */
 @media (max-width: 1279px) {
   .pt-grown {
     flex-direction: column;
     align-items: flex-end;
-  }
-
-  .pt-choice-buttons {
-    display: grid;
-    grid-template-columns: repeat(2, auto);
-  }
-
-  /* The three for what the child said: 💧 and 💩 side by side, 💧💩 under both. */
-  .pt-ask .pt-said:nth-child(3) {
-    grid-column: span 2;
-  }
-
-  .pt-choice:has(.pt-finish) .pt-choice-buttons {
-    grid-template-columns: auto;
-    justify-items: stretch;
   }
 }
 
@@ -595,18 +629,22 @@
   }
 }
 
-/* The row of steps lies on the picture, so it gets a little more contrast. Small and low, for the grown-up: the
-   picture is the story. */
+/* The row of steps lies on the picture as a strip of the book's paper, like Zähne putzen's controls, each step a
+   little round paper disc with its picture. Small and low, for the grown-up: the picture is the story. */
 .pt-steps {
   grid-column: 2;
   display: flex;
-  gap: clamp(2px, 0.6vw, 6px);
+  align-items: center;
+  gap: clamp(2px, 0.5vw, 5px);
   margin: 0;
-  padding: 3px 8px;
+  padding: clamp(3px, 0.6vmin, 5px) clamp(6px, 1.2vmin, 10px);
   list-style: none;
+  border: 1px solid #3d304559;
   border-radius: 999px;
-  background: #ffffffcc;
-  box-shadow: 0 2px 10px #0002;
+  background: var(--paper-grain, none), color-mix(in srgb, var(--paper, #fbf4e3) 70%, #fff);
+  box-shadow:
+    0 2px 0 #5a3c1f22,
+    0 8px 18px -6px #2a1e5c59;
 }
 
 .pt-steps li {
@@ -614,12 +652,11 @@
   display: grid;
   place-items: center;
   /* Still big enough to hit with a grown-up's finger, since a tap on a step jumps there. */
-  width: clamp(22px, min(3.4vw, 5.6vmin), 34px);
-  height: clamp(22px, min(3.4vw, 5.6vmin), 34px);
+  width: clamp(24px, min(3.6vw, 6vmin), 38px);
+  height: clamp(24px, min(3.6vw, 6vmin), 38px);
+  border: 1.5px solid #3d304540;
   border-radius: 50%;
-  font-size: clamp(12px, min(2.1vw, 3.4vmin), 20px);
-  opacity: 0.45;
-  filter: grayscale(0.7);
+  background: #fffdf7;
   transition: transform 0.3s;
 }
 
@@ -628,7 +665,7 @@
   place-items: center;
   width: 100%;
   height: 100%;
-  padding: 0;
+  padding: 12%;
   border: 0;
   border-radius: 50%;
   background: none;
@@ -636,26 +673,53 @@
   cursor: pointer;
 }
 
+/* The steps still to come are quieter, so the way already gone and the step now stand out. */
+.pt-step-symbols {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 100%;
+  height: 100%;
+  opacity: 0.5;
+}
+
+.pt-step-symbols .pt-symbol {
+  width: 100%;
+  height: 100%;
+  min-width: 0;
+  object-fit: contain;
+  font-size: clamp(12px, min(2.1vw, 3.4vmin), 20px);
+}
+
+.pt-step-symbols .pt-symbol + .pt-symbol {
+  margin-left: -30%;
+}
+
 .pt-steps li.done {
-  opacity: 1;
-  filter: none;
-  background: #d8f5d0;
+  border-color: #3ea31f80;
+  background: #e3f5d8;
 }
 
 .pt-steps li.now {
-  opacity: 1;
-  filter: none;
-  background: #ffe08a;
-  transform: scale(1.2);
+  border: 2px solid #3d3045;
+  background: #fff3b8;
+  box-shadow: 0 0 0 3px #ffc61a;
+  transform: scale(1.25);
+  z-index: 1;
 }
 
+.pt-steps li.done .pt-step-symbols,
+.pt-steps li.now .pt-step-symbols {
+  opacity: 1;
+}
+
+/* Trousers down or up: a small drawn arrow on the disc's corner. */
 .pt-arrow {
   position: absolute;
-  right: -3px;
-  bottom: -5px;
-  font-size: 0.6em;
-  font-weight: 900;
-  color: #3f88c5;
+  right: -4px;
+  bottom: -4px;
+  width: 48%;
+  height: 48%;
 }
 
 /* ---------- The end: this week's stars over the party picture ---------- */
