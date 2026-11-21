@@ -22,6 +22,12 @@ export interface Idea {
   partial?: string;
   /** Decided against it: stays in the list (and keeps its number) so it isn't suggested again. */
   rejected?: boolean;
+  /**
+   * Parked by the user (🅿️ on /management/): open, but done only when the user names it in so many words – what
+   * those words are stands here, in German. Never built, generated or recorded with others, never put into a batch
+   * or the picture queue, and never offered as next step (user decision, November 2026, H-88).
+   */
+  parked?: string;
 }
 
 export type IdeaStatus = "done" | "open" | "rejected";
