@@ -1,5 +1,6 @@
-import type { Localized } from "@/lib/language";
+import type { Localized, Texts } from "@/lib/language";
 import type { TimerPicture, TurnPicture } from "./settings";
+import { TIDY_NAME } from "./tidyNames";
 
 /** The game's name, on its start screen, its spine on the shelf and in the browser tab. */
 export const TIMER_TITLE: Localized = { de: "Timer", en: "Timer", zh: "计时器", hi: "टाइमर", es: "Temporizador", ar: "المؤقّت", ru: "Таймер" };
@@ -30,7 +31,7 @@ export const tomorrowAt = (at: string): Localized => ({
 });
 
 /** The pictures in their order on the start screen; „Weiter“ at the end goes on with the next, after the last the first. */
-export const PICTURES: { id: TimerPicture; emoji: string; name: Localized }[] = [
+export const PICTURES: { id: TimerPicture; emoji: string; name: Texts }[] = [
   // The order the user asked for (November 2026): the red disc Kitas know first, then the hourglass, the candle, the
   // apple tree, the flower and the pizza, then the alarm clock (H-70) and the rest; „Abwechseln“ last, in a group of its
   // own on the start screen (`TimerGame`).
@@ -49,6 +50,8 @@ export const PICTURES: { id: TimerPicture; emoji: string; name: Localized }[] = 
   { id: "flower", emoji: "🌸", name: { de: "Blume", en: "Flower", zh: "小花", hi: "फूल", es: "Flor", ar: "الزهرة", ru: "Цветок" } },
   { id: "pizza", emoji: "🍕", name: { de: "Pizza", en: "Pizza", zh: "披萨", hi: "पिज़्ज़ा", es: "Pizza", ar: "البيتزا", ru: "Пицца" } },
   { id: "clock", emoji: "⏰", name: { de: "Wecker", en: "Alarm Clock", zh: "闹钟", hi: "अलार्म घड़ी", es: "Despertador", ar: "المنبّه", ru: "Будильник" } },
+  // Tidy Up (H-118): a toy crane puts the toys into the box, best at five minutes; English only so far.
+  { id: "tidy", emoji: "🧸", name: TIDY_NAME },
   {
     id: "train",
     emoji: "🚂",
@@ -71,12 +74,12 @@ export const PICTURES: { id: TimerPicture; emoji: string; name: Localized }[] = 
     name: { de: "Sonnenaufgang", en: "Sunrise", zh: "日出", hi: "सूर्योदय", es: "Amanecer", ar: "شروق الشمس", ru: "Восход" },
   },
   { id: "swap", emoji: "🔁", name: SWAP_NAME },
-  // Taking turns at tennis (H-71, user request, November 2026), beside „Abwechseln“ in its group.
-  { id: "tennis", emoji: "🎾", name: { de: "Tennis", en: "Tennis", zh: "网球", hi: "टेनिस", es: "Tenis", ar: "التنس", ru: "Теннис" } },
+  // Tennis (H-71) stood here and was taken out again (user request, 21 November 2026: poorly done); better ideas for
+  // taking turns are H-108 to H-117.
 ];
 
 /**
- * The line on the cards of „Abwechseln“ and Tennis, last on the start screen, for grown-ups: they run on without an
+ * The line on the card of „Abwechseln“, last on the start screen, for grown-ups: it runs on without an
  * end, and each child gets its turn (user feedback, November 2026).
  */
 export const SWAP_NOTE: Localized = {
@@ -90,14 +93,14 @@ export const SWAP_NOTE: Localized = {
 };
 
 /** Whether a picture is one of taking turns, running on without end (`TurnPicture`). */
-export const isTurns = (id: TimerPicture): id is TurnPicture => id === "swap" || id === "tennis";
+export const isTurns = (id: TimerPicture): id is TurnPicture => id === "swap";
 
 /** The pictures that run until the time is up, in their order: all but those of taking turns. */
 export const TIMED_PICTURES = PICTURES.filter((p) => !isTurns(p.id));
 
 /**
  * The picture after `id` for „Weiter“: the next one that runs until the time is up, after the last the first – never
- * „Abwechseln“ or Tennis, which go on without an end; from them the first.
+ * „Abwechseln“, which goes on without an end; from it the first.
  */
 export function nextPicture(id: TimerPicture): TimerPicture {
   const i = TIMED_PICTURES.findIndex((p) => p.id === id);

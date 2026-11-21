@@ -20,7 +20,7 @@ export const litItems = (items: readonly SceneItem[], x: number, y: number, r: n
 /**
  * The night over the whole picture with the hole of the light in it: an HTML layer of its own above the svg, so
  * moving the light repaints only this layer, never the drawing (the engine sets `--torch-x`, `--torch-y` and
- * `--torch-r` in pixels on it). `off`: the night fades away, at the party when everything was found.
+ * `--torch-r` in pixels on it). `off`: the night fades away, at the end when everything was found.
  */
 export function TorchNight({ nightRef, off }: { nightRef: Ref<HTMLDivElement>; off: boolean }) {
   return <div ref={nightRef} className={`torch-night${off ? " off" : ""}`} aria-hidden />;

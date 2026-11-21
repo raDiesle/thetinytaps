@@ -45,7 +45,7 @@ export interface MascotStatusRow {
 export const MASCOT_STATUS: MascotStatusRow[] = [
   {
     href: "/timer/",
-    note: "Kein Fuchs und kein Bär mehr im Bild (Feedback November 2026: die gezeichneten Kinder sahen komisch aus). Beim Abwechseln liegen dafür zwei Sitzkissen in Fuchs- und Bärenfarbe, mit Fuchs- und Bärenohren. Einzige Ausnahme ist „Tennis“ (Wunsch November 2026): dort spielen Fuchskind und Bärenkind, als gemeinsames `Mascot`, still stehend – nur Schläger und Ball bewegen sich.",
+    note: "Kein Fuchs und kein Bär mehr im Bild (Feedback November 2026: die gezeichneten Kinder sahen komisch aus). Beim Abwechseln liegen dafür zwei Sitzkissen in Fuchs- und Bärenfarbe, mit Fuchs- und Bärenohren. „Tennis“, wo Fuchskind und Bärenkind spielten, ist wieder raus (Wunsch 21. November 2026).",
     tasks: [
       {
         label: "Fuchs- oder Bärenkind, wo es im Bild etwas tut (Erntewagen, Gartenschlauch, Kerze, Abwechseln)",
@@ -55,7 +55,13 @@ export const MASCOT_STATUS: MascotStatusRow[] = [
         note: "Rausgenommen (Feedback November 2026): die SVG-Kinder sahen in den ruhigen Bildern komisch aus.",
       },
       { label: "Sitzkissen in Fuchs- und Bärenfarbe beim Abwechseln", work: "drawing", effort: "S", state: "done" },
-      { label: "Fuchskind und Bärenkind spielen Tennis (H-71)", work: "drawing", effort: "S", state: "done" },
+      {
+        label: "Fuchskind und Bärenkind spielen Tennis (H-71)",
+        work: "drawing",
+        effort: "S",
+        state: "removed",
+        note: "Rausgenommen (Wunsch 21. November 2026): schlecht umgesetzt; bessere Ideen fürs Abwechseln sind H-108 bis H-117.",
+      },
       {
         label: "Fuchs- oder Bärenfamilie steht in jedem Bild daneben und winkt am Ende",
         work: "drawing",
@@ -68,7 +74,22 @@ export const MASCOT_STATUS: MascotStatusRow[] = [
   {
     href: "/abstillen/",
     note: "Gemini-Bilder: Tapsi, Mama und Papa Fuchs durch die ganze Geschichte, gezeichnet nach der Fuchsfamilie (buch-fuechse.webp).",
-    tasks: [{ label: "Tapsi, Mama und Papa Fuchs in allen Bildern", work: "picture", pictures: 51, effort: "M", state: "done" }],
+    tasks: [
+      { label: "Tapsi, Mama und Papa Fuchs in allen Bildern", work: "picture", pictures: 51, effort: "M", state: "done" },
+      {
+        label: "Tapsi, Mama und Papa Fuchs in „The Milk Sleeps at Night“",
+        work: "picture",
+        pictures: 12,
+        effort: "M",
+        idea: "H-104",
+        note: "In der Bilderliste (nightMilkPictures.ts): Wohnzimmer und Tapsis Zimmer nach Bildern der Milchkette und der Schnullerfee, am Abend, nachts im Mondlicht und am Morgen; Papa nachts im gestreiften Schlafanzug.",
+      },
+    ],
+  },
+  {
+    href: "/flaeschchen/",
+    note: "Gemini-Bilder wie bei „Abstillen“: Tapsi (einmal als Baby), Mama und Papa Fuchs in derselben Wohnung, Küche und demselben Garten; keine Bären, die Familie macht es selbst.",
+    tasks: [{ label: "Tapsi, Mama und Papa Fuchs in den Bildern", work: "picture", pictures: 27, effort: "M" }],
   },
   {
     href: "/schnullerfee/",
@@ -84,6 +105,11 @@ export const MASCOT_STATUS: MascotStatusRow[] = [
     href: "/haare-waschen/",
     note: "Gemini-Bilder wie bei „Abstillen“: Tapsi, Mama und Papa Fuchs in derselben Wohnung, dazu ihr Badezimmer; keine Bären, die Familie wäscht selbst.",
     tasks: [{ label: "Tapsi, Mama und Papa Fuchs in den Bildern", work: "picture", pictures: 25, effort: "M", state: "done" }],
+  },
+  {
+    href: "/grosses-bett/",
+    note: "Gemini-Bilder wie bei „Abstillen“: Tapsi, Mama und Papa Fuchs in derselben Wohnung, im Bett, das Tapsi in den anderen Büchern hat; dazu Bruno, Tapsis Bärenfreund aus „Kita-Start“, mit Mama und Papa Bär in ihrem Schlafzimmer und in Brunos Zimmer.",
+    tasks: [{ label: "Tapsi, Mama, Papa Fuchs und Brunos Bärenfamilie in den Bildern", work: "picture", pictures: 34, effort: "M" }],
   },
   {
     href: "/zaehne/",

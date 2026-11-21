@@ -9,12 +9,14 @@ export {
   type Loop,
   loadRecordings,
   loadSound,
+  playBuffer,
   playLoop,
   playRecorded,
   recorded,
   recordingReady,
   recordingSeconds,
   setSfxVolume,
+  softly,
   unlockAudio,
 } from "./core";
 export * from "./animals";

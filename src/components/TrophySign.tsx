@@ -6,9 +6,9 @@ import { MUSEUM_PATH, TROPHY_ROOM, useMuseumTrophies } from "@/lib/museum";
 import { preloadPage } from "@/lib/preloadPages";
 
 /*
- * The way from the bookshelf into the trophy room (user request, November 2026): a paper sign like the fullscreen
- * button's with a big golden cup on it, nailed onto the post at the bottom right of the picture books' compartment and
- * reaching left into it, over the books spine out there. A little in the cup glints now and then, as a trophy does in a
+ * The way from the bookshelf into the trophy room (user request, November 2026): a little wooden board in 3D with a big
+ * golden cup on it, sitting in the bottom right corner of the picture books' compartment with three nails in its corners
+ * and reaching left into it, over the books spine out there. A little in the cup glints now and then, as a trophy does in a
  * game (user request, November 2026: the small cup in a doorway above the loudspeaker was hardly recognised). A tap
  * turns the eye to the right – the room's wall comes round with a door in it (MuseumDoorway) –, the door opens and one
  * walks in. Before the first trophy there is nothing behind it, so the sign isn't there either.
@@ -17,7 +17,7 @@ import { preloadPage } from "@/lib/preloadPages";
 /** How long the walk from the shelf into the trophy room takes; `museum-door-*` in bookshelf.css run exactly this long. */
 const DOORWAY_MS = 1900;
 
-/** The sign, its nail's post at `left` and the compartment's floor at `top` px in the shelf. */
+/** The sign, the compartment's bottom right corner – its post at `left`, its floor at `top` – in px in the shelf. */
 export function TrophySign({ left, top }: { left: number; top: number }) {
   const t = useT();
   const navigate = useNavigate();
