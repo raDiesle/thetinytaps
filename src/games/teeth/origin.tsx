@@ -5,6 +5,7 @@ import { useT } from "@/lib/language";
 import { playCrunch, playGiggle, playMunch, playRecorded, playRustle, playYum } from "@/lib/sfx";
 import type { Cue } from "./cues";
 import type { Daytime } from "@/lib/days";
+import { clothesOf, PyjamaPattern, topFill } from "./clothes";
 import { PICTURE } from "./jaw";
 import { fitBox, FrameStroke, INK, Monster, screenFrame, SKIN, useRoom, type Box } from "./mouth";
 import { Piece, pictureSpace } from "./piece";
@@ -303,7 +304,8 @@ export function Origin({
   const frame = screenFrame(box, unit);
   const bottom = box.y + box.height;
   const sweets = part === "sweets";
-  const girl = useFigure() === "girl";
+  const figure = useFigure();
+  const girl = figure === "girl";
   // The camera zooms in on the mouth while the monsters grow: the whole picture is scaled as an HTML layer, which the
   // browser moves without painting it again, so the picture goes from showing `box` to showing `close`.
   const close = fitBox(room, MOUTH_FOCUS);
@@ -365,18 +367,14 @@ export function Origin({
             <clipPath id="origin-frame">
               <rect {...frame} />
             </clipPath>
-            <pattern id="origin-pyjama" width={36} height={36} patternUnits="userSpaceOnUse">
-              <rect width={36} height={36} fill="#3a4a9e" />
-              <circle cx={9} cy={9} r={4} fill="#ffe680" />
-              <circle cx={27} cy={27} r={3} fill="#fff" />
-            </pattern>
+            <PyjamaPattern id="origin-pyjama" figure={figure} />
           </defs>
 
           <g clipPath="url(#origin-frame)">
-            {/* Shoulders in a T-shirt, or pyjamas in the evening, down to the screen's bottom. */}
+            {/* Shoulders in the boy's or the girl's T-shirt, or pyjamas in the evening (`clothes.tsx`), down to the screen's bottom. */}
             <path
               d={`M20 ${Math.max(480, bottom + 20)} V440 C20 395 110 365 ${W / 2} 365 C330 365 420 395 420 440 V${Math.max(480, bottom + 20)} Z`}
-              fill={daytime === "evening" ? "url(#origin-pyjama)" : "#8e7dff"}
+              fill={topFill(figure, daytime, "origin-pyjama")}
               stroke={INK}
               strokeWidth={5}
             />
@@ -410,7 +408,8 @@ export function Origin({
               strokeLinejoin="round"
             />
             <path d="M222 44 C206 18 238 4 244 24 C248 38 230 42 228 32" fill="none" stroke={INK} strokeWidth={5} strokeLinecap="round" />
-            {girl && [-1, 1].map((s) => <circle key={s} cx={HEAD.x + s * (HEAD.r - 12)} cy={118} r={17} fill="#ffd43b" stroke={INK} strokeWidth={4} />)}
+            {girl &&
+              [-1, 1].map((s) => <circle key={s} cx={HEAD.x + s * (HEAD.r - 12)} cy={118} r={17} fill={clothesOf(figure).band} stroke={INK} strokeWidth={4} />)}
 
             <EyeWhite x={160} y={186} side={-1} />
             <EyeWhite x={280} y={186} side={1} />

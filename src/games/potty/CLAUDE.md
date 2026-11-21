@@ -131,6 +131,10 @@ The waiting song (`waitMusic.ts`, `useWaitingMusic`): `musik/musik-toepfchen-war
 
 ## Rules
 
+- „Junge / Mädchen“ on the home page changes nothing here: the child of the story is Tapsi, an animal in Gemini
+  pictures (root `CLAUDE.md`: animals stay as they are, and a painted picture is never made a second time for the
+  figure), and the game's own svg (clock, mouse, bubble, week chart) draws no child. A girl Tapsi would mean the whole
+  story of about 50 pictures and their frames drawn again – only when the user asks for it (November 2026).
 - Only Tapsi goes to the potty (the user's choice, to save pictures and tokens): every animal more would need the
   whole story of about 50 pictures drawn again. Never add another animal or family unless the user asks for it.
 - The game is opened when the child has to go now: the tile starts the story at once, with no start screen or
