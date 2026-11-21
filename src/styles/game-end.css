@@ -1,6 +1,9 @@
 /* ---------- End of a level: again or on to the next (GameEnd.tsx); the way back is the corner ---------- */
 
 .game-end {
+  /* The trophy's height on its board: big, so it is seen as won and as something to tap (user feedback, November
+     2026: at a third of the screen it was too small). */
+  --trophy-h: clamp(130px, 46vh, 380px);
   position: absolute;
   bottom: max(20px, env(safe-area-inset-bottom));
   left: 50%;
@@ -139,7 +142,7 @@
   position: relative;
   z-index: 1;
   display: block;
-  height: clamp(96px, 30vh, 230px);
+  height: var(--trophy-h);
   aspect-ratio: 2 / 3;
   /* Its foot stands on the board, a little sunk into its top. */
   margin-bottom: -0.4%;
@@ -231,8 +234,8 @@
    trophy's way down has a place to go. */
 .game-end-board {
   display: block;
-  width: calc(clamp(96px, 30vh, 230px) * 0.95);
-  height: calc(clamp(96px, 30vh, 230px) * 0.07);
+  width: calc(var(--trophy-h) * 0.95);
+  height: calc(var(--trophy-h) * 0.07);
   min-height: 7px;
   border: 1.5px solid #4a2e22;
   border-radius: 3px;
@@ -258,22 +261,18 @@
   cursor: pointer;
 }
 
-.game-end.inline .game-end-trophy {
-  height: clamp(80px, 22vh, 170px);
+/* The ring and hand round it once it landed (GameEnd's TrophyHint): taps go through to the trophy. */
+.game-end-trophy-hint {
+  position: absolute;
+  pointer-events: none;
 }
 
-.game-end.inline .game-end-board {
-  width: calc(clamp(80px, 22vh, 170px) * 0.95);
-  height: calc(clamp(80px, 22vh, 170px) * 0.07);
+.game-end.inline {
+  --trophy-h: clamp(110px, 36vh, 280px);
 }
 
-.game-end.corners .game-end-trophy {
-  height: clamp(64px, 18vh, 130px);
-}
-
-.game-end.corners .game-end-board {
-  width: calc(clamp(64px, 18vh, 130px) * 0.95);
-  height: calc(clamp(64px, 18vh, 130px) * 0.07);
+.game-end.corners {
+  --trophy-h: clamp(96px, 32vh, 230px);
 }
 
 @media (prefers-reduced-motion: reduce) {

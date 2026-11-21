@@ -5,12 +5,22 @@ import { Logo } from "@/components/Logo";
 import { RoomFeedback, RoomGlobe, RoomHourglass, RoomNotes, RoomOffline, RoomSpeaker, RoomStickers } from "@/components/RoomOptions";
 import { TrophySign } from "@/components/TrophySign";
 import { type WorldId, WorldCardScene } from "@/components/Worlds";
-import { bookIdOf, CATEGORIES, hasPage, SHELF } from "@/content/games";
+import { bookIdOf, CATEGORIES, hasPage, SHELF, shelfVolumes } from "@/content/games";
 import { takeOutBook } from "@/lib/bookTravel";
 import { type Localized, type Texts, useAppLanguage, useT } from "@/lib/language";
 import { preloadPage } from "@/lib/preloadPages";
 import { playKnock } from "@/lib/sfx";
-import { BOOK_ASPECT, BOOK_GAP, planShelf, type ShelfCell, type ShelfLayout, type ShelfRect, type ShelfThing } from "@/lib/shelfLayout";
+import {
+  BOOK_ASPECT,
+  BOOK_GAP,
+  LEAN_CLEAR,
+  planShelf,
+  STICKERS_ROOM,
+  type ShelfCell,
+  type ShelfLayout,
+  type ShelfRect,
+  type ShelfThing,
+} from "@/lib/shelfLayout";
 import pictures from "./bilder/*.webp?glob";
 
 /** The picture hanging on the wall where there is room: the fox family and the bear family reading together. */
@@ -69,7 +79,7 @@ const DAILY_SPINE = 0.38;
 const LEAN_ROOM = 0.13;
 
 /**
- * The place of the words carved beside the everyday helpers. Their sentence below the first line comes wherever it fits
+ * The place of the words carved before the everyday helpers. Their sentence below the first line comes wherever it fits
  * (measured in the page, `DailyGroup`): a phone on its side has room for it under the sign too, and showed only „Für
  * Groß & Klein“ with empty room below it (user feedback, November 2026).
  */
@@ -90,7 +100,7 @@ const CARVINGS: Carving[] = [
   { span: 1.4, narrow: false, minBook: 170 },
   { span: 1.3, narrow: false, minBook: 170 },
   { span: 1.25, narrow: true, minBook: 100 },
-];
+].map((carving) => ({ ...carving, span: carving.span + LEAN_CLEAR / BOOK_ASPECT }));
 
 /** How much smaller the picture books may get for the carved words. */
 const CARVING_SHRINK = 0.8;
@@ -119,7 +129,7 @@ for (const entry of SHELF) {
     cover: entry.game ? undefined : pictures[`cover-${c.id}.webp`],
     games: !entry.game && hasPage(c) ? c.games.map((g) => g.emoji) : undefined,
   };
-  const volumes = entry.game?.volumes?.map(
+  const volumes = (entry.game && shelfVolumes(entry.game))?.map(
     (v, i): ShelfBook => ({
       ...book,
       id: bookIdOf(v.href),
@@ -156,10 +166,11 @@ const SPINE_COLOURS = ["#5e4f44", "#475057", "#685e4b", "#515647", "#594c51", "#
 
 /**
  * The sign with the app's name hanging in front of a wide shelf: its letters' size for the room's height, and its
- * board's width and height in those (the name, the sign's padding and frame; the foxes on its o rise 0.4 above it).
+ * board's width and height in those (the name, the sign's padding and frame; the foxes on its o rise 0.4 above it). The
+ * board measures 6.9 of them in the page: a wider guess took the books' room beside it (November 2026).
  */
 const SIGN_SIZE = 0.09;
-const SIGN_EMS = 7.8;
+const SIGN_EMS = 7.1;
 const SIGN_BOARD = 1.5;
 /** How far the foxes on its o rise above its board, in its letters' size. */
 const SIGN_FOXES = 0.4;
@@ -214,7 +225,7 @@ export function Bookshelf({ secretProps, legal }: { secretProps: HTMLAttributes<
   const room = useRef<HTMLDivElement>(null);
   const [plan, setPlan] = useState<{ layout: ShelfLayout; roomWidth: number; carving?: Carving; spans: number[]; sign: number } | null>(null);
 
-  // The shelf's plan follows the room it has (the screen turned, the window resized). The words carved beside the
+  // The shelf's plan follows the room it has (the screen turned, the window resized). The words carved before the
   // everyday helpers' books come only where they leave the books nearly as big and can still be read.
   useLayoutEffect(() => {
     const box = room.current;
@@ -267,6 +278,7 @@ export function Bookshelf({ secretProps, legal }: { secretProps: HTMLAttributes<
     ? ({
         "--bh": `${layout.bookHeight}px`,
         "--gap": BOOK_GAP,
+        "--lean-clear": LEAN_CLEAR,
         "--post": `${layout.frame.post}px`,
         "--crown": `${layout.frame.crown}px`,
         "--plinth": `${layout.frame.plinth}px`,
@@ -304,7 +316,7 @@ export function Bookshelf({ secretProps, legal }: { secretProps: HTMLAttributes<
                */}
               <FullscreenButton className="shelf-fullscreen" />
               {/*
-               * The way to the trophy room: a sign nailed onto the post at the bottom right of the picture books'
+               * The way to the trophy room: a wooden sign nailed into the bottom right corner of the picture books'
                * compartment, reaching left into it (user request, November 2026: the trophies standing on a board took
                * the books' room and sank into the wall, and a small sign above the loudspeaker was hardly seen).
                */}
@@ -359,7 +371,7 @@ export function Bookshelf({ secretProps, legal }: { secretProps: HTMLAttributes<
  * with its name clipped on the board's edge under them (chosen from four drafts, user decision, November 2026). A game
  * with several parts stands as its books tied together with a red ribbon (`BookBundle`): the Belohnungstafel's, right of
  * Aufs Töpfchen, bound in gold and glowing brightest, so it is what the eye finds first (user feedback, November 2026).
- * Beside them words carved into the shelf's back panel tell grown-ups in short who the shelf is for and that it is a
+ * Before them words carved into the shelf's back panel tell grown-ups in short who the shelf is for and that it is a
  * first step into the digital world taken together – never an advert for one of its games (user feedback, November
  * 2026) – and their „mehr …“ opens all the texts for grown-ups (RoomNotes).
  */
@@ -401,12 +413,6 @@ function DailyGroup({
   }, [carving, language]);
   return (
     <span className="shelf-daily-row" style={{ "--span": span, "--books-span": DAILY_SPAN, "--lean-room": LEAN_ROOM } as CSSProperties}>
-      <span className="shelf-daily-books">
-        {books.map((book) =>
-          book.volumes ? <BookBundle key={book.id} volumes={book.volumes} take={take} /> : <SpineBook key={book.id} book={book} onClick={take(book)} />,
-        )}
-        <span className="shelf-group-label">{name}</span>
-      </span>
       {carving && (
         <span className="shelf-carving" data-narrow={carving.narrow || undefined}>
           {/* Kept whole, so a narrow carving never breaks it. */}
@@ -435,6 +441,12 @@ function DailyGroup({
           <RoomNotes />
         </span>
       )}
+      <span className="shelf-daily-books">
+        {books.map((book) =>
+          book.volumes ? <BookBundle key={book.id} volumes={book.volumes} take={take} /> : <SpineBook key={book.id} book={book} onClick={take(book)} />,
+        )}
+        <span className="shelf-group-label">{name}</span>
+      </span>
     </span>
   );
 }
@@ -473,9 +485,6 @@ function RibbonBow() {
     </svg>
   );
 }
-
-/** How much room the books spine out leave beside the wall with the stickers, in book heights. */
-const STICKERS_ROOM = 0.45;
 
 /** The name of the picture books' group (the everyday helpers' is their category's, `DailyGroup`). */
 const LEARNING: Localized = {
@@ -542,19 +551,18 @@ function Compartment({
     "--sx": `${(cell.x + cell.w / 2 - layout.width / 2) * back}px`,
     "--sy": `${(cell.y + cell.h / 2 - layout.height * EYE_HEIGHT) * back}px`,
   } as CSSProperties;
-  // The carved words move right to stand centred under the hanging sign, and the books spine out beside them make way –
-  // a little less than the words move, as there was room between them already.
-  const shift = cell.trail ? (layout.wordsShift ?? 0) : 0;
-  const spinesShift = Math.max(0, shift - 0.1 * layout.bookHeight);
-  const ends = cell.books ? endsFor(cell, layout.bookHeight, spans, spinesShift) : undefined;
+  // The carved words, and the sign over them on a wide shelf, begin the board at its far left where the everyday helpers
+  // stand first on it (user request, November 2026: a visitor looks at the left first); the books follow at their right.
+  const leads = cell.books?.[0] !== undefined && Boolean(PLACES[cell.books[0]][0].colour);
+  const ends = cell.books ? endsFor(cell, layout.bookHeight, spans, leads) : undefined;
   const things = cell.things ?? [];
   // The stack of books lying flat goes to one end, the left in one compartment, the right in the next – never to the
   // wall with the stickers, which it would hide.
-  const stackLeft = seed % 2 === 0 || things.includes("figure");
+  const stackLeft = !leads && (seed % 2 === 0 || things.includes("figure"));
   return (
     <div className={`shelf-cell${cell.books ? "" : ` thing ${things.join(" ")}`}`} style={style}>
       <span className="shelf-cell-shade" />
-      {cell.books && <BooksLight cell={cell} bh={layout.bookHeight} spans={spans} />}
+      {cell.books && <BooksLight cell={cell} bh={layout.bookHeight} spans={spans} leads={leads} />}
       <span className="shelf-wall left" />
       <span className="shelf-wall right" />
       <span className="shelf-cell-ceiling" />
@@ -562,9 +570,8 @@ function Compartment({
       {ends && (
         <div
           className="shelf-row"
-          style={
-            cell.trail ? ({ "--trail": `${cell.trail}px`, "--words-shift": `${shift}px`, "--spines-shift": `${spinesShift}px` } as CSSProperties) : undefined
-          }
+          data-leads={leads || undefined}
+          style={cell.lead || cell.pull ? ({ "--lead": `${cell.lead ?? 0}px`, "--pull": `${cell.pull ?? 0}px` } as CSSProperties) : undefined}
         >
           <span className="shelf-end">
             {ends.stack > 0 && stackLeft && <Stack seed={seed} />}
@@ -602,35 +609,42 @@ function Compartment({
 
 /**
  * Warm light falling on the back panel behind the books of a compartment that can be taken, so the eye goes to them and
- * the books only filling the shelf stand in its shadow (user decision, November 2026). Still: it never moves.
+ * the books only filling the shelf stand in its shadow (user decision, November 2026). Where the sign and the carved
+ * words begin the board (`leads`), a brighter light falls on them as well, so what a visitor should see first stands
+ * out (user request, November 2026). Still: it never moves.
  */
-function BooksLight({ cell, bh, spans }: { cell: ShelfCell; bh: number; spans: number[] }) {
+function BooksLight({ cell, bh, spans, leads }: { cell: ShelfCell; bh: number; spans: number[]; leads: boolean }) {
   const books = cell.books ?? [];
   const span = books.reduce((sum, b) => sum + spans[b], 0);
-  const width = span * bh * BOOK_ASPECT + (books.length + 1) * BOOK_GAP * bh;
-  const left = (cell.w - (cell.trail ?? 0) - width) / 2;
-  return <span className="shelf-light" style={{ left, width }} />;
+  const width = span * bh * BOOK_ASPECT + (books.length + 1) * BOOK_GAP * bh + (cell.lead ?? 0);
+  if (!leads) return <span className="shelf-light" style={{ left: (cell.w - width) / 2, width }} />;
+  const words = BOOK_GAP * bh + spans[books[0]] * bh * BOOK_ASPECT - DAILY_SPAN * bh * BOOK_ASPECT + (cell.lead ?? 0);
+  return (
+    <>
+      <span className="shelf-light" style={{ left: 2 + words, width: width - words }} />
+      <span className="shelf-light lead" style={{ left: 2, width: words + BOOK_GAP * bh }} />
+    </>
+  );
 }
 
 /**
  * How many books stand spine out at each end of a compartment of picture books, and whether a stack lies there too:
- * what the room beside the books leaves, the books standing together in the middle with `BOOK_GAP` round each. The
+ * what the room beside the books leaves, the books standing together in the middle with `BOOK_GAP` round each – or,
+ * where the carved words and the sign begin the board at its far left (`leads`), all of it at the right end. The
  * right end keeps room free beside the wall with the stickers, so they are seen.
  */
-function endsFor(cell: ShelfCell, bh: number, spans: number[], shift: number) {
+function endsFor(cell: ShelfCell, bh: number, spans: number[], leads: boolean) {
   const n = cell.books?.length ?? 0;
   const span = (cell.books ?? []).reduce((sum, b) => sum + spans[b], 0);
-  const trail = cell.trail ?? 0;
-  const end = (cell.w - trail - span * bh * BOOK_ASPECT - (n + 1) * BOOK_GAP * bh) / 2 - 2;
+  const free = cell.w - (cell.lead ?? 0) - span * bh * BOOK_ASPECT - (n + 1) * BOOK_GAP * bh - 4;
+  const end = leads ? 0 : free / 2;
   // The widest spine's room, so that they never reach past the wall.
   const spine = bh * 0.17 + 1;
-  const count = (room: number) => Math.max(0, Math.min(12, Math.floor(room / spine)));
+  const count = (room: number) => Math.max(0, Math.min(24, Math.floor(room / spine)));
   // A stack takes the room of this many spines, where there is room for it.
-  const stack = end >= bh * 0.6 ? Math.ceil((bh * 0.62) / spine) : 0;
-  // The room kept for the sign hanging in front is the right end's, filled with books spine out as well, less what the
-  // carved words moved into (`ShelfLayout.wordsShift`).
+  const stack = free - end >= bh * 0.6 ? Math.ceil((bh * 0.62) / spine) : 0;
   const wall = cell.things?.includes("figure") ? STICKERS_ROOM * bh : 0;
-  return { left: count(end), right: count(end + trail - wall - shift), stack };
+  return { left: count(end), right: count(free - end - wall), stack };
 }
 
 /** A few books standing with their spines out, only to fill the shelf: their colours and heights from `seed`. */

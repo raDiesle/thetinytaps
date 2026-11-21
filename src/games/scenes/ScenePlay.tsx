@@ -5,14 +5,18 @@ import "./scenes.css";
 import { FeedbackLayer, useTapFeedback } from "@/components/TapFeedback";
 import { GameEnd } from "@/components/GameEnd";
 import { useNoBackgroundMusic } from "@/lib/backgroundMusic";
-import { loadRecordings, playChime, playLullaby, playMelody, playRandomNote } from "@/lib/sfx";
+import { loadRecordings, playChime, playEvening, playLullaby, playRandomNote } from "@/lib/sfx";
 import { targetLanguageFor } from "@/content/targetLanguages";
 import { pick as pickLanguage, useAppLanguage } from "@/lib/language";
 import { pick } from "@/lib/random";
+import { afterPageMotion } from "@/lib/pageMotion";
+import { REPEAT_PAUSE_MS } from "@/lib/spacing";
 import { touchOnly } from "@/lib/device";
 import { tapState } from "@/lib/tapTargets";
 import { preloadScene, SCENE_ENTRIES, scenePath, sceneTitle } from "./catalog";
+import { BOW_AFTER_MS, BOW_KEYFRAMES, BOW_MS, bowFoot, bowOrder, bowStep, curtainEndAt, curtainSoundAt, EVENING_AFTER_MS, layerPoint } from "./curtainCall";
 import { ARROWS, centre, middleItem, nextInDirection } from "./focus";
+import { HELLO_AFTER_MS, HELLO_AGAIN_MS, HELLO_KEYFRAMES, HELLO_MS, helloOrder } from "./hello";
 import { HideoutContext, peekTimes, SURPRISES } from "./hideout";
 import { assignKeys, pressedKey } from "./keys";
 import { LaneLayer, type LaneControl } from "./LaneLayer";
@@ -23,6 +27,7 @@ import { coloursIn, type ColourTrait } from "./colourParts";
 import { nextQuest, questsFor, type Quest } from "./quests";
 import { driveDistance, guestFor, roadId, roadsFrom, tripTo, withGuest, type Road, type Trip } from "./roads";
 import { hasHints, isQuestMode, type ScenesSettings } from "./settings";
+import { loadRiddleSounds, playRiddleSound, riddleSoundReady } from "./riddleSounds";
 import { playSound } from "./sounds";
 import { gust, poke, SPOTS, SpotEffectArt, spotAt, type SpotEffect } from "./spots";
 import { litItems, TORCH_RADIUS, TORCH_STEP, TorchNight } from "./torch";
@@ -34,16 +39,15 @@ const MIN_KEY_MS = 600;
 const REPEAT_QUESTION_MS = 3000;
 /** Find modes: pause after a found item before the next question. */
 const NEXT_QUESTION_MS = 2600;
+/** Sound mode: the first sound waits at most this long for its recording, then the usual sound plays. */
+const RIDDLE_WAIT_MS = 2500;
 /** Find modes: when the hint ring appears. */
 const HINT_AFTER_MS = 8000;
 const HINT_AFTER_MISSES = 2;
 /** Chain reactions: the next item reacts this long after the one before. */
 const CHAIN_STEP_MS = 1100;
-/** "Alles entdeckt!": the party starts a moment after the last item, and everything dances for a while. */
-const PARTY_AFTER_MS = 900;
-const PARTY_MS = 3600;
-/** "Nochmal" and the next picture come once the party (or the room going dark) has had its moment. */
-const END_BUTTONS_MS = PARTY_AFTER_MS + 2400;
+/** Bedtime picture: "Nochmal" and the next picture come once the room going dark has had its moment. */
+const NIGHT_END_MS = EVENING_AFTER_MS + 2400;
 /** Vehicles driving into another picture (idea B-19): how fast they drive, in scene units per second… */
 const DRIVE_SPEED = 600;
 const DRIVE_MIN_MS = 1400;
@@ -120,7 +124,8 @@ export function ScenePlay({ scene, settings, onKeys }: { scene: Scene; settings:
   const [touched, setTouched] = useState(false);
   /** Explore and colour mode: items tapped at least once (in colour mode: the coloured ones). */
   const [discovered, setDiscovered] = useState<ReadonlySet<string>>(new Set());
-  const [partying, setPartying] = useState(false);
+  /** All found (B-21): the picture lies in warm evening light until it starts over. */
+  const [evening, setEvening] = useState(false);
   /** Colour mode: where the background was painted, by tapping it or an item. */
   const [dabs, setDabs] = useState<Dab[]>([]);
   /** Bedtime pictures: everything is asleep and the room is dark. */
@@ -188,6 +193,8 @@ export function ScenePlay({ scene, settings, onKeys }: { scene: Scene; settings:
   const greyId = `${svgId}-grey`;
 
   const questMode = isQuestMode(settings.mode);
+  /** „Geräusch-Rätsel“ (B-02): only a sound is the question, and the items sound with its recordings (soundRiddle.ts). */
+  const riddle = settings.mode === "sound";
   const colouring = settings.mode === "colour";
   const torch = settings.mode === "torch";
   /** "Straße malen" (N-43): drawn roads, and what a vehicle drives past wakes up (LaneLayer.tsx). */
@@ -197,7 +204,7 @@ export function ScenePlay({ scene, settings, onKeys }: { scene: Scene; settings:
   const itemsById = useMemo(() => new Map(items.map((item) => [item.id, item])), [items]);
   const roads = useMemo(() => roadsFrom(scene.id), [scene]);
   const allDiscovered = discovered.size === scene.items.length;
-  /** Bedtime picture while exploring: tapped items fall asleep, and the end is a quiet night instead of the party. */
+  /** Bedtime picture while exploring: tapped items fall asleep, and the end is a quiet night instead of the evening light and the bows. */
   const bedtime = !!scene.bedtime && !colouring && !questMode;
   // The good-night picture is about getting calm: no song in the background there.
   useNoBackgroundMusic(!!scene.bedtime);
@@ -237,24 +244,23 @@ export function ScenePlay({ scene, settings, onKeys }: { scene: Scene; settings:
     return next;
   }, []);
 
-  /** Start the item's animation and (unless quiet) its sound. Returns false while it is still running. */
+  /** Start the item's animation and its sound. Returns false while it is still running. */
   const animate = useCallback(
-    (item: SceneItem, quiet = false) => {
+    (item: SceneItem) => {
       const now = performance.now();
       if (now < (busyUntil.current.get(item.id) ?? 0)) return false;
       busyUntil.current.set(item.id, now + item.durationMs);
       const surprise = item.hideout ? nextSurprise(item) : undefined;
       setPlays((prev) => ({ ...prev, [item.id]: { count: (prev[item.id]?.count ?? 0) + 1, playing: true, surprise } }));
       later(() => setPlays((prev) => ({ ...prev, [item.id]: { ...prev[item.id], playing: false } })), item.durationMs);
-      if (!quiet) {
-        playSound(item.sound);
-        // The surprise says hello once it is out of its hideout; not while looking for something, it would
-        // mislead, and not at bedtime, where a bark would wake everyone up.
-        if (surprise !== undefined && !questMode && !bedtime) later(() => playSound(SURPRISES[surprise].sound), peekTimes(item).delayMs + 300);
-      }
+      if (riddle) playRiddleSound(item.sound);
+      else playSound(item.sound);
+      // The surprise says hello once it is out of its hideout; not while looking for something, it would
+      // mislead, and not at bedtime, where a bark would wake everyone up.
+      if (surprise !== undefined && !questMode && !bedtime) later(() => playSound(SURPRISES[surprise].sound), peekTimes(item).delayMs + 300);
       return true;
     },
-    [later, nextSurprise, questMode, bedtime],
+    [later, nextSurprise, questMode, bedtime, riddle],
   );
 
   /** The asked colours each item shows somewhere, read from the drawing once (colour questions, `coloursIn`). */
@@ -270,9 +276,10 @@ export function ScenePlay({ scene, settings, onKeys }: { scene: Scene; settings:
     return colours.has(colour);
   };
 
-  /** Asks the question (again): its bubble shows it, and a key asks again only after a while. */
-  const ask = useCallback(() => {
+  /** Asks the question (again): its bubble shows it, a sound question plays its sound, and a key asks again only after a while. */
+  const ask = useCallback((quest: Quest | null = questRef.current) => {
     lastQuestion.current = performance.now();
+    if (quest?.sound) playRiddleSound(quest.sound);
   }, []);
 
   const newQuestion = useCallback(() => {
@@ -284,12 +291,35 @@ export function ScenePlay({ scene, settings, onKeys }: { scene: Scene; settings:
     setQuest(next);
     setAnswered(answeredRef.current);
     setHint(false);
-    if (next) ask();
+    if (next) ask(next);
   }, [quests, ask]);
 
-  // Settings can't change while playing, so this only runs once.
+  // Settings can't change while playing, so this only runs once. The first sound question waits for the page to lie
+  // still (nothing sounds while it turns) and for its recording, so the child hears the good one first.
   useEffect(() => {
-    if (questMode) newQuestion();
+    if (!questMode) return;
+    if (!riddle) {
+      newQuestion();
+      return;
+    }
+    // Only this mode fetches the riddle's recordings (user request: never loaded while it is off).
+    loadRiddleSounds(quests.flatMap((quest) => (quest.sound ? [quest.sound] : [])));
+    const first = nextQuest(quests, null);
+    questRef.current = first;
+    setQuest(first);
+    if (!first?.sound) return;
+    const sound = first.sound;
+    let cancelled = false;
+    let stop = () => {};
+    const waited = new Promise((resolve) => later(() => resolve(null), RIDDLE_WAIT_MS));
+    Promise.race([riddleSoundReady(sound), waited]).then(() => {
+      // Not when the child already tapped the loudspeaker meanwhile.
+      if (!cancelled) stop = afterPageMotion(() => questRef.current === first && lastQuestion.current === 0 && ask(first));
+    });
+    return () => {
+      cancelled = true;
+      stop();
+    };
   }, []);
 
   // The hint ring marks an answer that hasn't been found yet; after each found one the wait starts again.
@@ -298,25 +328,75 @@ export function ScenePlay({ scene, settings, onKeys }: { scene: Scene; settings:
   const hintItem = quest?.answers.find((item) => !answered.has(item.id));
   useEffect(() => {
     if (!quest || !hintsOn) return;
-    const timer = setTimeout(() => setHint(true), HINT_AFTER_MS);
+    const timer = setTimeout(() => {
+      setHint(true);
+      // A sound question: the sound once more with the ring, so the child hears what it is looking for.
+      if (quest.sound && !celebrating.current) ask(quest);
+    }, HINT_AFTER_MS);
     return () => clearTimeout(timer);
-  }, [quest, answered, hintsOn]);
+  }, [quest, answered, hintsOn, ask]);
 
   const interacted = () => {
     setTouched(true);
   };
+
+  // „Hier bin ich!“ (B-15): nobody tapped yet, so after a while one item waves gently – silent, a few at most, one
+  // after the other – and the first tap or key ends it. Only where the child taps freely: a question, the torch's
+  // light or a road to draw is its own invitation.
+  const greets = !questMode && !torch && !lanes && !touched;
+  useEffect(() => {
+    if (!greets) return;
+    const order = helloOrder(here(items), scene.width, scene.height);
+    const waits: ReturnType<typeof setTimeout>[] = [];
+    const waves: Animation[] = [];
+    const wave = (item: SceneItem) => {
+      const root = sceneRef.current;
+      // Not a thing that is busy (driving in, playing): its own movement says enough.
+      if (!root || performance.now() < (busyUntil.current.get(item.id) ?? 0)) return;
+      const layer = root.querySelector(`[data-item="${item.id}"]`)?.closest<SVGSVGElement>("svg.scene-layer");
+      if (!layer) return;
+      // Like a bow at the end (B-21): the item's own layer moves about its foot, so no picture is painted again.
+      const [x, y] = layerPoint(bowFoot(item), scene.width, scene.height, root.clientWidth, root.clientHeight);
+      layer.style.transformOrigin = `${x}px ${y}px`;
+      waves.push(layer.animate(HELLO_KEYFRAMES, { duration: HELLO_MS, easing: "ease-in-out" }));
+    };
+    const stop = afterPageMotion(() => {
+      order.forEach((item, n) => waits.push(setTimeout(() => wave(item), HELLO_AFTER_MS + n * HELLO_AGAIN_MS)));
+    });
+    return () => {
+      stop();
+      waits.forEach(clearTimeout);
+      // The first tap ends a wave still under way, so the picture is quiet for the thing tapped.
+      for (const w of waves) w.cancel();
+    };
+  }, [greets, items, here, scene]);
 
   const moveFocus = useCallback((item: SceneItem) => {
     focusRef.current = item;
     setFocus(item);
   }, []);
 
-  /** Everything was discovered: all items dance at once; then the end's buttons come with the picture's trophy. */
-  const party = () => {
-    setPartying(true);
-    playMelody();
-    items.forEach((item, i) => later(() => animate(item, true), i * 40));
-    later(() => setPartying(false), PARTY_MS);
+  /**
+   * Everything was discovered (B-21): the light turns warm like an evening, everything found bows once, one after the
+   * other from left to right, silently, and one soft sound follows the last bow; then the end's buttons and the trophy.
+   * A bow moves the item's own layer (its svg, about the item's foot), so no picture is painted again while it bows.
+   */
+  const curtainCall = () => {
+    setEvening(true);
+    later(bowAll, BOW_AFTER_MS - EVENING_AFTER_MS);
+    later(playEvening, curtainSoundAt(items.length) - EVENING_AFTER_MS);
+  };
+  const bowAll = () => {
+    const root = sceneRef.current;
+    if (!root) return;
+    const step = bowStep(items.length);
+    bowOrder(items).forEach((item, i) => {
+      const layer = root.querySelector(`[data-item="${item.id}"]`)?.closest<SVGSVGElement>("svg.scene-layer");
+      if (!layer) return;
+      const [x, y] = layerPoint(bowFoot(item), scene.width, scene.height, root.clientWidth, root.clientHeight);
+      layer.style.transformOrigin = `${x}px ${y}px`;
+      layer.animate(BOW_KEYFRAMES, { duration: BOW_MS, delay: i * step, easing: "ease-in-out" });
+    });
   };
 
   /** Bedtime picture: everything is asleep, so the room goes dark – softly, without dancing or rising hearts. */
@@ -330,6 +410,7 @@ export function ScenePlay({ scene, settings, onKeys }: { scene: Scene; settings:
     setDiscovered(discoveredRef.current);
     setDabs([]);
     setNight(false);
+    setEvening(false);
     inLight.current = new Set();
   };
 
@@ -339,7 +420,7 @@ export function ScenePlay({ scene, settings, onKeys }: { scene: Scene; settings:
     const { trip: _, ...state } = (location.state ?? {}) as { trip?: Trip };
     navigate(scenePath(nextId), { replace: true, state });
   };
-  // Once all is found, the next picture loads while the party plays, so „Weiter“ shows it at once.
+  // Once all is found, the next picture loads during the evening light and the bows, so „Weiter“ shows it at once.
   useEffect(() => {
     if (allDiscovered) preloadScene(nextId);
   }, [allDiscovered, nextId]);
@@ -353,8 +434,7 @@ export function ScenePlay({ scene, settings, onKeys }: { scene: Scene; settings:
     // A splash of paint where the colour comes back.
     if (colouring) glow(x, y);
     if (discoveredRef.current.size !== scene.items.length) return;
-    if (bedtime) later(goodNight, PARTY_AFTER_MS);
-    else later(party, PARTY_AFTER_MS);
+    later(bedtime ? goodNight : curtainCall, EVENING_AFTER_MS);
   };
 
   /**
@@ -714,7 +794,7 @@ export function ScenePlay({ scene, settings, onKeys }: { scene: Scene; settings:
 
       const quest = questRef.current;
       if (quest) {
-        if (!celebrating.current && now - lastQuestion.current > REPEAT_QUESTION_MS) ask();
+        if (!celebrating.current && now - lastQuestion.current > REPEAT_QUESTION_MS) ask(quest);
         else softTap();
         return;
       }
@@ -737,7 +817,7 @@ export function ScenePlay({ scene, settings, onKeys }: { scene: Scene; settings:
   const greyFilter = `url(#${greyId})`;
   // The grey copy of the background, with holes where it was painted.
   const greyCopy = { filter: greyFilter, mask: `url(#${svgId}-paint)` };
-  const sceneClass = ["scene scene-root", colouring && "colouring", partying && "party", night && "night"].filter(Boolean).join(" ");
+  const sceneClass = ["scene scene-root", colouring && "colouring", night && "night"].filter(Boolean).join(" ");
 
   return (
     <div
@@ -779,7 +859,7 @@ export function ScenePlay({ scene, settings, onKeys }: { scene: Scene; settings:
         {/* Taps go through the grey copy to the background, whose things move (`<Poke>`). */}
         {grey && <use href={`#${svgId}-bg`} {...greyCopy} pointerEvents="none" />}
       </svg>
-      {items.map((item, i) => {
+      {items.map((item) => {
         const play = plays[item.id];
         const place = item.place;
         const drive = drives[item.id];
@@ -795,7 +875,6 @@ export function ScenePlay({ scene, settings, onKeys }: { scene: Scene; settings:
               <g
                 key={`${item.id}-${play?.count ?? 0}`}
                 className={`scene-item item-${look}${play?.playing ? " playing" : ""}${bedtime && discovered.has(item.id) ? " asleep" : ""}`}
-                style={{ "--party-i": i } as CSSProperties}
                 filter={colouring && !discovered.has(item.id) ? greyFilter : undefined}
                 data-item={item.id}
                 data-tap={quest ? tapState({ goal: quest.answers.includes(item), done: answered.has(item.id) }) : tapState({ done: discovered.has(item.id) })}
@@ -832,6 +911,8 @@ export function ScenePlay({ scene, settings, onKeys }: { scene: Scene; settings:
           {grey && <use href={`#${svgId}-overlay`} {...greyCopy} />}
         </SceneLayer>
       )}
+      {/* All found: warm evening light over the picture, an HTML layer of its own that only fades in (B-21). */}
+      <div className={`scene-evening${evening ? " on" : ""}`} aria-hidden />
       <SceneLayer scene={scene} className="scene-marks" taps>
         {exits.map((exit) => (
           <ExitSign
@@ -858,17 +939,19 @@ export function ScenePlay({ scene, settings, onKeys }: { scene: Scene; settings:
         <button
           type="button"
           key={quest.id}
-          className={quest.item ? "find-question find-item" : "find-question"}
+          className={quest.item ? "find-question find-item" : quest.sound ? "find-question find-sound" : "find-question"}
           aria-label={quest.question}
           onPointerDown={(e) => {
             e.stopPropagation();
-            ask();
+            // The sound again only after a pause; tapped meanwhile, the bubble only ripples (root CLAUDE.md).
+            if (quest.sound && performance.now() - lastQuestion.current < REPEAT_PAUSE_MS) ripple(e.clientX, e.clientY);
+            else ask(quest);
           }}
         >
           {quest.item && <Thumbnail item={quest.item} />}
           {quest.emoji && <span className="find-emoji">{quest.emoji}</span>}
-          {/* Find mode shows only the picture: nothing to read, and the bubble covers less of the scene. */}
-          {!quest.item && <span>{quest.question}</span>}
+          {/* Find mode shows only the picture, the sound riddle only its loudspeaker: nothing to read, and the bubble covers less of the scene. */}
+          {!quest.item && !quest.sound && <span>{quest.question}</span>}
           {quest.needed > 1 && (
             <span className="find-progress" aria-label={words.of(answered.size, quest.needed)}>
               {Array.from({ length: quest.needed }, (_, i) => (
@@ -890,9 +973,14 @@ export function ScenePlay({ scene, settings, onKeys }: { scene: Scene; settings:
           {discovered.size}/{scene.items.length}
         </div>
       )}
-      {/* Counted to the end (party, the room gone dark or the picture coloured in). */}
+      {/* Counted to the end (evening light and bows, the room gone dark or the picture coloured in). */}
       {!questMode && allDiscovered && (
-        <GameEnd delayMs={END_BUTTONS_MS} level={scene.id} onAgain={startOver} next={{ name: sceneTitle(nextId, appLanguage.id), onNext: goToNextScene }} />
+        <GameEnd
+          delayMs={bedtime ? NIGHT_END_MS : curtainEndAt(items.length)}
+          level={scene.id}
+          onAgain={startOver}
+          next={{ name: sceneTitle(nextId, appLanguage.id), onNext: goToNextScene }}
+        />
       )}
       {/* Colour mode with the key badges on: the space bar, small at the bottom, paints where nothing happens. */}
       {colouring && keysOn && !allDiscovered && (
