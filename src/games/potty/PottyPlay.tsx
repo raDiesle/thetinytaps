@@ -102,11 +102,21 @@ interface Begin {
 }
 
 /**
+ * The story played for the parents' video (`ParentsVideo`, idea Y-29): a grown-up's drawn hand taps through it, so it
+ * keeps nothing and ends on the week's stars – no star saved, no `GameEnd` (no trophy, no game counted), no step in the
+ * address – and a click of the one recording goes nowhere.
+ */
+export interface PottyDemo {
+  /** The week shown at the end instead of the stored one; this round's star is added to it, never saved. */
+  stars: StarLog;
+}
+
+/**
  * „Aufs Töpfchen“ (H-06): Tapsi eats, drinks, has to go, calls Mama and Papa and goes to the potty. Any tap or key goes on, a few
  * steps by themselves (`Step.auto`); while sitting a tap brings the next thought. What it has to do is what the child said,
  * picked by a grown-up while Tapsi calls (unknown until then); what came – or that nothing came – is chosen at the ✓.
  */
-export function PottyPlay() {
+export function PottyPlay({ demo }: { demo?: PottyDemo } = {}) {
   const language = useAppLanguage();
   const t = useT();
   const texts = t(POTTY_TEXTS);
@@ -116,7 +126,7 @@ export function PottyPlay() {
   const scenes = useMemo(() => scenesFor(said), [said]);
   const [at, setAt] = useState<At>(START);
   // The step on screen in the address by its name (stepAddress.ts); the bubble's scenes while sitting are no steps.
-  useStepAddress(STEPS[at.step].id);
+  useStepAddress(demo ? undefined : STEPS[at.step].id);
   const [busy, setBusy] = useState(false);
   /**
    * The buttons for what the child said show in this step: while calling, and on the way while nothing was picked.
@@ -145,7 +155,7 @@ export function PottyPlay() {
   const checked = useRef(false);
   /** This round's star is on the chart: one round, one star, also when the end is reached twice. */
   const starred = useRef(false);
-  const [log, setLog] = useState<StarLog>(loadStars);
+  const [log, setLog] = useState<StarLog>(() => demo?.stars ?? loadStars());
   /** The star of this round pops in on the chart. */
   const [fresh, setFresh] = useState(false);
 
@@ -302,13 +312,13 @@ export function PottyPlay() {
       case "stars":
         if (star) {
           starred.current = true;
-          const next = addStar(loadStars(), new Date());
-          saveStars(next);
+          const next = addStar(demo?.stars ?? loadStars(), new Date());
+          if (!demo) saveStars(next);
           setLog(next);
           setFresh(true);
           // In time with the new star popping in.
           sound(900, playTwinkle);
-        } else setLog(loadStars());
+        } else setLog(demo?.stars ?? loadStars());
         break;
       case "play":
         // Mama and Papa knock at the open door before they ask.
@@ -430,7 +440,8 @@ export function PottyPlay() {
 
   useEffect(() => {
     const onKeyDown = (e: KeyboardEvent) => {
-      if (e.repeat || e.key === "Escape") return;
+      // In the video only the drawn hand plays: a key of the one recording (Esc stops it) changes nothing here.
+      if (e.repeat || e.key === "Escape" || demo) return;
       // While sitting Enter is the ✓ for what the child said (pipi when it said both or nothing), Space pauses or goes
       // on (as in Zähne putzen), and every other key goes on when paused, else brings the next thought (silently).
       // Everywhere else every key is „Weiter“.
@@ -463,7 +474,8 @@ export function PottyPlay() {
   return (
     <div
       className={`potty-play pt-${went ?? said} pt-at-${step.id}${busy ? " busy" : ""}${sitting && paused ? " paused" : ""}`}
-      onPointerDown={(e: PointerEvent) => act(e.clientX, e.clientY)}
+      // In the video only the drawn hand taps (its events are not trusted): a click of the one recording goes nowhere.
+      onPointerDown={(e: PointerEvent) => (demo && e.isTrusted ? undefined : act(e.clientX, e.clientY))}
     >
       {shown.before && <StoryPicture key={`before-${shown.before.join()}`} name={shown.before} moving={false} />}
       <StoryPicture
@@ -506,7 +518,7 @@ export function PottyPlay() {
             <ControlIcon kind="pause" className="pt-pause-icon" />
           </span>
           {t(PAUSE)}
-          <small>{t(touchOnly ? TAP_TO_GO_ON : SPACE_OR_TAP_TO_GO_ON)}</small>
+          <small>{t(touchOnly || demo ? TAP_TO_GO_ON : SPACE_OR_TAP_TO_GO_ON)}</small>
         </div>
       )}
 
@@ -628,7 +640,7 @@ export function PottyPlay() {
 
       {/* There is one story only, so „Weiter“ would be „Nochmal“ again, and once on the potty a child is done: only
           „Menü“ with the shelf, small in the corner so the party picture stays free. */}
-      {last && <GameEnd delayMs={step.ms} menu corners />}
+      {last && !demo && <GameEnd delayMs={step.ms} menu corners />}
       <FeedbackLayer effects={effects} />
     </div>
   );

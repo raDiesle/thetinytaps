@@ -129,7 +129,26 @@ never the subject of a gendered verb („टैप्सी को सू-सू
 
 The waiting song (`waitMusic.ts`, `useWaitingMusic`): `musik/musik-toepfchen-warten-<lang>.mp3`, found by its file name, sung in the app language, else German; it loops without end and plays alone (nothing speaks while Tapsi sits; it would still get quiet for a voice). In all seven languages (`LOOPS` holds where each song repeats, a whole number of bars from just before the first word). While there is no file or it loads, the synthesized tune (`playWaitNote`, four bars on `BEAT_MS`) repeats instead. Like the brushing song it is part of the game and plays even with Töne or Musik off. Songs come from Suno (`/musik-erzeugen`, see `musik/README.md`: a seamless loop, no fade-out); `languageStatus.ts` lists the sung languages, `potty.test.ts` checks that against the files.
 
+The video for parents (idea Y-29, November 2026): `/management/video-toepfchen-eltern/` (linked at the top of
+`/management/`, `ParentsVideo.tsx`, noindex) shows the real game on a drawn tablet lying on a table, and a grown-up's
+drawn hand in a jumper sleeve (`ParentHand`) comes up from below and taps it through after a fixed script
+(`PARENTS_SCRIPT` in `parentsScript.ts`): the story starting at once, ▶, the 💧 of what the child said, sitting with the
+song and the thoughts, ⏸ and ▶ again, the ✓💧, the steps after it, the week's stars – about a minute and a half, a short
+line for grown-ups on a sheet beside the tablet at each part (English first, `languageStatus.ts`), then 15 s of the name
+and the game's address (`END_SLATE_MS`) for YouTube's end screen, since this video is „not made for kids“. Each beat waits
+for its step (`pt-at-<step>`), and the hand presses the button (`pt-pressed`, its look under a finger) and sends it a
+pointer event, so the game answers as to a finger. `PottyPlay demo` keeps nothing: the week shown is made up
+(`sampleWeek`), the round's star is never saved, no `GameEnd` (no trophy, no game counted), no step in the address, and
+a real click or key of the one recording changes nothing. The background song stays out; voice, sounds and the waiting
+song are fetched before (`preloadWaitingSong`). Recorded in Chrome like Zähne putzen's video (`src/lib/tabRecording.ts`).
+
 ## Rules
+
+- The parents' video shows only the tablet and a grown-up's hand – never a real child, not from behind nor blurred
+  (Y-29). The game in it is laid out at a real tablet's size (`SCREEN`, 1280 × 800) and scaled to the drawn screen:
+  laid out in the small screen itself, it sized buttons from the window and the ✓ ran off the tablet. Record it in a
+  window of 1080p or more, where the game's sizes come out as on a tablet. A new button the story needs a grown-up to
+  tap gets its beat in `PARENTS_SCRIPT` (`parentsScript.test.ts` checks the buttons it taps exist).
 
 - „Junge / Mädchen“ on the home page changes nothing here: the child of the story is Tapsi, an animal in Gemini
   pictures (root `CLAUDE.md`: animals stay as they are, and a painted picture is never made a second time for the

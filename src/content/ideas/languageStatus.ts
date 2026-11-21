@@ -132,6 +132,12 @@ export const LANGUAGE_STATUS: LanguageStatusRow[] = [
         languages: { de: "done", en: "done", zh: "done", hi: "done", es: "done", ar: "done", ru: "done" },
         note: "„Warten auf dem Töpfchen“ von Suno (Oktober 2026), endlos wiederholt; der Text für Suno und für Übersetzungen steht in src/games/potty/musik/suno-lied.md. In allen sieben Sprachen aufgenommen (Oktober 2026). Eine neue Sprache: musik-toepfchen-warten-<Sprache>.mp3 und ihre Schleife in waitMusic.ts (/musik-erzeugen).",
       },
+      {
+        label: "👪 Video für Eltern (Zeilen neben dem Tablet)",
+        languages: { en: "done" },
+        files: ["src/games/potty/parentsScript.ts", "src/games/potty/ParentsVideo.tsx"],
+        note: "Die zehn kurzen Zeilen für Eltern im Elternvideo (/management/video-toepfchen-eltern/, Y-29, 21. November 2026), englisch zuerst; in den anderen Sprachen zeigt das Video sie bis zur Übersetzung auf Englisch, während das Spiel selbst schon in der Sprache spielt. Name und Adresse am Ende brauchen keine.",
+      },
     ],
   },
   {

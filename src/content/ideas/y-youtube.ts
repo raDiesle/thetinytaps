@@ -239,6 +239,9 @@ export const youtubeIdeas: IdeaArea = {
       text: "Ein Video für Erwachsene (nicht „speziell für Kinder“, also mit Link und Endcard), 1–2 Minuten: das Spiel startet sofort, wenn das Kind muss; der Erwachsene tippt, was das Kind gesagt hat; beim Sitzen das Lied, die Gedanken, die Pause; die ✓ für das, was wirklich kam, oder „nichts“; der Stern der Woche. Gezeigt wird nur das Tablet und eine erwachsene Hand – nie ein echtes Kind auf dem Töpfchen, auch nicht von hinten oder verpixelt.",
       why: "Eltern wollen vor dem ersten Einsatz wissen, wie es abläuft; das Kindervideo (Y-07) darf nicht verlinken, dieses schon.",
       effort: "S",
+      done: true,
+      partial:
+        "Umgesetzt am 21. November 2026 als `/management/video-toepfchen-eltern/` (oben auf /management/ verlinkt): das echte Spiel auf einem gezeichneten Tablet, eine gezeichnete Erwachsenenhand im Pulloverärmel tippt es nach festem Ablauf durch (`PARENTS_SCRIPT`), rund anderthalb Minuten, daneben kurze Zeilen für Eltern (englisch zuerst), am Ende 15 s Name und Adresse für den Abspann von YouTube. Aufgenommen wie Zähne putzen in Chrome; der Aufnahme-Code liegt dafür gemeinsam in `src/lib/tabRecording.ts` (der Rest des geteilten Rahmens bleibt Y-25). Eine Sprecherstimme gibt es nicht: die Zeilen stehen im Bild.",
     },
   ],
 };

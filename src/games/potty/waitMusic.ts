@@ -69,6 +69,22 @@ const LOOPS: Record<string, { loopStart: number; loopEnd: number }> = {
 
 const loading = new Map<string, Promise<AudioBuffer | null>>();
 
+/** Fetches and decodes the waiting song ahead, for a video, where it must not start late; the game loads it on sitting down. */
+export function preloadWaitingSong(appLanguage: string) {
+  const lang = waitLanguageFor(appLanguage, Object.keys(SONGS));
+  return lang ? loadSong(lang) : Promise.resolve(null);
+}
+
+/** The song sung in `lang`, fetched and decoded once for the visit. */
+function loadSong(lang: string) {
+  let song = loading.get(lang);
+  if (!song) {
+    song = loadSound(SONGS[lang]);
+    loading.set(lang, song);
+  }
+  return song;
+}
+
 // The voice speaks from recordings, which the browser's speechSynthesis never sees: `talking()` knows both.
 const speaking = talking;
 
@@ -100,8 +116,7 @@ export function useWaitingMusic(playing: boolean, paused: boolean, appLanguage: 
   useEffect(() => {
     if (!playing || !lang) return;
     let alive = true;
-    if (!loading.has(lang)) loading.set(lang, loadSound(SONGS[lang]));
-    void loading.get(lang)?.then((loaded) => {
+    void loadSong(lang).then((loaded) => {
       if (alive) setBuffer({ lang, buffer: loaded });
     });
     return () => {
