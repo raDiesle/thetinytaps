@@ -29,9 +29,14 @@ late in the video. A new thing shown beside the picture (a control, a chart, a b
 
 ## Rules
 
-- The child's face (the mirror in `mouth.tsx`, the story in `origin.tsx`) follows „Junge / Mädchen“ from the home page
-  (`useFigure()`, F-04): the girl has two pigtails with yellow bands, and lashes at her eyes – in the mirror often only
-  the eyes are in sight. Mouth, teeth and monsters are the same for both; the song and the lines say nothing of boy or girl.
+- Every drawing of the child (the face in the mirror, `mouth.tsx`; the face and shoulders in the story, `origin.tsx`;
+  the arm in its sleeve at the sink, `prep.tsx`) follows „Junge / Mädchen“ from the home page (`useFigure()`, F-04): the
+  girl has two pigtails with pink bands and lashes at her eyes – in the mirror often only the eyes are in sight – and
+  wears clothes of her own (`clothes.tsx`: a pink T-shirt in the morning, berry pyjamas with little hearts in the
+  evening, where the boy wears violet and blue pyjamas with yellow dots; user request, November 2026). Only colours and
+  the pyjama's pattern differ, never shapes or poses; a new drawing of the child's clothes takes them from
+  `clothesOf` / `PyjamaPattern`, never a colour of its own. Mouth, teeth, brush and monsters are the same for both; the
+  song and the lines say nothing of boy or girl.
 - The face is clean skin: nothing sits on it round the mouth or on the chin (breakfast crumbs stuck there in the
   morning and looked like pimples, user feedback, November 2026). The cheeks are a soft blush that fades into the skin,
   and they keep a gap of skin to the lips: in the mirror a wide open or stretched mouth pushes them up and out

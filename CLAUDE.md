@@ -126,7 +126,9 @@ In a fresh worktree run `bun install` first.
   still link it. Never leave an idea half done: `partial` is only a note on a done (or rejected) idea of what was built,
   and what is really left becomes a new idea with the area's next number, while a rest that is only translations or
   recordings is no rest at all (`languageStatus.ts` and the voice list track those; `content.test.ts`). An idea the user
-  turns down gets `rejected: true` (kept, never deleted).
+  turns down gets `rejected: true` (kept, never deleted). An idea the user parks gets `parked: "<why, and the words that
+  start it>"` (🅿️ on `/management/`): it is never built, generated or recorded with other work, never put into a batch or
+  the picture queue and never offered – only done when the user says those words (H-88, user decision, November 2026).
   An idea round only collects – the user decides later what to implement, so don't offer to implement
   after one (say „umsetzen“, not the ambiguous „bauen“).
 - The hidden page `/management/` (hold Papa Fox and his child on the o of „Both“ in the home title, `Logo`; `/ideen/` is its old address) is where
