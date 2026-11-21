@@ -192,6 +192,9 @@ export const scenesIdeas: IdeaArea = {
       text: "Ist alles gefunden, wird das Licht im Bild langsam abendlich warm, und alles Gefundene nickt nacheinander einmal kurz, wie Schauspieler am Schluss – ohne Geräusch für jedes, nur ein leiser Klang am Ende. Statt der aufsteigenden Herzen und Sterne. Gehört zu A-30.",
       why: "Das Kind sieht noch einmal alles, was es gefunden hat, ruhig und in seinem eigenen Bild.",
       effort: "M",
+      partial:
+        "Gebaut (21. November 2026): Ist alles gefunden (Entdecken, Ausmalen, Taschenlampe, Straßen), legt sich warmes Abendlicht über das Bild und bleibt, alles Gefundene verbeugt sich von links nach rechts einmal, ohne eigenes Geräusch, danach ein leiser warmer Akkord und der Pokal. Das Tanzen aller Dinge und die Melodie sind weg; das Gute-Nacht-Bild wird weiter dunkel.",
+      done: true,
     },
   ],
 };
