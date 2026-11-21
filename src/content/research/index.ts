@@ -3,6 +3,10 @@
 
 import type { Research } from "./types";
 import { tinyfingersMarke } from "./tinyfingers-marke";
+import { nachtsAbstillen } from "./nachts-abstillen";
+import { flascheAbgewoehnen } from "./flasche-abgewoehnen";
+import { grossesBett } from "./grosses-bett";
+import { youtubeThemen } from "./youtube-themen";
 import { youtubeRechte } from "./youtube-rechte";
 import { youtubeKanal } from "./youtube-kanal";
 import { youtubeSuchen } from "./youtube-suchen";
@@ -33,6 +37,10 @@ export type { Research, ResearchArea, ResearchDomain, ResearchExclusion, Researc
 
 export const RESEARCH: Research[] = [
   tinyfingersMarke,
+  nachtsAbstillen,
+  flascheAbgewoehnen,
+  grossesBett,
+  youtubeThemen,
   youtubeRechte,
   youtubeSuchen,
   youtubeKanal,

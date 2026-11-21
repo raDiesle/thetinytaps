@@ -89,6 +89,7 @@ export function ChapterBook({
   code = "K",
   voice,
   first = "de",
+  level,
 }: {
   /** The story, in reading order. */
   chapters: StoryChapter[];
@@ -108,6 +109,11 @@ export function ChapterBook({
    * app plays the English one (`recordingUrl`), never a German voice reading English.
    */
   first?: "de" | "en";
+  /**
+   * The trophy's level, for a story standing at an address below another story of the same game
+   * („/abstillen/nachts/“ in the game „/abstillen/“): without it both would give the game's one trophy.
+   */
+  level?: string;
 }) {
   const t = useT();
   const { id: language } = useAppLanguage();
@@ -339,7 +345,7 @@ export function ChapterBook({
         </div>
       )}
       {/* One story, so only „Nochmal“; small in the corners, so the last picture stays free. */}
-      {last && <GameEnd delayMs={600} onAgain={() => show(CONTENTS)} corners />}
+      {last && <GameEnd delayMs={600} onAgain={() => show(CONTENTS)} corners level={level} />}
       <DevTag code={here.code} id={page.id} />
       <FeedbackLayer effects={effects} />
     </div>

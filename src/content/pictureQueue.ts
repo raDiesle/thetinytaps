@@ -7,6 +7,9 @@ import { MILK_CHAIN_PICTURE_QUEUE } from "@/games/milkchain/milkChainPictures";
 import { PACIFIER_PICTURE_QUEUE } from "@/games/pacifierstory/pacifierStoryPictures";
 import { KITA_PICTURE_QUEUE } from "@/games/kitastory/kitaStoryPictures";
 import { HAIR_PICTURE_QUEUE } from "@/games/hairstory/hairStoryPictures";
+import { NIGHT_PICTURE_QUEUE } from "@/games/nightmilk/nightMilkPictures";
+import { BOTTLE_PICTURE_QUEUE } from "@/games/bottlestory/bottleStoryPictures";
+import { BED_PICTURE_QUEUE } from "@/games/bedstory/bedStoryPictures";
 import { CAUSE_PICTURE_QUEUE } from "@/games/cause/causePictures";
 import { READER_PICTURE_QUEUE } from "@/components/readerPictures";
 import { SYMBOL_PICTURE_QUEUE } from "@/games/potty/symbolPictures";
@@ -69,6 +72,12 @@ export interface QueuedPicture {
    * and keep their whole cells, so they line up (`--frames`).
    */
   panels?: { file: string; prompt: string }[];
+  /**
+   * What is left to do once it is made, beyond saving it at `file` (and its panels' files) – a crop, a line in a game's
+   * code, `bun run previews <folder>`, a placeholder to take out –, so the Claude cloud session that makes it (Zscaler
+   * blocks Gemini on the Mac, root CLAUDE.md) finishes the work too. Left out where the picture plays as soon as its file is there.
+   */
+  after?: string;
   /** Why it must be drawn alone, so it never shares a sheet – only a reason from `ALONE_REASONS`. */
   alone?: AloneReason;
   /** When it was asked for, YYYY-MM-DD. */
@@ -86,7 +95,10 @@ export const PICTURE_QUEUE: QueuedPicture[] = [
   ...PACIFIER_PICTURE_QUEUE,
   ...KITA_PICTURE_QUEUE,
   ...HAIR_PICTURE_QUEUE,
+  ...NIGHT_PICTURE_QUEUE,
+  ...BOTTLE_PICTURE_QUEUE,
   ...CAUSE_PICTURE_QUEUE,
   ...READER_PICTURE_QUEUE,
   ...SYMBOL_PICTURE_QUEUE,
+  ...BED_PICTURE_QUEUE,
 ];

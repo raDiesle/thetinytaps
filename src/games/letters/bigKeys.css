@@ -1,0 +1,79 @@
+/* Wörter tippen's few big keys (BigKeys.tsx, W-02): under the picture on an upright screen, beside it on a wide one. */
+
+.wb-keys {
+  --gap: clamp(8px, 2vmin, 20px);
+  --pad: clamp(8px, 2vmin, 18px);
+  /* Under the picture: one row of up to three keys, two rows for more (`--rows` keys in each – the side's rows turned
+     over), as wide as the screen allows but leaving the picture most of the height. Six in one row were 56 px wide on an
+     upright phone. */
+  --size: min(calc((100vw - 2 * var(--pad) - (var(--rows) - 1) * var(--gap)) / var(--rows)), 22vh, 210px);
+  flex: none;
+  display: grid;
+  grid-template-columns: repeat(var(--rows), var(--size));
+  justify-content: center;
+  gap: var(--gap);
+  padding: var(--pad) max(var(--pad), env(safe-area-inset-right)) max(calc(var(--pad) + var(--frame, 0px)), env(safe-area-inset-bottom))
+    max(var(--pad), env(safe-area-inset-left));
+}
+
+/* A wide screen: the keys stand in a column (two for more than three keys) on the right, beside the picture, clear of
+   the notes in the top right corner. */
+@media (min-aspect-ratio: 5 / 4) {
+  .wb-play {
+    flex-direction: row;
+  }
+
+  .wb-keys {
+    --size: min(
+      calc((100vh - var(--corner-clear, 0px) - var(--pad) - var(--frame, 0px) - (var(--rows) - 1) * var(--gap)) / var(--rows)),
+      calc((42vw - (var(--columns) - 1) * var(--gap)) / var(--columns)),
+      210px
+    );
+    grid-template-columns: repeat(var(--columns), var(--size));
+    align-content: center;
+    padding: var(--corner-clear, var(--pad)) max(calc(var(--pad) + var(--frame, 0px)), env(safe-area-inset-right))
+      max(calc(var(--pad) + var(--frame, 0px)), env(safe-area-inset-bottom)) var(--pad);
+  }
+}
+
+.wb-key {
+  width: var(--size);
+  height: var(--size);
+  padding: 0;
+  border: 4px solid var(--ink);
+  border-radius: 24%;
+  background: var(--key);
+  color: #fff;
+  font-family: inherit;
+  font-size: calc(var(--size) * 0.58);
+  font-weight: 800;
+  line-height: 1;
+  -webkit-text-stroke: 0.06em var(--ink);
+  paint-order: stroke fill;
+  box-shadow: 0 6px 0 var(--ink);
+  touch-action: none;
+  user-select: none;
+  cursor: pointer;
+}
+
+.wb-key:active {
+  transform: translateY(5px);
+  box-shadow: 0 1px 0 var(--ink);
+}
+
+/* After a few wrong taps the right key is marked – still, never pulsing (root CLAUDE.md). */
+.wb-key.hint {
+  outline: 5px dashed var(--ink);
+  outline-offset: 4px;
+}
+
+/* Found: the key is pressed down and lit, the answer itself. */
+.wb-key.lit {
+  background: #ffe27a;
+  color: var(--ink);
+  -webkit-text-stroke: 0;
+  transform: translateY(5px);
+  box-shadow:
+    0 1px 0 var(--ink),
+    0 0 0 6px #fff6c4;
+}

@@ -81,7 +81,7 @@ function blend(a: Quat, b: Quat, k: number): Quat {
 }
 
 /** How far the handle turns out of the cheek towards the corner of the mouth (0.6 is about 30°). */
-const CHEEK_ANGLE = 0.6;
+const CHEEK_ANGLE = 1.3;
 
 /** How the brush is held on this tooth and side. */
 function poseFor(anchor: BrushAnchor, surface: Surface, tooth: ToothId): Pose {
@@ -125,8 +125,11 @@ const BLUE: Box["fills"] = ["#4cc9f0", "#33b0d9", "#2797bf"];
 const WHITE: Box["fills"] = ["#ffffff", "#e3f3ff", "#d2e9f8"];
 const SKY: Box["fills"] = ["#bfe9fb", "#9fd8f2", "#8acbe9"];
 const GRIP: Box["fills"] = ["#80ed99", "#57cc99", "#3fa97f"];
-/** A child's brush head covers about two milk molars. */
-const SIZE = 1.25;
+/**
+ * A child's brush head covers about one and a half milk molars: smaller than it once was (1.25), which hid much of the
+ * teeth being brushed, above all the back ones (user feedback, November 2026).
+ */
+const SIZE = 0.95;
 
 /** Rows of bristle tufts from the tip of the head towards the neck, alternating white and light blue like a real child's brush. */
 const TUFT_ROWS: [number, number][] = [

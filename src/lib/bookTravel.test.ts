@@ -32,7 +32,8 @@ test("each of a game's volumes is found by its own address", () => {
   for (const game of games) {
     const volumes = game.volumes ?? [];
     expect(volumes.map((v) => v.href).sort()).toEqual([game.href, ...(game.also ?? [])].sort());
-    for (const v of volumes) expect(shelfBookOf(v.href)).toBe(v.href.replaceAll("/", ""));
+    // A volume still being built is no book on the shelf (`shelfVolumes`): its page belongs to its game's book.
+    for (const v of volumes) expect(shelfBookOf(v.href), v.href).toBe((v.unfinished ? game.href : v.href).replaceAll("/", ""));
   }
 });
 

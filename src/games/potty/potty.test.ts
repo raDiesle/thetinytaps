@@ -2,6 +2,7 @@ import { existsSync, readdirSync, readFileSync } from "node:fs";
 import { describe, expect, it } from "bun:test";
 import { LANGUAGE_STATUS } from "@/content/ideas/languageStatus";
 import { voiceLines } from "@/content/voiceLines";
+import { TEETH_SYMBOLS } from "@/games/teeth/symbols";
 import {
   expectedWent,
   NOTHING_STEPS,
@@ -355,7 +356,7 @@ describe("Symbols of the strips (Aufs Töpfchen, Zähne putzen)", () => {
   });
 
   it("every picture of the teeth's bar has its picture or waits for it in the queue", () => {
-    for (const name of ["bonbon", "zahnbuerste", "zahn"]) expect(has(`src/games/teeth/bilder/symbole/${name}.webp`), name).toBe(true);
+    for (const name of TEETH_SYMBOLS) expect(has(`src/games/teeth/bilder/symbole/${name}.webp`), name).toBe(true);
   });
 
   it("every step of the story shows a symbol there is", () => {

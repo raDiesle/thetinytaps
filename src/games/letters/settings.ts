@@ -1,5 +1,6 @@
 import type { TouchKeysMode } from "@/components/TouchKeyboard";
 import type { ThemeId } from "@/content/types";
+import type { BigKeysMode } from "./fewKeys";
 
 export type LetterCase = "upper" | "both" | "lower";
 
@@ -20,11 +21,14 @@ export type WordLength = "3" | "4" | "7";
  */
 export type NumberReveal = "all" | "count" | "step" | "tap";
 
+/** Zählen: numbers come with each key („show“), or things appear and the child finds their digit key („find“, „Wo ist die 3?“, L-17). */
+export type CountPlay = "show" | "find";
+
 /** What is spoken for a letter: "Be, wie Bär!", "Bär!" or "Be!". */
 export type Announce = "letterAndWord" | "word" | "letter";
 
 export interface LettersSettings {
-  /** „Wo ist das B?“: after a few wrong keys, light up the wanted key on a little keyboard picture. */
+  /** „Wo ist das B?“ and „Wo ist die 3?“: after a few wrong keys, light up the wanted key on a little keyboard picture. */
   hints: boolean;
   letterCase: LetterCase;
   /** With "A a": the big letter holds the small one by the hand, both with eyes. */
@@ -44,10 +48,14 @@ export interface LettersSettings {
   digitOnRepeat: boolean;
   /** Frei tippen and Zählen: two keys make one number, 2 then 3 is 23, shown as rows of ten things (`twoDigits.ts`). */
   twoDigits: boolean;
+  /** Zählen: numbers come with each key, or the child finds the digit for the things shown („Wo ist die 3?“). */
+  countPlay: CountPlay;
   /** Frei tippen: a dark page – night colours behind light letters, for the evening or a darkened room. */
   dark: boolean;
   /** Big letter keys on the screen, for tablets without a keyboard. */
   touchKeys: TouchKeysMode;
+  /** „Wörter tippen“ on a touch screen: a few big keys instead of the whole alphabet, and how many (W-02, `fewKeys.ts`). */
+  bigKeys: BigKeysMode;
   /** „Wörter tippen“: which words. */
   wordKind: WordKind;
   /** „Wörter tippen“: whole word, or the first letter's key („Wo ist das B?“). */
@@ -68,8 +76,10 @@ export const DEFAULT_LETTERS_SETTINGS: LettersSettings = {
   finishCounting: true,
   digitOnRepeat: false,
   twoDigits: false,
+  countPlay: "show",
   dark: false,
   touchKeys: "auto",
+  bigKeys: "auto",
   wordKind: "nouns",
   wordTyping: "spell",
   wordLength: "4",

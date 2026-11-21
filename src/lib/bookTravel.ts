@@ -1,4 +1,4 @@
-import { bookIdOf, shelfEntryOf } from "@/content/games";
+import { bookIdOf, shelfEntryOf, shelfVolumes } from "@/content/games";
 import { playPageTurn } from "@/lib/sfx";
 import { pageMoves } from "@/lib/pageMotion";
 import { picturesReady } from "@/lib/picturesReady";
@@ -41,7 +41,8 @@ const still = () => matchMedia("(prefers-reduced-motion: reduce)").matches;
 export function shelfBookOf(pathname: string): string | undefined {
   const entry = shelfEntryOf(pathname);
   const path = pathname.endsWith("/") ? pathname : `${pathname}/`;
-  const volume = entry?.game?.volumes?.find((v) => path.startsWith(v.href));
+  // The longest address that fits: a volume may stand at an address below another's („/abstillen/nachts/“).
+  const volume = (entry?.game && shelfVolumes(entry.game))?.filter((v) => path.startsWith(v.href)).sort((a, b) => b.href.length - a.href.length)[0];
   return volume ? bookIdOf(volume.href) : entry?.id;
 }
 

@@ -1,9 +1,7 @@
-import { lazy, Suspense, useState } from "react";
+import { useState } from "react";
 import { Link } from "react-router";
 import { MenuTop } from "@/components/MenuTop";
 import { CloudQueueStatus } from "@/components/CloudQueueStatus";
-import { PictureQueue } from "@/components/PictureQueue";
-import { VoiceQueue } from "@/components/VoiceQueue";
 import { UNFINISHED } from "@/content/games";
 import { EFFORT_LABELS, IDEA_AREAS, TODDLER_RULES, TOP_PICKS, type Effort, type Idea, type IdeaArea, areaKey } from "@/content/ideas";
 import { RESEARCH } from "@/content/research";
@@ -75,16 +73,11 @@ const PLACES: ContentsEntry[] = [
 const TABLES: ContentsEntry[] = [
   { id: "sprachen", label: "🌍 Sprachen", note: "Übersetzungen und Aufnahmen" },
   { id: "maskottchen", label: "🦊🐻 Fuchs & Bär", note: "wo die Maskottchen schon sind" },
-  { id: "stimmen", label: "🎙️ Stimmen", note: "was ElevenLabs noch aufnehmen muss" },
-  { id: "offene-bilder", label: "🖼️ Offene Bilder", note: "die Warteschlange für Gemini" },
   { id: "recherchen", label: "🔍 Neue Recherchen", note: "die letzten, alle auf eigener Seite" },
 ];
 
 /** How many of the newest studies the page names, above the link to all of them. */
 const NEWEST_RESEARCH = 4;
-
-/** The lines still to record: loaded after the page, since it reads the data of every game. */
-const VoiceList = lazy(() => import("@/components/VoiceList").then((module) => ({ default: module.VoiceList })));
 
 /**
  * Hidden page for grown-ups that collects everything that helps decide what to
@@ -147,7 +140,13 @@ export function ManagementPage() {
 
   // A link from another page (the research's idea numbers) names an idea after „#“: jumped to at once, since a smooth
   // scroll over this long page did not get there in Chrome.
-  useHashPlace((id) => (IDEA_BY_ID.has(id) ? showIdea(id, true) : document.getElementById(id)?.scrollIntoView()));
+  // A folded part (the queues in the Claude Cloud status, Fuchs & Bär) opens when its address names it.
+  useHashPlace((id) => {
+    if (IDEA_BY_ID.has(id)) return showIdea(id, true);
+    const place = document.getElementById(id);
+    if (place instanceof HTMLDetailsElement) place.open = true;
+    place?.scrollIntoView();
+  });
 
   const words = query.toLowerCase().split(/\s+/).filter(Boolean);
   const visible = (idea: Idea) => {
@@ -221,16 +220,6 @@ export function ManagementPage() {
 
       <Mascots onShow={showIdea} />
 
-      <details id="stimmen" className="ideas-panel">
-        <summary>
-          <h2>🎙️ Stimmen: was ElevenLabs noch aufnehmen muss</h2>
-        </summary>
-        <VoiceQueue />
-        <Suspense fallback={<p className="ideas-hint">Die Sätze aller Spiele werden gelesen …</p>}>
-          <VoiceList />
-        </Suspense>
-      </details>
-
       <section id="recherchen" className="ideas-panel">
         <h2>🔍 Neue Recherchen</h2>
         <p className="ideas-hint">
@@ -253,8 +242,6 @@ export function ManagementPage() {
           Alle {RESEARCH.length} Recherchen nach Thema ↗
         </Link>
       </section>
-
-      <PictureQueue />
 
       {picks.length > 0 && (
         <section className="ideas-panel">

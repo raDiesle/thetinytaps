@@ -156,6 +156,9 @@ export const lettersIdeas: IdeaArea = {
       text: "Das Gegenstück zu „Wo ist das B?“ für Zahlen, als Option von „Nur Zahlen“: Drei Äpfel erscheinen, das Kind sucht die Taste 3 (auf dem Tablet die Zifferntaste). Andere Tasten machen nur Formen und Klänge; nach einer Weile leuchtet die richtige Taste auf der kleinen Tastatur. Erst 1–3, dann bis 5, dann bis 9 – das Spiel merkt selbst, wann es weitergeht.",
       why: "Vom Zählen zur Ziffer: Menge sehen und die passende Zahl selbst finden.",
       effort: "S",
+      done: true,
+      partial:
+        "Gebaut am 21. November 2026 als Wahl in „Zählen“ hinter ⚙️ („What to play?“ → „Where is the 3?“, wie „Wo ist das B?“ in „Wörter tippen“): Dinge erscheinen mit einer leeren Taste darunter, die richtige Zifferntaste drückt sie hinein und lässt die Ziffer leuchten, dazu „drei Äpfel!“ und ein Lob; andere Tasten kräuseln nur mit leisem Ton, nach drei leuchtet die Taste (Bildschirm-Tasten oder kleine Tastatur). Erst 1–3, nach drei Runden in Folge mit der ersten Taste bis 5, dann bis 9; eine Runde mit Hilfe geht eine Stufe zurück (numberFind.ts). Die Frage „How many? Find the number!“ ist nur englisch und noch nicht aufgenommen, bis dahin still.",
     },
     {
       id: "L-18",
@@ -172,6 +175,7 @@ export const lettersIdeas: IdeaArea = {
       text: "Option von „Nur Zahlen“: Die gedrückten Ziffern erscheinen auf dem Display eines großen Spielzeug-Telefons, jede mit ihrem Ton. Nach vier Ziffern klingelt es, und Oma Bär oder Opa Fuchs geht ran: „Hallo! Schön, dass du anrufst!“ (Aufnahme). Passt zu N-27 Tier-Telefon.",
       why: "Ziffern bekommen einen Sinn aus dem Alltag: Kinder lieben es, wie Mama zu wählen.",
       effort: "M",
+      rejected: true,
     },
     {
       id: "L-20",
@@ -180,6 +184,7 @@ export const lettersIdeas: IdeaArea = {
       text: "Der Buchstabe zerfällt in zwei oder drei große Teile, die daneben liegen; das Kind zieht sie zurück an ihren Platz (ein Teil rastet schon nahe dran ein). Ist er ganz, wird er lebendig (L-10) und sagt sein Wort. Als Option von „Frei tippen“ oder auf dem Tablet ganz ohne Tastatur.",
       why: "Die Form des Buchstabens wird begriffen, nicht nur gesehen: Strich, Bogen, Bauch.",
       effort: "M",
+      rejected: true,
     },
     {
       id: "L-21",
@@ -188,6 +193,7 @@ export const lettersIdeas: IdeaArea = {
       text: "Nach dem Nachspuren (L-11) oder auf Tippen klettert das Fuchskind auf den Buchstaben und rutscht seine Linie in Schreibrichtung hinunter, Papa Fuchs fängt es unten auf. Bei O dreht es eine Runde, bei M hüpft es über die Spitzen.",
       why: "Bringt die Maskottchen ins Spiel (Tabelle Fuchs & Bär) und zeigt nebenbei, wie der Buchstabe geschrieben wird.",
       effort: "M",
+      rejected: true,
     },
     {
       id: "L-22",

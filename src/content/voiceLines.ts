@@ -60,19 +60,26 @@ import { DAYTIME } from "@/games/teeth/daytime";
 import { STEPS as TEETH_STEPS } from "@/games/teeth/steps";
 import { KITA_STORY } from "@/games/kitastory/kitaStory";
 import { HAIR_STORY } from "@/games/hairstory/hairStory";
+import { NIGHT_MILK } from "@/games/nightmilk/nightMilk";
+import { BOTTLE_STORY } from "@/games/bottlestory/bottleStory";
+import { BED_STORY } from "@/games/bedstory/bedStory";
 import { MILK_CHAIN } from "@/games/milkchain/milkChain";
 import { PACIFIER_STORY } from "@/games/pacifierstory/pacifierStory";
 import { DONE_SAY, TIDY_SAY } from "@/games/teeth/lines";
 import { PRELUDE } from "@/games/teeth/TeethPlay";
 import { PICTURE_LINES, SOON_LINE, TURN_LINES } from "@/games/timer/voice";
 import { caseLetters, SMALL_PROMPT } from "@/games/letters/CasePlay";
+import { NUMBER_FIND_PROMPT } from "@/games/letters/numberFind";
 import { STOMP_INVITE } from "@/games/letters/MovePlay";
 import { TWO_DIGIT_NUMBERS, TWO_DIGIT_WORDS } from "@/games/letters/twoDigits";
-import { type Localized, pick } from "@/lib/language";
+import { type Localized, pick, type Texts } from "@/lib/language";
 import { voiceId } from "@/lib/voiceName";
 import goodNightFiles from "../components/stimme/*.mp3?glob";
 import kitaFiles from "../games/kitastory/stimme/*.mp3?glob";
 import hairFiles from "../games/hairstory/stimme/en/*.mp3?glob";
+import nightMilkFiles from "../games/nightmilk/stimme/en/*.mp3?glob";
+import bottleFiles from "../games/bottlestory/stimme/en/*.mp3?glob";
+import bedFiles from "../games/bedstory/stimme/en/*.mp3?glob";
 import milkChainFiles from "../games/milkchain/stimme/*.mp3?glob";
 import pacifierFiles from "../games/pacifierstory/stimme/*.mp3?glob";
 import animalsFiles from "../games/animals/stimme/*.mp3?glob";
@@ -269,6 +276,15 @@ function letters(language: TargetLanguageId): VoiceGroup[] {
       lines: once([...words.map(({ w }) => w.word), ...de.colors.map((c) => c.word), ...de.actions.map((a) => a.word)].map((w) => `${w}!`)),
     },
     { label: "Suchen: Frage", lines: once(de.letters.map(de.findPrompt)), built: "„Wo ist das …?“ mit dem Buchstaben" },
+    ...(NUMBER_FIND_PROMPT[language]
+      ? [
+          {
+            label: "Wo ist die 3?: Frage",
+            lines: [NUMBER_FIND_PROMPT[language]!],
+            note: "Zählen, „Wo ist die 3?“ (L-17): nennt keine Zahl, das Kind zählt selbst.",
+          },
+        ]
+      : []),
     { label: "Mitmachen", lines: once(de.actions.map(de.joinIn)) },
     {
       label: "Mitmachen mit Zahlen",
@@ -360,6 +376,7 @@ const MILK_CHAIN_TEXTS = byLanguage((texts) => texts.milkChain);
 const PACIFIER_TEXTS = byLanguage((texts) => texts.pacifierStory);
 const KITA_TEXTS = byLanguage((texts) => texts.kitaStory);
 const HAIR_TEXTS = byLanguage((texts) => texts.hairStory);
+const BOTTLE_TEXTS = byLanguage((texts) => texts.bottleStory);
 
 /**
  * A chapter book read aloud (`ChapterBook`'s `voice`): each page's sentence, in `language` where it is translated, else
@@ -379,15 +396,16 @@ function chapterBook(
 }
 
 function timer(language: TargetLanguageId): VoiceGroup[] {
-  const said = (line: Localized) => pick(line, language);
+  // A new picture's lines come English first and are left out of a language they are not translated into yet (Tidy Up).
+  const said = (lines: Texts[]) => once(lines.filter((line) => line[language] !== undefined).map((line) => pick(line, language)));
   const pictures = Object.values(PICTURE_LINES);
   return [
-    { label: "Am Anfang eines Bildes", lines: once(pictures.map((p) => said(p.start))) },
-    { label: "Kurz vor dem Ende", lines: [said(SOON_LINE)], note: "Zur Glocke, eine Minute vor dem Ende oder im letzten Fünftel einer kurzen Zeit (H-49)." },
-    { label: "Am Ende eines Bildes", lines: once(pictures.map((p) => said(p.end))) },
+    { label: "Am Anfang eines Bildes", lines: said(pictures.map((p) => p.start)) },
+    { label: "Kurz vor dem Ende", lines: said([SOON_LINE]), note: "Zur Glocke, eine Minute vor dem Ende oder im letzten Fünftel einer kurzen Zeit (H-49)." },
+    { label: "Am Ende eines Bildes", lines: said(pictures.map((p) => p.end)) },
     {
-      label: "Abwechseln und Tennis",
-      lines: once(TURN_LINES.map(said)),
+      label: "Abwechseln und Wippe",
+      lines: said(TURN_LINES),
       note: "„Wer fängt an?“, während die Lampen auslosen, dann wer anfängt; „Tauschen! …“ bei jedem Wechsel.",
     },
   ];
@@ -569,6 +587,9 @@ const RECORDED = new Set(
     kitaFiles,
     // An English-first book is recorded in English first (`en-<hash>`): its hash is the line's, as German files' are.
     hairFiles,
+    nightMilkFiles,
+    bottleFiles,
+    bedFiles,
   ].flatMap((files) => Object.keys(files).map((file) => file.slice(file.lastIndexOf("/") + 1, -4).replace(/^en-/, ""))),
 );
 
@@ -614,6 +635,9 @@ export function voiceLines(language: TargetLanguageId = "de"): VoiceGame[] {
     { href: "/schnullerfee/", groups: chapterBook(PACIFIER_STORY, language, PACIFIER_TEXTS) },
     { href: "/kita/", groups: chapterBook(KITA_STORY, language, KITA_TEXTS) },
     { href: "/haare-waschen/", groups: chapterBook(HAIR_STORY, language, HAIR_TEXTS, "en") },
+    { href: "/abstillen/nachts/", groups: chapterBook(NIGHT_MILK, language, {}, "en") },
+    { href: "/flaeschchen/", groups: chapterBook(BOTTLE_STORY, language, BOTTLE_TEXTS, "en") },
+    { href: "/grosses-bett/", groups: chapterBook(BED_STORY, language, {}, "en") },
     {
       href: "",
       groups: [

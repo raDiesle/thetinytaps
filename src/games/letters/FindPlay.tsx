@@ -5,11 +5,13 @@ import { Picture } from "@/components/Picture";
 import { TouchKeyboard, keyRows, useTouchKeys } from "@/components/TouchKeyboard";
 import { keyMatches, keyOf, toLower } from "@/content/languages";
 import { inTheme } from "@/content/themes";
-import type { LanguagePack, LetterEntry, ThemeId, WordEntry } from "@/content/types";
+import type { LanguagePack, LetterEntry, WordEntry } from "@/content/types";
 import { useAppLanguage } from "@/lib/language";
 import { pick, shuffle } from "@/lib/random";
 import { playChime } from "@/lib/sfx";
 import { useVoiceReady } from "@/lib/voiceReady";
+import { BigKeys } from "./BigKeys";
+import { bigKeyChoices, findableLetters, useKeyLevel } from "./fewKeys";
 import { LetterWord } from "./Cards";
 import { lettersVoice, useLettersPraise, useLettersSay } from "./voice";
 import type { LettersSettings } from "./settings";
@@ -26,26 +28,13 @@ const HINT_AFTER_WRONG = 3;
 
 const BACKGROUNDS = ["#fff4d6", "#e3f6ff", "#e9ffe0", "#ffe8f0", "#efe9ff", "#fff0e0"];
 
-/**
- * Letters to look for. Umlauts are left out: their keys are missing on many
- * keyboards, and they are rarely among the first letters children know. The same
- * goes for Russian Ё (outside А–Я), whose key sits left of the 1, and Spanish Ñ.
- * In other scripts (Hindi, Arabic) the letters printed on the keyboard rows, so
- * none that needs Shift (Hindi ख, ङ).
- */
-function findableLetters(pack: LanguagePack, theme: "all" | ThemeId): LetterEntry[] {
-  const keys = pack.keyboardRows.join("");
-  const findable = (upper: string) => /^[A-ZА-Я]$/.test(upper) || (!/[\p{Script=Latin}\p{Script=Cyrillic}]/u.test(upper) && keys.includes(upper));
-  const plain = pack.letters.filter((l) => findable(l.upper));
-  if (theme === "all") return plain;
-  const matching = plain.filter((l) => l.words.some((w) => w.theme === theme));
-  return matching.length > 0 ? matching : plain;
-}
-
 /** A letter to look for, with its picture. */
 type Sought = { letter: LetterEntry; word: WordEntry };
-/** One round: the letter on screen, the one after it (its lines load meanwhile), and whether its question waits for the praise. */
-type Round = Sought & { id: number; after: Sought; queue: boolean };
+/**
+ * One round: the letter on screen, the one after it (its lines load meanwhile), whether its question waits for the
+ * praise, and the few big keys to find it among on a touch screen (empty with the whole keyboard).
+ */
+type Round = Sought & { id: number; after: Sought; queue: boolean; keys: string[] };
 
 /** "Wo ist das B?": a letter and its picture appear, and the child looks for the key. */
 export function FindPlay({ pack, settings }: { pack: LanguagePack; settings: LettersSettings }) {
@@ -67,6 +56,11 @@ export function FindPlay({ pack, settings }: { pack: LanguagePack; settings: Let
   const { id: language } = useAppLanguage();
 
   const letters = useMemo(() => findableLetters(pack, settings.theme), [pack, settings.theme]);
+  /** The big keys' other letters: any letter with a key of its own, whatever the pictures. */
+  const keyPool = useMemo(() => findableLetters(pack, "all").map((l) => l.upper), [pack]);
+  const touchKeys = useTouchKeys(settings.touchKeys);
+  const keyLevel = useKeyLevel(settings.bigKeys);
+  const fewKeys = touchKeys && settings.bigKeys !== "all";
   const showHint = settings.hints && wrong >= HINT_AFTER_WRONG;
 
   const say = useLettersSay();
@@ -114,9 +108,10 @@ export function FindPlay({ pack, settings }: { pack: LanguagePack; settings: Let
   const nextLetter = useCallback(
     (queue = false) => {
       const first = upcoming.current ?? draw();
-      setComing({ ...first, id: nextId.current++, after: draw(), queue });
+      const keys = fewKeys ? bigKeyChoices(first.letter.upper, keyPool, keyLevel.count(), pack) : [];
+      setComing({ ...first, id: nextId.current++, after: draw(), queue, keys });
     },
-    [draw],
+    [draw, fewKeys, keyPool, keyLevel, pack],
   );
 
   // The letter waiting comes on screen once its lines are there.
@@ -156,6 +151,8 @@ export function FindPlay({ pack, settings }: { pack: LanguagePack; settings: Let
 
       if (keyMatches(key, current.letter.upper, pack)) {
         setFound(true);
+        // Found at the first tap, a few in a row bring one big key more; after wrong taps one less.
+        keyLevel.found(wrong === 0);
         playChime();
         say(pack.letterSentence(current.letter, current.word));
         praise(pick(pack.praise));
@@ -165,7 +162,7 @@ export function FindPlay({ pack, settings }: { pack: LanguagePack; settings: Let
       if ((wrong + 1) % HINT_AFTER_WRONG === 0) say(pack.findPrompt(current.letter));
       setWrong(wrong + 1);
     },
-    [current, found, wrong, pack, say, praise, softTap],
+    [current, found, wrong, pack, say, praise, softTap, keyLevel],
   );
 
   useEffect(() => {
@@ -177,7 +174,6 @@ export function FindPlay({ pack, settings }: { pack: LanguagePack; settings: Let
     return () => window.removeEventListener("keydown", onKeyDown);
   }, [pressKey, pack]);
 
-  const touchKeys = useTouchKeys(settings.touchKeys);
   const rows = useMemo(() => keyRows(pack.letters.map((l) => l.upper)), [pack]);
 
   // Tapping the card asks again.
@@ -195,7 +191,7 @@ export function FindPlay({ pack, settings }: { pack: LanguagePack; settings: Let
     : [];
 
   return (
-    <div className={`letters-play`} style={{ background }} onPointerDown={onPlayAreaPointer}>
+    <div className={`letters-play${fewKeys ? " wb-play" : ""}`} style={{ background }} onPointerDown={onPlayAreaPointer}>
       <div className="stage">
         {current && (
           <div key={current.id} className={`card find-card${found ? " done" : ""}`} data-tap onPointerDown={onCardPointer}>
@@ -209,7 +205,18 @@ export function FindPlay({ pack, settings }: { pack: LanguagePack; settings: Let
           </div>
         )}
       </div>
-      {touchKeys ? (
+      {fewKeys ? (
+        current && (
+          <BigKeys
+            keys={current.keys}
+            wanted={current.letter.upper}
+            onKey={pressKey}
+            label={(key) => (settings.letterCase === "lower" ? toLower(key, pack) : key)}
+            hint={showHint}
+            lit={found}
+          />
+        )
+      ) : touchKeys ? (
         <TouchKeyboard
           rows={rows}
           onKey={pressKey}

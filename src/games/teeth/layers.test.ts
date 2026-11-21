@@ -80,3 +80,41 @@ test("a brushed monster dissolves as HTML layers: its sprite's body and the grai
   expect(css).not.toMatch(/\.sugar-monster\.gone \.monster-(body|puff) \{[^}]*animation/);
   expect(mouth).not.toContain("monster-puff");
 });
+
+// While brushing only the song is heard (user feedback, November 2026): the monsters once fizzed as they dissolved,
+// one fizz after the other over the song. The mirror's sounds are only these, each set off by something else.
+test("a brushed monster dissolves without a sound of its own", async () => {
+  const play = await Bun.file("src/games/teeth/TeethPlay.tsx").text();
+  const sounds = play
+    .match(/import \{([^}]*)\} from "@\/lib\/sfx"/)?.[1]
+    .split(",")
+    .map((s) => s.trim())
+    .filter(Boolean);
+  expect(sounds?.sort()).toEqual([
+    "loadRecordings",
+    // A new part of the story or the sink, and each new step of the brushing.
+    "playChime",
+    // The countdown before the brushing.
+    "playCountNote",
+    "playDrumRoll",
+    // The end's cheer.
+    "playRecorded",
+    // A monster the child taps giggles.
+    "playSqueak",
+    // „Los!“ and the end's fanfare.
+    "playTusch",
+  ]);
+  expect(mouth).not.toMatch(/from "@\/lib\/sfx"/);
+});
+
+// The end's sparkle on the teeth (user feedback, November 2026): first too plain, then gold and quick flashes over a
+// tooth and a half were too strong. White light only, small, slow, each glint a Sprite whose HTML moves.
+test("the end's glints are white, small and slow Sprites", () => {
+  const glint = mouth.match(/function Glint\(\)[\s\S]*?\n\}/)?.[0] ?? "";
+  expect(glint).not.toMatch(/#f[0-9a-f]c[0-9a-f]00|#ffd|gold/i);
+  expect(glint).not.toMatch(/\p{Extended_Pictographic}/u);
+  expect(Number(mouth.match(/const GLINT_SIZE = ([\d.]+);/)?.[1])).toBeLessThanOrEqual(1.4);
+  expect(mouth).toMatch(/<Sprite\b[^>]*className="tooth-glint"/);
+  const seconds = Number(css.match(/\.tooth-glint > div \{[^}]*animation: teeth-glint ([\d.]+)s/)?.[1]);
+  expect(seconds).toBeGreaterThanOrEqual(8);
+});
