@@ -33,7 +33,6 @@ import {
 import { bulbBelow, CANDLE, FLAME_H, GLASS, HOURGLASS_BOX, PLATE, SAND_FLOOR, STAGE_H, STAGE_W, TRAIN } from "./scenes";
 import { DRAW_STEPS } from "./SwapPlay";
 import { LAMP, SWAP_FLOOR, SWAP_SEATS, TOY } from "./swap";
-import { BALL, BOARD, COURT, FLIGHT_MS, NET, PLAYERS, playerBox, racketHead } from "./tennis";
 import { DEFAULT_TIMER_SETTINGS, TIMER_SECONDS } from "./settings";
 import {
   BEAM,
@@ -66,14 +65,15 @@ describe("Timer", () => {
       expect(pick(p.name, firstLanguage(p.name)).trim()).not.toBe("");
     }
     // The order the user asked for (November 2026): Rote Scheibe, Sanduhr, Kerze, Apfelbaum, Blume, Pizza, Wecker, and
-    // Abwechseln and Tennis (H-71) last, in a group of their own.
+    // Abwechseln last, in a group of its own. Tennis (H-71) stood beside it and was taken out (user request, 21 November
+    // 2026: poorly done) – it stays out until a better picture of taking turns replaces it (H-108 to H-117).
     expect(PICTURES.slice(0, 7).map((p) => p.id)).toEqual(["disc", "sand", "candle", "apple", "flower", "pizza", "clock"]);
-    expect(PICTURES.slice(-2).map((p) => p.id)).toEqual(["swap", "tennis"]);
+    expect(PICTURES.at(-1)?.id).toBe("swap");
+    expect(PICTURES.map((p) => p.id as string)).not.toContain("tennis");
     expect(DEFAULT_TIMER_SETTINGS.picture).toBe(PICTURES[0].id);
     // Taking turns runs without end, so „Weiter“ never leads into it.
     expect(TIMED_PICTURES.map((p) => p.id)).not.toContain("swap");
-    expect(TIMED_PICTURES.map((p) => p.id)).not.toContain("tennis");
-    expect(TIMED_PICTURES).toHaveLength(PICTURES.length - 2);
+    expect(TIMED_PICTURES).toHaveLength(PICTURES.length - 1);
     const seen = new Set<string>();
     let id = TIMED_PICTURES[0].id;
     for (let i = 0; i < TIMED_PICTURES.length; i++) {
@@ -83,7 +83,6 @@ describe("Timer", () => {
     expect(seen.size).toBe(TIMED_PICTURES.length);
     expect(id).toBe(TIMED_PICTURES[0].id);
     expect(nextPicture("swap")).toBe(TIMED_PICTURES[0].id);
-    expect(nextPicture("tennis")).toBe(TIMED_PICTURES[0].id);
   });
 
   test("the alarm clock shows the time left on a screen whose digits never shift, starting on the time set and ending on 0:00", () => {
@@ -133,6 +132,14 @@ describe("Timer", () => {
     expect(TIMER_SECONDS.at(-1)).toBe(600);
     expect([...TIMER_SECONDS].sort((a, b) => a - b)).toEqual([...TIMER_SECONDS]);
     expect(TIMER_SECONDS).toContain(DEFAULT_TIMER_SETTINGS.seconds as (typeof TIMER_SECONDS)[number]);
+  });
+
+  test("every visit starts at 5 minutes: the length picked is never stored (user request, November 2026)", async () => {
+    expect(DEFAULT_TIMER_SETTINGS.seconds).toBe(300);
+    const game = await Bun.file(new URL("./TimerGame.tsx", import.meta.url)).text();
+    // The row's length and whether the own time is chosen live in `visitLength`, never in the stored settings.
+    expect(game).not.toMatch(/update\(\{[^}]*\b(seconds|useOwn)\b/);
+    expect(game).toMatch(/useState\(visitLength\)/);
   });
 
   test("what matters stays where every screen shows it (x 200–1400, y 80–820)", () => {
@@ -425,7 +432,7 @@ describe("Timer", () => {
     }
   });
 
-  test("Tidy Up: fifteen toys at five minutes, always many, the crane taking one at a time, the last landing as the time is up (H-108)", () => {
+  test("Tidy Up: fifteen toys at five minutes, always many, the crane taking one at a time, the last landing as the time is up (H-118)", () => {
     expect(toyCount(5 * 60_000)).toBe(15);
     expect(MAX_TOYS).toBe(15);
     expect(toyCount(10_000)).toBe(MIN_TOYS);
@@ -451,7 +458,7 @@ describe("Timer", () => {
     }
   });
 
-  test("Tidy Up: the toys lie between the posts and left of the box, each lands on its own in the heap, and the claw stays on the screen (H-108)", () => {
+  test("Tidy Up: the toys lie between the posts and left of the box, each lands on its own in the heap, and the claw stays on the screen (H-118)", () => {
     const half = TOY_SIZE / 2;
     for (const place of TOY_PLACES) {
       expect(place.x - half).toBeGreaterThanOrEqual(POSTS.xs[0] + POSTS.w);
@@ -483,7 +490,7 @@ describe("Timer", () => {
     expect(Math.min(...TOY_PLACES.map((p) => p.x)) - CLAW.w / 2).toBeGreaterThanOrEqual(BEAM.left);
   });
 
-  test("Tidy Up: a toy falls straight down from the open claw into the box, and every part snaps to its place at the end (H-108)", async () => {
+  test("Tidy Up: a toy falls straight down from the open claw into the box, and every part snaps to its place at the end (H-118)", async () => {
     const code = await Bun.file(new URL("./tidy.tsx", import.meta.url)).text();
     // The fall's start (still in the claw) and its end (in the box) share the same sideways move.
     expect(code).toContain("carried(((toy.slot.x - toy.x) / TOY) * 100)");
@@ -496,12 +503,9 @@ describe("Timer", () => {
 
   // User feedback, November 2026: the drawn fox and bear children in the timer's pictures (holding the basket and the
   // hose, blowing out the candle, taking turns) looked odd, and were taken out of every picture. The pictures tell
-  // their story by themselves; Abwechseln's children are the real ones, their places two cushions. The one exception is
-  // Tennis (H-71, user request, November 2026: „zwei die Tennis spielen“): the two players are what the picture is
-  // about, standing still as the shared `Mascot` while only their rackets and the ball move.
+  // their story by themselves; Abwechseln's children are the real ones, their places two cushions.
   test("no timer picture draws a fox or bear figure", async () => {
     for await (const file of new Bun.Glob("src/games/timer/*.tsx").scan(".")) {
-      if (file.endsWith("tennis.tsx")) continue;
       const code = await Bun.file(file).text();
       expect(/<Mascot(Head)?[\s/>]|MASCOT_COLORS\.\w+\.paw/.test(code) ? `${file} draws a fox or bear` : file).toBe(file);
     }
@@ -520,31 +524,6 @@ describe("Timer", () => {
     expect(LAMP.rim - 30).toBeGreaterThanOrEqual(80);
     expect(TOY.waiting).toBeLessThanOrEqual(820);
     expect(TOY.onCushion - TOY.h).toBeGreaterThanOrEqual(80);
-  });
-
-  test("Tennis keeps both players, the net, the board and the ball's whole flight on every screen, the same either side of the net (H-71)", () => {
-    for (const kind of ["fox", "bear"] as const) {
-      const box = playerBox(kind);
-      expect(box.x).toBeGreaterThanOrEqual(200);
-      expect(box.x + box.w).toBeLessThanOrEqual(RIGHT);
-      expect(box.y).toBeGreaterThanOrEqual(80);
-      // The racket's head leans towards the net and the ball meets it there, on the player's own side.
-      const [hx] = racketHead(kind);
-      expect(kind === "fox" ? hx < NET.left : hx > NET.right).toBe(true);
-    }
-    // Fair: both players and their rackets as far from the net.
-    expect(COURT.net - PLAYERS.fox).toBe(PLAYERS.bear - COURT.net);
-    expect(COURT.net - racketHead("fox")[0]).toBeCloseTo(racketHead("bear")[0] - COURT.net);
-    // The ball flies clearly over the net and below the board, and hops on the racket below it too.
-    const peak = BALL.contact - BALL.arc - BALL.r;
-    expect(BALL.contact + BALL.r).toBeLessThan(NET.top);
-    expect(peak).toBeGreaterThan(BOARD.y + BOARD.h);
-    expect(BALL.contact - BALL.hop - BALL.r).toBeGreaterThan(BOARD.y + BOARD.h);
-    expect(BALL.waiting.y + BALL.r).toBeLessThanOrEqual(820);
-    expect(BOARD.y).toBeGreaterThanOrEqual(80);
-    expect(BOARD.x + BOARD.w / 2).toBe(COURT.net);
-    // It flies slowly, so a child can follow it to whose turn it is.
-    expect(FLIGHT_MS).toBeGreaterThanOrEqual(2000);
   });
 
   // November 2026: below the head, the row of lengths left a phone on its side too little room for the twelve cards, and
@@ -683,7 +662,7 @@ describe("Timer", () => {
 // Chinese, Hindi and Arabic have no Latin letters in theirs.
 test("every line the Timer says is in every app language, but a new picture's English-first lines until they are asked for", () => {
   const lines = [...Object.values(PICTURE_LINES).flatMap((p) => [p.start, p.end]), SOON_LINE, ...TURN_LINES];
-  // The older lines are German first and translated into every language; an English-first one (Tidy Up, H-108) has
+  // The older lines are German first and translated into every language; an English-first one (Tidy Up, H-118) has
   // English, and the languages it lacks are marked in languageStatus.ts until translations are asked for.
   for (const line of lines) {
     if (firstLanguage(line) === "de") expect(APP_LANGUAGES.filter((language) => line[language] === undefined)).toEqual([]);

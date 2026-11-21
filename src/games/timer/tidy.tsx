@@ -1,7 +1,7 @@
 import { memo, useMemo, type CSSProperties, type ReactNode } from "react";
 import { Draw, INK, Layer, LeftGlow, STAGE_H, STAGE_W } from "./scenes";
 
-// Tidy Up (H-108, user request, 21 November 2026: a timer for tidying up, best at five minutes): toys lie on the rug
+// Tidy Up (H-118, user request, 21 November 2026: a timer for tidying up, best at five minutes): toys lie on the rug
 // of a children's room, the open toy box stands at the right, and a toy gantry crane runs along its beam above them.
 // One toy after the other it drives over a toy, lets its claw down, grips, lifts it, carries it over the box and lets
 // it fall straight down onto its own place in the heap – nearest the box first, so the empty floor grows from the box

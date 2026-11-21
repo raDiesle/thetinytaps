@@ -2,7 +2,8 @@ import { centre } from "./focus";
 import type { SceneItem } from "./types";
 
 // „Hier bin ich!“ (idea B-15): when nobody taps a picture for a while at its start, one single item waves gently, an
-// invitation for a child who doesn't know where to begin – never a task, and silent (see the rules in CLAUDE.md).
+// invitation for a child who doesn't know where to begin – never a task. It makes its own sound softly (user decision,
+// 21 November 2026), never a voice: the pictures have none (see the rules in CLAUDE.md).
 
 /** After the picture lies still, how long nobody has tapped before the first item waves. */
 export const HELLO_AFTER_MS = 6000;
@@ -10,6 +11,8 @@ export const HELLO_AFTER_MS = 6000;
 export const HELLO_AGAIN_MS = 12000;
 /** At most this many items wave, one after the other; then the picture stays still until the child acts. */
 export const HELLO_TIMES = 3;
+/** The waving thing's own sound, at this share of its usual loudness. */
+export const HELLO_VOLUME = 0.4;
 /** How long one wave lasts. */
 export const HELLO_MS = 1800;
 

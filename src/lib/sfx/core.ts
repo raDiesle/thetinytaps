@@ -49,6 +49,20 @@ export function setSfxVolume(volume: number) {
   masterVolume = volume;
 }
 
+/**
+ * Plays what `play` starts right away at `share` of its usual loudness – a sound heard softly, like a picture's thing
+ * saying hello before the first tap (Lebendige Bilder, B-15). Only what starts during the call is softer.
+ */
+export function softly(share: number, play: () => void) {
+  const before = masterVolume;
+  masterVolume = before * share;
+  try {
+    play();
+  } finally {
+    masterVolume = before;
+  }
+}
+
 /** Must be called from a user gesture so the browser allows audio. */
 export function unlockAudio() {
   void audio()?.resume();

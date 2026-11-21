@@ -1,6 +1,6 @@
 import type { EnglishFirst } from "@/lib/language";
 
-// „Tidy Up“ (H-108, 21 November 2026), the timer's picture for tidying up: written English first, as everything new
+// „Tidy Up“ (H-118, 21 November 2026), the timer's picture for tidying up: written English first, as everything new
 // is, and translated only when asked for – German included. Its texts stand here on their own, so the language table
 // (`languageStatus.ts`) can say they are English only while the Timer's other texts are in every language.
 

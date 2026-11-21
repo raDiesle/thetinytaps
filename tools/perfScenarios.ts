@@ -208,9 +208,9 @@ export const SCENARIOS: Scenario[] = [
   { name: "belohnungstafel", path: "/belohnungstafel/", parts: [{ label: "Sterne kleben", before: [START, { wait: 1500 }], ms: 6000, tap: TAPS }] },
   // The timer's pictures in their order on its start screen, each running for a while with a tap now and then (the
   // steam, the twinkling, the flame, what is left lighting up), the moon setting and the sun rising, the pizza's slices
-  // lifted off, the ladybug crawling round the red disc, the alarm clock's digits ticking, the toy crane carrying toys into the box and in „Abwechseln“ the
-  // lamps drawing who begins and the hourglass running, in „Tennis“ the sides lighting up in turn and the ball hopping
-  // on a racket while the board's lights go out. Each card is tapped by its name (its tooltip), so the cards' order and groups may change.
+  // lifted off, the ladybug crawling round the red disc, the alarm clock's digits ticking, the toy crane carrying toys
+  // into the box and in „Abwechseln“ the lamps drawing who begins and the hourglass running. Each card is tapped by its
+  // name (its tooltip), so the cards' order and groups may change.
   ...(
     [
       ["scheibe", "Rote Scheibe"],
@@ -226,7 +226,6 @@ export const SCENARIOS: Scenario[] = [
       ["raupe", "Raupe"],
       ["sonne", "Sonnenaufgang"],
       ["abwechseln", "Abwechseln"],
-      ["tennis", "Tennis"],
     ] as const
   ).map(([name, title]) => ({
     name: `timer-${name}`,
@@ -245,15 +244,6 @@ export const SCENARIOS: Scenario[] = [
         ms: 10000,
         tap: { selector: ".tm-play", every: 1500 },
       },
-    ],
-  },
-  // „Tennis“ with short turns: the sides drawing who begins, the racket swinging, the ball flying over the net and the
-  // shade changing sides as it crosses.
-  {
-    name: "timer-tennis-wechsel",
-    path: "/timer/?sekunden=5",
-    parts: [
-      { label: "Auslosen und Wechsel", before: [{ tap: `.mode-card[title^="Tennis"]` }, { wait: 500 }], ms: 10000, tap: { selector: ".tm-play", every: 1500 } },
     ],
   },
   // The Apfelbaum's harvest, sped up: bees buzzing, apples ripening and falling into the cart the bear child pushes.

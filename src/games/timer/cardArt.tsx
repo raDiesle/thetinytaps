@@ -2,7 +2,6 @@ import { memo, useLayoutEffect, useRef, useState } from "react";
 import { pieceCount, MAX_STOPS } from "./pieces";
 import type { SwapToy, TimerPicture } from "./settings";
 import { SwapBackdrop, SwapCushions, SwapHourglass, SwapLight, SwapShade, Toy } from "./swap";
-import { Ball, COURT, Racket, TennisBackdrop, TennisBoard, TennisPlayers, tennisStyle } from "./tennis";
 import { SceneParts, stageStyle } from "./TimerPlay";
 
 /**
@@ -45,8 +44,7 @@ function holdAt(card: HTMLElement | null, at: number) {
  * the picture is the button, no words on it; the middle rather than the end, user feedback, November 2026) – the tree
  * full of apples with the cart under them, the train halfway to the station, the leaf half eaten. It is the very drawing
  * of a run (`SceneParts`, started `MIDDLE` of it ago – `LATER` for a few), stopped at that moment by `holdAt`. „Abwechseln“ shows the fox
- * child's lamp on, the toy on its cushion and the hourglass half run; Tennis the fox child's side in the light with the
- * ball on its racket and half the board's lights out.
+ * child's lamp on, the toy on its cushion and the hourglass half run.
  */
 export const TimerCardArt = memo(function TimerCardArt({ picture, toy }: { picture: TimerPicture; toy: SwapToy }) {
   const at = CARD_MS * (LATER[picture] ?? MIDDLE);
@@ -63,16 +61,6 @@ export const TimerCardArt = memo(function TimerCardArt({ picture, toy }: { pictu
           <SwapShade kind="bear" on />
           <SwapHourglass ms={CARD_MS} startedAt={startedAt + at} flip={false} waiting={false} glow={0} />
           <Toy toy={toy} place="fox" />
-        </span>
-      ) : picture === "tennis" ? (
-        <span className="tm-stage" style={tennisStyle()}>
-          <TennisBackdrop />
-          <Racket kind="fox" bouncing={false} swing={0} />
-          <Racket kind="bear" bouncing={false} swing={0} />
-          <TennisPlayers />
-          <SwapShade kind="bear" on edge={COURT.net} />
-          <TennisBoard ms={CARD_MS} startedAt={startedAt + at} waiting={false} glow={0} />
-          <Ball place="fox" hop={0} />
         </span>
       ) : (
         <span className="tm-stage" style={stageStyle(picture, CARD_MS, pieceCount(CARD_MS, MAX_STOPS))}>

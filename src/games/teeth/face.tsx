@@ -22,7 +22,10 @@ export const BROW = "#6b4229";
 /** The lips, alike in the story and the mirror. */
 export const LIP = "#ff7088";
 /** A warm brown iris round the pupil, as the app's mascots have (root CLAUDE.md). */
-export const IRIS = "#7a4a28";
+export const IRIS = "#8a5533";
+/** The iris's rim and the pupil: dark warm browns. */
+const IRIS_RIM = "#4a2a18";
+const PUPIL = "#2b1810";
 
 /** The head's radius in the units the parts are drawn in: the story's head. */
 export const HEAD_UNITS = 165;
@@ -128,20 +131,27 @@ export function Ear({ x, y, r, side, k = 1, fill = SKIN }: { x: number; y: numbe
   );
 }
 
-/** An eye's white with its upper lid, `rx` already narrowed where the head is turned. */
+/** An eye's white with its outline, `rx` already narrowed where the head is turned; its lid (`EyeLid`) goes over the iris. */
 export function EyeBall({ x, y, rx, ry, k = 1 }: { x: number; y: number; rx: number; ry: number; k?: number }) {
+  return <ellipse cx={x} cy={y} rx={rx} ry={ry} fill="#fff" stroke={INK} strokeWidth={4 * k} />;
+}
+
+/**
+ * The eye's white less its outline, where the iris shows: the iris is clipped to it, so however it looks round it never
+ * reaches past the eye (a small iris swimming free in a big white looked staring and creepy, user feedback, November 2026).
+ */
+export const eyeOpening = (rx: number, ry: number, k = 1) => ({ rx: rx - 2 * k, ry: ry - 2 * k });
+
+/** The upper lid: a stronger line over the top, as drawn eyes with lashes have, lying over the top of the iris. */
+export function EyeLid({ x, y, rx, ry, k = 1 }: { x: number; y: number; rx: number; ry: number; k?: number }) {
   return (
-    <g>
-      <ellipse cx={x} cy={y} rx={rx} ry={ry} fill="#fff" stroke={INK} strokeWidth={4 * k} />
-      {/* The lid: a stronger line over the top, as drawn eyes with lashes have. */}
-      <path
-        d={`M${x - rx * 0.92} ${y - ry * 0.3} Q${x} ${y - ry * 1.34} ${x + rx * 0.92} ${y - ry * 0.3}`}
-        fill="none"
-        stroke={INK}
-        strokeWidth={6 * k}
-        strokeLinecap="round"
-      />
-    </g>
+    <path
+      d={`M${x - rx * 0.92} ${y - ry * 0.3} Q${x} ${y - ry * 1.34} ${x + rx * 0.92} ${y - ry * 0.3}`}
+      fill="none"
+      stroke={INK}
+      strokeWidth={6 * k}
+      strokeLinecap="round"
+    />
   );
 }
 
@@ -152,14 +162,18 @@ export const LASHES = [
   [22, -4, 34, -8],
 ];
 
-/** The iris with its pupil and two lights, round (x, y); `sx` narrows it where the head is turned. */
+/**
+ * The iris with its pupil and two lights, round (x, y); `sx` narrows it where the head is turned. Big and warm, as a
+ * child's eye in a picture book: a brown iris filling most of the eye with a soft dark brown rim and pupil (never the
+ * ink's violet), a big light up on the outside and a small one below.
+ */
 export function Iris({ x, y, r, sx = 1 }: { x: number; y: number; r: number; sx?: number }) {
   return (
     <g>
-      <ellipse cx={x} cy={y} rx={r * sx} ry={r} fill={IRIS} stroke={INK} strokeWidth={r * 0.1} />
-      <ellipse cx={x} cy={y} rx={r * 0.55 * sx} ry={r * 0.55} fill={INK} />
-      <circle cx={x + r * 0.35 * sx} cy={y - r * 0.45} r={r * 0.38} fill="#fff" />
-      <circle cx={x - r * 0.4 * sx} cy={y + r * 0.45} r={r * 0.17} fill="#fff" />
+      <ellipse cx={x} cy={y} rx={r * sx} ry={r} fill={IRIS} stroke={IRIS_RIM} strokeWidth={r * 0.12} />
+      <ellipse cx={x} cy={y + r * 0.08} rx={r * 0.5 * sx} ry={r * 0.5} fill={PUPIL} />
+      <circle cx={x + r * 0.32 * sx} cy={y - r * 0.38} r={r * 0.3} fill="#fff" />
+      <circle cx={x - r * 0.36 * sx} cy={y + r * 0.42} r={r * 0.13} fill="#fff" opacity={0.85} />
     </g>
   );
 }
@@ -183,7 +197,7 @@ export function Nose({ x, y, r, sx = 1, k = 1 }: { x: number; y: number; r: numb
 
 /** Where the face's parts sit on the head, in head units round its middle (y down): the story's child. */
 export const FACE = {
-  eyes: { x: 60, y: -29, rx: 22, ry: 26, iris: 14 },
+  eyes: { x: 60, y: -29, rx: 22, ry: 26, iris: 17.5 },
   brows: { x: 60, y: -68 },
   nose: { y: 10, r: 9 },
   ears: { x: 165, y: 13, r: 26 },

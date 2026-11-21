@@ -309,7 +309,7 @@ function TimerRun({
         .map((h) => h.land);
     if (picture === "train" && stops > 1) return pieceMoments(total, stops, haltMs(total, stops));
     if (picture === "pizza") return pieceMoments(total, SLICES);
-    // Each toy landing in the box (H-108), the last one being the end's.
+    // Each toy landing in the box (H-118), the last one being the end's.
     if (picture === "tidy")
       return tidyTimes(total, toyCount(set))
         .slice(0, -1)

@@ -306,9 +306,11 @@ export function buildMouth(open: number): MouthModel {
 
 /**
  * Seen from the side (user feedback, November 2026): with the head turned far, the mouth is a profile – the lips seen
- * only from the side, ending at the face's front, and the front teeth standing out past them, with no lip or gum in
- * front of them. How far a view is such a profile, 0 to 1: it comes in over the last part of a turn, so nothing jumps
- * while the head glides there, and never with the mouth open.
+ * only from the side, ending at the face's front, and the teeth inside the mouth behind them, every one growing out of
+ * its gum, the front teeth too: they only show their narrow side and their front edge in the gap between the lips'
+ * ends. Front teeth standing out past the face with no gum looked plainly wrong (user feedback, November 2026). How far
+ * a view is such a profile, 0 to 1: it comes in over the last part of a turn, so nothing jumps while the head glides
+ * there, and never with the mouth open.
  */
 export const PROFILE_YAW = { from: 50, full: 66 };
 export function profileOf(view: View): number {
@@ -316,10 +318,14 @@ export function profileOf(view: View): number {
   return k * k * (3 - 2 * k) * Math.max(0, 1 - 2 * view.open);
 }
 
-/** Where the lips' middle lies in a profile: pulled back onto the teeth, so the front teeth stand out past them. */
-const PROFILE_LIPS = { upper: 40, lower: -34, z: 84 };
+/**
+ * Where the lips' middle lies in a profile: just above the upper gum's edge and below the lower one's, so a band of gum
+ * shows over and under the teeth, and a little in front of the front teeth (whose fronts reach `ARCH.upper.b`), where
+ * the face's round runs (`midline`): the teeth stay inside the mouth.
+ */
+const PROFILE_LIPS = { upper: 40, lower: -34, z: 118 };
 
-/** The lips as the view shows them: in a profile the front of the lips is pulled back onto the teeth's roots. */
+/** The lips as the view shows them: in a profile the front of the lips is pulled onto the gums, in front of the teeth. */
 export function viewedLips(lips: Vec3[], view: View): Vec3[] {
   const k = profileOf(view);
   if (!k) return lips;
@@ -342,8 +348,7 @@ const noseY = () => HEAD_MIDDLE[1] - (10 / 165) * HEAD_RADIUS;
 
 /**
  * The face's outline in a profile, from the top of the head down to its bottom: the middle line of the face with its
- * nose, running in onto the lips' ends and straight from the upper lip's end to the lower one's, behind the front teeth,
- * which stand out past it. Whatever lies beyond it is the far side of the head and is not seen.
+ * nose, running in onto the lips' ends and straight from the upper lip's end to the lower one's, in front of the teeth. Whatever lies beyond it is the far side of the head and is not seen.
  */
 export function profileLine(lips: Vec3[]): Vec3[] {
   const ends = lips.filter((p) => Math.abs(p[0]) < 1e-6);

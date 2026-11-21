@@ -34,7 +34,7 @@ import {
   profileOf,
   viewedLips,
 } from "./jaw";
-import { BROW, Ear, EyeBall, FACE, HAIR, Hair, HEAD_UNITS, type HeadMap, INK, Iris, LASHES, LIP, Nose, SkinGradient } from "./face";
+import { BROW, Ear, EyeBall, EyeLid, eyeOpening, FACE, HAIR, Hair, HEAD_UNITS, type HeadMap, INK, Iris, LASHES, LIP, Nose, SkinGradient } from "./face";
 import { Brush, lerp3, type BrushAnchor } from "./brush";
 import type { Motion } from "./steps";
 
@@ -57,6 +57,8 @@ const DARK_FROM = 0.3;
 const WAITING_FACING = 0.25;
 /** Small enough that a monster sits on its tooth rather than covering it and its neighbours. */
 const MONSTER_SIZE = 0.58;
+/** How flat a monster gets at most on a face seen from the side (`leanOn`): flatter, it would no longer be seen as one. */
+const MIN_LEAN = 0.42;
 /** How far inside the lips' outline a monster's middle has to be: past the thick lip (half its stroke) onto the teeth. */
 const LIP_EDGE = 15;
 
@@ -541,11 +543,11 @@ export function Mouth({ view, zone, monsters, brush, happy, dazzled, action, gli
     const at = jaw.point(lift(alongFace(face, m.spot), face, 4));
     // Back teeth hidden behind the corners of the lips: their monsters would sit on the lip.
     if (!insideBy(at, lipPoints, LIP_EDGE)) return null;
-    // Seen from the side, the front teeth stand out past the face: only their sides show, so the waiting monsters on
-    // their fronts wait out of sight, rather than a crowd of them sticking out of the mouth.
+    // Seen from the side nothing past the face's front is seen: a waiting monster there waits out of sight.
     if (m.waiting && side && insideBy(at, side.ring, 0)) return null;
     // The ones being brushed move, so each lies in a layer of its own (Sprite), placed on the screen.
     const spot = m.waiting ? { x: at.x, y: at.y, scale: MONSTER_SIZE * project.zoom } : onScreen(at, MONSTER_SIZE * project.zoom);
+    const lean = leanOn(jaw.direction(face.normal), facing);
     return (
       <PlacedMonster
         key={m.id}
@@ -553,6 +555,7 @@ export function Mouth({ view, zone, monsters, brush, happy, dazzled, action, gli
         x={round(spot.x)}
         y={round(spot.y)}
         scale={round(spot.scale, 100)}
+        lean={lean}
         sprite={!m.waiting}
         color={m.color}
         variant={m.variant}
@@ -568,43 +571,21 @@ export function Mouth({ view, zone, monsters, brush, happy, dazzled, action, gli
   };
 
   // Seen from the side, over the lips: the far side of the head past the face's front is the mirror's glass, the face's
-  // outline runs down its front, the front teeth stand out past it (their crowns only: no gum or lip in front of them),
-  // and the lips' near half ends round at the front. It comes in as the head turns that far (`profile`), never at once.
+  // outline runs down its front, and the lips' near half ends round at the front, a little in front of the front teeth:
+  // every tooth stays inside the mouth, growing out of its gum, seen through the lips' opening (user feedback, November
+  // 2026). It comes in as the head turns that far (`profile`), never at once.
   const profileCut = useMemo(() => {
     if (!side) return null;
-    const zoneKeys = new Set(zoneTeeth?.map(toothKey));
-    const crowns = jawOrder(view).map((jaw) => {
-      const p = all[jaw];
-      const teeth = model.teeth.filter((t) => t.id.jaw === jaw && t.id.n <= 2).sort((a, b) => p.point(a.center).depth - p.point(b.center).depth);
-      return (
-        <g key={jaw}>
-          {teeth.map((t) => (
-            <Crown key={t.key} tooth={t} project={p} zone={zoneKeys.has(t.key) ? zoneSurface : undefined} />
-          ))}
-        </g>
-      );
-    });
     const near = smoothPart(lipPoints, side.nearFrom, side.nearCount);
     return (
       <g opacity={round(profile, 100)}>
-        <defs>
-          <clipPath id="profile-beyond">
-            <path d={side.beyond} />
-          </clipPath>
-          <clipPath id="profile-opening">
-            <path d={lipsPath} />
-          </clipPath>
-        </defs>
         <path d={side.beyond} fill={MIRROR_GLASS} />
         <path d={`M${side.line.map(fmt).join(" L")}`} fill="none" stroke={INK} strokeWidth={7} strokeLinejoin="round" strokeLinecap="round" />
-        <g clipPath="url(#profile-beyond)">
-          <g clipPath="url(#profile-opening)">{crowns}</g>
-        </g>
         <path d={near} fill="none" stroke={INK} strokeWidth={34} strokeLinejoin="round" strokeLinecap="round" />
         <path d={near} fill="none" stroke={LIP} strokeWidth={27} strokeLinejoin="round" strokeLinecap="round" />
       </g>
     );
-  }, [side, profile, view, all, model, lipPoints, lipsPath, zoneSurface, zoneTeeth]);
+  }, [side, profile, lipPoints]);
 
   // The lips over the glow's edge, in a layer of their own above it, so the glow stays inside them; with them the
   // monsters waiting for a later step, which stand still. While the head turns or the mouth opens there is no glow and
@@ -812,6 +793,7 @@ const PlacedMonster = memo(function PlacedMonster({
   x,
   y,
   scale,
+  lean,
   sprite,
   onTickle,
   ...monster
@@ -821,6 +803,8 @@ const PlacedMonster = memo(function PlacedMonster({
   x: number;
   y: number;
   scale: number;
+  /** How it lies flat on its tooth's face (`leanOn`): a matrix's first four numbers, or "" facing us. */
+  lean: string;
   sprite: boolean;
   onTickle: (id: number) => void;
 } & Omit<Parameters<typeof Monster>[0], "onTickle">) {
@@ -846,6 +830,7 @@ const PlacedMonster = memo(function PlacedMonster({
     return (
       <Sprite
         spot={{ x, y, scale }}
+        lean={lean}
         reach={MONSTER_REACH}
         className={`monster-sprite${gone ? " gone" : ""}${scared ? " scared" : ""}${tickled ? " tickled" : ""}`}
       >
@@ -856,8 +841,23 @@ const PlacedMonster = memo(function PlacedMonster({
         {gone && <MonsterDust color={color} />}
       </Sprite>
     );
-  return <g transform={`translate(${x} ${y}) scale(${scale})`}>{drawn}</g>;
+  return <g transform={`translate(${x} ${y}) scale(${scale})${lean && ` matrix(${lean} 0 0)`}`}>{drawn}</g>;
 });
+
+/**
+ * A monster lies on its tooth's face, not upright in front of it (user feedback, November 2026: on the teeth seen from
+ * the side they looked as if they flew before them): it is squashed along the way the face turns away on the screen
+ * (`away`, the face's normal on the screen) as much as the face is turned (`facing`, at most to `MIN_LEAN`), as a
+ * sticker on the tooth would be. Facing us it stays as it is (""), so most monsters keep one drawing.
+ */
+export function leanOn(away: { x: number; y: number }, facing: number): string {
+  const length = Math.hypot(away.x, away.y);
+  const k = Math.max(MIN_LEAN, Math.min(1, facing));
+  if (length < 0.05 || k > 0.97) return "";
+  const [dx, dy] = [away.x / length, away.y / length];
+  const r = (n: number) => Math.round(n * 50) / 50;
+  return [1 + (k - 1) * dx * dx, (k - 1) * dx * dy, (k - 1) * dx * dy, 1 + (k - 1) * dy * dy].map(r).join(" ");
+}
 
 /**
  * The grains a brushed monster falls apart into: where each lies on its body and where it drifts, in % of its sprite
@@ -930,12 +930,26 @@ interface SpriteSpot {
  * and the arrows on the lips are each such a layer, and what moves in them (sway, glow, nudge) moves the HTML around
  * their svg, which the browser does without painting (`.monster-sprite`, `.lip-arrow` in teeth.css).
  */
-function Sprite({ spot, reach, className, children }: { spot: SpriteSpot; reach: number; className: string; children: ReactNode }) {
+function Sprite({
+  spot,
+  lean = "",
+  reach,
+  className,
+  children,
+}: {
+  spot: SpriteSpot;
+  /** How it lies flat on a face turned away (`leanOn`). */
+  lean?: string;
+  reach: number;
+  className: string;
+  children: ReactNode;
+}) {
   const size = round(2 * reach * spot.scale);
+  const flat = lean && ` matrix(${lean.split(" ").join(", ")}, 0, 0)`;
   return (
     <div
       className={`mouth-sprite ${className}`}
-      style={{ width: size, height: size, transform: `translate(${round(spot.x - size / 2)}px, ${round(spot.y - size / 2)}px)` }}
+      style={{ width: size, height: size, transform: `translate(${round(spot.x - size / 2)}px, ${round(spot.y - size / 2)}px)${flat}` }}
     >
       {children}
     </div>
@@ -1137,8 +1151,14 @@ function KidFace({ project, head, happy, open, lips }: { project: Project; head:
               />
             )}
             <EyeBall x={eye.x} y={eye.y} rx={eyes.rx * k * sx} ry={eyes.ry * k} k={w} />
-            {/* Looking a little down, at the mouth in the mirror. */}
-            <Iris x={eye.x + 2 * k * sx} y={eye.y + 5 * k} r={eyes.iris * k} sx={sx} />
+            {/* Looking a little down, at the mouth in the mirror; clipped to the eye's white, with the lid over it. */}
+            <clipPath id={`kid-eye-${s}`}>
+              <ellipse cx={eye.x} cy={eye.y} {...eyeOpening(eyes.rx * k * sx, eyes.ry * k, w)} />
+            </clipPath>
+            <g clipPath={`url(#kid-eye-${s})`}>
+              <Iris x={eye.x + 2 * k * sx} y={eye.y + 5 * k} r={eyes.iris * k} sx={sx} />
+            </g>
+            <EyeLid x={eye.x} y={eye.y} rx={eyes.rx * k * sx} ry={eyes.ry * k} k={w} />
           </g>
         );
       })}

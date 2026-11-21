@@ -13,6 +13,7 @@ import { playKnock } from "@/lib/sfx";
 import {
   BOOK_ASPECT,
   BOOK_GAP,
+  DAILY_TALL,
   LEAN_CLEAR,
   planShelf,
   STICKERS_ROOM,
@@ -279,6 +280,7 @@ export function Bookshelf({ secretProps, legal }: { secretProps: HTMLAttributes<
         "--bh": `${layout.bookHeight}px`,
         "--gap": BOOK_GAP,
         "--lean-clear": LEAN_CLEAR,
+        "--daily-tall": DAILY_TALL,
         "--post": `${layout.frame.post}px`,
         "--crown": `${layout.frame.crown}px`,
         "--plinth": `${layout.frame.plinth}px`,
@@ -445,7 +447,7 @@ function DailyGroup({
         {books.map((book) =>
           book.volumes ? <BookBundle key={book.id} volumes={book.volumes} take={take} /> : <SpineBook key={book.id} book={book} onClick={take(book)} />,
         )}
-        <span className="shelf-group-label">{name}</span>
+        <GroupSign name={name} />
       </span>
     </span>
   );
@@ -484,6 +486,28 @@ function RibbonBow() {
       <rect x="16.5" y="12.5" width="7" height="7" rx="2" fill="#b0262d" stroke="#7a1a1f" strokeWidth="1.2" />
     </svg>
   );
+}
+
+/**
+ * A group's sign: a brass rail along the board's front edge under all of its books, from the first to the last, with
+ * its ends turned up round them, and the wooden sign with the group's name hanging big from the rail's middle – so it
+ * is plain at a glance that the name stands for every book on that board (user feedback, November 2026: the small sign
+ * alone was hardly seen, and not that it named all the books).
+ */
+function GroupSign({ name, board, style }: { name: string; board?: boolean; style?: CSSProperties }) {
+  return (
+    <span className={`shelf-group${board ? " board" : ""}`} style={style}>
+      <span className="shelf-group-rail" />
+      <span className="shelf-group-label">{name}</span>
+    </span>
+  );
+}
+
+/** Where a compartment's picture books stand, from the first to the last, standing together in its middle. */
+function groupWidth(cell: ShelfCell, bh: number, spans: number[]): CSSProperties {
+  const books = cell.books ?? [];
+  const width = books.reduce((sum, b) => sum + spans[b], 0) * bh * BOOK_ASPECT + (books.length - 1) * BOOK_GAP * bh;
+  return { left: (cell.w - width) / 2, width };
 }
 
 /** The name of the picture books' group (the everyday helpers' is their category's, `DailyGroup`). */
@@ -544,8 +568,13 @@ function Compartment({
   // What is stuck on the back panel moves away from the eye by half of what the depth draws it towards the middle, so
   // it sits in the middle of the back that can be seen, not half behind the plank in front.
   const back = (layout.bookHeight * DEPTH) / EYE / 2;
+  // Each board's books as big as its own room allows (`ShelfCell.bh`), and all on it – the books spine out too – sized by them.
+  const bh = cell.bh ?? layout.bookHeight;
   const style = {
     ...rect(cell),
+    ...(cell.bh && { "--bh": `${cell.bh}px` }),
+    // Under the sign hanging above them, the everyday helpers' books stand no higher than this.
+    ...(cell.tall !== undefined && { "--tall": `${cell.tall}px` }),
     "--cw": `${cell.w}px`,
     "--ch": `${cell.h}px`,
     "--sx": `${(cell.x + cell.w / 2 - layout.width / 2) * back}px`,
@@ -554,7 +583,7 @@ function Compartment({
   // The carved words, and the sign over them on a wide shelf, begin the board at its far left where the everyday helpers
   // stand first on it (user request, November 2026: a visitor looks at the left first); the books follow at their right.
   const leads = cell.books?.[0] !== undefined && Boolean(PLACES[cell.books[0]][0].colour);
-  const ends = cell.books ? endsFor(cell, layout.bookHeight, spans, leads) : undefined;
+  const ends = cell.books ? endsFor(cell, bh, spans, leads) : undefined;
   const things = cell.things ?? [];
   // The stack of books lying flat goes to one end, the left in one compartment, the right in the next – never to the
   // wall with the stickers, which it would hide.
@@ -562,7 +591,7 @@ function Compartment({
   return (
     <div className={`shelf-cell${cell.books ? "" : ` thing ${things.join(" ")}`}`} style={style}>
       <span className="shelf-cell-shade" />
-      {cell.books && <BooksLight cell={cell} bh={layout.bookHeight} spans={spans} leads={leads} />}
+      {cell.books && <BooksLight cell={cell} bh={bh} spans={spans} leads={leads} />}
       <span className="shelf-wall left" />
       <span className="shelf-wall right" />
       <span className="shelf-cell-ceiling" />
@@ -584,7 +613,7 @@ function Compartment({
           </span>
         </div>
       )}
-      {label && <span className="shelf-group-label shelf-board-label">{t(label)}</span>}
+      {label && cell.books && <GroupSign name={t(label)} board style={groupWidth(cell, bh, spans)} />}
       {things.includes("figure") && (
         // The stickers of the child's figure, stuck on the compartment's right wall, and „Wer spielt?“ written small on
         // that wall right above the fox's head (user feedback, November 2026).

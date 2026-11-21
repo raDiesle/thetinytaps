@@ -502,7 +502,8 @@ A game may give it before its end where reaching the goal once is enough (Ketten
 - Silent and still until the child acts: no sound without a tap/hover/key, no idle
   animation unless the parent turns it on (`document.getAnimations()` is empty after load; only a `TapHint` left
   waiting starts to move after its first stage, on the shelf the trophy sign's two glints, and in Lebendige Bilder a
-  few items waving silently, one after the other, before the first tap, B-15). In a game that plays
+  few items waving one after the other before the first tap, B-15 – each with its own sound, softly, the one sound
+  allowed before a tap, user decision, November 2026). In a game that plays
   at once (`startMode`), the tap on its card is that act: it may start moving and sounding right away – but never
   while the book still opens or a page turns (user feedback, November 2026: Aufs Töpfchen and Zähne putzen talked and
   moved during it). The new screen is drawn before the motion, and everything that starts by itself waits for it to lie
@@ -616,18 +617,24 @@ A game may give it before its end where reaching the goal once is enough (Ketten
   Tied, they are one block: pressed close and standing upright – never leaning, which looked unnatural for tied books –
   and one ribbon runs round all of them with its bow in their middle – never a band on each book, which looked like
   three small ribbons (user feedback, November 2026). The single books stand thick enough to hit with a finger on a
-  phone (`DAILY_SPINE`, widened again in November 2026 when they were still hard to hit), and lean a little differently, as books do. The Alltagshelfer are what parents
+  phone (`DAILY_SPINE`, widened again in November 2026 when they were still hard to hit), and lean a little differently, as books do.
+  Their row is as wide as its board allows, so they grow in height instead: taller than the picture books, as high as
+  their compartment lets them be taken out (`DAILY_TALL`), and the picture on each spine takes nearly its whole width,
+  since that picture is what a child knows the book by (user feedback, November 2026: books and pictures too small to
+  recognise; `shelfLayout.test.ts`). The Alltagshelfer are what parents
   need most, so they stand first, top left (first in `CATEGORIES`), and that bundle is the eye-catcher of the shelf:
   glowing brightest, the Belohnungstafel in it bound in gold – still, nothing idles. Every book stands on its board like
   its neighbours, never in a box or pulled out further than they: a slipcase round the two, pulled out and tipped, looked
   as if it floated (user feedback, November 2026). What can be taken is
   plainly unlike what only fills the shelf (user feedback, November 2026): books to take are bright, with paper labels
   or covers, standing at the front and glowing; books only filling it are dull and dim, never a paper label or a glow,
-  and answer a tap by rocking with a soft knock (`nudge`), so a child sees the tap was felt. The group is marked as one by a small wooden sign with its
-  name screwed onto the board's edge under it (`DailyGroup`; a label from four drafts – bookend, sign, paper band – user
-  decision, November 2026, made of wood so it looks mounted, user feedback, November 2026), and the picture books
-  standing together on one board just so by „Lernspiele“ on the board under them (`labelOf`); such a sign hangs only a
-  little below its board, never over a book on the board below. Before the helpers words carved into the back panel tell grown-ups in short what
+  and answer a tap by rocking with a soft knock (`nudge`), so a child sees the tap was felt. The group is marked as one by a wooden sign with its
+  name hanging big from a brass rail along the board's edge under all of its books, the rail's ends turned up round the
+  first and the last (`GroupSign`; a label from four drafts – bookend, sign, paper band – user decision, November 2026,
+  made of wood so it looks mounted; the small sign alone was hardly seen, nor that it named every book on the board, so
+  it grew and got the rail, user feedback, November 2026), and the picture books standing together on one board just so
+  by „Lernspiele“ on the board under them (`labelOf`); such a sign hangs only a little below its board, never over a
+  book on the board below (measure it at 844×390, where it comes closest). Before the helpers words carved into the back panel tell grown-ups in short what
   the shelf is for – „Für Groß & Klein“ – then that it is the first step into the digital world taken together, with
   learning games and little helpers for the day – and nothing else: no „Alles kostenlos.“, no „Seite an Seite“, no „die die Kommunikation fördern“, no „von Eltern für Eltern“ (each tried and
   taken out again, user feedback, November 2026), no pointer to one game („Ein Blick in die
@@ -938,7 +945,10 @@ src/lib/                 speech, sfx (synthesized + recorded sounds), storage, d
   On each board the books stand together in the middle with just `BOOK_GAP` between them, and books spine out fill the
   ends up to them – never spread over a wide board with big empty room between them (on a big monitor they looked lost,
   user feedback, November 2026; `.shelf-row`, `endsFor`).
-  The picture books are as big as the shelf allows (`TAKE_OUT`, little room above them, user feedback, October 2026) and
+  The picture books are as big as the shelf allows (`TAKE_OUT`, little room above them, user feedback, October 2026) –
+  each board's books as big as its own width and height allow (`ShelfCell.bh`, set as the compartment's `--bh`), never
+  all as small as the full board of the everyday helpers makes its books (on a tablet the picture books below were
+  half the size they could be, user feedback, November 2026) – and
   show that they are there to be taken: they stand at the board's front edge, before the books spine out, their tops
   tipped forwards as a hand takes a book out, with a warm glow round the cover; a mouse over one tips it further out.
   A tap on a book takes it out (`takeOutBook`, `bookTravel.ts`): it comes off its board, into the middle, its cover swings open
@@ -978,7 +988,10 @@ src/lib/                 speech, sfx (synthesized + recorded sounds), storage, d
   where it is wider than the words (`ShelfCell.lead`, `ShelfLayout.sign`, `signOver`) – after letting it reach half over
   the left post (`SIGN_OVER_POST`) and narrowing the words at their right so they stay centred under it (`pull`), since
   that room would come off the books – so it never covers a book to take – the first helper leans towards it
-  (`LEAN_CLEAR`) – and the books spine out keep clear of the wall with the stickers (`STICKERS_ROOM`), the foxes on its o stay on the screen (`shelfLayout.test.ts`), and the books spine out fill only the
+  (`LEAN_CLEAR`) –; where the top compartment is tall enough (a tablet), it hangs above the helpers' books instead, clear
+  over their tops (`ShelfCell.tall`, `UNDER_SIGN`), and they get its room – only where that makes them clearly wider
+  (`ABOVE_GAIN`), since under it they stand lower, and with a breath of room left beside the words (`WORDS_BREATH`;
+  user feedback, November 2026: beside the sign on a tablet the spines were too thin for their pictures) – and the books spine out keep clear of the wall with the stickers (`STICKERS_ROOM`), the foxes on its o stay on the screen (`shelfLayout.test.ts`), and the books spine out fill only the
   board's right end (`data-leads`). A brighter, still light falls on sign and words (`.shelf-light.lead`) so they stand
   out, and the plan takes the sign's measured width (`SIGN_EMS`), never a wide guess, since every px it reserves comes
   off the books. Upright, the words stand before the helpers too. On an upright screen it

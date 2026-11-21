@@ -7,7 +7,7 @@ import { TIDY_LINES } from "./tidyNames";
 import voiceFiles from "./stimme/**/*.mp3?glob";
 
 // What the Timer says (H-72, November 2026): where a picture goes as it starts, „Gleich ist es so weit!“ with the bell a
-// while before the end (H-49), and what is there at the end; Abwechseln and Tennis say who begins and whose turn it is.
+// while before the end (H-49), and what is there at the end; Abwechseln says who begins and whose turn it is.
 // In the app language, from the recordings in ./stimme/ (`bun run voice make --only timer`): a line not recorded in the
 // app language plays its English recording, else nothing – never the browser's voice.
 
@@ -246,7 +246,7 @@ export const SOON_LINE: Localized = {
   ru: "Уже совсем скоро!",
 };
 
-/** Abwechseln and Tennis: said as the lamps start to draw who begins. */
+/** Abwechseln: said as the lamps start to draw who begins. */
 export const WHO_BEGINS: Localized = {
   de: "Wer fängt an?",
   en: "Who goes first?",
@@ -301,12 +301,12 @@ export const TURN_TO: Record<Holder, Localized> = {
   },
 };
 
-/** Every line Abwechseln and Tennis can say, in the order they come. */
+/** Every line Abwechseln can say, in the order they come. */
 export const TURN_LINES: Localized[] = [WHO_BEGINS, ...Object.values(BEGINS), ...Object.values(TURN_TO)];
 
 /**
- * Every line the Timer can say in `language`, each once: the pictures' start and end lines, the bell's, and Abwechseln's
- * and Tennis's. A language without a translation of a line gets its German text, as `pick` gives it.
+ * Every line the Timer can say in `language`, each once: the pictures' start and end lines, the bell's, and Abwechseln's.
+ * A language without a translation of a line gets its German text, as `pick` gives it.
  */
 export function timerSaid(language: TargetLanguageId): string[] {
   const pictures = Object.values(PICTURE_LINES);
