@@ -6,17 +6,19 @@ import { MUSEUM_PATH, TROPHY_ROOM, useMuseumTrophies } from "@/lib/museum";
 import { preloadPage } from "@/lib/preloadPages";
 
 /*
- * The way from the bookshelf into the trophy room (user request, November 2026): a little paper sign like the fullscreen
- * button's, nailed onto the shelf's right side above the loudspeaker, a golden cup in a doorway on it. A tap turns the
- * eye to the right – the room's wall comes round with a door in it (MuseumDoorway) –, the door opens and one walks in.
- * Before the first trophy there is nothing behind it, so the sign isn't there either.
+ * The way from the bookshelf into the trophy room (user request, November 2026): a paper sign like the fullscreen
+ * button's with a big golden cup on it, nailed onto the post at the bottom right of the picture books' compartment and
+ * reaching left into it, over the books spine out there. A little in the cup glints now and then, as a trophy does in a
+ * game (user request, November 2026: the small cup in a doorway above the loudspeaker was hardly recognised). A tap
+ * turns the eye to the right – the room's wall comes round with a door in it (MuseumDoorway) –, the door opens and one
+ * walks in. Before the first trophy there is nothing behind it, so the sign isn't there either.
  */
 
 /** How long the walk from the shelf into the trophy room takes; `museum-door-*` in bookshelf.css run exactly this long. */
 const DOORWAY_MS = 1900;
 
-/** The sign on the shelf's right side, `top` px from the shelf's top. */
-export function TrophySign({ top }: { top: number }) {
+/** The sign, its nail's post at `left` and the compartment's floor at `top` px in the shelf. */
+export function TrophySign({ left, top }: { left: number; top: number }) {
   const t = useT();
   const navigate = useNavigate();
   const { search } = useLocation();
@@ -31,7 +33,7 @@ export function TrophySign({ top }: { top: number }) {
       <button
         type="button"
         className="shelf-trophy-sign"
-        style={{ top }}
+        style={{ left, top }}
         aria-label={label}
         title={label}
         onPointerDown={(e) => {
@@ -44,34 +46,68 @@ export function TrophySign({ top }: { top: number }) {
           else setWalking(true);
         }}
       >
-        <TrophyDoorArt />
+        <TrophyArt />
+        {/* Two glints on the cup, each a tiny layer of its own, so only they move and the svg is never painted again. */}
+        <span className="shelf-trophy-glint" aria-hidden>
+          <Glint />
+        </span>
+        <span className="shelf-trophy-glint" aria-hidden>
+          <Glint />
+        </span>
       </button>
       {walking && createPortal(<MuseumDoorway onInside={() => navigate(to)} />, document.body)}
     </>
   );
 }
 
-/** The sign's picture: a doorway, warm light in it and a golden cup standing there. */
-function TrophyDoorArt() {
+/** The sign's picture: a big golden cup with two handles and a star, on a wooden foot, a warm glow behind it. */
+function TrophyArt() {
   return (
-    <svg className="shelf-trophy-sign-art" viewBox="0 0 40 46" aria-hidden>
-      <path d="M6 44 V17 A14 14 0 0 1 34 17 V44 Z" fill="#7a4a26" />
-      <path d="M10 44 V18 A10 10 0 0 1 30 18 V44 Z" fill="#ffe7a8" />
-      <path d="M10 44 V18 A10 10 0 0 1 30 18 V44 Z" fill="url(#sign-light)" />
+    <svg className="shelf-trophy-sign-art" viewBox="0 0 48 52" aria-hidden>
       <defs>
-        <radialGradient id="sign-light" cx="0.5" cy="0.45" r="0.6">
-          <stop offset="0" stopColor="#fff8dc" />
-          <stop offset="1" stopColor="#f0b85a" />
+        <radialGradient id="trophy-sign-glow" cx="0.5" cy="0.42" r="0.5">
+          <stop offset="0" stopColor="#ffe9a0" />
+          <stop offset="1" stopColor="#ffe9a0" stopOpacity="0" />
         </radialGradient>
+        <linearGradient id="trophy-sign-gold" x1="0" x2="1">
+          <stop offset="0" stopColor="#fff0a8" />
+          <stop offset="0.35" stopColor="#f7c936" />
+          <stop offset="0.75" stopColor="#e3a218" />
+          <stop offset="1" stopColor="#b97a0c" />
+        </linearGradient>
       </defs>
-      {/* The cup: bowl, handles, stem and foot. */}
-      <g stroke="#6b4210" strokeWidth="1.1" strokeLinejoin="round">
-        <path d="M14.5 21 C12 21 11.5 26 15.5 27.5 M25.5 21 C28 21 28.5 26 24.5 27.5" fill="none" strokeWidth="1.6" />
-        <path d="M14 20 H26 C26 27 23.5 30 20 30.5 C16.5 30 14 27 14 20 Z" fill="#f2c230" />
-        <path d="M18.6 30.4 H21.4 L22 35 H18 Z" fill="#e0a91f" />
-        <rect x="15.5" y="35" width="9" height="3.6" rx="0.8" fill="#9a6a3a" />
+      <ellipse cx="24" cy="22" rx="23" ry="21" fill="url(#trophy-sign-glow)" />
+      <g stroke="#6b3f08" strokeWidth="1.4" strokeLinejoin="round" strokeLinecap="round">
+        {/* Handles behind the bowl. */}
+        <path d="M12 9.5 C3 9.5 3.5 22 13.5 23.5 M36 9.5 C45 9.5 44.5 22 34.5 23.5" fill="none" stroke="#6b3f08" strokeWidth="5" />
+        <path d="M12 9.5 C3 9.5 3.5 22 13.5 23.5 M36 9.5 C45 9.5 44.5 22 34.5 23.5" fill="none" stroke="#f2bd2c" strokeWidth="2.4" />
+        {/* Bowl, its rim, stem, knot and foot. */}
+        <path d="M10.5 7 H37.5 C37.5 22 32 29.5 24 30.5 C16 29.5 10.5 22 10.5 7 Z" fill="url(#trophy-sign-gold)" />
+        <ellipse cx="24" cy="7" rx="13.5" ry="2.2" fill="#ffe27a" />
+        <path d="M21.5 30.3 H26.5 L27.4 36 H20.6 Z" fill="#e3a218" />
+        <ellipse cx="24" cy="36.4" rx="5.2" ry="1.8" fill="#f7c936" />
+        <path d="M17.5 38 H30.5 L32 41.5 H16 Z" fill="#f2bd2c" />
+        <rect x="12.5" y="41.5" width="23" height="8" rx="1.5" fill="#8a5428" />
       </g>
-      <path d="M16 22 C16 25 16.8 27 18 28" stroke="#fff6c8" strokeWidth="1" fill="none" strokeLinecap="round" />
+      {/* The star on the bowl, the gold plate on the foot and the light down the bowl's left. */}
+      <path
+        d="M24 11.5 L25.9 15.4 L30.1 15.9 L27 18.8 L27.8 23 L24 20.9 L20.2 23 L21 18.8 L17.9 15.9 L22.1 15.4 Z"
+        fill="#fff3b8"
+        stroke="#b97a0c"
+        strokeWidth="0.9"
+        strokeLinejoin="round"
+      />
+      <rect x="17" y="43.6" width="14" height="3.8" rx="0.8" fill="#f2c94c" stroke="#6b3f08" strokeWidth="0.7" />
+      <path d="M14 10 C14 17 15.5 22.5 19 26.5" stroke="#fffbe6" strokeWidth="1.8" fill="none" strokeLinecap="round" opacity="0.85" />
+    </svg>
+  );
+}
+
+/** A glint: a four-pointed white star with a warm edge. */
+function Glint() {
+  return (
+    <svg viewBox="0 0 20 20" aria-hidden>
+      <path d="M10 0 C10.8 7 13 9.2 20 10 C13 10.8 10.8 13 10 20 C9.2 13 7 10.8 0 10 C7 9.2 9.2 7 10 0 Z" fill="#fffef5" stroke="#ffd86b" strokeWidth="0.8" />
     </svg>
   );
 }
@@ -112,7 +148,7 @@ function MuseumDoorway({ onInside }: { onInside: () => void }) {
             <span className="museum-doorway-panel" />
             <span className="museum-doorway-knob" />
             <span className="museum-doorway-plate">
-              <TrophyDoorArt />
+              <TrophyArt />
             </span>
           </span>
         </span>
