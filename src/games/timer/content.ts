@@ -1,5 +1,6 @@
-import type { Localized } from "@/lib/language";
+import type { Localized, Texts } from "@/lib/language";
 import type { TimerPicture, TurnPicture } from "./settings";
+import { TIDY_NAME } from "./tidyNames";
 
 /** The game's name, on its start screen, its spine on the shelf and in the browser tab. */
 export const TIMER_TITLE: Localized = { de: "Timer", en: "Timer", zh: "计时器", hi: "टाइमर", es: "Temporizador", ar: "المؤقّت", ru: "Таймер" };
@@ -30,7 +31,7 @@ export const tomorrowAt = (at: string): Localized => ({
 });
 
 /** The pictures in their order on the start screen; „Weiter“ at the end goes on with the next, after the last the first. */
-export const PICTURES: { id: TimerPicture; emoji: string; name: Localized }[] = [
+export const PICTURES: { id: TimerPicture; emoji: string; name: Texts }[] = [
   // The order the user asked for (November 2026): the red disc Kitas know first, then the hourglass, the candle, the
   // apple tree, the flower and the pizza, then the alarm clock (H-70) and the rest; „Abwechseln“ last, in a group of its
   // own on the start screen (`TimerGame`).
@@ -49,6 +50,8 @@ export const PICTURES: { id: TimerPicture; emoji: string; name: Localized }[] = 
   { id: "flower", emoji: "🌸", name: { de: "Blume", en: "Flower", zh: "小花", hi: "फूल", es: "Flor", ar: "الزهرة", ru: "Цветок" } },
   { id: "pizza", emoji: "🍕", name: { de: "Pizza", en: "Pizza", zh: "披萨", hi: "पिज़्ज़ा", es: "Pizza", ar: "البيتزا", ru: "Пицца" } },
   { id: "clock", emoji: "⏰", name: { de: "Wecker", en: "Alarm Clock", zh: "闹钟", hi: "अलार्म घड़ी", es: "Despertador", ar: "المنبّه", ru: "Будильник" } },
+  // Tidy Up (H-108): a toy crane puts the toys into the box, best at five minutes; English only so far.
+  { id: "tidy", emoji: "🧸", name: TIDY_NAME },
   {
     id: "train",
     emoji: "🚂",

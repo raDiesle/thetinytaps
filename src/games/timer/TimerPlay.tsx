@@ -5,7 +5,7 @@ import { useLeaveGame } from "@/components/GameShell";
 import { PlayOptions } from "@/components/PlayOptions";
 import { SettingsGroup } from "@/components/SettingControls";
 import { DEV } from "@/lib/buildInfo";
-import { type Localized, useAppLanguage, useT } from "@/lib/language";
+import { type Texts, useAppLanguage, useT } from "@/lib/language";
 import { playBlow, playMunch, playWhistle } from "@/lib/realSounds";
 import {
   loadRecordings,
@@ -14,6 +14,7 @@ import {
   playChime,
   playChimeNote,
   playClick,
+  playClonk,
   playDing,
   playDrops,
   playLeaves,
@@ -22,6 +23,7 @@ import {
   playPlop,
   playTusch,
   playTwinkle,
+  playWhirr,
   playYawn,
   playYum,
   recorded,
@@ -41,6 +43,7 @@ import type { SwapToy, TimeShown, TimerPicture, TimerSettings } from "./settings
 import { TimeShownChoice, TimeShownNote } from "./shown";
 import { SunsetScene } from "./sunset";
 import { SwapRun } from "./SwapPlay";
+import { TidyScene, tidyTimes, toyCount } from "./tidy";
 import { clockOn, digits, ownTimeMs } from "./time";
 import { PICTURE_LINES, SOON_LINE, type TimedPicture, timerLoad, timerSay } from "./voice";
 
@@ -289,7 +292,7 @@ function TimerRun({
   // recorded; a grown-up leaving with ✕ stops it.
   const language = useAppLanguage().id;
   const lines = PICTURE_LINES[picture];
-  const say = useCallback((line: Localized, queue = false) => timerSay(line, language, queue), [language]);
+  const say = useCallback((line: Texts, queue = false) => timerSay(line, language, queue), [language]);
   useEffect(() => {
     timerLoad([lines.start, SOON_LINE, lines.end], language);
     say(lines.start);
@@ -306,6 +309,11 @@ function TimerRun({
         .map((h) => h.land);
     if (picture === "train" && stops > 1) return pieceMoments(total, stops, haltMs(total, stops));
     if (picture === "pizza") return pieceMoments(total, SLICES);
+    // Each toy landing in the box (H-108), the last one being the end's.
+    if (picture === "tidy")
+      return tidyTimes(total, toyCount(set))
+        .slice(0, -1)
+        .map((t) => t.land);
     // The ladybug leaves a dot as it is back at the top (H-67).
     if (picture === "disc") return pieceMoments(total, ladybugLaps(set).dots);
     return [];
@@ -345,6 +353,7 @@ function TimerRun({
           lastPieceSound.current = now;
           if (picture === "apple") playPlop();
           else if (picture === "pizza") playMunch();
+          else if (picture === "tidy") playClonk();
           else if (picture === "disc") playPlink(nextMoment.current);
           else playDing();
         }
@@ -382,6 +391,7 @@ function TimerRun({
       else if (picture === "sunset") playYawn();
       else if (picture === "pizza") playYum();
       else if (picture === "clock") playBeeps();
+      else if (picture === "tidy") playClonk();
       say(lines.end, true);
       // The time is up, plain to see and hear (user feedback, November 2026): children cheer, the picture
       // lights up warmly, then the friendly tune – and the trophy with the end's buttons, nothing rising (user decision).
@@ -415,6 +425,8 @@ function TimerRun({
       else if (picture === "flower") playDrops();
       // The snooze bar is pressed down.
       else if (picture === "clock") playClick();
+      // The crane's motor whirrs.
+      else if (picture === "tidy") playWhirr();
       else playChimeNote(Math.floor(Math.random() * 8));
     },
     [phase, picture, ripple, glow, endsAt, total, apples],
@@ -514,6 +526,7 @@ export function SceneParts({
       {picture === "caterpillar" && <CaterpillarScene glow={poke} startedAt={startedAt} total={total} done={phase === "done"} still={still} />}
       {picture === "disc" && <DiscScene glow={poke} total={total} set={set} />}
       {picture === "pizza" && <PizzaScene glow={poke} />}
+      {picture === "tidy" && <TidyScene count={toyCount(set)} total={total} glow={poke} />}
       {picture === "clock" && <ClockScene glow={poke} endsAt={startedAt + total} total={total} running={phase === "running"} still={still} />}
       {picture === "flower" && <FlowerScene glow={poke} total={total} />}
       {picture === "sunset" && <SunsetScene glow={poke} />}

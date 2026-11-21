@@ -1,8 +1,9 @@
 import type { TargetLanguageId } from "@/content/targetLanguages";
-import { type Localized, pick } from "@/lib/language";
+import { type Localized, pick, type Texts } from "@/lib/language";
 import { recordedVoice } from "@/lib/voice";
 import type { TimerPicture, TurnPicture } from "./settings";
 import type { Holder } from "./swap";
+import { TIDY_LINES } from "./tidyNames";
 import voiceFiles from "./stimme/**/*.mp3?glob";
 
 // What the Timer says (H-72, November 2026): where a picture goes as it starts, „Gleich ist es so weit!“ with the bell a
@@ -14,11 +15,10 @@ import voiceFiles from "./stimme/**/*.mp3?glob";
 export const timerVoice = recordedVoice(voiceFiles);
 
 /** Says `line` in the app language (its English recording standing in where that language has none); `queue` waits for the line before. */
-export const timerSay = (line: Localized, language: TargetLanguageId, queue = false) =>
-  timerVoice.say(pick(line, language), language, { queue, english: line.en });
+export const timerSay = (line: Texts, language: TargetLanguageId, queue = false) => timerVoice.say(pick(line, language), language, { queue, english: line.en });
 
 /** Starts loading the recordings of `lines` in the app language, so each plays right when it is due. */
-export const timerLoad = (lines: Localized[], language: TargetLanguageId) =>
+export const timerLoad = (lines: Texts[], language: TargetLanguageId) =>
   timerVoice.load(
     lines.map((line) => pick(line, language)),
     language,
@@ -27,8 +27,11 @@ export const timerLoad = (lines: Localized[], language: TargetLanguageId) =>
 /** A picture that runs until the time is up. */
 export type TimedPicture = Exclude<TimerPicture, TurnPicture>;
 
-/** Each picture's two lines: where it goes, said as it starts, and what is there at the end. */
-export const PICTURE_LINES: Record<TimedPicture, { start: Localized; end: Localized }> = {
+/**
+ * Each picture's two lines: where it goes, said as it starts, and what is there at the end. The older pictures' lines
+ * are German first; a new picture's come English first (`Texts`) and only in English until translations are asked for.
+ */
+export const PICTURE_LINES: Record<TimedPicture, { start: Texts; end: Texts }> = {
   disc: {
     start: {
       de: "Die rote Scheibe wird kleiner.",
@@ -229,6 +232,7 @@ export const PICTURE_LINES: Record<TimedPicture, { start: Localized; end: Locali
       ru: "Вот и солнышко!",
     },
   },
+  tidy: TIDY_LINES,
 };
 
 /** Said with the bell a while before the end (H-49). */
@@ -307,5 +311,6 @@ export const TURN_LINES: Localized[] = [WHO_BEGINS, ...Object.values(BEGINS), ..
 export function timerSaid(language: TargetLanguageId): string[] {
   const pictures = Object.values(PICTURE_LINES);
   const lines = [...pictures.map((p) => p.start), SOON_LINE, ...pictures.map((p) => p.end), ...TURN_LINES];
-  return [...new Set(lines.map((line) => pick(line, language)))];
+  // An English-first line not yet translated into `language` is left out: its English recording stands in for it.
+  return [...new Set(lines.filter((line) => line[language] !== undefined).map((line) => pick(line, language)))];
 }
