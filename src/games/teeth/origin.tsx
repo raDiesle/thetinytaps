@@ -18,10 +18,11 @@ import { Piece, pictureSpace } from "./piece";
 // evening brushing, the moon crosses the night before the morning one) and the
 // crumbs grow into the same monsters the mirror shows later, while the child
 // looks worried. The child is happy about each sweet: its eyes follow it and
-// its brows go up, hearts rise, and while it chews its eyes close happily and
-// its cheeks glow. All of it is CSS animation (teeth.css), calm enough to go
-// with the music; ARRIVE_MS here sets when each sweet reaches the mouth, and
-// ORIGIN_CUES the sounds that go with it (cheering, unwrapping, biting, chewing, „Mmmh“).
+// its brows go up, and while it chews its eyes close happily and its cheeks
+// glow. Each sweet flies into the mouth in an arc and crumbles as it is bitten.
+// All of it is CSS animation (teeth.css), calm enough to go with the music;
+// ARRIVE_MS here sets when each sweet reaches the mouth, and ORIGIN_CUES the
+// sounds that go with it (cheering, unwrapping, biting, chewing, „Mmmh“).
 
 export type OriginPart = "sweets" | "grow";
 
@@ -32,10 +33,10 @@ const { width: W } = PICTURE;
 /** What has to fit between heading and controls: the head, with the corners the sweets appear in; the screen shows more sky round it. */
 const FOCUS: Box = { x: 40, y: 34, width: 360, height: 340 };
 /** Where the camera ends up while the monsters grow: the mouth with them, as big as the free room allows. */
-const MOUTH_FOCUS: Box = { x: 95, y: 222, width: 250, height: 150 };
+const MOUTH_FOCUS: Box = { x: 110, y: 226, width: 220, height: 132 };
 const HEAD = { x: W / 2, y: 215, r: 165 };
 /** Where the teeth stand in the mouth: from left to right, and from the top edge down to the bottom's lowest point. */
-export const MOUTH = { left: 110, right: 330, top: 262, depth: 95 };
+export const MOUTH = { left: 124, right: 316, top: 258, depth: 80 };
 const MID = (MOUTH.left + MOUTH.right) / 2;
 /** The cheeks: their middles across, and where and how big they are; kept clear of the mouth's corners (`cheeks.test.ts`). */
 export const CHEEKS = [98, 342];
@@ -45,48 +46,50 @@ type XY = [number, number];
 /** A cubic curve from its start through two handles to its end. */
 type Curve = [XY, XY, XY, XY];
 /**
- * The open smile as a child's mouth, not a geometric half ellipse (user feedback, November 2026: its pointed corners,
- * where a straight top met a round bottom, looked like a shape from maths): the top edge sags softly towards the middle,
- * the corners are tucked round, and the bottom is a full round curve, every curve running smoothly into the next.
+ * The open smile as a young child's mouth, not a geometric half ellipse (user feedback, November 2026: its pointed
+ * corners, where a straight top met a round bottom, looked like a shape from maths) nor a wide grin from cheek to cheek
+ * (user feedback, November 2026: the mouth should look friendlier and more like a child's): a little more than half the
+ * face wide, the top edge a soft smile sagging to the middle, the corners lifted and tucked round, the bottom a full
+ * round curve, every curve running smoothly into the next.
  */
 const TOP_CURVES: Curve[] = [
   [
-    [114, 256],
-    [150, 252],
-    [185, 266],
-    [220, 266],
+    [134, 250],
+    [162, 257],
+    [190, 261],
+    [220, 261],
   ],
   [
-    [220, 266],
-    [255, 266],
-    [290, 252],
-    [326, 256],
+    [220, 261],
+    [250, 261],
+    [278, 257],
+    [306, 250],
   ],
 ];
 const BOTTOM_CURVES: Curve[] = [
   [
-    [326, 256],
-    [334, 257],
-    [338, 264],
-    [334, 274],
+    [306, 250],
+    [313, 248],
+    [318, 253],
+    [316, 260],
   ],
   [
-    [334, 274],
-    [320, 326],
-    [275, 357],
-    [220, 357],
+    [316, 260],
+    [307, 312],
+    [266, 338],
+    [220, 338],
   ],
   [
-    [220, 357],
-    [165, 357],
-    [120, 326],
-    [106, 274],
+    [220, 338],
+    [174, 338],
+    [133, 312],
+    [124, 260],
   ],
   [
-    [106, 274],
-    [102, 264],
-    [106, 257],
-    [114, 256],
+    [124, 260],
+    [122, 253],
+    [127, 248],
+    [134, 250],
   ],
 ];
 const curvePath = (curves: Curve[]) => curves.map(([, a, b, c]) => `C${a.join(" ")} ${b.join(" ")} ${c.join(" ")}`).join(" ");
@@ -121,10 +124,10 @@ const bottomAt = (x: number) => edgeAt(BOTTOM_ROUND, x);
 /** The top edge of the mouth above x (it sags a little in the middle). */
 const topAt = (x: number) => edgeAt(TOP_EDGE, x);
 /** Wide enough that neighbouring teeth nearly touch: with gaps between them the story's child looked to have lost teeth. */
-const TOOTH_W = 33;
-/** Six teeth along the top, four along the round bottom. */
-const UPPER = [0, 1, 2, 3, 4, 5].map((i) => MOUTH.left + 21 + i * 34.5);
-const LOWER = [0, 1, 2, 3].map((i) => MID + (i - 1.5) * 35);
+const TOOTH_W = 26.5;
+/** Six small teeth along the top, four along the round bottom, a child's milk teeth. */
+const UPPER = [0, 1, 2, 3, 4, 5].map((i) => MID + (i - 2.5) * 27);
+const LOWER = [0, 1, 2, 3].map((i) => MID + (i - 1.5) * 27.5);
 const upperX = (i: number) => UPPER[i];
 const lowerX = (i: number) => LOWER[i];
 
@@ -134,13 +137,15 @@ const lowerX = (i: number) => LOWER[i];
  */
 function gumDepth(x: number, teeth: number[]) {
   const d = Math.min(...teeth.map((t) => Math.abs(x - t))) / (TOOTH_W / 2);
-  return d >= 1 ? 14 : 6 + 8 * d ** 2;
+  return d >= 1 ? 11 : 5 + 6 * d ** 2;
 }
 
+/** Every other unit across the mouth, where the gum's edge is worked out. */
+const ACROSS = Array.from({ length: (MOUTH.right - MOUTH.left) / 2 + 1 }, (_, i) => MOUTH.left + i * 2);
 /** The gum's edge over the upper teeth and under the lower ones, left to right. */
 const GUM_EDGE = {
-  upper: Array.from({ length: 111 }, (_, i) => MOUTH.left + i * 2).map((x) => ({ x, y: topAt(x) + gumDepth(x, UPPER) })),
-  lower: Array.from({ length: 111 }, (_, i) => MOUTH.left + i * 2).map((x) => ({ x, y: bottomAt(x) - gumDepth(x, LOWER) })),
+  upper: ACROSS.map((x) => ({ x, y: topAt(x) + gumDepth(x, UPPER) })),
+  lower: ACROSS.map((x) => ({ x, y: bottomAt(x) - gumDepth(x, LOWER) })),
 };
 const edgePath = (edge: { x: number; y: number }[]) => edge.map((p, i) => `${i ? "L" : "M"}${p.x} ${p.y.toFixed(1)}`).join(" ");
 /** The gum as a band: the edge, then back along the mouth's outline (clipped by it). */
@@ -153,7 +158,7 @@ const GUM_PATHS = {
 const FIRST_ID = 1000;
 
 /** The closed mouth while chewing: where its lips meet, in the middle (a little below the open mouth's top). */
-const CLOSED = { y: MOUTH.top + 16, half: 58 };
+const CLOSED = { y: MOUTH.top + 12, half: 50 };
 /** Its piece, and the point it moves round (where the lips meet). */
 const CLOSED_AREA: Box = { x: MID - CLOSED.half - 10, y: CLOSED.y - 22, width: 2 * CLOSED.half + 20, height: 60 };
 
@@ -255,42 +260,73 @@ const CRUMBS = [
 
 /** A tooth's place in the picture, where a crumb lies and its monster grows. */
 function crumbAt(c: (typeof CRUMBS)[number]) {
-  if (c.upper) return { x: upperX(c.tooth), y: MOUTH.top + 19 };
+  if (c.upper) return { x: upperX(c.tooth), y: MOUTH.top + 15 };
   const x = lowerX(c.tooth);
-  return { x, y: bottomAt(x) - 22 };
+  return { x, y: bottomAt(x) - 18 };
 }
 
-/** A lollipop with a white swirl, its stick going down. */
+/** A lollipop: a round candy with a pink and white swirl, a soft shade on its lower side and a gloss, on a white stick. */
 function Lollipop() {
   return (
     <g stroke={INK} strokeWidth={3} strokeLinejoin="round" strokeLinecap="round">
-      <rect x={-3} y={14} width={6} height={44} rx={3} fill="#fff" />
-      <circle r={24} fill="#ff7bd0" />
-      <path d="M0 0 a5 5 0 0 1 9 2 a10 10 0 0 1 -17 6 a15 15 0 0 1 22 -18" fill="none" stroke="#fff" strokeWidth={4} />
+      <defs>
+        <radialGradient id="origin-lolly" cx="0.38" cy="0.34" r="0.75">
+          <stop offset="0" stopColor="#ffb3e6" />
+          <stop offset="0.6" stopColor="#ff7bd0" />
+          <stop offset="1" stopColor="#e0529f" />
+        </radialGradient>
+      </defs>
+      <rect x={-3.5} y={16} width={7} height={44} rx={3.5} fill="#fff" />
+      <path d="M-1 20 V56" stroke="#e6e0f0" strokeWidth={2} />
+      <circle r={25} fill="url(#origin-lolly)" />
+      <path d="M0 0 a5 5 0 0 1 9 2 a10 10 0 0 1 -17 6 a15 15 0 0 1 22 -18 a20 20 0 0 1 3 26" fill="none" stroke="#fff" strokeWidth={5} opacity={0.9} />
+      <ellipse cx={-10} cy={-12} rx={7} ry={4} transform="rotate(-35 -10 -12)" fill="#fff" stroke="none" opacity={0.8} />
     </g>
   );
 }
 
-/** A wrapped sweet with its two twisted ends. */
+/** A wrapped sweet: a shiny orange candy in yellow paper twisted at both ends, with folds in the paper. */
 function Bonbon() {
   return (
-    <g stroke={INK} strokeWidth={3} strokeLinejoin="round">
-      <path d="M-20 0 L-38 -14 L-34 0 L-38 14 Z M20 0 L38 -14 L34 0 L38 14 Z" fill="#ffd23f" />
-      <ellipse rx={22} ry={16} fill="#ff9f43" />
-      <path d="M-10 -8 Q0 -13 10 -8" fill="none" stroke="#fff" strokeWidth={3} strokeLinecap="round" />
+    <g stroke={INK} strokeWidth={3} strokeLinejoin="round" strokeLinecap="round">
+      <defs>
+        <radialGradient id="origin-bonbon" cx="0.36" cy="0.32" r="0.8">
+          <stop offset="0" stopColor="#ffd08a" />
+          <stop offset="0.6" stopColor="#ff9f43" />
+          <stop offset="1" stopColor="#e57a1f" />
+        </radialGradient>
+      </defs>
+      <path d="M-19 -5 Q-30 -18 -40 -15 Q-34 0 -40 15 Q-30 18 -19 5 Z M19 -5 Q30 -18 40 -15 Q34 0 40 15 Q30 18 19 5 Z" fill="#ffd23f" />
+      <path d="M-24 -6 L-35 -10 M-24 6 L-35 10 M24 -6 L35 -10 M24 6 L35 10" stroke="#e0a800" strokeWidth={2} />
+      <ellipse rx={23} ry={17} fill="url(#origin-bonbon)" />
+      <path d="M-8 -17 Q-2 0 -8 17 M8 -17 Q14 0 8 17" fill="none" stroke="#fff" strokeWidth={2.5} opacity={0.45} />
+      <path d="M-13 -8 Q-4 -13 6 -10" fill="none" stroke="#fff" strokeWidth={3.5} opacity={0.85} />
     </g>
   );
 }
 
-/** A cupcake with purple icing, sprinkles and a cherry. */
+/** A cupcake: a ridged paper case, a swirl of lilac cream with sprinkles, and a shiny cherry on top. */
 function Cupcake() {
   return (
-    <g stroke={INK} strokeWidth={3} strokeLinejoin="round">
-      <path d="M-22 2 L22 2 L16 32 L-16 32 Z" fill="#4cc9f0" />
-      <path d="M-8 4 L-6 30 M8 4 L6 30" fill="none" strokeWidth={2} />
-      <path d="M-26 4 C-30 -10 -18 -18 -10 -14 C-6 -26 6 -26 10 -14 C18 -18 30 -10 26 4 Z" fill="#b388ff" />
-      <path d="M-14 -6 l4 -2 M0 -12 l3 3 M12 -4 l-3 -3" stroke="#8bd346" strokeWidth={3} strokeLinecap="round" />
-      <circle cx={2} cy={-26} r={6} fill="#ff4d6d" />
+    <g stroke={INK} strokeWidth={3} strokeLinejoin="round" strokeLinecap="round">
+      <defs>
+        <linearGradient id="origin-case" x1="0" y1="0" x2="1" y2="0">
+          <stop offset="0" stopColor="#7bd8f5" />
+          <stop offset="1" stopColor="#3bb3dd" />
+        </linearGradient>
+        <radialGradient id="origin-cream" cx="0.4" cy="0.3" r="0.8">
+          <stop offset="0" stopColor="#e3d2ff" />
+          <stop offset="1" stopColor="#a578f5" />
+        </radialGradient>
+      </defs>
+      <path d="M-23 2 L23 2 L17 33 L-17 33 Z" fill="url(#origin-case)" />
+      <path d="M-13 4 L-10 31 M0 4 V31 M13 4 L10 31" fill="none" strokeWidth={2} opacity={0.6} />
+      <path d="M-27 4 C-32 -8 -22 -16 -14 -12 C-14 -24 0 -28 4 -18 C10 -26 24 -20 20 -10 C30 -10 32 0 27 4 Z" fill="url(#origin-cream)" />
+      <path d="M-16 -4 Q-4 -10 10 -4" fill="none" stroke="#fff" strokeWidth={2.5} opacity={0.6} />
+      <path d="M-15 -8 l4 -2 M-2 -14 l3 3 M12 -3 l-3 -3 M-20 0 l2 3" stroke="#8bd346" strokeWidth={3} />
+      <path d="M2 -16 Q6 -30 12 -32" fill="none" strokeWidth={2.5} />
+      <circle cx={2} cy={-22} r={6.5} fill="#ff4d6d" />
+      <circle cx={0} cy={-24} r={1.8} fill="#fff" stroke="none" />
     </g>
   );
 }
@@ -307,15 +343,39 @@ const LOOK = perSweet(
   APPEAR_MS,
 );
 
-/** Two hearts rise beside the head when a sweet appears, on its side. */
-const HEARTS = SWEET_FROM.flatMap((from, i) => {
-  const side = from.x > W / 2 ? 1 : -1;
-  return [
-    { x: W / 2 + side * 112, y: 70, at: APPEAR_MS[i] + 500 },
-    { x: W / 2 + side * 168, y: 128, at: APPEAR_MS[i] + 770 },
-  ];
-});
-const HEART_PATH = "M0 10 C-22 -6 -16 -26 0 -14 C16 -26 22 -6 0 10 Z";
+/** Where a sweet ends its flight, in the middle of the open mouth, and is bitten. */
+const BITE = { x: MID, y: 284 };
+/** When the bits fly, after the sweet's arrival: as the teeth close on it. */
+const BITE_MS = 90;
+
+/** The colours a sweet crumbles into, and whether its bits are shards of candy or soft crumbs of cake. */
+const CRUMBLE = [
+  { colors: ["#ff7bd0", "#fff", "#ff7bd0"], shards: true },
+  { colors: ["#ff9f43", "#ffd23f", "#ff9f43"], shards: true },
+  { colors: ["#b388ff", "#e8b878", "#4cc9f0"], shards: false },
+];
+
+/**
+ * The bits that break off a sweet as it is bitten: a few, flung out from the bite and falling past the chin, turning
+ * and fading – calm, no burst of stars (`teeth-origin-bit`). Spread evenly to both sides, each a little different.
+ */
+const BITS = CRUMBLE.flatMap(({ colors, shards }, sweet) =>
+  [0, 1, 2, 3, 4, 5].map((k) => {
+    const side = k % 2 ? 1 : -1;
+    const out = 1 + Math.floor(k / 2);
+    return {
+      sweet,
+      color: colors[k % colors.length],
+      shards,
+      size: 4 + ((k * 7 + sweet * 3) % 4),
+      dx: side * (14 + out * 16 + sweet * 3),
+      up: 26 + ((k * 13 + sweet * 5) % 24),
+      fall: 150 + out * 12,
+      spin: side * (120 + out * 60),
+      at: ARRIVE_MS[sweet] + BITE_MS + (k % 3) * 40,
+    };
+  }),
+);
 
 /** What the child hears: a cheer when the sweets come, unwrapping the bonbon, a bite and chewing for each, „Mmmh“ at the end. */
 export const ORIGIN_CUES: Cue[] = [
@@ -402,7 +462,7 @@ const BROWS = [
 ];
 
 /** The mouth with its teeth, the crumbs on them and the monsters growing out of them. */
-const MOUTH_AREA: Box = { x: 86, y: 232, width: 268, height: 140 };
+const MOUTH_AREA: Box = { x: 100, y: 234, width: 240, height: 120 };
 /** Round the picture's corner, where each sweet is drawn before its keyframes move it into place. */
 const SWEET_AREA: Box = { x: -42, y: -36, width: 84, height: 98 };
 
@@ -463,7 +523,7 @@ export function Origin({
         });
   // The picture is still pictures with small moving ones between them, each moving piece an HTML layer of its own
   // (Piece): the sky behind (it changes colour as the day goes by), the sun or the moon crossing it, the child, and on
-  // the child its brows, pupils, cheeks, chewing mouth, hearts and sweets. Something animated inside an svg has the
+  // the child its brows, pupils, cheeks, chewing mouth, the sweets and the bits they crumble into. Something animated inside an svg has the
   // phone paint that svg again in every frame: with all of it in one picture, the story painted more than the budget.
   return (
     <div ref={scene} className={`origin at-${part} ${daytime}`}>
@@ -608,30 +668,30 @@ export function Origin({
                   return (
                     <Piece
                       key={i}
-                      area={{ x: x - 11, y: y - 7, width: 21, height: 18 }}
+                      area={{ x: x - 9, y: y - 6, width: 17, height: 15 }}
                       within={MOUTH_AREA}
                       className="origin-crumb"
                       style={{ "--crumb": `${ARRIVE_MS[c.sweet] + CHEW_MS - 200}ms`, "--grow": `${600 + i * 700}ms` } as CSSProperties}
                     >
-                      <circle cx={x - 6} cy={y + 2} r={4.5} fill={c.color} stroke={INK} strokeWidth={1.5} />
-                      <circle cx={x + 6} cy={y - 3} r={3.5} fill={c.color} stroke={INK} strokeWidth={1.5} />
-                      <circle cx={x + 3} cy={y + 7} r={3} fill="#fff" stroke={INK} strokeWidth={1.5} />
+                      <circle cx={x - 5} cy={y + 2} r={3.8} fill={c.color} stroke={INK} strokeWidth={1.3} />
+                      <circle cx={x + 5} cy={y - 2} r={3} fill={c.color} stroke={INK} strokeWidth={1.3} />
+                      <circle cx={x + 2.5} cy={y + 6} r={2.5} fill="#fff" stroke={INK} strokeWidth={1.3} />
                     </Piece>
                   );
                 })}
                 {part === "grow" &&
                   CRUMBS.map((c, i) => {
                     const { x, y } = crumbAt(c);
-                    // Its foot (12 below its middle at this size) is the bottom middle of its piece, where it grows from.
+                    // Its foot (9.5 below its middle at this size) is the bottom middle of its piece, where it grows from.
                     return (
                       <Piece
                         key={i}
-                        area={{ x: x - 14, y: y - 23, width: 28, height: 35 }}
+                        area={{ x: x - 11, y: y - 18, width: 22, height: 27.5 }}
                         within={MOUTH_AREA}
                         className="origin-monster"
                         style={{ "--grow": `${600 + i * 700}ms` } as CSSProperties}
                       >
-                        <g transform={`translate(${x.toFixed(1)} ${y.toFixed(1)}) scale(0.8)`}>
+                        <g transform={`translate(${x.toFixed(1)} ${y.toFixed(1)}) scale(0.63)`}>
                           <Monster
                             color={c.color}
                             variant={i % 3}
@@ -657,13 +717,14 @@ export function Origin({
             <path d={MOUTH_PATH} fill="#7a1f3d" />
             <g clipPath="url(#origin-mouth)">
               {/* The tongue lies behind the lower teeth. */}
-              <ellipse cx={MID} cy={MOUTH.top + MOUTH.depth - 42} rx={64} ry={22} fill="#ff7088" />
-              <g fill="#fffdf6" stroke={INK} strokeWidth={3}>
+              <ellipse cx={MID} cy={MOUTH.top + MOUTH.depth - 28} rx={52} ry={20} fill="#ff7088" />
+              <path d={`M${MID} ${MOUTH.top + MOUTH.depth - 42} V${MOUTH.top + MOUTH.depth - 24}`} stroke="#e2577c" strokeWidth={3} strokeLinecap="round" />
+              <g fill="#fffdf6" stroke={INK} strokeWidth={2.5}>
                 {[0, 1, 2, 3, 4, 5].map((i) => (
-                  <rect key={`u${i}`} x={upperX(i) - TOOTH_W / 2} y={MOUTH.top - 14} width={TOOTH_W} height={50} rx={9} />
+                  <rect key={`u${i}`} x={upperX(i) - TOOTH_W / 2} y={MOUTH.top - 14} width={TOOTH_W} height={42} rx={8} />
                 ))}
                 {[0, 1, 2, 3].map((i) => (
-                  <rect key={`l${i}`} x={lowerX(i) - TOOTH_W / 2} y={bottomAt(lowerX(i)) - 34} width={TOOTH_W} height={50} rx={9} />
+                  <rect key={`l${i}`} x={lowerX(i) - TOOTH_W / 2} y={bottomAt(lowerX(i)) - 28} width={TOOTH_W} height={42} rx={8} />
                 ))}
               </g>
               {/* The gum over the teeth's roots, with a darker edge where they come out of it. */}
@@ -674,17 +735,18 @@ export function Origin({
                 </g>
               ))}
             </g>
-            {/* Lips round the opening, as the mirror's: a pink band with its outline and a light on the lower lip. */}
-            <path d={MOUTH_PATH} fill="none" stroke={INK} strokeWidth={15} strokeLinejoin="round" />
-            <path d={MOUTH_PATH} fill="none" stroke={LIP} strokeWidth={9} strokeLinejoin="round" />
-            <path d="M178 360 Q220 368 262 360" fill="none" stroke="#fff" strokeWidth={3.5} strokeLinecap="round" opacity={0.55} />
+            {/* Lips round the opening, as the mirror's: a soft pink band with its outline – slim, a small child's lips –
+                and a light on the lower lip. */}
+            <path d={MOUTH_PATH} fill="none" stroke={INK} strokeWidth={11} strokeLinejoin="round" />
+            <path d={MOUTH_PATH} fill="none" stroke={LIP} strokeWidth={6} strokeLinejoin="round" />
+            <path d="M196 340 Q220 345 244 340" fill="none" stroke="#fff" strokeWidth={3} strokeLinecap="round" opacity={0.55} />
             {/* Little creases beside the corners, where the smile pushes the cheeks up. */}
             {MOUTH_CORNERS.map(({ x, y }, i) => {
               const s = i ? 1 : -1;
               return (
                 <path
                   key={s}
-                  d={`M${x + s * 8} ${y - 16} Q${x + s * 15} ${y - 4} ${x + s * 9} ${y + 8}`}
+                  d={`M${x + s * 7} ${y - 14} Q${x + s * 13} ${y - 4} ${x + s * 8} ${y + 6}`}
                   fill="none"
                   stroke={SKIN_SHADE}
                   strokeWidth={4}
@@ -694,25 +756,61 @@ export function Origin({
             })}
           </Piece>
 
-          {/* Hearts for each sweet: the child is delighted. */}
-          {sweets &&
-            HEARTS.map(({ x, y, at }, i) => (
-              <Piece key={i} area={{ x: x - 17, y: y - 22, width: 34, height: 34 }} className="origin-heart" style={{ "--at": `${at}ms` } as CSSProperties}>
-                <path transform={`translate(${x} ${y})`} d={HEART_PATH} fill="#ff6b9a" stroke={INK} strokeWidth={3} />
-              </Piece>
-            ))}
-
-          {/* Each sweet appears big in a top corner, floats a moment, then glides into the mouth. Its piece lies round
-              the picture's corner (0, 0), where the sweet is drawn and from where the keyframes move it. */}
+          {/* Each sweet appears big in a top corner, floats a moment, then flies into the mouth in an arc: it lifts a
+              little and swoops down, turning towards where it goes, and is squeezed as the teeth bite (`teeth-origin-sweet`).
+              Its pieces lie round the picture's corner (0, 0), where the sweet is drawn and from where the keyframes
+              move it: the outer one across (`-x`), the inner one up and down, so the two make the arc. */}
           {sweets &&
             SWEETS.map((Sweet, i) => (
               <Piece
                 key={i}
                 area={SWEET_AREA}
-                className="origin-sweet"
-                style={{ "--arrive": `${ARRIVE_MS[i]}ms`, "--sx": `${SWEET_FROM[i].x}px`, "--sy": `${SWEET_FROM[i].y}px` } as CSSProperties}
+                className="origin-sweet-x"
+                style={
+                  {
+                    "--arrive": `${ARRIVE_MS[i]}ms`,
+                    "--sx": `${SWEET_FROM[i].x}px`,
+                    "--sy": `${SWEET_FROM[i].y}px`,
+                    "--bx": `${BITE.x}px`,
+                    "--by": `${BITE.y}px`,
+                    "--tilt": `${SWEET_FROM[i].x > W / 2 ? -18 : 18}deg`,
+                  } as CSSProperties
+                }
+                over={
+                  <Piece area={SWEET_AREA} within={SWEET_AREA} className="origin-sweet">
+                    <Sweet />
+                  </Piece>
+                }
+              />
+            ))}
+          {/* As the teeth close on a sweet, a few bits break off it and fall past the chin. */}
+          {sweets &&
+            BITS.map((bit, i) => (
+              <Piece
+                key={i}
+                area={{ x: BITE.x - 8, y: BITE.y - 8, width: 16, height: 16 }}
+                className="origin-bit"
+                style={
+                  {
+                    "--at": `${bit.at}ms`,
+                    "--dx": `${bit.dx}px`,
+                    "--up": `${bit.up}px`,
+                    "--fall": `${bit.fall}px`,
+                    "--spin": `${bit.spin}deg`,
+                  } as CSSProperties
+                }
               >
-                <Sweet />
+                {bit.shards ? (
+                  <path
+                    d={`M${BITE.x - bit.size} ${BITE.y + bit.size * 0.4} L${BITE.x - bit.size * 0.2} ${BITE.y - bit.size} L${BITE.x + bit.size} ${BITE.y - bit.size * 0.1} L${BITE.x + bit.size * 0.3} ${BITE.y + bit.size * 0.8} Z`}
+                    fill={bit.color}
+                    stroke={INK}
+                    strokeWidth={1.5}
+                    strokeLinejoin="round"
+                  />
+                ) : (
+                  <circle cx={BITE.x} cy={BITE.y} r={bit.size * 0.8} fill={bit.color} stroke={INK} strokeWidth={1.5} />
+                )}
               </Piece>
             ))}
         </div>

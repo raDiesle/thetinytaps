@@ -27,7 +27,7 @@ test("the progress bar marks eating, getting the brush, brushing and putting the
   expect(play).toContain('<PhaseTile phase="tidy"');
   expect(play).toContain('ending === "rest" ? (');
   // The putting away is a section of the bar too: a tap on it starts the cheer and the tidying.
-  expect(play).toContain("...stepParts.map(([start]) => start), tidyPart[0]]");
+  expect(play).toContain("const segments: [number, number][] = [...tileParts, ...stepParts, tidyPart];");
   expect(play).toContain("introMs + totalMs + ENDING_MS - 1");
   expect(css).toMatch(/\.teeth-brushing \{[^}]*background: #dff3e7;/);
 });
@@ -57,6 +57,13 @@ test("on a wide screen the controls stand at the side, with the bar running from
 });
 
 test("the end's week, trophy and „Menü“ lie on a sheet sized by its own width, beside the head on a wide screen", () => {
-  expect(css).toMatch(/\.teeth-end,\s*\.teeth-week-before \{\s*container-type: inline-size;/);
-  expect(css).toMatch(/@media \(orientation: landscape\) \{\s*\.teeth-end,\s*\.teeth-week-before \{\s*width: min\(50%/);
+  expect(css).toMatch(/\.teeth-end \{\s*container-type: inline-size;/);
+  expect(css).toMatch(/@media \(orientation: landscape\) \{\s*\.teeth-end \{\s*width: min\(50%/);
+});
+
+// Beside the sink the week took the picture's room, and beside the first look in the mirror it pushed the face aside,
+// which then jumped to the middle as the brushing began (user feedback, November 2026): the week waits for the end.
+test("the week chart shows only at the end, never before the brushing", () => {
+  expect(play.match(/<Week\b/g)?.length).toBe(1);
+  expect(play).toMatch(/<div className="teeth-end">\s*\{settings\.week && <Week/);
 });

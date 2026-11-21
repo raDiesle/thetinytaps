@@ -18,3 +18,10 @@ test("the progress bar seeks only to a section's start", async () => {
   expect(body).toContain("sectionStart(");
   expect(body).not.toMatch(/seek\(Math\.min\(start \+ k \* length/);
 });
+
+// A tap low on the sweets' groove once started only the monsters growing, the second part hidden in it: a tap plays the
+// groove as it is seen from its start (user feedback, November 2026).
+test("the sections are the bar's grooves as they are seen, not the parts inside them", async () => {
+  const play = await Bun.file("src/games/teeth/TeethPlay.tsx").text();
+  expect(play).toContain("const sectionStarts = segments.map(([start]) => start);");
+});
