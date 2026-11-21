@@ -7,7 +7,8 @@ import type { Cue } from "./cues";
 import type { Daytime } from "@/lib/days";
 import { clothesOf, PyjamaPattern, topFill } from "./clothes";
 import { PICTURE } from "./jaw";
-import { fitBox, FrameStroke, INK, Monster, screenFrame, SKIN, useRoom, type Box } from "./mouth";
+import { BROW, Ear, EyeBall, FACE, HAIR, Hair, type HeadMap, INK, Iris, LASHES, LIP, Nose, SKIN_SHADE, SkinGradient } from "./face";
+import { fitBox, FrameStroke, Monster, screenFrame, useRoom, type Box } from "./mouth";
 import { Piece, pictureSpace } from "./piece";
 
 // Before anything else, a short story of where the sugar monsters come from:
@@ -33,22 +34,92 @@ const FOCUS: Box = { x: 40, y: 34, width: 360, height: 340 };
 /** Where the camera ends up while the monsters grow: the mouth with them, as big as the free room allows. */
 const MOUTH_FOCUS: Box = { x: 95, y: 222, width: 250, height: 150 };
 const HEAD = { x: W / 2, y: 215, r: 165 };
-/** The open smile: a nearly straight top edge and a round bottom. */
-/** The mouth's corners, top and depth. */
+/** Where the teeth stand in the mouth: from left to right, and from the top edge down to the bottom's lowest point. */
 export const MOUTH = { left: 110, right: 330, top: 262, depth: 95 };
 const MID = (MOUTH.left + MOUTH.right) / 2;
-/** The cheeks: their middles across, and where and how big they are; kept clear of the mouth's corners (`layers.test.ts`). */
+/** The cheeks: their middles across, and where and how big they are; kept clear of the mouth's corners (`cheeks.test.ts`). */
 export const CHEEKS = [98, 342];
 export const CHEEK = { y: 222, rx: 28, ry: 17 };
-const HALF = (MOUTH.right - MOUTH.left) / 2;
-const MOUTH_PATH = `M${MOUTH.left} ${MOUTH.top} Q${MID} ${MOUTH.top + 12} ${MOUTH.right} ${MOUTH.top} A${HALF} ${MOUTH.depth} 0 0 1 ${MOUTH.left} ${MOUTH.top} Z`;
-/** The bottom edge of the mouth below x. */
-const bottomAt = (x: number) => MOUTH.top + MOUTH.depth * Math.sqrt(Math.max(0, 1 - ((x - MID) / HALF) ** 2));
-/** The top edge of the mouth above x (it dips a little in the middle). */
-const topAt = (x: number) => {
-  const s = (x - MOUTH.left) / (MOUTH.right - MOUTH.left);
-  return MOUTH.top + 24 * s * (1 - s);
-};
+
+type XY = [number, number];
+/** A cubic curve from its start through two handles to its end. */
+type Curve = [XY, XY, XY, XY];
+/**
+ * The open smile as a child's mouth, not a geometric half ellipse (user feedback, November 2026: its pointed corners,
+ * where a straight top met a round bottom, looked like a shape from maths): the top edge sags softly towards the middle,
+ * the corners are tucked round, and the bottom is a full round curve, every curve running smoothly into the next.
+ */
+const TOP_CURVES: Curve[] = [
+  [
+    [114, 256],
+    [150, 252],
+    [185, 266],
+    [220, 266],
+  ],
+  [
+    [220, 266],
+    [255, 266],
+    [290, 252],
+    [326, 256],
+  ],
+];
+const BOTTOM_CURVES: Curve[] = [
+  [
+    [326, 256],
+    [334, 257],
+    [338, 264],
+    [334, 274],
+  ],
+  [
+    [334, 274],
+    [320, 326],
+    [275, 357],
+    [220, 357],
+  ],
+  [
+    [220, 357],
+    [165, 357],
+    [120, 326],
+    [106, 274],
+  ],
+  [
+    [106, 274],
+    [102, 264],
+    [106, 257],
+    [114, 256],
+  ],
+];
+const curvePath = (curves: Curve[]) => curves.map(([, a, b, c]) => `C${a.join(" ")} ${b.join(" ")} ${c.join(" ")}`).join(" ");
+const MOUTH_PATH = `M${TOP_CURVES[0][0].join(" ")} ${curvePath(TOP_CURVES)} ${curvePath(BOTTOM_CURVES)} Z`;
+/** Points along curves, from their start to their end. */
+const pointsOf = (curves: Curve[]) =>
+  curves.flatMap(([p0, p1, p2, p3]) =>
+    Array.from({ length: 24 }, (_, i) => {
+      const t = i / 23;
+      const u = 1 - t;
+      const at = (k: 0 | 1) => u ** 3 * p0[k] + 3 * u * u * t * p1[k] + 3 * u * t * t * p2[k] + t ** 3 * p3[k];
+      return { x: at(0), y: at(1) };
+    }),
+  );
+const TOP_EDGE = pointsOf(TOP_CURVES);
+const BOTTOM_EDGE = pointsOf(BOTTOM_CURVES);
+/** The mouth's two corners, furthest out left and right: the cheeks keep clear of them. */
+export const MOUTH_CORNERS = [BOTTOM_EDGE.reduce((a, b) => (b.x < a.x ? b : a)), BOTTOM_EDGE.reduce((a, b) => (b.x > a.x ? b : a))];
+/** Where an edge (left to right or right to left) is at x, between its two points round it. */
+function edgeAt(edge: { x: number; y: number }[], x: number) {
+  const points = edge[0].x < edge[edge.length - 1].x ? edge : [...edge].reverse();
+  const last = points[points.length - 1];
+  if (x <= points[0].x) return points[0].y;
+  if (x >= last.x) return last.y;
+  const i = points.findIndex((p) => p.x >= x);
+  const [a, b] = [points[i - 1], points[i]];
+  return b.x === a.x ? a.y : a.y + ((b.y - a.y) * (x - a.x)) / (b.x - a.x);
+}
+/** The bottom edge of the mouth below x: the round part of the bottom, between the corners. */
+const BOTTOM_ROUND = BOTTOM_EDGE.slice(24, 72);
+const bottomAt = (x: number) => edgeAt(BOTTOM_ROUND, x);
+/** The top edge of the mouth above x (it sags a little in the middle). */
+const topAt = (x: number) => edgeAt(TOP_EDGE, x);
 /** Wide enough that neighbouring teeth nearly touch: with gaps between them the story's child looked to have lost teeth. */
 const TOOTH_W = 33;
 /** Six teeth along the top, four along the round bottom. */
@@ -235,7 +306,12 @@ function SkyBody({ daytime }: { daytime: Daytime }) {
   );
 }
 
-/** A big round eye's white (and the girl's lashes); its pupil is a layer of its own over it (Pupil). */
+/** A point of the head (head units round its middle, `face.tsx`) in the story's picture: the head stands straight here. */
+const onStoryHead: HeadMap = (x, y) => ({ x: HEAD.x + x, y: HEAD.y + y });
+/** The eyes' middles. */
+const EYES = [-1, 1].map((s) => ({ s: s as -1 | 1, x: HEAD.x + s * FACE.eyes.x, y: HEAD.y + FACE.eyes.y }));
+
+/** An eye's white with its lid (and the girl's lashes); its iris is a layer of its own over it (Pupil). */
 function EyeWhite({ x, y, side }: { x: number; y: number; side: -1 | 1 }) {
   // The girl (👧 on the home page) has three lashes at the outer top.
   const girl = useFigure() === "girl";
@@ -243,42 +319,34 @@ function EyeWhite({ x, y, side }: { x: number; y: number; side: -1 | 1 }) {
     <g>
       {girl && (
         <path
-          d={[
-            [12, -22, 18, -34],
-            [19, -14, 30, -22],
-            [22, -4, 34, -8],
-          ]
-            .map(([x1, y1, x2, y2]) => `M${x + side * x1} ${y + y1} L${x + side * x2} ${y + y2}`)
-            .join(" ")}
+          d={LASHES.map(([x1, y1, x2, y2]) => `M${x + side * x1} ${y + y1} L${x + side * x2} ${y + y2}`).join(" ")}
           stroke={INK}
-          strokeWidth={5}
+          strokeWidth={4}
           strokeLinecap="round"
         />
       )}
-      <ellipse cx={x} cy={y} rx={22} ry={26} fill="#fff" stroke={INK} strokeWidth={4} />
+      <EyeBall x={x} y={y} rx={FACE.eyes.rx} ry={FACE.eyes.ry} />
     </g>
   );
 }
 
-/** An eye's pupil with two shines: it follows the sweets, and looks down at the teeth while the monsters grow. */
+/** An eye's iris with its pupil and lights: it follows the sweets, and looks down at the teeth while the monsters grow. */
 function Pupil({ x, y, look }: { x: number; y: number; look?: CSSProperties }) {
   return (
     <Piece area={{ x: x - 16, y: y - 14, width: 36, height: 36 }} className="origin-pupil" style={look}>
-      <circle cx={x + 2} cy={y + 4} r={15} fill={INK} />
-      <circle cx={x + 7} cy={y - 3} r={6} fill="#fff" />
-      <circle cx={x - 3} cy={y + 11} r={3} fill="#fff" />
+      <Iris x={x + 2} y={y + 4} r={FACE.eyes.iris} />
     </Piece>
   );
 }
 
 /** The brows, each turning round its middle (the middle of its piece) as it goes up in delight or worry. */
 const BROWS = [
-  { side: "left", d: "M140 150 Q160 140 180 148", area: { x: 136, y: 139, width: 48, height: 16 } },
-  { side: "right", d: "M260 148 Q280 140 300 150", area: { x: 256, y: 139, width: 48, height: 16 } },
+  { side: "left", d: "M140 150 Q160 140 180 148", area: { x: 134, y: 136, width: 52, height: 20 } },
+  { side: "right", d: "M260 148 Q280 140 300 150", area: { x: 254, y: 136, width: 52, height: 20 } },
 ];
 
 /** The mouth with its teeth, the crumbs on them and the monsters growing out of them. */
-const MOUTH_AREA: Box = { x: 100, y: 232, width: 240, height: 140 };
+const MOUTH_AREA: Box = { x: 86, y: 232, width: 268, height: 140 };
 /** Round the picture's corner, where each sweet is drawn before its keyframes move it into place. */
 const SWEET_AREA: Box = { x: -42, y: -36, width: 84, height: 98 };
 
@@ -368,6 +436,7 @@ export function Origin({
               <rect {...frame} />
             </clipPath>
             <PyjamaPattern id="origin-pyjama" figure={figure} />
+            <SkinGradient id="origin-skin" head={HEAD} />
           </defs>
 
           <g clipPath="url(#origin-frame)">
@@ -380,58 +449,62 @@ export function Origin({
             />
 
             {/* The girl (👧 on the home page): two pigtails behind the head; their bands come over the hair below. */}
+            {/* The child's head with the parts the mirror's face is drawn with too (`face.tsx`): the same child. */}
             {girl &&
-              [-1, 1].map((s) => (
-                <ellipse
-                  key={s}
-                  cx={HEAD.x + s * (HEAD.r + 22)}
-                  cy={140}
-                  rx={44}
-                  ry={72}
-                  transform={`rotate(${s * -35} ${HEAD.x + s * (HEAD.r + 22)} 140)`}
-                  fill="#8a5a3b"
-                  stroke={INK}
-                  strokeWidth={5}
-                />
-              ))}
-            <g stroke={INK} strokeWidth={5}>
-              <circle cx={HEAD.x - HEAD.r} cy={228} r={26} fill={SKIN} />
-              <circle cx={HEAD.x + HEAD.r} cy={228} r={26} fill={SKIN} />
-              <circle cx={HEAD.x} cy={HEAD.y} r={HEAD.r} fill={SKIN} />
-            </g>
-            {/* Hair with a fringe and a little curl on top. */}
-            <path
-              d="M58 200 C48 92 140 42 220 42 C300 42 392 92 382 200 C372 150 342 118 302 124 Q280 98 250 118 Q222 92 192 118 Q162 96 138 124 C98 118 68 150 58 200 Z"
-              fill="#8a5a3b"
-              stroke={INK}
-              strokeWidth={5}
-              strokeLinejoin="round"
-            />
-            <path d="M222 44 C206 18 238 4 244 24 C248 38 230 42 228 32" fill="none" stroke={INK} strokeWidth={5} strokeLinecap="round" />
+              [-1, 1].map((s) => {
+                const tail = onStoryHead(s * FACE.pigtails.x, FACE.pigtails.y);
+                return (
+                  <ellipse
+                    key={s}
+                    cx={tail.x}
+                    cy={tail.y}
+                    rx={FACE.pigtails.rx}
+                    ry={FACE.pigtails.ry}
+                    transform={`rotate(${s * -35} ${tail.x} ${tail.y})`}
+                    fill={HAIR}
+                    stroke={INK}
+                    strokeWidth={5}
+                  />
+                );
+              })}
+            {([-1, 1] as const).map((s) => {
+              const ear = onStoryHead(s * FACE.ears.x, FACE.ears.y);
+              return <Ear key={s} x={ear.x} y={ear.y} r={FACE.ears.r} side={s} />;
+            })}
+            <circle cx={HEAD.x} cy={HEAD.y} r={HEAD.r} fill="url(#origin-skin)" stroke={INK} strokeWidth={5} />
+            <Hair at={onStoryHead} />
             {girl &&
-              [-1, 1].map((s) => <circle key={s} cx={HEAD.x + s * (HEAD.r - 12)} cy={118} r={17} fill={clothesOf(figure).band} stroke={INK} strokeWidth={4} />)}
+              [-1, 1].map((s) => {
+                const band = onStoryHead(s * FACE.bands.x, FACE.bands.y);
+                return <circle key={s} cx={band.x} cy={band.y} r={FACE.bands.r} fill={clothesOf(figure).band} stroke={INK} strokeWidth={4} />;
+              })}
 
-            <EyeWhite x={160} y={186} side={-1} />
-            <EyeWhite x={280} y={186} side={1} />
-            <path d="M212 226 Q220 234 228 226" fill="none" stroke={INK} strokeWidth={4} strokeLinecap="round" />
+            {EYES.map((eye) => (
+              <EyeWhite key={eye.s} x={eye.x} y={eye.y} side={eye.s} />
+            ))}
+            <Nose x={HEAD.x} y={HEAD.y + FACE.nose.y} r={FACE.nose.r} />
           </g>
         </svg>
 
         <div className="teeth-space" style={space}>
           {BROWS.map((brow) => (
             <Piece key={brow.side} area={brow.area} className={`origin-brow ${brow.side}`} style={sweets ? DELIGHT : undefined}>
-              <path d={brow.d} fill="none" stroke={INK} strokeWidth={5} strokeLinecap="round" />
+              <path d={brow.d} fill="none" stroke={BROW} strokeWidth={6} strokeLinecap="round" />
             </Piece>
           ))}
-          <Pupil x={160} y={186} look={sweets ? LOOK : undefined} />
-          <Pupil x={280} y={186} look={sweets ? LOOK : undefined} />
-          {/* Happy closed eyes while chewing: skin over the eye and a smiling arc. */}
+          {EYES.map((eye) => (
+            <Pupil key={eye.s} x={eye.x} y={eye.y} look={sweets ? LOOK : undefined} />
+          ))}
+          {/* Happy closed eyes while chewing: skin over the eye (in the head's own light) and a smiling arc. */}
           {sweets && (
-            <Piece area={{ x: 130, y: 155, width: 180, height: 66 }} className="origin-happy-eyes" style={HAPPY_EYES}>
-              {[160, 280].map((x) => (
-                <g key={x}>
-                  <ellipse cx={x} cy={188} rx={27} ry={31} fill={SKIN} />
-                  <path d={`M${x - 18} 194 Q${x} 172 ${x + 18} 194`} fill="none" stroke={INK} strokeWidth={5} strokeLinecap="round" />
+            <Piece area={{ x: 126, y: 150, width: 188, height: 72 }} className="origin-happy-eyes" style={HAPPY_EYES}>
+              <defs>
+                <SkinGradient id="origin-happy-skin" head={HEAD} />
+              </defs>
+              {EYES.map(({ s, x, y }) => (
+                <g key={s}>
+                  <ellipse cx={x} cy={y + 2} rx={30} ry={34} fill="url(#origin-happy-skin)" />
+                  <path d={`M${x - 20} ${y + 8} Q${x} ${y - 16} ${x + 20} ${y + 8}`} fill="none" stroke={INK} strokeWidth={6} strokeLinecap="round" />
                 </g>
               ))}
             </Piece>
@@ -534,7 +607,24 @@ export function Origin({
                 </g>
               ))}
             </g>
-            <path d={MOUTH_PATH} fill="none" stroke={INK} strokeWidth={6} strokeLinejoin="round" />
+            {/* Lips round the opening, as the mirror's: a pink band with its outline and a light on the lower lip. */}
+            <path d={MOUTH_PATH} fill="none" stroke={INK} strokeWidth={15} strokeLinejoin="round" />
+            <path d={MOUTH_PATH} fill="none" stroke={LIP} strokeWidth={9} strokeLinejoin="round" />
+            <path d="M178 360 Q220 368 262 360" fill="none" stroke="#fff" strokeWidth={3.5} strokeLinecap="round" opacity={0.55} />
+            {/* Little creases beside the corners, where the smile pushes the cheeks up. */}
+            {MOUTH_CORNERS.map(({ x, y }, i) => {
+              const s = i ? 1 : -1;
+              return (
+                <path
+                  key={s}
+                  d={`M${x + s * 8} ${y - 16} Q${x + s * 15} ${y - 4} ${x + s * 9} ${y + 8}`}
+                  fill="none"
+                  stroke={SKIN_SHADE}
+                  strokeWidth={4}
+                  strokeLinecap="round"
+                />
+              );
+            })}
           </Piece>
 
           {/* Hearts for each sweet: the child is delighted. */}
