@@ -11,7 +11,13 @@ import { LetterCard, NumberCard } from "./Cards";
 import { lettersVoice, useLettersSay } from "./voice";
 import type { LettersSettings } from "./settings";
 import { useSoftTap } from "./softTap";
+import { SurpriseLayer, useSurprises } from "./Surprises";
 import "./letters.css";
+
+/** A surprise's size: this share of the play area's shorter side, within these limits in px. */
+const SURPRISE_SHARE = 0.42;
+const SURPRISE_MIN = 120;
+const SURPRISE_MAX = 360;
 
 /**
  * Presses closer together than this only make ripples, so mashing doesn't strobe nor chop line after line. The same key
@@ -156,6 +162,47 @@ export function LettersPlay({ pack, settings, numbersOnly = false }: { pack: Lan
   );
 
   const softTap = useSoftTap(ripple);
+
+  const root = useRef<HTMLDivElement>(null);
+  const stageBox = useRef<HTMLDivElement>(null);
+  const { surprises, spawn } = useSurprises();
+
+  /**
+   * Frei tippen: a surprise where the finger landed (`at`, client px) or, for a key, somewhere on the stage beside the
+   * card. Too soon after the last one (or too many on screen) it only ripples.
+   */
+  const surprise = useCallback(
+    (at?: { x: number; y: number }) => {
+      const area = root.current?.getBoundingClientRect();
+      const stage = stageBox.current?.getBoundingClientRect();
+      if (!area || !stage) return softTap(at?.x, at?.y);
+      const size = Math.max(SURPRISE_MIN, Math.min(SURPRISE_MAX, Math.min(area.width, area.height) * SURPRISE_SHARE));
+      const clamp = (v: number, min: number, max: number) => Math.max(min, Math.min(Math.max(min, max), v));
+      let x: number;
+      let y: number;
+      if (at) {
+        x = at.x;
+        y = at.y;
+      } else {
+        // A free place on the stage, kept clear of the card where it can be.
+        const card = cardBox.current?.firstElementChild?.getBoundingClientRect();
+        const random = () => ({
+          x: stage.left + size * 0.5 + Math.random() * (stage.width - size),
+          y: stage.top + size * 0.6 + Math.random() * (stage.height - size * 1.1),
+        });
+        const overCard = (p: { x: number; y: number }) =>
+          card !== undefined && p.x > card.left - size * 0.4 && p.x < card.right + size * 0.4 && p.y > card.top - size * 0.4 && p.y < card.bottom + size * 0.4;
+        let spot = random();
+        for (let tries = 0; tries < 12 && overCard(spot); tries++) spot = random();
+        x = spot.x;
+        y = spot.y;
+      }
+      x = clamp(x - area.left, size * 0.45, area.width - size * 0.45);
+      y = clamp(y - area.top, size * 0.5, stage.bottom - area.top - size * 0.4);
+      if (!spawn(x, y, size)) softTap(at?.x, at?.y);
+    },
+    [spawn, softTap],
+  );
 
   /** The word the letter comes with next time: its words take turns, so repeated presses stay interesting. */
   const nextWordOf = useCallback(
@@ -424,7 +471,9 @@ export function LettersPlay({ pack, settings, numbersOnly = false }: { pack: Lan
         return;
       }
       if (!target && specialKey(key)) return;
-      if (!target && numbersOnly) target = randomNumber(shown);
+      // Frei tippen: any other key that is no letter or number opens a surprise; Zählen brings a number by chance.
+      if (!target && !numbersOnly) return surprise();
+      if (!target) target = randomNumber(shown);
       const now = performance.now();
       const counting = settings.finishCounting && now < countingUntil.current;
       if (!target || counting || now - lastChange.current < MIN_CHANGE_MS) {
@@ -438,7 +487,23 @@ export function LettersPlay({ pack, settings, numbersOnly = false }: { pack: Lan
       lastChange.current = now;
       show(target);
     },
-    [pack, numbersOnly, holdDigit, shown, stage, show, announce, tryAdvance, softTap, byTap, specialKey, stepByStep, settings.finishCounting, repeats],
+    [
+      pack,
+      numbersOnly,
+      holdDigit,
+      shown,
+      stage,
+      show,
+      announce,
+      tryAdvance,
+      softTap,
+      byTap,
+      specialKey,
+      stepByStep,
+      settings.finishCounting,
+      repeats,
+      surprise,
+    ],
   );
 
   useEffect(() => {
@@ -461,12 +526,16 @@ export function LettersPlay({ pack, settings, numbersOnly = false }: { pack: Lan
   }, []);
 
   // Step-by-step: any click reveals the next part. Otherwise tapping the card
-  // repeats what it says, and tapping elsewhere makes ripples. Counting by
+  // repeats what it says, and tapping elsewhere opens a surprise there (Frei tippen) or ripples (Zählen). Counting by
   // tapping: only the things count; once all are counted, any click brings new ones.
   const onPlayAreaPointer = (e: PointerEvent) => {
-    const waitingForTaps = shown?.kind === "number" && byTap(shown) && stage <= shown.n;
-    if ((stepByStep || byTap(shown)) && shown && !waitingForTaps && tryAdvance()) return;
-    softTap(e.clientX, e.clientY);
+    if ((stepByStep || byTap(shown)) && shown) {
+      const waitingForTaps = shown.kind === "number" && byTap(shown) && stage <= shown.n;
+      if (waitingForTaps || !tryAdvance()) softTap(e.clientX, e.clientY);
+      return;
+    }
+    if (numbersOnly) softTap(e.clientX, e.clientY);
+    else surprise({ x: e.clientX, y: e.clientY });
   };
   const onItemPointer = (index: number, e: PointerEvent) => {
     if (countItem(index)) e.stopPropagation();
@@ -481,8 +550,8 @@ export function LettersPlay({ pack, settings, numbersOnly = false }: { pack: Lan
   const onCardPointer = stepByStep || byTap(shown) ? undefined : repeat;
 
   return (
-    <div className={`letters-play`} style={{ background }} onPointerDown={onPlayAreaPointer}>
-      <div className="stage">
+    <div ref={root} className={`letters-play`} style={{ background }} onPointerDown={onPlayAreaPointer}>
+      <div ref={stageBox} className="stage">
         <div ref={cardBox} className="card-box" style={{ translate: `${push[0]}cqw ${push[1]}cqh` }}>
           {shown === null && (
             <p className="letters-welcome">
@@ -545,6 +614,7 @@ export function LettersPlay({ pack, settings, numbersOnly = false }: { pack: Lan
         </div>
       </div>
       {touchKeys && <TouchKeyboard rows={rows} onKey={pressKey} label={(key) => (settings.letterCase === "lower" ? toLower(key, pack) : key)} />}
+      {!numbersOnly && <SurpriseLayer surprises={surprises} />}
       <FeedbackLayer effects={effects} />
     </div>
   );
