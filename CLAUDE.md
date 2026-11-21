@@ -14,10 +14,11 @@ bun run lint       # Biome alone; bun run typecheck: tsc alone (both are part of
 bun run previews   # the menus' pictures of the games, see „Menus show pictures from the games“
 bun run voice ...  # recordings with ElevenLabs (paid, only when asked), see Rules for every game
 bun run image ...  # picture with Gemini, see /bild-erzeugen
-bun run paid       # every approved paid request at once (voice queue, cheap pictures) – on a computer outside Zscaler, see Working here
+bun run paid       # every approved paid request at once (voice queue, cheap pictures) – in a Claude cloud session, outside Zscaler, see Working here
 bun run song ...   # measure a song from Suno, see /musik-erzeugen
 bun run perf ...   # how smoothly the games run on a ten-year-old Android phone, see Language and style
 bun run video intro # the YouTube videos' intro as an MP4 into video-out/, frame by frame, see src/video/CLAUDE.md
+bun run ship       # in a Claude cloud session after every finished task: merge into main, push, delete the branch, see Working here
 bun run frames     # do the two frames of each moving picture stay the same scene? --scenes: every picture of a story
 ```
 
@@ -63,7 +64,12 @@ In a fresh worktree run `bun install` first.
 
 - Several Claude sessions work in parallel, each in its own worktree. When a task
   is done: `bun run verify`, commit on the branch, merge into **local** `main` without asking,
-  never push (and don't offer to – pushing is the user's move). Other sessions merge into `main` all the time: merge `main` into your branch and verify there first, and when the merge into `main` still conflicts, `git merge --abort` it there at once and resolve on your branch – never resolve conflicts in the main checkout or leave it half-merged. Each session may run a dev server on its own
+  never push (and don't offer to – pushing is the user's move). **A Claude cloud session ships instead** (user request,
+  21 November 2026): after every task it finished well it commits and runs `bun run ship` (`tools/ship.ts`, only where
+  `CLAUDE_CODE_REMOTE` is set), which merges `origin/main` into the branch, verifies, fast-forwards `main`, pushes it
+  and deletes the session's branch on GitHub once `main` holds it – no question asked (where the cloud's git proxy refuses the deletion, HTTP 403, it says so and the user deletes the branch on GitHub). It stops on a dirty tree, a failed
+  verify, a conflict or a refused push and changes nothing then: fix it and run it again, or, where pushing `main` is
+  refused, leave the pushed branch and tell the user to merge it. It never forces or rewrites history (`ship.test.ts`). Other sessions merge into `main` all the time: merge `main` into your branch and verify there first, and when the merge into `main` still conflicts, `git merge --abort` it there at once and resolve on your branch – never resolve conflicts in the main checkout or leave it half-merged. Each session may run a dev server on its own
   port, so when you hand merged work over, name the URL of the one running from the repo root (local `main`) –
   the user once checked another session's server by mistake. Look at that server before naming it: a running dev server
   does not pick up a merge that brings new files, a changed `index.html` (it kept showing the old name after a rename)
@@ -93,16 +99,36 @@ In a fresh worktree run `bun install` first.
   requests at once, the default 4 stopped a run); check a key's account first
   (`bun run voice credits`: Creator is the first, Starter the second). The clone sounds close, not the same: use it for
   whole parts or languages or whole rounds (a pair, a scene: what is heard together comes from one voice), never a few lines among the original's, and say so in `languageStatus.ts`. It speaks Chinese, Hindi, Spanish and Arabic well though made from English takes (checked with `whisper-cli`, which writes Hindi in Urdu letters).
+- **Only what ElevenLabs licenses for commercial use is made with it** (user decision, 21 November 2026): every
+  recording, sound or song from ElevenLabs must be allowed in our YouTube videos (monetized too), so it comes from a
+  paid account (the free plan has no commercial license) and from a model or service that plan's commercial license
+  covers – never a Beta Service, which ElevenLabs leaves out of it, and music only under terms that name YouTube or
+  social media. The voice script records only with a model on its `LICENSED_MODELS` and refuses a free account before
+  the first paid request (`requireLicense` in `scripts/elevenlabs-voice.mjs`, `src/elevenLabsLicense.test.ts`); a new
+  model joins that list, and a new kind of ElevenLabs output (sound effects, music) gets the same check, only after
+  ElevenLabs' own pages show it is no Beta Service and its terms allow publishing („Can I publish the content I
+  generate on the platform?“ in the help center, the service-specific terms) – read there, never assumed.
 - **This Mac reaches neither ElevenLabs nor Gemini** (user decision, 21 November 2026): the company's Zscaler answers
   every request to api.elevenlabs.io and generativelanguage.googleapis.com with „Website blocked“, for good. So never
   start a paid run here (`bun run voice make`, `try`, `clone`, `credits`, `bun run image` with a prompt, `queue --make`)
   and never look for a way round the filter. What the user approves goes into a queue instead, in the same commit as
   the work that needs it: recordings as a job in `src/content/voiceQueue.ts` (parts, languages, the account and clone
   its voice lives in – `voiceQueue.test.ts` checks them), pictures into `src/content/pictureQueue.ts` as always. Then
-  merge into local main and tell the user to run `bun run paid` on the other computer (pull, `bun install`, the keys in
-  its shell, `bun run paid --dry` first; `scripts/paid-queue.mjs` refuses to start where the filter answers). The free
-  parts still run here (`bun run voice make --dry`, `bun run image queue`, `bun run paid --dry`). Both queues are on
-  `/management/`. A job or picture leaves its queue in the commit that brings its files.
+  merge into local main (pushing stays the user’s move). **Handing Gemini and ElevenLabs to a Claude cloud session is
+  the recommended default way past Zscaler** (claude.ai/code, user decision, 21 November 2026, first run that day) –
+  not a workaround on the Mac, not a VPN or proxy, not another computer unless no cloud session is at hand: its container is outside Zscaler and its environment holds
+  `ELEVENLABS_API_KEY`, `ELEVENLABS_API_KEY_2` and `GEMINI_API_KEY` as secrets, so once main is pushed the user starts a
+  cloud session on the repo and says `/paid-queue` (`.claude/skills/paid-queue/`: `bun run paid --dry`, `bun run paid`,
+  look at every picture made, take the made jobs and pictures out of their queues in the commit that brings their files,
+  `bun run verify`, `bun run ship`). It should happen by itself (user request, 21 November 2026): a scheduled
+  task starting a fresh cloud session each evening with „Run /paid-queue“ – scheduled tasks are off for the organization
+  so far (an admin turns them on under Organization settings → Capabilities); create it once they are on. Whether
+  anything is open for Claude Cloud is the first thing on `/management/` (`CloudQueueStatus`, right under the title,
+  `CloudQueueStatus.test.ts`), with the queues' details further down. Another computer outside the filter works
+  the same way (pull, `bun install`, the keys in its shell). `scripts/paid-queue.mjs` refuses to start where the filter
+  answers. A cloud session asked to work on the queue may start the paid run there – the rule against paid runs is
+  for this Mac. The free parts still run here (`bun run voice make --dry`, `bun run image queue`, `bun run paid --dry`).
+  Both queues are on `/management/`. A job or picture leaves its queue in the commit that brings its files.
 - **Every game with many scenes or rounds names the one on screen in the dev server** (user request, November 2026): a
   `<DevTag code id />` (`src/components/DevTag.tsx`) in the bottom right corner, visible only when `DEV`, with a short
   code (topic letter + number, „C07“) and the full id, so feedback can say exactly which scene is meant. A new game of
@@ -351,6 +377,14 @@ In a fresh worktree run `bun install` first.
   hand often lands twice) changes nothing on the screen the first one just brought – every tap or key that turns to the
   next picture, page or choice asks `screenTap()` of `src/lib/tapGuard.ts`, and a screen that changes by itself calls
   `screenChanged()` (user feedback, November 2026; Gefühle, Abstillen, Aufs Töpfchen; `tapGuard.test.ts`). Captions of a picture always stand under it, never on it, in every phase – small, since only grown-ups read them, at the one size of every caption (`--caption-size` in `base.css`), and the picture takes all the room they leave. A story's sentence a grown-up reads aloud under its picture is set alike in every story and game (user feedback from Abstillen, November 2026, and from Was gehört zusammen?'s round captions): the book's serif with its first letter big and red, as Gefühle's day pages and scenes, Abstillen and Was gehört zusammen? do – never a face, weight or size of its own.
+- **Players never see a picture that isn't made yet** (user request, November 2026): a story, scene, page, pair or round
+  whose painted pictures are still waiting (in the queue, not generated) is left out of the built site – the rest of the
+  game plays without it, a chapter or pass left empty goes too – while the dev server shows it with its placeholder, so
+  it can be looked at (`PROD` from `src/lib/buildInfo.ts`; `ChapterBook`'s `withPictures`, Was ist passiert?'s
+  `PLAYED_PASSES`, Gefühle's stories and day scenes, Was gehört zusammen?'s `fromPainted`; `missingPictures.test.ts`).
+  A new game or part showing painted pictures does the same, never an empty frame, a „Bild folgt“ or a gap for players;
+  a whole game whose pictures are all still waiting is `unfinished` (see below). A small symbol that has a drawn or
+  emoji stand-in (Aufs Töpfchen's strip, the Belohnungstafel) may keep it.
 - One tap or key = one immediate, visible and audible reaction. Every key does something.
   The feedback fits what the tap did (`useTapFeedback`, `src/components/TapFeedback.tsx`; user feedback, November 2026):
   a tap or key that sets nothing off gets soft rings as on water (`ripple`), or better something of the game's own world

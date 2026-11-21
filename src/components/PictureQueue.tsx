@@ -45,8 +45,8 @@ export function PictureQueue() {
         das Bild), große auf 2K-Bögen von Nano Banana 2.1 (≈ 0,007 $ statt 0,017 $ allein). Darum warten Bilder derselben Art, bis ihr Bogen voll ist; was schon
         so günstig geht wie möglich (ein voller Bogen, ein Geschichtenbild, das nach seinem eigenen ersten Bild gezeichnet wird), macht Claude gleich mit. Ein
         Bogen, der noch wartet, kostet jetzt gemacht eine Anfrage mehr – Claude fragt dann, ob er noch warten soll. Sag z. B. „mach die günstigen Bilder“ oder
-        „mach die wartenden Sticker jetzt“. Dieser Mac erreicht Gemini nicht (Zscaler): gemacht werden sie auf einem anderen Rechner mit{" "}
-        <code>bun run paid</code>.
+        „mach die wartenden Sticker jetzt“. Dieser Mac erreicht Gemini nicht (Zscaler): gemacht werden sie in einer Claude-Cloud-Sitzung mit{" "}
+        <code>bun run paid</code>, mit /paid-queue (siehe ganz oben).
       </p>
       {PICTURE_QUEUE.length === 0 ? (
         <p>Gerade wartet kein Bild.</p>

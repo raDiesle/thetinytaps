@@ -6,7 +6,8 @@
 //   bun run paid              records src/content/voiceQueue.ts, then makes the cheap pictures of pictureQueue.ts
 //   bun run paid --no-images | --no-voice     only one of the two
 //
-// On the other computer: `git pull` (or merge local main), `bun install`, the keys in the environment
+// In a Claude cloud session (claude.ai/code: outside Zscaler, the three keys are the environment's secrets; first run
+// 21 November 2026) or on another computer outside the filter: `git pull` (or merge local main), `bun install`, the keys in the environment
 // (ELEVENLABS_API_KEY, ELEVENLABS_API_KEY_2 when a job uses the second account, GEMINI_API_KEY), `bun run paid`, then
 // take the jobs and pictures made out of their queues and commit the new files with them.
 import { spawnSync } from "node:child_process";

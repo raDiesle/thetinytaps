@@ -20,7 +20,7 @@ Tapsi misses it, lays the head on Mama's breast and hears her heart, and Mama an
   a tap (or its number key) opens it. Then one page per tap or key (← and Backspace back, ◀ for the grown-up, from the
   first page back to the contents; a quick second tap or key turns no second page, `screenTap` of
   `src/lib/tapGuard.ts`, user feedback, November 2026), the picture as big as the room allows, under it the chapter's title on its first
-  page and the sentence to read aloud, small and decorated; a paper placeholder where a picture isn't made yet; `GameEnd` small in the
+  page and the sentence to read aloud, small and decorated; a page whose picture isn't made yet is left out for players and shows a paper placeholder only in the dev server (`withPictures`); `GameEnd` small in the
   corners on the last page, „Nochmal“ opening the contents; `DevTag` `K<chapter>-<page>`.
 - `en.ts`, `zh.ts`, `hi.ts`, `es.ts`, `ar.ts`, `ru.ts`: the chapters' titles and the pages' sentences in each language
   (user request, 9 November 2026), imported only by `src/content/texts/texts-<lang>.ts` and read with `byLanguage`.
