@@ -187,3 +187,17 @@ export function playStamp(delay = 0) {
   note({ from: 120, to: 42, duration: 0.35, type: "sine", volume: 0.6, delay });
   hiss({ from: 500, to: 150, duration: 0.16, volume: 0.16, q: 0.6, delay });
 }
+
+/** A firework: a whistle rising, the bang after `bangAt` seconds and, with `crackle`, sparks crackling after it. */
+export function playFirework(bangAt = 0.45, crackle = true) {
+  note({ from: 500, to: 1700, duration: bangAt * 0.95, type: "sine", volume: 0.07 });
+  note({ from: 150, to: 45, duration: 0.5, type: "sine", volume: 0.4, delay: bangAt });
+  hiss({ from: 1800, to: 600, duration: 0.35, volume: 0.18, q: 0.6, delay: bangAt });
+  if (crackle)
+    for (let i = 0; i < 8; i++) hiss({ from: 2500 + Math.random() * 3000, duration: 0.03, volume: 0.12, delay: bangAt + 0.25 + Math.random() * 0.8, q: 3 });
+}
+
+/** A balloon blown up: a short glide upwards. */
+export function playInflate() {
+  note({ from: 380, to: 760, duration: 0.35, type: "sine", volume: 0.12 });
+}

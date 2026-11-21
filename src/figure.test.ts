@@ -2,6 +2,7 @@ import { join } from "node:path";
 import { describe, expect, test } from "bun:test";
 import { isTest, read, sourceFiles } from "@/testSources";
 import { heroLook } from "@/games/elevator/kid";
+import { clothesOf } from "@/games/teeth/clothes";
 
 // A figure that stands for the child follows „Junge / Mädchen“ on the home page (`useFigure` in src/lib/common.ts).
 // Animals (Tapsi, the Gefühle animals) and the people in the pictures stay as they are.
@@ -14,7 +15,8 @@ const sources = sourceFiles()
 const CHILD_DRAWINGS = [
   "src/games/elevator/kid.tsx", // Kleine Abenteuer: the child of the stories, trails and films
   "src/games/teeth/mouth.tsx", // Zähne putzen: the face in the mirror
-  "src/games/teeth/origin.tsx", // Zähne putzen: the face in the story of the sugar monsters
+  "src/games/teeth/origin.tsx", // Zähne putzen: the face and shoulders in the story of the sugar monsters
+  "src/games/teeth/prep.tsx", // Zähne putzen: the child's arm in its sleeve at the sink
 ];
 
 describe("the child's figure", () => {
@@ -35,6 +37,13 @@ describe("the child's figure", () => {
     const { shirt: _bs, pants: _bp, ...boy } = heroLook("boy");
     expect(pigtails).toBeTruthy();
     expect(girl).toEqual(boy);
+  });
+
+  // Zähne putzen dresses the girl in clothes of her own (T-shirt, pyjama, pigtail bands), never the boy's.
+  test("the girl brushing her teeth wears her own clothes", () => {
+    const boy = clothesOf("boy");
+    const girl = clothesOf("girl");
+    expect([girl.shirt, girl.pyjama, girl.spot].filter((colour) => [boy.shirt, boy.pyjama, boy.spot].includes(colour))).toEqual([]);
   });
 
   // Words for the child that only fit a boy or a girl would be wrong for half of them, in any language.
