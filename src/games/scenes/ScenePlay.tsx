@@ -16,7 +16,7 @@ import { tapState } from "@/lib/tapTargets";
 import { preloadScene, SCENE_ENTRIES, scenePath, sceneTitle } from "./catalog";
 import { BOW_AFTER_MS, BOW_KEYFRAMES, BOW_MS, bowFoot, bowOrder, bowStep, curtainEndAt, curtainSoundAt, EVENING_AFTER_MS, layerPoint } from "./curtainCall";
 import { ARROWS, centre, middleItem, nextInDirection } from "./focus";
-import { HELLO_AFTER_MS, HELLO_AGAIN_MS, HELLO_MS, helloOrder } from "./hello";
+import { HELLO_AFTER_MS, HELLO_AGAIN_MS, HELLO_KEYFRAMES, HELLO_MS, helloOrder } from "./hello";
 import { HideoutContext, peekTimes, SURPRISES } from "./hideout";
 import { assignKeys, pressedKey } from "./keys";
 import { LaneLayer, type LaneControl } from "./LaneLayer";
@@ -344,24 +344,30 @@ export function ScenePlay({ scene, settings, onKeys }: { scene: Scene; settings:
   // after the other – and the first tap or key ends it. Only where the child taps freely: a question, the torch's
   // light or a road to draw is its own invitation.
   const greets = !questMode && !torch && !lanes && !touched;
-  const [hello, setHello] = useState<{ id: string; n: number } | null>(null);
   useEffect(() => {
-    if (!greets) {
-      setHello(null);
-      return;
-    }
+    if (!greets) return;
     const order = helloOrder(here(items), scene.width, scene.height);
     const waits: ReturnType<typeof setTimeout>[] = [];
+    const waves: Animation[] = [];
+    const wave = (item: SceneItem) => {
+      const root = sceneRef.current;
+      // Not a thing that is busy (driving in, playing): its own movement says enough.
+      if (!root || performance.now() < (busyUntil.current.get(item.id) ?? 0)) return;
+      const layer = root.querySelector(`[data-item="${item.id}"]`)?.closest<SVGSVGElement>("svg.scene-layer");
+      if (!layer) return;
+      // Like a bow at the end (B-21): the item's own layer moves about its foot, so no picture is painted again.
+      const [x, y] = layerPoint(bowFoot(item), scene.width, scene.height, root.clientWidth, root.clientHeight);
+      layer.style.transformOrigin = `${x}px ${y}px`;
+      waves.push(layer.animate(HELLO_KEYFRAMES, { duration: HELLO_MS, easing: "ease-in-out" }));
+    };
     const stop = afterPageMotion(() => {
-      order.forEach((item, n) => {
-        const at = HELLO_AFTER_MS + n * HELLO_AGAIN_MS;
-        waits.push(setTimeout(() => setHello({ id: item.id, n }), at));
-        waits.push(setTimeout(() => setHello((now) => (now?.n === n ? null : now)), at + HELLO_MS));
-      });
+      order.forEach((item, n) => waits.push(setTimeout(() => wave(item), HELLO_AFTER_MS + n * HELLO_AGAIN_MS)));
     });
     return () => {
       stop();
       waits.forEach(clearTimeout);
+      // The first tap ends a wave still under way, so the picture is quiet for the thing tapped.
+      for (const w of waves) w.cancel();
     };
   }, [greets, items, here, scene]);
 
@@ -860,21 +866,15 @@ export function ScenePlay({ scene, settings, onKeys }: { scene: Scene; settings:
         // A guest keeps the class of its own picture, which its animations use.
         const look = item === guest?.item ? guest.look : item.id;
         const peek = play?.playing && play.surprise !== undefined ? { surprise: SURPRISES[play.surprise], ...peekTimes(item) } : null;
-        const waving = hello?.id === item.id && !play?.playing;
         return (
-          <SceneLayer key={item.id} scene={scene} taps moving={!!play?.playing || !!drive || waving}>
+          <SceneLayer key={item.id} scene={scene} taps moving={!!play?.playing || !!drive}>
             <g
               className={drive && `scene-drive ${drive.phase}`}
               style={drive && ({ "--drive-dx": `${drive.dx}px`, "--drive-ms": `${drive.ms}ms` } as CSSProperties)}
             >
               <g
                 key={`${item.id}-${play?.count ?? 0}`}
-<<<<<<< HEAD
-                className={`scene-item item-${look}${play?.playing ? " playing" : ""}${waving ? " scene-hello" : ""}${bedtime && discovered.has(item.id) ? " asleep" : ""}`}
-                style={{ "--party-i": i } as CSSProperties}
-=======
                 className={`scene-item item-${look}${play?.playing ? " playing" : ""}${bedtime && discovered.has(item.id) ? " asleep" : ""}`}
->>>>>>> main
                 filter={colouring && !discovered.has(item.id) ? greyFilter : undefined}
                 data-item={item.id}
                 data-tap={quest ? tapState({ goal: quest.answers.includes(item), done: answered.has(item.id) }) : tapState({ done: discovered.has(item.id) })}

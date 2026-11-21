@@ -1,6 +1,6 @@
 import { describe, expect, test } from "bun:test";
 import { readFileSync } from "node:fs";
-import { HELLO_MS, HELLO_TIMES, helloOrder } from "./hello";
+import { HELLO_AGAIN_MS, HELLO_KEYFRAMES, HELLO_MS, HELLO_TIMES, helloOrder } from "./hello";
 import { SCENES } from "./index";
 
 describe("„Hier bin ich!“ (B-15)", () => {
@@ -14,11 +14,10 @@ describe("„Hier bin ich!“ (B-15)", () => {
     }
   });
 
-  test("the wave is as long as its CSS animation and moves nothing but its item", () => {
-    const css = readFileSync(new URL("./scenes.css", import.meta.url), "utf8");
-    const rule = css.match(/\.scene-item\.scene-hello \{[^}]*animation: scene-hello ([\d.]+)s[^;]*;/);
-    expect(rule).not.toBeNull();
-    expect(Number(rule?.[1]) * 1000).toBe(HELLO_MS);
+  test("the wave ends where it began, standing still", () => {
+    expect(HELLO_KEYFRAMES[0].transform).toBe("none");
+    expect(HELLO_KEYFRAMES.at(-1)?.transform).toBe("none");
+    expect(HELLO_MS).toBeLessThan(HELLO_AGAIN_MS);
   });
 
   test("it is silent: the engine plays no sound for it", () => {

@@ -460,29 +460,6 @@
   stroke-width: 7;
 }
 
-/* „Hier bin ich!“ (B-15, hello.ts): nobody tapped yet, so one item rocks gently on its foot twice, then stands still. */
-.scene-item.scene-hello {
-  transform-box: fill-box;
-  transform-origin: 50% 100%;
-  animation: scene-hello 1.8s ease-in-out;
-}
-
-@keyframes scene-hello {
-  20% {
-    transform: translateY(-6px) rotate(-4deg);
-  }
-  45% {
-    transform: translateY(0) rotate(0);
-  }
-  65% {
-    transform: translateY(-6px) rotate(4deg);
-  }
-  90%,
-  100% {
-    transform: translateY(0) rotate(0);
-  }
-}
-
 /* Everything discovered (B-21): the light turns warm like an evening and stays so. A layer of its own over the
    picture whose opacity alone changes, so nothing below is painted again; multiply keeps the drawing's contrast. */
 .scene-evening {

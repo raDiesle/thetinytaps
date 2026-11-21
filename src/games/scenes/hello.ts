@@ -10,8 +10,18 @@ export const HELLO_AFTER_MS = 6000;
 export const HELLO_AGAIN_MS = 12000;
 /** At most this many items wave, one after the other; then the picture stays still until the child acts. */
 export const HELLO_TIMES = 3;
-/** How long one wave lasts (its CSS animation, `scene-hello` in scenes.css). */
+/** How long one wave lasts. */
 export const HELLO_MS = 1800;
+
+/** One wave, as keyframes of the item's layer about its foot: it rocks gently to one side and the other, then stands still. */
+export const HELLO_KEYFRAMES: Keyframe[] = [
+  { transform: "none" },
+  { transform: "translateY(-5px) rotate(-4deg)", offset: 0.2 },
+  { transform: "none", offset: 0.45 },
+  { transform: "translateY(-5px) rotate(4deg)", offset: 0.65 },
+  { transform: "none", offset: 0.9 },
+  { transform: "none" },
+];
 
 /**
  * Which items wave, in turn: animals first (a creature saying hello is what a child expects), each group nearest to the
