@@ -17,6 +17,15 @@ and one store of settings (`tinytaps.letters.v2`, so letters, pictures and keys 
   stage so 99 fits on a phone on its side – counting 99 aloud or by tapping would be no game. Its word („twenty-three!“,
   English first, `TWO_DIGIT_WORDS`) waits for its recording and stays silent until then; the second digit always
   answers, while the same number again within `REPEAT_PAUSE_MS` stays quiet.
+  Zählen's other way to play is „Wo ist die 3?“ (`countPlay: "find"`, „What to play?“ behind ⚙️, L-17;
+  `NumberFindPlay.tsx`, `numberFind.ts`), as „Wo ist das B?“ is Wörter tippen's: things appear with an empty key under
+  them, and the child finds the digit key for how many there are. The question („How many? Find the number!“,
+  `NUMBER_FIND_PROMPT`, English first, silent until recorded) never names the number – counting is the point. Other
+  keys only ripple with the soft note; every third the question comes again and, with `hints`, the key lights up (on the
+  screen's keys, or the small keyboard's digit row). The right key fills the empty key with its digit, pressed and lit,
+  and says the counting sentence – nothing hops. It finds its own pace (`nextPace`): 1–3 first, three rounds in a row
+  found with the first key bring the next step (up to 5, then 9, its new numbers first), a round that needed the hint
+  the step before. A digit counts by its place too (`digitOf`: top row or keypad), so a French keyboard needs no Shift.
 - Frei tippen's dark page (`dark`, „Dark page“ behind ⚙️, Frei tippen only; user request, November 2026): night
   colours take turns behind the card (`DARK_BACKGROUNDS`), and the stage alone turns its `--ink` and `--accent` light
   (`.ft-dark .stage`), so letters, words, the letter family's hands and the tracing dots follow – the on-screen keys keep

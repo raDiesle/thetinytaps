@@ -69,6 +69,7 @@ import { DONE_SAY, TIDY_SAY } from "@/games/teeth/lines";
 import { PRELUDE } from "@/games/teeth/TeethPlay";
 import { PICTURE_LINES, SOON_LINE, TURN_LINES } from "@/games/timer/voice";
 import { caseLetters, SMALL_PROMPT } from "@/games/letters/CasePlay";
+import { NUMBER_FIND_PROMPT } from "@/games/letters/numberFind";
 import { STOMP_INVITE } from "@/games/letters/MovePlay";
 import { TWO_DIGIT_NUMBERS, TWO_DIGIT_WORDS } from "@/games/letters/twoDigits";
 import { type Localized, pick } from "@/lib/language";
@@ -275,6 +276,15 @@ function letters(language: TargetLanguageId): VoiceGroup[] {
       lines: once([...words.map(({ w }) => w.word), ...de.colors.map((c) => c.word), ...de.actions.map((a) => a.word)].map((w) => `${w}!`)),
     },
     { label: "Suchen: Frage", lines: once(de.letters.map(de.findPrompt)), built: "„Wo ist das …?“ mit dem Buchstaben" },
+    ...(NUMBER_FIND_PROMPT[language]
+      ? [
+          {
+            label: "Wo ist die 3?: Frage",
+            lines: [NUMBER_FIND_PROMPT[language]!],
+            note: "Zählen, „Wo ist die 3?“ (L-17): nennt keine Zahl, das Kind zählt selbst.",
+          },
+        ]
+      : []),
     { label: "Mitmachen", lines: once(de.actions.map(de.joinIn)) },
     {
       label: "Mitmachen mit Zahlen",
