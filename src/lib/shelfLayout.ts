@@ -20,6 +20,13 @@ export const BOOK_GAP = 0.3;
 export const TAKE_OUT = 0.9;
 
 /**
+ * How much taller the everyday helpers' books stand than a picture book, where their compartment lets them
+ * (`--daily-tall` in bookshelf-books.css): their board is full in its width, so only their height can grow, and their
+ * pictures and names were too small to recognise (user feedback, November 2026).
+ */
+export const DAILY_TALL = 1.4;
+
+/**
  * The things for grown-ups in the shelf's compartments (RoomOptions): the stickers of the child's figure (`figure`) are
  * stuck on the inner side of a compartment's right wall, the others stand on a board.
  */
@@ -88,6 +95,12 @@ export interface ShelfCell extends ShelfRect {
   /** The picture books in it, by their place in the list of books. */
   books?: number[];
   /**
+   * The height of a picture book on this board, in px: each board's books as big as its own width and height allow, so
+   * the few picture books below are not as small as the full board of the everyday helpers above them makes its books
+   * (user feedback, November 2026). Set on every compartment with books.
+   */
+  bh?: number;
+  /**
    * The grown-ups' things in it: one standing on its board, and the stickers (`figure`) on its right wall – in a
    * compartment of their own, or in the one of the everyday helpers on a wide shelf.
    */
@@ -112,7 +125,7 @@ export interface ShelfLayout {
   cells: ShelfCell[];
   /** The fronts of the planks between the compartments: the walls and the boards (the outer frame comes from `frame`). */
   planks: ShelfRect[];
-  /** Each picture book's height (its width is `BOOK_ASPECT` of it). */
+  /** The smallest board's picture books' height (each board's own is its cell's `bh`; a book's width is `BOOK_ASPECT` of it). */
   bookHeight: number;
   /** Whether it is planned for an upright screen: the things on top, the sign hanging above the shelf. */
   upright: boolean;
@@ -226,14 +239,15 @@ export function planShelf(width: number, height: number, spans: number[], option
 }
 
 /**
- * The places on `rows` boards and the biggest book they leave room for: the widest board decides. A wide shelf's
- * boards hold the books by kind (`boardsOf`), and its first keeps `lead` free at its left.
+ * The places on `rows` boards and the biggest book each board leaves room for (`bhs`), and the smallest of them (`bh`).
+ * A wide shelf's boards hold the books by kind (`boardsOf`), and its first keeps `lead` free at its left.
  */
 function rowsOf(spans: number[], rows: number, width: number, tier: number, wide = false, lead = 0, given?: number[][]) {
   const boards = given ?? (wide ? boardsOf(spans, rows) : split(spans.length, rows));
   const leadOf = (r: number) => (r === 0 ? lead : 0);
-  const bh = Math.min(...boards.map((books, r) => bookFor(width - leadOf(r), tier, spanOf(spans, books), books.length)));
-  return { boards, bh, leadOf, middle: Math.max(...boards.map((books, r) => leadOf(r) + rowWidth(spanOf(spans, books), books.length, bh))) };
+  const bhs = boards.map((books, r) => bookFor(width - leadOf(r), tier, spanOf(spans, books), books.length));
+  const middle = Math.max(...boards.map((books, r) => leadOf(r) + rowWidth(spanOf(spans, books), books.length, bhs[r])));
+  return { boards, bhs, bh: Math.min(...bhs), leadOf, middle };
 }
 
 /**
@@ -282,7 +296,7 @@ function planWide(width: number, height: number, spans: number[], legs: number, 
     // The bigger the books, the less room the sign needs beside the carved words, and the more room it takes, the smaller
     // the books: a few steps settle it.
     let plan = rowsOf(spans, rows, room, tier, true);
-    for (let step = 0; step < 20; step++) plan = rowsOf(spans, rows, room, tier, true, leadFor(sign, plan.bh, words, post));
+    for (let step = 0; step < 20; step++) plan = rowsOf(spans, rows, room, tier, true, leadFor(sign, plan.bhs[0], words, post));
     return { rows, tier, ...plan };
   };
   const plan = count > 1 ? prefer(option(2), option(1)) : option(1);
@@ -307,7 +321,7 @@ function planWide(width: number, height: number, spans: number[], legs: number, 
     const lead = plan.leadOf(r);
     // The stickers on the top compartment's right wall.
     const things: ShelfThing[] | undefined = r === 0 ? ["figure"] : undefined;
-    cells.push({ x: mid, y, w: middle, h: plan.tier, books, ...(things && { things }), ...(lead > 0 && { lead }) });
+    cells.push({ x: mid, y, w: middle, h: plan.tier, books, bh: plan.bhs[r], ...(things && { things }), ...(lead > 0 && { lead }) });
     if (r > 0) planks.push({ x: mid, y: y - board, w: middle, h: board });
   });
   const top = cells[SIDE_COLUMN.length];
@@ -320,7 +334,7 @@ function planWide(width: number, height: number, spans: number[], legs: number, 
     bookHeight: plan.bh,
     upright: false,
     legs,
-    ...(sign.width > 0 && top.books?.[0] === 0 && { sign: signOver(top, plan.bh, sign, carved, post) }),
+    ...(sign.width > 0 && top.books?.[0] === 0 && { sign: signOver(top, plan.bhs[0], sign, carved, post) }),
   };
 }
 
@@ -333,12 +347,26 @@ function planUpright(width: number, height: number, spans: number[], legs: numbe
   const rest = inner - things - board;
   const boards = uprightBoards(spans);
   const rows = boards.length;
-  const plan = rowsOf(spans, rows, room, (rest - (rows - 1) * board) / rows, false, 0, boards);
-  // The books' boards only as high as they need; what is left goes to the things on top.
-  const tier = Math.min((rest - (rows - 1) * board) / rows, plan.bh / 0.75);
-  const top = inner - rows * (tier + board);
+  const avail = rest - (rows - 1) * board;
+  const plan = rowsOf(spans, rows, room, Infinity, false, 0, boards);
+  // Each board only as high as its books need – the everyday helpers' taller (`DAILY_TALL`) –, as big as its width
+  // allows; where the boards would not fit so, the biggest books shrink first, and what is left goes to the things on top.
+  const tall = boards.map((books) => (spanOf(spans, books) > 1 ? DAILY_TALL : 1));
+  const need = (cap: number) => plan.bhs.reduce((sum, bh, r) => sum + (Math.min(bh, cap) * tall[r]) / TAKE_OUT, 0);
+  let cap = Math.max(...plan.bhs);
+  if (need(cap) > avail) {
+    let [lo, hi] = [0, cap];
+    for (let step = 0; step < 40; step++) [lo, hi] = need((lo + hi) / 2) > avail ? [lo, (lo + hi) / 2] : [(lo + hi) / 2, hi];
+    cap = lo;
+  }
+  const bhs = plan.bhs.map((bh) => Math.min(bh, cap));
+  // Room to spare goes to the boards too, up to a quarter of a book above each, so the books are not pressed under the next board.
+  const spare = Math.min(TAKE_OUT / 0.75, avail / need(cap));
+  const tiers = bhs.map((bh, r) => ((bh * tall[r]) / TAKE_OUT) * spare);
+  const top = inner - tiers.reduce((sum, t) => sum + t + board, 0);
   const n = SHELF_THINGS.length;
-  const middle = Math.min(room, Math.max(plan.middle, n * 64 + (n - 1) * wall));
+  const booksWidth = Math.max(...boards.map((books, r) => rowWidth(spanOf(spans, books), books.length, bhs[r])));
+  const middle = Math.min(room, Math.max(booksWidth, n * 64 + (n - 1) * wall));
   const cells: ShelfCell[] = [];
   const planks: ShelfRect[] = [];
   const cw = (middle - (n - 1) * wall) / n;
@@ -363,10 +391,12 @@ function planUpright(width: number, height: number, spans: number[], legs: numbe
       if (i > 0) planks.push({ x: post + i * (cw + wall) - wall, y: crown, w: wall, h: top });
     });
   }
+  let y = crown + top;
   plan.boards.forEach((books, r) => {
-    const y = crown + top + r * (tier + board) + board;
-    cells.push({ x: post, y, w: middle, h: tier, books });
+    y += board;
+    cells.push({ x: post, y, w: middle, h: tiers[r], books, bh: bhs[r] });
     planks.push({ x: post, y: y - board, w: middle, h: board });
+    y += tiers[r];
   });
-  return { width: middle + 2 * post, height, frame, cells, planks, bookHeight: plan.bh, upright: true, legs };
+  return { width: middle + 2 * post, height, frame, cells, planks, bookHeight: Math.min(...bhs), upright: true, legs };
 }

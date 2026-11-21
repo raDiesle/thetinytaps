@@ -616,7 +616,11 @@ A game may give it before its end where reaching the goal once is enough (Ketten
   Tied, they are one block: pressed close and standing upright – never leaning, which looked unnatural for tied books –
   and one ribbon runs round all of them with its bow in their middle – never a band on each book, which looked like
   three small ribbons (user feedback, November 2026). The single books stand thick enough to hit with a finger on a
-  phone (`DAILY_SPINE`, widened again in November 2026 when they were still hard to hit), and lean a little differently, as books do. The Alltagshelfer are what parents
+  phone (`DAILY_SPINE`, widened again in November 2026 when they were still hard to hit), and lean a little differently, as books do.
+  Their row is as wide as its board allows, so they grow in height instead: taller than the picture books, as high as
+  their compartment lets them be taken out (`DAILY_TALL`), and the picture on each spine takes nearly its whole width,
+  since that picture is what a child knows the book by (user feedback, November 2026: books and pictures too small to
+  recognise; `shelfLayout.test.ts`). The Alltagshelfer are what parents
   need most, so they stand first, top left (first in `CATEGORIES`), and that bundle is the eye-catcher of the shelf:
   glowing brightest, the Belohnungstafel in it bound in gold – still, nothing idles. Every book stands on its board like
   its neighbours, never in a box or pulled out further than they: a slipcase round the two, pulled out and tipped, looked
@@ -938,7 +942,10 @@ src/lib/                 speech, sfx (synthesized + recorded sounds), storage, d
   On each board the books stand together in the middle with just `BOOK_GAP` between them, and books spine out fill the
   ends up to them – never spread over a wide board with big empty room between them (on a big monitor they looked lost,
   user feedback, November 2026; `.shelf-row`, `endsFor`).
-  The picture books are as big as the shelf allows (`TAKE_OUT`, little room above them, user feedback, October 2026) and
+  The picture books are as big as the shelf allows (`TAKE_OUT`, little room above them, user feedback, October 2026) –
+  each board's books as big as its own width and height allow (`ShelfCell.bh`, set as the compartment's `--bh`), never
+  all as small as the full board of the everyday helpers makes its books (on a tablet the picture books below were
+  half the size they could be, user feedback, November 2026) – and
   show that they are there to be taken: they stand at the board's front edge, before the books spine out, their tops
   tipped forwards as a hand takes a book out, with a warm glow round the cover; a mouse over one tips it further out.
   A tap on a book takes it out (`takeOutBook`, `bookTravel.ts`): it comes off its board, into the middle, its cover swings open
