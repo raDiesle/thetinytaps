@@ -15,6 +15,9 @@ export const youtubeIdeas: IdeaArea = {
       text: "Jedes Video beginnt gleich, 3–4 Sekunden: das Bücherregal der Startseite, ein Buch kippt nach vorn, kommt heraus, schlägt auf – und auf der Seite steht schon das Spiel. Dazu ein kurzer eigener Klang (drei Töne plus Seitenrascheln) und Tapsi sagt „Fun for Both!“ in der Sprache des Videos. Das ist die Bewegung, die es nur bei uns gibt (`takeOutBook`), und dieselbe Bewegung wie in der App: Wer die Seite danach öffnet, erkennt sie sofort wieder.",
       why: "Wiedererkennung in den ersten Sekunden, ohne ein fremdes Logo-Feuerwerk – und das Intro ist zugleich die erste Werbung für die Seite.",
       effort: "M",
+      done: true,
+      partial:
+        "Unter /management/video-intro/ (nur dort, noch nicht auf der Seite): Regal, das Buch mit dem Familienbild als Cover kommt heraus und schlägt auf, auf der ersten Seite das Logo Buchstabe für Buchstabe, die Pfotenspur läuft zum o, Papa Fuchs setzt sich darauf, darunter funforboth.com – 7,5 s mit eigenem Klang aus Glöckchen, Rascheln und Pfoten. `bun run video intro` macht daraus das MP4 in 1920 × 1080 bei 60 fps, ohne Remotion und ohne Kosten. Tapsis „Fun for Both!“ fehlt noch, die Aufnahme wäre bezahlt.",
     },
     {
       id: "Y-02",

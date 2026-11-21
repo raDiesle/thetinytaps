@@ -42,6 +42,7 @@ const PrivacyPage = page(() => import("@/pages/LegalPage"), "PrivacyPage");
 const ManagementPage = page(() => import("@/pages/ManagementPage"), "ManagementPage");
 const PicturesPage = page(() => import("@/pages/PicturesPage"), "PicturesPage");
 const TeethVideoPage = page(() => import("@/pages/TeethVideoPage"), "TeethVideoPage");
+const IntroVideoPage = page(() => import("@/pages/IntroVideoPage"), "IntroVideoPage");
 const MoodPage = page(() => import("@/pages/MoodPage"), "MoodPage", "/wie-gehts-dir/");
 const CausePage = page(() => import("@/pages/CausePage"), "CausePage", "/was-ist-passiert/");
 const MarblePage = page(() => import("@/pages/MarblePage"), "MarblePage", "/kettenreaktion/");
@@ -120,6 +121,7 @@ export function App() {
           <Route path="management" element={<ManagementPage />} />
           <Route path="management/bilder" element={<PicturesPage />} />
           <Route path="management/video-zaehne" element={<TeethVideoPage />} />
+          <Route path="management/video-intro" element={<IntroVideoPage />} />
           {/* Its old name and address, for bookmarks. */}
           <Route path="ideen" element={<Navigate to="/management/" replace />} />
           <Route path="*" element={<Navigate to="/" replace />} />

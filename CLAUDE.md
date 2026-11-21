@@ -16,6 +16,7 @@ bun run voice ...  # recordings with ElevenLabs (paid, only when asked), see Rul
 bun run image ...  # picture with Gemini, see /bild-erzeugen
 bun run song ...   # measure a song from Suno, see /musik-erzeugen
 bun run perf ...   # how smoothly the games run on a ten-year-old Android phone, see Language and style
+bun run video intro # the YouTube videos' intro as an MP4 into video-out/, frame by frame, see src/video/CLAUDE.md
 bun run frames     # do the two frames of each moving picture stay the same scene? --scenes: every picture of a story
 ```
 
