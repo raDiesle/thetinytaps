@@ -11,8 +11,9 @@ import {
   stretchLips,
   TOOTH_CLEAR,
   type View,
+  viewedLips,
 } from "./jaw";
-import { CHEEK, CHEEKS, MOUTH } from "./origin";
+import { CHEEK, CHEEKS, MOUTH_CORNERS } from "./origin";
 import { GRIN_VIEW, STEPS } from "./steps";
 
 // The pink cheeks once lay right on the corners of the open mouth, in the mirror and in the story, and looked odd
@@ -31,7 +32,7 @@ describe("the mirror's cheeks", () => {
   test.each(stops.map((s) => [s.name, s] as const))("%s: no cheek touches the lips", (_, { view, zone }) => {
     const model = buildMouth(view.open);
     const all = projectors(view);
-    const raw = model.lips.map(all.face.point);
+    const raw = viewedLips(model.lips, view).map(all.face.point);
     const lips = stretchLips(raw, zone ? cornerStretch(raw, brushedPoints(model, all, zone), TOOTH_CLEAR) : NO_STRETCH);
     const cheeks = cheekSpots(all.face, lips);
     // Seen from the front both show; seen from the side at least the near one.
@@ -45,10 +46,7 @@ describe("the mirror's cheeks", () => {
 });
 
 test("the story's cheeks keep clear of the mouth's corners, also while they glow bigger", () => {
-  const corners = [
-    { x: MOUTH.left, y: MOUTH.top },
-    { x: MOUTH.right, y: MOUTH.top },
-  ];
+  const corners = MOUTH_CORNERS;
   const GLOW = 1.25;
   for (const cx of CHEEKS) {
     const nearest = Math.min(...edge(cx, CHEEK.y, CHEEK.rx * GLOW, CHEEK.ry * GLOW).flatMap((p) => corners.map((c) => Math.hypot(p.x - c.x, p.y - c.y))));

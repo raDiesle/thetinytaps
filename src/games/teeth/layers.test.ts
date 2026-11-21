@@ -80,3 +80,29 @@ test("a brushed monster dissolves as HTML layers: its sprite's body and the grai
   expect(css).not.toMatch(/\.sugar-monster\.gone \.monster-(body|puff) \{[^}]*animation/);
   expect(mouth).not.toContain("monster-puff");
 });
+
+// While brushing only the song is heard (user feedback, November 2026): the monsters once fizzed as they dissolved,
+// one fizz after the other over the song. The mirror's sounds are only these, each set off by something else.
+test("a brushed monster dissolves without a sound of its own", async () => {
+  const play = await Bun.file("src/games/teeth/TeethPlay.tsx").text();
+  const sounds = play
+    .match(/import \{([^}]*)\} from "@\/lib\/sfx"/)?.[1]
+    .split(",")
+    .map((s) => s.trim())
+    .filter(Boolean);
+  expect(sounds?.sort()).toEqual([
+    "loadRecordings",
+    // A new part of the story or the sink, and each new step of the brushing.
+    "playChime",
+    // The countdown before the brushing.
+    "playCountNote",
+    "playDrumRoll",
+    // The end's cheer.
+    "playRecorded",
+    // A monster the child taps giggles.
+    "playSqueak",
+    // „Los!“ and the end's fanfare.
+    "playTusch",
+  ]);
+  expect(mouth).not.toMatch(/from "@\/lib\/sfx"/);
+});

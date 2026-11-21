@@ -6,7 +6,7 @@ import { useNoBackgroundMusic } from "@/lib/backgroundMusic";
 import { useCommonSettings } from "@/lib/common";
 import { useDevice } from "@/lib/device";
 import { type Localized, useAppLanguage, useT, type Spoken, spokenIn } from "@/lib/language";
-import { loadRecordings, playChime, playCountNote, playDissolve, playDrumRoll, playRecorded, playSqueak, playTusch } from "@/lib/sfx";
+import { loadRecordings, playChime, playCountNote, playDrumRoll, playRecorded, playSqueak, playTusch } from "@/lib/sfx";
 import { pageMoving, usePageStill } from "@/lib/pageMotion";
 import { finishRoutineStep } from "@/lib/routine";
 import { useTimers } from "@/lib/timers";
@@ -219,7 +219,6 @@ export function TeethPlay({ settings, video }: { settings: TeethSettings; video?
   const tickleTimer = useRef<ReturnType<typeof setTimeout> | null>(null);
   // The end's fanfare and cheer come over most of a second: left meanwhile, they must not sound in the menu.
   const { later } = useTimers();
-  const lastGone = useRef(0);
   /** The free part of the screen between heading and controls; the picture fills the whole screen and fits what matters in here. */
   const room = useRef<HTMLDivElement>(null);
   /** Where the pictures are; a jump finds the picture shown in here. */
@@ -257,7 +256,6 @@ export function TeethPlay({ settings, video }: { settings: TeethSettings; video?
   const part = before ? prelude.indexOf(before) : prelude.length + phase;
   // The last one goes a moment before the step's time is up, so it's gone when the brush moves on.
   const isGone = (m: Monster) => brushed >= stepStarts[m.step] + ((m.order + 1) / perStep[m.step] - 0.04) * stepLength(m.step);
-  const goneCount = monsters.filter(isGone).length;
   const step = phase >= 0 && !done ? STEPS[phase] : null;
   const cue = before ? preludeCue(before) : step && stepText(step, "cue", language);
   /** In the last seconds before the brushing: 3, 2, 1. */
@@ -377,11 +375,6 @@ export function TeethPlay({ settings, video }: { settings: TeethSettings; video?
     if (count !== null && !paused) playDrumRoll(COUNTDOWN - count);
     // Only when the number changes.
   }, [count, round]);
-
-  useEffect(() => {
-    if (goneCount > lastGone.current) playDissolve();
-    lastGone.current = goneCount;
-  }, [goneCount]);
 
   useEffect(
     () => () => {
