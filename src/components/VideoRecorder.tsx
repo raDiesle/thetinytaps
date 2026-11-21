@@ -1,9 +1,11 @@
 import { type CSSProperties, type ReactNode, type RefObject, useCallback, useEffect, useRef, useState } from "react";
-import { YouTubeTexts } from "@/components/YouTubeTexts";
+import { CopyButton, YouTubeTexts } from "@/components/YouTubeTexts";
+import { type Chapter, chapterList, chapterText, MIN_CHAPTERS, type SaidLine, srt } from "@/video/captions";
 import type { YouTubeVideoId } from "@/video/youtubeTexts";
 import { MenuTop } from "@/components/MenuTop";
 import { unlockAudio } from "@/lib/sfx";
 import { useTimers } from "@/lib/timers";
+import { onLineSaid } from "@/lib/voice";
 import "./videoRecorder.css";
 
 /** Between the recording's start and the play: a still first frame to cut at, and time for the setup card to be gone. */
@@ -45,8 +47,20 @@ interface Saved {
   sound: boolean;
 }
 
+/** The chapter marks and subtitles noted while the play ran (idea Y-26), counted from the recording's start. */
+interface Captions {
+  chapters: Chapter[];
+  /** The .srt file of the lines said, empty when nothing was said. */
+  srt: string;
+}
+
 /** What the page shows: the choices before, the play (recorded or only played), or the video made. */
-type Phase = { kind: "setup"; note?: string } | { kind: "lead" } | { kind: "play"; recording: boolean } | { kind: "saving" } | { kind: "done"; saved?: Saved };
+type Phase =
+  | { kind: "setup"; note?: string }
+  | { kind: "lead" }
+  | { kind: "play"; recording: boolean }
+  | { kind: "saving" }
+  | { kind: "done"; saved?: Saved; captions?: Captions };
 
 /** Whether this browser can record its own tab (Chrome, Edge); elsewhere only playing for another recorder is offered. */
 const canRecord = () => typeof navigator !== "undefined" && !!navigator.mediaDevices?.getDisplayMedia && typeof MediaRecorder !== "undefined";
@@ -90,11 +104,53 @@ async function recordTab(stage: HTMLElement, onSaved: (blob: Blob, sound: boolea
 }
 
 /** Offers the file as a download, as if a link to it were clicked. */
-function download(saved: Saved) {
+function download(saved: Pick<Saved, "url" | "name">) {
   const link = document.createElement("a");
   link.href = saved.url;
   link.download = saved.name;
   link.click();
+}
+
+/** Offers `text` as a file named `name`. */
+function downloadText(text: string, name: string) {
+  const url = URL.createObjectURL(new Blob([text], { type: "text/plain;charset=utf-8" }));
+  download({ url, name });
+  setTimeout(() => URL.revokeObjectURL(url), 1000);
+}
+
+/**
+ * The chapter marks to paste at the end of the description, and the subtitles to upload in YouTube Studio (idea Y-26),
+ * under the finished video.
+ */
+function CaptionFiles({ captions, base, recorded }: { captions: Captions; base: string; recorded: boolean }) {
+  const text = chapterText(captions.chapters);
+  return (
+    <div className="video-rec-captions">
+      {captions.chapters.length >= MIN_CHAPTERS ? (
+        <>
+          <h2>
+            Kapitelmarken <CopyButton text={text} />
+          </h2>
+          <p className="video-rec-small">
+            Ans Ende der Beschreibung setzen: YouTube zeigt sie dann als Kapitel.
+            {!recorded && " Die Zeiten zählen ab „▶ Nur abspielen“; beim eigenen Aufnahmeprogramm um dessen Vorlauf verschieben."}
+          </p>
+          <pre>{text}</pre>
+        </>
+      ) : (
+        captions.chapters.length > 0 && (
+          <p className="video-rec-small">Zu kurz für Kapitelmarken: YouTube braucht mindestens {MIN_CHAPTERS} Kapitel von je 10 Sekunden.</p>
+        )
+      )}
+      {captions.srt && (
+        <div className="video-rec-actions">
+          <button type="button" onClick={() => downloadText(captions.srt, `${base}.srt`)}>
+            💬 Untertitel (.srt) speichern
+          </button>
+        </div>
+      )}
+    </div>
+  );
 }
 
 /** How many pixels the stage gives the video: its size on the screen times the screen's pixel density. */
@@ -185,8 +241,11 @@ export function VideoRecorder({
   stageStyle?: CSSProperties;
   /** Which video it is in `YOUTUBE_VIDEOS`, for its title and description to copy into YouTube Studio (Y-18). */
   youtube?: YouTubeVideoId;
-  /** The play, mounted on the stage while it runs; it calls `onFinished` when the video should end. */
-  play: (onFinished: () => void) => ReactNode;
+  /**
+   * The play, mounted on the stage while it runs; it calls `onFinished` when the video should end, and `chapter` as
+   * each part of it begins, for the chapter marks of YouTube's description (idea Y-26).
+   */
+  play: (onFinished: () => void, chapter: (title: string) => void) => ReactNode;
 }) {
   const [phase, setPhase] = useState<Phase>({ kind: "setup" });
   const stage = useRef<HTMLDivElement>(null);
@@ -195,12 +254,21 @@ export function VideoRecorder({
   const { later } = useTimers();
   const nameFor = useRef(fileName);
   nameFor.current = fileName;
+  /** When the recording (or the playing) began, so chapters and lines are counted from the video's first frame. */
+  const startedAt = useRef(0);
+  const chapters = useRef<Chapter[]>([]);
+  const lines = useRef<SaidLine[]>([]);
+  /** What was noted, kept for the card once the file comes. */
+  const captions = useRef<Captions | undefined>(undefined);
+  const chapter = useCallback((title: string) => {
+    chapters.current.push({ at: (performance.now() - startedAt.current) / 1000, title });
+  }, []);
 
   const onSaved = useCallback((blob: Blob, sound: boolean) => {
     recording.current = null;
     const saved = { url: URL.createObjectURL(blob), name: nameFor.current(blob.type.includes("mp4") ? "mp4" : "webm"), bytes: blob.size, sound };
     download(saved);
-    setPhase({ kind: "done", saved });
+    setPhase({ kind: "done", saved, captions: captions.current });
   }, []);
 
   // The old video's file is let go when a new one is made or the page is left.
@@ -209,11 +277,28 @@ export function VideoRecorder({
 
   /** The play is over: the recording ends and is saved, or the playing simply stops. */
   const finish = useCallback(() => {
+    const length = (performance.now() - startedAt.current) / 1000;
+    captions.current = { chapters: chapterList(chapters.current, length), srt: srt(lines.current, length) };
     if (recording.current) {
       setPhase({ kind: "saving" });
       recording.current.stop();
-    } else setPhase({ kind: "done" });
+    } else setPhase({ kind: "done", captions: captions.current });
   }, []);
+
+  /** A new run notes its own chapters and lines, from `now`. */
+  const restart = () => {
+    startedAt.current = performance.now();
+    chapters.current = [];
+    lines.current = [];
+    captions.current = undefined;
+  };
+
+  // While the play runs every recorded line said goes into the subtitles.
+  const playing = phase.kind === "play";
+  useEffect(
+    () => (playing ? onLineSaid((text, seconds) => lines.current.push({ at: (performance.now() - startedAt.current) / 1000, seconds, text })) : undefined),
+    [playing],
+  );
 
   const record = async () => {
     unlockAudio();
@@ -224,6 +309,7 @@ export function VideoRecorder({
       setPhase({ kind: "lead" });
       await new Promise((resolve) => requestAnimationFrame(() => requestAnimationFrame(resolve)));
       recording.current = await recordTab(element, onSaved);
+      restart();
       later(() => setPhase({ kind: "play", recording: true }), LEAD_IN_MS);
     } catch {
       // The grown-up said no to sharing the tab, or the browser can't.
@@ -236,6 +322,7 @@ export function VideoRecorder({
     unlockAudio();
     void document.documentElement.requestFullscreen?.().catch(() => undefined);
     setPhase({ kind: "lead" });
+    restart();
     later(() => setPhase({ kind: "play", recording: false }), LEAD_IN_MS);
   };
 
@@ -259,7 +346,7 @@ export function VideoRecorder({
   return (
     <div className={`video-rec${running ? " running" : ""}`}>
       <div className="video-rec-stage" ref={stage} style={stageStyle}>
-        {phase.kind === "play" && play(finish)}
+        {phase.kind === "play" && play(finish, chapter)}
       </div>
 
       {phase.kind === "setup" && (
@@ -326,6 +413,7 @@ export function VideoRecorder({
           ) : (
             <h1>Fertig</h1>
           )}
+          {phase.captions && <CaptionFiles captions={phase.captions} base={nameFor.current("mp4").replace(/\.mp4$/, "")} recorded={!!phase.saved} />}
           <div className="video-rec-actions">
             {phase.saved && (
               <button type="button" onClick={() => phase.saved && download(phase.saved)}>

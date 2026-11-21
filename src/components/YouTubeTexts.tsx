@@ -3,7 +3,7 @@ import { useAppLanguage } from "@/lib/language";
 import { TITLE_LIMIT, YOUTUBE_VIDEOS, type YouTubeVideoId, youtubeText } from "@/video/youtubeTexts";
 
 /** A button that copies a text and says so for a moment. */
-function CopyButton({ text }: { text: string }) {
+export function CopyButton({ text }: { text: string }) {
   const [copied, setCopied] = useState(false);
   return (
     <button

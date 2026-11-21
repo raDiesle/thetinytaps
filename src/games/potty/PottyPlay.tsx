@@ -45,6 +45,7 @@ import {
   scenePicture,
   SIT_GUARD_MS,
   scenesFor,
+  type StepId,
   STEPS,
   storyFor,
   symbolsFor,
@@ -52,6 +53,7 @@ import {
   TAPSI,
   THOUGHT_FRAME_MS,
   WAIT_SCENE_MS,
+  type WaitScene,
   type Went,
 } from "./content";
 import { CALL_PICTURE, CallBubble } from "./CallBubble";
@@ -107,12 +109,21 @@ const VIDEO_CHECK_MS = 100;
 export interface PottyVideoRun {
   /** What Tapsi needs, said from the first step on (the game only learns it while Tapsi calls). */
   said: Went;
-  /** What is in the potty at the end. */
-  came: Need;
+  /** What is in the potty at the end, or `nothing`: the other story, „Heute kommt nichts. Macht nichts!“ (idea Y-24). */
+  came: Need | "nothing";
   /** How many whole passes of the waiting song Tapsi sits (`WaitPasses`). */
   passes: number;
-  /** The party is over: the video ends. */
+  /**
+   * Only the sitting (idea Y-23): the video starts as Tapsi sits down and ends with the last pass of the waiting song,
+   * a „potty song“ to leave running while the child sits on the real potty.
+   */
+  sittingOnly?: boolean;
+  /** The party (or Tapsi playing, when nothing came) is over: the video ends. */
   onFinished: () => void;
+  /** A step begins, for the video's chapter marks. */
+  onStep?: (id: StepId) => void;
+  /** A thought comes into the bubble while Tapsi sits, for the chapter marks of a sitting-only video. */
+  onThought?: (scene: WaitScene) => void;
 }
 
 /** What `begin` plays a step with, when it is not what is picked now. */
@@ -224,7 +235,7 @@ export function PottyPlay({ video, demo }: { video?: PottyVideoRun; demo?: Potty
   useEffect(() => {
     if (opened.current || !still) return;
     opened.current = true;
-    begin(0, { came: null, said: video?.said ?? "unsure", nothing: false });
+    begin(video?.sittingOnly ? SIT : 0, { came: null, said: video?.said ?? "unsure", nothing: false });
   });
 
   const story = storyFor(at.nothing);
@@ -236,7 +247,18 @@ export function PottyPlay({ video, demo }: { video?: PottyVideoRun; demo?: Potty
   // the background song waits meanwhile.
   useNoBackgroundMusic(sitting || !!video);
   // A video sits as many passes of the song as chosen, then the ✓ chosen before says what came.
-  const passes = useMemo<WaitPasses | undefined>(() => video && { passes: video.passes, onEnd: () => finish(video.came) }, [video]);
+  /** The video's end, through a ref, so the timers started for a step reach the page's newest one. */
+  const onFinished = useRef(video?.onFinished);
+  onFinished.current = video?.onFinished;
+  // Sitting alone ends with the song; „nothing“ takes the other story.
+  const passes = useMemo<WaitPasses | undefined>(
+    () =>
+      video && {
+        passes: video.passes,
+        onEnd: () => (video.sittingOnly ? onFinished.current?.() : video.came === "nothing" ? finishWithNothing() : finish(video.came)),
+      },
+    [video],
+  );
   useWaitingMusic(sitting, paused, language.id, passes);
 
   // The next step's pictures load while this one plays, the thought bubble's once the animal sits.
@@ -277,6 +299,7 @@ export function PottyPlay({ video, demo }: { video?: PottyVideoRun; demo?: Potty
   const begin = (index: number, { came = went, said: saidNow = said, nothing = atRef.current.nothing, queue = false }: Begin = {}) => {
     const { id, ms, moves } = storyFor(nothing)[index];
     goTo({ step: index, scene: -1, nothing }, ms);
+    video?.onStep?.(id);
     startedAt.current = performance.now();
     setPause(false);
     setAsking(!video && (id === "call" || (id === "go" && saidNow === "unsure")));
@@ -366,7 +389,9 @@ export function PottyPlay({ video, demo }: { video?: PottyVideoRun; demo?: Potty
    * (both disturbed the user, who wants to listen to the song).
    */
   const nextScene = () => {
-    goTo({ ...atRef.current, scene: (atRef.current.scene + 1) % scenes.length }, SCENE_MS);
+    const scene = (atRef.current.scene + 1) % scenes.length;
+    goTo({ ...atRef.current, scene }, SCENE_MS);
+    video?.onThought?.(scenes[scene]);
   };
 
   /** Pauses the waiting or goes on with it; pausing stops the voice mid-sentence, as in Zähne putzen. */
@@ -422,12 +447,13 @@ export function PottyPlay({ video, demo }: { video?: PottyVideoRun; demo?: Potty
 
   // A video goes on from each step once its picture has played its movement once, its line is said and it was looked at
   // a moment: where the game waits for a tap (`Step.nudge`), the video can't. After the party it ends.
-  const onFinished = useRef(video?.onFinished);
-  onFinished.current = video?.onFinished;
   useEffect(() => {
     if (!video || !still || beat === 0) return;
-    const here = STEPS[at.step];
+    const story = storyFor(at.nothing);
+    const here = story[at.step];
     if (here.id === "sit") return;
+    /** The story ends with the party, or with Tapsi playing when nothing came. */
+    const end = at.nothing ? story.length - 1 : PARTY;
     const shown = Math.max(here.ms, (here.moves ?? []).flatMap((p) => framesFor(`${TAPSI.pictures}-${p}`)).length * MOVE_MS);
     let timer: ReturnType<typeof setTimeout>;
     const quiet = () => {
@@ -435,10 +461,10 @@ export function PottyPlay({ video, demo }: { video?: PottyVideoRun; demo?: Potty
       else
         timer = setTimeout(
           () => {
-            if (at.step >= PARTY) onFinished.current?.();
+            if (at.step >= end) onFinished.current?.();
             else begin(at.step + 1);
           },
-          at.step >= PARTY ? VIDEO_TAIL_MS : VIDEO_LOOK_MS,
+          at.step >= end ? VIDEO_TAIL_MS : VIDEO_LOOK_MS,
         );
     };
     timer = setTimeout(quiet, shown);

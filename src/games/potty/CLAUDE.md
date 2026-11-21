@@ -145,6 +145,12 @@ the song would begin its first verse again, never inside one). Every other step 
 has played once (`moves`, without `again`), its line is said (`voiceQuiet`) and `VIDEO_LOOK_MS` has passed; the party
 stays `VIDEO_TAIL_MS` more, then the recording ends. The page fetches the pictures, the thoughts that fit, the sounds
 (`preloadPottySounds`), the waiting song (`loadWaitSong`) and every line before it lets the recording start.
+„nichts“ beside the two ✓ there (idea Y-24) plays the story when nothing came (`NOTHING_STEPS`), ending a moment after
+Tapsi plays and Mama and Papa ask at the door. „Nur Sitzen“ (Y-23, `PottyVideoRun.sittingOnly`) is a potty song to leave
+running while the child sits on the real potty: the video starts as Tapsi sits down, shows the thoughts for what was
+chosen (pipi, kaka or both) and ends with the last pass of the song (3 or 5 passes, about 5 and 10 minutes). Every step
+that begins a chapter (`STEP_CHAPTERS`, `NOTHING_CHAPTERS` in `videoChapters.ts`, English first) – sitting only, every
+thought, named by its line – is a chapter mark for YouTube's description (Y-26, `VideoRecorder`'s `chapter`).
 A new thing shown beside the picture (a button, a chart) stays out of the video (`potty.test.ts`).
 
 The video for parents (idea Y-29, November 2026): `/management/video-toepfchen-eltern/` (linked at the top of

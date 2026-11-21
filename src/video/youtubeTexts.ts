@@ -28,7 +28,7 @@ export interface YouTubeVideo {
   title: { en: string; de?: string };
 }
 
-/** The videos there are or will be (ideas Y-06 to Y-11), by name. */
+/** The videos there are or will be (ideas Y-06 to Y-11, the potty's sitting-only song Y-23 and its story when nothing came Y-24), by name. */
 export const YOUTUBE_VIDEOS = {
   zaehne: {
     path: "/zaehne/",
@@ -41,6 +41,18 @@ export const YOUTUBE_VIDEOS = {
     forKids: true,
     song: true,
     title: { en: "Potty Training Song for Toddlers – Potty Time with Tapsi", de: "Töpfchen Lied für Kinder – Töpfchentraining mit Tapsi" },
+  },
+  "toepfchen-warten": {
+    path: "/toepfchen/",
+    forKids: true,
+    song: true,
+    title: { en: "Potty Song for Toddlers – Sit and Wait with Tapsi", de: "Töpfchen Lied für Kinder – Sitzen und Warten mit Tapsi" },
+  },
+  "toepfchen-nichts": {
+    path: "/toepfchen/",
+    forKids: true,
+    song: true,
+    title: { en: "Potty Training Story – Nothing Today? That's Okay!", de: "Töpfchen Geschichte – Heute kommt nichts? Macht nichts!" },
   },
   "toepfchen-eltern": {
     path: "/toepfchen/",

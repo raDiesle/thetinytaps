@@ -5,6 +5,12 @@ of the site children see: each video has a page only for grown-ups under `/manag
 the management page's contents by `TOOL_GROUPS`), never a link from the shelf or a book, until the user decides otherwise.
 - Recording a page's own tab in Chrome is `VideoRecorder` (`src/components/VideoRecorder.tsx`), shared by every video
   page (the games' videos, the intro and the outro): a new video page gives it its play, never a recorder of its own.
+- Chapters and subtitles (Y-26, `captions.ts`): while the play runs the recorder notes each recorded line as it starts
+  (`onLineSaid` in `src/lib/voice.ts`, so every video gets its subtitles by itself) and each `chapter(title)` its play
+  calls, counted from the recording's first frame. At the end the card shows the chapter marks to copy into the
+  description (`chapterList`: the first at 0:00, one shorter than 10 s joined to the one before, since YouTube shows
+  chapters only when there are three of at least 10 s) and saves the lines as an .srt. A new video calls `chapter` where
+  its parts begin, with names a parent would look for, never one per few seconds.
 - `intro/`: the videos' intro (Y-01), at `/management/video-intro/`: the shelf of picture books, the Fun for Both book
   (the families' picture `buch-cover.webp` as its cover) coming out and opening, its first page filling the screen,
   and the app's own `Logo` printed on it letter by letter, the paw tracks walking to the o and Papa Fox with his child

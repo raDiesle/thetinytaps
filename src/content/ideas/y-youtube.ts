@@ -215,6 +215,9 @@ export const youtubeIdeas: IdeaArea = {
       text: "Ein Video nur vom Sitzen, ohne die Geschichte davor: Tapsi sitzt, Mama und Papa klatschen leise, die Uhr tickt, das Warte-Lied läuft, die Denkblase zeigt nacheinander die Gedanken – in der Pipi-Fassung nur, was fließt (Brunnen, Wal, Elefant, Gartenschlauch, Sanduhr …), in der Kaka-Fassung nur, was gedrückt wird (Huhn, Ketchup, Knete, Maulwurf …) und die Schildkröte für Kinder, die Angst vor Kaka haben. 5 und 10 Minuten lang, als „Töpfchen-Lied“ betitelt, zum Laufenlassen, während das Kind auf dem echten Töpfchen sitzt. Mit dem Modus aus Y-21 nur ein anderer Startpunkt (der Sitz-Schritt) und eine andere Länge.",
       why: "Genau der Moment, in dem Eltern zum Handy greifen: Das Kind soll sitzen bleiben. Die Gedanken sind ja gerade für dieses Sitzen gemacht – im Video helfen sie genauso.",
       effort: "S",
+      done: true,
+      partial:
+        "Umgesetzt am 21. November 2026 als Wahl „🎵 Nur Sitzen (Töpfchen-Lied)“ auf /management/video-toepfchen/: Das Video beginnt, wenn Tapsi sich setzt, zeigt die Gedanken zu dem, was unter „Gedanken für“ gewählt ist (Pipi, Kaka oder beides), und endet mit dem letzten Durchlauf des Warte-Lieds – 1, 2, 3 oder 5 Durchläufe, auf Deutsch etwa 2, 4, 6½ und 11 Minuten (für 5 und 10 Minuten also 3 und 5). Jeder Gedanke ist ein Kapitel, benannt nach seiner Zeile in der Sprache des Videos. Titel und Beschreibung für YouTube unter „toepfchen-warten“ („Potty Song for Toddlers – Sit and Wait with Tapsi“).",
     },
     {
       id: "Y-24",
@@ -223,6 +226,9 @@ export const youtubeIdeas: IdeaArea = {
       text: "Die zweite Geschichte des Spiels als eigenes kurzes Video: Tapsi sitzt, nichts kommt, „Heute kommt nichts. Macht nichts!“, Händewaschen, dann spielt Tapsi mit Bauklötzen und Mama und Papa fragen später an der Tür noch einmal. Mit dem Modus aus Y-21, dort als dritte Wahl neben ✓💧 und ✓💩.",
       why: "Dass manchmal nichts kommt, ist im Töpfchentraining Alltag und für Kinder oft enttäuschend – ein Video, das es freundlich zeigt, gibt es kaum.",
       effort: "S",
+      done: true,
+      partial:
+        "Umgesetzt am 21. November 2026: „nichts“ als dritte Wahl unter „Im Töpfchen“ auf /management/video-toepfchen/ spielt die zweite Geschichte (`NOTHING_STEPS`) bis Tapsi spielt und Mama und Papa an der Tür fragen, dann endet das Video. Titel unter „toepfchen-nichts“. Die letzte Zeile („Tapsi spielt. Mama und Papa schauen rein …“) hat noch in keiner Sprache eine Aufnahme und bleibt bis dahin stumm (steht unter 🎙️ Stimmen).",
     },
     {
       id: "Y-25",
@@ -242,6 +248,9 @@ export const youtubeIdeas: IdeaArea = {
       text: "Die Video-Seite schreibt mit, wann jeder Schritt beginnt und wann Tapsi welche Zeile sagt, und speichert neben dem Video eine Textdatei mit Kapitelmarken für die Beschreibung („0:00 Essen und Trinken, 0:14 Muss mal, 0:26 Mama! Papa! …“, die Namen der Schritte aus der Schrittleiste) und eine Untertitel-Datei (.srt) mit den Zeilen aus `POTTY_TEXTS` in der Sprache des Videos. Beim Töpfchen zuerst, dann für jedes Video aus Y-25.",
       why: "Kapitel lassen Eltern direkt zum Sitzen oder Händewaschen springen, und Untertitel helfen beim Gefundenwerden – beides ohne Handarbeit und in jeder Sprache gleich.",
       effort: "S",
+      done: true,
+      partial:
+        "Umgesetzt am 21. November 2026 im geteilten `VideoRecorder` (`src/video/captions.ts`), damit jedes Video es bekommt: Er schreibt jede gesagte Aufnahme mit (`onLineSaid` in voice.ts) und jedes Kapitel, das das Video meldet, gezählt ab dem ersten Bild der Aufnahme. Am Ende stehen die Kapitelmarken zum Kopieren unter dem Video (erstes bei 0:00, eines unter 10 s wird mit dem davor zusammengelegt, weil YouTube sonst keine zeigt) und die Untertitel lassen sich als .srt speichern. Aufs Töpfchen meldet seine Kapitel: Time to go, On the potty, All done!, Flush and wash hands, Party! – englisch zuerst (`videoChapters.ts`); „Nur Sitzen“ ein Kapitel je Gedanke. Untertitel bekommt jedes Video von selbst, Kapitel noch nicht: Zähne putzen ist Y-32.",
     },
     {
       id: "Y-27",
@@ -284,6 +293,14 @@ export const youtubeIdeas: IdeaArea = {
       title: "Vor dem ersten Video selbst nachsehen: Suno-Plan, ElevenLabs, Gemini",
       text: "Was die Recherche zu Y-20 nicht lesen konnte oder nur der Betreiber weiß: für jedes Lied im Video (Zahnputzlied, Warte-Lied, Hintergrundlied), ob beim Erzeugen und Herunterladen Suno Pro oder Premier aktiv war, mit Rechnung, Lied-ID und Datum als Beleg – sonst das Lied neu machen; die Bedingungen von ElevenLabs im Browser lesen (kommerzielle Nutzung im Starter-Plan, Rechte an der Voice-Design-Stimme und ihren Klonen auf dem zweiten Konto, Soundeffekte); die aktuellen Gemini-API-Bedingungen lesen, vor allem ob die Klausel gegen Dienste für unter 18-Jährige noch gilt und ob sie für vorab gemachte Bilder überhaupt greift. Das Ergebnis kommt in die Recherche.",
       why: "Ein gesperrtes Video oder ein Content-ID-Anspruch kostet mehr als eine halbe Stunde Lesen – und bei Suno entscheidet allein der Plan beim Erzeugen.",
+      effort: "S",
+    },
+    {
+      id: "Y-32",
+      emoji: "🔖",
+      title: "Kapitelmarken auch für Zähne putzen",
+      text: "Das Zähneputz-Video meldet dem `VideoRecorder` seine Teile als Kapitel, wie Aufs Töpfchen (Y-26): die Geschichte mit den Süßigkeiten, am Waschbecken, dann die Strophen des Lieds – oben, unten, vorn, hinten … – mit Namen, nach denen Eltern suchen (englisch zuerst). Die Untertitel kommen schon von selbst, soweit Tapsi Zeilen sagt; das gesungene Lied selbst hat keine.",
+      why: "Kapitel lassen Eltern direkt zum Putzen springen, wenn die Geschichte davor schon bekannt ist.",
       effort: "S",
     },
   ],

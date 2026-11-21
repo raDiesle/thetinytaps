@@ -159,7 +159,18 @@ let hushed = new Promise<void>((resolve) => {
  */
 export const untilHush = (): Promise<undefined> => hushed.then(() => undefined);
 
-function play(buffer: AudioBuffer) {
+/** Who hears of every recording as it starts (a video's subtitles, `VideoRecorder`): its text and its length in seconds. */
+const lineListeners = new Set<(text: string, seconds: number) => void>();
+
+/** Calls `listener` with each line's text and length as its recording starts playing, in every game; returns how to stop. */
+export function onLineSaid(listener: (text: string, seconds: number) => void) {
+  lineListeners.add(listener);
+  return () => {
+    lineListeners.delete(listener);
+  };
+}
+
+function play(buffer: AudioBuffer, text: string) {
   const ac = audioContext();
   if (!ac) return Promise.resolve();
   return new Promise<void>((done) => {
@@ -172,6 +183,7 @@ function play(buffer: AudioBuffer) {
     };
     playing = source;
     source.start();
+    for (const listener of lineListeners) listener(text, buffer.duration);
   });
 }
 
@@ -281,7 +293,7 @@ export function recordedVoice(files: VoiceFiles, { browser = false }: { browser?
           await pageStill();
           // Due and not there yet: the paw track shows until it is (SoundLoading), so the child sees it is coming.
           const sound = fetched.has(url) || at !== generation ? await buffer : await waitingFor(Promise.race([atMost(buffer), stopped]));
-          if (sound && at === generation) await play(sound);
+          if (sound && at === generation) await play(sound, text);
         };
       };
       if (!names) {
