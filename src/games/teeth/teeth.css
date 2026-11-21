@@ -200,8 +200,8 @@
 }
 
 /* The monsters sit on the teeth from the start (the story before, origin.tsx, shows them growing):
-   they don't pop up, they only fade in softly as their side of a tooth turns into view. They sway,
-   and vanish in a puff. */
+   they don't pop up, they only fade in softly as their side of a tooth turns into view. The ones being brushed
+   dance and dissolve (`.monster-sprite` below). */
 .sugar-monster {
   animation: teeth-monster-show 0.3s ease-out backwards;
 }
@@ -237,45 +237,8 @@
   }
 }
 
-.monster-puff {
-  opacity: 0;
-  pointer-events: none;
-}
-
 .sugar-monster.gone .monster-body {
   pointer-events: none;
-  animation: monster-poof 1.07s ease-in-out forwards;
-}
-
-.sugar-monster.gone .monster-puff {
-  transform-box: fill-box;
-  transform-origin: center;
-  animation: puff-out 1.4s ease-out forwards;
-}
-
-@keyframes monster-poof {
-  30% {
-    transform: scale(1.25) rotate(-15deg);
-    opacity: 1;
-  }
-  to {
-    transform: scale(0) rotate(200deg);
-    opacity: 0;
-  }
-}
-
-@keyframes puff-out {
-  0% {
-    opacity: 0;
-    transform: scale(0.3);
-  }
-  30% {
-    opacity: 1;
-  }
-  to {
-    opacity: 0;
-    transform: scale(1.6);
-  }
 }
 
 /* The brush (brush.tsx): a layer of its own, moved to its tooth with a glide, and inside it the scrubbing, circling
@@ -1768,26 +1731,137 @@
 
 .monster-sprite .monster-body,
 .monster-sprite .sugar-monster.scared .monster-body,
+.monster-sprite .sugar-monster.tickled .monster-body,
 .monster-sprite .monster-eyes {
   animation: none;
 }
 
-/* The monster's foot (15 of its 34 units below its middle) stays put while it sways. */
+/* The ones to brush now dance like jelly to the song: squashed on each beat, stretched and tipped between, a bar
+   for the whole dance. The foot (15 of its 34 units below its middle) stays put. */
 .sprite-body {
   transform-origin: 50% 72%;
-  animation: monster-sway 2.14s ease-in-out infinite;
+  animation: teeth-monster-jelly 2.144s ease-in-out infinite;
 }
 
 .mouth-sprite:nth-child(odd) .sprite-body {
-  animation-delay: -1.07s;
+  animation-delay: -1.072s;
 }
 
+@keyframes teeth-monster-jelly {
+  0%,
+  100% {
+    transform: rotate(-6deg) scale(1, 1);
+  }
+  25% {
+    transform: rotate(0deg) scale(1.1, 0.9);
+  }
+  50% {
+    transform: rotate(6deg) translateY(-4%) scale(0.95, 1.07);
+  }
+  75% {
+    transform: rotate(0deg) scale(1.1, 0.9);
+  }
+}
+
+/* The next one to go knows the brush is coming: it ducks and shivers, one beat each way. */
 .monster-sprite.scared .sprite-body {
-  animation: tremble 0.536s ease-in-out infinite;
+  animation: teeth-monster-cower 0.536s ease-in-out infinite;
 }
 
+@keyframes teeth-monster-cower {
+  0%,
+  100% {
+    transform: translateX(-3%) rotate(-5deg) scale(1.06, 0.88);
+  }
+  50% {
+    transform: translateX(3%) rotate(5deg) scale(1.06, 0.88);
+  }
+}
+
+/* A tapped one giggles. */
+.monster-sprite.tickled .sprite-body {
+  animation: wiggle 0.4s ease-in-out infinite;
+}
+
+/* Brushed away, it dissolves in two beats: squeezed by the brush, then stretched upwards, blurring and fading,
+   while it falls apart into sugar grains and foam bubbles (`.monster-dust`). Only the HTML layer's transform, opacity
+   and filter change, which a phone does on the small layer alone. */
 .monster-sprite.gone .sprite-body {
-  animation: none;
+  pointer-events: none;
+  animation: teeth-monster-dissolve 1.072s ease-in forwards;
+}
+
+@keyframes teeth-monster-dissolve {
+  0% {
+    transform: scale(1, 1);
+    filter: blur(0);
+    opacity: 1;
+  }
+  20% {
+    transform: scale(1.18, 0.78);
+    filter: blur(0);
+    opacity: 1;
+  }
+  45% {
+    transform: translateY(-6%) scale(0.92, 1.12);
+    filter: blur(1px);
+    opacity: 0.75;
+  }
+  to {
+    transform: translateY(-22%) scale(0.55, 1.3);
+    filter: blur(6px);
+    opacity: 0;
+  }
+}
+
+/* The grains: each a layer the size of the sprite with its dot where it lies on the body (--sx, --sy), so its drift
+   (--dx, --dy) is a share of the sprite. Sugar grains in the monster's colour, foam bubbles as white rings; they come
+   loose from the top down (the delays in mouth.tsx), spread, rise and melt in three beats. */
+.monster-dust,
+.monster-dust > i {
+  position: absolute;
+  inset: 0;
+  pointer-events: none;
+}
+
+.monster-dust > i {
+  opacity: 0;
+  animation: teeth-dust 1.608s cubic-bezier(0.2, 0.7, 0.4, 1) forwards;
+}
+
+.monster-dust > i::before {
+  content: "";
+  position: absolute;
+  left: calc(50% + var(--sx));
+  top: calc(50% + var(--sy));
+  width: var(--size);
+  height: var(--size);
+  margin: calc(var(--size) / -2) 0 0 calc(var(--size) / -2);
+  border: 1.5px solid #2a1e5c;
+  border-radius: 30%;
+  background: var(--grain);
+  transform: rotate(45deg);
+}
+
+.monster-dust > i.foam::before {
+  border-color: #bde0fe;
+  border-radius: 50%;
+  background: #ffffffd9;
+}
+
+@keyframes teeth-dust {
+  0% {
+    opacity: 0;
+    transform: translate(0, 0) scale(0.4);
+  }
+  12% {
+    opacity: 1;
+    transform: translate(0, 0) scale(1.15);
+  }
+  to {
+    opacity: 0;
+    transform: translate(var(--dx), var(--dy)) scale(0.3);
+  }
 }
 
 /* The glow of svg's monster-glow (r 27 round 3 units above the middle), as a soft round light behind the monster. */
@@ -1807,6 +1881,7 @@
 
 .teeth-play.paused .sprite-body,
 .teeth-play.paused .sprite-glow,
+.teeth-play.paused .monster-dust > i,
 .teeth-play.paused .lip-arrow {
   animation-play-state: paused;
 }
@@ -1815,5 +1890,14 @@
   .sprite-body,
   .sprite-glow {
     animation: none;
+  }
+
+  /* Still, a brushed monster goes: it only fades. */
+  .monster-sprite.gone .sprite-body {
+    animation: fade-out 0.536s ease-out forwards;
+  }
+
+  .monster-dust {
+    display: none;
   }
 }

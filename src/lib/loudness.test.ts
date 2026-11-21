@@ -39,7 +39,9 @@ describe("loudness", () => {
   // The limiter itself, and the videos' intro, which renders its sound into a file (an OfflineAudioContext: no speaker).
   const mayUseDestination = [join("sfx", "core.ts"), join("video", "intro", "introSound.ts")];
   test("everything plays through the one limiter (speaker), never straight to the speaker", () => {
-    const direct = files.filter(({ path, code }) => !mayUseDestination.some((file) => path.endsWith(file)) && /\.destination\b/.test(code)).map(({ path }) => path);
+    const direct = files
+      .filter(({ path, code }) => !mayUseDestination.some((file) => path.endsWith(file)) && /\.destination\b/.test(code))
+      .map(({ path }) => path);
     expect(direct).toEqual([]);
   });
 });

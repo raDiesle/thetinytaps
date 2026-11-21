@@ -1,30 +1,19 @@
 /* ---------- The videos' intro (/management/video-intro/, for grown-ups) ---------- */
 
-/* Dark round a 16 : 9 stage as big as the window allows; the stage alone is recorded. */
-.vi-video {
-  position: fixed;
+/* The canvas fills the stage it lies on (the recorder's, or the whole window for `bun run video intro`). */
+.vi-box {
+  position: absolute;
   inset: 0;
-  display: grid;
-  place-items: center;
-  background: #111;
-  color: #2d2340;
-}
-
-.vi-video.running {
-  cursor: none;
-}
-
-.vi-stage {
-  position: relative;
-  width: min(100vw, calc(100dvh * 16 / 9));
-  aspect-ratio: 16 / 9;
   overflow: hidden;
   background: #fffaf0;
 }
 
-/* For `bun run video intro`: the window is the canvas, nothing round it. */
-.vi-render .vi-stage {
+.vi-render {
+  position: fixed;
+  top: 0;
+  left: 0;
   width: 100vw;
+  aspect-ratio: 16 / 9;
 }
 
 /* The canvas is drawn at 1920 × 1080 and scaled to the stage. */
@@ -268,64 +257,4 @@
   inset: 0;
   background: #fffaf0;
   pointer-events: none;
-}
-
-/* ----- The card for grown-ups over the stage ----- */
-
-.vi-card {
-  position: absolute;
-  width: min(92vw, 640px);
-  max-height: 92dvh;
-  overflow: auto;
-  padding: 18px 22px;
-  border-radius: 14px;
-  background: #fffdf6;
-  box-shadow: 0 10px 40px #0008;
-  line-height: 1.4;
-}
-
-.vi-card h1 {
-  margin: 0 0 8px;
-  font-size: 1.5rem;
-}
-
-.vi-card .menu-top {
-  float: left;
-  margin: 0 12px 4px 0;
-}
-
-.vi-small {
-  font-size: 0.9rem;
-  opacity: 0.85;
-}
-
-.vi-warn {
-  color: #b3261e;
-}
-
-.vi-actions {
-  display: flex;
-  flex-wrap: wrap;
-  gap: 10px;
-  margin: 12px 0 6px;
-}
-
-.vi-actions button {
-  padding: 10px 18px;
-  border: 2px solid #2d2340;
-  border-radius: 10px;
-  background: #fff;
-  font: inherit;
-  font-weight: 700;
-  cursor: pointer;
-}
-
-.vi-actions .vi-go {
-  background: #ffd23f;
-}
-
-.vi-preview {
-  width: 100%;
-  margin-top: 8px;
-  border-radius: 8px;
 }

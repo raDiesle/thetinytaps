@@ -3,8 +3,8 @@
 What the YouTube videos are made of (ideas area Y on `/management/`, user request, November 2026). Nothing here is part
 of the site children see: each video has a page only for grown-ups under `/management/` (in `NO_INDEX_PATHS`, linked at
 the top of the management page), never a link from the shelf or a book, until the user decides otherwise.
-- `tabRecording.ts`: a page records its own tab with its sound in Chrome, cut to its 16 : 9 stage, and saves the file
-  (shared by `/management/video-zaehne/` and `/management/video-intro/`). A new video page uses it, never a copy.
+- Recording a page's own tab in Chrome is `VideoRecorder` (`src/components/VideoRecorder.tsx`), shared by every video
+  page (the games' videos and the intro): a new video page gives it its play, never a recorder of its own.
 - `intro/`: the videos' intro (Y-01), at `/management/video-intro/`: the shelf of picture books, the Fun for Both book
   (the families' picture `buch-cover.webp` as its cover) coming out and opening, its first page filling the screen,
   and the app's own `Logo` printed on it letter by letter, the paw tracks walking to the o and Papa Fox with his child

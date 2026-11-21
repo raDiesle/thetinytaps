@@ -175,10 +175,11 @@
     box-shadow 0.1s;
 }
 
-/* Pressed in, like a real button. */
+/* Pressed in, like a real button – also under the parents' video's drawn hand (`pt-pressed`, ParentsVideo.tsx). */
 .pt-said:active,
 .pt-next:active,
-.pt-finish:active {
+.pt-finish:active,
+.pt-pressed:is(.pt-said, .pt-next, .pt-finish) {
   transform: translateY(3px);
   box-shadow:
     0 1px 0 #2a1e5c,
@@ -457,7 +458,8 @@
   cursor: pointer;
 }
 
-.pt-pause:active {
+.pt-pause:active,
+.pt-pause.pt-pressed {
   transform: translateY(3px);
   box-shadow:
     0 1px 0 #2a1e5c,

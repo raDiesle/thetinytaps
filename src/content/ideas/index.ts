@@ -16,6 +16,7 @@ import { newGamesIdeas } from "./n-new-games";
 import { adventureIdeas } from "./m-adventure";
 import { littleAdventuresIdeas } from "./g-little-adventures";
 import { otherGamesIdeas } from "./x-other-games";
+import { teethIdeas } from "./x-teeth";
 import { marblesIdeas } from "./k-marbles";
 import { chainReactionIdeas } from "./r-chain-reactions";
 import { parentPhoneIdeas } from "./e-parent-phone";
@@ -61,7 +62,18 @@ export const IDEA_GROUPS: IdeaGroup[] = [
   {
     emoji: "👪",
     title: "Für Eltern & Technik",
-    areas: [everydayHelpersIdeas, timerIdeas, pottyIdeas, rewardChartIdeas, figureIdeas, bookIdeas, parentPhoneIdeas, firstVisitIdeas, allGamesIdeas],
+    areas: [
+      everydayHelpersIdeas,
+      timerIdeas,
+      pottyIdeas,
+      teethIdeas,
+      rewardChartIdeas,
+      figureIdeas,
+      bookIdeas,
+      parentPhoneIdeas,
+      firstVisitIdeas,
+      allGamesIdeas,
+    ],
   },
   { emoji: "📣", title: "Bekannt machen", areas: [youtubeIdeas] },
 ];

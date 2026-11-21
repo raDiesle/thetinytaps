@@ -25,7 +25,7 @@ import {
 } from "./content";
 import { CALL_PICTURE } from "./CallBubble";
 import { addStar } from "./stars";
-import { loopPosition, waitLanguageFor, waitLanguageOf } from "./waitMusic";
+import { loopPosition, passesEndMs, waitLanguageFor, waitLanguageOf, waitLoopSeconds } from "./waitMusic";
 
 /** What the child can have said: a button each, or nothing yet. */
 const SAIDS: Said[] = [...SAID.map((s) => s.id), "unsure"];
@@ -321,5 +321,23 @@ describe("Aufs Töpfchen", () => {
     banned.push("पानी", "बारिश", "फव्वारा", "फ़व्वारा", "पाइप", "गुब्बारा", "केचप", "मुर्गी", "अंड", "ज़ोर", "जोर", "छपाक", "बूँद");
     banned.push("ماء", "مطر", "نافورة", "خرطوم", "بالون", "كاتشب", "دجاج", "بيض", "صلصال", "ضغط", "اضغط", "رذاذ", "قطرة");
     for (const text of lyrics) expect(banned.filter((word) => text.includes(word))).toEqual([]);
+  });
+
+  it("ends a video's waiting only at the end of a whole pass of the song, never inside a verse (Y-21, Y-22)", () => {
+    const part = { loopStart: 0.4, loopEnd: 100.4 };
+    expect(passesEndMs(0.4, part, 1)).toBeCloseTo(100_000);
+    expect(passesEndMs(0.4, part, 3)).toBeCloseTo(300_000);
+    // Going on after a pause in the middle of a pass ends at that pass's end, then whole passes.
+    expect(passesEndMs(60.4, part, 2)).toBeCloseTo(140_000);
+    // Every sung language knows its pass, so the video page can say how long Tapsi sits.
+    for (const language of ["de", "en", "zh", "hi", "es", "ar", "ru"]) expect(waitLoopSeconds(language)).toBeGreaterThan(60);
+  });
+
+  it("shows nothing but the picture in a video: no row of steps, buttons, stars or GameEnd", () => {
+    const play = readFileSync(new URL("./PottyPlay.tsx", import.meta.url), "utf8");
+    expect(play).toMatch(/\{!video && \(\s*<div className="pt-bottom">/);
+    // The parents' video (`demo`) shows no GameEnd either.
+    expect(play).toMatch(/\{last && !video(?: && !demo)? && <GameEnd/);
+    expect(play).toContain("if (video) return;");
   });
 });

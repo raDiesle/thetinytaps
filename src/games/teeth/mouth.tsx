@@ -1,5 +1,4 @@
 import { memo, useLayoutEffect, useMemo, useRef, useState, type CSSProperties, type PointerEvent, type ReactNode, type RefObject } from "react";
-import { STAR_PATH } from "@/components/TapFeedback";
 import { useFigure } from "@/lib/common";
 import { clothesOf } from "./clothes";
 import { useT } from "@/lib/language";
@@ -43,6 +42,12 @@ const GUM_FILLS: Record<FaceKind, string> = { outer: "#ff8fab", top: "#ffa6bc", 
 /** The gum's edge round each tooth. */
 const GUM_RIM = "#e2577c";
 const ZONE_FILL = "#fff2a8";
+/** The inside of the cheeks and lips round the teeth: the gum runs into it, so nothing dark shows between gum and lips. */
+const CHEEK_INSIDE = "#f27e9c";
+/** The dark of the mouth behind the teeth, seen only between the rows of an open mouth. */
+const MOUTH_DARK = "#5c1430";
+/** From how far open the dark behind the teeth shows; with the teeth together only cheek shows round them. */
+const DARK_FROM = 0.3;
 /** Monsters still waiting for a later step only show where their side of the tooth clearly faces out of the mouth. */
 const WAITING_FACING = 0.25;
 /** The child's hair, also its eyebrows. */
@@ -432,7 +437,8 @@ export function Mouth({ view, zone, monsters, brush, happy, dazzled, action, gli
       <>
         <KidFace project={all.face} head={all.face.point(HEAD_MIDDLE)} happy={happy} open={view.open} lips={lipPoints} />
         <g clipPath="url(#mouth-inside)">
-          <path d={lipsPath} fill="#5c1430" />
+          <path d={lipsPath} fill={CHEEK_INSIDE} />
+          {view.open > DARK_FROM && <path d={cavityPath(model, all)} fill={MOUTH_DARK} />}
           {tongueUp && <path d={smoothPath(model.tongue.map(all.lower.point))} fill="#ff6f91" stroke="#d94f74" strokeWidth={3} />}
           {palateDown && <path d={smoothPath(model.palate.map(all.upper.point))} fill="#c94a6e" />}
           {jawParts}
@@ -620,6 +626,32 @@ export function Mouth({ view, zone, monsters, brush, happy, dazzled, action, gli
 }
 
 /**
+ * The opening into the mouth between the two rows of teeth: the outline round every chewing surface of both jaws,
+ * each seen through its own (perhaps tipped) projector. Dark behind the tongue and palate; outside it the cheeks show.
+ */
+function cavityPath(model: MouthModel, all: ReturnType<typeof projectors>): string {
+  const points = model.teeth.flatMap((t) => surfaceFace(t.faces, "top").points.map(all[t.id.jaw].point));
+  return `M${convexHull(points).map(fmt).join(" L")}Z`;
+}
+
+/** The smallest convex outline round `points` (Andrew's monotone chain). */
+function convexHull<P extends { x: number; y: number }>(points: P[]): P[] {
+  const sorted = [...points].sort((a, b) => a.x - b.x || a.y - b.y);
+  if (sorted.length < 3) return sorted;
+  const cross = (o: P, a: P, b: P) => (a.x - o.x) * (b.y - o.y) - (a.y - o.y) * (b.x - o.x);
+  const half = (list: P[]) => {
+    const out: P[] = [];
+    for (const p of list) {
+      while (out.length >= 2 && cross(out[out.length - 2], out[out.length - 1], p) <= 0) out.pop();
+      out.push(p);
+    }
+    out.pop();
+    return out;
+  };
+  return [...half(sorted), ...half([...sorted].reverse())];
+}
+
+/**
  * A monster on its tooth. Drawn again only when one of its own props changes, not with every tick of the clock:
  * `onTickle` has to stay the same function (useCallback) for that.
  */
@@ -660,15 +692,71 @@ const PlacedMonster = memo(function PlacedMonster({
   );
   if (sprite)
     return (
-      <Sprite spot={{ x, y, scale }} reach={MONSTER_REACH} className={`monster-sprite${gone ? " gone" : ""}${scared ? " scared" : ""}`}>
+      <Sprite
+        spot={{ x, y, scale }}
+        reach={MONSTER_REACH}
+        className={`monster-sprite${gone ? " gone" : ""}${scared ? " scared" : ""}${tickled ? " tickled" : ""}`}
+      >
         {active && <div className="sprite-glow" />}
         <div className="sprite-body">
           <svg viewBox={spriteBox(MONSTER_REACH)}>{drawn}</svg>
         </div>
+        {gone && <MonsterDust color={color} />}
       </Sprite>
     );
   return <g transform={`translate(${x} ${y}) scale(${scale})`}>{drawn}</g>;
 });
+
+/**
+ * The grains a brushed monster falls apart into: where each lies on its body and where it drifts, in % of its sprite
+ * from the sprite's middle, when it comes loose in beats (the top first, so it dissolves from the top down), its size
+ * in % and whether it is a foam bubble (a white ring) or a sugar grain in the monster's colour. Spread over the body
+ * by the golden angle and fixed, so every monster dissolves alike.
+ */
+const DUST = Array.from({ length: 16 }, (_, i) => {
+  const angle = i * 2.39996;
+  const r = Math.sqrt((i + 0.5) / 16);
+  const sx = Math.round(19 * r * Math.cos(angle));
+  const sy = Math.round(17 * r * Math.sin(angle));
+  return {
+    sx,
+    sy,
+    dx: Math.round(sx * 1.8 + (i % 2 ? 6 : -6)),
+    dy: Math.round(sy * 1.2 - 34 - (i % 3) * 8),
+    delay: Math.round((0.15 + ((sy + 17) / 34) * 0.7) * 100) / 100,
+    size: 6 + (i % 3) * 2,
+    foam: i % 3 === 1,
+  };
+});
+
+/**
+ * A brushed monster dissolves: its body squeezes, blurs and fades upwards while it falls apart into sugar grains and
+ * foam bubbles that drift off and melt away. Each grain is a small HTML element moved by CSS (`teeth-dust`), never
+ * something animated inside an svg.
+ */
+function MonsterDust({ color }: { color: string }) {
+  return (
+    <div className="monster-dust" aria-hidden>
+      {DUST.map((d, i) => (
+        <i
+          key={i}
+          className={d.foam ? "foam" : undefined}
+          style={
+            {
+              "--sx": `${d.sx}%`,
+              "--sy": `${d.sy}%`,
+              "--dx": `${d.dx}%`,
+              "--dy": `${d.dy}%`,
+              "--size": `${d.size}%`,
+              "--grain": color,
+              animationDelay: `${(d.delay * 0.536).toFixed(3)}s`,
+            } as CSSProperties
+          }
+        />
+      ))}
+    </div>
+  );
+}
 
 /** Rounded, so a place that hasn't really moved leaves the page as it is. */
 const round = (n: number, by = 10) => Math.round(n * by) / by;
@@ -999,14 +1087,6 @@ export function Monster({
             <path d="M-3.5 5.6 L-2.2 9 L-0.8 6.6 Z" fill="#fff" />
           </>
         )}
-      </g>
-      <g className="monster-puff">
-        <g fill="#fff" stroke="#bde0fe" strokeWidth={2}>
-          <circle cx={-10} cy={-4} r={7} />
-          <circle cx={8} cy={-8} r={8} />
-          <circle cx={2} cy={7} r={7} />
-        </g>
-        <path d={STAR_PATH} transform="translate(-7 -9) scale(0.14)" fill="#ffd23f" stroke={INK} strokeWidth={10} />
       </g>
     </g>
   );
