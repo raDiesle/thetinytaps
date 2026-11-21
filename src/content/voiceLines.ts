@@ -393,7 +393,7 @@ function timer(language: TargetLanguageId): VoiceGroup[] {
     { label: "Kurz vor dem Ende", lines: [said(SOON_LINE)], note: "Zur Glocke, eine Minute vor dem Ende oder im letzten Fünftel einer kurzen Zeit (H-49)." },
     { label: "Am Ende eines Bildes", lines: once(pictures.map((p) => said(p.end))) },
     {
-      label: "Abwechseln",
+      label: "Abwechseln und Wippe",
       lines: once(TURN_LINES.map(said)),
       note: "„Wer fängt an?“, während die Lampen auslosen, dann wer anfängt; „Tauschen! …“ bei jedem Wechsel.",
     },

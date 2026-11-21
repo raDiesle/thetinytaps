@@ -1,4 +1,4 @@
-import type { Localized } from "@/lib/language";
+import type { Localized, Texts } from "@/lib/language";
 import type { TimerPicture, TurnPicture } from "./settings";
 
 /** The game's name, on its start screen, its spine on the shelf and in the browser tab. */
@@ -30,7 +30,7 @@ export const tomorrowAt = (at: string): Localized => ({
 });
 
 /** The pictures in their order on the start screen; „Weiter“ at the end goes on with the next, after the last the first. */
-export const PICTURES: { id: TimerPicture; emoji: string; name: Localized }[] = [
+export const PICTURES: { id: TimerPicture; emoji: string; name: Texts }[] = [
   // The order the user asked for (November 2026): the red disc Kitas know first, then the hourglass, the candle, the
   // apple tree, the flower and the pizza, then the alarm clock (H-70) and the rest; „Abwechseln“ last, in a group of its
   // own on the start screen (`TimerGame`).
@@ -71,8 +71,9 @@ export const PICTURES: { id: TimerPicture; emoji: string; name: Localized }[] = 
     name: { de: "Sonnenaufgang", en: "Sunrise", zh: "日出", hi: "सूर्योदय", es: "Amanecer", ar: "شروق الشمس", ru: "Восход" },
   },
   { id: "swap", emoji: "🔁", name: SWAP_NAME },
-  // Tennis (H-71) stood here and was taken out again (user request, 21 November 2026: poorly done); better ideas for
-  // taking turns are H-108 to H-117.
+  // Tennis (H-71) stood here and was taken out again (user request, 21 November 2026: poorly done). In its place the
+  // seesaw (H-109), the best of the better ideas H-108 to H-117: written English first, its other languages on request.
+  { id: "seesaw", emoji: "⚖️", name: { en: "Seesaw" } },
 ];
 
 /**
@@ -90,14 +91,14 @@ export const SWAP_NOTE: Localized = {
 };
 
 /** Whether a picture is one of taking turns, running on without end (`TurnPicture`). */
-export const isTurns = (id: TimerPicture): id is TurnPicture => id === "swap";
+export const isTurns = (id: TimerPicture): id is TurnPicture => id === "swap" || id === "seesaw";
 
 /** The pictures that run until the time is up, in their order: all but those of taking turns. */
 export const TIMED_PICTURES = PICTURES.filter((p) => !isTurns(p.id));
 
 /**
  * The picture after `id` for „Weiter“: the next one that runs until the time is up, after the last the first – never
- * „Abwechseln“, which goes on without an end; from it the first.
+ * „Abwechseln“ or the Wippe, which go on without an end; from them the first.
  */
 export function nextPicture(id: TimerPicture): TimerPicture {
   const i = TIMED_PICTURES.findIndex((p) => p.id === id);

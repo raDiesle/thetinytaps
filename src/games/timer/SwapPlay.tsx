@@ -5,12 +5,13 @@ import { PlayOptions } from "@/components/PlayOptions";
 import { Choice, SettingsGroup } from "@/components/SettingControls";
 import { type Localized, useAppLanguage, useT } from "@/lib/language";
 import { afterPageMotion } from "@/lib/pageMotion";
-import { loadRecordings, playChime, playClick, playMelody, playTusch, playTwinkle, playWhoosh, recorded } from "@/lib/sfx";
+import { loadRecordings, playChime, playClick, playKnock, playMelody, playTusch, playTwinkle, playWhoosh, recorded } from "@/lib/sfx";
 import { hush } from "@/lib/voice";
 import { useWakeLock } from "@/lib/wakeLock";
 import { nextPicture, PICTURES, SWAP_NAME } from "./content";
 import type { SwapToy, TimeShown, TimerPicture, TurnPicture } from "./settings";
 import { TimeShownChoice, TimeShownNote } from "./shown";
+import { SAW, Seesaw, SeesawBackdrop, SeesawGoal, SeesawStand } from "./seesaw";
 import { type Holder, SWAP_TOYS, SwapBackdrop, SwapCushions, SwapHourglass, SwapLight, SwapShade, Toy } from "./swap";
 import { TimeLeft } from "./TimerPlay";
 import { BEGINS, TURN_LINES, TURN_TO, timerLoad, timerSay, WHO_BEGINS } from "./voice";
@@ -52,6 +53,8 @@ const other = (h: Holder): Holder => (h === "fox" ? "bear" : "fox");
  * grown-up leaves with ✕ – or until the clock time set, then both lamps shine, children cheer and „Nochmal“ and „Weiter“
  * come. Real time like every timer: the turn is worked out from the clock, so a phone that slept shows the right child.
  * Behind ⚙️ grown-ups pick the toy, say whose turn it is (which starts that turn anew) and see the time to the change.
+ * The Wippe (`picture` "seesaw", H-109) takes turns the same way: the side in the light is the one whose seat carries the
+ * toy, sinking the whole turn long until it touches down; then the toy hops over to the other seat, now up high.
  */
 export function SwapRun({
   picture,
@@ -65,7 +68,7 @@ export function SwapRun({
   onAgain,
   onPicture,
 }: {
-  /** The picture of taking turns: the toy between two cushions. */
+  /** The picture of taking turns: the toy between two cushions, or on a seesaw. */
   picture: TurnPicture;
   /** One child's turn, in ms. */
   turnMs: number;
@@ -93,6 +96,9 @@ export function SwapRun({
   const [poke, setPoke] = useState(0);
   /** Counts the toy's moves, so it hops each time. */
   const [hop, setHop] = useState(0);
+  /** Counts the starts of the turns (the draw's end, a grown-up giving the turn), so the seesaw's motion starts anew. */
+  const [round, setRound] = useState(0);
+  const seesaw = picture === "seesaw";
   const holderNow = useRef<Holder | null>(null);
   const drawTimers = useRef<ReturnType<typeof setTimeout>[]>([]);
   const { effects, ripple, glow } = useTapFeedback();
@@ -113,6 +119,7 @@ export function SwapRun({
     setDrawn(null);
     setRunning(false);
     setTurns({ start: Date.now() + after, first });
+    setRound((n) => n + 1);
     setHop((n) => n + 1);
     playWhoosh();
     drawTimers.current.push(setTimeout(playChime, 700));
@@ -179,7 +186,8 @@ export function SwapRun({
     };
   }, [turns, turnMs, endsAt, done]);
 
-  // The toy hops over with a whoosh and a chime as the next turn starts.
+  // The toy hops over with a whoosh and a chime as the next turn starts – on the seesaw after the soft bump of the seat
+  // touching down.
   const lastTurn = useRef(turn);
   useEffect(() => {
     if (turn === lastTurn.current) return;
@@ -188,10 +196,11 @@ export function SwapRun({
     setHop((n) => n + 1);
     // Rendered already, so `holderNow` is the child whose turn it is now.
     if (holderNow.current) say(TURN_TO[holderNow.current]);
+    if (seesaw) playKnock(320);
     playWhoosh();
     const timer = setTimeout(playChime, 700);
     return () => clearTimeout(timer);
-  }, [turn, say]);
+  }, [turn, say, seesaw]);
   // At the clock time set, the end is plain like every timer's: children cheer, then the trophy with the end's buttons.
   useEffect(() => {
     if (!done) return;
@@ -239,24 +248,47 @@ export function SwapRun({
   return (
     <>
       <div className="tm-play" data-picture={picture} onPointerDown={down} role="img" aria-label={name ? t(name) : undefined}>
-        <div className={`tm-stage ${done ? "tm-done" : "tm-running"}`}>
-          <SwapBackdrop />
-          <SwapLight kind="fox" on={lit("fox")} />
-          <SwapLight kind="bear" on={lit("bear")} />
-          <SwapCushions />
-          <SwapShade kind="fox" on={!lit("fox")} />
-          <SwapShade kind="bear" on={!lit("bear")} />
-          <SwapHourglass
-            key={running && turns ? `${turns.start}-${turn}` : "wait"}
-            ms={turnMs}
-            startedAt={turnStart}
-            flip={running && turn > 0}
-            waiting={!running}
-            glow={poke}
-          />
-          <Toy toy={toy} place={holder ?? "middle"} hop={hop} />
-          {done && <div className="tm-done-light" />}
-        </div>
+        {seesaw ? (
+          <div className={`tm-stage ${done ? "tm-done" : "tm-running"}`}>
+            <SeesawBackdrop />
+            {(["fox", "bear"] as const).map((kind) => (
+              <SwapShade key={kind} kind={kind} on={!lit(kind)} edge={SAW.x} />
+            ))}
+            {holder && ticking && <SeesawGoal kind={holder} n={poke} />}
+            <SeesawStand />
+            <Seesaw
+              toy={toy}
+              place={holder ?? "middle"}
+              hop={hop}
+              running={ticking}
+              first={turns?.first ?? "fox"}
+              turnMs={turnMs}
+              startedAt={turns?.start ?? 0}
+              round={round}
+              level={done}
+            />
+            {done && <div className="tm-done-light" />}
+          </div>
+        ) : (
+          <div className={`tm-stage ${done ? "tm-done" : "tm-running"}`}>
+            <SwapBackdrop />
+            <SwapLight kind="fox" on={lit("fox")} />
+            <SwapLight kind="bear" on={lit("bear")} />
+            <SwapCushions />
+            <SwapShade kind="fox" on={!lit("fox")} />
+            <SwapShade kind="bear" on={!lit("bear")} />
+            <SwapHourglass
+              key={running && turns ? `${turns.start}-${turn}` : "wait"}
+              ms={turnMs}
+              startedAt={turnStart}
+              flip={running && turn > 0}
+              waiting={!running}
+              glow={poke}
+            />
+            <Toy toy={toy} place={holder ?? "middle"} hop={hop} />
+            {done && <div className="tm-done-light" />}
+          </div>
+        )}
         {ticking && <TimeShownNote shown={timeShown} endsAt={turnStart + turnMs} total={turnMs} />}
         <FeedbackLayer effects={effects} />
         {done && <GameEnd delayMs={4200} level={picture} onAgain={onAgain} next={nextInfo && { name: t(nextInfo.name), onNext: () => onPicture(next) }} />}

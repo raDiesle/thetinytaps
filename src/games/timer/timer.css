@@ -1576,6 +1576,107 @@
   }
 }
 
+/* Wippe (H-109): the plank turns round its pivot as one layer, back and forth for ever, one turn each way (`--tm-ms`,
+   started `--tm-delay` ago); the toy riding on it turns back the same way and stays upright. Two names of the same
+   keyframes, so the motion starts anew whenever the turns do (`round`). Before the turns run and at the end it turns
+   slowly to its place instead. */
+.tm-saw,
+.tm-saw-upright {
+  transition: transform 1.2s ease-in-out;
+}
+
+.tm-saw-a {
+  animation: tm-saw-a var(--tm-ms) linear var(--tm-delay) infinite var(--tm-saw-dir) both;
+}
+
+.tm-saw-b {
+  animation: tm-saw-b var(--tm-ms) linear var(--tm-delay) infinite var(--tm-saw-dir) both;
+}
+
+.tm-saw-upright.tm-saw-a {
+  animation-name: tm-saw-back-a;
+}
+
+.tm-saw-upright.tm-saw-b {
+  animation-name: tm-saw-back-b;
+}
+
+@keyframes tm-saw-a {
+  from {
+    transform: rotate(var(--tm-tilt));
+  }
+  to {
+    transform: rotate(calc(-1 * var(--tm-tilt)));
+  }
+}
+
+@keyframes tm-saw-b {
+  from {
+    transform: rotate(var(--tm-tilt));
+  }
+  to {
+    transform: rotate(calc(-1 * var(--tm-tilt)));
+  }
+}
+
+@keyframes tm-saw-back-a {
+  from {
+    transform: rotate(calc(-1 * var(--tm-tilt)));
+  }
+  to {
+    transform: rotate(var(--tm-tilt));
+  }
+}
+
+@keyframes tm-saw-back-b {
+  from {
+    transform: rotate(calc(-1 * var(--tm-tilt)));
+  }
+  to {
+    transform: rotate(var(--tm-tilt));
+  }
+}
+
+.tm-saw-toy {
+  position: absolute;
+  transition: transform 1.2s ease-in-out;
+}
+
+.tm-saw-upright {
+  transform-origin: 50% 100%;
+}
+
+.tm-saw-toy div,
+.tm-saw-toy svg {
+  display: block;
+  width: 100%;
+  height: 100%;
+}
+
+/* Every second the toy bounces softly on its seat (H-63), as a child does on a seesaw. */
+.tm-saw-bob {
+  animation: tm-saw-bob 1s ease-in-out infinite;
+}
+
+@keyframes tm-saw-bob {
+  40% {
+    transform: translateY(-9%);
+  }
+  70% {
+    transform: translateY(1%);
+  }
+}
+
+.tm-saw-goal {
+  position: absolute;
+  inset: 0;
+  border-radius: 50%;
+  background: radial-gradient(closest-side, rgb(255 246 190 / 0.95), rgb(255 230 140 / 0.55) 65%, transparent);
+  opacity: 0;
+  pointer-events: none;
+  animation: tm-left 1.6s ease-out;
+}
+
 /* Boxes the sun, the moon, the stalk and what is still to grow move in, cut off where the hills or the soil begin. */
 .tm-sky-box {
   overflow: hidden;
