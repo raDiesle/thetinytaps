@@ -7,24 +7,20 @@ import type { Countable, LanguagePack, LetterEntry, WordEntry } from "@/content/
 import { loadRecordings, playBoing, playChime, playCountNote, playHonk, playWhistle, recorded } from "@/lib/sfx";
 import { pick, useAppLanguage, useT } from "@/lib/language";
 import { repeatPause } from "@/lib/spacing";
+import { MIN_CHANGE_MS, SAME_KEY_PAUSE_MS } from "./pace";
 import { HalfNumberCard, LetterCard, NumberCard } from "./Cards";
 import { lettersVoice, useLettersSay } from "./voice";
 import type { LettersSettings } from "./settings";
 import { useSoftTap } from "./softTap";
 import { SurpriseLayer, useSurprises } from "./Surprises";
 import { TWO_DIGIT_MAX, TWO_DIGIT_MIN, TWO_DIGIT_WORDS } from "./twoDigits";
+import { PageColor } from "./PageColor";
 import "./letters.css";
 
 /** A surprise's size: this share of the play area's shorter side, within these limits in px. */
 const SURPRISE_SHARE = 0.42;
 const SURPRISE_MIN = 120;
 const SURPRISE_MAX = 360;
-
-/**
- * Presses closer together than this only make ripples, so mashing doesn't strobe nor chop line after line. The same key
- * again waits longer still, `REPEAT_PAUSE_MS` (`repeats`).
- */
-const MIN_CHANGE_MS = 1000;
 
 /** Enter: a real car horn and train whistle (src/lib/sounds/), synthesized until loaded. */
 const honk = recorded("honk", playHonk);
@@ -123,10 +119,10 @@ export function LettersPlay({ pack, settings, numbersOnly = false }: { pack: Lan
   const hornCount = useRef(0);
   const cardBox = useRef<HTMLDivElement>(null);
   /**
-   * The same key (or the card, or its picture) again is said and sounded only after a pause: a child hammering one key
-   * heard its line and a note at every press (user feedback, November 2026). Pressed during it, it only ripples.
+   * The same key (or the card, or its picture) again is said and sounded only after `SAME_KEY_PAUSE_MS`: a child
+   * hammering one key heard its line and a note at every press (user feedback, November 2026). Pressed during it, it only ripples.
    */
-  const repeats = useMemo(() => repeatPause(), []);
+  const repeats = useMemo(() => repeatPause(SAME_KEY_PAUSE_MS), []);
 
   const say = useLettersSay();
 
@@ -184,13 +180,13 @@ export function LettersPlay({ pack, settings, numbersOnly = false }: { pack: Lan
 
   /**
    * Frei tippen: a surprise where the finger landed (`at`, client px) or, for a key, somewhere on the stage beside the
-   * card. Too soon after the last one (or too many on screen) it only ripples.
+   * card. False when none came: too soon after the last one, or too many on screen.
    */
-  const surprise = useCallback(
+  const trySurprise = useCallback(
     (at?: { x: number; y: number }) => {
       const area = root.current?.getBoundingClientRect();
       const stage = stageBox.current?.getBoundingClientRect();
-      if (!area || !stage) return softTap(at?.x, at?.y);
+      if (!area || !stage) return false;
       const size = Math.max(SURPRISE_MIN, Math.min(SURPRISE_MAX, Math.min(area.width, area.height) * SURPRISE_SHARE));
       const clamp = (v: number, min: number, max: number) => Math.max(min, Math.min(Math.max(min, max), v));
       let x: number;
@@ -214,9 +210,17 @@ export function LettersPlay({ pack, settings, numbersOnly = false }: { pack: Lan
       }
       x = clamp(x - area.left, size * 0.45, area.width - size * 0.45);
       y = clamp(y - area.top, size * 0.5, stage.bottom - area.top - size * 0.4);
-      if (!spawn(x, y, size)) softTap(at?.x, at?.y);
+      return spawn(x, y, size);
     },
-    [spawn, softTap],
+    [spawn],
+  );
+
+  /** A surprise, or only ripples where none can come now. */
+  const surprise = useCallback(
+    (at?: { x: number; y: number }) => {
+      if (!trySurprise(at)) softTap(at?.x, at?.y);
+    },
+    [trySurprise, softTap],
   );
 
   /** The word the letter comes with next time: its words take turns, so repeated presses stay interesting. */
@@ -436,12 +440,14 @@ export function LettersPlay({ pack, settings, numbersOnly = false }: { pack: Lan
 
   /**
    * Keys that are not letters or numbers each do their own thing: Space jumps with a few raindrops,
-   * Enter honks or whistles, arrows push the card, Backspace brings back the one before.
-   * Returns false for keys without a meaning of their own.
+   * Enter honks or whistles, arrows push the card, Backspace brings back the one before. In Frei tippen Space and Enter
+   * open a surprise first, and only when none can come now (pressed quickly again) do their own thing (user request,
+   * November 2026). Returns false for keys without a meaning of their own.
    */
   const specialKey = useCallback(
     (key: string) => {
       if (key !== " " && key !== "Enter" && !(key in ARROWS) && (key !== "Backspace" || history.current.length === 0)) return false;
+      if ((key === " " || key === "Enter") && !numbersOnly && trySurprise()) return true;
       // The same key again moves the card but sounds only after its pause; Backspace waits for it, since it speaks.
       const again = !repeats.pass(key);
       const sound = (play: () => void) => !again && play();
@@ -477,7 +483,7 @@ export function LettersPlay({ pack, settings, numbersOnly = false }: { pack: Lan
       }
       return false;
     },
-    [present, ripple, softTap, animateCard, repeats],
+    [present, ripple, softTap, animateCard, repeats, numbersOnly, trySurprise],
   );
 
   /** A key was pressed, on the keyboard or on the screen. */
@@ -618,7 +624,8 @@ export function LettersPlay({ pack, settings, numbersOnly = false }: { pack: Lan
   const onCardPointer = stepByStep || byTap(shown) ? undefined : repeat;
 
   return (
-    <div ref={root} className={`letters-play${dark ? " ft-dark" : ""}`} style={{ background }} onPointerDown={onPlayAreaPointer}>
+    <div ref={root} className={`letters-play${dark ? " ft-dark" : ""}`} onPointerDown={onPlayAreaPointer}>
+      <PageColor color={background} />
       <div ref={stageBox} className="stage">
         <div ref={cardBox} className="card-box" style={{ translate: `${push[0]}cqw ${push[1]}cqh` }}>
           {firstDigit !== null && <HalfNumberCard key="half" first={firstDigit} />}

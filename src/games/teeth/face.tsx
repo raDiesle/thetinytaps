@@ -142,17 +142,17 @@ export function EyeBall({ x, y, rx, ry, k = 1 }: { x: number; y: number; rx: num
  */
 export const eyeOpening = (rx: number, ry: number, k = 1) => ({ rx: rx - 2 * k, ry: ry - 2 * k });
 
-/** The upper lid: a stronger line over the top, as drawn eyes with lashes have, lying over the top of the iris. */
+/** How far down the eye's sides the lid's line reaches: from this angle above the middle on one side to the other. */
+const LID_FROM = (25 * Math.PI) / 180;
+
+/**
+ * The upper lid: the eye's own outline drawn a little stronger over the top, as drawn eyes with lashes have. It runs
+ * exactly along the eye's edge, never inside the white: a lid line curving through the white above the iris met the
+ * outline in a thick dark crescent over the pupil, which looked odd (user feedback, November 2026).
+ */
 export function EyeLid({ x, y, rx, ry, k = 1 }: { x: number; y: number; rx: number; ry: number; k?: number }) {
-  return (
-    <path
-      d={`M${x - rx * 0.92} ${y - ry * 0.3} Q${x} ${y - ry * 1.34} ${x + rx * 0.92} ${y - ry * 0.3}`}
-      fill="none"
-      stroke={INK}
-      strokeWidth={6 * k}
-      strokeLinecap="round"
-    />
-  );
+  const [dx, dy] = [rx * Math.cos(LID_FROM), ry * Math.sin(LID_FROM)];
+  return <path d={`M${x - dx} ${y - dy} A${rx} ${ry} 0 0 1 ${x + dx} ${y - dy}`} fill="none" stroke={INK} strokeWidth={6 * k} strokeLinecap="round" />;
 }
 
 /** The girl's three lashes at the outer top of each eye, in head units from the eye's middle: from x, y to x, y. */

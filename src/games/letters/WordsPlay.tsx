@@ -10,9 +10,12 @@ import { useAppLanguage } from "@/lib/language";
 import { pick, shuffle } from "@/lib/random";
 import { playChime, playCountNote } from "@/lib/sfx";
 import { useVoiceReady } from "@/lib/voiceReady";
+import { BigKeys } from "./BigKeys";
+import { bigKeyChoices, findableLetters, useKeyLevel } from "./fewKeys";
 import { lettersVoice, useLettersPraise, useLettersSay } from "./voice";
 import type { LettersSettings, WordKind } from "./settings";
 import { useSoftTap } from "./softTap";
+import { PageColor } from "./PageColor";
 import "./letters.css";
 import "./words.css";
 
@@ -64,6 +67,8 @@ export function WordsPlay({ pack, settings }: { pack: LanguagePack; settings: Le
   /** Wrong keys for the current letter; changing it restarts the shake animation. */
   const [nudges, setNudges] = useState(0);
   const [background, setBackground] = useState(BACKGROUNDS[0]);
+  /** On a touch screen, the few big keys the letter waiting is found among (W-02); empty with the whole keyboard. */
+  const [keys, setKeys] = useState<string[]>([]);
   const { effects, ripple } = useTapFeedback();
 
   const lastType = useRef(0);
@@ -88,6 +93,26 @@ export function WordsPlay({ pack, settings }: { pack: LanguagePack; settings: Le
 
   const say = useLettersSay();
   const praise = useLettersPraise();
+
+  const touchKeys = useTouchKeys(settings.touchKeys);
+  const fewKeys = touchKeys && settings.bigKeys !== "all";
+  const keyLevel = useKeyLevel(settings.bigKeys);
+  /** The big keys' other letters: any letter with a key of its own. */
+  const keyPool = useMemo(() => findableLetters(pack, "all").map((l) => l.upper), [pack]);
+
+  /** The key that types a piece; "Ó" has none on the screen, so its "O" does (أ: ا, कि: क). */
+  const keyFor = useCallback(
+    (unit: string) => {
+      const upper = toUpper(unitKey(unit), pack);
+      return pack.letters.some((l) => l.upper === upper) ? upper : (pack.letters.find((l) => keyMatches(upper, l.upper, pack))?.upper ?? upper);
+    },
+    [pack],
+  );
+  /** Lays out the big keys for the piece to find next. */
+  const dealKeys = useCallback(
+    (unit: string) => setKeys(fewKeys ? bigKeyChoices(keyFor(unit), keyPool, keyLevel.count(), pack) : []),
+    [fewKeys, keyFor, keyPool, keyLevel, pack],
+  );
 
   /** The letter's name ("Be!", "باء!"); a Hindi piece is said as it sounds ("कि!"). */
   const letterLine = useCallback(
@@ -144,9 +169,10 @@ export function WordsPlay({ pack, settings }: { pack: LanguagePack; settings: Le
     setCurrent(coming);
     setTyped(0);
     setNudges(0);
+    dealKeys(textUnits(spellingOf(coming.word))[0]);
     setBackground(BACKGROUNDS[coming.id % BACKGROUNDS.length]);
     say(`${coming.word.word}!`);
-  }, [coming, ready, say]);
+  }, [coming, ready, say, dealKeys]);
 
   const typeNext = useCallback(() => {
     if (!current || done) return;
@@ -155,7 +181,10 @@ export function WordsPlay({ pack, settings }: { pack: LanguagePack; settings: Le
     setTyped(next);
     setNudges(0);
     sayLetter(char);
+    // Found at the first tap, a few in a row bring one big key more; after wrong taps one less.
+    keyLevel.found(nudges === 0);
     if (next < letters.length) {
+      dealKeys(letters[next]);
       playCountNote(typed);
       return;
     }
@@ -166,7 +195,7 @@ export function WordsPlay({ pack, settings }: { pack: LanguagePack; settings: Le
     if (isAction(word)) say(pack.joinIn(word), true);
     else praise(pick(pack.praise));
     if (isColor(word)) setBackground(word.color);
-  }, [current, done, letters, typed, pack, say, praise, sayLetter]);
+  }, [current, done, letters, typed, nudges, pack, say, praise, sayLetter, keyLevel, dealKeys]);
 
   /** Type the next letter unless the last one was too recent. */
   const tryType = useCallback(() => {
@@ -218,7 +247,6 @@ export function WordsPlay({ pack, settings }: { pack: LanguagePack; settings: Le
     return () => window.removeEventListener("keydown", onKeyDown);
   }, [pressKey, pack]);
 
-  const touchKeys = useTouchKeys(settings.touchKeys);
   const rows = useMemo(() => keyRows(pack.letters.map((l) => l.upper)), [pack]);
 
   // Tapping the waiting letter types it, tapping the picture says the word,
@@ -238,9 +266,8 @@ export function WordsPlay({ pack, settings }: { pack: LanguagePack; settings: Le
     softTap(e.clientX, e.clientY);
   };
 
-  // The key for the next letter; "Ó" has none on the screen, so its "O" lights up (أ: ا, कि: क).
-  const wanted = letters[typed] && toUpper(unitKey(letters[typed]), pack);
-  const wantedKey = !wanted || pack.letters.some((l) => l.upper === wanted) ? wanted : pack.letters.find((l) => keyMatches(wanted, l.upper, pack))?.upper;
+  // The key for the next letter lights up on the whole keyboard.
+  const wantedKey = letters[typed] ? keyFor(letters[typed]) : undefined;
 
   // „A a“ writes the word as it is written, „Bär“.
   const display = (char: string) => (settings.letterCase === "upper" ? toUpper(char, pack) : settings.letterCase === "lower" ? toLower(char, pack) : char);
@@ -254,7 +281,8 @@ export function WordsPlay({ pack, settings }: { pack: LanguagePack; settings: Le
   const typedColor = (i: number) => (color ? (done ? "#fff" : color.color) : BRIGHT_COLORS[i % BRIGHT_COLORS.length]);
 
   return (
-    <div className={`words-play${color && done ? " colored" : ""}`} style={{ background }} onPointerDown={onPlayAreaPointer}>
+    <div className={`words-play${color && done ? " colored" : ""}${fewKeys ? " wb-play" : ""}`} onPointerDown={onPlayAreaPointer}>
+      <PageColor color={background} />
       <div className="stage">
         {color && done && (
           <div key={`parade-${current?.id}`} className="color-parade" aria-hidden>
@@ -298,14 +326,25 @@ export function WordsPlay({ pack, settings }: { pack: LanguagePack; settings: Le
           </div>
         )}
       </div>
-      {touchKeys && (
-        <TouchKeyboard
-          rows={rows}
-          onKey={pressKey}
-          label={(key) => (settings.letterCase === "lower" ? toLower(key, pack) : key)}
-          highlight={done ? undefined : wantedKey}
-        />
-      )}
+      {fewKeys
+        ? // Among a few keys the right one is marked only after a few wrong taps: lit at once, there would be nothing to find.
+          current && (
+            <BigKeys
+              keys={keys}
+              wanted={done ? undefined : wantedKey}
+              onKey={pressKey}
+              label={(key) => (settings.letterCase === "lower" ? toLower(key, pack) : key)}
+              hint={nudges >= HINT_AFTER_WRONG}
+            />
+          )
+        : touchKeys && (
+            <TouchKeyboard
+              rows={rows}
+              onKey={pressKey}
+              label={(key) => (settings.letterCase === "lower" ? toLower(key, pack) : key)}
+              highlight={done ? undefined : wantedKey}
+            />
+          )}
       <FeedbackLayer effects={effects} />
     </div>
   );

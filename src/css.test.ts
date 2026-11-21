@@ -136,6 +136,26 @@ test("no attribute selector inside :has() and no * after it", () => {
   expect(wrong).toEqual([]);
 });
 
+// A `background` transition repaints and rasters its whole box in every frame of the fade: on Frei tippen's
+// screen-sized page, changing colour with each letter, it rastered 54 screens a second on an old phone (November
+// 2026). A changing page colour fades in as a layer of its own by opacity (`PageColor`); only these small things,
+// changed by a hover or a press, keep one. A new entry here must be small (a switch, one line of a menu), never a page
+// or a big picture.
+const SMALL_BACKGROUND_TRANSITIONS = ["src/styles/start-screen.css .toggle-track", "src/styles/book.css .toc-line"];
+
+test("background transitions only on small controls", () => {
+  const found: string[] = [];
+  for (const file of cssFiles) {
+    const css = readFileSync(file, "utf8").replace(/\/\*[\s\S]*?\*\//g, "");
+    for (const rule of css.matchAll(/([^{}]+)\{([^{}]*)\}/g)) {
+      const transitions = [...rule[2].matchAll(/transition(?:-property)?\s*:([^;]*)/g)].map((m) => m[1]);
+      if (transitions.some((value) => /(^|[\s,])background(-color)?(\s|,|$)|(^|[\s,])all(\s|,|$)/.test(value)))
+        found.push(`${file.split("\\").join("/")} ${rule[1].trim()}`);
+    }
+  }
+  expect(found.filter((rule) => !SMALL_BACKGROUND_TRANSITIONS.includes(rule))).toEqual([]);
+});
+
 // Over the 3D canvas of Bewegungsabenteuer a backdrop blur is drawn again in every frame on a phone.
 test("no stylesheet of Bewegungsabenteuer uses backdrop-filter", () => {
   const found = cssFiles.filter((file) => file.startsWith(join("src", "games", "adventure")) && /backdrop-filter/.test(readFileSync(file, "utf8")));

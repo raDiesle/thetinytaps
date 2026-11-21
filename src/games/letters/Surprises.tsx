@@ -1,18 +1,44 @@
 import { memo, useCallback, useEffect, useId, useMemo, useRef, useState, useSyncExternalStore, type CSSProperties } from "react";
+import { PROD } from "@/lib/buildInfo";
 import { pick, shuffle } from "@/lib/random";
 import { playHoot, playQuack, playTweet } from "@/lib/realSounds";
-import { playBlub, playCrack, playFirework, playInflate, playMusicbox, playPlop, playPop, playRip, playTwinkle } from "@/lib/sfx";
+import {
+  playBlub,
+  playBoing,
+  playChimeNote,
+  playCrack,
+  playCrackle,
+  playDing,
+  playDrops,
+  playFirework,
+  playInflate,
+  playMusicbox,
+  playPlop,
+  playPop,
+  playRip,
+  playSizzle,
+  playSplash,
+  playSwirl,
+  playTwinkle,
+  playWhirr,
+  playWhoosh,
+} from "@/lib/sfx";
 import { EXTRA_SOUND_GAP_MS, spaced } from "@/lib/spacing";
 import { useTimers } from "@/lib/timers";
+import { ART_KINDS, type ArtKind, type ArtParams, ArtView, artParams, CanvasArt } from "./SurpriseArt";
+import { BabyDrawing, EGG_BABIES, type EggBaby, GIFT_TOYS, type GiftToy, ToyDrawing } from "./SurpriseFigures";
+import { CANVAS_KINDS, CANVAS_SECONDS, type CanvasKind, type CanvasParams, canvasParams } from "./surpriseCanvas";
 import "./surprises.css";
 
 // Frei tippen's surprises (user request, November 2026): every key that is no letter or number, and every tap beside
 // the card, opens a surprise – a firework, a present, an egg hatching … – each time another kind, and each kind
 // drawn anew every time (other colours, patterns, what comes out). Each is a few small HTML layers moved only by
-// transform and opacity, and goes again by itself.
+// transform and opacity, or one small canvas drawn by its own loop (`surpriseCanvas.ts`), and goes again by itself.
+// Every surprise is drawn by the app itself, never with emojis – the present's toy and the egg's baby too
+// (`SurpriseFigures.tsx`; user request, November 2026).
 
 /** The kinds of surprise; they take turns in a shuffled order, never the same twice in a row. */
-export const SURPRISE_KINDS = ["firework", "gift", "egg", "balloons", "flowers", "bubbles", "rainbow"] as const;
+export const SURPRISE_KINDS = ["firework", "gift", "egg", "balloons", "flowers", "bubbles", ...ART_KINDS, ...CANVAS_KINDS] as const;
 
 /** One kind of surprise. */
 export type SurpriseKind = (typeof SURPRISE_KINDS)[number];
@@ -20,11 +46,29 @@ export type SurpriseKind = (typeof SURPRISE_KINDS)[number];
 /** How surprises are kept from piling up while a child hammers keys (`surprises.test.ts` keeps them few). */
 export const SURPRISE = {
   /** A new surprise comes at most this often; presses between only ripple. */
-  gapMs: 600,
+  gapMs: 250,
   /** At most this many on screen at once. */
   maxAtOnce: 3,
   /** How long each kind stays, in ms – its CSS animations end within it. */
-  lifeMs: { firework: 2400, gift: 2700, egg: 2900, balloons: 3200, flowers: 2900, bubbles: 2700, rainbow: 2700 } satisfies Record<SurpriseKind, number>,
+  lifeMs: {
+    firework: 2400,
+    gift: 2700,
+    egg: 2900,
+    balloons: 3200,
+    flowers: 2900,
+    bubbles: 2700,
+    comet: 2400,
+    snowflake: 2800,
+    mandala: 2800,
+    splash: 2700,
+    pinwheel: 2700,
+    balls: 3000,
+    // A canvas kind stays a moment longer than its loop runs, so the loop always ends by itself first.
+    skyrocket: CANVAS_SECONDS.skyrocket * 1000 + 200,
+    fountain: CANVAS_SECONDS.fountain * 1000 + 200,
+    swirl: CANVAS_SECONDS.swirl * 1000 + 200,
+    sparkler: CANVAS_SECONDS.sparkler * 1000 + 200,
+  } satisfies Record<SurpriseKind, number>,
 };
 
 const PALETTES = [
@@ -38,19 +82,8 @@ const PALETTES = [
 ];
 const BRIGHT = ["#ff5d73", "#ffb703", "#3ec300", "#00b4d8", "#8e7dff", "#ff7bd0", "#ff8c42", "#2ec4b6"];
 const PASTEL = ["#ffd6e0", "#fff1b8", "#d4f5c9", "#cdeeff", "#e4dcff", "#ffe2c6", "#c8f7ef"];
-const GIFT_THINGS = ["🧸", "⚽", "🚗", "🪀", "🎨", "🍭", "🐶", "🐱", "🚂", "🦄", "🪁", "🥁", "🍓", "🚀", "🐰", "🎺"];
-const EGG_BABIES: { emoji: string; sound?: () => void }[] = [
-  { emoji: "🐥", sound: playTweet },
-  { emoji: "🦆", sound: playQuack },
-  { emoji: "🦉", sound: playHoot },
-  { emoji: "🦕" },
-  { emoji: "🐢" },
-  { emoji: "🐊" },
-  { emoji: "🐧" },
-  { emoji: "🦖" },
-  { emoji: "🐉" },
-  { emoji: "🦜", sound: playTweet },
-];
+/** The sound a baby animal makes as it looks out of its egg, where it has one. */
+const BABY_SOUNDS: Partial<Record<EggBaby, () => void>> = { chick: playTweet, duckling: playQuack, owlet: playHoot, parrot: playTweet };
 
 const rand = (min: number, max: number) => min + Math.random() * (max - min);
 
@@ -59,22 +92,28 @@ type Burst = { x: number; y: number; delay: number; sparks: Spark[]; shape: "dot
 
 type Params =
   | { kind: "firework"; rise: number; bursts: Burst[] }
-  | { kind: "gift"; box: string; ribbon: string; dots: boolean; thing: string; lidX: number; lidTurn: number }
-  | { kind: "egg"; shell: string; mark: string; pattern: "dots" | "zigzag" | "stripes" | "speckles"; baby: string; topX: number; topTurn: number }
+  | { kind: "gift"; box: string; ribbon: string; dots: boolean; thing: GiftToy; tint: string; lidX: number; lidTurn: number }
+  | { kind: "egg"; shell: string; mark: string; pattern: "dots" | "zigzag" | "stripes" | "speckles"; baby: EggBaby; topX: number; topTurn: number }
   | { kind: "balloons"; balloons: { x: number; color: string; drift: number; turn: number; dur: number }[]; rise: number }
   | { kind: "flowers"; flowers: { x: number; height: number; petals: number; color: string; heart: string; pointy: boolean; delay: number }[] }
   | { kind: "bubbles"; bubbles: { x: number; y: number; size: number; dx: number; dy: number; dur: number; delay: number }[] }
-  | { kind: "rainbow"; width: number; tilt: number; pastel: boolean; clouds: boolean };
+  | ArtParams
+  | CanvasParams;
+
+const isArt = (kind: SurpriseKind): kind is ArtKind => (ART_KINDS as readonly string[]).includes(kind);
+const isCanvas = (kind: SurpriseKind): kind is CanvasKind => (CANVAS_KINDS as readonly string[]).includes(kind);
 
 /** One surprise on screen: where (px in the layer), how big, and how it was drawn this time. */
 export type Surprise = { id: number; x: number; y: number; size: number } & Params;
 
 /** Draws this time's look of `kind`: everything random is decided here, so drawing it again changes nothing. */
 function makeParams(kind: SurpriseKind, size: number, y: number): Params {
+  if (isArt(kind)) return artParams(kind);
+  if (isCanvas(kind)) return canvasParams(kind);
   switch (kind) {
     case "firework": {
       const palette = pick(PALETTES);
-      const pattern = pick(["ring", "peony", "double", "spiral", "willow", "triple"] as const);
+      const pattern = pick(["ring", "peony", "double", "spiral", "willow", "triple", "heart", "star", "saturn"] as const);
       const shape = pick(["dot", "dot", "star", "diamond", "sparkle"] as const);
       const ring = (n: number, r: number, colors: string[], stagger = 0, jitter = 0): Spark[] =>
         Array.from({ length: n }, (_, i) => {
@@ -93,6 +132,34 @@ function makeParams(kind: SurpriseKind, size: number, y: number): Params {
         flash: palette[0],
       });
       const n = Math.round(rand(14, 20));
+      /** Sparks that land on the outline `at(u)` (u from 0 to 1, a radius of about 1), scaled by `r`. */
+      const figure = (count: number, r: number, at: (u: number) => [number, number], colors: string[]): Spark[] =>
+        Array.from({ length: count }, (_, i) => {
+          const [fx, fy] = at(i / count);
+          return { x: fx * r * size, y: fy * r * size, color: colors[i % colors.length], delay: 0 };
+        });
+      const heart = (u: number): [number, number] => {
+        const a = u * Math.PI * 2;
+        return [(16 * Math.sin(a) ** 3) / 17, -(13 * Math.cos(a) - 5 * Math.cos(2 * a) - 2 * Math.cos(3 * a) - Math.cos(4 * a)) / 17 - 0.1];
+      };
+      const star = (u: number): [number, number] => {
+        const corner = (k: number): [number, number] => {
+          const a = -Math.PI / 2 + (k * Math.PI) / 5;
+          const r = k % 2 ? 0.45 : 1;
+          return [Math.cos(a) * r, Math.sin(a) * r];
+        };
+        const k = u * 10;
+        const [ax, ay] = corner(Math.floor(k));
+        const [bx, by] = corner(Math.floor(k) + 1);
+        const f = k - Math.floor(k);
+        return [ax + (bx - ax) * f, ay + (by - ay) * f];
+      };
+      const tilt = rand(-0.5, 0.5);
+      const saturn = (u: number): [number, number] => {
+        const a = u * Math.PI * 2;
+        const [ex, ey] = [Math.cos(a), Math.sin(a) * 0.28];
+        return [ex * Math.cos(tilt) - ey * Math.sin(tilt), ex * Math.sin(tilt) + ey * Math.cos(tilt)];
+      };
       const bursts =
         pattern === "ring"
           ? [burst(ring(n, 0.6, palette))]
@@ -104,11 +171,17 @@ function makeParams(kind: SurpriseKind, size: number, y: number): Params {
                 ? [burst(ring(n, 0.6, palette, 20))]
                 : pattern === "willow"
                   ? [burst(ring(n, 0.5, ["#ffc300", "#ffb000", "#ff8c00"]), 0, 0, 0, 0.45, 1.6)]
-                  : [
-                      burst(ring(10, 0.28, palette), -0.3, 0.05, 0),
-                      burst(ring(10, 0.28, palette), 0.28, -0.12, 220),
-                      burst(ring(10, 0.26, palette), 0, 0.22, 440),
-                    ];
+                  : pattern === "triple"
+                    ? [
+                        burst(ring(10, 0.28, palette), -0.3, 0.05, 0),
+                        burst(ring(10, 0.28, palette), 0.28, -0.12, 220),
+                        burst(ring(10, 0.26, palette), 0, 0.22, 440),
+                      ]
+                    : pattern === "heart"
+                      ? [burst(figure(26, 0.55, heart, ["#ff3d5a", "#ff4fb8"]), 0, 0, 0, 0.06)]
+                      : pattern === "star"
+                        ? [burst(figure(30, 0.6, star, palette), 0, 0, 0, 0.06)]
+                        : [burst([...figure(24, 0.7, saturn, [palette[0]]), ...ring(10, 0.2, [palette[1]])], 0, 0, 0, 0.06)];
       return { kind, rise: size * 0.35, bursts };
     }
     case "gift":
@@ -117,7 +190,8 @@ function makeParams(kind: SurpriseKind, size: number, y: number): Params {
         box: pick(BRIGHT),
         ribbon: pick(["#ffd23f", "#ffffff", "#ff5d73", "#3ec1ff"]),
         dots: Math.random() < 0.5,
-        thing: pick(GIFT_THINGS),
+        thing: pick(GIFT_TOYS),
+        tint: pick(BRIGHT),
         lidX: rand(-0.5, 0.5),
         lidTurn: pick([-1, 1]) * rand(20, 45),
       };
@@ -127,7 +201,7 @@ function makeParams(kind: SurpriseKind, size: number, y: number): Params {
         shell: pick(PASTEL),
         mark: pick(BRIGHT),
         pattern: pick(["dots", "zigzag", "stripes", "speckles"] as const),
-        baby: "",
+        baby: pick(EGG_BABIES),
         topX: rand(-0.35, 0.35),
         topTurn: pick([-1, 1]) * rand(25, 50),
       };
@@ -177,8 +251,6 @@ function makeParams(kind: SurpriseKind, size: number, y: number): Params {
         })),
       };
     }
-    case "rainbow":
-      return { kind, width: rand(1.2, 1.6) * size, tilt: rand(-10, 10), pastel: Math.random() < 0.35, clouds: Math.random() < 0.7 };
   }
 }
 
@@ -233,7 +305,7 @@ export function useSurprises() {
   const gate = useMemo(() => spaced(SURPRISE.gapMs), []);
   const extras = useMemo(() => spaced(EXTRA_SOUND_GAP_MS), []);
   const bag = useRef<SurpriseKind[]>([]);
-  const last = useRef<{ kind?: SurpriseKind; thing?: string; baby?: string }>({});
+  const last = useRef<{ kind?: SurpriseKind; thing?: GiftToy; baby?: EggBaby }>({});
   const nextId = useRef(0);
 
   /** The next kind from a shuffled bag; a new bag never starts with the kind just shown. */
@@ -256,14 +328,13 @@ export function useSurprises() {
       const extra = extras.pass();
       let babySound: (() => void) | undefined;
       if (params.kind === "gift") {
-        while (params.thing === last.current.thing) params.thing = pick(GIFT_THINGS);
+        while (params.thing === last.current.thing) params.thing = pick(GIFT_TOYS);
         last.current.thing = params.thing;
       }
       if (params.kind === "egg") {
-        let baby = pick(EGG_BABIES);
-        while (baby.emoji === last.current.baby) baby = pick(EGG_BABIES);
-        last.current.baby = params.baby = baby.emoji;
-        babySound = baby.sound;
+        while (params.baby === last.current.baby) params.baby = pick(EGG_BABIES);
+        last.current.baby = params.baby;
+        babySound = BABY_SOUNDS[params.baby];
       }
       store.add({ id: nextId.current++, x, y, size, ...params }, SURPRISE.lifeMs[kind]);
       // Every surprise answers at once, its big moment has its own sound, and a second sound only as a spaced extra.
@@ -293,14 +364,60 @@ export function useSurprises() {
           playBlub();
           if (extra) later(playPlop, 1500);
           break;
-        case "rainbow":
+        case "comet":
+          playWhoosh();
+          later(playTwinkle, 880);
+          break;
+        case "snowflake":
+          playChimeNote(4);
+          later(() => playChimeNote(6), 1500);
+          if (extra) later(playTwinkle, 1600);
+          break;
+        case "mandala":
           playMusicbox();
+          if (extra) later(playDing, 700);
+          break;
+        case "splash":
+          playSplash();
+          if (extra) later(playDrops, 500);
+          break;
+        case "pinwheel":
+          playWhirr();
+          break;
+        case "balls": {
+          // The first ball lands at a third of its fall (`ft-ball` in surprises.css), the second bounce a while later.
+          const first = 2.5 * 0.3 * 1000 + params.balls[0].delay * 1000;
+          later(playBoing, first);
+          if (extra) later(playBoing, first + 2.5 * 0.32 * 1000);
+          break;
+        }
+        case "skyrocket":
+          playFirework(0.55, extra && params.burst !== "glitter");
+          if (extra && params.burst === "glitter") later(playCrackle, 700);
+          break;
+        case "fountain":
+          playSizzle();
+          if (extra) later(playCrackle, 400);
+          break;
+        case "swirl":
+          playSwirl();
+          if (extra) later(playTwinkle, 1500);
+          break;
+        case "sparkler":
+          playSizzle();
+          if (extra) later(playTwinkle, 1900);
           break;
       }
       return true;
     },
     [store, gate, extras, nextKind, later],
   );
+
+  // For trying out one kind in the browser console: __surprise("comet"), then a key that opens a surprise.
+  useEffect(() => {
+    if (PROD) return;
+    Object.assign(window, { __surprise: (kind: SurpriseKind) => (bag.current = [kind]) });
+  }, []);
 
   return { surprises: store, spawn };
 }
@@ -322,14 +439,17 @@ const vars = (v: Record<string, string | number>) => v as CSSProperties;
 
 const SurpriseView = memo(function SurpriseView({ s }: { s: Surprise }) {
   return (
-    <div className={`ft-at ft-${s.kind}`} style={vars({ left: `${s.x}px`, top: `${s.y}px`, "--s": `${s.size}px` })}>
+    // The kind is an attribute, never a class: a class „ft-<kind>“ is the animation of that kind's own drawing
+    // (`.ft-snowflake`, `.ft-pinwheel`) and once moved the whole surprise with it (`surprises.test.ts`).
+    <div className="ft-at" data-kind={s.kind} style={vars({ left: `${s.x}px`, top: `${s.y}px`, "--s": `${s.size}px` })}>
       {s.kind === "firework" && <Firework s={s} />}
       {s.kind === "gift" && <Gift s={s} />}
       {s.kind === "egg" && <Egg s={s} />}
       {s.kind === "balloons" && <Balloons s={s} />}
       {s.kind === "flowers" && <Flowers s={s} />}
       {s.kind === "bubbles" && <Bubbles s={s} />}
-      {s.kind === "rainbow" && <Rainbow s={s} />}
+      {isArt(s.kind) && <ArtView s={s as ArtParams} size={s.size} />}
+      {isCanvas(s.kind) && <CanvasArt s={s as CanvasParams} size={s.size} />}
     </div>
   );
 });
@@ -365,7 +485,9 @@ function Gift({ s }: { s: Extract<Surprise, { kind: "gift" }> }) {
   const dark = "#0000002e";
   return (
     <div className="ft-gift-box">
-      <span className="ft-gift-thing">{s.thing}</span>
+      <span className="ft-gift-thing">
+        <ToyDrawing toy={s.thing} tint={s.tint} />
+      </span>
       <div className="ft-gift-shake">
         <svg className="ft-gift-body" viewBox="0 0 100 60" role="presentation">
           <rect x="10" y="0" width="80" height="60" rx="4" fill={s.box} stroke="#5a3a2a" strokeWidth="2.5" />
@@ -453,7 +575,9 @@ function EggHalf({ s, top }: { s: Extract<Surprise, { kind: "egg" }>; top: boole
 function Egg({ s }: { s: Extract<Surprise, { kind: "egg" }> }) {
   return (
     <div className="ft-egg-box">
-      <span className="ft-egg-baby">{s.baby}</span>
+      <span className="ft-egg-baby">
+        <BabyDrawing baby={s.baby} />
+      </span>
       <div className="ft-egg-shake">
         <EggHalf s={s} top={false} />
         <EggHalf s={s} top />
@@ -546,30 +670,5 @@ function Bubbles({ s }: { s: Extract<Surprise, { kind: "bubbles" }> }) {
         />
       ))}
     </>
-  );
-}
-
-const RAINBOW = ["#ff4d4d", "#ff9f1c", "#ffd23f", "#3ec300", "#00b4d8", "#8e7dff"];
-const RAINBOW_PASTEL = ["#ffadad", "#ffd6a5", "#fdffb6", "#caffbf", "#9bf6ff", "#bdb2ff"];
-
-function Rainbow({ s }: { s: Extract<Surprise, { kind: "rainbow" }> }) {
-  const colors = s.pastel ? RAINBOW_PASTEL : RAINBOW;
-  return (
-    <div className="ft-rainbow-tilt" style={vars({ "--w": `${s.width}px`, rotate: `${s.tilt}deg` })}>
-      <svg className="ft-rainbow" viewBox="0 0 200 110" role="presentation">
-        {colors.map((color, i) => {
-          const r = 88 - i * 10;
-          return <path key={color} d={`M${100 - r} 104 A${r} ${r} 0 0 1 ${100 + r} 104`} fill="none" stroke={color} strokeWidth="10.5" />;
-        })}
-        {s.clouds &&
-          [22, 178].map((cx) => (
-            <g key={cx} fill="#ffffff" stroke="#c9d6e3" strokeWidth="1.5">
-              <circle cx={cx - 12} cy="100" r="11" />
-              <circle cx={cx + 12} cy="100" r="11" />
-              <circle cx={cx} cy="92" r="14" />
-            </g>
-          ))}
-      </svg>
-    </div>
   );
 }

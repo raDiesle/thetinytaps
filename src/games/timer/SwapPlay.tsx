@@ -5,28 +5,26 @@ import { PlayOptions } from "@/components/PlayOptions";
 import { Choice, SettingsGroup } from "@/components/SettingControls";
 import { type Localized, useAppLanguage, useT } from "@/lib/language";
 import { afterPageMotion } from "@/lib/pageMotion";
-import { loadRecordings, playChime, playClick, playMelody, playTusch, playTwinkle, playWhoosh, recorded } from "@/lib/sfx";
+import { loadRecordings, playChime, playKnock, playMelody, playTusch, playTwinkle, playWhoosh, recorded } from "@/lib/sfx";
 import { hush } from "@/lib/voice";
 import { useWakeLock } from "@/lib/wakeLock";
 import { nextPicture, PICTURES, SWAP_NAME } from "./content";
 import type { SwapToy, TimeShown, TimerPicture, TurnPicture } from "./settings";
 import { TimeShownChoice, TimeShownNote } from "./shown";
+import { SAW, Seesaw, SeesawBackdrop, SeesawGoal, SeesawStand, SeesawSun } from "./seesaw";
 import { type Holder, SWAP_TOYS, SwapBackdrop, SwapCushions, SwapHourglass, SwapLight, SwapShade, Toy } from "./swap";
 import { TimeLeft } from "./TimerPlay";
-import { BEGINS, TURN_LINES, TURN_TO, timerLoad, timerSay, WHO_BEGINS } from "./voice";
+import { BEGINS, TURN_LINES, TURN_TO, timerLoad, timerSay } from "./voice";
 
 /** Children cheering at the clock time set (a recording, else a flourish). */
 const playCheer = recorded("cheer", playTusch);
 
 /**
- * Who begins is drawn by the lamps (user feedback, November 2026: who is first must be plain from the start): they
- * click on and off in turn, these many ms apart, slower and slower, and the last one on is the first child's. An even
- * count, so the lamp lit first is the one that wins.
+ * Who begins: the fox child, on the left, always – no draw (user feedback, 21 November 2026: the lamps clicking on and
+ * off at random before the turns was a start sequence nobody wanted). The toy or the seat shows it from the first
+ * second, and a grown-up gives the other child the first turn behind ⚙️ („Wer ist dran?“).
  */
-export const DRAW_STEPS = [240, 250, 270, 300, 350, 420, 520, 660] as const;
-
-/** How long the winning lamp stays on before the toy hops over to its cushion. */
-const DRAW_HOLD_MS = 500;
+export const FIRST_TURN: Holder = "fox";
 
 /** How long the toy's hop takes: the first turn starts as it lands. */
 const HOP_MS = 1200;
@@ -42,16 +40,16 @@ function turnAt(turns: Turns, turnMs: number, now: number) {
   return Math.max(0, Math.floor((now - turns.start) / turnMs));
 }
 
-/** The other child. */
-const other = (h: Holder): Holder => (h === "fox" ? "bear" : "fox");
-
 /**
- * Abwechseln (H-52): two children take turns with a toy. First the lamps over the two cushions draw who begins; then
- * the toy hops onto that child's cushion under its lamp while the hourglass runs; when the sand is through, the lamps
+ * Abwechseln (H-52): two children take turns with a toy. The fox child begins (`FIRST_TURN`): its lamp is on from the
+ * first second and the toy hops onto its cushion while the hourglass runs; when the sand is through, the lamps
  * change, the toy hops over to the other cushion with a sound, the hourglass turns itself over, and so on until a
  * grown-up leaves with ✕ – or until the clock time set, then both lamps shine, children cheer and „Nochmal“ and „Weiter“
  * come. Real time like every timer: the turn is worked out from the clock, so a phone that slept shows the right child.
  * Behind ⚙️ grown-ups pick the toy, say whose turn it is (which starts that turn anew) and see the time to the change.
+ * The Wippe (`picture` "seesaw", H-109) takes turns the same way, without a toy: the side in the sun is the one whose
+ * seat sinks the whole turn long, as a chick walks over to it, until it touches down; then the chick turns round and
+ * walks back to the other seat, now up high.
  */
 export function SwapRun({
   picture,
@@ -65,7 +63,7 @@ export function SwapRun({
   onAgain,
   onPicture,
 }: {
-  /** The picture of taking turns: the toy between two cushions. */
+  /** The picture of taking turns: the toy between two cushions, or on a seesaw. */
   picture: TurnPicture;
   /** One child's turn, in ms. */
   turnMs: number;
@@ -82,24 +80,25 @@ export function SwapRun({
 }) {
   const t = useT();
   const [endsAt] = useState(() => (totalMs === undefined ? undefined : Date.now() + totalMs));
-  /** The turns, once the lamps have drawn who begins (null while they draw). */
+  /** The turns, once the page lies still (null while it still turns). */
   const [turns, setTurns] = useState<Turns | null>(null);
-  /** The lamp on while they draw. */
-  const [drawn, setDrawn] = useState<Holder | null>(null);
   const [turn, setTurn] = useState(0);
-  /** The first turn has begun (the toy has landed), so the sand runs. */
+  /** The first turn has begun (the toy has landed), so the sand runs and the chick walks. */
   const [running, setRunning] = useState(false);
   const [done, setDone] = useState(false);
   const [poke, setPoke] = useState(0);
-  /** Counts the toy's moves, so it hops each time. */
+  /** Counts the toy's moves (Abwechseln), so it hops each time. */
   const [hop, setHop] = useState(0);
+  /** Counts the starts of the turns (the draw's end, a grown-up giving the turn), so the seesaw's motion starts anew. */
+  const [round, setRound] = useState(0);
+  const seesaw = picture === "seesaw";
   const holderNow = useRef<Holder | null>(null);
-  const drawTimers = useRef<ReturnType<typeof setTimeout>[]>([]);
+  const startTimers = useRef<ReturnType<typeof setTimeout>[]>([]);
   const { effects, ripple, glow } = useTapFeedback();
   useWakeLock(!done);
   useEffect(() => loadRecordings(["cheer"]), []);
 
-  // The voice (H-72): „Wer fängt an?“ as the lamps draw, who begins as they have, and „Tauschen! …“ at every change.
+  // The voice (H-72): who begins as the turns start, and „Tauschen! …“ at every change.
   // Silent until recorded; a grown-up leaving with ✕ stops it.
   const language = useAppLanguage().id;
   const say = useCallback((line: Localized, queue = false) => timerSay(line, language, queue), [language]);
@@ -107,48 +106,33 @@ export function SwapRun({
   useEffect(() => hush, []);
 
   /** A child's turn begins now (or after the toy's hop): the toy hops over to its cushion with a whoosh and a chime. */
-  const begin = useCallback((first: Holder, after: number) => {
-    for (const timer of drawTimers.current) clearTimeout(timer);
-    drawTimers.current = [];
-    setDrawn(null);
-    setRunning(false);
-    setTurns({ start: Date.now() + after, first });
-    setHop((n) => n + 1);
-    playWhoosh();
-    drawTimers.current.push(setTimeout(playChime, 700));
-  }, []);
+  const begin = useCallback(
+    (first: Holder, after: number) => {
+      for (const timer of startTimers.current) clearTimeout(timer);
+      startTimers.current = [];
+      setRunning(false);
+      setTurns({ start: Date.now() + after, first });
+      setRound((n) => n + 1);
+      setHop((n) => n + 1);
+      if (!seesaw) playWhoosh();
+      startTimers.current.push(setTimeout(playChime, seesaw ? 0 : 700));
+    },
+    [seesaw],
+  );
 
-  // The lamps draw who begins, once the page lies still: on and off in turn with a click, slower and slower.
+  // The first child's turn starts as soon as the page lies still: the toy hops onto its cushion (on the seesaw, whose
+  // first seat already stands up high, the chick sets off at once).
   useEffect(() => {
     if (endsAt !== undefined && Date.now() >= endsAt) return;
-    const winner: Holder = Math.random() < 0.5 ? "fox" : "bear";
-    const timers = drawTimers.current;
     const cancel = afterPageMotion(() => {
-      let at = 0;
-      setDrawn(winner);
-      playClick();
-      say(WHO_BEGINS);
-      DRAW_STEPS.forEach((gap, i) => {
-        at += gap;
-        timers.push(
-          setTimeout(() => {
-            setDrawn(i % 2 === 0 ? other(winner) : winner);
-            playClick();
-          }, at),
-        );
-      });
-      timers.push(
-        setTimeout(() => {
-          begin(winner, HOP_MS);
-          say(BEGINS[winner], true);
-        }, at + DRAW_HOLD_MS),
-      );
+      begin(FIRST_TURN, seesaw ? 0 : HOP_MS);
+      say(BEGINS[FIRST_TURN], true);
     });
     return () => {
       cancel();
-      for (const timer of drawTimers.current) clearTimeout(timer);
+      for (const timer of startTimers.current) clearTimeout(timer);
     };
-  }, [begin, endsAt, say]);
+  }, [begin, endsAt, say, seesaw]);
 
   // The turn, checked at least every second and again when the page comes back (timers sleep in the background).
   useEffect(() => {
@@ -179,7 +163,8 @@ export function SwapRun({
     };
   }, [turns, turnMs, endsAt, done]);
 
-  // The toy hops over with a whoosh and a chime as the next turn starts.
+  // The toy hops over with a whoosh and a chime as the next turn starts – on the seesaw the seat touches down with a soft
+  // bump and a chime, and the chick turns round.
   const lastTurn = useRef(turn);
   useEffect(() => {
     if (turn === lastTurn.current) return;
@@ -188,10 +173,11 @@ export function SwapRun({
     setHop((n) => n + 1);
     // Rendered already, so `holderNow` is the child whose turn it is now.
     if (holderNow.current) say(TURN_TO[holderNow.current]);
-    playWhoosh();
+    if (seesaw) playKnock(320);
+    else playWhoosh();
     const timer = setTimeout(playChime, 700);
     return () => clearTimeout(timer);
-  }, [turn, say]);
+  }, [turn, say, seesaw]);
   // At the clock time set, the end is plain like every timer's: children cheer, then the trophy with the end's buttons.
   useEffect(() => {
     if (!done) return;
@@ -206,8 +192,10 @@ export function SwapRun({
 
   const holder: Holder | null = turns ? ((turn % 2 === 0) === (turns.first === "fox") ? "fox" : "bear") : null;
   holderNow.current = holder;
-  /** The lamp that shines: the drawing one, then the child's whose turn it is; at the end both. */
-  const lit = (kind: Holder) => done || (holder ?? drawn) === kind;
+  /** Whose side is shown as having the turn: before the first turn starts (the page still turning), the first child's. */
+  const shown = holder ?? FIRST_TURN;
+  /** The lamp that shines: the child's whose turn it is; at the end both. */
+  const lit = (kind: Holder) => done || shown === kind;
 
   /** A tap or a key: the sand still on top lights up (H-51, „Wie lange noch?“) and twinkles; after the end, ripples. */
   const answer = useCallback(
@@ -239,36 +227,62 @@ export function SwapRun({
   return (
     <>
       <div className="tm-play" data-picture={picture} onPointerDown={down} role="img" aria-label={name ? t(name) : undefined}>
-        <div className={`tm-stage ${done ? "tm-done" : "tm-running"}`}>
-          <SwapBackdrop />
-          <SwapLight kind="fox" on={lit("fox")} />
-          <SwapLight kind="bear" on={lit("bear")} />
-          <SwapCushions />
-          <SwapShade kind="fox" on={!lit("fox")} />
-          <SwapShade kind="bear" on={!lit("bear")} />
-          <SwapHourglass
-            key={running && turns ? `${turns.start}-${turn}` : "wait"}
-            ms={turnMs}
-            startedAt={turnStart}
-            flip={running && turn > 0}
-            waiting={!running}
-            glow={poke}
-          />
-          <Toy toy={toy} place={holder ?? "middle"} hop={hop} />
-          {done && <div className="tm-done-light" />}
-        </div>
+        {seesaw ? (
+          <div className={`tm-stage ${done ? "tm-done" : "tm-running"}`}>
+            <SeesawBackdrop />
+            {(["fox", "bear"] as const).map((kind) => (
+              <SeesawSun key={kind} kind={kind} on={lit(kind)} />
+            ))}
+            {(["fox", "bear"] as const).map((kind) => (
+              <SwapShade key={kind} kind={kind} on={!lit(kind)} edge={SAW.x} />
+            ))}
+            {holder && ticking && <SeesawGoal kind={holder} n={poke} />}
+            <SeesawStand />
+            <Seesaw
+              holder={shown}
+              running={ticking}
+              first={turns?.first ?? FIRST_TURN}
+              turnMs={turnMs}
+              startedAt={turns?.start ?? 0}
+              round={round}
+              level={done}
+            />
+            {done && <div className="tm-done-light" />}
+          </div>
+        ) : (
+          <div className={`tm-stage ${done ? "tm-done" : "tm-running"}`}>
+            <SwapBackdrop />
+            <SwapLight kind="fox" on={lit("fox")} />
+            <SwapLight kind="bear" on={lit("bear")} />
+            <SwapCushions />
+            <SwapShade kind="fox" on={!lit("fox")} />
+            <SwapShade kind="bear" on={!lit("bear")} />
+            <SwapHourglass
+              key={running && turns ? `${turns.start}-${turn}` : "wait"}
+              ms={turnMs}
+              startedAt={turnStart}
+              flip={running && turn > 0}
+              waiting={!running}
+              glow={poke}
+            />
+            <Toy toy={toy} place={holder ?? "middle"} hop={hop} />
+            {done && <div className="tm-done-light" />}
+          </div>
+        )}
         {ticking && <TimeShownNote shown={timeShown} endsAt={turnStart + turnMs} total={turnMs} />}
         <FeedbackLayer effects={effects} />
         {done && <GameEnd delayMs={4200} level={picture} onAgain={onAgain} next={nextInfo && { name: t(nextInfo.name), onNext: () => onPicture(next) }} />}
       </div>
       <PlayOptions>
         <SettingsGroup title={t(SWAP_NAME)}>
-          <Choice
-            label={t({ de: "Spielzeug", en: "Toy", zh: "玩具", hi: "खिलौना", es: "Juguete", ar: "اللعبة", ru: "Игрушка" })}
-            value={toy}
-            onChange={onToy}
-            options={SWAP_TOYS.map((s) => ({ value: s.id, label: `${s.emoji} ${t(s.name)}` }))}
-          />
+          {!seesaw && (
+            <Choice
+              label={t({ de: "Spielzeug", en: "Toy", zh: "玩具", hi: "खिलौना", es: "Juguete", ar: "اللعبة", ru: "Игрушка" })}
+              value={toy}
+              onChange={onToy}
+              options={SWAP_TOYS.map((s) => ({ value: s.id, label: `${s.emoji} ${t(s.name)}` }))}
+            />
+          )}
           <Choice
             label={t({
               de: "Wer ist dran?",
@@ -279,7 +293,7 @@ export function SwapRun({
               ar: "دور مَن؟",
               ru: "Чья очередь?",
             })}
-            value={holder ?? drawn ?? "fox"}
+            value={shown}
             // Starts that child's turn anew, with a full hourglass: for who begins, or to set it right.
             onChange={(first: Holder) => {
               begin(first, 0);

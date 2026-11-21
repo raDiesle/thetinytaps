@@ -22,7 +22,7 @@ animation in it put at that moment and then stopped (`holdAt`, `.tm-card-art.tm-
 the picture (`ART_ASPECT`). Names are only read out and their tooltip. They stand in the order the user chose (November
 2026, `PICTURES`): Rote Scheibe, Sanduhr, Kerze, Apfelbaum, Blume, Pizza, Wecker, then Tidy Up and the others, on one frame with
 no name; after all of them Abwechseln is a category of its own, named on its frame (`GameMode.kind`): its two children
-with the toy, the lamps and the hourglass, and that it runs on without end is said in its tooltip (`SWAP_NOTE`). Where there is
+with the toy, the lamps and the hourglass, then the Wippe, and that they run on without end is said in their tooltip (`SWAP_NOTE`). Where there is
 room, its frame stands beside the pictures' rather than in a row of its own below (`packGroups`' `reserve`), so all
 cards still fit on one screen. The row of lengths stands in the menu's head (`levelInHead`), on a phone on its side
 beside the ribbon: under the head it left the cards too little room there, and the Abwechseln group fell below the
@@ -111,17 +111,37 @@ taken out (user request, November 2026). The pictures:
   beside it), standing between two floor cushions (`SWAP_SEATS`, the same way left and right of it): the fox child's
   (orange, with pointed ears sewn on) and the bear child's (brown, round ears). A lamp hangs over each. Whose turn it is
   shows at once from afar (user feedback, November 2026): that child's lamp is on and shines on its cushion
-  (`SwapLight`), the other side lies in soft shade (`SwapShade`), and the toy sits on the lit cushion. Who begins is
-  drawn at the start, once the page lies still: the lamps click on and off in turn, slower and slower (`DRAW_STEPS`),
-  the last one on is the first child's, and the toy hops from in front of the hourglass onto that cushion – the sand
-  only starts as it lands. When the sand is through the lamps change, the toy hops over with a whoosh and a chime and
+  (`SwapLight`), the other side lies in shade (`SwapShade`), and the toy sits on the lit cushion. The fox child begins
+  (`FIRST_TURN`), its lamp on from the first second: once the page lies still the toy hops from in front of the
+  hourglass onto its cushion – the sand only starts as it lands. No draw of who begins (the lamps clicking on and off at
+  random were taken out, user feedback, 21 November 2026); a grown-up gives the bear child the first turn behind ⚙️. When the sand is through the lamps change, the toy hops over with a whoosh and a chime and
   the hourglass turns itself over – back and forth until a grown-up leaves with ✕ (with „bis um“ set, until then, each
   turn as long as the row's minutes; at the end both lamps shine). Behind ⚙️: the toy (Bobbycar, Puppe, Ball,
-  `SWAP_TOYS`, kept as `toy`), „Wer ist dran?“ (starts that child's turn anew, also during the draw) and the time to the
-  change. The turn is worked out from the clock (`turnAt`).
+  `SWAP_TOYS`, kept as `toy`), „Wer ist dran?“ (starts that child's turn anew) and the time to the change. The turn is worked out from the clock (`turnAt`).
 - „Tennis“ 🎾 (H-71) stood beside Abwechseln from 7 November 2026 and was taken out on 21 November 2026 (user request:
-  poorly done); better ways of taking turns wait as H-108 to H-117. Its id `tennis` is gone from `PICTURES`, so a kept
-  choice falls back to the first picture.
+  poorly done). Its id `tennis` is gone from `PICTURES`, so a kept choice falls back to the first picture.
+- „Wippe“ ⚖️ (H-109, `seesaw.tsx`, 21 November 2026, chosen as the best of H-108 to H-117; reworked the same day after
+  feedback): Abwechseln on a seesaw, in its group after the hourglass, run by the same `SwapRun` (the fox child first,
+  turns from the clock, „Wer ist dran?“, the same voice lines) – without a toy (a Bobbycar riding on the seat looked odd,
+  so its toy choice is hidden there). The seesaw is the time: the seat of the child whose turn it is starts up high and
+  sinks evenly the whole turn long until its underside lies on a tyre half buried under it (`SAW_TILT` worked out from
+  `TYRE_TOP`), then the other seat, now up high, sinks – so the waiting child sees its own seat rise towards its turn.
+  What tips it is a yellow chick walking along the plank (`Chick`, `WALKER`): from beside the low seat over to the high
+  one, as long as the turn, its weight carrying the plank evenly with it; when the seat touches down (a soft bump and a
+  chime) it turns round and walks back. Its legs swing and its body bobs at their own pace however long the turn is, so
+  a ten-minute turn still plainly moves. The plank is big and steep (`SAW`: thick, the seats as far apart as the
+  tablet's 4:3 cut allows, the pivot high, about 26° each way). The plank with its handles, the cushions on its seats
+  (the shared `Cushion`, no figures) and its hub is one HTML layer turning round the pivot (`PLANK_BOX`): one CSS
+  animation, `infinite alternate` with a turn each way, `alternate-reverse` when the bear child begins, its delay read
+  once as the turns start (a delay changed on a running animation moves it); the chick walks in it by a second animation
+  as long (`tm-saw-walk-*`), turns back the plank's turn round its feet (`tm-saw-back-*`, so it stays upright) and looks
+  the way it walks. Two names of the same keyframes (`tm-saw-a`/`-b`, by `round` and `wake`) start them anew when a
+  grown-up gives the turn and when the page comes back (`visibilitychange`: while hidden the animations' time can stand
+  still while the clock runs on – the sinking seat was then the waiting child's). Before the first turn the plank already
+  stands tipped for the fox child with the chick still beside the bear's seat; at the end it lies level, the chick in the
+  middle. Whose turn it is: warm sun over that half (`SeesawSun`), the other half in shade (`SwapShade` with `edge` at
+  the pivot). A tap lights the tyre the falling seat goes to (`SeesawGoal`). Its name is English only („Seesaw“) until
+  translations are asked for.
   At the end the picture's own sound, then children cheer (the `cheer` recording) while a warm light spreads over the
   picture (`.tm-done-light`), a friendly tune after it, then `GameEnd` with the picture's trophy (nothing rises, the trophy replaced it, user decision, November 2026) with „Nochmal“ and „Weiter“ (the next picture,
   the same minutes, `nextPicture`). Every tap or key during the run answers (steam and a whistle, twinkling, the flame
@@ -142,8 +162,8 @@ Files: `TimerGame.tsx` (start screen: cards, minutes and the own time's slip), `
 „Andere …“), `time.ts` (own times: typing, clock times, labels, digits; tested in `time.test.ts`), `TimerPlay.tsx` (one
 run: working out its length, the question when a clock time is past, the clock, the phases `running` →
 `blow` (candle only) → `done`, taps, the end, the sounds of the pieces), `pieces.ts` (how a run is cut into pieces, the
-train's halts, where the apples hang; tested), `SwapPlay.tsx` and `swap.tsx` („Abwechseln“: the draw and its turns, and its room,
-lamps, cushions and toys), `apples.tsx`, `caterpillar.tsx`, `clock.tsx`, `disc.tsx`, `flower.tsx`, `sunset.tsx`, `pizza.tsx`, `tidy.tsx` (one picture each; `tidyNames.ts` Tidy Up's English-only texts), `shown.tsx`
+train's halts, where the apples hang; tested), `SwapPlay.tsx` and `swap.tsx` („Abwechseln“: its turns, and its room,
+lamps, cushions and toys), `seesaw.tsx` (the Wippe's playground, plank, stand and chick), `apples.tsx`, `caterpillar.tsx`, `clock.tsx`, `disc.tsx`, `flower.tsx`, `sunset.tsx`, `pizza.tsx`, `tidy.tsx` (one picture each; `tidyNames.ts` Tidy Up's English-only texts), `shown.tsx`
 („Zeit im Bild“: its choice, the note with digits or tally marks), `scenes.tsx` (the other drawings
 and the shared `Layer`, `Draw`, `LeftGlow`), `timer.css`, `content.ts`
 (names, order), `settings.ts`.
@@ -180,16 +200,25 @@ and the shared `Layer`, `Draw`, `LeftGlow`), `timer.css`, `content.ts`
   one before is over (`appleTimes`, `timer.test.ts` checks). Small helpers that only liven the picture (the bees) are
   tiny beside what runs down, as in life – big bees took the eye from the blossoms (user feedback, November 2026).
 - **Whose turn it is, is seen from across the room, from the very first second** (user feedback, November 2026: a
-  toy lying beside one of two small cushions did not tell it): the child's whole side changes – its lamp on and its
-  light on the cushion, the other side in shade – and the toy sits on that cushion, not beside it. Who begins is never
-  left unsaid: the lamps draw it before the sand runs, and only then does the time start. A new way to show a turn
-  keeps that: a big change of the whole side, never a small sign.
+  toy lying beside one of two small cushions did not tell it; asked again on 21 November 2026, so the shade is dark,
+  `rgb(28 30 70 / 0.6)`): the child's whole side changes – its lamp or sun on, the other side in plain shade – and the
+  toy sits on that cushion, not beside it. Who begins is shown from the first second, never drawn at random: the fox
+  child, on the left, begins, and a grown-up changes it behind ⚙️ (user feedback, 21 November 2026: the lamps' draw at
+  the start was not wanted; `timer.test.ts` checks). A new way to show a turn keeps that: a big change of the whole side,
+  never a small sign.
+- **What runs slowly shows from afar that it moves, even on a long turn** (user feedback on the Wippe, 21 November
+  2026: at bigger numbers its slow tilt looked still): next to the slow motion that is the time, something moves at its
+  own steady pace (the chick's steps), and the slow motion itself is made as big as the picture allows (a big board,
+  a steep tilt) – evenly, never speeding up or jerking.
 - **A picture of taking turns plays out something toddlers know and do themselves** (user feedback, 21 November 2026:
   Tennis was poorly done and is taken out – a game two-year-olds hardly know, seen from the side so the ball's flight is a short arc in
   the middle, the players standing stiff, the ball hopping above the racket instead of lying on it, the time only a row
-  of lights): a new one (better ideas in H-108 to H-117) shows a scene from their own day (a seesaw, a swing, a ball
-  rolled to each other), seen so the change crosses the whole picture, with what passes over really held or sat on, and
-  the time in the very motion where it can be – and it thinks of the waiting child, who should see its turn coming.
+  of lights): a new one (the Wippe, H-109, does it; more ideas in H-108 to H-117) shows a scene from their own day (a
+  seesaw, a swing, a ball rolled to each other), seen so the change crosses the whole picture, with what passes over
+  really held or sat on, and the time in the very motion where it can be – and it thinks of the waiting child, who
+  should see its turn coming. Whatever rides or walks on something that tips or turns stays upright (turned back the
+  same way, as the Wippe's chick), and nothing rides along only to be there (the Wippe's toy on the seat looked odd), and a picture of taking turns is added to `TurnPicture`, `isTurns` and `LEVEL_IDS`, after the
+  others in the Abwechseln group.
 - **One drawing for one thing**: a thing two pictures show (the hourglass) is one component both use, never copied and
   drawn again with its own sizes (user request, November 2026; `timer.test.ts` checks the hourglass).
 - **The cards' order is the user's** (November 2026: Rote Scheibe, Sanduhr, Kerze, Apfelbaum, Blume, Pizza, then the
@@ -287,7 +316,8 @@ and the shared `Layer`, `Draw`, `LeftGlow`), `timer.css`, `content.ts`
   pieces still come from the minutes chosen (2 Min. with `?sekunden=25`: twenty apples, its whole year in 25 seconds).
 - **What it says** (H-72, `voice.ts`): each picture one short line as it starts, where it goes (said once the page lies
   still – `say` waits for it), „Gleich ist es so weit!“ with the bell (H-49) and one line at the end, what is there
-  now; Abwechseln „Wer fängt an?“ as the lamps draw, who begins, and „Tauschen! Jetzt ist das … dran.“ at
+  now; Abwechseln who begins as the first turn starts („Wer fängt an?“, from the draw taken out, is kept with its
+  recordings but said by nothing), and „Tauschen! Jetzt ist das … dran.“ at
   every change (and when a grown-up gives the turn behind ⚙️). Nothing speaks before a grown-up starts a run with a
   card, lines after the first are queued so none cuts another off, and leaving stops the voice (`hush`). Every line is
   `Localized` in all app languages (November 2026) and said in the app language through `timerSay` (its English

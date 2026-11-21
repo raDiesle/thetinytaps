@@ -308,7 +308,8 @@ In a fresh worktree run `bun install` first.
   tick, step or key (Zähne putzen and Kleine Abenteuer both stuttered on phones from this). What moves on every frame
   moves by CSS (`transform`, `opacity`, `filter` of an HTML layer), never by React drawing it again per frame, and only
   what the child is busy with moves (waiting figures stand still). Any CSS animation of an element *inside* an svg, and
-  of `mask-position`, `background-position`, `clip-path` or a size, has the phone paint that whole svg or box again in
+  of `mask-position`, `background-position`, `clip-path`, a `background` colour (a page's colour fading per letter rastered
+  the whole screen 54 times a second; `PageColor`, `css.test.ts`) or a size, has the phone paint that whole svg or box again in
   every frame: a glow pulsing over the teeth with the lips in one svg, and a shadow band slid across the page beneath
   as a moving mask, each repainted most of the screen 60 times a second. Give such a thing a layer of its own (its own
   svg or element) and animate that layer's `transform` or `opacity`: a small figure that sways or glows is a small
@@ -1120,7 +1121,7 @@ src/lib/                 speech, sfx (synthesized + recorded sounds), storage, d
   a page there in every language that sends on at once with a canonical link, which Google takes as a redirect – without
   it GitHub Pages answers 404 and the page's place in Google is lost (`content.test.ts`). Pages that must stay out of results get a
   `noindex` tag (`NO_INDEX_PATHS`), never a `Disallow` in robots.txt, which hides the tag from Google. No
-  `<meta name="keywords">` (ignored by Google, a spam hint for Bing): the searched words go into title, description and text. Heavy downloads (service worker copy,
+  `<meta name="keywords">` (ignored by Google, a spam hint for Bing; `metaKeywords.test.ts`): the searched words go into title, description and text, and never another product's name, hidden or as our own (a competitor's name in metatags infringes its sign, BGH „Impuls“; study `tinyfingers-marke`). Heavy downloads (service worker copy,
   songs) start only after the page has loaded (`afterLoad` in `src/lib/pwa.ts`).
 - Visits are counted only by Cloudflare Web Analytics (the build adds it with the repository variable
   `CF_BEACON_TOKEN`) and how the app is used by Umami Cloud (`src/lib/analytics.ts`: pages by itself, plus a few events –

@@ -31,7 +31,8 @@ import {
   trainSteps,
 } from "./pieces";
 import { bulbBelow, CANDLE, FLAME_H, GLASS, HOURGLASS_BOX, PLATE, SAND_FLOOR, STAGE_H, STAGE_W, TRAIN } from "./scenes";
-import { DRAW_STEPS } from "./SwapPlay";
+import { FIRST_TURN } from "./SwapPlay";
+import { PLANK_BOX, SAW, SAW_GROUND, SAW_TILT, SEAT_CUSHION_W, TYRE_TOP, TYRE_X, WALKER } from "./seesaw";
 import { LAMP, SWAP_FLOOR, SWAP_SEATS, TOY } from "./swap";
 import { DEFAULT_TIMER_SETTINGS, TIMER_SECONDS } from "./settings";
 import {
@@ -57,7 +58,7 @@ import {
 describe("Timer", () => {
   const RIGHT_EDGE = 1340;
 
-  test("every picture has its own id, an emoji and a name, they stand in the order the user asked for and „Weiter“ goes round all but Abwechseln", () => {
+  test("every picture has its own id, an emoji and a name, they stand in the order the user asked for and „Weiter“ goes round all but those of taking turns", () => {
     expect(new Set(PICTURES.map((p) => p.id)).size).toBe(PICTURES.length);
     for (const p of PICTURES) {
       expect(p.emoji).not.toBe("");
@@ -65,15 +66,16 @@ describe("Timer", () => {
       expect(pick(p.name, firstLanguage(p.name)).trim()).not.toBe("");
     }
     // The order the user asked for (November 2026): Rote Scheibe, Sanduhr, Kerze, Apfelbaum, Blume, Pizza, Wecker, and
-    // Abwechseln last, in a group of its own. Tennis (H-71) stood beside it and was taken out (user request, 21 November
-    // 2026: poorly done) – it stays out until a better picture of taking turns replaces it (H-108 to H-117).
+    // Abwechseln and the Wippe (H-109) last, in a group of their own. Tennis (H-71) stood there and was taken out (user
+    // request, 21 November 2026: poorly done).
     expect(PICTURES.slice(0, 7).map((p) => p.id)).toEqual(["disc", "sand", "candle", "apple", "flower", "pizza", "clock"]);
-    expect(PICTURES.at(-1)?.id).toBe("swap");
+    expect(PICTURES.slice(-2).map((p) => p.id)).toEqual(["swap", "seesaw"]);
     expect(PICTURES.map((p) => p.id as string)).not.toContain("tennis");
     expect(DEFAULT_TIMER_SETTINGS.picture).toBe(PICTURES[0].id);
     // Taking turns runs without end, so „Weiter“ never leads into it.
     expect(TIMED_PICTURES.map((p) => p.id)).not.toContain("swap");
-    expect(TIMED_PICTURES).toHaveLength(PICTURES.length - 1);
+    expect(TIMED_PICTURES.map((p) => p.id)).not.toContain("seesaw");
+    expect(TIMED_PICTURES).toHaveLength(PICTURES.length - 2);
     const seen = new Set<string>();
     let id = TIMED_PICTURES[0].id;
     for (let i = 0; i < TIMED_PICTURES.length; i++) {
@@ -83,6 +85,7 @@ describe("Timer", () => {
     expect(seen.size).toBe(TIMED_PICTURES.length);
     expect(id).toBe(TIMED_PICTURES[0].id);
     expect(nextPicture("swap")).toBe(TIMED_PICTURES[0].id);
+    expect(nextPicture("seesaw")).toBe(TIMED_PICTURES[0].id);
   });
 
   test("the alarm clock shows the time left on a screen whose digits never shift, starting on the time set and ending on 0:00", () => {
@@ -526,6 +529,37 @@ describe("Timer", () => {
     expect(TOY.onCushion - TOY.h).toBeGreaterThanOrEqual(80);
   });
 
+  // H-109: the seesaw is the time – a seat sinks the whole turn long until it lies on its tyre, as the chick walks over to
+  // it, then the other child's seat, up high, sinks. It must touch down for real, stay fair, tip far (user request,
+  // 21 November 2026: a bigger board, a plainer motion) and be seen whole on a phone on its side.
+  test("Wippe: the seat touches down on its tyre, both seats the same either side, and everything stays on the screen (H-109)", () => {
+    const rad = (SAW_TILT * Math.PI) / 180;
+    // Tipped, the plank's underside under the low seat lies exactly on the tyre's top, and the tyres lie under the seats.
+    expect(SAW.y + SAW.thick / 2 + SAW.seat * Math.sin(rad)).toBeCloseTo(TYRE_TOP);
+    expect(SAW.x - TYRE_X.fox).toBeCloseTo(TYRE_X.bear - SAW.x);
+    expect(TYRE_TOP).toBeLessThan(SAW_GROUND);
+    // A big board and a tilt a child sees from the sofa, and the plank's end never sinks into the ground.
+    expect(SAW_TILT).toBeGreaterThanOrEqual(22);
+    expect(SAW.thick).toBeGreaterThanOrEqual(40);
+    expect(SAW.y + SAW.thick / 2 + SAW.half * Math.sin(rad)).toBeLessThan(SAW_GROUND);
+    // Fair: the pivot in the middle of the stage, both seats as far from it.
+    expect(SAW.x as number).toBe(STAGE_W / 2);
+    // Level (at the end) the cushions stay within the screen's safe part.
+    expect(SAW.x - SAW.seat - SEAT_CUSHION_W / 2).toBeGreaterThanOrEqual(200);
+    expect(SAW.x + SAW.seat + SEAT_CUSHION_W / 2).toBeLessThanOrEqual(RIGHT_EDGE);
+    // The chick walks between the cushions, never into them, and the cushion up high (its ears) and the chick at the
+    // high end stay below the top.
+    expect(WALKER.reach + WALKER.w / 2).toBeLessThanOrEqual(SAW.seat - SEAT_CUSHION_W / 2);
+    const plankTop = SAW.y - SAW.thick / 2;
+    expect(plankTop - WALKER.h - WALKER.reach * Math.sin(rad)).toBeGreaterThanOrEqual(80);
+    expect(plankTop - 114 - SAW.seat * Math.sin(rad)).toBeGreaterThanOrEqual(80);
+    // The chick walks far each turn, so its way is seen even on a long one.
+    expect(WALKER.reach * 2).toBeGreaterThanOrEqual(500);
+    // The plank turns round the pivot in the middle of its layer.
+    expect(PLANK_BOX.x + PLANK_BOX.w / 2).toBe(SAW.x as number);
+    expect(PLANK_BOX.y + PLANK_BOX.h / 2).toBe(SAW.y as number);
+  });
+
   // November 2026: below the head, the row of lengths left a phone on its side too little room for the twelve cards, and
   // the Abwechseln group fell below the screen. In the head it stands beside the ribbon, in room taken anyway.
   test("the row of lengths stands in the menu's head, so every card fits on a phone on its side", async () => {
@@ -540,12 +574,12 @@ describe("Timer", () => {
     expect(SWAP_FLOOR).toBe(SAND_FLOOR);
   });
 
-  // User feedback, November 2026: who begins must be plain from the start. The lamps draw it, slower and slower, and
-  // an even count of changes ends on the lamp lit first – the one drawn.
-  test("the lamps' draw of who begins slows down and ends on the lamp lit first", () => {
-    expect(DRAW_STEPS.length % 2).toBe(0);
-    for (let i = 1; i < DRAW_STEPS.length; i++) expect(DRAW_STEPS[i]).toBeGreaterThanOrEqual(DRAW_STEPS[i - 1]);
-    expect(DRAW_STEPS.reduce((a, b) => a + b, 0)).toBeLessThanOrEqual(4000);
+  // User feedback, 21 November 2026: no start sequence drawing a side at random – the fox child begins at once, shown
+  // from the first second, and a grown-up gives the other child the first turn behind ⚙️.
+  test("Abwechseln and the Wippe start with the fox child's turn, never with a draw", async () => {
+    expect(FIRST_TURN).toBe("fox");
+    const play = await Bun.file("src/games/timer/SwapPlay.tsx").text();
+    expect(play).not.toMatch(/Math\.random|DRAW_STEPS|WHO_BEGINS/);
   });
 
   // The book's paper margin and the ⚙️ note lie over the stage's right edge (x 1400 at 4:3): a figure standing to 1380

@@ -9,7 +9,28 @@
   inset: 0;
   display: flex;
   flex-direction: column;
-  transition: background 0.4s;
+  /* The page's colour lies beneath everything in it, on layers of its own (`PageColor`). */
+  isolation: isolate;
+}
+
+/* One plain colour each, so the phone rasters no pixels for them; a new one fades in by opacity alone, never by a
+   `background` transition, which repainted the whole screen in every frame of the fade (see PageColor.tsx). */
+.lp-color {
+  position: absolute;
+  inset: 0;
+  z-index: -1;
+  pointer-events: none;
+  will-change: opacity;
+}
+
+.lp-color-in {
+  animation: lp-color-in 0.4s ease-out;
+}
+
+@keyframes lp-color-in {
+  from {
+    opacity: 0;
+  }
 }
 
 /* Frei tippen's dark page (`dark`): light letters and words on night colours; the tracing dots follow `--ink`. Only

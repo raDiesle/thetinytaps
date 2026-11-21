@@ -246,7 +246,7 @@ export const SOON_LINE: Localized = {
   ru: "Уже совсем скоро!",
 };
 
-/** Abwechseln: said as the lamps start to draw who begins. */
+/** Abwechseln: said as the lamps drew who begins – said by nothing since the draw was taken out (21 November 2026), kept with its recordings. */
 export const WHO_BEGINS: Localized = {
   de: "Wer fängt an?",
   en: "Who goes first?",
@@ -257,7 +257,7 @@ export const WHO_BEGINS: Localized = {
   ru: "Кто начинает?",
 };
 
-/** Said as the lamps have drawn the first child. */
+/** Said as the first child's turn starts. */
 export const BEGINS: Record<Holder, Localized> = {
   fox: {
     de: "Das Fuchskind fängt an!",

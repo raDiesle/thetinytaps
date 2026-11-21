@@ -132,7 +132,7 @@ export const SCENARIOS: Scenario[] = [
     path: "/buchstaben/",
     parts: [
       { label: "Tippen auf der Tastatur", before: [{ wait: 1500 }], ms: 8000, type: { keys: [..."abcmotx"], every: 500 } },
-      // Keys that are no letter or number open a surprise each (firework, present, egg …), at most three at once.
+      // Keys that are no letter or number open a surprise each (fireworks on a canvas, a snowflake, a present …), at most three at once.
       { label: "Überraschungen", before: [{ wait: 1500 }], ms: 9000, type: { keys: [...",.-+#<*"], every: 600 } },
     ],
   },
@@ -216,8 +216,9 @@ export const SCENARIOS: Scenario[] = [
   // The timer's pictures in their order on its start screen, each running for a while with a tap now and then (the
   // steam, the twinkling, the flame, what is left lighting up), the moon setting and the sun rising, the pizza's slices
   // lifted off, the ladybug crawling round the red disc, the alarm clock's digits ticking, the toy crane carrying toys
-  // into the box and in „Abwechseln“ the lamps drawing who begins and the hourglass running. Each card is tapped by its
-  // name (its tooltip), so the cards' order and groups may change.
+  // into the box, in „Abwechseln“ the toy hopping onto the first cushion and the hourglass running, and on the Wippe the
+  // chick stepping along the plank as the seesaw tips slowly. Each card is tapped by its name (its
+  // tooltip), so the cards' order and groups may change.
   ...(
     [
       ["scheibe", "Rote Scheibe"],
@@ -233,25 +234,33 @@ export const SCENARIOS: Scenario[] = [
       ["raupe", "Raupe"],
       ["sonne", "Sonnenaufgang"],
       ["abwechseln", "Abwechseln"],
+      ["wippe", "Seesaw"],
     ] as const
   ).map(([name, title]) => ({
     name: `timer-${name}`,
     path: "/timer/",
     parts: [{ label: "Läuft", before: [{ tap: `.mode-card[title^="${title}"]` }, { wait: 1500 }], ms: 8000, tap: { selector: ".tm-play", every: 1500 } }],
   })),
-  // „Abwechseln“ with short turns: the lamps drawing who begins, the toy hopping over, the lamps changing and the
-  // hourglass turning itself over.
+  // „Abwechseln“ meant with short turns: the toy hopping over, the lamps changing and the hourglass turning itself over.
+  // `?sekunden=` works only on the dev server, so on the built site these two measure the start of a turn of the row's
+  // length (November 2026).
   {
     name: "timer-abwechseln-wechsel",
     path: "/timer/?sekunden=5",
     parts: [
       {
-        label: "Auslosen und Wechsel",
+        label: "Wechsel",
         before: [{ tap: `.mode-card[title^="Abwechseln"]` }, { wait: 500 }],
         ms: 10000,
         tap: { selector: ".tm-play", every: 1500 },
       },
     ],
+  },
+  // The Wippe with short turns: the chick walking over, the seat touching down, the chick turning round and the plank tipping back.
+  {
+    name: "timer-wippe-wechsel",
+    path: "/timer/?sekunden=5",
+    parts: [{ label: "Wechsel", before: [{ tap: `.mode-card[title^="Seesaw"]` }, { wait: 500 }], ms: 10000, tap: { selector: ".tm-play", every: 1500 } }],
   },
   // The Apfelbaum's harvest, sped up: bees buzzing, apples ripening and falling into the cart the bear child pushes.
   {
