@@ -123,10 +123,11 @@ test("both style blocks ask for friendly faces", () => {
 
 // The user only wants to know how many pictures wait, never to read and approve prompts there (November 2026).
 test("the management page shows how many pictures wait, and no prompts to review", () => {
-  const page = readFileSync("src/pages/ManagementPage.tsx", "utf8");
+  // Folded into the Claude Cloud status at the top since 21 November 2026, its line naming how many are open now.
+  const page = readFileSync("src/components/CloudQueueStatus.tsx", "utf8");
   const queue = readFileSync("src/components/PictureQueue.tsx", "utf8");
   expect(page).toContain("<PictureQueue />");
-  expect(queue).toMatch(/<h2>[\s\S]*?PICTURE_QUEUE\.length[\s\S]*?<\/h2>/);
+  expect(queue).toMatch(/<h3>[\s\S]*?PICTURE_QUEUE\.length[\s\S]*?<\/h3>/);
   for (const source of [page, queue]) {
     expect(source).not.toMatch(/picturePrompts|PICTURE_PROMPTS|Bildvorschl/);
   }
