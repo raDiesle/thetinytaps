@@ -1,6 +1,6 @@
 import { describe, expect, test } from "bun:test";
 import { readFileSync } from "node:fs";
-import { HELLO_AGAIN_MS, HELLO_KEYFRAMES, HELLO_MS, HELLO_TIMES, helloOrder } from "./hello";
+import { HELLO_AGAIN_MS, HELLO_KEYFRAMES, HELLO_MS, HELLO_TIMES, HELLO_VOLUME, helloOrder } from "./hello";
 import { SCENES } from "./index";
 
 describe("„Hier bin ich!“ (B-15)", () => {
@@ -20,9 +20,11 @@ describe("„Hier bin ich!“ (B-15)", () => {
     expect(HELLO_MS).toBeLessThan(HELLO_AGAIN_MS);
   });
 
-  test("it is silent: the engine plays no sound for it", () => {
+  test("it says hello with its own sound, softly, never a voice", () => {
     const play = readFileSync(new URL("./ScenePlay.tsx", import.meta.url), "utf8");
     const effect = play.slice(play.indexOf("„Hier bin ich!“"), play.indexOf("}, [greets"));
-    expect(effect).not.toMatch(/play[A-Z]\w*\(|say\(|speak\(/);
+    expect(effect).toContain("softly(HELLO_VOLUME, () => playSound(item.sound))");
+    expect(effect).not.toMatch(/say\(|speak\(|recordedVoice/);
+    expect(HELLO_VOLUME).toBeLessThan(1);
   });
 });

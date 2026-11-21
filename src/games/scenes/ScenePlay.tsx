@@ -5,7 +5,7 @@ import "./scenes.css";
 import { FeedbackLayer, useTapFeedback } from "@/components/TapFeedback";
 import { GameEnd } from "@/components/GameEnd";
 import { useNoBackgroundMusic } from "@/lib/backgroundMusic";
-import { loadRecordings, playChime, playEvening, playLullaby, playRandomNote } from "@/lib/sfx";
+import { loadRecordings, playChime, softly, playEvening, playLullaby, playRandomNote } from "@/lib/sfx";
 import { targetLanguageFor } from "@/content/targetLanguages";
 import { pick as pickLanguage, useAppLanguage } from "@/lib/language";
 import { pick } from "@/lib/random";
@@ -16,7 +16,7 @@ import { tapState } from "@/lib/tapTargets";
 import { preloadScene, SCENE_ENTRIES, scenePath, sceneTitle } from "./catalog";
 import { BOW_AFTER_MS, BOW_KEYFRAMES, BOW_MS, bowFoot, bowOrder, bowStep, curtainEndAt, curtainSoundAt, EVENING_AFTER_MS, layerPoint } from "./curtainCall";
 import { ARROWS, centre, middleItem, nextInDirection } from "./focus";
-import { HELLO_AFTER_MS, HELLO_AGAIN_MS, HELLO_KEYFRAMES, HELLO_MS, helloOrder } from "./hello";
+import { HELLO_AFTER_MS, HELLO_AGAIN_MS, HELLO_KEYFRAMES, HELLO_MS, HELLO_VOLUME, helloOrder } from "./hello";
 import { HideoutContext, peekTimes, SURPRISES } from "./hideout";
 import { assignKeys, pressedKey } from "./keys";
 import { LaneLayer, type LaneControl } from "./LaneLayer";
@@ -340,8 +340,8 @@ export function ScenePlay({ scene, settings, onKeys }: { scene: Scene; settings:
     setTouched(true);
   };
 
-  // „Hier bin ich!“ (B-15): nobody tapped yet, so after a while one item waves gently – silent, a few at most, one
-  // after the other – and the first tap or key ends it. Only where the child taps freely: a question, the torch's
+  // „Hier bin ich!“ (B-15): nobody tapped yet, so after a while one item waves gently with its own sound, softly – a
+  // few at most, one after the other – and the first tap or key ends it. Only where the child taps freely: a question, the torch's
   // light or a road to draw is its own invitation.
   const greets = !questMode && !torch && !lanes && !touched;
   useEffect(() => {
@@ -359,6 +359,8 @@ export function ScenePlay({ scene, settings, onKeys }: { scene: Scene; settings:
       const [x, y] = layerPoint(bowFoot(item), scene.width, scene.height, root.clientWidth, root.clientHeight);
       layer.style.transformOrigin = `${x}px ${y}px`;
       waves.push(layer.animate(HELLO_KEYFRAMES, { duration: HELLO_MS, easing: "ease-in-out" }));
+      // Its own sound, softly – never a voice. Not in the bedtime picture, which stays calm until the child acts.
+      if (!scene.bedtime) softly(HELLO_VOLUME, () => playSound(item.sound));
     };
     const stop = afterPageMotion(() => {
       order.forEach((item, n) => waits.push(setTimeout(() => wave(item), HELLO_AFTER_MS + n * HELLO_AGAIN_MS)));
