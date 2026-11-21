@@ -11,4 +11,16 @@ describe("Claude Cloud status on /management/", () => {
     expect(status).toBeLessThan(page.indexOf("<Contents"));
     expect(status).toBeLessThan(page.indexOf("<NextPanel"));
   });
+
+  // User request, 21 November 2026: voices, sounds and pictures are one short line each in the status, folded open to
+  // their whole lists there – no section of their own further down the page any more.
+  it("holds each queue folded, and the page no second section for them", () => {
+    const status = readFileSync(new URL("./CloudQueueStatus.tsx", import.meta.url), "utf8");
+    for (const id of ["stimmen", "geraeusche", "offene-bilder"]) expect(status).toContain(`id="${id}"`);
+    expect(status).toMatch(/<details id=\{id\}/);
+    expect(status).not.toMatch(/<details[^>]*\bopen\b(?!=)/);
+    const page = readFileSync(new URL("../pages/ManagementPage.tsx", import.meta.url), "utf8");
+    for (const part of ["<PictureQueue", "<VoiceQueue", "<VoiceList", "<SoundQueue", 'id="stimmen"', 'id: "offene-bilder"', 'id: "stimmen"'])
+      expect(page).not.toContain(part);
+  });
 });

@@ -32,6 +32,7 @@ import { MILK_CHAIN_ZH as milkChain } from "@/games/milkchain/zh";
 import { PACIFIER_STORY_ZH as pacifierStory } from "@/games/pacifierstory/zh";
 import { KITA_STORY_ZH as kitaStory } from "@/games/kitastory/zh";
 import { HAIR_STORY_ZH as hairStory } from "@/games/hairstory/zh";
+import { BOTTLE_STORY_ZH as bottleStory } from "@/games/bottlestory/zh";
 import { TRANSLATION as cloudTrip } from "@/games/adventure/stories/cloudTrip/lines.zh";
 import { TRANSLATION as fireRescue } from "@/games/adventure/stories/fireRescue/lines.zh";
 import { TRANSLATION as treasureIsland } from "@/games/adventure/stories/treasureIsland/lines.zh";
@@ -78,6 +79,7 @@ export const TEXTS: LanguageTexts = {
   pacifierStory,
   kitaStory,
   hairStory,
+  bottleStory,
   cause,
   seo,
   stories: { cloudTrip, fireRescue, treasureIsland },

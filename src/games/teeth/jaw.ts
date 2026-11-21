@@ -56,15 +56,21 @@ export const PICTURE = { width: 440, height: 400 };
 // Milk teeth from the front: two incisors, the canine, two molars. Angles are
 // positions along the arch in degrees; depth is from cheek side to tongue
 // side; edge is how much of that depth is left as chewing surface on top
-// (incisors are chisels, molars are flat).
+// (incisors are chisels, molars are flat). From the last molar to the front
+// tooth the chewing surface gets narrower step by step (21, 17.5, 13.5, 9, 5.4):
+// a jump from the two broad molars to three equally thin teeth looked odd from
+// above (user feedback, November 2026; `jaw.test.ts`).
 const TEETH = [
-  { from: 0.4, to: 14.4, height: 30, depth: 17, edge: 0.22 },
-  { from: 15, to: 27.6, height: 28, depth: 17, edge: 0.25 },
-  { from: 28.2, to: 42, height: 31, depth: 20, edge: 0.3 },
-  { from: 42.6, to: 60.4, height: 24, depth: 28, edge: 0.7 },
+  { from: 0.4, to: 14.4, height: 30, depth: 18, edge: 0.3 },
+  { from: 15, to: 27.6, height: 28, depth: 21, edge: 0.43 },
+  { from: 28.2, to: 42, height: 31, depth: 25, edge: 0.54 },
+  { from: 42.6, to: 60.4, height: 24, depth: 28, edge: 0.625 },
   { from: 61, to: 80, height: 23, depth: 30, edge: 0.7 },
 ];
 export const TEETH_PER_SIDE = TEETH.length;
+
+/** How deep each tooth's chewing surface is, front tooth first, in model units. */
+export const CHEWING_DEPTHS = TEETH.map((t) => t.depth * t.edge);
 
 /** Half width and depth of the outer arch curve. */
 const ARCH = { lower: { a: 108, b: 100 }, upper: { a: 114, b: 106 } };
@@ -298,6 +304,70 @@ export function buildMouth(open: number): MouthModel {
   return { teeth, gums, tongue, palate, lips };
 }
 
+/**
+ * Seen from the side (user feedback, November 2026): with the head turned far, the mouth is a profile – the lips seen
+ * only from the side, ending at the face's front, and the teeth inside the mouth behind them, every one growing out of
+ * its gum, the front teeth too: they only show their narrow side and their front edge in the gap between the lips'
+ * ends. Front teeth standing out past the face with no gum looked plainly wrong (user feedback, November 2026). How far
+ * a view is such a profile, 0 to 1: it comes in over the last part of a turn, so nothing jumps while the head glides
+ * there, and never with the mouth open.
+ */
+export const PROFILE_YAW = { from: 50, full: 66 };
+export function profileOf(view: View): number {
+  const k = Math.min(1, Math.max(0, (Math.abs(view.yaw) - PROFILE_YAW.from) / (PROFILE_YAW.full - PROFILE_YAW.from)));
+  return k * k * (3 - 2 * k) * Math.max(0, 1 - 2 * view.open);
+}
+
+/**
+ * Where the lips' middle lies in a profile: just above the upper gum's edge and below the lower one's, so a band of gum
+ * shows over and under the teeth, and a little in front of the front teeth (whose fronts reach `ARCH.upper.b`), where
+ * the face's round runs (`midline`): the teeth stay inside the mouth.
+ */
+const PROFILE_LIPS = { upper: 40, lower: -34, z: 118 };
+
+/** The lips as the view shows them: in a profile the front of the lips is pulled onto the gums, in front of the teeth. */
+export function viewedLips(lips: Vec3[], view: View): Vec3[] {
+  const k = profileOf(view);
+  if (!k) return lips;
+  const width = Math.max(...lips.map((p) => Math.abs(p[0])));
+  return lips.map(([x, y, z]) => {
+    const front = k * Math.max(0, 1 - (x / width) ** 2) ** 2;
+    const to = y > 0 ? PROFILE_LIPS.upper : PROFILE_LIPS.lower;
+    return [x, y + (to - y) * front, z + (PROFILE_LIPS.z - z) * front];
+  });
+}
+
+/** A point of the face's middle line (x = 0) at height y on the head, with the nose standing out of it. */
+function midline(y: number): Vec3 {
+  const v = Math.max(-1, Math.min(1, (HEAD_MIDDLE[1] - y) / HEAD_RADIUS));
+  const nose = 26 * Math.exp(-(((y - noseY()) / 20) ** 2));
+  return [0, y, HEAD_MIDDLE[2] + FACE_BULGE * HEAD_RADIUS * Math.sqrt(1 - v * v) + nose];
+}
+/** The nose's height on the head (the story's nose, 10 head units below the middle). */
+const noseY = () => HEAD_MIDDLE[1] - (10 / 165) * HEAD_RADIUS;
+
+/**
+ * The face's outline in a profile, from the top of the head down to its bottom: the middle line of the face with its
+ * nose, running in onto the lips' ends and straight from the upper lip's end to the lower one's, in front of the teeth. Whatever lies beyond it is the far side of the head and is not seen.
+ */
+export function profileLine(lips: Vec3[]): Vec3[] {
+  const ends = lips.filter((p) => Math.abs(p[0]) < 1e-6);
+  const upper = ends.reduce((a, b) => (b[1] > a[1] ? b : a));
+  const lower = ends.reduce((a, b) => (b[1] < a[1] ? b : a));
+  /** Over this height the skin runs in onto a lip's end. */
+  const ease = 46;
+  const along = (from: number, to: number, end: Vec3) =>
+    Array.from({ length: 33 }, (_, i) => {
+      const y = from + ((to - from) * i) / 32;
+      const p = midline(y);
+      const near = Math.max(0, 1 - Math.abs(y - end[1]) / ease) ** 2;
+      return [0, y, p[2] + (end[2] - p[2]) * near] as Vec3;
+    });
+  const top = HEAD_MIDDLE[1] + HEAD_RADIUS;
+  const bottom = HEAD_MIDDLE[1] - HEAD_RADIUS;
+  return [...along(top, upper[1], upper), ...along(lower[1], bottom, lower)];
+}
+
 export interface Point2 {
   x: number;
   y: number;
@@ -337,16 +407,37 @@ export function distanceOutside(p: { x: number; y: number }, points: { x: number
   return nearest;
 }
 
-/** The child's head round the mouth: its middle in the model and its radius. */
-export const HEAD_MIDDLE: Vec3 = [0, 20, -60];
-export const HEAD_RADIUS = 270;
+/**
+ * The child's head round the mouth: its middle in the model and its radius. Laid out like the story's child
+ * (origin.tsx), the mouth in the lower half and the eyes above the middle, so the end's whole face is the same child
+ * (user feedback, November 2026: with the head's middle at the mouth the eyes were squeezed into its top edge).
+ */
+export const HEAD_MIDDLE: Vec3 = [0, 165, -60];
+export const HEAD_RADIUS = 350;
+/** How far the face bulges out in front of the head's middle, as a share of its radius: the eyes and nose sit there. */
+const FACE_BULGE = 0.55;
+
+/**
+ * A point on the face, from where it lies on a flat drawing of the head: `x` across and `y` down, as shares of its
+ * radius from its middle (the story's head, face.tsx). It sits on the round of the face, so it turns with the head;
+ * past the head's edge (hair, pigtails) it lies in the plane of the head's middle.
+ */
+export function onHead(x: number, y: number): Vec3 {
+  const round = Math.sqrt(Math.max(0, 1 - x * x - y * y));
+  return [x * HEAD_RADIUS, HEAD_MIDDLE[1] - y * HEAD_RADIUS, HEAD_MIDDLE[2] + FACE_BULGE * HEAD_RADIUS * round];
+}
+
+/** Which way the face looks at a point of `onHead`, for how far a part there faces the viewer. */
+export function headNormal(x: number, y: number): Vec3 {
+  return [x, -y, Math.sqrt(Math.max(0, 1 - x * x - y * y))];
+}
 
 /** The cheeks' size about their middle, across and up, in model units (times the view's zoom on the picture). */
-export const CHEEK = { rx: 28, ry: 18 };
+export const CHEEK = { rx: 46, ry: 29 };
 /** Room between a cheek's edge and the lips' outline: half the thick lip (34 wide) and a gap of skin. */
 export const CHEEK_GAP = 17 + 16;
 /** Where a cheek sits on a shut mouth's face: beside the nose, below the eyes. */
-const CHEEK_AT: Vec3 = [150, 92, 84];
+const CHEEK_AT: Vec3 = [200, 150, 84];
 /** How far a cheek may be pushed up and out by a wide mouth before it would leave the face. */
 const CHEEK_PUSH = 90;
 

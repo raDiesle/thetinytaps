@@ -4,6 +4,7 @@ import { expect, test } from "bun:test";
 // no headings or hints came back, and the pause button has no emoji.
 
 const play = await Bun.file("src/games/teeth/TeethPlay.tsx").text();
+const css = await Bun.file("src/games/teeth/teeth.css").text();
 
 test("no heading or hint for grown-ups on the picture", () => {
   for (const words of ["Erbsengroß", "Ausspucken", "teeth-cue", "teeth-mouth", "teeth-clock"]) expect(play.includes(words) ? words : "").toBe("");
@@ -14,13 +15,25 @@ test("the controls are drawn, with no emoji", () => {
 });
 
 test("the progress bar shows the time before the brushing as its first part", () => {
-  expect(play).toContain("teeth-segment intro");
   expect(play).toContain("teeth-time intro");
+});
+
+// A sweet at the start and a tooth at the end said nothing of what each part of the bar is (user feedback, November
+// 2026): the bar shows the routine's phases apart – eating sweets, getting the brush, the brushing's steps in a frame of
+// their own, and putting the brush away, which keeps the bar until the brush is back in its cup.
+test("the progress bar marks eating, getting the brush, brushing and putting the brush away apart", () => {
+  expect(play).toContain('const PHASE_SYMBOL: Record<BarPhase, TeethSymbol | null> = { eat: "bonbon", fetch: "zahnpasta", ready: null, tidy: "becher" };');
+  expect(play).toMatch(/<div className="teeth-brushing">\s*<div className="teeth-lane teeth-track">\s*\{STEPS\.map/);
+  expect(play).toContain('<PhaseTile phase="tidy"');
+  expect(play).toContain('ending === "rest" ? (');
+  // The putting away is a section of the bar too: a tap on it starts the cheer and the tidying.
+  expect(play).toContain("const segments: [number, number][] = [...tileParts, ...stepParts, tidyPart];");
+  expect(play).toContain("introMs + totalMs + ENDING_MS - 1");
+  expect(css).toMatch(/\.teeth-brushing \{[^}]*background: #dff3e7;/);
 });
 
 // A jump on the progress bar into the story or the sink once played that part's pictures from its start, while the
 // clock and the song were further on, and pausing there left the sky and the brows running (user feedback, November 2026).
-const css = await Bun.file("src/games/teeth/teeth.css").text();
 
 test("a jump moves the story's and the sink's animations to where the clock is", () => {
   expect(play).toMatch(/getAnimations\(\{ subtree: true \}\)[^\n]*animation\.currentTime = into/);
@@ -44,6 +57,13 @@ test("on a wide screen the controls stand at the side, with the bar running from
 });
 
 test("the end's week, trophy and „Menü“ lie on a sheet sized by its own width, beside the head on a wide screen", () => {
-  expect(css).toMatch(/\.teeth-end,\s*\.teeth-week-before \{\s*container-type: inline-size;/);
-  expect(css).toMatch(/@media \(orientation: landscape\) \{\s*\.teeth-end,\s*\.teeth-week-before \{\s*width: min\(50%/);
+  expect(css).toMatch(/\.teeth-end \{\s*container-type: inline-size;/);
+  expect(css).toMatch(/@media \(orientation: landscape\) \{\s*\.teeth-end \{\s*width: min\(50%/);
+});
+
+// Beside the sink the week took the picture's room, and beside the first look in the mirror it pushed the face aside,
+// which then jumped to the middle as the brushing began (user feedback, November 2026): the week waits for the end.
+test("the week chart shows only at the end, never before the brushing", () => {
+  expect(play.match(/<Week\b/g)?.length).toBe(1);
+  expect(play).toMatch(/<div className="teeth-end">\s*\{settings\.week && <Week/);
 });

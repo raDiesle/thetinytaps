@@ -23,7 +23,7 @@ describe("the picture's layers (ScenePlay.tsx)", () => {
   });
 
   test("every item gets a layer of its own, a layer of the graphics card while it moves", () => {
-    expect(source).toMatch(/\{items\.map\(\(item, i\) => \{[\s\S]*?<SceneLayer key=\{item\.id\} scene=\{scene\} taps moving=/);
+    expect(source).toMatch(/\{items\.map\(\(item\) => \{[\s\S]*?<SceneLayer key=\{item\.id\} scene=\{scene\} taps moving=/);
   });
 });
 

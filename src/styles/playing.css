@@ -56,12 +56,6 @@
   cursor: pointer;
 }
 
-.play-fullscreen .fullscreen-icon {
-  width: 20px;
-  height: 20px;
-  stroke: #0000008c;
-}
-
 .play-fullscreen:hover .fullscreen-icon {
   stroke: var(--ink);
 }
@@ -128,27 +122,32 @@
   }
 }
 
-/*
- * ⚙️ carries its name in words, big enough to be seen across the room: the bare gear, its name shown only while held,
- * was not found by grown-ups (user feedback, November 2026). Still held like ✕, so a child's tap does nothing.
- */
+/* ⚙️ is a slip like the fullscreen one beside it (book.css), its gear drawn like that one's corners. */
 .play-options-button.hold-exit {
-  display: flex;
-  align-items: center;
-  gap: 8px;
-  width: auto;
-  height: auto;
-  min-height: 68px;
-  padding: 8px 22px 8px 12px;
-  border-radius: 999px;
-  color: var(--ink);
-  font: inherit;
+  display: grid;
+  place-items: center;
 }
 
-.play-options-gear {
-  font-family: var(--font-emoji);
-  font-size: 2.6rem;
-  line-height: 1;
+.play-fullscreen .fullscreen-icon,
+.play-options-icon {
+  width: 20px;
+  height: 20px;
+  fill: none;
+  stroke: #0000008c;
+  stroke-width: 3;
+  stroke-linecap: round;
+  stroke-linejoin: round;
+}
+
+/* The gear's teeth are finer than the corners' strokes: the same line weight to the eye. */
+.play-options-icon {
+  width: 22px;
+  height: 22px;
+  stroke-width: 2.2;
+}
+
+.play-options-button:hover .play-options-icon {
+  stroke: var(--ink);
 }
 
 /*
@@ -180,20 +179,8 @@
   font-size: 1.4rem;
 }
 
-/* Phones keep the game's room: only the gear, on a note as small as the fullscreen one beside ✕ – its name in words,
-   even made small, covered too much of a phone's picture and looked crowded there (user feedback, November 2026). Its
-   name is still read out (`aria-label`); tablets and computers show it. */
+/* Phones keep the game's room: the intro note under ⚙️ is smaller there. */
 @media (max-width: 599.98px), (max-height: 599.98px) {
-  .play-options-button.hold-exit {
-    justify-content: center;
-    min-height: 0;
-    padding: 0;
-  }
-
-  .play-options-gear {
-    font-size: 1.3rem;
-  }
-
   .play-options-intro {
     top: calc(100% + 8px);
     max-width: min(340px, 60vw);

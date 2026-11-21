@@ -9,6 +9,7 @@ import { useAppLanguage, useT } from "@/lib/language";
 import {
   DEFAULT_LETTERS_SETTINGS,
   LETTERS_SETTINGS_KEY,
+  type CountPlay,
   type LetterCase,
   type LettersSettings,
   type NumberReveal,
@@ -20,6 +21,7 @@ import { CasePlay } from "./CasePlay";
 import { FindPlay } from "./FindPlay";
 import { LettersPlay } from "./LettersPlay";
 import { MovePlay } from "./MovePlay";
+import { NumberFindPlay } from "./NumberFindPlay";
 import { type LettersWay, WAY_TITLES } from "./names";
 import { WordsPlay } from "./WordsPlay";
 
@@ -44,6 +46,8 @@ export function LettersGame({ way }: { way: LettersWay }) {
   /** Wörter tippen with the first letter only: a letter and its picture, and the child finds its key („Wo ist das B?“). */
   const findLetter = way === "words" && settings.wordTyping === "first";
   const numbersOnly = way === "count";
+  /** Zählen with things to count first: the child finds their digit key („Wo ist die 3?“, L-17). */
+  const findNumber = numbersOnly && settings.countPlay === "find";
 
   const showWord = (
     <Toggle
@@ -58,6 +62,48 @@ export function LettersGame({ way }: { way: LettersWay }) {
       })}
       checked={settings.showWord}
       onChange={(showWord) => update({ showWord })}
+    />
+  );
+
+  /** „Wo ist das B?“ and „Wo ist die 3?“: the wanted key lights up when the child looks for a while. */
+  const hints = (
+    <Toggle
+      label={
+        touchKeys
+          ? t({
+              de: "Gesuchte Taste aufleuchten lassen, wenn es länger dauert",
+              ru: "Подсвечивать нужную клавишу, если поиск затянулся",
+              en: "Light up the wanted key when it takes a while",
+              zh: "找得久了，让要找的键亮起来",
+              hi: "देर लगे तो ढूँढा जा रहा बटन चमकाएँ",
+              es: "Iluminar la tecla buscada si tarda",
+              ar: "إضاءة الزر المطلوب إذا طال البحث",
+            })
+          : t({
+              de: "Taste auf einer kleinen Tastatur zeigen, wenn es länger dauert",
+              ru: "Показывать клавишу на маленькой клавиатуре, если поиск затянулся",
+              en: "Show the key on a small keyboard when it takes a while",
+              zh: "找得久了，在小键盘图上显示那个键",
+              hi: "देर लगे तो छोटे कीबोर्ड पर बटन दिखाएँ",
+              es: "Mostrar la tecla en un teclado pequeño si tarda",
+              ar: "إظهار الزر على لوحة مفاتيح صغيرة إذا طال البحث",
+            })
+      }
+      checked={settings.hints}
+      onChange={(hints) => update({ hints })}
+    />
+  );
+
+  /** Zählen: numbers come with each key, or things come and the child finds their digit („Wo ist die 3?“). */
+  const countPlay = (
+    <Choice<CountPlay>
+      label={t({ en: "What to play?" })}
+      value={settings.countPlay}
+      onChange={(countPlay) => update({ countPlay })}
+      options={[
+        { value: "show", label: t({ en: "🔢 Each key brings a number" }) },
+        { value: "find", label: t({ en: "🔍 Where is the 3?" }) },
+      ]}
     />
   );
 
@@ -122,7 +168,10 @@ export function LettersGame({ way }: { way: LettersWay }) {
       // screen: ✕ and „Menü“ go back to the book's table of contents, the page before the game (user feedback, November 2026).
       startMode={way}
     >
-      {findLetter ? (
+      {findNumber ? (
+        // A new kind of pictures brings a new number at once.
+        <NumberFindPlay key={settings.theme} pack={pack} settings={play} />
+      ) : findLetter ? (
         // A new kind of pictures brings a new letter at once.
         <FindPlay key={settings.theme} pack={pack} settings={play} />
       ) : way === "words" ? (
@@ -146,11 +195,19 @@ export function LettersGame({ way }: { way: LettersWay }) {
               })}
             </b>
             {intro[way]}
+            {/* „Wo ist die 3?“ (L-17) came later, English first: its own sentence until translations are asked for. */}
+            {numbersOnly && <> {t({ en: "Or “Where is the 3?”: things appear, and the child finds their number key." })}</>}
           </>
         }
       >
-        {way !== "words" ? (
+        {findNumber ? (
           <SettingsGroup title={title}>
+            {countPlay}
+            {hints}
+          </SettingsGroup>
+        ) : way !== "words" ? (
+          <SettingsGroup title={title}>
+            {numbersOnly && countPlay}
             <Choice<NumberReveal>
               label={t({ de: "Zahlen", ru: "Цифры", en: "Numbers", zh: "数字", hi: "अंक", es: "Números", ar: "الأرقام" })}
               value={settings.numbers}
@@ -324,31 +381,7 @@ export function LettersGame({ way }: { way: LettersWay }) {
             {findLetter ? (
               <>
                 {showWord}
-                <Toggle
-                  label={
-                    touchKeys
-                      ? t({
-                          de: "Gesuchte Taste aufleuchten lassen, wenn es länger dauert",
-                          ru: "Подсвечивать нужную клавишу, если поиск затянулся",
-                          en: "Light up the wanted key when it takes a while",
-                          zh: "找得久了，让要找的键亮起来",
-                          hi: "देर लगे तो ढूँढा जा रहा बटन चमकाएँ",
-                          es: "Iluminar la tecla buscada si tarda",
-                          ar: "إضاءة الزر المطلوب إذا طال البحث",
-                        })
-                      : t({
-                          de: "Taste auf einer kleinen Tastatur zeigen, wenn es länger dauert",
-                          ru: "Показывать клавишу на маленькой клавиатуре, если поиск затянулся",
-                          en: "Show the key on a small keyboard when it takes a while",
-                          zh: "找得久了，在小键盘图上显示那个键",
-                          hi: "देर लगे तो छोटे कीबोर्ड पर बटन दिखाएँ",
-                          es: "Mostrar la tecla en un teclado pequeño si tarda",
-                          ar: "إظهار الزر على لوحة مفاتيح صغيرة إذا طال البحث",
-                        })
-                  }
-                  checked={settings.hints}
-                  onChange={(hints) => update({ hints })}
-                />
+                {hints}
               </>
             ) : (
               <>

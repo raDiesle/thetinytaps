@@ -44,3 +44,56 @@
 .find-card.done .picture {
   animation: none;
 }
+
+/* ---------- Wo ist die 3? (NumberFindPlay.tsx) ---------- */
+
+/* The key to find under the things: an empty key, still, until the right one is pressed (no idle motion). */
+.nf-key {
+  padding: 0.08em 0.32em;
+  border: 0.05em dashed var(--ink);
+  border-radius: 0.2em;
+  background: rgb(255 255 255 / 0.6);
+  font-size: min(20cqh, 26cqw);
+  font-weight: 800;
+  line-height: 1;
+}
+
+/* Empty while looked for: the digit keeps the key's size but isn't seen. */
+.nf-key span {
+  visibility: hidden;
+}
+
+/* Found: the digit stands in the key, pressed down and lit – the answer, nothing hops (root CLAUDE.md). */
+.nf-card.done .nf-key {
+  border-style: solid;
+  background: var(--accent);
+  color: #fff;
+  transform: translateY(0.07em);
+  box-shadow: 0 0.02em 0 var(--ink);
+}
+
+.nf-card.done .nf-key span {
+  visibility: visible;
+}
+
+/* Phones on their side: the things beside the key, so both get the height the on-screen keys leave. */
+@media (max-width: 599.98px), (max-height: 599.98px) {
+  @container (min-aspect-ratio: 1 / 1) {
+    .letters-play .nf-card {
+      flex-direction: row;
+      gap: 5cqw;
+    }
+
+    .letters-play .nf-card .count-item {
+      font-size: min(27cqh, 10cqw);
+    }
+
+    .letters-play .nf-card :is(.count-1, .count-2, .count-3) .count-item {
+      font-size: min(50cqh, 14cqw);
+    }
+
+    .letters-play .nf-card .nf-key {
+      font-size: min(50cqh, 14cqw);
+    }
+  }
+}

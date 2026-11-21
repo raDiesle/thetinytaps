@@ -14,7 +14,7 @@ function kindOf(p: QueuedPicture) {
 }
 
 /**
- * On the management page: every picture asked for that Gemini still has to make (content/pictureQueue.ts), split as
+ * On the management page, opened from „Offene Bilder“ in the Claude Cloud status: every picture asked for that Gemini still has to make (content/pictureQueue.ts), split as
  * `bun run image queue` splits it – what is cheap now, what waits for partners to fill its sheet, and what waits for
  * its reference – with how many wait in all in its heading, the one number the user looks for, and below how many mascot
  * pictures still wait for their word. Prompts are not shown here to check: the user only wants the count (November 2026).
@@ -35,18 +35,17 @@ export function PictureQueue() {
       </tr>
     ));
   return (
-    <section id="offene-bilder" className="ideas-panel">
-      <h2>
-        🖼️ Offene Bilder: {PICTURE_QUEUE.length} {PICTURE_QUEUE.length === 1 ? "wartet" : "warten"} auf Gemini
-      </h2>
+    <>
+      <h3>
+        {PICTURE_QUEUE.length} {PICTURE_QUEUE.length === 1 ? "Bild wartet" : "Bilder warten"} auf Gemini
+      </h3>
       <p className="ideas-hint">
         Jedes Bild, um das gebeten wird, kommt erst hierher, und keins wird einzeln gemacht, wo es einen Bogen teilen kann. Eine Anfrage an Gemini kostet gleich
         viel, ob sie ein Bild bringt oder einen Bogen aus zwei oder vier, die danach zerschnitten werden: kleine Bilder kommen auf 1K-Bögen von Lite (≈ 0,004 $
         das Bild), große auf 2K-Bögen von Nano Banana 2.1 (≈ 0,007 $ statt 0,017 $ allein). Darum warten Bilder derselben Art, bis ihr Bogen voll ist; was schon
         so günstig geht wie möglich (ein voller Bogen, ein Geschichtenbild, das nach seinem eigenen ersten Bild gezeichnet wird), macht Claude gleich mit. Ein
         Bogen, der noch wartet, kostet jetzt gemacht eine Anfrage mehr – Claude fragt dann, ob er noch warten soll. Sag z. B. „mach die günstigen Bilder“ oder
-        „mach die wartenden Sticker jetzt“. Dieser Mac erreicht Gemini nicht (Zscaler): gemacht werden sie in einer Claude-Cloud-Sitzung mit{" "}
-        <code>bun run paid</code>, mit /paid-queue (siehe ganz oben).
+        „mach die wartenden Sticker jetzt“.
       </p>
       {PICTURE_QUEUE.length === 0 ? (
         <p>Gerade wartet kein Bild.</p>
@@ -100,6 +99,6 @@ export function PictureQueue() {
         Noch ohne fertigen Auftrag: {mascots} Bilder mit Fuchs und Bär (<a href="#maskottchen">Fuchs & Bär</a>) . Sind sie gewünscht, kommen sie hier in die
         Liste.
       </p>
-    </section>
+    </>
   );
 }

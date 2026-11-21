@@ -39,11 +39,8 @@ export const PREP_CUES: Record<PrepPart, Cue[]> = {
     { at: 1000, play: () => playRecorded("clink", playTwinkle) },
     { at: 2050, play: () => playRecorded("clink", playTwinkle) },
   ],
-  // The squeeze, and a twinkle when the toothpaste is on.
-  paste: [
-    { at: 1650, play: playPuff },
-    { at: 3650, play: playTwinkle },
-  ],
+  // The squeeze. No twinkle or stars when the toothpaste is on (user feedback, November 2026): the dab is the picture.
+  paste: [{ at: 1650, play: playPuff }],
   // The tap runs, the brush rattles back into its cup, and a twinkle: all tidy.
   tidy: [
     { at: 600, play: () => playRecorded("splash", playSplash) },
@@ -102,18 +99,15 @@ const ARM = 580;
 /** How much wider the sleeve gets per unit down, so the arm looks to come towards us. */
 const ARM_SPREAD = 0.06;
 
-/**
- * A child's fist round a handle that runs left to right through the origin, the arm going down off the picture:
- * four fingers curled round it, the thumb lying along the top.
- */
-function Fist({ daytime }: { daytime: Daytime }) {
+/** The wrist and the arm in its sleeve below a hand at the origin, going down off the picture and widening towards us. */
+function Arm({ daytime, id }: { daytime: Daytime; id: string }) {
   // The sleeve is the boy's or the girl's T-shirt, or pyjama in the evening (`clothes.tsx`).
   const figure = useFigure();
-  const sleeve = topFill(figure, daytime, "prep-pyjama");
+  const sleeve = topFill(figure, daytime, id);
   return (
-    <g stroke={INK} strokeWidth={4} strokeLinejoin="round">
+    <>
       <defs>
-        <PyjamaPattern id="prep-pyjama" figure={figure} />
+        <PyjamaPattern id={id} figure={figure} />
       </defs>
       {/* Long enough to reach past the screen's edge however much of the sink shows, and wider further down: the arm
           comes towards us from the child standing in front of the sink, not up out of the basin. */}
@@ -121,6 +115,18 @@ function Fist({ daytime }: { daytime: Daytime }) {
       <path d={`M-23 66 L23 66 L${23 + ARM_SPREAD * ARM} ${66 + ARM} L${-23 - ARM_SPREAD * ARM} ${66 + ARM} Z`} fill={sleeve} />
       <path d={`M-12 80 L${-12 - ARM_SPREAD * ARM * 0.6} ${66 + ARM}`} stroke="#fff" strokeWidth={3} strokeLinecap="round" opacity={0.3} />
       <rect x={-25} y={62} width={50} height={14} rx={7} fill={sleeve} />
+    </>
+  );
+}
+
+/**
+ * A child's fist round a handle that runs left to right through the origin, the arm going down off the picture:
+ * four fingers curled round it, the thumb lying along the top.
+ */
+function Fist({ daytime }: { daytime: Daytime }) {
+  return (
+    <g stroke={INK} strokeWidth={4} strokeLinejoin="round">
+      <Arm daytime={daytime} id="prep-pyjama-fist" />
       <path d="M-26 -6 C-26 -16 -18 -20 -8 -20 L14 -20 C24 -20 28 -14 28 -4 L28 14 C28 26 20 32 8 32 L-12 32 C-22 32 -26 26 -26 14 Z" fill={SKIN} />
       {[-19, -6, 7, 20].map((x, i) => (
         <g key={x}>
@@ -130,6 +136,42 @@ function Fist({ daytime }: { daytime: Daytime }) {
       ))}
       <path d="M-30 -8 C-34 -18 -26 -24 -16 -22 L8 -17 C14 -15 14 -9 8 -8 L-18 -6 C-24 -5 -28 -5 -30 -8 Z" fill={SKIN} strokeWidth={3} />
       <path d="M2 -16 C6 -15 7 -11 3 -10" fill="#ffe3d3" strokeWidth={1.8} />
+    </g>
+  );
+}
+
+/** The fingers of the open hand: where each starts on the palm, how it leans and how long it is. */
+const OPEN_FINGERS = [
+  { x: -19, lean: -14, length: 34 },
+  { x: -6, lean: -5, length: 40 },
+  { x: 7, lean: 4, length: 38 },
+  { x: 19, lean: 13, length: 30 },
+];
+
+/**
+ * The same hand open, reaching for the handle before it closes round it (and letting go of it at the end): the palm
+ * where the fist is, the fingers stretched up past the handle a little bent, the thumb out to the side. A hand that
+ * came up already closed round nothing looked odd (user feedback, November 2026).
+ */
+function OpenHand({ daytime }: { daytime: Daytime }) {
+  return (
+    <g stroke={INK} strokeWidth={4} strokeLinejoin="round">
+      <Arm daytime={daytime} id="prep-pyjama-open" />
+      {OPEN_FINGERS.map(({ x, lean, length }) => (
+        <g key={x} transform={`rotate(${lean} ${x} 0)`}>
+          <rect x={x - 6} y={-length} width={12} height={length + 10} rx={6} fill={SKIN} strokeWidth={3} />
+          <path
+            d={`M${x - 3} ${-length * 0.45} Q${x} ${-length * 0.4} ${x + 3} ${-length * 0.45}`}
+            fill="none"
+            strokeWidth={1.8}
+            stroke="#c98a6a"
+            strokeLinecap="round"
+          />
+        </g>
+      ))}
+      <path d="M-26 0 C-26 -6 -20 -8 -10 -8 L16 -8 C24 -8 28 -4 28 2 L28 14 C28 26 20 32 8 32 L-12 32 C-22 32 -26 26 -26 14 Z" fill={SKIN} />
+      <path d="M-24 14 C-34 8 -44 -2 -46 -10 C-47 -16 -41 -18 -37 -13 C-33 -7 -27 -1 -20 2 Z" fill={SKIN} strokeWidth={3} />
+      <path d="M-8 18 Q2 24 14 18" fill="none" strokeWidth={1.8} stroke="#c98a6a" strokeLinecap="round" />
     </g>
   );
 }
@@ -332,7 +374,7 @@ const CUP = "M318 212 L394 212 L386 298 L326 298 Z";
 /** Where the brush, its toothpaste or foam and the hand lie, in the toothbrush's coordinates (its head at the origin). */
 const BRUSH_AREA: Box = { x: -46, y: -46, width: 236, height: 72 };
 /** The fist's own layer round its pivot at the wrist, long enough for the arm to reach off the screen. */
-const FIST_AREA: Box = { x: -64, y: -28, width: 128, height: 680 };
+const FIST_AREA: Box = { x: -64, y: -52, width: 128, height: 704 };
 /** Where the hand holds the handle, in the toothbrush's coordinates: the wrist turns round it. */
 const WRIST = { x: 118, y: 12 };
 /** The tube's layer, in its own coordinates (the nozzle at the origin). */
@@ -358,14 +400,14 @@ function BrushMoves({ children }: { children: ReactNode }) {
   );
 }
 
-/** Twinkles round the brush (this one!), one on the dab of toothpaste, and round the cup at the end (all tidy). */
+/** Twinkles round the brush (this one!) and round the cup at the end (all tidy); none on the toothpaste. */
 const TWINKLES: Record<PrepPart, { x: number; y: number; s: number; delay: number; className: string }[]> = {
   brush: [
     { x: 300, y: 70, s: 0.28, delay: 0, className: "" },
     { x: 414, y: 120, s: 0.28, delay: 300, className: "" },
     { x: 298, y: 150, s: 0.28, delay: 600, className: "" },
   ],
-  paste: [{ x: 130, y: 128, s: 0.3, delay: 3600, className: "late" }],
+  paste: [],
   tidy: [
     { x: 300, y: 150, s: 0.3, delay: 7500, className: "tidy" },
     { x: 410, y: 168, s: 0.3, delay: 7770, className: "tidy" },
@@ -525,9 +567,15 @@ export function Prep({ part, daytime, free }: { part: PrepPart; daytime: Daytime
                 within={WRIST_BOX}
                 className="prep-hand"
                 over={
-                  <Piece area={FIST_AREA} within={ORIGIN_BOX} className="prep-still">
-                    <Fist daytime={daytime} />
-                  </Piece>
+                  <>
+                    {/* Open as it reaches for the brush and lets go of it, closed round the handle while it holds it. */}
+                    <Piece area={FIST_AREA} within={ORIGIN_BOX} className="prep-open-hand">
+                      <OpenHand daytime={daytime} />
+                    </Piece>
+                    <Piece area={FIST_AREA} within={ORIGIN_BOX} className="prep-fist">
+                      <Fist daytime={daytime} />
+                    </Piece>
+                  </>
                 }
               />
             }

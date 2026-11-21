@@ -49,6 +49,20 @@ export function setSfxVolume(volume: number) {
   masterVolume = volume;
 }
 
+/**
+ * Plays what `play` starts right away at `share` of its usual loudness – a sound heard softly, like a picture's thing
+ * saying hello before the first tap (Lebendige Bilder, B-15). Only what starts during the call is softer.
+ */
+export function softly(share: number, play: () => void) {
+  const before = masterVolume;
+  masterVolume = before * share;
+  try {
+    play();
+  } finally {
+    masterVolume = before;
+  }
+}
+
 /** Must be called from a user gesture so the browser allows audio. */
 export function unlockAudio() {
   void audio()?.resume();
@@ -192,6 +206,13 @@ export function playRecorded(name: string, synth: () => void) {
     synth();
     return;
   }
+  playBuffer(buffer);
+}
+
+/** Plays a recording loaded elsewhere (`loadSound`) as a sound effect, slightly higher or lower each time. */
+export function playBuffer(buffer: AudioBuffer) {
+  const ac = audio();
+  if (!ac) return;
   const source = ac.createBufferSource();
   source.buffer = buffer;
   source.playbackRate.value = 0.96 + Math.random() * 0.08;
