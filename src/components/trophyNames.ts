@@ -33,6 +33,13 @@ const NAMERS: Record<string, () => Promise<Namer>> = {
   "/gefuehle/": () => import("@/games/feelings/groups").then(({ GROUPS }) => feelingsNamer(GROUPS)),
   "/wie-gehts-dir/": () => import("@/games/feelings/groups").then(({ GROUPS }) => feelingsNamer(GROUPS)),
   "/was-ist-passiert/": async () => (level, language) => numbered(level, "runde-", ROUND, language),
+  // The book Abstillen's second story (its volume /abstillen/nachts/) gives a trophy of its own, level „nachts“.
+  "/abstillen/": () =>
+    import("@/games/nightmilk/names").then(
+      ({ NIGHT_MILK_TITLE }) =>
+        (level, language) =>
+          level === "nachts" ? pick(NIGHT_MILK_TITLE, language) : undefined,
+    ),
 };
 
 /** „Tag“ and „Runde“ with their number, in each app language. */

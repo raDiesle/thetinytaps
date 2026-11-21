@@ -4,6 +4,7 @@ import { expect, test } from "bun:test";
 // no headings or hints came back, and the pause button has no emoji.
 
 const play = await Bun.file("src/games/teeth/TeethPlay.tsx").text();
+const css = await Bun.file("src/games/teeth/teeth.css").text();
 
 test("no heading or hint for grown-ups on the picture", () => {
   for (const words of ["Erbsengroß", "Ausspucken", "teeth-cue", "teeth-mouth", "teeth-clock"]) expect(play.includes(words) ? words : "").toBe("");
@@ -14,13 +15,23 @@ test("the controls are drawn, with no emoji", () => {
 });
 
 test("the progress bar shows the time before the brushing as its first part", () => {
-  expect(play).toContain("teeth-segment intro");
   expect(play).toContain("teeth-time intro");
+});
+
+// A sweet at the start and a tooth at the end said nothing of what each part of the bar is (user feedback, November
+// 2026): the bar shows the routine's phases apart – eating sweets, getting the brush, the brushing's steps in a frame of
+// their own, and putting the brush away, which keeps the bar until the brush is back in its cup.
+test("the progress bar marks eating, getting the brush, brushing and putting the brush away apart", () => {
+  expect(play).toContain('const PHASE_SYMBOL: Record<BarPhase, TeethSymbol | null> = { eat: "bonbon", fetch: "zahnpasta", ready: null, tidy: "becher" };');
+  expect(play).toMatch(/<div className="teeth-brushing">\s*<div className="teeth-lane teeth-track">\s*\{STEPS\.map/);
+  expect(play).toContain('<PhaseTile phase="tidy"');
+  expect(play).toContain('ending === "rest" ? (');
+  expect(play).toContain("introMs + totalMs + ENDING_MS - SEEK_END_MS");
+  expect(css).toMatch(/\.teeth-brushing \{[^}]*background: #dff3e7;/);
 });
 
 // A jump on the progress bar into the story or the sink once played that part's pictures from its start, while the
 // clock and the song were further on, and pausing there left the sky and the brows running (user feedback, November 2026).
-const css = await Bun.file("src/games/teeth/teeth.css").text();
 
 test("a jump moves the story's and the sink's animations to where the clock is", () => {
   expect(play).toMatch(/getAnimations\(\{ subtree: true \}\)[^\n]*animation\.currentTime = into/);

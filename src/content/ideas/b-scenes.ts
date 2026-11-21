@@ -22,6 +22,9 @@ export const scenesIdeas: IdeaArea = {
       text: "Neuer Such-Modus: Nur das Geräusch wird gespielt (Hund bellt, Bagger brummt) – wer war das? Nutzt die vorhandenen sfx-Klänge.",
       why: "Genaues Hinhören; funktioniert auch ohne Sprachausgabe.",
       effort: "S",
+      done: true,
+      partial:
+        "Umgesetzt am 21. November 2026 als Spielart „🔊 Sounds“ in der Zeile über den Bildern: Die Blase zeigt nur einen Lautsprecher (antippen spielt das Geräusch nochmal), gefragt werden nur Geräusche, die ein Kind am Klang erkennt (37 Tiere, Fahrzeuge und Dinge, soundRiddle.ts), jedes Ding mit dem Geräusch zählt als richtig, nach einer Weile oder zwei Fehlversuchen zeigt ein Ring eins und das Geräusch kommt nochmal. Die Geräusche des Modus kommen auf Wunsch von ElevenLabs und werden nur geladen, wenn der Modus an ist; bis eine Cloud-Sitzung sie macht (Sound-Warteschlange), spielt der Modus die bisherigen Klänge.",
     },
     {
       id: "B-03",
@@ -30,6 +33,7 @@ export const scenesIdeas: IdeaArea = {
       text: "„Wie viele Hütchen siehst du?“ Jedes angetippte Hütchen hüpft und wird mitgezählt. Braucht Szenen mit mehreren gleichen Dingen.",
       why: "Zählen in einem echten Bild statt abstrakt.",
       effort: "M",
+      rejected: true,
     },
     {
       id: "B-04",
@@ -129,6 +133,7 @@ export const scenesIdeas: IdeaArea = {
       text: "Eine kleine Figur (z. B. der Maulwurf) läuft zu jedem angetippten Ding und schaut es sich an, kommentiert manchmal.",
       why: "Roter Faden durch das Bild, Figur zum Mögen.",
       effort: "L",
+      rejected: true,
     },
     {
       id: "B-15",
@@ -137,6 +142,9 @@ export const scenesIdeas: IdeaArea = {
       text: "Tippt eine Weile niemand, winkt ein einzelnes Ding sanft und ruft leise „Hallo!“ – eine Einladung, kein Auftrag. Nach dem ersten Tippen ist es wieder still.",
       why: "Hilft, wenn das Kind nicht weiß, wo es anfangen soll – ohne das Bild unruhig zu machen.",
       effort: "S",
+      done: true,
+      partial:
+        "Umgesetzt beim Entdecken und Ausmalen (hello.ts): Tippt nach dem Start 6 Sekunden niemand, wiegt sich ein Ding sanft zweimal auf seinem Fuß – erst die Tiere, die der Bildmitte am nächsten sind –, danach alle 12 Sekunden ein anderes, höchstens drei. Der erste Tipp oder Tastendruck beendet es. Ohne „Hallo!“: Die Bilder sprechen nicht (keine Stimme in Lebendige Bilder) und klingen nie ohne Tippen.",
     },
     {
       id: "B-16",
@@ -190,6 +198,9 @@ export const scenesIdeas: IdeaArea = {
       text: "Ist alles gefunden, wird das Licht im Bild langsam abendlich warm, und alles Gefundene nickt nacheinander einmal kurz, wie Schauspieler am Schluss – ohne Geräusch für jedes, nur ein leiser Klang am Ende. Statt der aufsteigenden Herzen und Sterne. Gehört zu A-30.",
       why: "Das Kind sieht noch einmal alles, was es gefunden hat, ruhig und in seinem eigenen Bild.",
       effort: "M",
+      partial:
+        "Gebaut (21. November 2026): Ist alles gefunden (Entdecken, Ausmalen, Taschenlampe, Straßen), legt sich warmes Abendlicht über das Bild und bleibt, alles Gefundene verbeugt sich von links nach rechts einmal, ohne eigenes Geräusch, danach ein leiser warmer Akkord und der Pokal. Das Tanzen aller Dinge und die Melodie sind weg; das Gute-Nacht-Bild wird weiter dunkel.",
+      done: true,
     },
   ],
 };

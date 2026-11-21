@@ -299,10 +299,9 @@
   display: flex;
   flex: none;
   align-items: flex-end;
-  width: calc(var(--bh) * 0.82 * var(--span, 1));
+  /* With the room kept for the sign hanging over the carved words (`ShelfCell.lead`), which the words' place takes. */
+  width: calc(var(--bh) * 0.82 * var(--span, 1) + var(--lead, 0px));
   height: var(--bh);
-  /* The carved words take no tap but „mehr …“ in their middle: the picture book beside them comes close, not a finger's gap away. */
-  margin-right: calc(var(--bh) * -0.12);
   transform: translateZ(calc(var(--d) * 0.17));
 }
 
@@ -477,8 +476,13 @@
 }
 
 /*
- * Words carved into the shelf's back panel beside the everyday helpers: cut into the wood (dark, with a lit lower lip),
- * yet big and plain enough to read. On the back panel, moved like what is stuck there (`--sx`, `--sy`, Compartment).
+ * Words carved into the shelf's back panel before the everyday helpers, at the board's far left where a visitor looks
+ * first (user request, November 2026): cut into the wood (dark, with a lit lower lip), yet big and plain enough to read
+ * – grown only into the room they have, never given more (user feedback, November 2026: grown to a heading, their
+ * place took the books' room). On the back
+ * panel, moved like what is stuck there (`--sx`, `--sy`, Compartment). At their right they keep room for the first
+ * book's top, which leans towards them (`LEAN_CLEAR`, `--lean-clear`), and stand narrower by `--pull`, so they stay
+ * centred under the sign reaching left over the post (`ShelfCell.pull`).
  */
 .shelf-carving {
   display: flex;
@@ -488,7 +492,7 @@
   gap: 0.2em;
   align-self: center;
   height: 98%;
-  padding: 0 0 0 calc(var(--bh) * 0.1);
+  padding: 0 calc(var(--bh) * var(--lean-clear, 0) + var(--pull, 0px)) 0 0;
   color: #5b3a1c;
   font-family: Georgia, "Times New Roman", serif;
   font-size: calc(var(--bh) * 0.078);
@@ -499,7 +503,7 @@
   text-shadow:
     0 1px 0 #f6dcaecc,
     0 -1px 0 #2a170866;
-  transform: translate(calc(var(--sx) + var(--words-shift, 0px)), var(--sy)) translateZ(calc(var(--d) * -0.97 + 2px));
+  transform: translate(var(--sx), var(--sy)) translateZ(calc(var(--d) * -0.97 + 2px));
   pointer-events: none;
 }
 
@@ -558,23 +562,53 @@
   font-size: max(1em, 8px);
 }
 
+/*
+ * The first line a little bigger and cut deeper than the sentence under it, in the book's red, so it stands out from
+ * the wood by its colour (user feedback, November 2026: highlighted by colour, never by taking the books' room).
+ */
 .shelf-carving-big {
   font-size: 1.45em;
   font-weight: 700;
   font-style: normal;
+  color: #9a2814;
+  text-shadow:
+    0 1.5px 0 #fbe6bef0,
+    0 -1px 0 #3a0f0699;
+}
+
+.shelf-carving-words {
+  color: #4a2a0e;
 }
 
 /*
- * Below the sign hanging down into the compartment in front of a wide shelf (`SIGN_DIP` of its height, `--ch`): the
- * words begin under its bottom edge.
+ * In front of a wide shelf the words use the room that is there anyway (user feedback, November 2026): from the board
+ * up to under the sign hanging into the compartment (`SIGN_DIP` of its height, `--ch`), and as wide as their place,
+ * which the sign's width sets – their letters grow into it (`cqw`, `cqh` of the carving), never below their size in a
+ * low compartment and never past a share of the books' height. No room is made for them: the plan's place stays as it is.
  */
 .room-scene[data-plan="wide"] .shelf-carving {
+  container-type: size;
+  align-self: flex-end;
+  height: max(calc(var(--bh) * 0.98), calc(var(--ch) * 0.68));
   padding-top: max(0px, calc(var(--bh) * 1.04 - var(--ch) * 0.7));
+}
+
+.room-scene[data-plan="wide"] .shelf-carving > * {
+  --fit: clamp(calc(var(--bh) * 0.078), min(6cqw, 9cqh), calc(var(--bh) * 0.15));
+}
+
+.room-scene[data-plan="wide"] .shelf-carving > .shelf-carving-big {
+  font-size: calc(var(--fit) * 1.45);
+}
+
+.room-scene[data-plan="wide"] .shelf-carving > .shelf-carving-words,
+.room-scene[data-plan="wide"] .shelf-carving > .home-menu {
+  font-size: max(var(--fit), 8px);
 }
 
 /* A narrow place (a phone): as big as the books' names, so it can still be read, and closer to its sides. */
 .shelf-carving[data-narrow] {
-  padding-inline: calc(var(--bh) * 0.08);
+  padding-left: calc(var(--bh) * 0.04);
   font-size: calc(var(--bh) * 0.075);
 }
 

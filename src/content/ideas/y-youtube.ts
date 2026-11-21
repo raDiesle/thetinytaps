@@ -228,7 +228,7 @@ export const youtubeIdeas: IdeaArea = {
       effort: "S",
       done: true,
       partial:
-        "Umgesetzt am 21. November 2026: „nichts“ als dritte Wahl unter „Im Töpfchen“ auf /management/video-toepfchen/ spielt die zweite Geschichte (`NOTHING_STEPS`) bis Tapsi spielt und Mama und Papa an der Tür fragen, dann endet das Video. Titel unter „toepfchen-nichts“. Die letzte Zeile („Tapsi spielt. Mama und Papa schauen rein …“) hat noch in keiner Sprache eine Aufnahme und bleibt bis dahin stumm: Die Liste der Aufnahmen las nur die Schritte der üblichen Geschichte und hatte sie nie (jetzt beide Geschichten, `potty.test.ts`); sie steht unter 🎙️ Stimmen und kommt mit `bun run voice make --only toepfchen` (Russisch mit dem Klon „Tapsi Coach (Klon ru)“, `--voice wlDm46LsfSYnFAMs48Uv`). Am 21. November 2026 sperrte das Firmennetz (Zscaler) ElevenLabs, daher noch nicht aufgenommen: freigegeben und in die Warteschlange gestellt (`toepfchen-nichts`, `toepfchen-nichts-ru` in voiceQueue.ts), aufgenommen mit `bun run paid` auf einem anderen Rechner.",
+        "Umgesetzt am 21. November 2026: „nichts“ als dritte Wahl unter „Im Töpfchen“ auf /management/video-toepfchen/ spielt die zweite Geschichte (`NOTHING_STEPS`) bis Tapsi spielt und Mama und Papa an der Tür fragen, dann endet das Video. Titel unter „toepfchen-nichts“. Die letzte Zeile („Tapsi spielt. Mama und Papa schauen rein …“) hat noch in keiner Sprache eine Aufnahme und bleibt bis dahin stumm: Die Liste der Aufnahmen las nur die Schritte der üblichen Geschichte und hatte sie nie (jetzt beide Geschichten, `potty.test.ts`); sie steht unter 🎙️ Stimmen und kommt mit `bun run voice make --only toepfchen` (Russisch mit dem Klon „Tapsi Coach (Klon ru)“, `--voice wlDm46LsfSYnFAMs48Uv`). Am 21. November 2026 sperrte das Firmennetz (Zscaler) ElevenLabs, daher noch nicht aufgenommen: freigegeben und in die Warteschlange gestellt (`toepfchen-nichts`, `toepfchen-nichts-ru` in voiceQueue.ts), aufgenommen in einer Claude-Cloud-Sitzung mit `/paid-queue`.",
     },
     {
       id: "Y-25",
@@ -302,6 +302,30 @@ export const youtubeIdeas: IdeaArea = {
       text: "Das Zähneputz-Video meldet dem `VideoRecorder` seine Teile als Kapitel, wie Aufs Töpfchen (Y-26): die Geschichte mit den Süßigkeiten, am Waschbecken, dann die Strophen des Lieds – oben, unten, vorn, hinten … – mit Namen, nach denen Eltern suchen (englisch zuerst). Die Untertitel kommen schon von selbst, soweit Tapsi Zeilen sagt; das gesungene Lied selbst hat keine.",
       why: "Kapitel lassen Eltern direkt zum Putzen springen, wenn die Geschichte davor schon bekannt ist.",
       effort: "S",
+    },
+    {
+      id: "Y-33",
+      emoji: "🧩",
+      title: "„Social Story“ im Titel der englischen Geschichten-Videos",
+      text: "Unsere Kapitelbücher (Kita-Start, Haare waschen, Schnullerfee, später Arzt, Zahnarzt, großes Bett) sind fast genau, was Eltern auf Englisch als „social story“ suchen: ruhig, Schritt für Schritt, was gleich passiert, mit einem Kind, das es schafft. Ihre englischen Videos tragen das im Titel („First Day of Daycare – Social Story for Toddlers“) und sagen in der Beschreibung, dass sie auch für Kinder gemacht sind, die Neues schwer nehmen. Nur Titel und Beschreibung in `src/video/youtubeTexts.ts`, kein neues Bild.",
+      why: "„social story“ ist auf Englisch eine eigene Suche mit festen Anhängseln: „… going to the doctor“, „… haircut“, „… dentist“, „… potty training“, „starting kindergarten social story“, „sleeping in own bed social story“. Die Kanäle dort sind klein (Haarschnitt 21 Tsd., Arzt 2 Tsd. Aufrufe), es gibt also Nachfrage und wenig Konkurrenz (Recherche „youtube-themen“).",
+      effort: "S",
+    },
+    {
+      id: "Y-34",
+      emoji: "🌙",
+      title: "Ruhige Gute-Nacht-Videos (low stimulation)",
+      text: "Sobald es ein Gute-Nacht-Spiel (N-03) oder eine Abendgeschichte gibt, ein langsames Video daraus: gedämpfte Farben, kein Schnitt, ruhige Stimme, am Ende wird das Bild dunkel – so wie die App ohnehin aussieht. Titel mit „calm“ oder „low stimulation“ und der Länge („10 minutes“), auf Deutsch „ruhige Einschlafgeschichte für Kleinkinder“.",
+      why: "Einschlafen ist das größte Feld überhaupt: „bedtime story for toddlers“ mit „short“, „to sleep“, „no ads“, „low stimulation“, „10 minutes“, auf Deutsch „einschlafgeschichten für kinder“ und „… ohne werbung“. Die Nachfrage nach ruhigen Videos ist der Trend, und genau das unterscheidet uns von CoComelon (Recherche „youtube-themen“).",
+      effort: "M",
+    },
+    {
+      id: "Y-35",
+      emoji: "🎵",
+      title: "Ein kurzes Lied zu jeder neuen Geschichte",
+      text: "Zu einer Geschichte, deren Thema auch als Lied gesucht wird, ein kurzes Lied mit Suno (30–60 Sekunden, `/musik-erzeugen`), das in der Geschichte am Ende kommt und als eigenes Video oder Short läuft: „Bye-bye, Fläschchen“ (H-105), „Im großen Bett“ (H-106), „Beim Zahnarzt“ (H-107), „Ein Baby kommt“ (H-12). Jedes Lied ist ein zweites Video zum selben Thema, das auf dieselbe Seite zeigt. Kostet Suno-Credits, also nur auf Anfrage.",
+      why: "Fast jede Alltags-Suche hat ein „… lied“ oder „… song“ als Vorschlag: geschwisterchen lied, zahnarzt kinder lied, kinderarzt lied, fieber kinderlied, abschied kita lied, kinderlied umzug, goodbye pacifier song (Recherche „youtube-themen“).",
+      effort: "M",
     },
   ],
 };
