@@ -22,7 +22,7 @@ animation in it put at that moment and then stopped (`holdAt`, `.tm-card-art.tm-
 the picture (`ART_ASPECT`). Names are only read out and their tooltip. They stand in the order the user chose (November
 2026, `PICTURES`): Rote Scheibe, Sanduhr, Kerze, Apfelbaum, Blume, Pizza, Wecker, then Tidy Up and the others, on one frame with
 no name; after all of them Abwechseln is a category of its own, named on its frame (`GameMode.kind`): its two children
-with the toy, the lamps and the hourglass, and that it runs on without end is said in its tooltip (`SWAP_NOTE`). Where there is
+with the toy, the lamps and the hourglass, then the Wippe, and that they run on without end is said in their tooltip (`SWAP_NOTE`). Where there is
 room, its frame stands beside the pictures' rather than in a row of its own below (`packGroups`' `reserve`), so all
 cards still fit on one screen. The row of lengths stands in the menu's head (`levelInHead`), on a phone on its side
 beside the ribbon: under the head it left the cards too little room there, and the Abwechseln group fell below the
@@ -120,8 +120,22 @@ taken out (user request, November 2026). The pictures:
   `SWAP_TOYS`, kept as `toy`), „Wer ist dran?“ (starts that child's turn anew, also during the draw) and the time to the
   change. The turn is worked out from the clock (`turnAt`).
 - „Tennis“ 🎾 (H-71) stood beside Abwechseln from 7 November 2026 and was taken out on 21 November 2026 (user request:
-  poorly done); better ways of taking turns wait as H-108 to H-117. Its id `tennis` is gone from `PICTURES`, so a kept
-  choice falls back to the first picture.
+  poorly done). Its id `tennis` is gone from `PICTURES`, so a kept choice falls back to the first picture.
+- „Wippe“ ⚖️ (H-109, `seesaw.tsx`, 21 November 2026, chosen as the best of H-108 to H-117): Abwechseln on a seesaw, in
+  its group after the hourglass, run by the same `SwapRun` (draw, turns from the clock, toy, „Wer ist dran?“, the same
+  voice lines). The seesaw is the time: the seat of the child whose turn it is starts up high and sinks evenly the whole
+  turn long until its underside lies on a tyre half buried under it (`SAW_TILT` worked out from `TYRE_TOP`); then the
+  toy hops over to the other seat, now up high, with a soft bump, a whoosh and a chime, and the seesaw carries that one
+  down – so the waiting child sees its own seat rise towards its turn. No hourglass or board beside it. The plank with
+  its handles, the cushions on its seats (the shared `Cushion`, no figures) and its hub is one HTML layer turning round
+  the pivot (`PLANK_BOX`): one CSS animation, `infinite alternate` with a turn each way, `alternate-reverse` when the bear
+  child begins, its delay read once as the turns start (a delay changed on a running animation moves it); two names of
+  the same keyframes (`tm-saw-a`/`-b`, by `round`) so it starts anew when a grown-up gives the turn. The toy rides in
+  that layer and turns back the same way (`tm-saw-back-*`, round its bottom's middle), so it stays upright, and bounces
+  softly once a second (H-63). While the sides draw it lies level with the toy in front of the stand; at the end it
+  lies level. Whose turn it is: the other half of the playground lies in shade (`SwapShade` with `edge` at the pivot). A
+  tap lights the tyre the falling seat goes to (`SeesawGoal`). Its name is English only („Seesaw“) until translations
+  are asked for.
   At the end the picture's own sound, then children cheer (the `cheer` recording) while a warm light spreads over the
   picture (`.tm-done-light`), a friendly tune after it, then `GameEnd` with the picture's trophy (nothing rises, the trophy replaced it, user decision, November 2026) with „Nochmal“ and „Weiter“ (the next picture,
   the same minutes, `nextPicture`). Every tap or key during the run answers (steam and a whistle, twinkling, the flame
@@ -143,7 +157,7 @@ Files: `TimerGame.tsx` (start screen: cards, minutes and the own time's slip), `
 run: working out its length, the question when a clock time is past, the clock, the phases `running` →
 `blow` (candle only) → `done`, taps, the end, the sounds of the pieces), `pieces.ts` (how a run is cut into pieces, the
 train's halts, where the apples hang; tested), `SwapPlay.tsx` and `swap.tsx` („Abwechseln“: the draw and its turns, and its room,
-lamps, cushions and toys), `apples.tsx`, `caterpillar.tsx`, `clock.tsx`, `disc.tsx`, `flower.tsx`, `sunset.tsx`, `pizza.tsx`, `tidy.tsx` (one picture each; `tidyNames.ts` Tidy Up's English-only texts), `shown.tsx`
+lamps, cushions and toys), `seesaw.tsx` (the Wippe's playground, plank and stand), `apples.tsx`, `caterpillar.tsx`, `clock.tsx`, `disc.tsx`, `flower.tsx`, `sunset.tsx`, `pizza.tsx`, `tidy.tsx` (one picture each; `tidyNames.ts` Tidy Up's English-only texts), `shown.tsx`
 („Zeit im Bild“: its choice, the note with digits or tally marks), `scenes.tsx` (the other drawings
 and the shared `Layer`, `Draw`, `LeftGlow`), `timer.css`, `content.ts`
 (names, order), `settings.ts`.
@@ -187,9 +201,12 @@ and the shared `Layer`, `Draw`, `LeftGlow`), `timer.css`, `content.ts`
 - **A picture of taking turns plays out something toddlers know and do themselves** (user feedback, 21 November 2026:
   Tennis was poorly done and is taken out – a game two-year-olds hardly know, seen from the side so the ball's flight is a short arc in
   the middle, the players standing stiff, the ball hopping above the racket instead of lying on it, the time only a row
-  of lights): a new one (better ideas in H-108 to H-117) shows a scene from their own day (a seesaw, a swing, a ball
-  rolled to each other), seen so the change crosses the whole picture, with what passes over really held or sat on, and
-  the time in the very motion where it can be – and it thinks of the waiting child, who should see its turn coming.
+  of lights): a new one (the Wippe, H-109, does it; more ideas in H-108 to H-117) shows a scene from their own day (a
+  seesaw, a swing, a ball rolled to each other), seen so the change crosses the whole picture, with what passes over
+  really held or sat on, and the time in the very motion where it can be – and it thinks of the waiting child, who
+  should see its turn coming. Whatever rides on something that tips or turns stays upright (turned back the same way,
+  as the Wippe's toy), and a picture of taking turns is added to `TurnPicture`, `isTurns` and `LEVEL_IDS`, after the
+  others in the Abwechseln group.
 - **One drawing for one thing**: a thing two pictures show (the hourglass) is one component both use, never copied and
   drawn again with its own sizes (user request, November 2026; `timer.test.ts` checks the hourglass).
 - **The cards' order is the user's** (November 2026: Rote Scheibe, Sanduhr, Kerze, Apfelbaum, Blume, Pizza, then the

@@ -320,6 +320,9 @@ export const timerIdeas: IdeaArea = {
       text: "Eine Wippe mit einem Sitz für jedes Kind (Fuchs- und Bärenfarben wie die Kissen). Wer dran ist, sitzt oben im Licht; die Wippe senkt sich die ganze Runde lang ganz langsam auf dessen Seite, bis sie aufsetzt – dann ist das andere dran, und sie hebt es nun von unten wieder hoch. Zeit und Wer-ist-dran sind ein und dieselbe Bewegung, ohne Tafel oder Sanduhr daneben.",
       why: "Eine Wippe kennt jedes Kleinkind vom Spielplatz, und dass sie hin und her geht, ist dort schon Abwechseln. Wie schräg sie steht, sieht man von Weitem.",
       effort: "M",
+      done: true,
+      partial:
+        "Gebaut als Bild „Wippe“ in der Gruppe Abwechseln, neben der Sanduhr (21. November 2026, als beste der Ideen H-108 bis H-117 ausgewählt: Sie erfüllt alles, was nach Tennis als Regel gilt – eine Szene vom Spielplatz, der Wechsel quer übers ganze Bild, die Zeit in der Bewegung selbst, und das wartende Kind sieht seinen Sitz steigen). Auf einem Spielplatz steht eine Wippe mit Holzbrett, Haltegriffen und rotem Gestell; auf ihren Sitzen liegen die Kissen in Fuchs- und Bärenfarbe (keine Figuren). Zu Beginn liegt sie waagrecht, das Spielzeug wartet vor dem Gestell, und die Seiten leuchten abwechselnd auf wie die Lampen, bis eine bleibt; dann kippt die Wippe diesen Sitz hoch und das Spielzeug hüpft darauf. Die ganze Runde lang sinkt der Sitz gleichmäßig, bis er auf seinem halb eingegrabenen Reifen aufsetzt (ein dumpfer Ton), das Spielzeug hüpft zum anderen Sitz, der nun oben ist, und die Wippe trägt ihn hinunter – ohne Ende hin und her. Das Spielzeug bleibt aufrecht und wippt jede Sekunde sanft auf seinem Sitz (H-63); ein Tippen lässt den Reifen leuchten, auf dem der Sitz landen wird. Spielzeug und „Wer ist dran?“ hinter ⚙️ wie bei Abwechseln, dieselben Sätze der Stimme. Name nur englisch („Seesaw“), bis Übersetzungen gewünscht sind.",
     },
     {
       id: "H-110",
