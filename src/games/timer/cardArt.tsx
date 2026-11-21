@@ -1,7 +1,7 @@
 import { memo, useLayoutEffect, useRef, useState } from "react";
 import { pieceCount, MAX_STOPS } from "./pieces";
 import type { SwapToy, TimerPicture } from "./settings";
-import { SAW, Seesaw, SeesawBackdrop, SeesawStand } from "./seesaw";
+import { SAW, Seesaw, SeesawBackdrop, SeesawStand, SeesawSun } from "./seesaw";
 import { SwapBackdrop, SwapCushions, SwapHourglass, SwapLight, SwapShade, Toy } from "./swap";
 import { SceneParts, stageStyle } from "./TimerPlay";
 
@@ -46,8 +46,8 @@ function holdAt(card: HTMLElement | null, at: number) {
  * the picture is the button, no words on it; the middle rather than the end, user feedback, November 2026) – the tree
  * full of apples with the cart under them, the train halfway to the station, the leaf half eaten. It is the very drawing
  * of a run (`SceneParts`, started `MIDDLE` of it ago – `LATER` for a few), stopped at that moment by `holdAt`. „Abwechseln“ shows the fox
- * child's lamp on, the toy on its cushion and the hourglass half run; the Wippe the fox child's side in the light, its seat
- * with the toy on it on its way down.
+ * child's lamp on, the toy on its cushion and the hourglass half run; the Wippe the fox child's side in the sun, its seat
+ * on its way down with the chick walking over to it.
  */
 export const TimerCardArt = memo(function TimerCardArt({ picture, toy }: { picture: TimerPicture; toy: SwapToy }) {
   const at = CARD_MS * (LATER[picture] ?? MIDDLE);
@@ -68,9 +68,10 @@ export const TimerCardArt = memo(function TimerCardArt({ picture, toy }: { pictu
       ) : picture === "seesaw" ? (
         <span className="tm-stage">
           <SeesawBackdrop />
+          <SeesawSun kind="fox" on />
           <SwapShade kind="bear" on edge={SAW.x} />
           <SeesawStand />
-          <Seesaw toy={toy} place="fox" hop={0} running first="fox" turnMs={CARD_MS} startedAt={startedAt + at} round={0} />
+          <Seesaw holder="fox" running first="fox" turnMs={CARD_MS} startedAt={startedAt + at} round={0} />
         </span>
       ) : (
         <span className="tm-stage" style={stageStyle(picture, CARD_MS, pieceCount(CARD_MS, MAX_STOPS))}>
