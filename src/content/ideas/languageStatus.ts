@@ -206,6 +206,12 @@ export const LANGUAGE_STATUS: LanguageStatusRow[] = [
         languages: { de: "done", en: "done", zh: "done", hi: "done", es: "done", ar: "done", ru: "done" },
         note: "„Da ist ja Familie Fuchs!“ und „Da ist ja Familie Bär!“ (4. November 2026), übersetzt am 5. November 2026.",
       },
+      {
+        label: "🔊 Geräusch-Rätsel",
+        languages: { en: "done" },
+        note: "Neu seit B-02 (21. November 2026), englisch zuerst: der Name der Spielart in der Zeile über den Bildern („🔊 Sounds“) und die nur vorgelesene Frage „Who makes this sound?“ (soundRiddle.ts). Die Geräusche selbst brauchen keine Sprache; ihre Aufnahmen von ElevenLabs warten in der Sound-Warteschlange. Die Texte für Suchmaschinen nennen den Modus schon in allen sieben Sprachen.",
+        files: ["src/games/scenes/soundRiddle.ts"],
+      },
     ],
   },
   {

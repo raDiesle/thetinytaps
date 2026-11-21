@@ -22,6 +22,9 @@ export const scenesIdeas: IdeaArea = {
       text: "Neuer Such-Modus: Nur das Geräusch wird gespielt (Hund bellt, Bagger brummt) – wer war das? Nutzt die vorhandenen sfx-Klänge.",
       why: "Genaues Hinhören; funktioniert auch ohne Sprachausgabe.",
       effort: "S",
+      done: true,
+      partial:
+        "Umgesetzt am 21. November 2026 als Spielart „🔊 Sounds“ in der Zeile über den Bildern: Die Blase zeigt nur einen Lautsprecher (antippen spielt das Geräusch nochmal), gefragt werden nur Geräusche, die ein Kind am Klang erkennt (37 Tiere, Fahrzeuge und Dinge, soundRiddle.ts), jedes Ding mit dem Geräusch zählt als richtig, nach einer Weile oder zwei Fehlversuchen zeigt ein Ring eins und das Geräusch kommt nochmal. Die Geräusche des Modus kommen auf Wunsch von ElevenLabs und werden nur geladen, wenn der Modus an ist; bis eine Cloud-Sitzung sie macht (Sound-Warteschlange), spielt der Modus die bisherigen Klänge.",
     },
     {
       id: "B-03",
