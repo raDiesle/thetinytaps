@@ -71,12 +71,12 @@ export const PICTURES: { id: TimerPicture; emoji: string; name: Localized }[] = 
     name: { de: "Sonnenaufgang", en: "Sunrise", zh: "日出", hi: "सूर्योदय", es: "Amanecer", ar: "شروق الشمس", ru: "Восход" },
   },
   { id: "swap", emoji: "🔁", name: SWAP_NAME },
-  // Taking turns at tennis (H-71, user request, November 2026), beside „Abwechseln“ in its group.
-  { id: "tennis", emoji: "🎾", name: { de: "Tennis", en: "Tennis", zh: "网球", hi: "टेनिस", es: "Tenis", ar: "التنس", ru: "Теннис" } },
+  // Tennis (H-71) stood here and was taken out again (user request, 21 November 2026: poorly done); better ideas for
+  // taking turns are H-108 to H-117.
 ];
 
 /**
- * The line on the cards of „Abwechseln“ and Tennis, last on the start screen, for grown-ups: they run on without an
+ * The line on the card of „Abwechseln“, last on the start screen, for grown-ups: it runs on without an
  * end, and each child gets its turn (user feedback, November 2026).
  */
 export const SWAP_NOTE: Localized = {
@@ -90,14 +90,14 @@ export const SWAP_NOTE: Localized = {
 };
 
 /** Whether a picture is one of taking turns, running on without end (`TurnPicture`). */
-export const isTurns = (id: TimerPicture): id is TurnPicture => id === "swap" || id === "tennis";
+export const isTurns = (id: TimerPicture): id is TurnPicture => id === "swap";
 
 /** The pictures that run until the time is up, in their order: all but those of taking turns. */
 export const TIMED_PICTURES = PICTURES.filter((p) => !isTurns(p.id));
 
 /**
  * The picture after `id` for „Weiter“: the next one that runs until the time is up, after the last the first – never
- * „Abwechseln“ or Tennis, which go on without an end; from them the first.
+ * „Abwechseln“, which goes on without an end; from it the first.
  */
 export function nextPicture(id: TimerPicture): TimerPicture {
   const i = TIMED_PICTURES.findIndex((p) => p.id === id);
