@@ -86,19 +86,19 @@ test("the highlighter covers all the words of a chosen choice", () => {
   }
 });
 
-// The small grey gear on ⚙️'s note wasn't seen while playing, nor known for the options without words (user feedback,
-// November 2026): on tablets and computers its note is much bigger than the fullscreen one beside it and carries its
-// name in words, and it lights up softly a few times as play starts, then stands still. On a phone the words covered
-// too much of the picture: there it is only the gear, on a slip like the fullscreen one.
-test("⚙️ while playing is a big symbol-only note that lights up only as play starts", () => {
-  const slip = rule(".play-area .play-options-corner .play-options-button");
-  const width = (decls: string) => Number(decls.match(/width:\s*(\d+)px/)?.[1]);
-  expect(width(slip)).toBeGreaterThan(1.5 * width(rule(".play-area .play-fullscreen, .play-options-button)")));
+// ⚙️ while playing is the same note as the fullscreen one beside it, as big, its gear drawn in the same pencil line
+// (user feedback, November 2026: a bigger note with the ⚙️ emoji looked like another thing), and it lights up softly a
+// few times as play starts, then stands still – that is how grown-ups find it.
+test("⚙️ while playing is a note just like the fullscreen one and lights up only as play starts", () => {
+  // No rule makes its slip bigger than the shared one of the fullscreen note.
+  expect(css).not.toMatch(/\.play-options-corner \.play-options-button\s*\{[^}]*(width|height):/);
   const playing = read("src/styles/playing.css");
-  const playingRule = (selector: string) => playing.match(new RegExp(`\\n${selector.replace(/[.*+?^${}()|[\]\\]/g, "\\$&")}\\s*\\{([^}]*)\\}`))?.[1] ?? "";
-  expect(Number(playingRule(".play-options-gear").match(/font-size:\s*([\d.]+)rem/)?.[1])).toBeGreaterThanOrEqual(2.4);
-  // Only the symbol: its name and „halten“ are read out, never written on the slip (user feedback, November 2026).
-  expect(read("src/components/PlayOptions.tsx")).not.toContain("play-options-label");
+  expect(playing).not.toMatch(/\.play-options-button[^{]*\{[^}]*(width|height|padding):/);
+  // A drawn gear, never the emoji, and no words on the slip: its name and „halten“ are read out.
+  const code = read("src/components/PlayOptions.tsx");
+  expect(code).toContain('className="play-options-icon"');
+  expect(code).not.toMatch(/>\s*⚙️\s*</);
+  expect(code).not.toContain("play-options-label");
   const glow = playing.match(/\.play-options-corner \{[^}]*animation:\s*([^;]+);/)?.[1] ?? "";
   expect(glow).toContain("play-options-glow");
   // A number of times, never `infinite`: after it, nothing idles.

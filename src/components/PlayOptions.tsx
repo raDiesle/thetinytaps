@@ -12,7 +12,25 @@ const HOLD_MS = 500;
 export const INTRO_MS = 4000;
 
 /**
- * A game's options while it plays, for grown-ups: ⚙️ in the top corner as a symbol only (its name just read out), always held
+ * A gear drawn in the same pencil line as the fullscreen note's corners beside it, eight teeth round a ring: the ⚙️
+ * emoji on its own big note looked like another thing than its neighbour (user feedback, November 2026).
+ */
+const GEAR_PATH = (() => {
+  const teeth = 8;
+  const [outer, inner] = [10, 7.2];
+  const at = (r: number, a: number) => `${(12 + r * Math.sin(a)).toFixed(2)} ${(12 - r * Math.cos(a)).toFixed(2)}`;
+  let d = "";
+  for (let i = 0; i < teeth; i++) {
+    const a = (i * 2 * Math.PI) / teeth;
+    d += `${i === 0 ? "M" : "L"}${at(inner, a - 0.3)} L${at(outer, a - 0.17)} L${at(outer, a + 0.17)} L${at(inner, a + 0.3)} `;
+    d += `A${inner} ${inner} 0 0 1 ${at(inner, a + (2 * Math.PI) / teeth - 0.3)} `;
+  }
+  return `${d.trim()}Z`;
+})();
+
+/**
+ * A game's options while it plays, for grown-ups: ⚙️ in the top corner as a drawn gear only, on a note just like the
+ * fullscreen one beside it (its name just read out), always held
  * (the ring fills), opens `children` in a panel over the game; „Weiter spielen“ or a tap beside it closes it. While it
  * is open, keys don't reach the game (holding Esc still leaves it). Changes apply at once, the game keeps playing behind.
  * `intro` (a game with many ways to play) is a note under it as play starts, telling grown-ups what they can choose
@@ -47,9 +65,10 @@ export function PlayOptions({ children, intro }: { children: ReactNode; intro?: 
     <>
       <div className="play-options-corner" data-tap-keep>
         <button type="button" className={`hold-exit play-options-button${holding ? " holding" : ""}`} aria-label={`${label} (${hold})`} {...props}>
-          <span className="play-options-gear" aria-hidden>
-            ⚙️
-          </span>
+          <svg className="play-options-icon" viewBox="0 0 24 24" aria-hidden>
+            <path d={GEAR_PATH} />
+            <circle cx="12" cy="12" r="3.2" />
+          </svg>
         </button>
         {introShown && (
           <div

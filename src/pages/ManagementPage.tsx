@@ -1,6 +1,7 @@
 import { lazy, Suspense, useState } from "react";
 import { Link } from "react-router";
 import { MenuTop } from "@/components/MenuTop";
+import { CloudQueueStatus } from "@/components/CloudQueueStatus";
 import { PictureQueue } from "@/components/PictureQueue";
 import { VoiceQueue } from "@/components/VoiceQueue";
 import { UNFINISHED } from "@/content/games";
@@ -185,6 +186,7 @@ export function ManagementPage() {
         <span aria-hidden>🧭</span> Management
       </h1>
       <p className="ideas-build">Stand: {buildDate()}</p>
+      <CloudQueueStatus />
       <p className="home-subtitle">
         Alles, was beim Entscheiden hilft: Ideen, Sprachen, Recherchen, offene Bilder. {active - done} offene Ideen, {done} schon umgesetzt (nicht mehr
         aufgelistet), {rejected} abgelehnt. Die Nummern (z.&nbsp;B. <b>N-03</b>) bleiben fest, damit man sie nennen kann.

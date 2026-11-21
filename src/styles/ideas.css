@@ -32,6 +32,16 @@
   font-size: 1.2rem;
 }
 
+/* The state of the paid queue, first on the page: green when nothing is open, amber while Claude Cloud has work. */
+.ideas-cloud {
+  border: 3px solid #5fb36b;
+}
+
+.ideas-cloud-open {
+  border-color: #e0a020;
+  background: #fff8e6;
+}
+
 .ideas-panel summary {
   cursor: pointer;
 }

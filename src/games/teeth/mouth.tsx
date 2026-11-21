@@ -459,6 +459,19 @@ export function Mouth({ view, zone, monsters, brush, happy, dazzled, action, gli
     [happy, model, all],
   );
 
+  // Glints flashing on the front teeth's light, one after the other (`GLINT_TEETH`), where a tooth faces the viewer.
+  const glints = useMemo(
+    () =>
+      happy
+        ? GLINT_TEETH.flatMap((id, i) => {
+            const t = teethByKey.get(toothKey(id));
+            if (!t || all[id.jaw].facing(surfaceFace(t.faces, "outer").normal) <= 0.55) return [];
+            return [{ key: t.key, at: all[id.jaw].point(t.shine[0]), turn: i }];
+          })
+        : [],
+    [happy, teethByKey, all],
+  );
+
   // The face and the teeth change only while the head turns or the mouth opens: built once for each view,
   // not again with every tick of the clock (hundreds of paths, too slow for a phone five times a second).
   const zoneSurface = zone?.surface;
@@ -654,8 +667,9 @@ export function Mouth({ view, zone, monsters, brush, happy, dazzled, action, gli
         </svg>
       )}
 
-      {/* All clean: a soft white light round the teeth that breathes, clipped to the mouth with the teeth themselves
-          left out, so their outlines stay sharp. Its own layer, which only changes its opacity. */}
+      {/* All clean: a bright light round the teeth that breathes, clipped to the mouth with the teeth themselves left
+          out, so their outlines stay sharp, and a warm light beaming out round the lips. Its own layer, which only
+          changes its opacity. */}
       {happy && !gliding && (
         <svg className="mouth mouth-moving teeth-shine" viewBox={viewBox} aria-hidden>
           <defs>
@@ -665,13 +679,23 @@ export function Mouth({ view, zone, monsters, brush, happy, dazzled, action, gli
             <clipPath id="mouth-shine">
               <path d={`${lipsPath} ${shineTeeth.map((t) => t.d).join(" ")}`} clipRule="evenodd" />
             </clipPath>
+            <clipPath id="smile-halo">
+              <path d={`${rectPath(frame)} ${lipsPath}`} clipRule="evenodd" />
+            </clipPath>
             <filter id="teeth-shine-soft" x="-20%" y="-20%" width="140%" height="140%">
-              <feGaussianBlur stdDeviation={6} />
+              <feGaussianBlur stdDeviation={5} />
+            </filter>
+            <filter id="smile-halo-soft" x="-30%" y="-60%" width="160%" height="220%">
+              <feGaussianBlur stdDeviation={14} />
             </filter>
           </defs>
           <g clipPath="url(#mirror-shine)">
+            {/* The smile beams: a warm light round the lips, over the face. */}
+            <g clipPath="url(#smile-halo)">
+              <path d={lipsPath} fill="none" stroke="#fffaf0" strokeWidth={80} opacity={0.9} filter="url(#smile-halo-soft)" />
+            </g>
             <g clipPath="url(#mouth-shine)">
-              <g filter="url(#teeth-shine-soft)" fill="none" stroke="#fffbe6" strokeWidth={22} strokeLinejoin="round">
+              <g filter="url(#teeth-shine-soft)" fill="none" stroke="#fffdf2" strokeWidth={34} strokeLinejoin="round">
                 {shineTeeth.map((t) => (
                   <path key={t.key} d={t.d} />
                 ))}
@@ -698,6 +722,20 @@ export function Mouth({ view, zone, monsters, brush, happy, dazzled, action, gli
         {action && <LipArrows action={action} lips={lipPoints} zoom={project.zoom} onScreen={onScreen} />}
         {/* A last sugar monster peeks in, dazzled by the clean teeth, and puts on sunglasses: no sugar left for it. */}
         {dazzled && <DazzledMonster screen={screen} />}
+        {/* All clean: glints of light flash on the teeth in turn, each a small layer of its own. */}
+        {!gliding &&
+          glints.map((g) => {
+            const at = onScreen(g.at, GLINT_SIZE);
+            return (
+              <Sprite key={g.key} spot={{ x: round(at.x), y: round(at.y), scale: round(at.scale, 1000) }} reach={GLINT_REACH} className="tooth-glint">
+                <div style={{ "--turn": g.turn } as CSSProperties}>
+                  <svg viewBox={spriteBox(GLINT_REACH)} aria-hidden>
+                    <Glint />
+                  </svg>
+                </div>
+              </Sprite>
+            );
+          })}
       </div>
 
       <svg className="mouth mouth-moving" viewBox={`0 0 ${screen.width} ${screen.height}`} aria-hidden>
@@ -903,6 +941,59 @@ function Sprite({ spot, reach, className, children }: { spot: SpriteSpot; reach:
     </div>
   );
 }
+
+/**
+ * The front teeth a glint flashes on at the end, in the order they flash: crossing from one side of the smile to the
+ * other and between the rows, so the light seems to run over all of them.
+ */
+const GLINT_TEETH: ToothId[] = [
+  { jaw: "upper", side: "left", n: 0 },
+  { jaw: "lower", side: "right", n: 1 },
+  { jaw: "upper", side: "right", n: 2 },
+  { jaw: "upper", side: "left", n: 3 },
+  { jaw: "lower", side: "left", n: 0 },
+  { jaw: "upper", side: "right", n: 0 },
+];
+/** How far a glint's rays reach from its middle, in its own units. */
+const GLINT_REACH = 50;
+/** A glint's size in the picture: its long rays reach about one tooth each way – bigger was too strong. */
+const GLINT_SIZE = 1.3;
+
+/**
+ * A glint of light as on something polished: a white core with four long, thin rays and four short ones between them,
+ * in white light only – never a drawn star with an ink line (stars on the teeth looked out of place, and emoji look
+ * poor), nor gold (too strong; user feedback, November 2026). A faint cool shade along its rays lets the white show on
+ * the white teeth. Drawn still: its Sprite's HTML flashes it, slowly.
+ */
+function Glint() {
+  const ray = (length: number, width: number, angle: number) => (
+    <path key={angle} d={`M0 ${-length} Q${width} 0 0 ${length} Q${-width} 0 0 ${-length} Z`} transform={`rotate(${angle})`} />
+  );
+  return (
+    <>
+      <defs>
+        <radialGradient id="glint-core">
+          <stop offset="0" stopColor="#fff" />
+          <stop offset="0.3" stopColor="#fff" stopOpacity="0.9" />
+          <stop offset="0.6" stopColor="#c9dcf2" stopOpacity="0.45" />
+          <stop offset="1" stopColor="#c9dcf2" stopOpacity="0" />
+        </radialGradient>
+      </defs>
+      <circle r={26} fill="url(#glint-core)" />
+      {/* A faint cool edge, so the white light shows on the white teeth too. */}
+      <g fill="#fff" stroke="#7f9cc0" strokeOpacity={0.8} strokeWidth={1.6} strokeLinejoin="round">
+        {ray(49, 5.5, 0)}
+        {ray(49, 5.5, 90)}
+        {ray(24, 4, 45)}
+        {ray(24, 4, 135)}
+      </g>
+      <circle r={6} fill="#fff" />
+    </>
+  );
+}
+
+/** A rectangle as a path, to cut a shape out of it (evenodd). */
+const rectPath = ({ x, y, width, height }: { x: number; y: number; width: number; height: number }) => `M${x} ${y} H${x + width} V${y + height} H${x} Z`;
 
 /** The viewBox of an svg filling a Sprite: `reach` units each way round (0, 0). */
 const spriteBox = (reach: number) => `${-reach} ${-reach} ${2 * reach} ${2 * reach}`;

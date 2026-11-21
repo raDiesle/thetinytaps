@@ -2,15 +2,16 @@ import { VOICE_QUEUE } from "@/content/voiceQueue";
 
 /**
  * On the management page, above the lines still to record: the recordings the user has already asked for, waiting for
- * `bun run paid` on a computer whose network reaches ElevenLabs (content/voiceQueue.ts) – this Mac's Zscaler blocks it.
+ * `bun run paid` in a Claude cloud session, whose network reaches ElevenLabs (content/voiceQueue.ts) – this Mac's Zscaler blocks it.
  */
 export function VoiceQueue() {
   return (
     <>
-      <h3>Freigegeben: {VOICE_QUEUE.length === 1 ? "1 Aufnahme wartet" : `${VOICE_QUEUE.length} Aufnahmen warten`} auf den anderen Rechner</h3>
+      <h3>Freigegeben: {VOICE_QUEUE.length === 1 ? "1 Aufnahme wartet" : `${VOICE_QUEUE.length} Aufnahmen warten`} auf Claude Cloud</h3>
       <p className="ideas-hint">
         Das Firmennetz dieses Macs (Zscaler) sperrt ElevenLabs und Gemini. Was du freigibst, schreibt Claude darum hier ein (und die Bilder in „Offene Bilder“);
-        auf einem anderen Rechner macht <code>bun run paid</code> alles auf einmal – vorher <code>bun run paid --dry</code> zeigt, was es kostet.
+        eine Claude-Cloud-Sitzung macht mit <code>bun run paid</code> alles auf einmal, mit /paid-queue (siehe ganz oben) – <code>bun run paid --dry</code>{" "}
+        zeigt vorher, was es kostet.
       </p>
       {VOICE_QUEUE.length > 0 && (
         <div className="ideas-overview-scroll">

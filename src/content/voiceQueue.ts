@@ -1,8 +1,9 @@
 /**
  * Recordings the user has asked for and that still wait for their run (user request, 21 November 2026): the network
  * of the Mac most sessions run on (the company's Zscaler) blocks ElevenLabs and Gemini, so an approved paid run is
- * written down here and made on another computer with `bun run paid` (`scripts/paid-queue.mjs`), which records these
- * jobs with `bun run voice make` and then makes the cheap pictures of `pictureQueue.ts`.
+ * written down here and made in a Claude cloud session with `/paid-queue` (`bun run paid`, `scripts/paid-queue.mjs`),
+ * which records these jobs with `bun run voice make`, then makes the cheap pictures of `pictureQueue.ts` and lists the
+ * sound effects of `soundQueue.ts`.
  *
  * A job only says which recordings to make, never the lines: `voice make` finds the lines still missing in the parts
  * and languages named, so a job run twice costs nothing the second time. Once its recordings are made and committed,
@@ -45,26 +46,9 @@ export interface VoiceJob {
   voice?: string;
   /** Requests at once (`--parallel`): 2 on the second account, whose plan allows 3. */
   parallel?: number;
+  /** What is left to do once it is recorded (a line to switch on, a test to update); left out where the game plays the recordings as soon as they are there. */
+  after?: string;
 }
 
 /** Approved and not made yet, in the order `bun run paid` records them. */
-export const VOICE_QUEUE: VoiceJob[] = [
-  {
-    id: "toepfchen-nichts",
-    why: "Aufs Töpfchen: „Tapsi spielt. Mama und Papa schauen rein …“, die letzte Zeile, wenn nichts kam (Y-24)",
-    date: "2026-11-21",
-    only: ["toepfchen"],
-    lang: ["en", "zh", "hi", "es", "ar", "de"],
-    account: "first",
-  },
-  {
-    id: "toepfchen-nichts-ru",
-    why: "dieselbe Zeile auf Russisch, mit dem Klon wie Töpfchens übrige russische Sätze",
-    date: "2026-11-21",
-    only: ["toepfchen"],
-    lang: ["ru"],
-    account: "second",
-    voice: "wlDm46LsfSYnFAMs48Uv",
-    parallel: 2,
-  },
-];
+export const VOICE_QUEUE: VoiceJob[] = [];

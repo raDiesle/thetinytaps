@@ -74,3 +74,19 @@ test("the end's buttons and its trophy answer without a pointer too", async () =
   // Still a span, so no rule for buttons restyles it.
   expect(end).toMatch(/<span\s+ref=\{trophyRef\}/);
 });
+
+// It wasn't clear the landed trophy can be tapped, it was small and its count hard to read (user feedback, November
+// 2026): it stays big, the shared ring and hand point at it (stopped at their first stage, never darkening „Weiter“),
+// and its count stands on a light plate big enough to read.
+test("the landed trophy is big, marked by the shared tap hint, and its count is easy to read", async () => {
+  const end = await Bun.file("src/components/GameEnd.tsx").text();
+  expect(end).toMatch(/\{landed && trophySize && [^}]*<TrophyHint \{\.\.\.trophySize\} \/>\}/);
+  expect(end).toMatch(/<TapHint\b[^>]*\bupTo=\{1\}/);
+  const css = await Bun.file("src/styles/game-end.css").text();
+  const height = Number(css.match(/\.game-end \{[^}]*--trophy-h: clamp\((\d+)px, (\d+)vh/)?.[2]);
+  expect(height).toBeGreaterThanOrEqual(40);
+  const trophy = await Bun.file("src/components/Trophy.tsx").text();
+  const plate = trophy.match(/function Plate[\s\S]*?\n\}/)?.[0] ?? "";
+  expect(Number(plate.match(/fontSize="([\d.]+)"/)?.[1])).toBeGreaterThanOrEqual(14);
+  expect(plate).toMatch(/fill="#fff/);
+});
