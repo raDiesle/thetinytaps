@@ -3,10 +3,12 @@
 Route `/timer/` · idea H-04 („Timer zum Zuschauen“). A book of its own among the Alltagshelfer, the very first one on the shelf, top left (user decision, November 2026; it was hidden as `unfinished` while being built).
 
 A visual timer for the day, not a game: a grown-up picks the length in the row above the cards („Wie lange?“: 10 or 30
-Sek., 1, 2, 3, 5 or 10 Min., `TIMER_SECONDS`, kept as `seconds`; the seconds asked for by the user, November 2026) and a picture card starts it. Behind them „Andere …“ opens a sheet for grown-ups
+Sek., 1, 2, 3, 5 or 10 Min., `TIMER_SECONDS`, kept as `seconds`; the seconds asked for by the user, November 2026) and a picture card starts it.
+Every visit starts at 5 minutes: the length picked is kept for the visit only (`visitLength` in `TimerGame.tsx`), never
+stored, so the next visit never opens on whatever was picked last (user request, November 2026). Behind them „Andere …“ opens a sheet for grown-ups
 (`OwnTimeSheet`, H-59, H-60): any length from 10 seconds to 3 hours (− and + for hours, minutes and seconds, ready slips
 for 15 to 60 minutes, typed on a computer), or „Bis um“ a clock time to end at. The time set there stays as a slip of its
-own in the row (`own`, `useOwn`) until another comes. Held ⚙️ while it runs shows the time left in digits for
+own in the row (`own`, stored) until another comes; whether it is the one chosen (`useOwn`) lasts for the visit like the length. Held ⚙️ while it runs shows the time left in digits for
 grown-ups (`TimeLeft`, H-62). Every timer but the Wecker (whose screen is the time left) shows the time left in the picture's bottom right corner on a small paper
 note (`shown.tsx`, kept as `timeNote`): by default as minutes and seconds („Zahlen“, `digits`, e.g. „4:37“; user
 request, November 2026 – the tally marks were the default before). Behind ⚙️ its „Zeit im Bild“ switches to tally marks
@@ -176,6 +178,12 @@ and the shared `Layer`, `Draw`, `LeftGlow`), `timer.css`, `content.ts`
   light on the cushion, the other side in shade – and the toy sits on that cushion, not beside it. Who begins is never
   left unsaid: the lamps draw it before the sand runs, and only then does the time start. A new way to show a turn
   keeps that: a big change of the whole side, never a small sign.
+- **A picture of taking turns plays out something toddlers know and do themselves** (user feedback, 21 November 2026:
+  Tennis is poorly done – a game two-year-olds hardly know, seen from the side so the ball's flight is a short arc in
+  the middle, the players standing stiff, the ball hopping above the racket instead of lying on it, the time only a row
+  of lights): a new one (better ideas in H-104 to H-113) shows a scene from their own day (a seesaw, a swing, a ball
+  rolled to each other), seen so the change crosses the whole picture, with what passes over really held or sat on, and
+  the time in the very motion where it can be – and it thinks of the waiting child, who should see its turn coming.
 - **One drawing for one thing**: a thing two pictures show (the hourglass) is one component both use, never copied and
   drawn again with its own sizes (user request, November 2026; `timer.test.ts` checks the hourglass).
 - **The cards' order is the user's** (November 2026: Rote Scheibe, Sanduhr, Kerze, Apfelbaum, Blume, Pizza, then the
