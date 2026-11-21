@@ -72,7 +72,7 @@ export const LANGUAGE_STATUS: LanguageStatusRow[] = [
         label: "🗣️ Stimme",
         languages: { de: "done", en: "done", zh: "done", hi: "done", es: "done", ar: "done", ru: "done" },
         recorded: true,
-        note: "Was jedes Bild am Anfang und am Ende sagt, „Gleich ist es so weit!“ zur Glocke, und bei Abwechseln und Tennis „Wer fängt an?“, wer anfängt und „Tauschen! …“ (H-72, voice.ts, 7. November 2026): in alle Sprachen übersetzt (timerSaid) und außer Russisch von ElevenLabs gesprochen (7./8. November 2026); Russisch fehlt noch (die Credits des Monats waren aufgebraucht) und bleibt bis dahin still, keine Browserstimme. Russisch am 12. November 2026 von ElevenLabs gesprochen mit dem Klon von Tapsis Stimme aus ihren russischen Aufnahmen („Tapsi Coach (Klon ru)“, zweites Konto).",
+        note: "Was jedes Bild am Anfang und am Ende sagt, „Gleich ist es so weit!“ zur Glocke, und bei Abwechseln „Wer fängt an?“, wer anfängt und „Tauschen! …“ (H-72, voice.ts, 7. November 2026): in alle Sprachen übersetzt (timerSaid) und außer Russisch von ElevenLabs gesprochen (7./8. November 2026); Russisch fehlt noch (die Credits des Monats waren aufgebraucht) und bleibt bis dahin still, keine Browserstimme. Russisch am 12. November 2026 von ElevenLabs gesprochen mit dem Klon von Tapsis Stimme aus ihren russischen Aufnahmen („Tapsi Coach (Klon ru)“, zweites Konto).",
       },
     ],
   },

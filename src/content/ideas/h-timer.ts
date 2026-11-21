@@ -270,7 +270,7 @@ export const timerIdeas: IdeaArea = {
       effort: "M",
       done: true,
       partial:
-        "Gebaut als Bild „Tennis“ in der Gruppe Abwechseln (Wunsch 7. November 2026): ein blauer Platz mit Netz vor einem grünen Zaun, die beiden Kinder stehen still mit ihren Schlägern. Zu Beginn leuchten die Seiten abwechselnd auf, langsamer und langsamer, bis eine bleibt. Der Ball hüpft auf dem Schläger dessen, der dran ist; eine Anzeigetafel über dem Netz hat zehn Lichter, die eins nach dem anderen ausgehen. Ist die Zeit um, schwingt der Schläger, der Ball fliegt in gut zwei Sekunden übers Netz, und die Schatten wechseln, sobald er das Netz überquert.",
+        "Am 21. November 2026 wieder herausgenommen (Wunsch: schlecht umgesetzt); bessere Ideen fürs Abwechseln sind H-108 bis H-117. Gebaut war es als Bild „Tennis“ in der Gruppe Abwechseln (Wunsch 7. November 2026): ein blauer Platz mit Netz vor einem grünen Zaun, die beiden Kinder stehen still mit ihren Schlägern. Zu Beginn leuchten die Seiten abwechselnd auf, langsamer und langsamer, bis eine bleibt. Der Ball hüpft auf dem Schläger dessen, der dran ist; eine Anzeigetafel über dem Netz hat zehn Lichter, die eins nach dem anderen ausgehen. Ist die Zeit um, schwingt der Schläger, der Ball fliegt in gut zwei Sekunden übers Netz, und die Schatten wechseln, sobald er das Netz überquert.",
     },
     {
       id: "H-69",
@@ -302,7 +302,7 @@ export const timerIdeas: IdeaArea = {
       why: "Ein Timer soll beruhigen; das Ende bleibt so ruhig wie das Warten davor.",
       effort: "S",
     },
-    // Abwechseln, better (user feedback, 21 November 2026: Tennis, H-71, is poorly done – the players stand stiff, the
+    // Abwechseln, better (user feedback, 21 November 2026, then Tennis taken out: H-71 was poorly done – the players stand stiff, the
     // ball hops above the racket rather than on it, the court seen from the side hides its flight, and the time is
     // only a row of lights over the net). An idea round: the user picks later.
     {
@@ -325,7 +325,7 @@ export const timerIdeas: IdeaArea = {
       id: "H-110",
       emoji: "⚽",
       title: "Abwechseln: Ball zurollen statt Tennis",
-      text: "Statt Tennis rollen sich die beiden Kinder einen großen Ball über den Boden zu, von oben oder schräg von vorn gesehen, damit der Weg quer übers Bild läuft. Wer dran ist, hat den Ball in den Armen; ist die Zeit um, rollt er ihn langsam zum anderen, der ihn auffängt. Tennis (H-71) fällt dann weg oder wird so umgebaut: Blick von hinten aufs Feld, der Ball liegt wirklich auf dem Schläger, die Kinder bewegen sich beim Schlag mit.",
+      text: "Statt des herausgenommenen Tennis rollen sich die beiden Kinder einen großen Ball über den Boden zu, von oben oder schräg von vorn gesehen, damit der Weg quer übers Bild läuft. Wer dran ist, hat den Ball in den Armen; ist die Zeit um, rollt er ihn langsam zum anderen, der ihn auffängt. Tennis (H-71) ist schon herausgenommen; käme es je wieder, dann so: Blick von hinten aufs Feld, der Ball liegt wirklich auf dem Schläger, die Kinder bewegen sich beim Schlag mit.",
       why: "Tennis kennen Zweijährige kaum, einen Ball zurollen spielen sie selbst; und von der Seite gesehen war der Flug übers Netz nur ein kurzer Bogen in der Bildmitte.",
       effort: "M",
     },

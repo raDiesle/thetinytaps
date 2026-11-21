@@ -45,7 +45,7 @@ export interface MascotStatusRow {
 export const MASCOT_STATUS: MascotStatusRow[] = [
   {
     href: "/timer/",
-    note: "Kein Fuchs und kein Bär mehr im Bild (Feedback November 2026: die gezeichneten Kinder sahen komisch aus). Beim Abwechseln liegen dafür zwei Sitzkissen in Fuchs- und Bärenfarbe, mit Fuchs- und Bärenohren. Einzige Ausnahme ist „Tennis“ (Wunsch November 2026): dort spielen Fuchskind und Bärenkind, als gemeinsames `Mascot`, still stehend – nur Schläger und Ball bewegen sich.",
+    note: "Kein Fuchs und kein Bär mehr im Bild (Feedback November 2026: die gezeichneten Kinder sahen komisch aus). Beim Abwechseln liegen dafür zwei Sitzkissen in Fuchs- und Bärenfarbe, mit Fuchs- und Bärenohren. „Tennis“, wo Fuchskind und Bärenkind spielten, ist wieder raus (Wunsch 21. November 2026).",
     tasks: [
       {
         label: "Fuchs- oder Bärenkind, wo es im Bild etwas tut (Erntewagen, Gartenschlauch, Kerze, Abwechseln)",
@@ -55,7 +55,13 @@ export const MASCOT_STATUS: MascotStatusRow[] = [
         note: "Rausgenommen (Feedback November 2026): die SVG-Kinder sahen in den ruhigen Bildern komisch aus.",
       },
       { label: "Sitzkissen in Fuchs- und Bärenfarbe beim Abwechseln", work: "drawing", effort: "S", state: "done" },
-      { label: "Fuchskind und Bärenkind spielen Tennis (H-71)", work: "drawing", effort: "S", state: "done" },
+      {
+        label: "Fuchskind und Bärenkind spielen Tennis (H-71)",
+        work: "drawing",
+        effort: "S",
+        state: "removed",
+        note: "Rausgenommen (Wunsch 21. November 2026): schlecht umgesetzt; bessere Ideen fürs Abwechseln sind H-108 bis H-117.",
+      },
       {
         label: "Fuchs- oder Bärenfamilie steht in jedem Bild daneben und winkt am Ende",
         work: "drawing",

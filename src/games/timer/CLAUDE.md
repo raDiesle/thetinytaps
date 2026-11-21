@@ -22,7 +22,7 @@ animation in it put at that moment and then stopped (`holdAt`, `.tm-card-art.tm-
 the picture (`ART_ASPECT`). Names are only read out and their tooltip. They stand in the order the user chose (November
 2026, `PICTURES`): Rote Scheibe, Sanduhr, Kerze, Apfelbaum, Blume, Pizza, Wecker, then the others, on one frame with
 no name; after all of them Abwechseln is a category of its own, named on its frame (`GameMode.kind`): its two children
-with the toy, the lamps and the hourglass, then Tennis, and that they run on without end is said in their tooltip (`SWAP_NOTE`). Where there is
+with the toy, the lamps and the hourglass, and that it runs on without end is said in its tooltip (`SWAP_NOTE`). Where there is
 room, its frame stands beside the pictures' rather than in a row of its own below (`packGroups`' `reserve`), so all
 cards still fit on one screen. The row of lengths stands in the menu's head (`levelInHead`), on a phone on its side
 beside the ribbon: under the head it left the cards too little room there, and the Abwechseln group fell below the
@@ -106,16 +106,9 @@ taken out (user request, November 2026). The pictures:
   turn as long as the row's minutes; at the end both lamps shine). Behind ⚙️: the toy (Bobbycar, Puppe, Ball,
   `SWAP_TOYS`, kept as `toy`), „Wer ist dran?“ (starts that child's turn anew, also during the draw) and the time to the
   change. The turn is worked out from the clock (`turnAt`).
-- „Tennis“ 🎾 (`tennis.tsx`, H-71, user request, November 2026: „zwei die Tennis spielen und der Ball fliegt langsam auf
-  die Seite vom anderen“): Abwechseln's turns (`SwapPlay.tsx`, the same draw, ⚙️ and clock, without the toy) as the fox
-  child and the bear child playing tennis on a blue court, the net in the middle. Whose turn it is shows from afar: the
-  ball is on that child's racket, hopping on it once a second, and that half of the court lies in the light, the other in
-  shade (`SwapShade` with `edge` at the net). At the change the racket swings, the ball flies slowly in a high arc over
-  the net (`FLIGHT_MS`, 2.4 s, a knock as it is hit and as it lands) and the shade changes sides only as it crosses the net
-  (`tm-cross`), so the light follows the ball. The draw lights the sides in turn while the ball waits at the net's foot.
-  The time of a turn shows as ten lights on a board over the net going out one by one (`TennisBoard`), worked out from
-  the turn's start so a reload keeps them right. The players stand still: only rackets and ball move, each a layer of
-  its own (`Racket`, `Ball`).
+- „Tennis“ 🎾 (H-71) stood beside Abwechseln from 7 November 2026 and was taken out on 21 November 2026 (user request:
+  poorly done); better ways of taking turns wait as H-108 to H-117. Its id `tennis` is gone from `PICTURES`, so a kept
+  choice falls back to the first picture.
   At the end the picture's own sound, then children cheer (the `cheer` recording) while a warm light spreads over the
   picture (`.tm-done-light`), a friendly tune after it, then `GameEnd` with the picture's trophy (nothing rises, the trophy replaced it, user decision, November 2026) with „Nochmal“ and „Weiter“ (the next picture,
   the same minutes, `nextPicture`). Every tap or key during the run answers (steam and a whistle, twinkling, the flame
@@ -136,8 +129,8 @@ Files: `TimerGame.tsx` (start screen: cards, minutes and the own time's slip), `
 „Andere …“), `time.ts` (own times: typing, clock times, labels, digits; tested in `time.test.ts`), `TimerPlay.tsx` (one
 run: working out its length, the question when a clock time is past, the clock, the phases `running` →
 `blow` (candle only) → `done`, taps, the end, the sounds of the pieces), `pieces.ts` (how a run is cut into pieces, the
-train's halts, where the apples hang; tested), `SwapPlay.tsx` and `swap.tsx` („Abwechseln“ and „Tennis“: the draw and its turns, and Abwechseln's room,
-lamps, cushions and toys), `tennis.tsx` (Tennis's court, players, rackets, ball and board), `apples.tsx`, `caterpillar.tsx`, `clock.tsx`, `disc.tsx`, `flower.tsx`, `sunset.tsx`, `pizza.tsx` (one picture each), `shown.tsx`
+train's halts, where the apples hang; tested), `SwapPlay.tsx` and `swap.tsx` („Abwechseln“: the draw and its turns, and its room,
+lamps, cushions and toys), `apples.tsx`, `caterpillar.tsx`, `clock.tsx`, `disc.tsx`, `flower.tsx`, `sunset.tsx`, `pizza.tsx` (one picture each), `shown.tsx`
 („Zeit im Bild“: its choice, the note with digits or tally marks), `scenes.tsx` (the other drawings
 and the shared `Layer`, `Draw`, `LeftGlow`), `timer.css`, `content.ts`
 (names, order), `settings.ts`.
@@ -179,7 +172,7 @@ and the shared `Layer`, `Draw`, `LeftGlow`), `timer.css`, `content.ts`
   left unsaid: the lamps draw it before the sand runs, and only then does the time start. A new way to show a turn
   keeps that: a big change of the whole side, never a small sign.
 - **A picture of taking turns plays out something toddlers know and do themselves** (user feedback, 21 November 2026:
-  Tennis is poorly done – a game two-year-olds hardly know, seen from the side so the ball's flight is a short arc in
+  Tennis was poorly done and is taken out – a game two-year-olds hardly know, seen from the side so the ball's flight is a short arc in
   the middle, the players standing stiff, the ball hopping above the racket instead of lying on it, the time only a row
   of lights): a new one (better ideas in H-108 to H-117) shows a scene from their own day (a seesaw, a swing, a ball
   rolled to each other), seen so the change crosses the whole picture, with what passes over really held or sat on, and
@@ -187,7 +180,7 @@ and the shared `Layer`, `Draw`, `LeftGlow`), `timer.css`, `content.ts`
 - **One drawing for one thing**: a thing two pictures show (the hourglass) is one component both use, never copied and
   drawn again with its own sizes (user request, November 2026; `timer.test.ts` checks the hourglass).
 - **The cards' order is the user's** (November 2026: Rote Scheibe, Sanduhr, Kerze, Apfelbaum, Blume, Pizza, then the
-  Wecker; Abwechseln and Tennis last): keep it when adding a picture (a new one goes after these, before Abwechseln, unless the
+  Wecker; Abwechseln last): keep it when adding a picture (a new one goes after these, before Abwechseln, unless the
   user says otherwise), and add it to the perf scenarios' list in `tools/perfScenarios.ts`, which taps each card by its
   name (`timer.test.ts` checks the order). Abwechseln is another thing to do than the pictures that run until the time
   is up – taking turns without end – so it stands in a group of its own after them (`GameMode.kind`, user request,
@@ -203,10 +196,8 @@ and the shared `Layer`, `Draw`, `LeftGlow`), `timer.css`, `content.ts`
   children that pushed the cart, held the hose and blew out the candle – drawn in SVG they looked odd, a bear with two
   brown circles for paws on the hose. A picture tells its story by itself (the cart rolling by itself, the hose in a forked
   stick, the last candle going out by itself); where it is about the real children (Abwechseln), a thing of theirs
-  stands for them (the cushions in fox and bear colours, no face). `timer.test.ts` checks that no picture draws one. The
-  one exception is Tennis (user request, November 2026): the two players are what the picture is about, so they are the
-  shared `Mascot` children, standing still, while only their rackets and the ball move – never a figure of its own,
-  and never a third one watching.
+  stands for them (the cushions in fox and bear colours, no face). `timer.test.ts` checks that no picture draws one.
+  Tennis, whose players were the shared `Mascot` children, was the one exception and is taken out (21 November 2026).
 - **What grows, grows as a whole** (user feedback, November 2026): a plant rising gets bigger as it rises – its stalk
   thicker, its leaves bigger – scaled from its foot (`transform-origin` at the soil, never stretched one way), and a
   flower grows open from small to big with all its petals at once, never petal after petal.
@@ -283,7 +274,7 @@ and the shared `Layer`, `Draw`, `LeftGlow`), `timer.css`, `content.ts`
   pieces still come from the minutes chosen (2 Min. with `?sekunden=25`: twenty apples, its whole year in 25 seconds).
 - **What it says** (H-72, `voice.ts`): each picture one short line as it starts, where it goes (said once the page lies
   still – `say` waits for it), „Gleich ist es so weit!“ with the bell (H-49) and one line at the end, what is there
-  now; Abwechseln and Tennis „Wer fängt an?“ as the lamps draw, who begins, and „Tauschen! Jetzt ist das … dran.“ at
+  now; Abwechseln „Wer fängt an?“ as the lamps draw, who begins, and „Tauschen! Jetzt ist das … dran.“ at
   every change (and when a grown-up gives the turn behind ⚙️). Nothing speaks before a grown-up starts a run with a
   card, lines after the first are queued so none cuts another off, and leaving stops the voice (`hush`). Every line is
   `Localized` in all app languages (November 2026) and said in the app language through `timerSay` (its English
