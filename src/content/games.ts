@@ -2,6 +2,7 @@ import { ALLTAG_BLURB, ALLTAG_TITLE, BOOK_BLURB, BOOK_TITLE, MOOD_BLURB, MOOD_TI
 import { CAUSE_BLURB, CAUSE_TITLE } from "@/games/cause/names";
 import { MILK_CHAIN_BLURB, MILK_CHAIN_BOOK } from "@/games/milkchain/names";
 import { NIGHT_MILK_BLURB, NIGHT_MILK_BOOK } from "@/games/nightmilk/names";
+import { BOTTLE_STORY_BLURB, BOTTLE_STORY_BOOK } from "@/games/bottlestory/names";
 import { PACIFIER_STORY_BLURB, PACIFIER_STORY_BOOK } from "@/games/pacifierstory/names";
 import { KITA_STORY_BLURB, KITA_STORY_BOOK } from "@/games/kitastory/names";
 import { HAIR_STORY_BLURB, HAIR_STORY_BOOK } from "@/games/hairstory/names";
@@ -131,6 +132,17 @@ export const CATEGORIES: Category[] = [
           { href: "/abstillen/", emoji: "🤱", title: MILK_CHAIN_BOOK },
           { href: "/abstillen/nachts/", emoji: "🌙", title: NIGHT_MILK_BOOK, unfinished: { blurb: NIGHT_MILK_BLURB } },
         ],
+      },
+      {
+        // The book „Bottle to Cup“ beside „Abstillen“ (idea H-105, user request, 21 November 2026): „Bye-Bye, Bottle!“, a
+        // story in chapters along the guides' steps from the bottle to an open cup, for every child that drank from a
+        // bottle, breastfed or not (src/games/bottlestory), English first. Still being built while its pictures wait in
+        // the queue: the last one made drops `unfinished` (`AFTER` in bottleStoryPictures.ts).
+        href: "/flaeschchen/",
+        emoji: "🍼",
+        title: BOTTLE_STORY_BOOK,
+        blurb: BOTTLE_STORY_BLURB,
+        unfinished: true,
       },
       {
         // The book „Schnullerfee“ beside „Abstillen“ (user request, 10 November 2026): „Tapsi und die Schnullerfee“, a

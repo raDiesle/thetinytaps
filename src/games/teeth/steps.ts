@@ -70,7 +70,7 @@ export const STEPS: Step[] = [
     surface: "outer",
     teeth: teeth(["upper", "lower"], ["left"], [4, 3, 2]).sort((a, b) => b.n - a.n),
     motion: "circle",
-    view: { open: 0, pitch: 4, yaw: 42, look: [-70, 18, 70], zoom: 1.4, tilt: FLAT },
+    view: { open: 0, pitch: 4, yaw: 70, look: [-70, 18, 70], zoom: 1.4, tilt: FLAT },
   },
   {
     id: "outer-front",
@@ -92,7 +92,7 @@ export const STEPS: Step[] = [
     surface: "outer",
     teeth: teeth(["upper", "lower"], ["right"], [2, 3, 4]).sort((a, b) => a.n - b.n),
     motion: "circle",
-    view: { open: 0, pitch: 4, yaw: -42, look: [70, 18, 70], zoom: 1.4, tilt: FLAT },
+    view: { open: 0, pitch: 4, yaw: -70, look: [70, 18, 70], zoom: 1.4, tilt: FLAT },
   },
   {
     id: "inner-lower",

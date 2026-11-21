@@ -26,6 +26,7 @@ const PLAYERS: Record<string, string> = {
   "src/games/kitastory/stimme": "src/games/kitastory/KitaStoryGame.tsx",
   "src/games/hairstory/stimme": "src/games/hairstory/HairStoryGame.tsx",
   "src/games/nightmilk/stimme": "src/games/nightmilk/NightMilkGame.tsx",
+  "src/games/bottlestory/stimme": "src/games/bottlestory/BottleStoryGame.tsx",
 };
 
 /**
@@ -40,6 +41,7 @@ const GERMAN_ONLY: Record<string, string> = {};
  * story that is a part of a book's row (the night story of Abstillen), that part.
  */
 const ENGLISH_ONLY: Record<string, { href: string; part?: string }> = {
+  flaeschchen: { href: "/flaeschchen/" },
   "abstillen-nachts": { href: "/abstillen/", part: "🌙 The Milk Sleeps at Night" },
 };
 

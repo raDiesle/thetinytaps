@@ -3,6 +3,7 @@
 
 import type { Research } from "./types";
 import { nachtsAbstillen } from "./nachts-abstillen";
+import { flascheAbgewoehnen } from "./flasche-abgewoehnen";
 import { youtubeThemen } from "./youtube-themen";
 import { youtubeRechte } from "./youtube-rechte";
 import { youtubeKanal } from "./youtube-kanal";
@@ -34,6 +35,7 @@ export type { Research, ResearchArea, ResearchDomain, ResearchExclusion, Researc
 
 export const RESEARCH: Research[] = [
   nachtsAbstillen,
+  flascheAbgewoehnen,
   youtubeThemen,
   youtubeRechte,
   youtubeSuchen,

@@ -5,7 +5,7 @@ Routes `/bilder/` (menu) and `/bilder/<id>/`. The menu has the mode as a choice 
 no „Über das Spiel“ and no „Einstellungen“ (`GameShell` with `startMode` and `leaveTo`), and ✕ and Esc go
 back to `/bilder/`.
 
-Scene engine (modes in menu order: "Freies Entdecken" first and the default, see below; colouring in – a tapped item gets its colour back, and every tap paints a big round dab of colour into the grey background, so the parts that never move can be painted too; Space paints a random spot of the background where nothing happens (Enter still starts the item in the frame), shown as a small wide key at the bottom in the middle while the key badges are on; find with only the item, glowing, in the bubble; trait questions in `quests.ts` (colours also count for a part, `colourParts.ts`); "Taschenlampe" in `torch.tsx` (idea B-17: the picture lies under a night layer, an HTML div above the svg whose radial gradient leaves a round light where the mouse hovers, a finger slides or taps and the arrow keys push it; any other key takes the light to some item; no key badges and no ⌨️ there; what comes into the light wakes up – moves, sounds and is counted – and at the party the night fades away, while a bedtime picture stays dark; a tap still starts the tapped item itself); "Straße malen" (see below); "Freies Entdecken" with chain reactions and "alles entdeckt" party; tap, or keys with arrow-key frame in `focus.ts` (keys mode is on wherever there is a keyboard, with the key
+Scene engine (modes in menu order: "Freies Entdecken" first and the default, see below; the „Geräusch-Rätsel“ below; colouring in – a tapped item gets its colour back, and every tap paints a big round dab of colour into the grey background, so the parts that never move can be painted too; Space paints a random spot of the background where nothing happens (Enter still starts the item in the frame), shown as a small wide key at the bottom in the middle while the key badges are on; find with only the item, glowing, in the bubble; trait questions in `quests.ts` (colours also count for a part, `colourParts.ts`); "Taschenlampe" in `torch.tsx` (idea B-17: the picture lies under a night layer, an HTML div above the svg whose radial gradient leaves a round light where the mouse hovers, a finger slides or taps and the arrow keys push it; any other key takes the light to some item; no key badges and no ⌨️ there; what comes into the light wakes up – moves, sounds and is counted – and at the party the night fades away, while a bedtime picture stays dark; a tap still starts the tapped item itself); "Straße malen" (see below); "Freies Entdecken" with chain reactions and "alles entdeckt" party; tap, or keys with arrow-key frame in `focus.ts` (keys mode is on wherever there is a keyboard, with the key
 badges in the picture; ⌨️ in the bottom left corner switches it off and on, kept for the next pictures); vehicles that drive into another picture in `roads.ts` – every second tap sends the fire engine, the tractor, the bus or the dump truck off, a sign at the edge follows it, and in the other picture the same drawing drives in and parks as a guest) and the scenes `baustelle/`, `stadt/`, `bauernhof/`, `hof/`, `zoo/`, `unterwasser/`, `badezimmer/`, `wald/`, `feuerwache/`, `weltall/`, `spielplatz/`, `kueche/`, `supermarkt/`, `flughafen/`, `winterbaustelle/` (reuses the Baustelle drawings with snow on top), `kita/`, `kinderarzt/`, `strand/`, `dinotal/`, `gutenacht/` (bedtime picture: `bedtime` on the scene makes every tapped thing fall asleep, and when all sleep the room goes dark instead of the party), and the season pictures `winter/`, `herbst/`, `ostern/`; every tap on the background brings something to life in `spots.tsx` (a thing of the background wrapped in `<Poke>` sways, wobbles, hops or glows; anywhere else the scene's `spots` say what comes out there – a gust of wind in the sky that bends the trees and blows the clouds along, a beetle crawling out of the floor tiles, a spider on the wall, a flower and butterfly from the meadow, a fish jumping out of the water; no speech, so nothing to translate); hidden surprises in `hideout.tsx` (an item with `hideout` draws a `<Hideout>` behind its door, lid or sand pile, and on every tap another animal or present peeks out); shared depth helpers (`onFloor` for rooms), drawing helpers and sky in `layout.ts`, `shared.tsx`, `sky.tsx`; leaves and snow on the ground and in the air for outdoor pictures in `weather.tsx`.
 
 ## Straße malen (idea N-43)
@@ -26,6 +26,26 @@ wakes up like in the torch's light (moves, sounds, is counted), so the picture e
   (or the bottom middle) to the key's item (`LaneControl.driveTo`).
 - Everything is still once the vehicles wait: wheels turn only while driving, and the frame loop stops.
 - Its prompt is `roadPrompts` in `phrases.ts`, in every language.
+
+## Geräusch-Rätsel (idea B-02)
+
+Mode `sound`, „🔊 Sounds“ in the row (English first, its texts in `soundRiddle.ts`, a part of its own in
+`languageStatus.ts`). Only a sound plays – a dog barks, a digger rumbles – and the child taps who made it. The bubble at
+the top shows a loudspeaker and nothing to read; a tap on it plays the sound again, after `REPEAT_PAUSE_MS` (meanwhile
+it only ripples), and so does a key where the key badges are off. Every item with that sound is right (`needed: 1`);
+after `HINT_AFTER_MS` or two misses a ring marks one and the sound comes once more.
+- Only sounds a small child knows by ear are asked (`RIDDLE_SOUNDS`: animals, vehicles, a few things like the clock, the
+  toilet and the kettle), never a synthesized pop, boing or chime. An item that only borrows such a sound (the fox and
+  the seal barking like a dog, a washing machine on the digger's engine) goes on `BORROWED_SOUNDS`: it asks nothing, but
+  counts as right where another item asks its sound. A new item with a sound of the list is either what a child
+  pictures hearing it or goes on that list; every picture asks at least two sounds (`soundRiddle.test.ts`).
+- Its sounds come from ElevenLabs (user decision, 21 November 2026), one recording per sound in `geraeusche/` (its
+  README: prompt, cut, mono 44.1 kHz 64 kbit/s), made by a cloud session from `src/content/soundQueue.ts`. They are
+  fetched **only while the mode is on** (user request): `riddleSounds.ts`, imported by `ScenePlay` alone, whose
+  `loadRiddleSounds` is called only in the sound mode's start; the glob holds addresses, never the files. In the mode
+  the items sound with them too (`playRiddleSound`), so the answer sounds like the question; a sound without its
+  recording yet plays the usual one. The first sound waits for the page to lie still and for its recording (at most
+  `RIDDLE_WAIT_MS`).
 
 ## Working on scenes
 
@@ -74,7 +94,7 @@ wakes up like in the torch's light (moves, sounds, is counted), so the picture e
   plural grammar in questions, roads). `bun test` after every change to items.
 - The mode labels for the row on `/bilder/` are `SCENE_MODES` in `settings.ts`, so their languages count for this game in
   `languageStatus.ts`; a new mode comes with its label in English only (root `CLAUDE.md`, Language; `label` is a
-  `Localized`, German first, so far – the first English-only one makes it a `Texts` of `src/lib/language.ts`) and a part
+  `Texts`, as „🔊 Sounds“, kept in the mode's own file so its part of the language status covers it) and a part
   marking the gap there, German included. Keep labels
   short: all modes must fit in one row on a phone on its side (844 × 390), or the row wraps and pushes the pictures down
   („Straße malen“ is „🛣️ Straßen“ there for this). Check the row there after adding a mode.

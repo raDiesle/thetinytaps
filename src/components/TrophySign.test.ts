@@ -19,3 +19,15 @@ test("the trophy sign is sized by its own width, never by the shelf's", () => {
   expect(sign).toContain("--trophy-sign:");
   expect(sign).not.toMatch(/padding:[^;]*%/);
 });
+
+// A little wooden board sitting in the compartment's bottom right corner, held by three nails in its corners (user
+// request, November 2026): a paper sign hanging above the board on one nail looked flat and loose.
+test("the trophy sign is a wooden board in the corner with three nails", () => {
+  const sign = css.match(/\.shelf-trophy-sign \{([^}]*)\}/)?.[1] ?? "";
+  expect(sign).toContain("var(--wood-grain-h)");
+  expect(sign).not.toContain("--paper-grain");
+  // Its foot on the board: moved up by its whole height and its thickness, never lifted above the board.
+  expect(sign).toMatch(/translate: [^;]+ calc\(-100% - var\(--edge\)\);/);
+  const nails = css.match(/\.shelf-trophy-sign::before \{([^}]*)\}/)?.[1] ?? "";
+  expect(nails.match(/var\(--head\)/g)?.length).toBe(3);
+});

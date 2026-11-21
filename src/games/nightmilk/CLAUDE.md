@@ -44,7 +44,7 @@ wakes, sees the moon, hugs the teddy and sleeps on. Milk in the day, sleep at ni
   gentler ones. No clock, age, number of nights or weekday: each family has its own night.
 - **The milk keeps its rule**: Tapsi drinks only by day, in the evening or in the morning, never in a night picture
   (checked), and plainly at Mama's breast (`NURSING` of the Milchkette's pictures).
-- The bottle night is not in it: a child weaned from a night bottle gets it in H-105.
+- The bottle night is not in it: a child weaned from a night bottle gets it in „Bye-Bye, Bottle!“ (`/flaeschchen/`, H-105).
 - Tapsi is an animal, not the child's figure, so it does not follow „Junge / Mädchen“.
 - Pictures (`/bild-erzeugen`, made only in a Claude cloud session; read Kita-Start's lessons in
   `src/games/kitastory/CLAUDE.md` and Hair Washing's first – they hold here): the living room is drawn from the
