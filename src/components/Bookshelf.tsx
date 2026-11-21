@@ -568,7 +568,11 @@ function Compartment({
       <span className="shelf-cell-ceiling" />
       <span className="shelf-cell-floor" />
       {ends && (
-        <div className="shelf-row" data-leads={leads || undefined} style={cell.lead ? ({ "--lead": `${cell.lead}px` } as CSSProperties) : undefined}>
+        <div
+          className="shelf-row"
+          data-leads={leads || undefined}
+          style={cell.lead || cell.pull ? ({ "--lead": `${cell.lead ?? 0}px`, "--pull": `${cell.pull ?? 0}px` } as CSSProperties) : undefined}
+        >
           <span className="shelf-end">
             {ends.stack > 0 && stackLeft && <Stack seed={seed} />}
             <Spines count={stackLeft ? ends.left - ends.stack : ends.left} seed={seed} />
