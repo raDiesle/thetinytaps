@@ -1,5 +1,6 @@
 import type { Localized, Texts } from "@/lib/language";
 import type { TimerPicture, TurnPicture } from "./settings";
+import { TIDY_NAME } from "./tidyNames";
 
 /** The game's name, on its start screen, its spine on the shelf and in the browser tab. */
 export const TIMER_TITLE: Localized = { de: "Timer", en: "Timer", zh: "计时器", hi: "टाइमर", es: "Temporizador", ar: "المؤقّت", ru: "Таймер" };
@@ -49,6 +50,8 @@ export const PICTURES: { id: TimerPicture; emoji: string; name: Texts }[] = [
   { id: "flower", emoji: "🌸", name: { de: "Blume", en: "Flower", zh: "小花", hi: "फूल", es: "Flor", ar: "الزهرة", ru: "Цветок" } },
   { id: "pizza", emoji: "🍕", name: { de: "Pizza", en: "Pizza", zh: "披萨", hi: "पिज़्ज़ा", es: "Pizza", ar: "البيتزا", ru: "Пицца" } },
   { id: "clock", emoji: "⏰", name: { de: "Wecker", en: "Alarm Clock", zh: "闹钟", hi: "अलार्म घड़ी", es: "Despertador", ar: "المنبّه", ru: "Будильник" } },
+  // Tidy Up (H-118): a toy crane puts the toys into the box, best at five minutes; English only so far.
+  { id: "tidy", emoji: "🧸", name: TIDY_NAME },
   {
     id: "train",
     emoji: "🚂",

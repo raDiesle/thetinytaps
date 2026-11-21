@@ -20,7 +20,7 @@ request, November 2026; the middle rather than the end, user feedback, November 
 `GameMode.art`): the very drawing of a run (`SceneParts`), cut as for 5 minutes and started half of it ago, every
 animation in it put at that moment and then stopped (`holdAt`, `.tm-card-art.tm-still`), so the menu stands still. The cards come as wide as
 the picture (`ART_ASPECT`). Names are only read out and their tooltip. They stand in the order the user chose (November
-2026, `PICTURES`): Rote Scheibe, Sanduhr, Kerze, Apfelbaum, Blume, Pizza, Wecker, then the others, on one frame with
+2026, `PICTURES`): Rote Scheibe, Sanduhr, Kerze, Apfelbaum, Blume, Pizza, Wecker, then Tidy Up and the others, on one frame with
 no name; after all of them Abwechseln is a category of its own, named on its frame (`GameMode.kind`): its two children
 with the toy, the lamps and the hourglass, then the Wippe, and that they run on without end is said in their tooltip (`SWAP_NOTE`). Where there is
 room, its frame stands beside the pictures' rather than in a row of its own below (`packGroups`' `reserve`), so all
@@ -93,6 +93,19 @@ taken out (user request, November 2026). The pictures:
   front from an hour on). The digits are the time left, so it shows no note in the corner and has no „Zeit im Bild“
   behind ⚙️. Under them a row of `CLOCK_BLOCKS` light blocks goes out one by one from the right, so a child who can't
   read digits sees the time go too. A tap presses the snooze bar with a click; at the end it beeps and rings on its feet.
+- „Tidy Up“ 🧸 (`tidy.tsx`, H-118, user request, 21 November 2026: a timer for tidying up, best at five minutes): toys
+  lie on the rug of a children's room (`TOY_PLACES`, two rows, block, ball, car, duck, ring pyramid, drum, book and
+  spinning top, `TOY_KINDS`), the open toy box stands at the right, and a red and yellow toy gantry crane spans the
+  picture above them (`BEAM`, `POSTS`). One toy after the other its trolley drives over a toy, the rope grows, the claw
+  opens, goes down, grips, lifts it, carries it over the box and opens, and the toy falls straight down onto its own
+  place in the heap (`heapSlot`, `HEAP_ROWS`, smaller there, `HEAP_SCALE`), its top showing over the rim, with a clonk
+  (spaced) – nearest the box first, so the empty floor grows from the box outwards (`tidyToys`). One toy every 20
+  seconds, at least `MIN_TOYS`, so five minutes takes all fifteen (`toyCount`, `MAX_TOYS`), each toy's turn the same
+  share of the time and the last landing as it is up (`tidyTimes`, `CYCLE`). Trolley, rope, claw, its two fingers and
+  each toy move on keyframes written for the run from that one plan (`TidyKeyframes`), so they stay in step; the claw
+  sways a little every second. A tap makes the motor whirr and lights the toys still on the floor. Its name and lines
+  are English only (`tidyNames.ts`, their own part in `languageStatus.ts`) until translations are asked for. The
+  Aufräumlied (H-119, a fixed five minutes with a Suno song) is an idea of its own, not built.
 - „Abwechseln“ 🔁 (H-52): two children take turns with a toy. The time set is one turn. Its hourglass is the
   Sanduhr's own (`Hourglass` in `scenes.tsx`, user request, November 2026: one drawing, never a second one built
   beside it), standing between two floor cushions (`SWAP_SEATS`, the same way left and right of it): the fox child's
@@ -144,7 +157,7 @@ Files: `TimerGame.tsx` (start screen: cards, minutes and the own time's slip), `
 run: working out its length, the question when a clock time is past, the clock, the phases `running` →
 `blow` (candle only) → `done`, taps, the end, the sounds of the pieces), `pieces.ts` (how a run is cut into pieces, the
 train's halts, where the apples hang; tested), `SwapPlay.tsx` and `swap.tsx` („Abwechseln“: the draw and its turns, and its room,
-lamps, cushions and toys), `seesaw.tsx` (the Wippe's playground, plank and stand), `apples.tsx`, `caterpillar.tsx`, `clock.tsx`, `disc.tsx`, `flower.tsx`, `sunset.tsx`, `pizza.tsx` (one picture each), `shown.tsx`
+lamps, cushions and toys), `seesaw.tsx` (the Wippe's playground, plank and stand), `apples.tsx`, `caterpillar.tsx`, `clock.tsx`, `disc.tsx`, `flower.tsx`, `sunset.tsx`, `pizza.tsx`, `tidy.tsx` (one picture each; `tidyNames.ts` Tidy Up's English-only texts), `shown.tsx`
 („Zeit im Bild“: its choice, the note with digits or tally marks), `scenes.tsx` (the other drawings
 and the shared `Layer`, `Draw`, `LeftGlow`), `timer.css`, `content.ts`
 (names, order), `settings.ts`.
@@ -197,7 +210,7 @@ and the shared `Layer`, `Draw`, `LeftGlow`), `timer.css`, `content.ts`
 - **One drawing for one thing**: a thing two pictures show (the hourglass) is one component both use, never copied and
   drawn again with its own sizes (user request, November 2026; `timer.test.ts` checks the hourglass).
 - **The cards' order is the user's** (November 2026: Rote Scheibe, Sanduhr, Kerze, Apfelbaum, Blume, Pizza, then the
-  Wecker; Abwechseln last): keep it when adding a picture (a new one goes after these, before Abwechseln, unless the
+  Wecker, then Tidy Up; Abwechseln last): keep it when adding a picture (a new one goes after these, before Abwechseln, unless the
   user says otherwise), and add it to the perf scenarios' list in `tools/perfScenarios.ts`, which taps each card by its
   name (`timer.test.ts` checks the order). Abwechseln is another thing to do than the pictures that run until the time
   is up – taking turns without end – so it stands in a group of its own after them (`GameMode.kind`, user request,
@@ -298,11 +311,12 @@ and the shared `Layer`, `Draw`, `LeftGlow`), `timer.css`, `content.ts`
   recording standing in where the language has none); `timerSaid(language)` lists them for the recordings. Only
   recordings play (`timerVoice`, ./stimme/, `bun run voice make --only timer`), never the browser's voice: a line without its recording stays
   silent (every app language but Russian recorded, November 2026). A new picture gets its two lines in `PICTURE_LINES` (the type asks for them), English only
-  until translations are asked for, German included (root `CLAUDE.md`, Language – the lines are `Localized`, German
-  first, so far: the first English-only pair makes them `Texts` of `src/lib/language.ts` and teaches `timerSay` and
-  `timer.test.ts`, which compares with the German lines, a line's first language; a changed line of the older ones is
-  changed in its German), and they come on the 🎙️ list by themselves; `timer.test.ts` fails on a line missing
-  in a language until it is translated (mark the gap in `languageStatus.ts` and loosen that check only then).
+  until translations are asked for, German included (root `CLAUDE.md`, Language): `PICTURE_LINES` takes `Texts`, the
+  older lines German first and a new picture's English first in a file of its own (`tidyNames.ts`) that its own part
+  in `languageStatus.ts` names in `files`, so the inline texts' check reads it as English only. `timerSaid` and the 🎙️
+  list leave a line out of a language it is not translated into (its English recording stands in), and
+  `timer.test.ts` keeps every German-first line in every language; a changed line of the older ones is changed in its
+  German.
 - Its ideas are the area „Timer“ on `/management/` (`src/content/ideas/h-timer.ts`, H numbers shared with the
   Alltagshelfer): any time to set (H-59 to H-62), pictures that visibly change every second and show where they go,
   also over long times (H-45, H-63 to H-69), and new pictures. A new timer idea goes there, not into the Alltagshelfer.

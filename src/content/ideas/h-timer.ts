@@ -388,5 +388,58 @@ export const timerIdeas: IdeaArea = {
       why: "Ein Weg mit einem Ziel beim wartenden Kind zeigt Richtung und Rest der Zeit in einem Bild, wie der Zug zum Bahnhof, den Kinder im Timer schon kennen.",
       effort: "M",
     },
+    // Aufräumen (user request, 21 November 2026): a timer made for tidying up, best at 5 minutes – ideas collected, the
+    // best one (H-118) built, and the user's own idea of a fixed 5-minute tidy-up song (H-119) taken up.
+    {
+      id: "H-118",
+      emoji: "🧸",
+      title: "Aufräumen: ein Spielzeugkran räumt mit",
+      text: "Ein Timer-Bild fürs Aufräumen: Im Kinderzimmer liegen Spielsachen auf dem Boden, rechts steht die offene Spielzeugkiste, und ein gelber Spielzeugkran fährt oben an seinem Balken hin und her. Er fährt über ein Spielzeug, lässt den Greifer herunter, packt zu, hebt es hoch, fährt über die Kiste und lässt es senkrecht hineinfallen – eins nach dem anderen, bis der Boden leer und die Kiste voll ist. Bei 5 Minuten sind es 15 Spielsachen, alle 20 Sekunden eins.",
+      why: "Das Kind räumt selbst auf, während der Kran es vormacht: Was noch auf dem Boden liegt, ist die Zeit, die bleibt, und die Kiste füllt sich sichtbar mit. Kein Wettrennen gegen den Kran – er arbeitet ruhig und gleichmäßig, wie ein Vorbild.",
+      effort: "M",
+      done: true,
+      partial:
+        "Gebaut als Bild „Tidy Up“ (Aufräumen) im Timer (21. November 2026, tidy.tsx): ein rot-gelber Portalkran über dem Teppich, die Laufkatze fährt am Balken, das Seil wird länger, der Greifer öffnet sich, packt zu und hebt das Spielzeug; über der Kiste geht er auf, und das Spielzeug fällt senkrecht auf seinen eigenen Platz im Haufen, dessen oberer Teil über den Rand schaut. Erst die Sachen nahe der Kiste, dann die weiter weg, sodass der leere Boden von der Kiste her wächst. 6 bis 15 Spielsachen (Bauklotz, Ball, Auto, Ente, Ringpyramide, Trommel, Buch, Kreisel), bei 5 Minuten 15. Jede Sekunde schwingt der Greifer leicht; ein Tippen lässt den Motor surren und lässt die Sachen am Boden aufleuchten. Name und Sätze nur auf Englisch, bis Übersetzungen gewünscht sind.",
+    },
+    {
+      id: "H-119",
+      emoji: "🎶",
+      title: "Aufräumlied: genau 5 Minuten, ganz vorn im Timer",
+      text: "Ganz vorn auf dem Startbildschirm des Timers eine eigene Gruppe „Aufräumen“ (wie Abwechseln eine eigene Gruppe hat). Darin ein Timer, der immer genau 5 Minuten läuft, ohne Wahl der Länge, zu einem eigens mit Suno gemachten Aufräumlied von 5 Minuten – wie das Zahnputzlied bei „Zähne putzen“: die Strophen werden gemessen (/musik-erzeugen), und das Bild geht mit dem Lied. Der Fortschritt ist deutlich zu sehen: fünf Etappen, eine pro Minute und Strophe (erst die Bausteine, dann die Autos, die Bälle, die Kuscheltiere, die Bücher), jede mit ihrem Fach oder ihrer Kiste, die sich füllt und schließt, dazu ein Weg mit fünf Stationen oben im Bild, den eine kleine Figur entlanggeht. Der Refrain kehrt nach jeder Etappe wieder, und das Lied endet mit dem letzten Spielzeug. Das Lied spielt auch, wenn „Musik“ aus ist, weil es das Spiel selbst ist, und singt in der App-Sprache (zuerst Englisch).",
+      why: "Kinder hören an Strophe und Refrain, wie weit ein Lied ist, lange bevor sie eine Uhr lesen; fünf Minuten sind die Zeit, die Eltern fürs Aufräumen am häufigsten nennen. Ein festes Lied wird zum Ritual: Läuft es, wird aufgeräumt, ohne dass jemand drängen muss. Baut auf H-57 auf, aber mit einer festen Länge und einem eigenen Platz vorn statt einem Lied pro Länge. Das Lied treibt nicht zur Eile (kein „schnell, schnell“). Kostet Suno-Credits, also erst auf Wunsch; als Video auch für YouTube („Aufräumlied 5 Minuten“).",
+      effort: "M",
+    },
+    {
+      id: "H-120",
+      emoji: "📦",
+      title: "Aufräumen: fünf Kisten in fünf Minuten",
+      text: "Fünf bunte Kisten nebeneinander, jede für eine Sorte (Bausteine, Autos, Bälle, Kuscheltiere, Bücher). In jeder Minute füllt sich eine Kiste mit ihrer Sorte, Stück für Stück, und am Ende der Minute klappt ihr Deckel zu. Nach fünf Minuten sind alle Deckel zu.",
+      why: "Fünf Minuten werden zu fünf sichtbaren Stücken: „Noch zwei Kisten“ versteht ein Kind ohne Uhr. Und Große können sagen: „Jetzt die Autos“, während die Autokiste dran ist.",
+      effort: "M",
+    },
+    {
+      id: "H-121",
+      emoji: "🧩",
+      title: "Aufräumen: jedes Ding an seinen Platz",
+      text: "Ein Regal mit Umrissen, wie sie Kitas aufkleben: wo das Auto steht, wo der Ball, wo die Puppe. Ein Spielzeug nach dem anderen kommt vom Boden auf seinen Umriss, bis jeder Platz besetzt ist.",
+      why: "So räumen viele Kitas auf: Jedes Ding hat seinen Platz. Das Bild zeigt, was noch fehlt – die leeren Umrisse –, und übt nebenbei Zuordnen.",
+      effort: "M",
+    },
+    {
+      id: "H-122",
+      emoji: "🛣️",
+      title: "Aufräumen: der Straßenteppich kommt zum Vorschein",
+      text: "Von oben gesehen liegt ein Spielteppich mit Straßen voller Spielsachen. Mit jedem Stück, das in die Kiste kommt, wird ein Stück Straße frei. Ist alles weg, fährt ein kleines Auto einmal die ganze freie Straße entlang.",
+      why: "Das Freiwerden ist die Belohnung, die Kinder vom echten Aufräumen kennen: Jetzt ist Platz zum Spielen.",
+      effort: "M",
+    },
+    {
+      id: "H-123",
+      emoji: "🚂",
+      title: "Aufräumen: der Aufräumzug",
+      text: "Ein Spielzeugzug mit fünf Wagen hält im Kinderzimmer. In jeder Minute wird ein Wagen mit Spielsachen beladen, dann rückt der Zug ein Stück weiter. Am Ende fährt der volle Zug in den Spielzeugschrank wie in einen Bahnhof, und die Tür geht zu.",
+      why: "Wagen für Wagen zeigt, wie weit es ist, und der Zug, der am Ende verschwindet, sagt: fertig, alles weg.",
+      effort: "M",
+    },
   ],
 };

@@ -629,18 +629,72 @@
 }
 
 /*
- * A group's name: a small wooden sign screwed onto the front edge of the board under its books, a screw at each end,
- * its letters painted on in cream (user feedback, November 2026) – „Alltagshelfer“ under the everyday helpers,
- * „Lernspiele“ on the plinth under the picture books. It hangs only a little below the board, never over the books on
- * the board below.
+ * A group's sign (`GroupSign`): a brass rail along the front edge of the board under all of its books, its ends turned
+ * up round the first and the last, and the group's name big on a wooden sign hanging from the rail's middle, its
+ * letters painted on in cream – „Alltagshelfer“ under the everyday helpers, „Lernspiele“ under the picture books (user
+ * feedback, November 2026: a small sign alone was hardly seen, nor that it named every book on the board). It hangs
+ * only a little below the board, never over the books on the board below.
  */
-.shelf-group-label {
-  --screw: calc(var(--bh) * 0.03);
+.shelf-group {
+  --screw: calc(var(--bh) * 0.036);
+  --rail: calc(var(--bh) * 0.042);
   position: absolute;
   top: 100%;
+  left: calc(var(--bh) * -0.02);
+  right: calc(var(--bh) * -0.02);
+  height: 0;
+  transform: translateZ(calc(var(--d) * 0.03 + 3px));
+  pointer-events: none;
+}
+
+/* „Lernspiele“ on the compartment's own board below (the plinth), under the picture books standing in its middle. */
+.shelf-group.board {
+  right: auto;
+  margin-left: calc(var(--bh) * -0.02);
+  padding-right: calc(var(--bh) * 0.04);
+  transform: translateZ(3px);
+}
+
+.shelf-group-rail {
+  position: absolute;
+  top: calc(var(--bh) * 0.018);
+  left: 0;
+  right: 0;
+  height: var(--rail);
+  border-radius: var(--rail);
+  background: linear-gradient(#fff3c4, #d9b25e 40%, #9c7330 75%, #6e4f1e);
+  box-shadow:
+    0 0 0 1px #4a3214aa,
+    0 2px 3px #2a170899;
+}
+
+/* Its ends, turned up round the group's first and last book. */
+.shelf-group-rail::before,
+.shelf-group-rail::after {
+  content: "";
+  position: absolute;
+  bottom: 0;
+  left: 0;
+  width: var(--rail);
+  height: calc(var(--bh) * 0.17);
+  border-radius: var(--rail) var(--rail) 0 0;
+  background: linear-gradient(90deg, #fff3c4, #d9b25e 45%, #8a6428);
+  box-shadow:
+    0 0 0 1px #4a3214aa,
+    2px 0 3px #2a170866;
+}
+
+.shelf-group-rail::after {
+  right: 0;
+  left: auto;
+}
+
+.shelf-group-label {
+  position: absolute;
+  top: 0;
   left: 50%;
-  padding: 0.06em calc(var(--screw) * 2 + 0.45em) 0.1em;
-  border-radius: calc(var(--bh) * 0.012);
+  padding: 0.08em calc(var(--screw) * 2 + 0.5em) 0.12em;
+  border-radius: calc(var(--bh) * 0.014);
   background:
     linear-gradient(#ffffff3d, #0000 22%, #0000 72%, #0000004d),
     var(--wood-grain-h) 0 0 / 700px 210px,
@@ -649,20 +703,20 @@
     inset 0 0 0 1px #3d22104d,
     inset 0 1px 0 #ffffff47,
     inset 0 -1px 0 #00000040,
-    0 calc(var(--bh) * 0.008) 0 #5a3418,
-    0 3px 4px #2a170866;
-  color: #fbf0d6;
+    0 0 0 calc(var(--bh) * 0.008) #d9b25e,
+    0 calc(var(--bh) * 0.012) 0 calc(var(--bh) * 0.004) #5a3418,
+    0 4px 6px #2a170880;
+  color: #fff6de;
   font-family: Georgia, "Times New Roman", serif;
-  font-size: calc(var(--bh) * 0.08);
+  font-size: calc(var(--bh) * 0.13);
   font-weight: 700;
   line-height: 1.1;
-  letter-spacing: 0.02em;
+  letter-spacing: 0.03em;
   white-space: nowrap;
   text-shadow:
     0 -1px 0 #2a170899,
     0 1px 0 #ffffff26;
-  transform: translateX(-50%) translateZ(calc(var(--d) * 0.03 + 3px));
-  pointer-events: none;
+  transform: translateX(-50%);
 }
 
 /* Its two screws: brass heads with a slot, a little shadow where each sits in the wood. */
@@ -684,11 +738,6 @@
   right: calc(var(--screw) * 0.8);
   left: auto;
   rotate: 70deg;
-}
-
-/* „Lernspiele“ on the compartment's own board below (the plinth), under the picture books standing in its middle. */
-.shelf-board-label {
-  transform: translateX(-50%) translateZ(3px);
 }
 
 @media (hover: hover) {
