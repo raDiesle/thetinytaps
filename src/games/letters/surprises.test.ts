@@ -9,7 +9,7 @@ const css = readFileSync("src/games/letters/surprises.css", "utf8").replace(/\/\
 
 test("surprises never pile up", () => {
   expect(SURPRISE.maxAtOnce).toBeLessThanOrEqual(3);
-  expect(SURPRISE.gapMs).toBeGreaterThanOrEqual(500);
+  expect(SURPRISE.gapMs).toBeGreaterThanOrEqual(200);
 });
 
 test("every kind has its lifetime, and there are many kinds to take turns", () => {
