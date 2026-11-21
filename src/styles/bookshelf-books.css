@@ -313,7 +313,13 @@
  * alike (user feedback, November 2026), so the gaps open towards their tops and none touches its neighbour; the books
  * tied together stand upright (`.shelf-bundle`). Taken out, a book straightens as it lifts (bookTravel.ts).
  */
+/*
+ * They stand taller than the picture books (`DAILY_TALL`), as high as their compartment lets them be taken out
+ * (`TAKE_OUT` of its height, `--ch`): their row is as wide as the board allows, so only their height can grow, and the
+ * room above them stood empty while their pictures and names were too small to recognise (user feedback, November 2026).
+ */
 .shelf-daily-books {
+  --sh: min(var(--ch, var(--bh)) * 0.9, var(--bh) * var(--daily-tall, 1));
   position: relative;
   display: flex;
   flex: none;
@@ -328,7 +334,7 @@
   display: block;
   flex: 1 1 0;
   min-width: 0;
-  height: calc(var(--bh) * 0.97);
+  height: calc(var(--sh) * 0.97);
   color: var(--ink);
   text-decoration: none;
   transform-origin: 0 100%;
@@ -352,15 +358,15 @@
 }
 
 .shelf-daily:nth-child(4n + 2) {
-  height: calc(var(--bh) * 0.92);
+  height: calc(var(--sh) * 0.92);
 }
 
 .shelf-daily:nth-child(4n + 3) {
-  height: var(--bh);
+  height: var(--sh);
 }
 
 .shelf-daily:nth-child(4n + 4) {
-  height: calc(var(--bh) * 0.94);
+  height: calc(var(--sh) * 0.94);
 }
 
 /* Bright cloth with gold bands at its ends, clear of the label, and a warm glow: unlike the dull books only filling the shelf. */
@@ -699,10 +705,14 @@
     linear-gradient(90deg, #00000040, #ffffff2e 45%, #0000001f 70%, #00000047), var(--c);
 }
 
-/* The paper label between the gold bands: a small picture from the game on top, the name running down below it in one line. */
+/*
+ * The paper label between the gold bands: a picture from the game on top, the name running down below it in one line.
+ * The picture is what a child recognises the book by, so the label takes nearly the spine's whole width and the picture
+ * nearly the label's (user feedback, November 2026: too small to recognise).
+ */
 .shelf-daily-label {
   position: absolute;
-  inset: 8% 9%;
+  inset: 7% 4%;
   display: flex;
   flex-direction: column;
   align-items: center;
@@ -719,10 +729,10 @@
 /* Its size in the label's own units (`cqw`), which only the label's children can use. */
 .shelf-daily-picture {
   flex: none;
-  width: 78cqw;
+  width: 96cqw;
   aspect-ratio: 1;
-  margin-block: 8cqw 4cqw;
-  border-radius: 10cqw;
+  margin-block: 2cqw 4cqw;
+  border-radius: 8cqw;
   object-fit: cover;
   pointer-events: none;
 }
@@ -733,7 +743,7 @@
   min-height: 0;
   margin-bottom: 6cqw;
   overflow: hidden;
-  font-size: min(48cqw, calc((100cqh - 90cqw) / var(--len) * var(--per-letter, 1.65)));
+  font-size: min(48cqw, calc((100cqh - 106cqw) / var(--len) * var(--per-letter, 1.65)));
   font-weight: 700;
   line-height: 1.3;
   text-align: center;

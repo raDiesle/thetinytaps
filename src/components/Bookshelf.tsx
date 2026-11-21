@@ -13,6 +13,7 @@ import { playKnock } from "@/lib/sfx";
 import {
   BOOK_ASPECT,
   BOOK_GAP,
+  DAILY_TALL,
   LEAN_CLEAR,
   planShelf,
   STICKERS_ROOM,
@@ -279,6 +280,7 @@ export function Bookshelf({ secretProps, legal }: { secretProps: HTMLAttributes<
         "--bh": `${layout.bookHeight}px`,
         "--gap": BOOK_GAP,
         "--lean-clear": LEAN_CLEAR,
+        "--daily-tall": DAILY_TALL,
         "--post": `${layout.frame.post}px`,
         "--crown": `${layout.frame.crown}px`,
         "--plinth": `${layout.frame.plinth}px`,
@@ -544,8 +546,11 @@ function Compartment({
   // What is stuck on the back panel moves away from the eye by half of what the depth draws it towards the middle, so
   // it sits in the middle of the back that can be seen, not half behind the plank in front.
   const back = (layout.bookHeight * DEPTH) / EYE / 2;
+  // Each board's books as big as its own room allows (`ShelfCell.bh`), and all on it – the books spine out too – sized by them.
+  const bh = cell.bh ?? layout.bookHeight;
   const style = {
     ...rect(cell),
+    ...(cell.bh && { "--bh": `${cell.bh}px` }),
     "--cw": `${cell.w}px`,
     "--ch": `${cell.h}px`,
     "--sx": `${(cell.x + cell.w / 2 - layout.width / 2) * back}px`,
@@ -554,7 +559,7 @@ function Compartment({
   // The carved words, and the sign over them on a wide shelf, begin the board at its far left where the everyday helpers
   // stand first on it (user request, November 2026: a visitor looks at the left first); the books follow at their right.
   const leads = cell.books?.[0] !== undefined && Boolean(PLACES[cell.books[0]][0].colour);
-  const ends = cell.books ? endsFor(cell, layout.bookHeight, spans, leads) : undefined;
+  const ends = cell.books ? endsFor(cell, bh, spans, leads) : undefined;
   const things = cell.things ?? [];
   // The stack of books lying flat goes to one end, the left in one compartment, the right in the next – never to the
   // wall with the stickers, which it would hide.
@@ -562,7 +567,7 @@ function Compartment({
   return (
     <div className={`shelf-cell${cell.books ? "" : ` thing ${things.join(" ")}`}`} style={style}>
       <span className="shelf-cell-shade" />
-      {cell.books && <BooksLight cell={cell} bh={layout.bookHeight} spans={spans} leads={leads} />}
+      {cell.books && <BooksLight cell={cell} bh={bh} spans={spans} leads={leads} />}
       <span className="shelf-wall left" />
       <span className="shelf-wall right" />
       <span className="shelf-cell-ceiling" />
