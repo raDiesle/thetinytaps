@@ -5,7 +5,7 @@ import "./scenes.css";
 import { FeedbackLayer, useTapFeedback } from "@/components/TapFeedback";
 import { GameEnd } from "@/components/GameEnd";
 import { useNoBackgroundMusic } from "@/lib/backgroundMusic";
-import { loadRecordings, playChime, playLullaby, playMelody, playRandomNote } from "@/lib/sfx";
+import { loadRecordings, playChime, playEvening, playLullaby, playRandomNote } from "@/lib/sfx";
 import { targetLanguageFor } from "@/content/targetLanguages";
 import { pick as pickLanguage, useAppLanguage } from "@/lib/language";
 import { pick } from "@/lib/random";
@@ -14,6 +14,7 @@ import { REPEAT_PAUSE_MS } from "@/lib/spacing";
 import { touchOnly } from "@/lib/device";
 import { tapState } from "@/lib/tapTargets";
 import { preloadScene, SCENE_ENTRIES, scenePath, sceneTitle } from "./catalog";
+import { BOW_AFTER_MS, BOW_KEYFRAMES, BOW_MS, bowFoot, bowOrder, bowStep, curtainEndAt, curtainSoundAt, EVENING_AFTER_MS, layerPoint } from "./curtainCall";
 import { ARROWS, centre, middleItem, nextInDirection } from "./focus";
 import { HELLO_AFTER_MS, HELLO_AGAIN_MS, HELLO_MS, helloOrder } from "./hello";
 import { HideoutContext, peekTimes, SURPRISES } from "./hideout";
@@ -45,11 +46,8 @@ const HINT_AFTER_MS = 8000;
 const HINT_AFTER_MISSES = 2;
 /** Chain reactions: the next item reacts this long after the one before. */
 const CHAIN_STEP_MS = 1100;
-/** "Alles entdeckt!": the party starts a moment after the last item, and everything dances for a while. */
-const PARTY_AFTER_MS = 900;
-const PARTY_MS = 3600;
-/** "Nochmal" and the next picture come once the party (or the room going dark) has had its moment. */
-const END_BUTTONS_MS = PARTY_AFTER_MS + 2400;
+/** Bedtime picture: "Nochmal" and the next picture come once the room going dark has had its moment. */
+const NIGHT_END_MS = EVENING_AFTER_MS + 2400;
 /** Vehicles driving into another picture (idea B-19): how fast they drive, in scene units per second… */
 const DRIVE_SPEED = 600;
 const DRIVE_MIN_MS = 1400;
@@ -126,7 +124,8 @@ export function ScenePlay({ scene, settings, onKeys }: { scene: Scene; settings:
   const [touched, setTouched] = useState(false);
   /** Explore and colour mode: items tapped at least once (in colour mode: the coloured ones). */
   const [discovered, setDiscovered] = useState<ReadonlySet<string>>(new Set());
-  const [partying, setPartying] = useState(false);
+  /** All found (B-21): the picture lies in warm evening light until it starts over. */
+  const [evening, setEvening] = useState(false);
   /** Colour mode: where the background was painted, by tapping it or an item. */
   const [dabs, setDabs] = useState<Dab[]>([]);
   /** Bedtime pictures: everything is asleep and the room is dark. */
@@ -205,7 +204,7 @@ export function ScenePlay({ scene, settings, onKeys }: { scene: Scene; settings:
   const itemsById = useMemo(() => new Map(items.map((item) => [item.id, item])), [items]);
   const roads = useMemo(() => roadsFrom(scene.id), [scene]);
   const allDiscovered = discovered.size === scene.items.length;
-  /** Bedtime picture while exploring: tapped items fall asleep, and the end is a quiet night instead of the party. */
+  /** Bedtime picture while exploring: tapped items fall asleep, and the end is a quiet night instead of the evening light and the bows. */
   const bedtime = !!scene.bedtime && !colouring && !questMode;
   // The good-night picture is about getting calm: no song in the background there.
   useNoBackgroundMusic(!!scene.bedtime);
@@ -245,22 +244,20 @@ export function ScenePlay({ scene, settings, onKeys }: { scene: Scene; settings:
     return next;
   }, []);
 
-  /** Start the item's animation and (unless quiet) its sound. Returns false while it is still running. */
+  /** Start the item's animation and its sound. Returns false while it is still running. */
   const animate = useCallback(
-    (item: SceneItem, quiet = false) => {
+    (item: SceneItem) => {
       const now = performance.now();
       if (now < (busyUntil.current.get(item.id) ?? 0)) return false;
       busyUntil.current.set(item.id, now + item.durationMs);
       const surprise = item.hideout ? nextSurprise(item) : undefined;
       setPlays((prev) => ({ ...prev, [item.id]: { count: (prev[item.id]?.count ?? 0) + 1, playing: true, surprise } }));
       later(() => setPlays((prev) => ({ ...prev, [item.id]: { ...prev[item.id], playing: false } })), item.durationMs);
-      if (!quiet) {
-        if (riddle) playRiddleSound(item.sound);
-        else playSound(item.sound);
-        // The surprise says hello once it is out of its hideout; not while looking for something, it would
-        // mislead, and not at bedtime, where a bark would wake everyone up.
-        if (surprise !== undefined && !questMode && !bedtime) later(() => playSound(SURPRISES[surprise].sound), peekTimes(item).delayMs + 300);
-      }
+      if (riddle) playRiddleSound(item.sound);
+      else playSound(item.sound);
+      // The surprise says hello once it is out of its hideout; not while looking for something, it would
+      // mislead, and not at bedtime, where a bark would wake everyone up.
+      if (surprise !== undefined && !questMode && !bedtime) later(() => playSound(SURPRISES[surprise].sound), peekTimes(item).delayMs + 300);
       return true;
     },
     [later, nextSurprise, questMode, bedtime, riddle],
@@ -373,12 +370,27 @@ export function ScenePlay({ scene, settings, onKeys }: { scene: Scene; settings:
     setFocus(item);
   }, []);
 
-  /** Everything was discovered: all items dance at once; then the end's buttons come with the picture's trophy. */
-  const party = () => {
-    setPartying(true);
-    playMelody();
-    items.forEach((item, i) => later(() => animate(item, true), i * 40));
-    later(() => setPartying(false), PARTY_MS);
+  /**
+   * Everything was discovered (B-21): the light turns warm like an evening, everything found bows once, one after the
+   * other from left to right, silently, and one soft sound follows the last bow; then the end's buttons and the trophy.
+   * A bow moves the item's own layer (its svg, about the item's foot), so no picture is painted again while it bows.
+   */
+  const curtainCall = () => {
+    setEvening(true);
+    later(bowAll, BOW_AFTER_MS - EVENING_AFTER_MS);
+    later(playEvening, curtainSoundAt(items.length) - EVENING_AFTER_MS);
+  };
+  const bowAll = () => {
+    const root = sceneRef.current;
+    if (!root) return;
+    const step = bowStep(items.length);
+    bowOrder(items).forEach((item, i) => {
+      const layer = root.querySelector(`[data-item="${item.id}"]`)?.closest<SVGSVGElement>("svg.scene-layer");
+      if (!layer) return;
+      const [x, y] = layerPoint(bowFoot(item), scene.width, scene.height, root.clientWidth, root.clientHeight);
+      layer.style.transformOrigin = `${x}px ${y}px`;
+      layer.animate(BOW_KEYFRAMES, { duration: BOW_MS, delay: i * step, easing: "ease-in-out" });
+    });
   };
 
   /** Bedtime picture: everything is asleep, so the room goes dark – softly, without dancing or rising hearts. */
@@ -392,6 +404,7 @@ export function ScenePlay({ scene, settings, onKeys }: { scene: Scene; settings:
     setDiscovered(discoveredRef.current);
     setDabs([]);
     setNight(false);
+    setEvening(false);
     inLight.current = new Set();
   };
 
@@ -401,7 +414,7 @@ export function ScenePlay({ scene, settings, onKeys }: { scene: Scene; settings:
     const { trip: _, ...state } = (location.state ?? {}) as { trip?: Trip };
     navigate(scenePath(nextId), { replace: true, state });
   };
-  // Once all is found, the next picture loads while the party plays, so „Weiter“ shows it at once.
+  // Once all is found, the next picture loads during the evening light and the bows, so „Weiter“ shows it at once.
   useEffect(() => {
     if (allDiscovered) preloadScene(nextId);
   }, [allDiscovered, nextId]);
@@ -415,8 +428,7 @@ export function ScenePlay({ scene, settings, onKeys }: { scene: Scene; settings:
     // A splash of paint where the colour comes back.
     if (colouring) glow(x, y);
     if (discoveredRef.current.size !== scene.items.length) return;
-    if (bedtime) later(goodNight, PARTY_AFTER_MS);
-    else later(party, PARTY_AFTER_MS);
+    later(bedtime ? goodNight : curtainCall, EVENING_AFTER_MS);
   };
 
   /**
@@ -799,7 +811,7 @@ export function ScenePlay({ scene, settings, onKeys }: { scene: Scene; settings:
   const greyFilter = `url(#${greyId})`;
   // The grey copy of the background, with holes where it was painted.
   const greyCopy = { filter: greyFilter, mask: `url(#${svgId}-paint)` };
-  const sceneClass = ["scene scene-root", colouring && "colouring", partying && "party", night && "night"].filter(Boolean).join(" ");
+  const sceneClass = ["scene scene-root", colouring && "colouring", night && "night"].filter(Boolean).join(" ");
 
   return (
     <div
@@ -841,7 +853,7 @@ export function ScenePlay({ scene, settings, onKeys }: { scene: Scene; settings:
         {/* Taps go through the grey copy to the background, whose things move (`<Poke>`). */}
         {grey && <use href={`#${svgId}-bg`} {...greyCopy} pointerEvents="none" />}
       </svg>
-      {items.map((item, i) => {
+      {items.map((item) => {
         const play = plays[item.id];
         const place = item.place;
         const drive = drives[item.id];
@@ -857,8 +869,12 @@ export function ScenePlay({ scene, settings, onKeys }: { scene: Scene; settings:
             >
               <g
                 key={`${item.id}-${play?.count ?? 0}`}
+<<<<<<< HEAD
                 className={`scene-item item-${look}${play?.playing ? " playing" : ""}${waving ? " scene-hello" : ""}${bedtime && discovered.has(item.id) ? " asleep" : ""}`}
                 style={{ "--party-i": i } as CSSProperties}
+=======
+                className={`scene-item item-${look}${play?.playing ? " playing" : ""}${bedtime && discovered.has(item.id) ? " asleep" : ""}`}
+>>>>>>> main
                 filter={colouring && !discovered.has(item.id) ? greyFilter : undefined}
                 data-item={item.id}
                 data-tap={quest ? tapState({ goal: quest.answers.includes(item), done: answered.has(item.id) }) : tapState({ done: discovered.has(item.id) })}
@@ -895,6 +911,8 @@ export function ScenePlay({ scene, settings, onKeys }: { scene: Scene; settings:
           {grey && <use href={`#${svgId}-overlay`} {...greyCopy} />}
         </SceneLayer>
       )}
+      {/* All found: warm evening light over the picture, an HTML layer of its own that only fades in (B-21). */}
+      <div className={`scene-evening${evening ? " on" : ""}`} aria-hidden />
       <SceneLayer scene={scene} className="scene-marks" taps>
         {exits.map((exit) => (
           <ExitSign
@@ -955,9 +973,14 @@ export function ScenePlay({ scene, settings, onKeys }: { scene: Scene; settings:
           {discovered.size}/{scene.items.length}
         </div>
       )}
-      {/* Counted to the end (party, the room gone dark or the picture coloured in). */}
+      {/* Counted to the end (evening light and bows, the room gone dark or the picture coloured in). */}
       {!questMode && allDiscovered && (
-        <GameEnd delayMs={END_BUTTONS_MS} level={scene.id} onAgain={startOver} next={{ name: sceneTitle(nextId, appLanguage.id), onNext: goToNextScene }} />
+        <GameEnd
+          delayMs={bedtime ? NIGHT_END_MS : curtainEndAt(items.length)}
+          level={scene.id}
+          onAgain={startOver}
+          next={{ name: sceneTitle(nextId, appLanguage.id), onNext: goToNextScene }}
+        />
       )}
       {/* Colour mode with the key badges on: the space bar, small at the bottom, paints where nothing happens. */}
       {colouring && keysOn && !allDiscovered && (

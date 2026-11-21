@@ -483,20 +483,21 @@
   }
 }
 
-/* Everything discovered: all items dance together for a moment. */
-.scene.party .scene-item {
-  transform-box: fill-box;
-  transform-origin: 50% 100%;
-  animation: scene-dance 0.7s ease-in-out calc(var(--party-i) * 40ms) 4;
+/* Everything discovered (B-21): the light turns warm like an evening and stays so. A layer of its own over the
+   picture whose opacity alone changes, so nothing below is painted again; multiply keeps the drawing's contrast. */
+.scene-evening {
+  position: absolute;
+  inset: 0;
+  pointer-events: none;
+  opacity: 0;
+  mix-blend-mode: multiply;
+  background: linear-gradient(#ffb877, #ffd3a1 55%, #f7c6b0);
+  transition: opacity 1s ease;
 }
 
-@keyframes scene-dance {
-  25% {
-    transform: translateY(-14px) rotate(-5deg);
-  }
-  75% {
-    transform: translateY(-14px) rotate(5deg);
-  }
+.scene-evening.on {
+  opacity: 0.85;
+  transition-duration: 2.4s;
 }
 
 /* A note for the grown-up, below the picture; the picture stays playable. */
