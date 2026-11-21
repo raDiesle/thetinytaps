@@ -47,6 +47,12 @@ export function sungSteps(lang: string): number[] {
   return song.verses.map((t) => Math.round((t - song.start) * 1000));
 }
 
+/** When the song has rung out after its finale, in ms of brushing time (as `sungSteps`): the video recording runs until then (`TeethVideo`). */
+export function songEndMs(lang: string, buffer: AudioBuffer | null): number | undefined {
+  const song = SUNG[lang];
+  return buffer && song ? Math.round((buffer.duration - song.start) * 1000) : undefined;
+}
+
 /** Loudness of the song: as loud as the voice (every language's song measured −15.9 to −16.4 LUFS, see src/lib/loudness.ts). */
 const VOLUME = songGain(-16.1);
 /** Loudness while the voice says what to do, so it can be understood. */
