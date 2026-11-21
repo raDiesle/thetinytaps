@@ -377,6 +377,14 @@ In a fresh worktree run `bun install` first.
   hand often lands twice) changes nothing on the screen the first one just brought – every tap or key that turns to the
   next picture, page or choice asks `screenTap()` of `src/lib/tapGuard.ts`, and a screen that changes by itself calls
   `screenChanged()` (user feedback, November 2026; Gefühle, Abstillen, Aufs Töpfchen; `tapGuard.test.ts`). Captions of a picture always stand under it, never on it, in every phase – small, since only grown-ups read them, at the one size of every caption (`--caption-size` in `base.css`), and the picture takes all the room they leave. A story's sentence a grown-up reads aloud under its picture is set alike in every story and game (user feedback from Abstillen, November 2026, and from Was gehört zusammen?'s round captions): the book's serif with its first letter big and red, as Gefühle's day pages and scenes, Abstillen and Was gehört zusammen? do – never a face, weight or size of its own.
+- **Players never see a picture that isn't made yet** (user request, November 2026): a story, scene, page, pair or round
+  whose painted pictures are still waiting (in the queue, not generated) is left out of the built site – the rest of the
+  game plays without it, a chapter or pass left empty goes too – while the dev server shows it with its placeholder, so
+  it can be looked at (`PROD` from `src/lib/buildInfo.ts`; `ChapterBook`'s `withPictures`, Was ist passiert?'s
+  `PLAYED_PASSES`, Gefühle's stories and day scenes, Was gehört zusammen?'s `fromPainted`; `missingPictures.test.ts`).
+  A new game or part showing painted pictures does the same, never an empty frame, a „Bild folgt“ or a gap for players;
+  a whole game whose pictures are all still waiting is `unfinished` (see below). A small symbol that has a drawn or
+  emoji stand-in (Aufs Töpfchen's strip, the Belohnungstafel) may keep it.
 - One tap or key = one immediate, visible and audible reaction. Every key does something.
   The feedback fits what the tap did (`useTapFeedback`, `src/components/TapFeedback.tsx`; user feedback, November 2026):
   a tap or key that sets nothing off gets soft rings as on water (`ripple`), or better something of the game's own world

@@ -8,12 +8,12 @@ import { useAppLanguage, useT } from "@/lib/language";
 import { playPlop, playTwinkle } from "@/lib/sfx";
 import { screenChanged, screenTap } from "@/lib/tapGuard";
 import { ChoiceCard, GoOn, StepBack, StepDots, StoryPicture, StoryWords } from "../feelings/storyParts";
-import { framesOf, preloadImages } from "./images";
-import { CAUSE_PASSES, CAUSE_QUESTION, type CauseScene, causeOnLeft, sceneCode, sceneImages } from "./scenes";
+import { framesOf, PLAYED_PASSES, preloadImages } from "./images";
+import { CAUSE_QUESTION, type CauseScene, causeOnLeft, sceneCode, sceneImages } from "./scenes";
 
 /** Where the child stopped: kept between visits, so the game goes on with the next scenes. */
 interface CauseProgress {
-  /** The pass played last, counted from 0 (`CAUSE_PASSES`). */
+  /** The pass played last, counted from 0 (`PLAYED_PASSES`). */
   pass: number;
   /** The scene of `pass` it goes on with, counted from 0. */
   scene: number;
@@ -36,14 +36,14 @@ export function CausePlay() {
   // A link to a scene (`?seite=2-3`: the second pass's third scene) starts there, else where the last visit stopped.
   const [now, setNow] = useState(() => {
     const [linkedPass, linkedScene] = (stepInAddress() ?? "").split("-").map((n) => Number(n) - 1);
-    if (CAUSE_PASSES[linkedPass]?.[linkedScene]) return { pass: linkedPass, index: linkedScene, run: 0 };
-    const pass = progress.pass % CAUSE_PASSES.length;
-    return { pass, index: progress.scene < CAUSE_PASSES[pass].length ? progress.scene : 0, run: 0 };
+    if (PLAYED_PASSES[linkedPass]?.[linkedScene]) return { pass: linkedPass, index: linkedScene, run: 0 };
+    const pass = progress.pass % PLAYED_PASSES.length;
+    return { pass, index: progress.scene < PLAYED_PASSES[pass].length ? progress.scene : 0, run: 0 };
   });
-  const scenes = CAUSE_PASSES[now.pass];
+  const scenes = PLAYED_PASSES[now.pass];
   const scene = scenes[now.index];
   const last = now.index === scenes.length - 1;
-  const following = (now.pass + 1) % CAUSE_PASSES.length;
+  const following = (now.pass + 1) % PLAYED_PASSES.length;
   // The scene on screen is in the address: its pass and its place there, each from 1 (stepAddress.ts).
   useStepAddress(`${now.pass + 1}-${now.index + 1}`);
 

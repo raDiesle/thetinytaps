@@ -5,6 +5,7 @@ import { useInnerBack } from "@/components/GameShell";
 import { FeedbackLayer, useTapFeedback } from "@/components/TapFeedback";
 import { VoiceSwitch } from "@/components/VoiceSwitch";
 import type { TextsLanguageId } from "@/content/texts";
+import { PROD } from "@/lib/buildInfo";
 import { type Texts, useAppLanguage, useT } from "@/lib/language";
 import { noPointerClick } from "@/lib/press";
 import { playPageTurn, playRandomNote } from "@/lib/sfx";
@@ -72,7 +73,8 @@ const BACK = { de: "Zurückblättern", en: "Page back", zh: "上一页", hi: "�
  * the picture fills the room above, and under it what the grown-up reads, with the chapter's title over its first page.
  * Any tap or key turns on (← and Backspace back, ◀ bottom left, from the first page back to the contents); the corner
  * goes back to the contents (`useInnerBack`), and the last page ends with „Nochmal“, which opens the contents again. A
- * page whose picture isn't made yet shows a paper placeholder in its place.
+ * page whose picture isn't made yet is left out in the built site, so no player sees an empty picture (`withPictures`);
+ * the dev server shows a paper placeholder in its place, so it can be looked at.
  *
  * With `voice`, Tapsi's voice reads each page's sentence as it comes (user decision, November 2026), from the book's
  * recordings in the app language – a page without one stays silent, never German in another language. The loudspeaker
@@ -80,7 +82,7 @@ const BACK = { de: "Zurückblättern", en: "Page back", zh: "上一页", hi: "�
  * page on screen and the next one are loaded (on the contents, each chapter's first page), nothing while it is off.
  */
 export function ChapterBook({
-  chapters,
+  chapters: written,
   title,
   pictureOf,
   translations,
@@ -92,7 +94,7 @@ export function ChapterBook({
   chapters: StoryChapter[];
   /** The story's name over its table of contents. */
   title: Texts;
-  /** A page's picture by its id, or nothing while it isn't made yet (a paper placeholder stands there). */
+  /** A page's picture by its id, or nothing while it isn't made yet (left out for players, a placeholder in the dev server). */
   pictureOf: (id: string) => string | undefined;
   /** The story in the other languages (`byLanguage`), filled as their texts load. */
   translations?: Partial<Record<TextsLanguageId, StoryTranslation>>;
@@ -110,6 +112,7 @@ export function ChapterBook({
   const t = useT();
   const { id: language } = useAppLanguage();
   const translation = language === first ? undefined : translations?.[language as TextsLanguageId];
+  const chapters = useMemo(() => withPictures(written, pictureOf), [written, pictureOf]);
   const { pages, where, starts } = useMemo(() => {
     const pages = chapters.flatMap((c) => c.pages);
     return {
@@ -341,4 +344,14 @@ export function ChapterBook({
       <FeedbackLayer effects={effects} />
     </div>
   );
+}
+
+/**
+ * The chapters as players read them: in the built site a page whose picture isn't made yet is left out, and a chapter
+ * left without pages with it, so a story waiting for pictures never shows an empty one (user request, November 2026);
+ * with `all` (the dev server) every page stays and the missing ones show their placeholder.
+ */
+export function withPictures(chapters: StoryChapter[], pictureOf: (id: string) => string | undefined, all = !PROD): StoryChapter[] {
+  if (all) return chapters;
+  return chapters.map((chapter) => ({ ...chapter, pages: chapter.pages.filter((page) => pictureOf(page.id)) })).filter((chapter) => chapter.pages.length > 0);
 }
