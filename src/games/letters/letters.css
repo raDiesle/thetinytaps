@@ -12,6 +12,23 @@
   transition: background 0.4s;
 }
 
+/* Frei tippen's dark page (`dark`): light letters and words on night colours; the tracing dots follow `--ink`. Only
+   the stage turns light: the on-screen keys below keep their dark outlines, and the letters' eyes their dark pupils. */
+.letters-play.ft-dark .stage {
+  --ink: #f6eedc;
+  --accent: #ff9f8a;
+  color: var(--ink);
+}
+
+/* Step by step, the places still to come show as light dashes on the dark page. */
+.letters-play.ft-dark .reveal.waiting {
+  outline-color: #f6eedc40;
+}
+
+.letters-play.ft-dark .eyes span {
+  --ink: #3d3045;
+}
+
 /* The card's room: the whole screen, or what the on-screen keys leave. Cards size themselves to it (cqh / cqw). */
 .stage {
   position: relative;

@@ -50,6 +50,8 @@ const ARROWS: Record<string, [number, number]> = {
 };
 
 const BACKGROUNDS = ["#fff4d6", "#e3f6ff", "#e9ffe0", "#ffe8f0", "#efe9ff", "#fff0e0"];
+/** Frei tippen's dark page (`dark`, user request, November 2026): night colours taking turns like the light ones. */
+const DARK_BACKGROUNDS = ["#1f2340", "#152a3a", "#1b2e26", "#2e1f33", "#26203f", "#33261f"];
 
 type Shown = { kind: "letter"; id: number; letter: LetterEntry; word: WordEntry } | { kind: "number"; id: number; n: number; thing: Countable };
 
@@ -93,7 +95,7 @@ export function LettersPlay({ pack, settings, numbersOnly = false }: { pack: Lan
   const [stage, setStage] = useState(0);
   /** Counting by tapping: indices of the tapped things, in order. */
   const [tapped, setTapped] = useState<number[]>([]);
-  const [background, setBackground] = useState(BACKGROUNDS[0]);
+  const [backgroundIndex, setBackgroundIndex] = useState(0);
   const [push, setPush] = useState<[number, number]>([0, 0]);
   /** Two-digit numbers: the first digit pressed, waiting beside an empty place for the second. */
   const [firstDigit, setFirstDigit] = useState<number | null>(null);
@@ -101,6 +103,9 @@ export function LettersPlay({ pack, settings, numbersOnly = false }: { pack: Lan
   const t = useT();
   const { id: language } = useAppLanguage();
   const stepByStep = settings.numbers === "step";
+  /** Frei tippen only: Zählen keeps its light page. */
+  const dark = settings.dark && !numbersOnly;
+  const background = (dark ? DARK_BACKGROUNDS : BACKGROUNDS)[backgroundIndex];
   /** A number stops before its digit, which comes only when the same number is pressed again (`digitOnRepeat`). */
   const holdDigit = settings.digitOnRepeat && (settings.numbers === "all" || settings.numbers === "count");
 
@@ -291,7 +296,7 @@ export function LettersPlay({ pack, settings, numbersOnly = false }: { pack: Lan
     if (current.current) history.current = [...history.current.slice(-(MAX_HISTORY - 1)), current.current];
     current.current = next;
     setFirstDigit(null);
-    setBackground(BACKGROUNDS[next.id % BACKGROUNDS.length]);
+    setBackgroundIndex(next.id % BACKGROUNDS.length);
     setPush([0, 0]);
     setShown(next);
     setTapped([]);
@@ -613,7 +618,7 @@ export function LettersPlay({ pack, settings, numbersOnly = false }: { pack: Lan
   const onCardPointer = stepByStep || byTap(shown) ? undefined : repeat;
 
   return (
-    <div ref={root} className={`letters-play`} style={{ background }} onPointerDown={onPlayAreaPointer}>
+    <div ref={root} className={`letters-play${dark ? " ft-dark" : ""}`} style={{ background }} onPointerDown={onPlayAreaPointer}>
       <div ref={stageBox} className="stage">
         <div ref={cardBox} className="card-box" style={{ translate: `${push[0]}cqw ${push[1]}cqh` }}>
           {firstDigit !== null && <HalfNumberCard key="half" first={firstDigit} />}

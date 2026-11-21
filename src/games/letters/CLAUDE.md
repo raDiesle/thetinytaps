@@ -17,6 +17,11 @@ and one store of settings (`tinytaps.letters.v2`, so letters, pictures and keys 
   stage so 99 fits on a phone on its side – counting 99 aloud or by tapping would be no game. Its word („twenty-three!“,
   English first, `TWO_DIGIT_WORDS`) waits for its recording and stays silent until then; the second digit always
   answers, while the same number again within `REPEAT_PAUSE_MS` stays quiet.
+- Frei tippen's dark page (`dark`, „Dark page“ behind ⚙️, Frei tippen only; user request, November 2026): night
+  colours take turns behind the card (`DARK_BACKGROUNDS`), and the stage alone turns its `--ink` and `--accent` light
+  (`.ft-dark .stage`), so letters, words, the letter family's hands and the tracing dots follow – the on-screen keys keep
+  their dark outlines and the letters' eyes their dark pupils. A new colour on the card uses `--ink` or `--accent`, never
+  a fixed dark one, or it vanishes on the dark page.
 - Mitmachen, `/mitmachen/` (`MovePlay.tsx`, `move.css`; L-15): a digit, or any other key for a number by chance, has a
   fox or bear child hop, clap or stamp that many times (the three take turns), alone; it
   invites first („Hüpf mit!“ – hop and clap from the pack's doing words, `joinIn`), then counts each one aloud with a

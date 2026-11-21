@@ -268,6 +268,9 @@ export function LettersGame({ way }: { way: LettersWay }) {
               checked={settings.trace}
               onChange={(trace) => update({ trace })}
             />
+            {way === "free" && (
+              <Toggle label={t({ en: "Dark page: light letters on night colors" })} checked={settings.dark} onChange={(dark) => update({ dark })} />
+            )}
             {!numbersOnly && showWord}
             {!numbersOnly && play.letterCase === "both" && !settings.trace && (
               <Toggle
