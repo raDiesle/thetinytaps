@@ -36,8 +36,9 @@ describe("loudness", () => {
     for (const { path, code } of players) expect({ path, measured: /\bsongGain\(-\d/.test(code) }).toEqual({ path, measured: true });
   });
 
-  // The limiter itself, and the videos' intro, which renders its sound into a file (an OfflineAudioContext: no speaker).
-  const mayUseDestination = [join("sfx", "core.ts"), join("video", "intro", "introSound.ts")];
+  // The limiter itself, and the videos' intro and outro, whose sound is rendered into a file (`renderSound`, an
+  // OfflineAudioContext: no speaker).
+  const mayUseDestination = [join("sfx", "core.ts"), join("video", "frames.tsx")];
   test("everything plays through the one limiter (speaker), never straight to the speaker", () => {
     const direct = files
       .filter(({ path, code }) => !mayUseDestination.some((file) => path.endsWith(file)) && /\.destination\b/.test(code))

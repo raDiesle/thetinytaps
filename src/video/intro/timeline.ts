@@ -1,8 +1,9 @@
 // The intro's motion as plain numbers of its time: every frame is a function of the second it shows, so the page can
 // play it live and `bun run video intro` can step through it frame by frame and get the same picture each time.
 
-/** The intro is drawn on a canvas of this size and scaled to the screen; the video is made at exactly this size. */
-export const CANVAS = { width: 1920, height: 1080 };
+import { CANVAS } from "../canvas";
+
+export { CANVAS };
 
 /** How long the intro lasts, in seconds; the sound rings out within it. */
 export const INTRO_SECONDS = 7.5;
@@ -83,15 +84,32 @@ export function bookPose(t: number): BookPose {
   return { x, y, scale, tip, cover: open * 180 };
 }
 
+/** How the camera looks at the shelf: how close, and how dim and soft it is behind the book. */
+export interface ShelfPose {
+  scale: number;
+  /** 0 to 1, how much darker. */
+  dim: number;
+  /** In pixels of the canvas. */
+  blur: number;
+}
+
 /** The camera on the shelf: a little closer, and the shelf going dim and soft behind the book that comes out. */
-export function shelfPose(t: number) {
+export function shelfPose(t: number): ShelfPose {
   const push = easeInOut(progress(t, BEATS.push));
   const out = easeInOut(progress(t, BEATS.out));
   return { scale: 1 + 0.08 * push, dim: 0.38 * out, blur: 7 * out };
 }
 
+/** How far each part of the printed title has come, 0 to 1. */
+export interface TitlePose {
+  letters: number;
+  tracks: number;
+  foxes: number;
+  address: number;
+}
+
 /** How far each part of the title has come, 0 to 1. */
-export function titlePose(t: number) {
+export function titlePose(t: number): TitlePose {
   return {
     letters: progress(t, BEATS.letters),
     tracks: easeInOut(progress(t, BEATS.tracks)),

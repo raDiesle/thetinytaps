@@ -2,19 +2,21 @@ import { mkdirSync, rmSync, writeFileSync } from "node:fs";
 import { join } from "node:path";
 import { evaluate, launchChrome, open, siteUrl } from "./chrome";
 
-// `bun run video intro` – makes the YouTube videos' intro (src/video/intro) as an MP4 file, frame by frame: headless
-// Chrome opens its page with `?render`, shows each frame at its exact second and takes a picture of it, the page renders
-// its sound without playing it (an OfflineAudioContext; Chrome is muted besides), and ffmpeg joins both. Every run gives
-// the same video, sharp at 1920 × 1080, never dropping a frame as a screen recording can.
+// `bun run video intro` / `bun run video outro` – makes the YouTube videos' intro or outro (src/video) as an MP4 file,
+// frame by frame: headless Chrome opens its page with `?render`, shows each frame at its exact second and takes a picture
+// of it, the page renders its sound without playing it (an OfflineAudioContext; Chrome is muted besides), and ffmpeg
+// joins both. Every run gives the same video, sharp at 1920 × 1080, never dropping a frame as a screen recording can.
 //
 //   bun run video intro                      builds the site and serves it
 //   bun run video intro --url http://localhost:3000   uses a running dev server instead
+//   bun run video outro --ziel /zaehne/ --sprache en  the outro whose code leads to that game, in that language
+//                     (default: the home page, in the browser's language)
 //   --fps 30          frames per second (default 60)
 //   --shots 0.9,2.8   only pictures of these seconds, as PNG, to look at (no video)
 //   --out <folder>    where the files go (default video-out/, not in git)
 
 /** The videos this tool can make, by name: the page that draws them. */
-const VIDEOS: Record<string, string> = { intro: "/management/video-intro/" };
+const VIDEOS: Record<string, string> = { intro: "/management/video-intro/", outro: "/management/video-outro/" };
 
 const args = process.argv.slice(2);
 const option = (name: string) => {
@@ -29,6 +31,13 @@ const shots = option("shots")
   ?.split(",")
   .map(Number)
   .filter((n) => Number.isFinite(n));
+/** The outro's choices, passed on to its page; they also name the file. */
+const target = option("ziel");
+const language = option("sprache");
+const query = new URLSearchParams({ render: "" });
+if (target) query.set("ziel", target);
+if (language) query.set("sprache", language);
+const fileName = [name, target?.replaceAll("/", ""), language].filter(Boolean).join("-");
 const outDir = option("out") ?? join(import.meta.dir, "..", "video-out");
 mkdirSync(outDir, { recursive: true });
 
@@ -39,27 +48,27 @@ const { cdp, stop } = await launchChrome({ width: 1920, height: 1080, scale: 1 }
 const capture = async () => Buffer.from((await cdp.send<{ data: string }>("Page.captureScreenshot", { format: "png" })).data, "base64");
 
 /** Shows the frame at second `t`: the page draws it and waits for it to be painted. */
-const seek = (t: number) => evaluate(cdp, `window.__intro.seek(${t})`);
+const seek = (t: number) => evaluate(cdp, `window.__video.seek(${t})`);
 
 try {
   await cdp.send("Page.enable");
   await cdp.send("Emulation.setDeviceMetricsOverride", { width: 1920, height: 1080, deviceScaleFactor: 1, mobile: false });
-  await open(cdp, `${site.url}${path}?render`);
+  await open(cdp, `${site.url}${path}?${query}`);
   // The page's code may still be loading after the load event (a lazy page): wait for its handle.
-  for (let tries = 0; tries < 100 && !(await evaluate<boolean>(cdp, "!!window.__intro")); tries++) await Bun.sleep(100);
-  const seconds = await evaluate<number>(cdp, "window.__intro.seconds");
+  for (let tries = 0; tries < 100 && !(await evaluate<boolean>(cdp, "!!window.__video")); tries++) await Bun.sleep(100);
+  const seconds = await evaluate<number>(cdp, "window.__video.seconds");
 
   if (shots) {
     for (const t of shots) {
       await seek(t);
-      const file = join(outDir, `${name}-${t.toFixed(2)}s.png`);
+      const file = join(outDir, `${fileName}-${t.toFixed(2)}s.png`);
       writeFileSync(file, await capture());
       console.log(file);
     }
   } else {
-    const wav = join(outDir, `${name}.wav`);
-    writeFileSync(wav, Buffer.from(await evaluate<string>(cdp, "window.__intro.sound()"), "base64"));
-    const mp4 = join(outDir, `${name}.mp4`);
+    const wav = join(outDir, `${fileName}.wav`);
+    writeFileSync(wav, Buffer.from(await evaluate<string>(cdp, "window.__video.sound()"), "base64"));
+    const mp4 = join(outDir, `${fileName}.mp4`);
     const ffmpeg = Bun.spawn(
       [
         "ffmpeg",

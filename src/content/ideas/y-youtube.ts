@@ -42,6 +42,9 @@ export const youtubeIdeas: IdeaArea = {
       text: "Am Ende, 8–12 Sekunden: das Buch klappt zu und gleitet zurück ins Regal, die anderen Bücher leuchten kurz nacheinander auf und zeigen je eine Sekunde ihres Spiels. Darunter groß „funforboth.com“, Tapsi sagt die Adresse, dazu drei bis vier Zeichen mit kurzen Wörtern: kostenlos · ohne Werbung · offline · 7 Sprachen, und die Spielzeit-Grenze ⏳. Weil YouTube bei Kindervideos keine klickbaren Endcards zeigt, muss alles im Bild stehen.",
       why: "Ein Abspann, der selbst zeigt, wie viel es noch gibt, statt nur eine Adresse – und der wie das Intro aussieht, damit beides zusammengehört.",
       effort: "M",
+      done: true,
+      partial:
+        "Umgesetzt am 21. November 2026 als /management/video-outro/ (12 s): das Intro rückwärts – die erste Seite mit dem Namen, das Buch klappt zu und geht zurück in seine Lücke –, dann leuchten die vier Bilderbücher nacheinander auf und zeigen je ein Bild eines ihrer Spiele (die Vorschaubilder der Menüs, ohne Wörter darin), dann eine Karte mit Logo, funforboth.com, fünf Zeichen „Free · No ads · Plays offline · 7 languages · Play-time limit“ (englisch zuerst) und dem QR-Code aus Y-05. Eigener Klang: Zuklappen, Klopfen, ein Ton je Buch, die drei Glockentöne des Intros, Akkord. `bun run video outro` macht das MP4. Tapsi sagt die Adresse noch nicht, die Aufnahme wäre bezahlt.",
     },
     {
       id: "Y-05",
@@ -50,6 +53,9 @@ export const youtubeIdeas: IdeaArea = {
       text: "Viele Familien schauen YouTube auf dem Fernseher, wo niemand einen Link tippen kann: Im Abspann steht ein QR-Code, der direkt zum Spiel aus dem Video führt (funforboth.com/zaehne/, /en/zaehne/ …, die Adressen gibt es schon in jeder Sprache). Die Adresse wird kurz gesagt und steht auch in der Beschreibung. Ob Umami Besucher von YouTube erkennt (Referrer youtube.com, vom Fernseher meist keiner), messen; Zusätze nach „?“ zählt Umami nicht.",
       why: "Vom Video auf dem Fernseher zum Spiel auf dem Handy in einem Schritt – genau dort verlieren Videos sonst ihre Zuschauer.",
       effort: "S",
+      done: true,
+      partial:
+        "Im Abspann (Y-04): rechts auf der Karte ein großer QR-Code mit „Scan to play“ und der kurzen Adresse darunter (funforboth.com/en/zaehne). Er führt zur Startseite oder zu Zähne putzen, Aufs Töpfchen, Timer, Schnullerfee, Abstillen oder Kita-Start, in der Sprache des Videos (Wahl auf der Seite, `--ziel` und `--sprache` beim Werkzeug). Geprüft durch Lesen des gerenderten Bildes, auch auf 480 × 270 verkleinert. Ob Umami Besucher von YouTube erkennt, ist noch nicht gemessen; die Adresse in der Videobeschreibung gehört zu Y-18.",
     },
     {
       id: "Y-06",

@@ -534,6 +534,12 @@ export const LANGUAGE_STATUS: LanguageStatusRow[] = [
         ],
         note: "Das Pokalzimmer neben dem Regal (/pokale/, 13. November 2026), englisch zuerst: „Trophy room“ (Schild am Regal, Raumname, Seitentitel, auch am Pokal am Ende eines Levels), „Bookshelf“, „Hall“, der Plan der Räume („Plan of the trophy rooms“, „You are here“, „Close“), „Put it back“ und „First won“, auf Wunsch übersetzt am 19. November 2026, Deutsch eingeschlossen. „Zurück zum Bücherregal“ ist schon in allen Sprachen da, ebenso die Namen der Spiele und Level auf den Schildern der Sockel; „Tag“ und „Runde“ mit ihrer Zahl (trophyNames.ts) stehen in allen sieben Sprachen.",
       },
+      {
+        label: "📚 Abspann der YouTube-Videos",
+        languages: { en: "done" },
+        files: ["src/video/outro/content.ts"],
+        note: "Die Wörter auf der Karte am Ende jedes Videos (/management/video-outro/, Y-04 und Y-05, 21. November 2026), englisch zuerst: die fünf Zeichen „Free“, „No ads“, „Plays offline“, „7 languages“, „Play-time limit“ und „Scan to play“ über dem QR-Code. In den anderen Sprachen zeigt der Abspann sie bis zur Übersetzung auf Englisch; die Adresse des Codes folgt schon der Sprache (/en/zaehne/). Name und Adresse brauchen keine. Tapsi sagt die Adresse noch nicht (bezahlte Aufnahme).",
+      },
     ],
   },
 ];

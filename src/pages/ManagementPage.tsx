@@ -177,6 +177,8 @@ export function ManagementPage() {
         {" · "}
         <Link to="/management/video-intro/">📖 Intro für die Videos</Link>
         {" · "}
+        <Link to="/management/video-outro/">📚 Abspann für die Videos</Link>
+        {" · "}
         <Link to="/management/video-toepfchen/">🎬 Aufs Töpfchen fürs Video aufnehmen</Link>
         {" · "}
         <Link to="/management/video-toepfchen-eltern/">🎬 Aufs Töpfchen: Video für Eltern aufnehmen</Link>

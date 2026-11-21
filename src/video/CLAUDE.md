@@ -4,18 +4,27 @@ What the YouTube videos are made of (ideas area Y on `/management/`, user reques
 of the site children see: each video has a page only for grown-ups under `/management/` (in `NO_INDEX_PATHS`, linked at
 the top of the management page), never a link from the shelf or a book, until the user decides otherwise.
 - Recording a page's own tab in Chrome is `VideoRecorder` (`src/components/VideoRecorder.tsx`), shared by every video
-  page (the games' videos and the intro): a new video page gives it its play, never a recorder of its own.
+  page (the games' videos, the intro and the outro): a new video page gives it its play, never a recorder of its own.
 - `intro/`: the videos' intro (Y-01), at `/management/video-intro/`: the shelf of picture books, the Fun for Both book
   (the families' picture `buch-cover.webp` as its cover) coming out and opening, its first page filling the screen,
   and the app's own `Logo` printed on it letter by letter, the paw tracks walking to the o and Papa Fox with his child
   sitting down on it, then „funforboth.com“. 7.5 s with a sound of its own (`introSound.ts`: a knock, the rush out of
   the shelf, the page-turn, Fun – for – Both as three rising bell notes, paws patting, a warm chord). No voice yet:
   Tapsi saying „Fun for Both!“ would be a paid recording, made only when the user asks.
+- `outro/`: the videos' outro (Y-04, Y-05), at `/management/video-outro/`: the intro backwards (it starts on the page
+  the intro ends on, the name fades, the book closes and goes back into its gap – `introSecond` maps its time onto the
+  intro's, so both stay one motion), the four picture books lighting up one after another with a menu picture of one of
+  their games, then a card with the `Logo`, „funforboth.com“, five signs (free, no ads, offline, languages, play-time
+  limit) and a QR code to the video's game in the video's language (`CODE_TARGETS`, `addressFor`; `uqr` draws it). 12 s.
+  YouTube shows no end screen links on videos made for children, so all of it is in the picture.
+  `bun run video outro --ziel /zaehne/ --sprache en` makes it for one game and language.
+- `frames.tsx`, `sound.ts`, `canvas.ts`: what both share – the 1920 × 1080 canvas fitted to its stage, the live play
+  (`LivePlay`), the render handle (`RenderPlay`, `window.__video`), and the notes and noises of their sounds.
 
 Rules:
 - **Every frame is a function of its second** (`timeline.ts`): positions, scales and what has appeared are computed
   from `t`, never left to CSS animations or timers. So the page plays it live from the clock, and `bun run video intro`
-  steps through it frame by frame (`?render`, `window.__intro.seek(t)`) and gets the same sharp video every time –
+  steps through it frame by frame (`?render`, `window.__video.seek(t)`) and gets the same sharp video every time –
   1920 × 1080 at 60 fps, no dropped frame. A new video made by the tool follows the same pattern and is added to
   `VIDEOS` in `tools/video.ts`.
 - The canvas is drawn at 1920 × 1080 in pixels and scaled to the stage (`.vi-fit`); the title lies over the book only
@@ -26,5 +35,9 @@ Rules:
   file (`ffmpeg -af ebur128`), never by playing it on this Mac – and say so.
 - The Browser pane, when hidden, throttles frames and `seek` never resolves there: look at frames with
   `bun run video intro --shots 0.9,2.8,4.4` (PNGs in `video-out/`, which git ignores) instead.
+- A picture shown in a video has no words in it (the outro shows counting, not the letters game's „Affe“): one picture
+  serves the video in every language, and its words are the video's own, in its language.
+- A QR code is checked by decoding the rendered frame, also scaled down to 480 × 270 as on a television across the room
+  (CoreImage's `CIDetector` in a small Swift script does it on this Mac), never only by looking at it.
 - Only the app's own pictures and drawings; a new Gemini picture for a video goes into the picture queue and fills a
   sheet like every other (`/bild-erzeugen`).
