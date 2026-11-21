@@ -26,6 +26,7 @@ import { Prep, PREP_CUES, PREP_MS, PREP_RECORDINGS, TIDY_RECORDINGS } from "./pr
 import type { TeethSettings } from "./settings";
 import { GRIN_VIEW, STEPS, stepText } from "./steps";
 import { sungLanguageFor } from "./sung";
+import { DrawnSymbol, hasDrawnSymbol } from "./barSymbols";
 import { type TeethSymbol, teethSymbol } from "./symbols";
 import { Week } from "./week";
 import voiceFiles from "./stimme/**/*.mp3?glob";
@@ -209,10 +210,11 @@ function preludeTiles(prelude: Prelude[]): { phase: BarPhase; parts: Prelude[] }
   return tiles;
 }
 
-/** A symbol of the bar, or its empty place while its picture is not made yet (never an emoji instead). */
+/** A symbol of the bar: its painted picture, its drawn stand-in while the picture waits, else an empty place (never an emoji). */
 function BarSymbol({ name }: { name: TeethSymbol | null }) {
   const src = name && teethSymbol(name);
-  return src ? <img className="teeth-symbol" src={src} alt="" draggable={false} aria-hidden /> : <span className="teeth-symbol" aria-hidden />;
+  if (src) return <img className="teeth-symbol" src={src} alt="" draggable={false} aria-hidden />;
+  return name && hasDrawnSymbol(name) ? <DrawnSymbol name={name} /> : <span className="teeth-symbol" aria-hidden />;
 }
 
 /** One phase outside the brushing on the bar: its symbol beside a groove that fills as the time goes by. */
@@ -516,11 +518,13 @@ export function TeethPlay({ settings, video }: { settings: TeethSettings; video?
   } as CSSProperties;
 
   /**
-   * Tapping or dragging on the progress bar jumps to the start of the section under the finger (`sectionStart`), before,
-   * while or after brushing: a part of the prelude, a step, or the end's cheer and tidying. Dragging jumps only when it
-   * reaches another section, so a section is never started again and again under a moving finger.
+   * Tapping or dragging on the progress bar plays the groove under the finger from its start (`sectionStart`), before,
+   * while or after brushing: eating sweets from the first sweet, getting the brush from the cup, a step, or the end's
+   * cheer and tidying – the groove as it is seen, never a part hidden inside it (a tap low on the sweets' groove once
+   * started only the monsters growing, user feedback, November 2026). Dragging jumps only when it reaches another
+   * groove, so one is never started again and again under a moving finger.
    */
-  const sectionStarts = [...prelude.map((p) => preludeStart(prelude, p)), ...stepParts.map(([start]) => start), tidyPart[0]];
+  const sectionStarts = segments.map(([start]) => start);
   const lastSection = useRef<number | null>(null);
   const seekFromPointer = (e: PointerEvent<HTMLDivElement>, first: boolean) => {
     const parts = [...e.currentTarget.querySelectorAll(".teeth-segment")];
@@ -636,12 +640,8 @@ export function TeethPlay({ settings, video }: { settings: TeethSettings; video?
         </div>
       ) : (
         <>
-          {/* The week shows before brushing too, which star is to come (not during the story, nor on a phone, where the pictures need the room); while brushing, the mouth gets its room. */}
-          {before && before !== "sweets" && before !== "grow" && settings.week && (
-            <div className="teeth-week-before">
-              <Week log={week} today={new Date()} now={daytime} />
-            </div>
-          )}
+          {/* The week waits for the end: beside the sink it took the picture's room, and beside the first look in the
+              mirror it pushed the face aside, which jumped to the middle as the brushing began (user feedback, November 2026). */}
           <div className="teeth-controls">
             <button type="button" className="teeth-button" onClick={togglePause} aria-label={paused ? t(GO_ON) : t(PAUSE)}>
               <ControlIcon kind={paused ? "play" : "pause"} className="teeth-button-icon" />

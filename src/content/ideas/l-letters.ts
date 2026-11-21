@@ -175,6 +175,7 @@ export const lettersIdeas: IdeaArea = {
       text: "Option von „Nur Zahlen“: Die gedrückten Ziffern erscheinen auf dem Display eines großen Spielzeug-Telefons, jede mit ihrem Ton. Nach vier Ziffern klingelt es, und Oma Bär oder Opa Fuchs geht ran: „Hallo! Schön, dass du anrufst!“ (Aufnahme). Passt zu N-27 Tier-Telefon.",
       why: "Ziffern bekommen einen Sinn aus dem Alltag: Kinder lieben es, wie Mama zu wählen.",
       effort: "M",
+      rejected: true,
     },
     {
       id: "L-20",
@@ -183,6 +184,7 @@ export const lettersIdeas: IdeaArea = {
       text: "Der Buchstabe zerfällt in zwei oder drei große Teile, die daneben liegen; das Kind zieht sie zurück an ihren Platz (ein Teil rastet schon nahe dran ein). Ist er ganz, wird er lebendig (L-10) und sagt sein Wort. Als Option von „Frei tippen“ oder auf dem Tablet ganz ohne Tastatur.",
       why: "Die Form des Buchstabens wird begriffen, nicht nur gesehen: Strich, Bogen, Bauch.",
       effort: "M",
+      rejected: true,
     },
     {
       id: "L-21",
@@ -191,6 +193,7 @@ export const lettersIdeas: IdeaArea = {
       text: "Nach dem Nachspuren (L-11) oder auf Tippen klettert das Fuchskind auf den Buchstaben und rutscht seine Linie in Schreibrichtung hinunter, Papa Fuchs fängt es unten auf. Bei O dreht es eine Runde, bei M hüpft es über die Spitzen.",
       why: "Bringt die Maskottchen ins Spiel (Tabelle Fuchs & Bär) und zeigt nebenbei, wie der Buchstabe geschrieben wird.",
       effort: "M",
+      rejected: true,
     },
     {
       id: "L-22",

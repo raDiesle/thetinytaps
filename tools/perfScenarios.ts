@@ -208,8 +208,10 @@ export const SCENARIOS: Scenario[] = [
   { name: "belohnungstafel", path: "/belohnungstafel/", parts: [{ label: "Sterne kleben", before: [START, { wait: 1500 }], ms: 6000, tap: TAPS }] },
   // The timer's pictures in their order on its start screen, each running for a while with a tap now and then (the
   // steam, the twinkling, the flame, what is left lighting up), the moon setting and the sun rising, the pizza's slices
-  // lifted off, the ladybug crawling round the red disc, the alarm clock's digits ticking and in „Abwechseln“ the
-  // lamps drawing who begins and the hourglass running. Each card is tapped by its name (its tooltip), so the cards' order and groups may change.
+  // lifted off, the ladybug crawling round the red disc, the alarm clock's digits ticking, the toy crane carrying toys
+  // into the box, in „Abwechseln“ the lamps drawing who begins and the hourglass running, and on the Wippe the sides
+  // drawing and the seesaw tipping slowly with the toy bouncing on its seat. Each card is tapped by its name (its
+  // tooltip), so the cards' order and groups may change.
   ...(
     [
       ["scheibe", "Rote Scheibe"],
@@ -219,10 +221,13 @@ export const SCENARIOS: Scenario[] = [
       ["blume", "Blume"],
       ["pizza", "Pizza"],
       ["wecker", "Wecker"],
+      // Tidy Up is English only so far, so its card is named so in the German app too.
+      ["aufraeumen", "Tidy Up"],
       ["zug", "Zug zum Bahnhof"],
       ["raupe", "Raupe"],
       ["sonne", "Sonnenaufgang"],
       ["abwechseln", "Abwechseln"],
+      ["wippe", "Seesaw"],
     ] as const
   ).map(([name, title]) => ({
     name: `timer-${name}`,
@@ -241,6 +246,14 @@ export const SCENARIOS: Scenario[] = [
         ms: 10000,
         tap: { selector: ".tm-play", every: 1500 },
       },
+    ],
+  },
+  // The Wippe with short turns: the seat touching down, the toy hopping up onto the other seat and the plank turning back.
+  {
+    name: "timer-wippe-wechsel",
+    path: "/timer/?sekunden=5",
+    parts: [
+      { label: "Auslosen und Wechsel", before: [{ tap: `.mode-card[title^="Seesaw"]` }, { wait: 500 }], ms: 10000, tap: { selector: ".tm-play", every: 1500 } },
     ],
   },
   // The Apfelbaum's harvest, sped up: bees buzzing, apples ripening and falling into the cart the bear child pushes.

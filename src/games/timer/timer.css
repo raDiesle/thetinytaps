@@ -1576,6 +1576,107 @@
   }
 }
 
+/* Wippe (H-109): the plank turns round its pivot as one layer, back and forth for ever, one turn each way (`--tm-ms`,
+   started `--tm-delay` ago); the toy riding on it turns back the same way and stays upright. Two names of the same
+   keyframes, so the motion starts anew whenever the turns do (`round`). Before the turns run and at the end it turns
+   slowly to its place instead. */
+.tm-saw,
+.tm-saw-upright {
+  transition: transform 1.2s ease-in-out;
+}
+
+.tm-saw-a {
+  animation: tm-saw-a var(--tm-ms) linear var(--tm-delay) infinite var(--tm-saw-dir) both;
+}
+
+.tm-saw-b {
+  animation: tm-saw-b var(--tm-ms) linear var(--tm-delay) infinite var(--tm-saw-dir) both;
+}
+
+.tm-saw-upright.tm-saw-a {
+  animation-name: tm-saw-back-a;
+}
+
+.tm-saw-upright.tm-saw-b {
+  animation-name: tm-saw-back-b;
+}
+
+@keyframes tm-saw-a {
+  from {
+    transform: rotate(var(--tm-tilt));
+  }
+  to {
+    transform: rotate(calc(-1 * var(--tm-tilt)));
+  }
+}
+
+@keyframes tm-saw-b {
+  from {
+    transform: rotate(var(--tm-tilt));
+  }
+  to {
+    transform: rotate(calc(-1 * var(--tm-tilt)));
+  }
+}
+
+@keyframes tm-saw-back-a {
+  from {
+    transform: rotate(calc(-1 * var(--tm-tilt)));
+  }
+  to {
+    transform: rotate(var(--tm-tilt));
+  }
+}
+
+@keyframes tm-saw-back-b {
+  from {
+    transform: rotate(calc(-1 * var(--tm-tilt)));
+  }
+  to {
+    transform: rotate(var(--tm-tilt));
+  }
+}
+
+.tm-saw-toy {
+  position: absolute;
+  transition: transform 1.2s ease-in-out;
+}
+
+.tm-saw-upright {
+  transform-origin: 50% 100%;
+}
+
+.tm-saw-toy div,
+.tm-saw-toy svg {
+  display: block;
+  width: 100%;
+  height: 100%;
+}
+
+/* Every second the toy bounces softly on its seat (H-63), as a child does on a seesaw. */
+.tm-saw-bob {
+  animation: tm-saw-bob 1s ease-in-out infinite;
+}
+
+@keyframes tm-saw-bob {
+  40% {
+    transform: translateY(-9%);
+  }
+  70% {
+    transform: translateY(1%);
+  }
+}
+
+.tm-saw-goal {
+  position: absolute;
+  inset: 0;
+  border-radius: 50%;
+  background: radial-gradient(closest-side, rgb(255 246 190 / 0.95), rgb(255 230 140 / 0.55) 65%, transparent);
+  opacity: 0;
+  pointer-events: none;
+  animation: tm-left 1.6s ease-out;
+}
+
 /* Boxes the sun, the moon, the stalk and what is still to grow move in, cut off where the hills or the soil begin. */
 .tm-sky-box {
   overflow: hidden;
@@ -2037,4 +2138,122 @@
 /* Once `holdAt` has put the card's look at the middle of its run, nothing in it moves any more. */
 .tm-card-art.tm-still * {
   animation: none !important;
+}
+
+/* Tidy Up (H-118, tidy.tsx): a toy crane takes the toys off the rug one by one and lets each fall into the toy box.
+   The trolley's way, the rope, the claw, its fingers and each toy's way are keyframes written for the run
+   (`TidyKeyframes`), so they move in step; at the end everything stands where the last toy left it. */
+.tm-toy,
+.tm-tidy-trolley,
+.tm-tidy-rope,
+.tm-tidy-claw,
+.tm-tidy-finger {
+  will-change: transform;
+  animation: var(--tm-anim) var(--tm-ms) linear both;
+}
+
+/* The trolley's own drawing lies over the rope and the claw hanging from it. */
+.tm-tidy-trolley > svg {
+  position: relative;
+}
+
+.tm-tidy-rope {
+  position: absolute;
+  border-radius: 3px;
+  background: #3b2a20;
+  transform-origin: top;
+}
+
+.tm-tidy-claw {
+  position: absolute;
+}
+
+/* The claw sways a little once a second (H-63), so even a long run never looks stuck. */
+.tm-tidy-sway {
+  position: absolute;
+  inset: 0;
+  transform-origin: 50% 0;
+  animation: tm-tidy-sway 1s ease-in-out infinite;
+}
+
+@keyframes tm-tidy-sway {
+  25% {
+    transform: rotate(1.5deg);
+  }
+  75% {
+    transform: rotate(-1.5deg);
+  }
+}
+
+.tm-tidy-sway svg {
+  position: absolute;
+  inset: 0;
+  display: block;
+  width: 100%;
+  height: 100%;
+  overflow: visible;
+}
+
+/* Each finger turns round its pivot on the claw's head: out when open, in round the toy when gripping. */
+.tm-tidy-finger {
+  position: absolute;
+  inset: 0;
+}
+
+.tm-tidy-left {
+  --tm-side: 1;
+  transform-origin: 32.86% 34%;
+}
+
+.tm-tidy-right {
+  --tm-side: -1;
+  transform-origin: 67.14% 34%;
+}
+
+/* What still lies on the floor lights at a tap (H-51); a toy the claw has taken no longer does. */
+.tm-toy-left {
+  position: absolute;
+  inset: 0;
+  animation: tm-toy-taken 1ms linear var(--tm-at) forwards;
+}
+
+@keyframes tm-toy-taken {
+  to {
+    visibility: hidden;
+  }
+}
+
+.tm-toy-left .tm-left-glow {
+  inset: -18%;
+  border-radius: 50%;
+  background: radial-gradient(closest-side, rgb(255 246 190 / 0.9), rgb(255 230 140 / 0.5) 70%, transparent);
+}
+
+.tm-done .tm-toy,
+.tm-done .tm-tidy-trolley,
+.tm-done .tm-tidy-rope,
+.tm-done .tm-tidy-claw,
+.tm-done .tm-tidy-sway,
+.tm-done .tm-tidy-finger {
+  animation: none;
+}
+
+.tm-done .tm-toy {
+  transform: var(--tm-end);
+}
+
+.tm-done .tm-toy-left {
+  visibility: hidden;
+}
+
+.tm-done .tm-tidy-trolley {
+  transform: translateX(var(--tm-trolley-end));
+}
+
+.tm-done .tm-tidy-rope {
+  transform: scaleY(var(--tm-rope-rest));
+}
+
+.tm-done .tm-tidy-finger {
+  transform: rotate(calc(var(--tm-side) * 24deg));
 }

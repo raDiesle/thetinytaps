@@ -1,6 +1,7 @@
 import { memo, useLayoutEffect, useRef, useState } from "react";
 import { pieceCount, MAX_STOPS } from "./pieces";
 import type { SwapToy, TimerPicture } from "./settings";
+import { SAW, Seesaw, SeesawBackdrop, SeesawStand } from "./seesaw";
 import { SwapBackdrop, SwapCushions, SwapHourglass, SwapLight, SwapShade, Toy } from "./swap";
 import { SceneParts, stageStyle } from "./TimerPlay";
 
@@ -14,10 +15,11 @@ const CARD_MS = 5 * 60_000;
 const MIDDLE = 0.5;
 
 /**
- * Pictures whose middle shows little take a later moment, as a share of the run: the Sonnenaufgang's moon has set at
- * the middle and its sun not yet risen.
+ * Pictures whose middle shows little take another moment, as a share of the run: the Sonnenaufgang's moon has set at
+ * the middle and its sun not yet risen, and the Wippe lies nearly level there, so its card shows the fox child's seat
+ * still well up.
  */
-const LATER: Partial<Record<TimerPicture, number>> = { sunset: 0.68 };
+const LATER: Partial<Record<TimerPicture, number>> = { sunset: 0.68, seesaw: 0.25 };
 
 /**
  * Stops a card's drawing `at` ms into its run: every animation in it is put at that moment, its look there written into
@@ -44,7 +46,8 @@ function holdAt(card: HTMLElement | null, at: number) {
  * the picture is the button, no words on it; the middle rather than the end, user feedback, November 2026) – the tree
  * full of apples with the cart under them, the train halfway to the station, the leaf half eaten. It is the very drawing
  * of a run (`SceneParts`, started `MIDDLE` of it ago – `LATER` for a few), stopped at that moment by `holdAt`. „Abwechseln“ shows the fox
- * child's lamp on, the toy on its cushion and the hourglass half run.
+ * child's lamp on, the toy on its cushion and the hourglass half run; the Wippe the fox child's side in the light, its seat
+ * with the toy on it on its way down.
  */
 export const TimerCardArt = memo(function TimerCardArt({ picture, toy }: { picture: TimerPicture; toy: SwapToy }) {
   const at = CARD_MS * (LATER[picture] ?? MIDDLE);
@@ -61,6 +64,13 @@ export const TimerCardArt = memo(function TimerCardArt({ picture, toy }: { pictu
           <SwapShade kind="bear" on />
           <SwapHourglass ms={CARD_MS} startedAt={startedAt + at} flip={false} waiting={false} glow={0} />
           <Toy toy={toy} place="fox" />
+        </span>
+      ) : picture === "seesaw" ? (
+        <span className="tm-stage">
+          <SeesawBackdrop />
+          <SwapShade kind="bear" on edge={SAW.x} />
+          <SeesawStand />
+          <Seesaw toy={toy} place="fox" hop={0} running first="fox" turnMs={CARD_MS} startedAt={startedAt + at} round={0} />
         </span>
       ) : (
         <span className="tm-stage" style={stageStyle(picture, CARD_MS, pieceCount(CARD_MS, MAX_STOPS))}>

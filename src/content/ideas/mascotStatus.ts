@@ -45,7 +45,7 @@ export interface MascotStatusRow {
 export const MASCOT_STATUS: MascotStatusRow[] = [
   {
     href: "/timer/",
-    note: "Kein Fuchs und kein Bär mehr im Bild (Feedback November 2026: die gezeichneten Kinder sahen komisch aus). Beim Abwechseln liegen dafür zwei Sitzkissen in Fuchs- und Bärenfarbe, mit Fuchs- und Bärenohren. „Tennis“, wo Fuchskind und Bärenkind spielten, ist wieder raus (Wunsch 21. November 2026).",
+    note: "Kein Fuchs und kein Bär mehr im Bild (Feedback November 2026: die gezeichneten Kinder sahen komisch aus). Beim Abwechseln liegen dafür zwei Sitzkissen in Fuchs- und Bärenfarbe, mit Fuchs- und Bärenohren – auf dem Boden neben der Sanduhr und auf den Sitzen der Wippe (H-109). „Tennis“, wo Fuchskind und Bärenkind spielten, ist wieder raus (Wunsch 21. November 2026).",
     tasks: [
       {
         label: "Fuchs- oder Bärenkind, wo es im Bild etwas tut (Erntewagen, Gartenschlauch, Kerze, Abwechseln)",
