@@ -61,9 +61,14 @@ if (!push("origin", "main")) {
 
 // Main holds the branch now: its remote copy goes, and the session goes on from main under the same name, so the next
 // task starts from the newest state and pushes to a fresh branch of that name.
-if (git("ls-remote", "--heads", "origin", branch)) {
-  if (!push("origin", "--delete", branch)) console.log(`\nship: main is pushed, but deleting origin/${branch} failed – delete it by hand`);
-}
+// The cloud's git proxy may refuse deleting a branch (HTTP 403, a policy, not the network: November 2026), so it is tried
+// once, and the last line says truthfully whether the branch is gone – the user deletes it on GitHub otherwise.
+let cleaned = !git("ls-remote", "--heads", "origin", branch);
+if (!cleaned) cleaned = run("git", ["push", "origin", "--delete", branch]);
 run("git", ["checkout", "-B", branch, "main"]);
 git("branch", "--unset-upstream");
-console.log(`\nship: OK – main pushed, origin/${branch} cleaned up`);
+console.log(
+  cleaned
+    ? `\nship: OK – main pushed, origin/${branch} deleted`
+    : `\nship: OK – main pushed; deleting origin/${branch} was refused here, so the user deletes it on GitHub (main holds all of it)`,
+);

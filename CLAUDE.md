@@ -67,7 +67,7 @@ In a fresh worktree run `bun install` first.
   never push (and don't offer to – pushing is the user's move). **A Claude cloud session ships instead** (user request,
   21 November 2026): after every task it finished well it commits and runs `bun run ship` (`tools/ship.ts`, only where
   `CLAUDE_CODE_REMOTE` is set), which merges `origin/main` into the branch, verifies, fast-forwards `main`, pushes it
-  and deletes the session's branch on GitHub once `main` holds it – no question asked. It stops on a dirty tree, a failed
+  and deletes the session's branch on GitHub once `main` holds it – no question asked (where the cloud's git proxy refuses the deletion, HTTP 403, it says so and the user deletes the branch on GitHub). It stops on a dirty tree, a failed
   verify, a conflict or a refused push and changes nothing then: fix it and run it again, or, where pushing `main` is
   refused, leave the pushed branch and tell the user to merge it. It never forces or rewrites history (`ship.test.ts`). Other sessions merge into `main` all the time: merge `main` into your branch and verify there first, and when the merge into `main` still conflicts, `git merge --abort` it there at once and resolve on your branch – never resolve conflicts in the main checkout or leave it half-merged. Each session may run a dev server on its own
   port, so when you hand merged work over, name the URL of the one running from the repo root (local `main`) –
