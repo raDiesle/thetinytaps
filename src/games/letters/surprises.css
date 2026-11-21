@@ -1,0 +1,564 @@
+/* Frei tippen's surprises (Surprises.tsx): each a few small HTML layers, moved only by transform and opacity, so an old
+   phone rasters each once and only moves it. Every animation runs once and ends before the surprise is removed
+   (`SURPRISE.lifeMs`). --s is the surprise's size in px. */
+
+.ft-layer {
+  position: absolute;
+  inset: 0;
+  overflow: hidden;
+  pointer-events: none;
+}
+
+.ft-at {
+  position: absolute;
+  width: 0;
+  height: 0;
+}
+
+.ft-at > *,
+.ft-burst > *,
+.ft-gift-box > *,
+.ft-egg-box > *,
+.ft-flower > * {
+  position: absolute;
+  will-change: transform, opacity;
+}
+
+/* ---------- Firework: a rocket rises to the spot, then one or more bursts of sparks. ---------- */
+
+.ft-rocket {
+  left: calc(var(--s) * -0.015);
+  top: calc(var(--s) * -0.06);
+  width: calc(var(--s) * 0.03);
+  height: calc(var(--s) * 0.12);
+  border-radius: 999px;
+  background: linear-gradient(to top, #fff8d000, #fff8d0 70%, #ffffff);
+  animation: ft-rocket 0.45s ease-out both;
+}
+
+@keyframes ft-rocket {
+  0% {
+    transform: translateY(var(--rise));
+    opacity: 0;
+  }
+  15% {
+    opacity: 1;
+  }
+  90% {
+    transform: translateY(0);
+    opacity: 1;
+  }
+  100% {
+    transform: translateY(0);
+    opacity: 0;
+  }
+}
+
+.ft-burst {
+  position: absolute;
+  width: 0;
+  height: 0;
+}
+
+.ft-flash {
+  left: calc(var(--s) * -0.25);
+  top: calc(var(--s) * -0.25);
+  width: calc(var(--s) * 0.5);
+  height: calc(var(--s) * 0.5);
+  border-radius: 50%;
+  background: radial-gradient(circle, #ffffff 0, var(--c) 25%, #ffffff00 68%);
+  animation: ft-flash 0.5s ease-out var(--delay) both;
+}
+
+@keyframes ft-flash {
+  0% {
+    transform: scale(0.2);
+    opacity: 0;
+  }
+  20% {
+    opacity: 0.9;
+  }
+  100% {
+    transform: scale(1.4);
+    opacity: 0;
+  }
+}
+
+.ft-spark {
+  --d: calc(var(--s) * 0.07);
+  left: calc(var(--d) / -2);
+  top: calc(var(--d) / -2);
+  width: var(--d);
+  height: var(--d);
+  border-radius: 50%;
+  background: var(--c);
+  box-shadow: 0 0 calc(var(--d) * 0.7) var(--c);
+  animation: ft-spark var(--dur) cubic-bezier(0.15, 0.7, 0.3, 1) var(--delay) both;
+}
+
+.ft-spark.star {
+  --d: calc(var(--s) * 0.085);
+  border-radius: 0;
+  box-shadow: none;
+  clip-path: polygon(50% 0, 61% 35%, 98% 35%, 68% 57%, 79% 91%, 50% 70%, 21% 91%, 32% 57%, 2% 35%, 39% 35%);
+}
+
+.ft-spark.diamond {
+  --d: calc(var(--s) * 0.07);
+  border-radius: 0;
+  box-shadow: none;
+  clip-path: polygon(50% 0, 100% 50%, 50% 100%, 0 50%);
+}
+
+.ft-spark.sparkle {
+  --d: calc(var(--s) * 0.09);
+  border-radius: 0;
+  box-shadow: none;
+  clip-path: polygon(50% 0, 60% 40%, 100% 50%, 60% 60%, 50% 100%, 40% 60%, 0 50%, 40% 40%);
+}
+
+@keyframes ft-spark {
+  0% {
+    transform: translate(0, 0) scale(0.4);
+    opacity: 0;
+  }
+  6% {
+    opacity: 1;
+  }
+  60% {
+    transform: translate(var(--x), var(--y)) scale(1);
+    opacity: 1;
+  }
+  100% {
+    transform: translate(var(--x), calc(var(--y) + var(--fall))) scale(0.5);
+    opacity: 0;
+  }
+}
+
+/* ---------- Present: it pops up, wiggles, the lid flies off and a toy comes out. ---------- */
+
+.ft-gift-box {
+  left: calc(var(--s) * -0.4);
+  top: calc(var(--s) * -0.45);
+  width: calc(var(--s) * 0.8);
+  height: calc(var(--s) * 0.8);
+  transform-origin: 50% 100%;
+  animation: ft-gift-box 2.6s linear both;
+}
+
+@keyframes ft-gift-box {
+  0% {
+    transform: scale(0);
+    opacity: 0;
+  }
+  10% {
+    transform: scale(1.08);
+    opacity: 1;
+  }
+  15% {
+    transform: scale(1);
+  }
+  86% {
+    transform: scale(1);
+    opacity: 1;
+  }
+  100% {
+    transform: scale(0.92);
+    opacity: 0;
+  }
+}
+
+.ft-gift-shake {
+  inset: 0;
+  transform-origin: 50% 100%;
+  animation: ft-gift-shake 2.6s linear both;
+}
+
+@keyframes ft-gift-shake {
+  0%,
+  17% {
+    transform: none;
+  }
+  21% {
+    transform: rotate(-7deg);
+  }
+  25% {
+    transform: rotate(7deg);
+  }
+  29% {
+    transform: rotate(-5deg);
+  }
+  33%,
+  100% {
+    transform: none;
+  }
+}
+
+.ft-gift-body {
+  position: absolute;
+  left: 0;
+  top: 40%;
+  width: 100%;
+  height: 60%;
+}
+
+.ft-gift-lid {
+  position: absolute;
+  left: 0;
+  top: 0;
+  width: 100%;
+  height: 40%;
+  will-change: transform, opacity;
+  animation: ft-gift-lid 2.6s ease-out both;
+}
+
+@keyframes ft-gift-lid {
+  0%,
+  33% {
+    transform: none;
+    opacity: 1;
+  }
+  46% {
+    transform: translate(var(--lx), -70%) rotate(var(--lr));
+    opacity: 1;
+  }
+  60%,
+  100% {
+    transform: translate(calc(var(--lx) * 1.6), -110%) rotate(calc(var(--lr) * 1.6));
+    opacity: 0;
+  }
+}
+
+.ft-gift-thing {
+  left: 0;
+  right: 0;
+  top: 30%;
+  text-align: center;
+  font-size: calc(var(--s) * 0.42);
+  line-height: 1;
+  animation: ft-gift-thing 2.6s ease-out both;
+}
+
+@keyframes ft-gift-thing {
+  0%,
+  33% {
+    transform: translateY(40%) scale(0.3);
+    opacity: 0;
+  }
+  36% {
+    opacity: 1;
+  }
+  48% {
+    transform: translateY(-70%) scale(1.25);
+    opacity: 1;
+  }
+  55%,
+  100% {
+    transform: translateY(-60%) scale(1);
+    opacity: 1;
+  }
+}
+
+/* ---------- Egg: it wobbles, cracks, its top flies off and a baby animal looks out. ---------- */
+
+.ft-egg-box {
+  left: calc(var(--s) * -0.3);
+  top: calc(var(--s) * -0.38);
+  width: calc(var(--s) * 0.6);
+  height: calc(var(--s) * 0.72);
+  transform-origin: 50% 100%;
+  animation: ft-egg-box 2.8s linear both;
+}
+
+@keyframes ft-egg-box {
+  0% {
+    transform: scale(0);
+    opacity: 0;
+  }
+  9% {
+    transform: scale(1.06);
+    opacity: 1;
+  }
+  13% {
+    transform: scale(1);
+  }
+  87% {
+    transform: scale(1);
+    opacity: 1;
+  }
+  100% {
+    transform: scale(0.92);
+    opacity: 0;
+  }
+}
+
+.ft-egg-shake {
+  inset: 0;
+  transform-origin: 50% 95%;
+  animation: ft-egg-shake 2.8s linear both;
+}
+
+@keyframes ft-egg-shake {
+  0%,
+  14% {
+    transform: none;
+  }
+  18% {
+    transform: rotate(-8deg);
+  }
+  22% {
+    transform: rotate(8deg);
+  }
+  26% {
+    transform: rotate(-8deg);
+  }
+  30% {
+    transform: rotate(8deg);
+  }
+  34% {
+    transform: rotate(-4deg);
+  }
+  38%,
+  100% {
+    transform: none;
+  }
+}
+
+.ft-egg-top,
+.ft-egg-bottom {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+}
+
+.ft-egg-top {
+  will-change: transform, opacity;
+  animation: ft-egg-top 2.8s ease-out both;
+}
+
+@keyframes ft-egg-top {
+  0%,
+  41% {
+    transform: none;
+    opacity: 1;
+  }
+  52% {
+    transform: translate(var(--tx), -45%) rotate(var(--tr));
+    opacity: 1;
+  }
+  64%,
+  100% {
+    transform: translate(calc(var(--tx) * 1.5), -75%) rotate(calc(var(--tr) * 1.5));
+    opacity: 0;
+  }
+}
+
+.ft-egg-baby {
+  left: -20%;
+  right: -20%;
+  top: 22%;
+  text-align: center;
+  font-size: calc(var(--s) * 0.4);
+  line-height: 1;
+  animation: ft-egg-baby 2.8s ease-out both;
+}
+
+@keyframes ft-egg-baby {
+  0%,
+  41% {
+    transform: translateY(40%) scale(0.3);
+    opacity: 0;
+  }
+  44% {
+    opacity: 1;
+  }
+  52% {
+    transform: translateY(-38%) scale(1.2);
+    opacity: 1;
+  }
+  58%,
+  100% {
+    transform: translateY(-30%) scale(1);
+    opacity: 1;
+  }
+}
+
+/* ---------- Balloons: they rise, sway and pop. ---------- */
+
+.ft-balloon {
+  left: calc(var(--bx) - var(--s) * 0.13);
+  top: calc(var(--s) * -0.24);
+  width: calc(var(--s) * 0.26);
+  height: calc(var(--s) * 0.48);
+  transform-origin: 50% 30%;
+  animation: ft-balloon var(--dur) ease-in-out both;
+}
+
+@keyframes ft-balloon {
+  0% {
+    transform: translateY(30%) scale(0.2);
+    opacity: 0;
+  }
+  12% {
+    transform: translateY(0) scale(1);
+    opacity: 1;
+  }
+  50% {
+    transform: translate(calc(var(--drift) * -0.5), calc(var(--rise) * 0.45)) rotate(calc(var(--turn) * -1));
+  }
+  80% {
+    transform: translate(var(--drift), var(--rise)) rotate(var(--turn)) scale(1);
+    opacity: 1;
+  }
+  84% {
+    transform: translate(var(--drift), var(--rise)) rotate(var(--turn)) scale(1.3);
+    opacity: 0.6;
+  }
+  87%,
+  100% {
+    transform: translate(var(--drift), var(--rise)) rotate(var(--turn)) scale(1.5);
+    opacity: 0;
+  }
+}
+
+/* ---------- Flowers: a stem grows, then the flower opens. ---------- */
+
+.ft-flower {
+  position: absolute;
+  top: calc(var(--s) * 0.35);
+  width: 0;
+  height: 0;
+}
+
+.ft-stem {
+  left: calc(var(--s) * -0.06);
+  bottom: 0;
+  width: calc(var(--s) * 0.12);
+  height: var(--h);
+  transform-origin: 50% 100%;
+  animation: ft-stem 2.5s ease-out var(--delay) both;
+}
+
+@keyframes ft-stem {
+  0% {
+    transform: scaleY(0);
+    opacity: 1;
+  }
+  24% {
+    transform: scaleY(1);
+  }
+  86% {
+    transform: scaleY(1);
+    opacity: 1;
+  }
+  100% {
+    transform: scaleY(1);
+    opacity: 0;
+  }
+}
+
+.ft-head {
+  left: calc(var(--s) * -0.22);
+  top: calc(-1 * var(--h) - var(--s) * 0.2);
+  width: calc(var(--s) * 0.44);
+  height: calc(var(--s) * 0.44);
+  animation: ft-head 2.5s ease-out var(--delay) both;
+}
+
+@keyframes ft-head {
+  0%,
+  20% {
+    transform: scale(0) rotate(-90deg);
+    opacity: 1;
+  }
+  38% {
+    transform: scale(1.15) rotate(10deg);
+  }
+  46% {
+    transform: scale(1) rotate(0);
+    opacity: 1;
+  }
+  86% {
+    transform: scale(1) rotate(0);
+    opacity: 1;
+  }
+  100% {
+    transform: scale(0.9) rotate(0);
+    opacity: 0;
+  }
+}
+
+/* ---------- Soap bubbles: they drift up and pop one after the other. ---------- */
+
+.ft-bubble {
+  border-radius: 50%;
+  border: 3px solid #5b9bd5cc;
+  background: radial-gradient(circle at 32% 30%, #ffffff 0 10%, #ffffff55 22%, #8fd0ff55 60%, #ff8fd899 100%);
+  box-shadow:
+    inset 0 0 8px #ffffffcc,
+    0 0 0 1px #ffffff99;
+  animation: ft-bubble var(--dur) ease-out var(--delay) both;
+}
+
+@keyframes ft-bubble {
+  0% {
+    transform: translate(0, 0) scale(0.2);
+    opacity: 0;
+  }
+  12% {
+    transform: translate(calc(var(--bx) * 0.1), calc(var(--by) * 0.1)) scale(1);
+    opacity: 1;
+  }
+  86% {
+    transform: translate(var(--bx), var(--by)) scale(1);
+    opacity: 1;
+  }
+  93%,
+  100% {
+    transform: translate(var(--bx), var(--by)) scale(1.35);
+    opacity: 0;
+  }
+}
+
+/* ---------- Rainbow: it grows over the spot, stays a moment and fades. ---------- */
+
+.ft-rainbow-tilt {
+  left: calc(var(--w) * -0.5);
+  top: calc(var(--w) * -0.4);
+  width: var(--w);
+  height: calc(var(--w) * 0.55);
+  will-change: auto;
+}
+
+.ft-rainbow {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  transform-origin: 50% 100%;
+  will-change: transform, opacity;
+  animation: ft-rainbow 2.6s ease-out both;
+}
+
+@keyframes ft-rainbow {
+  0% {
+    transform: translateY(15%) scale(0.3);
+    opacity: 0;
+  }
+  18% {
+    transform: translateY(0) scale(1.05);
+    opacity: 1;
+  }
+  24% {
+    transform: scale(1);
+  }
+  84% {
+    transform: scale(1);
+    opacity: 1;
+  }
+  100% {
+    transform: translateY(-6%) scale(1);
+    opacity: 0;
+  }
+}

@@ -127,7 +127,11 @@ export const SCENARIOS: Scenario[] = [
   {
     name: "buchstaben",
     path: "/buchstaben/",
-    parts: [{ label: "Tippen auf der Tastatur", before: [{ wait: 1500 }], ms: 8000, type: { keys: [..."abcmotx"], every: 500 } }],
+    parts: [
+      { label: "Tippen auf der Tastatur", before: [{ wait: 1500 }], ms: 8000, type: { keys: [..."abcmotx"], every: 500 } },
+      // Keys that are no letter or number open a surprise each (firework, present, egg …), at most three at once.
+      { label: "Überraschungen", before: [{ wait: 1500 }], ms: 9000, type: { keys: [...",.-+#<*"], every: 600 } },
+    ],
   },
   {
     name: "zaehlen",
