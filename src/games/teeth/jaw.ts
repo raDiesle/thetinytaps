@@ -79,6 +79,11 @@ const UPPER_SCALE = 1.15;
 const OVERBITE = 7;
 const GAP_OPEN = 104;
 const GUM = 18;
+/**
+ * How far the gum's cheek-side wall reaches from the tooth's foot: far past the lips, which cut it off, so the gum
+ * always runs into the lips with no dark gap between them, seen from the front or the side (user feedback, November 2026).
+ */
+const GUM_CHEEK = 110;
 const SAMPLES = 4;
 /**
  * The gum line, as a share of the tooth's height from its base: the gum
@@ -231,7 +236,7 @@ function buildGum(jaw: Jaw, side: Side, n: number, open: number): GumPiece {
   const bottom = base - dir * GUM;
   const rim = (t: number) => base + (top - base) * (gumLine(n, Math.abs(t)) + GUM_OVERLAP);
   const outerRim = angles.map((t) => archPoint(jaw, t, -3, rim(t)));
-  const outerFoot = angles.map((t) => archPoint(jaw, t, -3, bottom));
+  const outerFoot = angles.map((t) => archPoint(jaw, t, -3, base - dir * GUM_CHEEK));
   const innerRim = angles.map((t) => archPoint(jaw, t, spec.depth + 4, rim(t)));
   const innerFoot = angles.map((t) => archPoint(jaw, t, spec.depth + 4, bottom));
   const center = mean([...outerRim, ...outerFoot, ...innerRim, ...innerFoot]);

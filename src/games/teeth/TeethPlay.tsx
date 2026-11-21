@@ -6,7 +6,7 @@ import { useNoBackgroundMusic } from "@/lib/backgroundMusic";
 import { useCommonSettings } from "@/lib/common";
 import { useDevice } from "@/lib/device";
 import { type Localized, useAppLanguage, useT, type Spoken, spokenIn } from "@/lib/language";
-import { loadRecordings, playChime, playCountNote, playDrumRoll, playPoof, playRecorded, playSqueak, playTusch } from "@/lib/sfx";
+import { loadRecordings, playChime, playCountNote, playDissolve, playDrumRoll, playRecorded, playSqueak, playTusch } from "@/lib/sfx";
 import { pageMoving, usePageStill } from "@/lib/pageMotion";
 import { finishRoutineStep } from "@/lib/routine";
 import { useTimers } from "@/lib/timers";
@@ -378,7 +378,7 @@ export function TeethPlay({ settings, video }: { settings: TeethSettings; video?
   }, [count, round]);
 
   useEffect(() => {
-    if (goneCount > lastGone.current) playPoof();
+    if (goneCount > lastGone.current) playDissolve();
     lastGone.current = goneCount;
   }, [goneCount]);
 

@@ -67,6 +67,15 @@ export function playPoof() {
   note({ from: PENTATONIC[7] * 2, duration: 0.3, type: "sine", volume: 0.08, delay: 0.18 });
 }
 
+/** "Pfffzzz…" – a little monster dissolves into fizzing sugar: a soft puff, then tiny bubbles popping up the scale. */
+export function playDissolve() {
+  note({ from: 700, to: 220, duration: 0.2, type: "sine", volume: 0.2 });
+  hiss({ from: 2400, to: 5200, duration: 0.6, volume: 0.05, delay: 0.08, q: 2 });
+  [2, 4, 3, 5, 6, 7].forEach((step, i) =>
+    note({ from: PENTATONIC[step] * 2, to: PENTATONIC[step] * 2.4, duration: 0.07, type: "sine", volume: 0.07, delay: 0.15 + i * 0.07 }),
+  );
+}
+
 /** A slow, soft lullaby falling down the scale, for good night. */
 export function playLullaby() {
   [5, 4, 2, 3, 1, 0].forEach((step, i) => note({ from: PENTATONIC[step], duration: 0.9, type: "sine", volume: 0.12, delay: i * 0.6 }));
