@@ -38,6 +38,11 @@ scene (see `/neue-szene`); use pictures for illustrations, cards and backdrops.
 
 ## Cheap first: the queue (always)
 
+**Parked pictures never go along** (user decision, November 2026): an idea marked `parked` in `src/content/ideas/`
+(🅿️ on `/management/`, e.g. H-88, the girl's pictures for „Aufs Töpfchen“) is never put into the queue, a sheet, a
+batch or a `--jobs` file with other pictures, and never offered – its pictures are made only when the user says the
+words its `parked` names. Filling a sheet or a batch is no such word.
+
 Pictures are always made as cheap as they can be (user decision, November 2026). A request costs the same whether
 it brings one picture or a sheet of two or four (`--grid`), so pictures of one kind wait until their sheet is full,
 and later sessions bring the partners.

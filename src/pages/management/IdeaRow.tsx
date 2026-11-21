@@ -39,11 +39,13 @@ export function IdeaRow({
         )}
         {idea.planned && isOpen(idea) && <span className="idea-planned">schon geplant</span>}
         {idea.rejected && <span className="idea-rejected">✗ abgelehnt</span>}
+        {idea.parked && isOpen(idea) && <span className="idea-parked">🅿️ geparkt</span>}
         {isOpen(idea) && <MarkButtons id={idea.id} marks={marks} onMark={onMark} />}
       </div>
       <p>{idea.text}</p>
       {idea.why && <p className="idea-why">💬 {idea.why}</p>}
       {idea.partial && <p className="idea-partial">Davon gebaut: {idea.partial}</p>}
+      {idea.parked && isOpen(idea) && <p className="idea-partial">🅿️ {idea.parked}</p>}
     </li>
   );
 }

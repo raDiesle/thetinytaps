@@ -17,6 +17,27 @@ import {
 } from "./jaw";
 import { GRIN_VIEW, STEPS } from "./steps";
 
+// The screen is held sideways, so the mouth is drawn wide: a tall open „Aaah“ left most of it to an empty palate and
+// drew the teeth small (user request, November 2026).
+describe("the mouth fills a screen held sideways", () => {
+  const extent = (open: number) => {
+    const lips = buildMouth(open).lips;
+    const xs = lips.map((p) => p[0]);
+    const ys = lips.map((p) => p[1]);
+    return { width: Math.max(...xs) - Math.min(...xs), height: Math.max(...ys) - Math.min(...ys) };
+  };
+
+  test("wide open, it is still clearly wider than tall", () => {
+    const { width, height } = extent(1);
+    expect(width / height).toBeGreaterThan(1.7);
+  });
+
+  test("with the teeth together, it is a broad grin", () => {
+    const { width, height } = extent(0);
+    expect(width / height).toBeGreaterThan(2.8);
+  });
+});
+
 describe("the teeth being brushed", () => {
   // As the mirror draws them: the step's faces that face the viewer, their line from end to end.
   const brushed = (step: (typeof STEPS)[number]) => {

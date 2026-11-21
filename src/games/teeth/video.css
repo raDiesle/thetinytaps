@@ -1,0 +1,108 @@
+/* ---------- Zähne putzen fürs Video (/management/video-zaehne/, for grown-ups) ---------- */
+
+/* The page is dark round a 16 : 9 stage as big as the window allows; only the stage is recorded (Region Capture). */
+.teeth-video {
+  position: fixed;
+  inset: 0;
+  display: grid;
+  place-items: center;
+  background: #111;
+  color: #2d2340;
+}
+
+/* While it plays the mouse pointer stays out of the picture. */
+.teeth-video.running {
+  cursor: none;
+}
+
+.teeth-video-stage {
+  position: relative;
+  width: min(100vw, calc(100dvh * 16 / 9));
+  aspect-ratio: 16 / 9;
+  overflow: hidden;
+  /* The brushing's own sky, so the first frames before the story are not black. */
+  background: linear-gradient(#c4f1ff, #fff4d6);
+}
+
+/* The choices before and the video after lie over the stage, and are gone before the recording starts. */
+.teeth-video-card {
+  position: absolute;
+  inset: auto;
+  width: min(92vw, 640px);
+  max-height: 92dvh;
+  overflow: auto;
+  padding: 18px 22px;
+  border-radius: 14px;
+  background: #fffdf6;
+  box-shadow: 0 10px 40px #0008;
+  line-height: 1.4;
+}
+
+.teeth-video-card h1 {
+  margin: 0 0 8px;
+  font-size: 1.5rem;
+}
+
+.teeth-video-card .menu-top {
+  float: left;
+  margin: 0 12px 4px 0;
+}
+
+.teeth-video-facts {
+  display: grid;
+  grid-template-columns: auto 1fr;
+  gap: 4px 14px;
+  margin: 10px 0 4px;
+}
+
+.teeth-video-facts dt {
+  font-weight: 700;
+}
+
+.teeth-video-facts dd {
+  margin: 0;
+}
+
+.teeth-video-small {
+  font-size: 0.9rem;
+  opacity: 0.8;
+}
+
+.teeth-video-warn {
+  color: #b3261e;
+}
+
+.teeth-video-choice,
+.teeth-video-actions {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 10px;
+  margin: 12px 0;
+}
+
+.teeth-video-card button {
+  padding: 8px 16px;
+  border: 2px solid #c9bfa8;
+  border-radius: 10px;
+  background: #fff;
+  font: inherit;
+  font-weight: 700;
+  cursor: pointer;
+}
+
+.teeth-video-card button:disabled {
+  opacity: 0.5;
+  cursor: default;
+}
+
+.teeth-video-card button.chosen,
+.teeth-video-card button.teeth-video-go {
+  border-color: #e0a800;
+  background: #ffe27a;
+}
+
+.teeth-video-preview {
+  width: 100%;
+  border-radius: 8px;
+  background: #000;
+}

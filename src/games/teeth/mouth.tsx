@@ -1,6 +1,7 @@
 import { memo, useLayoutEffect, useMemo, useRef, useState, type CSSProperties, type PointerEvent, type ReactNode, type RefObject } from "react";
 import { STAR_PATH } from "@/components/TapFeedback";
 import { useFigure } from "@/lib/common";
+import { clothesOf } from "./clothes";
 import { useT } from "@/lib/language";
 import {
   alongFace,
@@ -818,7 +819,9 @@ function KidFace({ project, head, happy, open, lips }: { project: Project; head:
         strokeWidth={6}
       />
       {pigtails.map(({ s, band }) =>
-        band.facing > 0 ? <circle key={s} cx={band.at.x} cy={band.at.y} r={26 * project.zoom} fill="#ffd43b" stroke={INK} strokeWidth={5} /> : null,
+        band.facing > 0 ? (
+          <circle key={s} cx={band.at.x} cy={band.at.y} r={26 * project.zoom} fill={clothesOf("girl").band} stroke={INK} strokeWidth={5} />
+        ) : null,
       )}
       {cheeks.map((c, i) => (
         <ellipse key={i} cx={c.x} cy={c.y} rx={c.rx} ry={c.ry} fill="url(#kid-cheek)" />

@@ -448,6 +448,7 @@ button.idea-id {
 
 .effort,
 .idea-planned,
+.idea-parked,
 .idea-rejected {
   white-space: nowrap;
   padding: 2px 10px;
@@ -470,6 +471,11 @@ button.idea-id {
 
 .idea-planned {
   background: #e3f0ff;
+}
+
+/* A parked idea waits for the user's own words (`Idea.parked`). */
+.idea-parked {
+  background: #dfe6ff;
 }
 
 /* A rejected idea's note on what of it was built once. */

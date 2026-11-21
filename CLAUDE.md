@@ -126,7 +126,9 @@ In a fresh worktree run `bun install` first.
   still link it. Never leave an idea half done: `partial` is only a note on a done (or rejected) idea of what was built,
   and what is really left becomes a new idea with the area's next number, while a rest that is only translations or
   recordings is no rest at all (`languageStatus.ts` and the voice list track those; `content.test.ts`). An idea the user
-  turns down gets `rejected: true` (kept, never deleted).
+  turns down gets `rejected: true` (kept, never deleted). An idea the user parks gets `parked: "<why, and the words that
+  start it>"` (🅿️ on `/management/`): it is never built, generated or recorded with other work, never put into a batch or
+  the picture queue and never offered – only done when the user says those words (H-88, user decision, November 2026).
   An idea round only collects – the user decides later what to implement, so don't offer to implement
   after one (say „umsetzen“, not the ambiguous „bauen“).
 - The hidden page `/management/` (hold Papa Fox and his child on the o of „Both“ in the home title, `Logo`; `/ideen/` is its old address) is where
@@ -343,7 +345,10 @@ In a fresh worktree run `bun install` first.
   a story's end is celebrated by its picture and its sound (everyone in it cheering, the tune) and by its trophy handed
   over (see trophies below) – nothing rises there any more: the hearts, stars and notes of `celebrate`
   were replaced by the trophy (user decision, November 2026), and never a storm of confetti, shapes or fast movement.
-  `celebrate` is left only to a grown-ups' chart filled (Belohnungstafel, Tagesplan). `tapFeedback.test.ts` keeps it
+  `celebrate` is left only to a grown-ups' chart filled (Belohnungstafel, Tagesplan). The one place where a key or tap
+  is meant to set off a show is Frei tippen, where keys without a letter, number or job, and taps beside the card, open
+  a surprise (a firework, a present, an egg hatching, user request, November 2026) – one at a time, never a storm, and
+  never copied into another game's answers (`src/games/letters/CLAUDE.md`). `tapFeedback.test.ts` keeps it
   calm, `calmAnswers.test.ts` keeps answers still and `celebrate` out of the games.
 - No wrong answers, no error sounds, nothing to read: pictures, sounds and voice. That means no words in the picture
   for a sound or a call either – no floating „Mäh!“, „Brumm!“, „Krah!“, no „Danke!“ or „Bäh!“ bubble (removed, user

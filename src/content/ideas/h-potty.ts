@@ -325,5 +325,15 @@ export const pottyIdeas: IdeaArea = {
       why: "Noch ein Gedanke zum Warten ohne Drücken. Nah an der Schildkröte (H-37) – nur umsetzen, wenn es mehr davon geben soll.",
       effort: "S",
     },
+    {
+      id: "H-88",
+      emoji: "👧",
+      title: "Tapsi als Mädchen: alle Bilder noch einmal",
+      text: "Wenn auf der Startseite „Mädchen“ gewählt ist, geht ein Fuchsmädchen aufs Töpfchen statt Tapsi wie bisher: die ganze Geschichte (Küche, Bad, Warten, Denkblasen, Spielzimmer – rund 50 Bilder mit ihren zweiten Frames) noch einmal mit Gemini gezeichnet, gleiche Räume und Eltern, nur Tapsi mit Zöpfen und eigener Kleidung. Das Spiel nimmt dann je nach „Junge / Mädchen“ den einen oder den anderen Satz Bilder.",
+      why: "Ein Mädchen findet sich in der Geschichte wieder, wie schon in Zähne putzen. Kostet aber so viel wie die ganze Geschichte noch einmal.",
+      effort: "L",
+      parked:
+        "Geparkt (Entscheidung November 2026): Diese Bilder werden nie mit anderen zusammen erzeugt, nicht in die Bilder-Warteschlange gestellt und nicht als nächster Schritt angeboten – nur wenn du ausdrücklich sagst „Erzeuge die Bilder für Töpfchen gehen für Mädchen“.",
+    },
   ],
 };
