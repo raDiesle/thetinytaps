@@ -18,6 +18,7 @@ bun run paid       # every approved paid request at once (voice queue, cheap pic
 bun run song ...   # measure a song from Suno, see /musik-erzeugen
 bun run perf ...   # how smoothly the games run on a ten-year-old Android phone, see Language and style
 bun run video intro # the YouTube videos' intro as an MP4 into video-out/, frame by frame, see src/video/CLAUDE.md
+bun run ship       # in a Claude cloud session after every finished task: merge into main, push, delete the branch, see Working here
 bun run frames     # do the two frames of each moving picture stay the same scene? --scenes: every picture of a story
 ```
 
@@ -63,7 +64,12 @@ In a fresh worktree run `bun install` first.
 
 - Several Claude sessions work in parallel, each in its own worktree. When a task
   is done: `bun run verify`, commit on the branch, merge into **local** `main` without asking,
-  never push (and don't offer to – pushing is the user's move). Other sessions merge into `main` all the time: merge `main` into your branch and verify there first, and when the merge into `main` still conflicts, `git merge --abort` it there at once and resolve on your branch – never resolve conflicts in the main checkout or leave it half-merged. Each session may run a dev server on its own
+  never push (and don't offer to – pushing is the user's move). **A Claude cloud session ships instead** (user request,
+  21 November 2026): after every task it finished well it commits and runs `bun run ship` (`tools/ship.ts`, only where
+  `CLAUDE_CODE_REMOTE` is set), which merges `origin/main` into the branch, verifies, fast-forwards `main`, pushes it
+  and deletes the session's branch on GitHub once `main` holds it – no question asked. It stops on a dirty tree, a failed
+  verify, a conflict or a refused push and changes nothing then: fix it and run it again, or, where pushing `main` is
+  refused, leave the pushed branch and tell the user to merge it. It never forces or rewrites history (`ship.test.ts`). Other sessions merge into `main` all the time: merge `main` into your branch and verify there first, and when the merge into `main` still conflicts, `git merge --abort` it there at once and resolve on your branch – never resolve conflicts in the main checkout or leave it half-merged. Each session may run a dev server on its own
   port, so when you hand merged work over, name the URL of the one running from the repo root (local `main`) –
   the user once checked another session's server by mistake. Look at that server before naming it: a running dev server
   does not pick up a merge that brings new files, a changed `index.html` (it kept showing the old name after a rename)
@@ -114,7 +120,7 @@ In a fresh worktree run `bun install` first.
   `ELEVENLABS_API_KEY`, `ELEVENLABS_API_KEY_2` and `GEMINI_API_KEY` as secrets, so once main is pushed the user starts a
   cloud session on the repo and says `/paid-queue` (`.claude/skills/paid-queue/`: `bun run paid --dry`, `bun run paid`,
   look at every picture made, take the made jobs and pictures out of their queues in the commit that brings their files,
-  `bun run verify`, merge into main and push). It should happen by itself (user request, 21 November 2026): a scheduled
+  `bun run verify`, `bun run ship`). It should happen by itself (user request, 21 November 2026): a scheduled
   task starting a fresh cloud session each evening with „Run /paid-queue“ – scheduled tasks are off for the organization
   so far (an admin turns them on under Organization settings → Capabilities); create it once they are on. Whether
   anything is open for Claude Cloud is the first thing on `/management/` (`CloudQueueStatus`, right under the title,

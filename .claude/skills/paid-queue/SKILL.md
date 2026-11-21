@@ -26,7 +26,6 @@ Being asked to run the queue is the user's approval to spend what the queues lis
 5. Take every made job out of `VOICE_QUEUE` and every made picture out of its queue (the script prints which), in the
    same commit as the new files (`stimme/`, `bilder/`); keep the queue files' types and exported helpers.
 6. `bun run format`, then `bun run verify` – it must end with `verify: OK`, never piped before the commit.
-7. Commit (`Paid runs: <what was made, in plain words>`), merge into main fast-forward, push the session's branch, and
-   push main when the user asked for it in this session (the session's permissions may refuse it: then say the user
-   must merge the pushed branch).
+7. Commit (`Paid runs: <what was made, in plain words>`), then `bun run ship`: it merges into main, pushes it and
+   deletes the session's branch (where pushing main is refused it says so: push the branch and tell the user to merge it).
 8. Report: what was recorded and generated, the cost, what was left out and why, and what was pushed.
