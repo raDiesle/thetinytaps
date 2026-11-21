@@ -7,6 +7,7 @@ import {
   insideBy,
   lerpView,
   midLine,
+  MIN_FACING,
   NO_STRETCH,
   openCorners,
   projectors,
@@ -60,6 +61,33 @@ describe("the teeth being brushed", () => {
   test("seen from the side, the near corner of the mouth would hide the back teeth without opening", () => {
     const { lips, keep } = brushed(STEPS.find((s) => s.id === "outer-left")!);
     expect(keep.some((p) => !insideBy(p, lips, TOOTH_CLEAR))).toBe(true);
+  });
+});
+
+// Gaps of dark mouth showed between the gum and the lips, most of all seen from the side (user feedback, November 2026):
+// the gum's cheek-side wall reaches past the lips, which cut it off, so the gum always runs into them. Round a jaw
+// tipped into the open mouth, and beside the arch seen from the side, the inside of the cheek shows (CHEEK_INSIDE in
+// mouth.tsx), never the dark of the mouth.
+describe("the gum runs into the lips", () => {
+  const views: [string, View, (typeof STEPS)[number] | null][] = [
+    ["grin", GRIN_VIEW, null],
+    ...STEPS.map((s) => [s.id, s.view, s] as [string, View, (typeof STEPS)[number]]),
+  ];
+
+  test.each(views)("%s: every cheek-side wall of gum that shows ends outside the lips", (_, view, zone) => {
+    const model = buildMouth(view.open);
+    const all = projectors(view);
+    const plain = model.lips.map(all.face.point);
+    const lips = stretchLips(plain, zone ? cornerStretch(plain, brushedPoints(model, all, zone), TOOTH_CLEAR) : NO_STRETCH);
+    const inside = model.gums.flatMap((gum) => {
+      const wall = gum.faces.find((f) => f.kind === "outer")!;
+      // A jaw tipped to show its top or tongue side lies in the open mouth like a model, with cheek round it.
+      if (Math.abs(view.tilt[gum.jaw]) >= 0.01 || all[gum.jaw].facing(wall.normal) <= MIN_FACING) return [];
+      // The wall's points: its rim along the tooth, then its foot back the other way.
+      const feet = wall.points.slice(wall.points.length / 2).map(all[gum.jaw].point);
+      return feet.filter((p) => insideBy(p, lips, 0)).map(() => gum.key);
+    });
+    expect(inside).toEqual([]);
   });
 });
 

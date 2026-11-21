@@ -12,10 +12,13 @@ import { recordedVoice } from "@/lib/voice";
 /** The game's voice. */
 export const lettersVoice = recordedVoice(voiceFiles);
 
-/** Says a line of the language pack from its recording; `queue` waits for what is being said. */
+/**
+ * Says a line of the language pack from its recording; `queue` waits for what is being said. A line that may have no
+ * text in the app language yet passes its `english`, whose recording stands in for a missing one.
+ */
 export function useLettersSay() {
   const { id } = useAppLanguage();
-  return useCallback((text: string, queue = false) => lettersVoice.say(text, id, { queue }), [id]);
+  return useCallback((text: string, queue = false, english?: string) => lettersVoice.say(text, id, { queue, english }), [id]);
 }
 
 /**

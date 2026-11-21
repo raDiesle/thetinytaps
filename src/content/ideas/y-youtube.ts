@@ -175,6 +175,9 @@ export const youtubeIdeas: IdeaArea = {
       text: "Wie `/management/video-zaehne/`: eine Seite `/management/video-toepfchen/` (oben auf `/management/` verlinkt, noindex) spielt die ganze Töpfchen-Geschichte einmal auf einer 16 : 9-Bühne und nimmt sie in Chrome mit Ton auf. Im Bild nur das Bild: keine Schrittleiste, kein „Weiter“, keine Knöpfe für „Was muss dein Kind?“ und „Was ist im Töpfchen?“, kein ⏸, keine Wochensterne, kein `GameEnd`, kein Pokal, und es zählt nichts (kein Stern, keine Spielzeit). Weil die Geschichte im Spiel auf Tippen wartet (`Step.nudge`), gibt die Seite einen festen Ablauf vor: jeder Schritt geht weiter, wenn seine Zeile gesagt und seine Bewegung (Hose runter, hinsetzen) einmal gespielt ist, plus eine kurze Pause zum Schauen. Vor der Aufnahme wählt man auf der Seite, was Tapsi muss (Pipi, Kaka, beides), was am Ende im Töpfchen ist, und wie lange Tapsi sitzt (Y-22); Sprache folgt dem Regal. Stimme, Bilder und Warte-Lied werden vorher geladen, damit nichts zu spät kommt.",
       why: "„Potty training video“ wird auf YouTube viel gesucht, und die Geschichte samt Lied und Aufnahmen in sieben Sprachen gibt es schon – es fehlt nur der Ablauf ohne Tippen. Das ist die Grundlage für Y-07.",
       effort: "M",
+      done: true,
+      partial:
+        "Gebaut als `/management/video-toepfchen/` (`PottyVideo.tsx`, `PottyPlay video`): Tapsi muss Pipi, Kaka oder beides, im Töpfchen ist Pipi oder Kaka, gesessen wird 1, 2 oder 3 Durchläufe des Warte-Lieds (Y-22). Jeder Schritt geht weiter, wenn seine Bewegung einmal gespielt und seine Zeile gesagt ist, plus 1,6 s zum Schauen; nach der Party noch 3 s. „Muss mal“ ohne Wahl gibt es im Video nicht, da die Wahl vorher fällt. Auf Deutsch mit einem Durchlauf etwa 3 Minuten.",
     },
     {
       id: "Y-22",
@@ -183,6 +186,9 @@ export const youtubeIdeas: IdeaArea = {
       text: "Im Spiel endet das Warten nie von allein; im Video endet es nach einer gewählten Zahl von Durchläufen des Warte-Lieds, immer am Ende eines Durchlaufs (`LOOPS`), damit kein Vers abreißt – dann kommt das ✓ und „fertig“. Kurz (ein Durchlauf, etwa 30–40 Sekunden) für die ganze Geschichte in 1–2 Minuten, 3 und 5 Minuten für Kinder, die länger sitzen müssen. Die Gedanken wechseln wie im Spiel alle 14 Sekunden, die Maus läuft nach 20 Sekunden und dann alle 45 – in den langen Fassungen das, was das Sitzen kurzweilig macht.",
       why: "Eltern brauchen ein Video, das genau so lange läuft, wie ihr Kind sitzen soll – und es soll ruhig enden, nicht mitten im Lied.",
       effort: "S",
+      done: true,
+      partial:
+        "Gebaut mit Y-21 als 1, 2 oder 3 ganze Durchläufe des Warte-Lieds (`passesEndMs`): Ein Durchlauf ist in jeder Sprache etwa 1:45 bis 2:12 lang, nicht 30–40 Sekunden, daher sind es etwa 2, 4 und 6 Minuten statt „kurz, 3 und 5“. Kürzer als ein Durchlauf ist Y-30.",
     },
     {
       id: "Y-23",
@@ -207,6 +213,9 @@ export const youtubeIdeas: IdeaArea = {
       text: "Was `TeethVideo.tsx` kann – die 16 : 9-Bühne, die Tab-Aufnahme mit Ton (`getDisplayMedia`, Region Capture, MP4 sonst WebM), „Nur abspielen“ im Vollbild, Esc zum Abbrechen, das Speichern am Ende – als gemeinsames Stück in `src/components/` herauslösen, sobald das zweite Video (Y-21) kommt. Ein Spiel liefert dann nur noch seinen Ablauf, seine Wahlen vor der Aufnahme und wann das Video zu Ende ist. Danach kosten Schnullerfee, Abstillen und Kita-Start (Y-08) und der Timer (Y-09) nur noch ihren Ablauf.",
       why: "Zweimal dieselben 200 Zeilen Aufnahme-Code würden auseinanderlaufen; geteilt wird jede Verbesserung (Ton, Format, Schärfe) für alle Videos auf einmal besser.",
       effort: "S",
+      done: true,
+      partial:
+        "`src/components/VideoRecorder.tsx` (mit `VideoChoice` und `videoRecorder.css`); Zähne putzen und Aufs Töpfchen geben nur noch ihren Ablauf, ihre Wahlen, ihre Angaben und wann alles geladen ist.",
     },
     {
       id: "Y-26",
@@ -238,6 +247,14 @@ export const youtubeIdeas: IdeaArea = {
       title: "Elternvideo: so begleitet Aufs Töpfchen das Töpfchentraining",
       text: "Ein Video für Erwachsene (nicht „speziell für Kinder“, also mit Link und Endcard), 1–2 Minuten: das Spiel startet sofort, wenn das Kind muss; der Erwachsene tippt, was das Kind gesagt hat; beim Sitzen das Lied, die Gedanken, die Pause; die ✓ für das, was wirklich kam, oder „nichts“; der Stern der Woche. Gezeigt wird nur das Tablet und eine erwachsene Hand – nie ein echtes Kind auf dem Töpfchen, auch nicht von hinten oder verpixelt.",
       why: "Eltern wollen vor dem ersten Einsatz wissen, wie es abläuft; das Kindervideo (Y-07) darf nicht verlinken, dieses schon.",
+      effort: "S",
+    },
+    {
+      id: "Y-30",
+      emoji: "⏩",
+      title: "Kurzes Sitzen im Töpfchen-Video: nach dem ersten Refrain",
+      text: "Das Video aus Y-21 sitzt mindestens einen ganzen Durchlauf des Warte-Lieds, je nach Sprache 1:45 bis 2:12. Für eine ganze Geschichte in 1–2 Minuten (Shorts, eine kurze Fassung) endet das Sitzen stattdessen nach dem ersten Refrain: dafür in jeder der sieben Sprachen messen, wo der erste Refrain endet (`bun run song`, wie bei `LOOPS`), und dort als vierte Wahl „kurz“ anbieten.",
+      why: "Ein Durchlauf des Lieds ist für ein kurzes Video zu lang, und mitten im Vers abbrechen soll es nie.",
       effort: "S",
     },
   ],

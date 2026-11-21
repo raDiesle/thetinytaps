@@ -1,5 +1,6 @@
 import { readFileSync } from "node:fs";
 import { expect, test } from "bun:test";
+import { INTRO_MS } from "./PlayOptions";
 
 const playing = readFileSync("src/styles/playing.css", "utf8");
 const rule = (selector: string) => playing.match(new RegExp(`\\n${selector.replace(/[.*+?^${}()|[\]\\]/g, "\\$&")}\\s*\\{([^}]*)\\}`))?.[1] ?? "";
@@ -19,4 +20,9 @@ test("the intro under ⚙️ fades by itself and lets taps through", () => {
 
 test("Buchstaben & Zahlen says what its options hold as play starts", () => {
   expect(readFileSync("src/games/letters/LettersGame.tsx", "utf8")).toMatch(/<PlayOptions\s[^>]*intro=/);
+});
+
+test("the intro goes again soon", () => {
+  // 9 s lingered far too long over the child's picture (user feedback, November 2026).
+  expect(INTRO_MS).toBeLessThanOrEqual(4000);
 });
