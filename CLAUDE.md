@@ -131,8 +131,7 @@ In a fresh worktree run `bun install` first.
   should happen by itself (user request, 21 November 2026): a scheduled task starting a fresh cloud session each
   evening with „Run /paid-queue“ – scheduled tasks are off for the organization so far (an admin turns them on under
   Organization settings → Capabilities); create it once they are on. Whether anything is open for Claude Cloud is the
-  first thing on `/management/` (`CloudQueueStatus`, right under the title, `CloudQueueStatus.test.ts`), with the
-  queues' details further down. `scripts/paid-queue.mjs` refuses to start where the filter answers. A cloud session
+  first thing on `/management/` (`CloudQueueStatus`, right under the title, `CloudQueueStatus.test.ts`), each queue there one short line folded open to its whole list (🎙️ Stimmen, 🔊 Geräusche, 🖼️ Offene Bilder; user request, 21 November 2026: never a section of its own further down again). `scripts/paid-queue.mjs` refuses to start where the filter answers. A cloud session
   asked to work on the queue may start the paid run there – the rule against paid runs is for this Mac. The free parts
   still run here (`bun run voice make --dry`, `bun run image queue`, `bun run paid --dry`). A job, picture or sound
   leaves its queue in the commit that brings its files.
@@ -524,7 +523,7 @@ A game may give it before its end where reaching the goal once is enough (Ketten
   (`VoiceSwitch` in `src/components/`, user decisions, November 2026) – Gefühle's „Alltagssituationen“ and the chapter
   books read aloud by Tapsi's voice (`ChapterBook`'s `voice`: Abstillen, Schnullerfee, Kita-Start, one switch for all
   three) – only there, never as a pattern for other games (`VoiceSwitch.test.ts`). Recordings are made only when the user asks (see Language).
-  What still waits for its recording is listed on `/management/` (🎙️ Stimmen), read from the games' own data by
+  What still waits for its recording is listed on `/management/` (🎙️ Stimmen, a folded line in the Claude Cloud status at the top), read from the games' own data by
   `src/content/voiceLines.ts`: a game that says something new adds where it comes from there, never a call of the
   browser's voice (`voiceLines.test.ts` fails when anything but `src/lib/voice.ts` takes `speak` from the speech module,
   and on a game with the fallback that is not on its list). Lines that wait for their recording and are said by nothing
@@ -1127,7 +1126,7 @@ src/lib/                 speech, sfx (synthesized + recorded sounds), storage, d
   and its `PRIVACY_UPDATED` in the same commit (`tracking.test.ts` checks the main ones). Both stay out of search results.
 - A new Lebendige-Bilder picture: `/neue-szene`. A new Kleine-Abenteuer level: `/neues-abenteuer`. A generated picture: `/bild-erzeugen`
   – always as cheap as it can be (user decision, November 2026): every picture asked for goes into the queue
-  (`src/content/pictureQueue.ts`, shown on `/management/` under „Offene Bilder“) and `bun run image queue` makes only
+  (`src/content/pictureQueue.ts`, shown on `/management/` under „Offene Bilder“, folded in the Claude Cloud status at the top) and `bun run image queue` makes only
   what is already as cheap as it gets; a picture whose shared sheet isn't full waits for later sessions, unless
   the user, asked in the session with the number of pictures short of their sheet, says to make it now. Never a
   picture generated alone where a sheet can hold it – unless the user says to make it faster (user decision, 12
