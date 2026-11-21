@@ -83,6 +83,12 @@ export const LANGUAGE_STATUS: LanguageStatusRow[] = [
     languages: { de: "text", en: "text", zh: "text", hi: "text", es: "text", ar: "text", ru: "text" },
   },
   {
+    href: "/flaeschchen/",
+    note: 'Das Buch „Bottle to Cup“ mit „Bye-Bye, Bottle!“, einer Geschichte in Kapiteln vom Fläschchen zum Becher (bottleStory.ts, Idee H-105, 21. November 2026), Englisch zuerst geschrieben (ChapterBook first="en") und nur Englisch. Es fehlen alle anderen Sprachen, auch Deutsch: Name, Satz fürs Regal (names.ts) und Kapitel und Sätze, als <Sprache>.ts im Ordner wie bei „Haare waschen“; bis dahin liest man es überall auf Englisch. Tapsis Stimme liest jede Seite vor, Aufnahmen gibt es noch keine (bun run voice make --only flaeschchen), bis dahin bleibt es still. Die Wörter des Buchs selbst (Kapitel, Weiter) kommen aus ChapterBook; die Texte für Suchmaschinen sind in allen sieben Sprachen da.',
+    recorded: true,
+    languages: { en: "text" },
+  },
+  {
     href: "/schnullerfee/",
     note: "Das Buch „Schnullerfee“ mit „Tapsi und die Schnullerfee“, einer Geschichte in Kapiteln (pacifierStory.ts, November 2026): Name, Satz fürs Regal, Kapitel und Sätze in <Sprache>.ts im Ordner, übersetzt auf Wunsch am 10. November 2026. Tapsis Stimme liest jede Seite vor (ChapterBook, 13. November 2026), unten rechts über ▶ schaltet ein Lautsprecher sie für Erwachsene aus, die selbst vorlesen; Aufnahmen gibt es noch keine (bun run voice make --only schnullerfee), bis dahin bleibt es still. Die Wörter des Buchs selbst (Kapitel, Weiter) kommen aus ChapterBook.",
     recorded: true,

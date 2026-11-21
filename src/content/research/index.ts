@@ -2,6 +2,7 @@
 // one file per study. Newest first. Idea ids and game addresses are checked in content.test.ts.
 
 import type { Research } from "./types";
+import { flascheAbgewoehnen } from "./flasche-abgewoehnen";
 import { youtubeThemen } from "./youtube-themen";
 import { youtubeRechte } from "./youtube-rechte";
 import { youtubeKanal } from "./youtube-kanal";
@@ -32,6 +33,7 @@ export { RESEARCH_AREAS } from "./types";
 export type { Research, ResearchArea, ResearchDomain, ResearchExclusion, ResearchGameMatch, ResearchTopic } from "./types";
 
 export const RESEARCH: Research[] = [
+  flascheAbgewoehnen,
   youtubeThemen,
   youtubeRechte,
   youtubeSuchen,

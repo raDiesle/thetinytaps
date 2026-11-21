@@ -71,6 +71,11 @@ export const MASCOT_STATUS: MascotStatusRow[] = [
     tasks: [{ label: "Tapsi, Mama und Papa Fuchs in allen Bildern", work: "picture", pictures: 51, effort: "M", state: "done" }],
   },
   {
+    href: "/flaeschchen/",
+    note: "Gemini-Bilder wie bei „Abstillen“: Tapsi (einmal als Baby), Mama und Papa Fuchs in derselben Wohnung, Küche und demselben Garten; keine Bären, die Familie macht es selbst.",
+    tasks: [{ label: "Tapsi, Mama und Papa Fuchs in den Bildern", work: "picture", pictures: 27, effort: "M" }],
+  },
+  {
     href: "/schnullerfee/",
     note: "Gemini-Bilder wie bei „Abstillen“: Tapsi, Mama und Papa Fuchs in derselben Wohnung; die Schnullerfee ist eine kleine Bärin mit Flügeln, Krone und Sternstab – Fuchs und Bär sind beide da.",
     tasks: [{ label: "Tapsi, Mama, Papa Fuchs und die Bärenfee in den Bildern", work: "picture", pictures: 40, effort: "M", state: "done" }],
