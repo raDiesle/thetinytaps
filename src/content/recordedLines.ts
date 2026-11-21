@@ -131,6 +131,7 @@ export const RECORDED_GAMES: RecordedGame[] = [
   { name: "schnullerfee", folder: "src/games/pacifierstory/stimme", lines: spoken("/schnullerfee/") },
   { name: "kita", folder: "src/games/kitastory/stimme", lines: spoken("/kita/") },
   { name: "haare-waschen", folder: "src/games/hairstory/stimme", lines: spoken("/haare-waschen/", { first: "en" }) },
+  { name: "abstillen-nachts", folder: "src/games/nightmilk/stimme", lines: spoken("/abstillen/nachts/", { first: "en" }) },
 ];
 
 /** The languages these games are recorded in: the app's. */

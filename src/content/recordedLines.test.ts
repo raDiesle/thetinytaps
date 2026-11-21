@@ -25,6 +25,7 @@ const PLAYERS: Record<string, string> = {
   "src/games/pacifierstory/stimme": "src/games/pacifierstory/PacifierStoryGame.tsx",
   "src/games/kitastory/stimme": "src/games/kitastory/KitaStoryGame.tsx",
   "src/games/hairstory/stimme": "src/games/hairstory/HairStoryGame.tsx",
+  "src/games/nightmilk/stimme": "src/games/nightmilk/NightMilkGame.tsx",
 };
 
 /**
@@ -35,9 +36,12 @@ const GERMAN_ONLY: Record<string, string> = {};
 
 /**
  * Recorded games written English first (root CLAUDE.md, November 2026) and not translated yet, German included: they say
- * everything in English, so only the English voice records them, and their row in languageStatus.ts says so.
+ * everything in English, so only the English voice records them, and their row in languageStatus.ts says so – or, for a
+ * story that is a part of a book's row (the night story of Abstillen), that part.
  */
-const ENGLISH_ONLY: Record<string, string> = {};
+const ENGLISH_ONLY: Record<string, { href: string; part?: string }> = {
+  "abstillen-nachts": { href: "/abstillen/", part: "🌙 The Milk Sleeps at Night" },
+};
 
 test("no two lines of a game share a recording", () => {
   for (const game of RECORDED_GAMES) {
@@ -75,7 +79,11 @@ test("every recorded game says something in every app language", () => {
       expect(game.lines(language).length, `${game.name} ${language}`).toBeGreaterThan(0);
     }
   for (const href of Object.values(GERMAN_ONLY)) expect(Object.keys(LANGUAGE_STATUS.find((row) => row.href === href)?.languages ?? {}), href).toEqual(["de"]);
-  for (const href of Object.values(ENGLISH_ONLY)) expect(Object.keys(LANGUAGE_STATUS.find((row) => row.href === href)?.languages ?? {}), href).toEqual(["en"]);
+  for (const { href, part } of Object.values(ENGLISH_ONLY)) {
+    const row = LANGUAGE_STATUS.find((r) => r.href === href);
+    const languages = part ? row?.parts?.find((p) => p.label === part)?.languages : row?.languages;
+    expect(Object.keys(languages ?? {}), `${href} ${part ?? ""}`).toEqual(["en"]);
+  }
 });
 
 // A line a language hasn't translated is said in German there, and has no recording in that language: it must never be

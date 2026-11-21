@@ -78,9 +78,27 @@ export const LANGUAGE_STATUS: LanguageStatusRow[] = [
   },
   {
     href: "/abstillen/",
-    note: "Das Buch „Abstillen“ mit „Tapsis Milchkette“, der Abstillgeschichte in Kapiteln (milkChain.ts): Name, Satz fürs Regal, Kapitel und Sätze in <Sprache>.ts im Ordner, übersetzt auf Wunsch am 9. November 2026. Tapsis Stimme liest jede Seite vor (ChapterBook, 13. November 2026), unten rechts über ▶ schaltet ein Lautsprecher sie für Erwachsene aus, die selbst vorlesen; Aufnahmen gibt es noch keine (bun run voice make --only abstillen), bis dahin bleibt es still.",
-    recorded: true,
-    languages: { de: "text", en: "text", zh: "text", hi: "text", es: "text", ar: "text", ru: "text" },
+    note: "Das Buch „Abstillen“ mit zwei Geschichten in Kapiteln, die Tapsis Stimme vorliest (ChapterBook, 13. November 2026); unten rechts über ▶ schaltet ein Lautsprecher sie für Erwachsene aus, die selbst vorlesen. Die Wörter des Buchs selbst (Kapitel, Weiter) kommen aus ChapterBook.",
+    parts: [
+      {
+        label: "🤱 Tapsis Milchkette",
+        recorded: true,
+        languages: { de: "text", en: "text", zh: "text", hi: "text", es: "text", ar: "text", ru: "text" },
+        note: "Die Abstillgeschichte in Kapiteln (milkChain.ts): Name, Satz fürs Regal, Kapitel und Sätze in <Sprache>.ts im Ordner, übersetzt auf Wunsch am 9. November 2026. Aufnahmen gibt es noch keine (bun run voice make --only abstillen), bis dahin bleibt es still.",
+      },
+      {
+        label: "🌙 The Milk Sleeps at Night",
+        recorded: true,
+        languages: { en: "text" },
+        note: 'Die Geschichte fürs nächtliche Abstillen (H-104, nightMilk.ts, /abstillen/nachts/, 21. November 2026), Englisch zuerst geschrieben (ChapterBook first="en"): Titel, Name des Bands und Satz fürs Regal (names.ts), Kapitel und Sätze. Übersetzt wird erst auf Wunsch, Deutsch eingeschlossen – bis dahin liest auch ein deutsches Kind sie auf Englisch; dann kommen Kapitel und Sätze in <Sprache>.ts im Ordner, geladen über texts-<Sprache>.ts, wie bei „Haare waschen“. Aufnahmen gibt es noch keine (bun run voice make --only abstillen-nachts, nur die englische Stimme), bis dahin bleibt es still. Die Texte für Suchmaschinen sind in allen sieben Sprachen da.',
+        files: [
+          "src/games/nightmilk/names.ts",
+          "src/games/nightmilk/NightMilkGame.tsx",
+          "src/games/nightmilk/nightMilk.ts",
+          "src/games/nightmilk/nightMilkPictures.ts",
+        ],
+      },
+    ],
   },
   {
     href: "/schnullerfee/",

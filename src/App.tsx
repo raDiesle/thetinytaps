@@ -69,6 +69,7 @@ const TogetherPage = page(
 );
 const TimerPage = page(() => import("@/pages/TimerPage"), "TimerPage", "/timer/");
 const MilkChainPage = page(() => import("@/pages/MilkChainPage"), "MilkChainPage", "/abstillen/");
+const NightMilkPage = page(() => import("@/pages/NightMilkPage"), "NightMilkPage", "/abstillen/nachts/");
 const TrophyRoomPage = page(() => import("@/pages/TrophyRoomPage"), "TrophyRoomPage", "/pokale/");
 
 export function App() {
@@ -97,6 +98,7 @@ export function App() {
           <Route path="zaehne" element={<TeethPage />} />
           <Route path="toepfchen" element={<PottyPage />} />
           <Route path="abstillen" element={<MilkChainPage />} />
+          <Route path="abstillen/nachts" element={<NightMilkPage />} />
           <Route path="schnullerfee" element={<PacifierStoryPage />} />
           <Route path="kita" element={<KitaStoryPage />} />
           <Route path="haare-waschen" element={<HairStoryPage />} />

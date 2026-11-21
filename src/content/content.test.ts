@@ -1,6 +1,6 @@
 import { existsSync, readdirSync, readFileSync } from "node:fs";
 import { describe, expect, test } from "bun:test";
-import { CATEGORIES, SHELF, UNFINISHED, bookIdOf, bookPage, categoryHref, categoryOf, hasPage, listedGames, pagesBetween } from "./games";
+import { CATEGORIES, SHELF, UNFINISHED, bookIdOf, bookPage, categoryHref, categoryOf, hasPage, listedGames, pagesBetween, shelfVolumes } from "./games";
 import { areaKey, MASCOT_STATUS, IDEA_AREAS, LANGUAGE_STATUS, type LanguageState, languageStateOf, TOP_PICKS } from "./ideas";
 import { keyMatches, keyOf, LANGUAGES, languageFor, letterIndex, toLower } from "./languages";
 import { RESEARCH } from "./research";
@@ -89,7 +89,7 @@ describe("home menu", () => {
   // (user feedback, November 2026).
   test("every book spine out on the shelf has a picture from its game", () => {
     for (const entry of SHELF.filter((e) => e.game)) {
-      for (const href of entry.game?.volumes?.map((v) => v.href) ?? [entry.href]) {
+      for (const href of (entry.game && shelfVolumes(entry.game))?.map((v) => v.href) ?? [entry.href]) {
         expect(existsSync(`src/components/bilder/spine-${bookIdOf(href)}.webp`), href).toBe(true);
       }
     }
