@@ -48,23 +48,4 @@ export interface VoiceJob {
 }
 
 /** Approved and not made yet, in the order `bun run paid` records them. */
-export const VOICE_QUEUE: VoiceJob[] = [
-  {
-    id: "toepfchen-nichts",
-    why: "Aufs Töpfchen: „Tapsi spielt. Mama und Papa schauen rein …“, die letzte Zeile, wenn nichts kam (Y-24)",
-    date: "2026-11-21",
-    only: ["toepfchen"],
-    lang: ["en", "zh", "hi", "es", "ar", "de"],
-    account: "first",
-  },
-  {
-    id: "toepfchen-nichts-ru",
-    why: "dieselbe Zeile auf Russisch, mit dem Klon wie Töpfchens übrige russische Sätze",
-    date: "2026-11-21",
-    only: ["toepfchen"],
-    lang: ["ru"],
-    account: "second",
-    voice: "wlDm46LsfSYnFAMs48Uv",
-    parallel: 2,
-  },
-];
+export const VOICE_QUEUE: VoiceJob[] = [];

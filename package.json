@@ -12,6 +12,7 @@
     "format": "biome check --write",
     "typecheck": "tsc --noEmit && tsc --noEmit -p tsconfig.scripts.json",
     "preview": "bun tools/preview.ts",
+    "ship": "bun tools/ship.ts",
     "image": "bun scripts/gemini-image.mjs",
     "song": "bun scripts/song-timing.mjs",
     "song:stretch": "bun scripts/song-stretch.mjs",
