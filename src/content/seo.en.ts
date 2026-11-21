@@ -37,7 +37,7 @@ export const SEO_EN: SeoTranslation = {
       title: "Letters and Numbers – Keyboard Games",
       description:
         "Free typing, counting, joining in and typing words: every key shows its letter with a picture and a voice, numbers come to count and to hop.",
-      text: "Five games on the keyboard or the screen: free typing with a letter, a picture and a word, counting with numbers and things, Join In, where a fox or bear child hops, claps or stamps every number, and typing words with first words, colors, action words and “Where is the B?”, and “Where Is Little b?”, where a big letter looks for its child among three small ones.",
+      text: "Six games on the keyboard or the screen: free typing with a letter, a picture and a word, counting with numbers and things, the Counting Tower, where a fox or bear child climbs block by block up to a hundred, from a balloon to the moon, Join In, where a fox or bear child hops, claps or stamps every number, and typing words with first words, colors, action words and “Where is the B?”, and “Where Is Little b?”, where a big letter looks for its child among three small ones.",
     },
     "/spiele/zuordnen/": {
       title: "Matching Games for Toddlers",
@@ -116,6 +116,12 @@ export const SEO_EN: SeoTranslation = {
       description:
         "Every key brings a number with as many things to count: all at once, counted aloud, step by step or counted by tapping. For toddlers, without ads.",
       text: "A number game on the keyboard or the screen: every digit shows itself with as many things, any other key brings a number from 1 to 9. The things come all at once, are counted aloud, come step by step, or the child taps each one and counts. Press four, and four apples, say, lie next to the big digit, and the voice says how many there are. How the things come is chosen by us grown-ups behind the gear at the top right, which we press and hold: with “All at once” they are there right away, with “Counted aloud” one appears after another and is counted out loud, with “Step by step” every key press brings the next, and with “Count by tapping” the child taps each thing until the digit stands there at the end. If you like, the digit comes only when the same number is pressed again right away, so the amount counts first, or it appears in dots to trace with a finger. For older children there are two-digit numbers: two keys then make one number, two and then three make 23, and the things lie in rows of ten, so the tens are easy to see. On a tablet the number keys lie big on the screen.",
+    },
+    "/zaehlturm/": {
+      title: "Counting Tower – Count to 100, Block by Block",
+      description:
+        "Ten rounds of ten blocks, a goal up high in each: block by block a fox or bear child climbs to a hundred and counts along. For toddlers, without ads.",
+      text: "A number game to build, up to a hundred: down on the meadow a colorful block waits with its number. When the child taps the screen or presses a key, it flies up onto the tower, the fox or bear child hops on top, and the voice counts along. Big beside it stands the number. The higher the tower, the more it wobbles, from the seventh block on the wood creaks, and the goal above comes closer. Every round has ten blocks and a goal of its own, while the sky goes from morning to night: at 10 a red balloon that carries the child gently down, at 20 a nest the little bird hops home into, at 30 a paper plane, at 40 a cloud to stand on, at 50 a rainbow to slide down, at 60 a kite, at 70 a big bird that gives the child a ride, at 80 a hot-air balloon, at 90 the little owl in its tree hollow and at 100 the moon, which rocks the child in its crescent. The tenth block of each round comes slowly, with a drum roll, then the tower tumbles block by block, and every goal has a trophy of its own. “Next” counts on with the next round, at 11, 21, 31. Behind the gear we grown-ups hold down, we start again at 1 or jump with a slider to any number and build on from there. There is no wrong and no hurry.",
     },
     "/mitmachen/": {
       title: "Numbers to Join In – Hop, Clap, Stamp",

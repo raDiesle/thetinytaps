@@ -123,7 +123,14 @@ const CUTS: Record<string, { x: number; y: number; size: number }> = {
  * „A“, its monkey and „Affe“ whole and in the middle; Zählen's number and all its things; Mitmachen's number and the
  * fox hopping it; the animal with the right thing and a wrong one beside it).
  */
-const WHOLE = new Set(["components/buchstaben", "components/zaehlen", "components/mitmachen", "components/gross-klein", "components/tiere"]);
+const WHOLE = new Set([
+  "components/buchstaben",
+  "components/zaehlen",
+  "components/zaehlturm",
+  "components/mitmachen",
+  "components/gross-klein",
+  "components/tiere",
+]);
 
 /**
  * A part of the window shown alone, by `keyOf`, in CSS pixels: cut out and set into a blurred copy of itself widened
@@ -148,6 +155,17 @@ const PLAYS: Record<string, (cdp: Cdp) => Promise<void>> = {
   "components/zaehlen": async (cdp) => {
     await press(cdp, "3");
     await sleep(4500);
+  },
+  // Seven blocks on the tower, the child on top reaching for the red balloon.
+  "components/zaehlturm": async (cdp) => {
+    // The game goes on where the last visit stopped (the boy's picture left it at 8): start again at 1 for each.
+    await evaluate(cdp, `localStorage.removeItem("tinytaps.tower.v1"); location.replace(location.pathname); true`);
+    await sleep(2500);
+    for (let i = 0; i < 7; i++) {
+      await press(cdp, "a");
+      await sleep(1100);
+    }
+    await sleep(1500);
   },
   "components/mitmachen": async (cdp) => {
     await press(cdp, "3");

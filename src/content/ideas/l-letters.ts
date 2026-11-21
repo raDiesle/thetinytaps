@@ -164,6 +164,9 @@ export const lettersIdeas: IdeaArea = {
       text: "Jede Taste legt einen bunten Klotz auf einen Turm, die Stimme zählt mit: „eins, zwei, drei …“. Das Fuchskind setzt den Klotz, Papa Bär hält den Turm. Beim zehnten Klotz wackelt er, purzelt mit Gelächter um, und es geht von vorne los. Die Ziffer steht groß neben dem Turm.",
       why: "Zahlenreihe bis 10 im eigenen Tempo, und das Umpurzeln ist die Belohnung, kein Zählen von Runden.",
       effort: "S",
+      done: true,
+      partial:
+        "Gebaut als „Counting Tower“ (`/zaehlturm/`, 21. November 2026), neu gedacht und bis hundert (Nutzerwunsch, ohne Option): zehn Runden zu je zehn Klötzen (1–10, 11–20 … 91–100), jede mit ihrem eigenen Ziel über dem Turm, das mit jedem Klotz näher kommt und beim zehnten erreicht wird – Luftballon, Vogelnest, Papierflieger, Wolke, Regenbogen-Rutsche, Drachen, großer Vogel, Heißluftballon, Eulenhöhle und zuletzt der Mond bei 100. Das Fuchs- oder Bärkind (Junge / Mädchen) steht oben und klettert mit, der Turm wackelt mit jedem Klotz etwas mehr, der Himmel geht vom Morgen bis in die Nacht. Jede Runde endet mit ihrem Bild, Pokal und „Weiter“ zur nächsten Zehnerreihe. Hinter ⚙️ (gehalten): neu bei 1 anfangen oder mit einem Regler zu jeder Zahl springen; die früheren Klötze der Runde stehen dann schon. Die Zahlwörter eins bis neun sind aufgenommen, 10–100 warten auf ihre Aufnahme und bleiben bis dahin still.",
     },
     {
       id: "L-19",

@@ -1,6 +1,6 @@
 # Buchstaben & Zahlen
 
-The book „Buchstaben & Zahlen“ holds five games, each a page of its table of contents (`games.ts`), sharing this folder
+The book „Buchstaben & Zahlen“ holds six games, each a page of its table of contents (`games.ts`), sharing this folder
 and one store of settings (`tinytaps.letters.v2`, so letters, pictures and keys stay as chosen in each):
 - Frei tippen, `/buchstaben/` (`LettersPlay.tsx`): every key shows its letter with a picture and word; a number shows its
   things and digit at once, or optionally counts them aloud, step by step or by tapping each thing. Every other key
@@ -27,6 +27,8 @@ and one store of settings (`tinytaps.letters.v2`, so letters, pictures and keys 
   invites first („Hüpf mit!“ – hop and clap from the pack's doing words, `joinIn`), then counts each one aloud with a
   wait between (`BEAT_MS`), so the child can join in. A row of marks under the digit fills one by one. Keys during a
   round only ripple; a tap on the child afterwards plays the same number again. No ⚙️: nothing to choose.
+- Zähl-Turm (Counting Tower), `/zaehlturm/`: a game of its own in `src/games/tower/`, with its own `CLAUDE.md`; it
+  borrows this folder's voice and number words.
 - Wörter tippen, `/woerter/`: the whole word (`WordsPlay.tsx`: picture words, colour words, doing words or all of them
   mixed, all from the language pack), or the first letter, which plays „Wo ist das B?“ (`FindPlay.tsx`: find the key
   for a shown letter).

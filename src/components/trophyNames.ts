@@ -32,6 +32,11 @@ const NAMERS: Record<string, () => Promise<Namer>> = {
     }),
   "/gefuehle/": () => import("@/games/feelings/groups").then(({ GROUPS }) => feelingsNamer(GROUPS)),
   "/wie-gehts-dir/": () => import("@/games/feelings/groups").then(({ GROUPS }) => feelingsNamer(GROUPS)),
+  "/zaehlturm/": () =>
+    import("@/games/tower/names").then(({ GOAL_NAMES }) => (level, language) => {
+      const name = GOAL_NAMES[level as keyof typeof GOAL_NAMES];
+      return name && pick(name, language);
+    }),
   "/was-ist-passiert/": async () => (level, language) => numbered(level, "runde-", ROUND, language),
   // The book Abstillen's second story (its volume /abstillen/nachts/) gives a trophy of its own, level „nachts“.
   "/abstillen/": () =>

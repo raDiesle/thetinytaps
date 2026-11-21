@@ -71,6 +71,7 @@ import { PICTURE_LINES, SOON_LINE, TURN_LINES } from "@/games/timer/voice";
 import { caseLetters, SMALL_PROMPT } from "@/games/letters/CasePlay";
 import { STOMP_INVITE } from "@/games/letters/MovePlay";
 import { TWO_DIGIT_NUMBERS, TWO_DIGIT_WORDS } from "@/games/letters/twoDigits";
+import { HUNDRED } from "@/games/tower/names";
 import { type Localized, pick, type Texts } from "@/lib/language";
 import { voiceId } from "@/lib/voiceName";
 import goodNightFiles from "../components/stimme/*.mp3?glob";
@@ -300,6 +301,7 @@ function letters(language: TargetLanguageId): VoiceGroup[] {
     ...(TWO_DIGIT_WORDS[language]
       ? [{ label: "Zweistellige Zahlen", lines: once(TWO_DIGIT_NUMBERS.map(TWO_DIGIT_WORDS[language]!)), built: "die Zahlwörter 10–99" }]
       : []),
+    ...(HUNDRED[language] ? [{ label: "Zähl-Turm: hundert", lines: [HUNDRED[language]!] }] : []),
   ];
 }
 

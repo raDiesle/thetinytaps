@@ -110,7 +110,7 @@ describe("home menu", () => {
   test("Frei tippen, Zählen, Mitmachen, Wörter tippen and Wo ist das kleine b? are games in their book's table of contents, not ways to play of one", () => {
     const book = CATEGORIES.find((category) => category.id === "buchstaben-zahlen");
     expect(book && hasPage(book)).toBe(true);
-    expect(book?.games.map((game) => game.href)).toEqual(["/buchstaben/", "/zaehlen/", "/mitmachen/", "/woerter/", "/gross-klein/"]);
+    expect(book?.games.map((game) => game.href)).toEqual(["/buchstaben/", "/zaehlen/", "/zaehlturm/", "/mitmachen/", "/woerter/", "/gross-klein/"]);
   });
 
   test("category ids and game addresses are unique", () => {

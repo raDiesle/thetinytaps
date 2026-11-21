@@ -28,6 +28,15 @@ export function playCountNote(i: number) {
   tone(PENTATONIC[i % PENTATONIC.length], 0.35, "triangle", 0.2);
 }
 
+/**
+ * The i-th note of a long climb (the Counting Tower's blocks, low 0 up to as high as it goes): the five notes of the
+ * pentatonic scale go on upwards octave by octave, so every step is higher than the one before, also past eight.
+ */
+export function playClimbNote(i: number, volume = 0.18) {
+  const steps = [523.25, 587.33, 659.25, 783.99, 880];
+  note({ from: steps[i % steps.length] * 2 ** Math.floor(i / steps.length), duration: 0.35, type: "triangle", volume });
+}
+
 /** "Dong" – the i-th note struck by something heavy: two octaves lower, long and dull. */
 export function playDeepNote(i: number) {
   note({ from: PENTATONIC[i % PENTATONIC.length] / 4, duration: 0.7, type: "triangle", volume: 0.4, lowpass: 700 });

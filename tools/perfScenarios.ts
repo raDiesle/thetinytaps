@@ -142,6 +142,13 @@ export const SCENARIOS: Scenario[] = [
     parts: [{ label: "Zahlen tippen", before: [{ wait: 1500 }], ms: 8000, type: { keys: [..."3719524"], every: 700 } }],
   },
   {
+    // Zähl-Turm: each key flies a block onto the tower and the child hops onto it, all as layers moved by their
+    // transform; the tenth brings the goal's end picture and the tower tumbling.
+    name: "zaehlturm",
+    path: "/zaehlturm/",
+    parts: [{ label: "Klötze bis zum Ziel", before: [{ wait: 1500 }], ms: 14000, type: { keys: [..."aaaaaaaaaa"], every: 1100 } }],
+  },
+  {
     // Mitmachen: the child hops, claps and stamps on its own layer; keys during a round only ripple.
     name: "mitmachen",
     path: "/mitmachen/",

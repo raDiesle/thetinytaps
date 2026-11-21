@@ -15,6 +15,7 @@ const sources = sourceFiles()
 const CHILD_DRAWINGS = [
   "src/games/elevator/kid.tsx", // Kleine Abenteuer: the child of the stories, trails and films
   "src/games/teeth/mouth.tsx", // Zähne putzen: the face in the mirror
+  "src/games/tower/Kid.tsx", // Counting Tower: the child climbing the tower
   "src/games/teeth/origin.tsx", // Zähne putzen: the face and shoulders in the story of the sugar monsters
   "src/games/teeth/prep.tsx", // Zähne putzen: the child's arm in its sleeve at the sink
 ];

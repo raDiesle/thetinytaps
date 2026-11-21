@@ -320,12 +320,15 @@ export function Mascot({
   child = false,
   pose = "stand",
   mouth,
+  lashes = false,
 }: {
   kind: MascotKind;
   child?: boolean;
   pose?: MascotPose;
   /** Another mouth than the pose's own (a grin showing the teeth). */
   mouth?: MascotMouth;
+  /** Lashes, for a girl (the fox girl of „Junge / Mädchen“), Mama or Oma. */
+  lashes?: boolean;
 }) {
   const fox = kind === "fox";
   const c = MASCOT_COLORS[kind];
@@ -368,7 +371,7 @@ export function Mascot({
         <Arm {...RAISED_ARM} kind={kind} />
       )}
       <g transform={head}>
-        <MascotHead kind={kind} child={child} mouth={mouth ?? (pose === "cheer" ? "open" : "smile")} />
+        <MascotHead kind={kind} child={child} lashes={lashes} mouth={mouth ?? (pose === "cheer" ? "open" : "smile")} />
       </g>
     </svg>
   );

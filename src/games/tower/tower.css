@@ -1,0 +1,111 @@
+/* Counting Tower (L-18): every class and keyframe prefixed `tw-`. Everything that moves is a small HTML layer of its own,
+   moved by its transform (element.animate in TowerPlay); the backdrop is one still svg drawn once. */
+
+.tw-play {
+  position: absolute;
+  inset: 0;
+  overflow: hidden;
+  container-type: size;
+}
+
+.tw-scene {
+  position: absolute;
+  inset: 0;
+  touch-action: manipulation;
+  user-select: none;
+  -webkit-user-select: none;
+}
+
+.tw-backdrop {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  display: block;
+}
+
+/* Layers placed by a transform from the stage's top left corner. */
+.tw-goal,
+.tw-star,
+.tw-leaf,
+.tw-block,
+.tw-kid,
+.tw-waiting {
+  position: absolute;
+  left: 0;
+  top: 0;
+  will-change: transform;
+  pointer-events: none;
+}
+
+.tw-goal svg,
+.tw-star svg,
+.tw-leaf svg,
+.tw-block svg,
+.tw-waiting svg,
+.tw-mother svg,
+.tw-baby svg {
+  display: block;
+  width: 100%;
+  height: 100%;
+}
+
+.tw-goal-balloon svg,
+.tw-goal-kite svg {
+  overflow: visible;
+}
+
+/* The big bird faces where it will fly with the child: to the right. */
+.tw-goal-bird svg {
+  transform: scaleX(-1);
+}
+
+/* The tower's own layer, as wide as the tower and its sway, swaying from its foot. */
+.tw-tower {
+  position: absolute;
+  top: 0;
+  will-change: transform;
+  pointer-events: none;
+}
+
+.tw-rock {
+  width: 100%;
+  height: 100%;
+}
+
+.tw-mother,
+.tw-baby {
+  position: absolute;
+  will-change: transform;
+}
+
+/* The block waiting on the meadow: the thing to tap (the whole stage takes the tap, this marks where it goes). */
+.tw-waiting {
+  pointer-events: auto;
+  filter: drop-shadow(0 0.25em 0.3em rgb(0 0 0 / 0.18));
+}
+
+/* The stars by the moon: dim until the tower comes near, then lit, one by one. */
+.tw-star {
+  opacity: 0.25;
+  transition: opacity 0.6s ease-out;
+}
+
+.tw-star.tw-lit {
+  opacity: 1;
+}
+
+/* The big number of blocks on the tower, in the colour of the block just put on. */
+.tw-digit {
+  position: absolute;
+  /* `translate`, not `transform`: the entrance's scale must not undo the centring. */
+  translate: -50% -50%;
+  font-family: var(--font-rounded);
+  font-weight: 900;
+  line-height: 1;
+  -webkit-text-stroke: 0.035em #3b2a1a;
+  paint-order: stroke fill;
+  text-shadow: 0 0.04em 0 rgb(59 42 26 / 0.35);
+  pointer-events: none;
+  animation: pop-in 0.35s ease-out;
+}

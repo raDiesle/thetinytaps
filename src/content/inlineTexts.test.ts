@@ -35,6 +35,7 @@ const FOLDERS: Record<string, string[]> = {
   // The book's three games share one folder: Frei tippen has it, the two others only their own play.
   "/buchstaben/": ["src/games/letters"],
   "/zaehlen/": [],
+  "/zaehlturm/": ["src/games/tower"],
   "/mitmachen/": ["src/games/letters/MovePlay.tsx", "src/games/letters/names.ts"],
   "/woerter/": ["src/games/letters/WordsPlay.tsx", "src/games/letters/FindPlay.tsx"],
   "/gross-klein/": ["src/games/letters/CasePlay.tsx"],

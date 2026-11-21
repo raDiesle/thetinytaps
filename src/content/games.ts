@@ -1,5 +1,6 @@
 import { ALLTAG_BLURB, ALLTAG_TITLE, BOOK_BLURB, BOOK_TITLE, MOOD_BLURB, MOOD_TITLE } from "@/games/feelings/names";
 import { CAUSE_BLURB, CAUSE_TITLE } from "@/games/cause/names";
+import { TOWER_BLURB, TOWER_TITLE } from "@/games/tower/names";
 import { MILK_CHAIN_BLURB, MILK_CHAIN_BOOK } from "@/games/milkchain/names";
 import { NIGHT_MILK_BLURB, NIGHT_MILK_BOOK } from "@/games/nightmilk/names";
 import { BOTTLE_STORY_BLURB, BOTTLE_STORY_BOOK } from "@/games/bottlestory/names";
@@ -464,11 +465,12 @@ export const CATEGORIES: Category[] = [
       ar: "الضغط على الأزرار وإيجاد الحروف",
       ru: "Нажимать клавиши, находить буквы",
     },
-    // Four games, each a page of the book's table of contents, never ways to play behind ⚙️ of one game (user
+    // Its games, each a page of the book's table of contents, never ways to play behind ⚙️ of one game (user
     // feedback, November 2026).
     games: [
       { href: "/buchstaben/", emoji: "⌨️", title: FREE_TITLE, blurb: FREE_BLURB },
       { href: "/zaehlen/", emoji: "🔢", title: COUNT_TITLE, blurb: COUNT_BLURB },
+      { href: "/zaehlturm/", emoji: "🧱", title: TOWER_TITLE, blurb: TOWER_BLURB },
       { href: "/mitmachen/", emoji: "🐸", title: MOVE_TITLE, blurb: MOVE_BLURB },
       { href: "/woerter/", emoji: "✍️", title: WORDS_TITLE, blurb: WORDS_BLURB },
       { href: "/gross-klein/", emoji: "👪", title: CASE_TITLE, blurb: CASE_BLURB },

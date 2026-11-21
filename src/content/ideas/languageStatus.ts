@@ -536,6 +536,12 @@ export const LANGUAGE_STATUS: LanguageStatusRow[] = [
     note: "Ein Spiel für sich seit November 2026 (vorher „Nur Zahlen“ in „Frei tippen“), mit dessen Zahlen und Texten. Deutsch von ElevenLabs gesprochen bis auf die Zählsätze („drei Äpfel!“): bis dahin sagt es nur die Zahl. Name, Zeile im Inhaltsverzeichnis und der Hinweis unter ⚙️ beim Spielstart übersetzt am 5. November 2026. Die anderen Sprachen außer Russisch sind ganz von ElevenLabs gesprochen, auch die Zählsätze (7./8. November 2026); Russisch fehlt noch. Deutsch am 12. November 2026 von ElevenLabs gesprochen mit dem Klon von Tapsis Stimme aus ihren deutschen Aufnahmen („Tapsi Coach (Klon de)“, zweites Konto). Russisch am 12. November 2026 von ElevenLabs gesprochen mit dem Klon von Tapsis Stimme aus ihren russischen Aufnahmen („Tapsi Coach (Klon ru)“, zweites Konto), ohne die Tags, wie ein Satz gesagt wird („[warmly]“), da die Credits nur so reichten – ganz, auch die Zählsätze (die Aufnahmen von „Buchstaben & Zahlen“ gelten für alle Spiele dieses Buchs). Zweistellige Zahlen (21. November 2026, Schalter unter ⚙️) kommen nur auf Englisch: der Schalter und die Zahlwörter 10–99 („twenty-three!“), noch nicht aufgenommen – bis dahin bleibt die zweistellige Zahl still, auf Deutsch fehlt beides.",
   },
   {
+    href: "/zaehlturm/",
+    recorded: true,
+    languages: { en: "partial", de: "partial", zh: "partial", hi: "partial", es: "partial", ar: "partial", ru: "partial" },
+    note: "Neu (21. November 2026, L-18), englisch zuerst: Name, Zeile im Inhaltsverzeichnis, die Namen der zehn Ziele (für „Weiter“ und die Pokale) und die Texte hinter ⚙️ („Start at“, „From 1“) nur auf Englisch, bis Übersetzungen gewünscht sind. Gezählt wird mit den Zahlwörtern eins bis neun aus den Aufnahmen von „Buchstaben & Zahlen“, in jeder Sprache; 10 bis 99 sind die englischen zweistelligen Zahlwörter von „Buchstaben & Zahlen“ und „one hundred!“ eigenes Englisch, alle noch nicht aufgenommen – bis dahin bleiben diese Klötze still. Die Texte für Suchmaschinen gibt es in allen sieben Sprachen.",
+  },
+  {
     href: "/mitmachen/",
     recorded: true,
     languages: { de: "done", en: "partial", zh: "partial", hi: "partial", es: "partial", ar: "partial", ru: "partial" },

@@ -49,6 +49,7 @@ const PottyVideoPage = page(() => import("@/pages/PottyVideoPage"), "PottyVideoP
 const PottyParentsVideoPage = page(() => import("@/pages/PottyParentsVideoPage"), "PottyParentsVideoPage");
 const MoodPage = page(() => import("@/pages/MoodPage"), "MoodPage", "/wie-gehts-dir/");
 const CausePage = page(() => import("@/pages/CausePage"), "CausePage", "/was-ist-passiert/");
+const TowerPage = page(() => import("@/pages/TowerPage"), "TowerPage", "/zaehlturm/");
 const MarblePage = page(() => import("@/pages/MarblePage"), "MarblePage", "/kettenreaktion/");
 const PacifierStoryPage = page(() => import("@/pages/PacifierStoryPage"), "PacifierStoryPage", "/schnullerfee/");
 const KitaStoryPage = page(() => import("@/pages/KitaStoryPage"), "KitaStoryPage", "/kita/");
@@ -116,6 +117,7 @@ export function App() {
           {/* „Was brauche ich?“ is one of the two games of „Wie geht's dir?“ now (its card on the start screen). */}
           <Route path="was-brauche-ich" element={<Navigate to="/wie-gehts-dir/" replace />} />
           <Route path="was-ist-passiert" element={<CausePage />} />
+          <Route path="zaehlturm" element={<TowerPage />} />
           <Route path="schatten" element={<ShadowsPage />} />
           <Route path="socken" element={<SocksPage />} />
           <Route path="kettenreaktion/:level?" element={<MarblePage />} />

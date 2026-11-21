@@ -457,6 +457,11 @@ export const MASCOT_STATUS: MascotStatusRow[] = [
     ],
   },
   {
+    href: "/zaehlturm/",
+    note: "L-18: das Fuchs- oder Bärenkind („Junge / Mädchen“) klettert Klotz für Klotz auf den Turm und greift das Ziel – es ist das Spiel.",
+    tasks: [{ label: "Fuchs- oder Bärenkind klettert auf den Turm", work: "drawing", effort: "S", state: "done" }],
+  },
+  {
     href: "/mitmachen/",
     note: "L-15: das Fuchs- oder Bärenkind hüpft, klatscht und stampft die Zahl – es ist das Spiel. Seit November 2026 Bilder von Gemini (`letters/bilder/`): je Kind Stehen, Hüpfen, Klatschen, Stampfen, dazu die Zeichen der Bewegungen in zwei Bildern.",
     tasks: [

@@ -110,7 +110,7 @@ export const SEO_TEXTS: PageSeo[] = [
     title: "Buchstaben und Zahlen lernen – Tastatur-Spiele",
     description:
       "Frei tippen, Zählen, Mitmachen und Wörter tippen: Jede Taste zeigt ihren Buchstaben mit Bild und Stimme, Zahlen kommen zum Zählen und Hüpfen.",
-    text: "Fünf Spiele auf der Tastatur oder dem Bildschirm: Frei tippen mit Buchstabe, Bild und Wort, Zählen mit Zahlen und Dingen, Mitmachen, bei dem ein Fuchs- oder Bärenkind jede Zahl hüpft, klatscht oder stampft, und Wörter tippen mit ersten Wörtern, Farben, Tu-Wörtern und „Wo ist das B?“, und „Wo ist das kleine b?“, bei dem ein großer Buchstabe unter drei kleinen sein Kind sucht.",
+    text: "Sechs Spiele auf der Tastatur oder dem Bildschirm: Frei tippen mit Buchstabe, Bild und Wort, Zählen mit Zahlen und Dingen, der Zähl-Turm, auf dem ein Fuchs- oder Bärenkind Klotz für Klotz bis hundert hinaufklettert, vom Luftballon bis zum Mond, Mitmachen, bei dem ein Fuchs- oder Bärenkind jede Zahl hüpft, klatscht oder stampft, und Wörter tippen mit ersten Wörtern, Farben, Tu-Wörtern und „Wo ist das B?“, und „Wo ist das kleine b?“, bei dem ein großer Buchstabe unter drei kleinen sein Kind sucht.",
   },
   {
     path: "/spiele/zuordnen/",
@@ -202,6 +202,12 @@ export const SEO_TEXTS: PageSeo[] = [
     description:
       "Jede Taste bringt eine Zahl mit so vielen Dingen zum Zählen: alles auf einmal, vorgezählt, Schritt für Schritt oder selbst gezählt. Ohne Werbung.",
     text: "Ein Zahlen-Spiel auf der Tastatur oder dem Bildschirm: Jede Ziffer zeigt sich mit so vielen Dingen, jede andere Taste bringt eine Zahl von 1 bis 9. Die Dinge kommen alle auf einmal, werden vorgezählt, kommen Schritt für Schritt, oder das Kind tippt jedes an und zählt selbst. Drückt es die Vier, liegen zum Beispiel vier Äpfel neben der großen Ziffer, und die Stimme sagt, wie viele es sind. Wie die Dinge kommen, wählen wir Großen hinter dem Zahnrad oben rechts, das wir gedrückt halten: Bei „Alles sofort“ sind sie gleich da, bei „Vorzählen“ erscheint eins nach dem anderen und wird laut mitgezählt, bei „Schritt für Schritt“ bringt jeder Tastendruck das nächste, und bei „Selbst zählen“ tippt das Kind jedes Ding an, bis am Ende die Ziffer dasteht. Wer mag, lässt die Ziffer erst kommen, wenn dieselbe Zahl gleich noch einmal gedrückt wird, damit zuerst die Menge zählt, oder lässt sie aus Punkten erscheinen, zum Nachspuren mit dem Finger. Für Größere gibt es zweistellige Zahlen: Dann machen zwei Tasten eine Zahl, die Zwei und dann die Drei die 23, und die Dinge liegen in Zehnerreihen, damit man die Zehner sieht. Am Tablet liegen die Zifferntasten groß auf dem Bildschirm.",
+  },
+  {
+    path: "/zaehlturm/",
+    title: "Zähl-Turm – bis hundert zählen, Klotz für Klotz",
+    description: "Zehn Runden, zehn Klötze, oben ein Ziel: Klotz für Klotz klettert ein Fuchs- oder Bärenkind bis zur Hundert und zählt mit. Ohne Werbung.",
+    text: "Ein Zahlen-Spiel zum Bauen, bis hundert: Unten auf der Wiese wartet ein bunter Klotz mit seiner Zahl. Tippt das Kind auf den Bildschirm oder drückt eine Taste, fliegt er oben auf den Turm, das Fuchs- oder Bärenkind hüpft hinauf, und die Stimme zählt mit. Groß daneben steht die Zahl. Je höher der Turm, desto mehr wackelt er, ab dem siebten Klotz knarzt das Holz, und oben rückt das Ziel näher. Jede Runde hat zehn Klötze und ihr eigenes Ziel, und der Himmel geht dabei vom Morgen bis in die Nacht: bei 10 ein roter Luftballon, der das Kind sanft hinunterträgt, bei 20 ein Nest, in das ein kleines Vögelchen heimhüpft, bei 30 ein Papierflieger, bei 40 eine Wolke zum Draufstehen, bei 50 ein Regenbogen zum Hinunterrutschen, bei 60 ein Drachen, bei 70 ein großer Vogel, der das Kind auf dem Rücken trägt, bei 80 ein Heißluftballon, bei 90 die kleine Eule in ihrer Baumhöhle und bei 100 der Mond, der das Kind in seiner Sichel wiegt. Der zehnte Klotz jeder Runde kommt langsam, mit einem Trommelwirbel, danach purzelt der Turm Klotz für Klotz um, und für jedes Ziel gibt es einen eigenen Pokal. „Weiter“ zählt mit der nächsten Runde weiter, bei 11, 21, 31. Hinter dem Zahnrad, das wir Großen gedrückt halten, fangen wir wieder bei 1 an oder springen mit einem Schieber zu jeder Zahl und bauen von dort weiter. Es gibt kein Falsch und keine Eile.",
   },
   {
     path: "/mitmachen/",
