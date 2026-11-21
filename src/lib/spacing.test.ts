@@ -40,7 +40,7 @@ describe("repeatPause", () => {
   test("Buchstaben & Zahlen pauses a repeated key and spaces its soft notes", () => {
     const letters = new URL("../games/letters/", import.meta.url);
     const play = readFileSync(new URL("LettersPlay.tsx", letters), "utf8");
-    expect(play).toContain("repeatPause()");
+    expect(play).toContain("repeatPause(SAME_KEY_PAUSE_MS)");
     expect(play).toContain("repeats.pass(toUpper(key, pack))");
     for (const file of ["LettersPlay.tsx", "WordsPlay.tsx", "FindPlay.tsx", "MovePlay.tsx"]) {
       const source = readFileSync(new URL(file, letters), "utf8");

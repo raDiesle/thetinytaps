@@ -1,5 +1,6 @@
 import { TRANSLATION as fireRescue } from "@/games/adventure/stories/fireRescue/lines.de";
 import { HAIR_STORY_DE as hairStory } from "@/games/hairstory/de";
+import { BOTTLE_STORY_DE as bottleStory } from "@/games/bottlestory/de";
 import type { LanguageTexts } from ".";
 
 // The German translations of what is written English first (root CLAUDE.md, since November 2026), one chunk loaded
@@ -9,5 +10,6 @@ import type { LanguageTexts } from ".";
 /** The German texts. */
 export const TEXTS: LanguageTexts = {
   hairStory,
+  bottleStory,
   stories: { fireRescue },
 };

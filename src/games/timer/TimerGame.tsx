@@ -15,10 +15,22 @@ import "./timer.css";
 const OWN = "own";
 const OTHER = "other";
 
+/**
+ * The length chosen on this visit. It is never stored: every visit starts at 5 minutes (`DEFAULT_TIMER_SETTINGS`, user
+ * request, November 2026 – a stored length greeted the next visit with whatever was picked last), while within a visit
+ * the row keeps what was picked, also after a run and back. The own time behind „Andere …“ stays stored as its slip.
+ */
+let visitLength = { seconds: DEFAULT_TIMER_SETTINGS.seconds, useOwn: DEFAULT_TIMER_SETTINGS.useOwn };
+
 export function TimerGame() {
   const t = useT();
   const [settings, update] = useGameSettings(TIMER_SETTINGS_KEY, DEFAULT_TIMER_SETTINGS);
   const [sheet, setSheet] = useState(false);
+  const [length, setLength] = useState(visitLength);
+  const choose = (next: typeof visitLength) => {
+    visitLength = next;
+    setLength(next);
+  };
   // Each card is its picture as it looks at the end, with no words on it (user request, November 2026); its name, and
   // for „Abwechseln“ the line saying it goes on and on, are only read out and its tooltip. „Abwechseln“ is a category
   // of its own, named on its frame after all the pictures, which share a frame with no name (user request, November 2026).
@@ -32,9 +44,9 @@ export function TimerGame() {
   }));
   // A picture kept from before may since have been taken out („Eimer“, „Kuchen“): then the first one is marked.
   const picture = PICTURES.some((p) => p.id === settings.picture) ? settings.picture : DEFAULT_TIMER_SETTINGS.picture;
-  const seconds = TIMER_SECONDS.includes(settings.seconds as (typeof TIMER_SECONDS)[number]) ? settings.seconds : DEFAULT_TIMER_SETTINGS.seconds;
+  const seconds = TIMER_SECONDS.includes(length.seconds as (typeof TIMER_SECONDS)[number]) ? length.seconds : DEFAULT_TIMER_SETTINGS.seconds;
   const own = settings.own;
-  const useOwn = settings.useOwn && own !== null;
+  const useOwn = length.useOwn && own !== null;
   const ownLabel = (time: OwnTime) =>
     time.kind === "for"
       ? t(lengthWords(time.seconds))
@@ -67,8 +79,8 @@ export function TimerGame() {
               value={useOwn ? OWN : String(seconds)}
               onChange={(value) => {
                 if (value === OTHER) setSheet(true);
-                else if (value === OWN) update({ useOwn: true });
-                else update({ seconds: Number(value), useOwn: false });
+                else if (value === OWN) choose({ seconds, useOwn: true });
+                else choose({ seconds: Number(value), useOwn: false });
               }}
               options={[
                 ...TIMER_SECONDS.map((s) => ({ value: String(s), label: t(lengthWords(s)) })),
@@ -82,7 +94,8 @@ export function TimerGame() {
               start={own}
               onClose={() => setSheet(false)}
               onDone={(time) => {
-                update({ own: time, useOwn: true });
+                update({ own: time });
+                choose({ seconds, useOwn: true });
                 setSheet(false);
               }}
             />

@@ -263,7 +263,7 @@ export const allGamesIdeas: IdeaArea = {
       why: "Weniger Sinnesreize: kein Blinken, nichts Wildes, die Freude liegt im Bild und im Satz der Stimme. Ein Kind sieht, was es geschafft hat, statt Formen, die mit dem Spiel nichts zu tun haben.",
       effort: "M",
       partial:
-        "Die aufsteigenden Herzen, Sterne und Noten (`celebrate`) sind an allen Enden weg, der Pokal des Levels steht dort (A-31, 11. November 2026); das Konfetti in Bewegungsabenteuer und im Zirkus und die eigenen Enden der Spiele sind noch offen.",
+        "Die aufsteigenden Herzen, Sterne und Noten (`celebrate`) sind an allen Enden weg, der Pokal des Levels steht dort (A-31, 11. November 2026); das Konfetti in Bewegungsabenteuer und im Zirkus und die eigenen Enden der übrigen Spiele sind noch offen; Lebendige Bilder endet mit Abendlicht und Verbeugung (B-21, 21. November 2026).",
       done: true,
     },
     {

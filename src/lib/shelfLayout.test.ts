@@ -1,12 +1,28 @@
 import { describe, expect, test } from "bun:test";
 import { readFileSync } from "node:fs";
-import { BOOK_ASPECT, BOOK_GAP, planShelf, SHELF_THINGS, SIGN_CLEAR, SIGN_DIP, type ShelfRect, TAKE_OUT } from "./shelfLayout";
+import {
+  BOOK_ASPECT,
+  BOOK_GAP,
+  DAILY_TALL,
+  LEAN_CLEAR,
+  planShelf,
+  SHELF_THINGS,
+  SIGN_DIP,
+  SIGN_OVER_POST,
+  type ShelfRect,
+  TAKE_OUT,
+  UNDER_SIGN,
+  WORDS_BREATH,
+} from "./shelfLayout";
 
-/** The home page's places: the everyday helpers' books with the words carved beside them, then three picture books. */
+/** The home page's places: the everyday helpers' books with the words carved before them, then three picture books. */
 const BOOKS = [3, 1, 1, 1];
 
-/** Of the everyday helpers' place, the words carved beside their books (`CARVINGS` in Bookshelf.tsx). */
-const CARVED = 1.4;
+/** Of the everyday helpers' place, the words carved before their books (`CARVINGS` in Bookshelf.tsx, with `LEAN_CLEAR`). */
+const CARVED = 1.4 + LEAN_CLEAR / BOOK_ASPECT;
+
+/** The home page's places as Bookshelf.tsx makes them: the everyday helpers with the carved words, four picture books. */
+const HOME = [3.9 + CARVED, 1, 1, 1, 1];
 
 /** A phone on its side, upright, a tablet, a laptop, a big monitor (the room the shelf gets in each). */
 const ROOMS = [
@@ -23,7 +39,7 @@ const SIGN = (height: number) => Math.min(64, Math.max(20, height * 0.09));
 
 /** What the home page asks for besides the room: the sign hanging in front of a wide shelf, the carved words, the legs' least height. */
 const OPTIONS = (height: number) => ({
-  sign: { width: SIGN(height) * 7.8, height: SIGN(height) * 1.5, rise: SIGN(height) * 0.4 },
+  sign: { width: SIGN(height) * 7.1, height: SIGN(height) * 1.5, rise: SIGN(height) * 0.4 },
   carved: CARVED,
   legs: height * 0.1,
 });
@@ -72,43 +88,62 @@ describe("the bookshelf", () => {
   );
 
   // The sign with the app's name hangs on its chains in front of a wide shelf, down into its top compartment over the
-  // carved words, which stand centred under it (user feedback, November 2026): never over a book to take or the wall with the stickers, its foxes
-  // still on the screen; and the bottom of the screen's middle, where browsers note how to leave fullscreen, holds only
-  // the shelf's legs.
-  test.each(ROOMS.filter(([w, h]) => w > h))("a wide shelf's sign hangs into its top compartment, clear of the books, in a %i × %i room", (width, height) => {
+  // carved words, which stand centred under it at the board's far left, where a visitor looks first (user request,
+  // November 2026): the books to take follow at their right, never under the sign, and its foxes stay on the screen;
+  // the bottom of the screen's middle, where browsers note how to leave fullscreen, holds only the shelf's legs.
+  test.each(ROOMS.filter(([w, h]) => w > h))(
+    "a wide shelf's sign hangs at its top board's far left, clear of the books, in a %i × %i room",
+    (width, height) => {
+      const options = OPTIONS(height);
+      const { cells, legs, sign, frame } = planShelf(width, height, BOOKS, options);
+      expect(legs).toBeGreaterThanOrEqual(options.legs - 0.01);
+      const top = cells.find((c) => c.books) as (typeof cells)[number];
+      const bh = top.bh ?? 0;
+      expect(sign).toBeDefined();
+      if (!sign) return;
+      // Down by `SIGN_DIP`, or deeper where the foxes on it would leave the screen.
+      const dip = top.y + top.h * SIGN_DIP;
+      if (Math.abs(sign.y + sign.h - dip) > 0.01) {
+        expect(sign.y + sign.h).toBeGreaterThan(dip);
+        expect(sign.y).toBeCloseTo(options.sign.rise);
+      }
+      // The row (`.shelf-row`): its 2 px padding, a gap from the post, the carved words' place with the lead, then the books.
+      const books = top.books ?? [];
+      const span = books.reduce((sum, b) => sum + BOOKS[b], 0);
+      expect(books[0]).toBe(0);
+      const start = top.x + 2 + BOOK_GAP * bh;
+      const words = (CARVED * BOOK_ASPECT - LEAN_CLEAR) * bh + (top.lead ?? 0);
+      const helpersStart = start + words + LEAN_CLEAR * bh;
+      // At the far left, reaching at most half over the post, and clear of the first book to take, which leans towards it.
+      expect(sign.x).toBeGreaterThanOrEqual(top.x - frame.post * SIGN_OVER_POST - 0.01);
+      expect(sign.x).toBeLessThanOrEqual(top.x + BOOK_GAP * bh + 2.01);
+      // Hanging above the helpers' books (`tall`) it keeps clear over their tops, else beside them.
+      if (top.tall !== undefined) expect(sign.y + sign.h).toBeLessThanOrEqual(top.y + top.h - top.tall + 0.01);
+      else {
+        expect(sign.x + sign.w).toBeLessThanOrEqual(helpersStart - LEAN_CLEAR * bh + 0.01);
+        // The carved words stand centred under it, narrower by their `pull` at the right.
+        expect(start + (words - (top.pull ?? 0)) / 2).toBeCloseTo(sign.x + sign.w / 2, 0);
+      }
+      // Everything on the board fits it.
+      expect((top.lead ?? 0) + span * BOOK_ASPECT * bh + (books.length + 1) * BOOK_GAP * bh).toBeLessThanOrEqual(top.w + 0.01);
+      // The foxes on its o rise 0.4 of its letters above it, inside the shelf: it starts right at the screen's top (`--top`;
+      // the fullscreen button is nailed onto its corner, user request, November 2026).
+      expect(sign.y - 0.4 * SIGN(height)).toBeGreaterThanOrEqual(-0.01);
+    },
+  );
+
+  // The sign and the carved words at the top board's far left take only the room they need: grown to a heading their
+  // place took the books' room (user feedback, November 2026), and the books are what a child looks for. With the home
+  // page's places (the everyday helpers about 3.8 picture books wide, four picture books), against the shelf without
+  // sign and words; the floors lie just under what the plan gives, above what the bigger place gave.
+  test.each([
+    [1000, 650, 0.63],
+    [1250, 640, 0.77],
+    [1880, 900, 0.93],
+  ])("the sign and the carved words leave the books big in a %i × %i room", (width, height, floor) => {
     const options = OPTIONS(height);
-    const { cells, bookHeight: bh, legs, sign, wordsShift } = planShelf(width, height, BOOKS, options);
-    expect(legs).toBeGreaterThanOrEqual(options.legs - 0.01);
-    const top = cells.find((c) => c.books) as (typeof cells)[number];
-    expect(sign).toBeDefined();
-    if (!sign) return;
-    // Down by `SIGN_DIP`, or deeper where the foxes on it would leave the screen.
-    const dip = top.y + top.h * SIGN_DIP;
-    if (Math.abs(sign.y + sign.h - dip) > 0.01) {
-      expect(sign.y + sign.h).toBeGreaterThan(dip);
-      expect(sign.y).toBeCloseTo(options.sign.rise);
-    }
-    // The books stand together in the middle of what the trail leaves (`.shelf-row`): where the helpers' books end.
-    const books = top.books ?? [];
-    const span = books.reduce((sum, b) => sum + BOOKS[b], 0);
-    const free = top.w - 4 - span * BOOK_ASPECT * bh - (books.length + 1) * BOOK_GAP * bh - (top.trail ?? 0);
-    // Only the row's 2 px padding may be wanting, which the plan leaves out.
-    expect(free).toBeGreaterThanOrEqual(-4.01);
-    const helpersEnd = top.x + 2 + free / 2 + BOOK_GAP * bh + (BOOKS[0] - CARVED) * BOOK_ASPECT * bh;
-    expect(books[0]).toBe(0);
-    expect(sign.x).toBeGreaterThanOrEqual(helpersEnd + SIGN_CLEAR.books * bh - 0.01);
-    expect(sign.x + sign.w).toBeLessThanOrEqual(top.x + top.w - SIGN_CLEAR.wall * bh + 0.01);
-    // The carved words stand centred under it (user feedback, November 2026), moved right where it hangs right of them.
-    const wordsMiddle = helpersEnd + (CARVED * BOOK_ASPECT * bh) / 2 + 0.05 * bh + (wordsShift ?? 0);
-    expect(wordsMiddle).toBeCloseTo(sign.x + sign.w / 2, 0);
-    // The foxes on its o rise 0.4 of its letters above it, inside the shelf: it starts right at the screen's top (`--top`;
-    // the fullscreen button is nailed onto its corner, user request, November 2026).
-    expect(sign.y - 0.4 * SIGN(height)).toBeGreaterThanOrEqual(-0.01);
-    // Sign and words hang far right, so the books at their left come towards the shelf's middle (user feedback,
-    // November 2026): right at the wall with the stickers, or no room is left at the board's right to move them into.
-    const atWall = sign.x + sign.w > top.x + top.w - SIGN_CLEAR.wall * bh - 1;
-    const noRoomRight = !top.trail;
-    expect(atWall || noRoomRight).toBe(true);
+    const plain = planShelf(width, height, [3.8, 1, 1, 1, 1], { legs: options.legs }).bookHeight;
+    expect(planShelf(width, height, [3.8 + CARVED, 1, 1, 1, 1], options).bookHeight).toBeGreaterThanOrEqual(plain * floor);
   });
 
   test.each(ROOMS)("compartments and planks lie inside the frame and never on each other in a %i × %i room", (width, height) => {
@@ -132,13 +167,67 @@ describe("the bookshelf", () => {
 
   // Books pressed together were hard to see and a child's tap could catch the neighbour (user feedback, October 2026).
   test.each(ROOMS)("the books stand with room round each and can be taken out in a %i × %i room", (width, height) => {
-    const { cells, bookHeight } = planShelf(width, height, BOOKS, OPTIONS(height));
+    const { cells } = planShelf(width, height, BOOKS, OPTIONS(height));
     for (const cell of cells.filter((c) => c.books)) {
+      const bookHeight = cell.bh ?? 0;
       const n = cell.books?.length ?? 0;
       const span = (cell.books ?? []).reduce((sum, b) => sum + BOOKS[b], 0);
-      expect((cell.trail ?? 0) + span * bookHeight * BOOK_ASPECT + (n + 1) * BOOK_GAP * bookHeight).toBeLessThanOrEqual(cell.w + 0.01);
+      expect((cell.lead ?? 0) + span * bookHeight * BOOK_ASPECT + (n + 1) * BOOK_GAP * bookHeight).toBeLessThanOrEqual(cell.w + 0.01);
       expect(bookHeight).toBeLessThanOrEqual(cell.h * TAKE_OUT + 0.01);
     }
+  });
+
+  // Sized all alike by the full board of the everyday helpers, the four picture books below were small on a tablet and
+  // an upright phone, with empty room round them (user feedback, November 2026): each board's books are as big as its
+  // own width and height allow, and the everyday helpers' compartment leaves them room to stand taller (`DAILY_TALL`).
+  test.each(ROOMS)("each board's books are as big as its own room allows in a %i × %i room", (width, height) => {
+    const plan = planShelf(width, height, BOOKS, OPTIONS(height));
+    const boards = plan.cells.filter((c) => c.books);
+    for (const cell of boards) {
+      const n = cell.books?.length ?? 0;
+      const span = (cell.books ?? []).reduce((sum, b) => sum + BOOKS[b], 0);
+      const bh = cell.bh ?? 0;
+      expect(bh).toBeGreaterThanOrEqual(plan.bookHeight);
+      // Bound by its width, by its compartment's height, or by the biggest a book gets (380 px).
+      const byWidth = (cell.w - (cell.lead ?? 0)) / (span * BOOK_ASPECT + (n + 1) * BOOK_GAP);
+      const bound = Math.min(byWidth, (cell.h * TAKE_OUT) / (span > 1 && plan.upright ? DAILY_TALL : 1), 380);
+      expect(bh).toBeGreaterThan(bound * (plan.upright ? 0.6 : 0.99));
+      if (plan.upright && span > 1) expect(cell.h * TAKE_OUT).toBeGreaterThanOrEqual(bh * DAILY_TALL - 0.01);
+    }
+  });
+
+  // With the home page's places (the everyday helpers and the words carved before them filling the top board, four
+  // picture books below), the picture books on a laptop are clearly bigger than the full top board makes its books.
+  test("the picture books below are bigger than the full top board makes its books, in a 1250 × 640 room", () => {
+    const plan = planShelf(1250, 640, HOME, OPTIONS(640));
+    const [top, below] = plan.cells.filter((c) => c.books);
+    expect(top.bh).toBeCloseTo(plan.bookHeight);
+    expect(below.bh ?? 0).toBeGreaterThan(plan.bookHeight * 1.15);
+  });
+
+  // On a tablet the sign beside the carved words took half the top board, and the everyday helpers' spines were too thin
+  // for their pictures (user feedback, November 2026): where the top compartment is tall enough, the sign hangs above
+  // their books instead, which get the whole board and stand under it, clear of it, at least as high as a picture book.
+  test.each([
+    [1000, 650],
+    [1000, 700],
+  ])("on a tablet the sign hangs above the everyday helpers, which get the whole board, in a %i × %i room", (width, height) => {
+    const options = OPTIONS(height);
+    const plan = planShelf(width, height, HOME, options);
+    const top = plan.cells.filter((c) => c.books)[0];
+    const bh = top.bh ?? 0;
+    expect(top.tall).toBeDefined();
+    expect(top.tall ?? 0).toBeGreaterThanOrEqual(bh - 0.01);
+    const sign = plan.sign as ShelfRect;
+    expect(sign.y + sign.h + UNDER_SIGN * bh).toBeLessThanOrEqual(top.y + top.h - (top.tall ?? 0) + 0.01);
+    expect(sign.x).toBeGreaterThanOrEqual(top.x - plan.frame.post * SIGN_OVER_POST - 0.01);
+    expect(sign.y - 0.4 * SIGN(height)).toBeGreaterThanOrEqual(-0.01);
+    // Bigger than with the sign beside the words: there they were about 100 px high.
+    expect(bh).toBeGreaterThan(140);
+    // The carved words keep a breath of room beside them, so the first book leaning towards them stays clear.
+    expect(top.lead ?? 0).toBeGreaterThanOrEqual(WORDS_BREATH * bh - 0.01);
+    // And only where the books get clearly bigger so: a laptop's stand taller beside the sign, under it they would be lower.
+    expect(planShelf(1250, 640, HOME, OPTIONS(640)).cells.find((c) => c.books)?.tall).toBeUndefined();
   });
 
   // A board above the books holding only spines to fill the shelf looked odd: nothing up there could be tapped.
@@ -195,6 +284,21 @@ describe("the bookshelf", () => {
       expect(rule(place)).toContain("transform");
       expect(rule(place)).not.toContain("auto");
     }
+  });
+
+  // The picture on an everyday helper's spine is how a child finds its book, and it was too small to recognise (user
+  // feedback, November 2026): the label takes nearly the spine's width and the picture nearly the label's, and the books
+  // stand taller than the picture books where their compartment lets them (`DAILY_TALL`).
+  test("the everyday helpers' books stand tall with big pictures on their spines", () => {
+    const css = readFileSync(new URL("../styles/bookshelf-books.css", import.meta.url), "utf8");
+    const rule = (selector: string) => css.match(new RegExp(`\\n${selector.replace(/[.>]/g, "\\$&")} \\{([^}]*)\\}`))?.[1] ?? "";
+    const [, side] = rule(".shelf-daily-label").match(/inset: [\d.]+% ([\d.]+)%/) ?? [];
+    expect(Number(side)).toBeLessThanOrEqual(5);
+    const [, picture] = rule(".shelf-daily-picture").match(/width: ([\d.]+)cqw/) ?? [];
+    expect(Number(picture)).toBeGreaterThanOrEqual(90);
+    expect(rule(".shelf-daily-books")).toContain("var(--daily-tall");
+    expect(rule(".shelf-daily")).toContain("height: calc(var(--sh)");
+    expect(DAILY_TALL).toBeGreaterThanOrEqual(1.3);
   });
 
   // Leaning, the books tied together with a ribbon looked unnatural (user feedback, November 2026).

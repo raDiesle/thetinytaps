@@ -96,6 +96,7 @@ export const wordsIdeas: IdeaArea = {
       text: "Ist ein Wort fertig, bleibt das Ding noch eine Weile zum Spielen da: Der BALL hüpft beim Antippen, das AUTO fährt los, die KATZE schnurrt beim Streicheln. Erst dann kommt das nächste Wort.",
       why: "Belohnung, die direkt zum Wort gehört statt Konfetti; das Wort bekommt eine Bedeutung.",
       effort: "M",
+      rejected: true,
     },
   ],
 };

@@ -151,7 +151,6 @@
 /* Heading, week and controls lie on the picture; the heading lets taps through to the monsters. */
 .teeth-heading,
 .teeth-end,
-.teeth-week-before,
 .teeth-controls {
   position: relative;
   z-index: 1;
@@ -159,13 +158,6 @@
 
 .teeth-heading {
   pointer-events: none;
-}
-
-/* On a phone on its side the sink would shrink to a stamp next to the week, so before brushing it waits for the end. */
-@media (orientation: landscape) and (max-height: 500px) {
-  .teeth-week-before {
-    display: none;
-  }
 }
 
 .mouth {
@@ -331,7 +323,44 @@
 
 @keyframes teeth-shine-breathe {
   50% {
-    opacity: 0.55;
+    opacity: 0.75;
+  }
+}
+
+/* All clean: white glints of light come and go slowly on the front teeth in turn (mouth.tsx, `Glint`), one two beats
+   after the other, each for about four beats, and round again every four bars – quicker and gold was too strong (user
+   feedback, November 2026). Each a small HTML layer of its own (`Sprite`) whose HTML grows,
+   turns a little and fades, never something inside its svg. They start once the shine has come up. */
+.tooth-glint {
+  pointer-events: none;
+}
+
+.tooth-glint > div {
+  opacity: 0;
+  will-change: transform, opacity;
+  animation: teeth-glint 8.58s ease-in-out calc(1.07s + var(--turn) * 1.07s) infinite;
+}
+
+.tooth-glint svg {
+  display: block;
+  width: 100%;
+  height: 100%;
+  overflow: visible;
+}
+
+@keyframes teeth-glint {
+  0% {
+    opacity: 0;
+    transform: scale(0.2) rotate(-25deg);
+  }
+  12% {
+    opacity: 0.85;
+    transform: scale(1) rotate(0deg);
+  }
+  26%,
+  100% {
+    opacity: 0;
+    transform: scale(0.4) rotate(12deg);
   }
 }
 
@@ -457,13 +486,13 @@
 
 .teeth-progress {
   --gap: clamp(4px, 0.9vmin, 8px);
+  --symbol: clamp(24px, 4.6vmin, 44px);
   position: relative;
   flex: 1;
   display: flex;
   align-items: center;
-  gap: var(--gap);
-  /* The toothbrush riding along measures the bar's width in cqw. */
-  container-type: inline-size;
+  /* Wider between the phases than between the brushing's steps, so the phases read apart. */
+  gap: calc(var(--gap) * 2);
   /* Room above and below the thin bar, so a finger hits it easily. */
   padding: 12px 0;
   cursor: pointer;
@@ -492,9 +521,34 @@
   transition: transform 0.2s linear;
 }
 
-/* The time before the brushing: story, sink and the first look in the mirror. */
-.teeth-segment.intro {
+/* A phase outside the brushing (eating sweets, getting the brush, putting it away): its symbol beside one groove, as
+   long as two steps. Getting the brush and putting it away happen at the sink, so they share its blue. */
+.teeth-tile {
+  /* The symbol's room first, then the rest shared out: two shares for a phase, seven for the brushing's steps. */
+  flex: 2 1 calc(var(--symbol) + var(--gap));
+  min-width: 0;
+  display: flex;
+  align-items: center;
+  gap: var(--gap);
+}
+
+/* Where a groove (or the brushing's steps) lies: on a screen wider than tall all of them in one column, so the bar
+   runs straight beside its symbols. */
+.teeth-lane {
+  flex: 1;
+  min-width: 0;
+  display: flex;
+  align-items: center;
+}
+
+.teeth-segment.eat,
+.teeth-segment.ready {
   --fill: #b9a4f5;
+}
+
+.teeth-segment.fetch,
+.teeth-segment.tidy {
+  --fill: #8fc9f2;
 }
 
 .teeth-segment.top {
@@ -503,6 +557,28 @@
 
 .teeth-segment.inner {
   --fill: #ff8fab;
+}
+
+/* The brushing itself: its steps in a frame of their own, a soft green tray they lie in, the clean tooth at its end. */
+.teeth-brushing {
+  flex: 7 1 calc(var(--symbol) + var(--gap) + 16px);
+  min-width: 0;
+  display: flex;
+  align-items: center;
+  gap: var(--gap);
+  margin: -4px 0;
+  padding: 3px 4px 3px 8px;
+  border: 2px solid #3d304540;
+  border-radius: 999px;
+  background: #dff3e7;
+  box-shadow: inset 0 1px 2px #3d30451f;
+}
+
+/* The steps, equally wide: the riding toothbrush measures their row's width in cqw. */
+.teeth-track {
+  position: relative;
+  gap: var(--gap);
+  container-type: inline-size;
 }
 
 /* The part running now stands a little taller with a golden ring, still – never pulsing. */
@@ -515,18 +591,18 @@
     0 2px 6px 2px #2a1e5c40;
 }
 
-/* The sweet at the start of the bar and the clean tooth at its end, small pictures from Gemini (`symbols.ts`). */
+/* The phases' symbols and the clean tooth, small pictures from Gemini (`symbols.ts`). */
 .teeth-symbol {
   flex: none;
-  width: clamp(34px, 7vmin, 50px);
-  height: clamp(34px, 7vmin, 50px);
+  width: var(--symbol);
+  height: var(--symbol);
   object-fit: contain;
   pointer-events: none;
   filter: drop-shadow(0 1px 1px #3d304540);
 }
 
-/* The toothbrush riding along the bar: a layer as small as the brush, moved by its transform to where the clock is
-   (`--at` parts of `--parts` equally wide ones, with the gaps between them), its head on that point. */
+/* The toothbrush riding along the brushing's steps: a layer as small as the brush, moved by its transform to where the
+   clock is (`--at` steps of `--parts` equally wide ones, with the gaps between them), its head on that point. */
 .teeth-runner {
   position: absolute;
   top: 50%;
@@ -561,19 +637,31 @@
     gap: clamp(6px, 1.4vmin, 14px);
   }
 
+  /* The two buttons side by side on top, the bar under them, the time at the bottom: beside a picture held sideways
+     the strip may be a little wider, and the bar gets the height. */
   .teeth-controls {
     order: -1;
     flex-direction: column;
+    display: grid;
+    grid-template-columns: auto auto;
+    grid-template-rows: auto minmax(0, 1fr) auto;
+    justify-items: center;
     align-self: flex-start;
-    gap: clamp(5px, 1.2vmin, 10px);
+    gap: clamp(5px, 1.2vmin, 10px) clamp(4px, 0.8vmin, 8px);
     width: auto;
     height: calc(100% - var(--corner-clear, 0px));
     max-height: 640px;
     margin-top: var(--corner-clear, 0px);
-    padding: 6px 4px;
+    padding: 6px;
     border-color: #3d304533;
+    border-radius: 24px;
     background: var(--paper-grain), color-mix(in srgb, var(--paper, #fbf4e3) 55%, #fff0);
     box-shadow: 0 4px 12px -6px #2a1e5c40;
+  }
+
+  .teeth-progress,
+  .teeth-time {
+    grid-column: 1 / -1;
   }
 
   .teeth-button {
@@ -585,23 +673,53 @@
   .teeth-progress {
     flex-direction: column;
     align-self: stretch;
-    align-items: center;
+    align-items: stretch;
     --gap: clamp(3px, 0.7vmin, 6px);
+    --symbol: clamp(26px, 5.4vmin, 40px);
+    --lane: clamp(16px, 3.2vmin, 26px);
     min-height: 0;
     /* Room beside the thin bar, so a finger hits it easily. */
     padding: 4px 0;
-    /* Upright, the riding toothbrush measures the bar's height in cqh. */
+  }
+
+  /* Upright, a phase's symbol stands left of its groove, and every groove lies in one lane. */
+  .teeth-tile {
+    min-height: calc(var(--symbol) + 4px);
+    padding: 0 4px 0 8px;
+    border: 2px solid transparent;
+  }
+
+  .teeth-lane {
+    flex: none;
+    align-self: stretch;
+    flex-direction: column;
+    align-items: center;
+    width: var(--lane);
+  }
+
+  .teeth-brushing {
+    min-height: 0;
+    margin: 0;
+    padding: 4px 4px 4px 8px;
+    border-radius: 20px;
+    align-items: stretch;
+  }
+
+  /* The clean tooth stands in the symbols' column, at the end of the brushing. */
+  .teeth-brushing > .teeth-symbol {
+    order: -1;
+    align-self: flex-end;
+  }
+
+  /* Upright, the riding toothbrush measures the steps' column in cqh. */
+  .teeth-track {
+    min-height: 0;
     container-type: size;
   }
 
-  .teeth-symbol {
-    width: clamp(30px, 6vmin, 44px);
-    height: clamp(30px, 6vmin, 44px);
-  }
-
-  /* Upright the brush rides down the bar, turned so its head points down onto where the clock is. */
+  /* Upright the brush rides down the steps, turned so its head points down onto where the clock is. */
   .teeth-runner {
-    top: 4px;
+    top: 0;
     left: 50%;
     transform: translateY(calc((100cqh - var(--gap) * (var(--parts) - 1)) * var(--at) / var(--parts) + var(--gap) * var(--part)));
   }
@@ -614,6 +732,7 @@
   }
 
   .teeth-segment {
+    flex: 1;
     width: clamp(11px, 2.2vmin, 18px);
     height: auto;
     min-height: 0;
@@ -755,6 +874,12 @@
   .monster-glow {
     animation: none;
   }
+
+  /* The glints stand still, lit. */
+  .tooth-glint > div {
+    opacity: 0.85;
+    animation: none;
+  }
 }
 
 /* ---------- More life: blinking, brows, scared monsters, arrows on the lips ---------- */
@@ -881,46 +1006,148 @@
   }
 }
 
-/* Each sweet takes its time, so a toddler sees what it is: it grows in its corner (0.5 s), floats there
-   (1.1 s), glides into the mouth (1 s, arriving at --arrive) and is gone while the mouth closes. */
+/* Each sweet takes its time, so a toddler sees what it is: it grows in its corner (0.5 s), floats there (0.65 s), then
+   flies into the mouth (1.15 s, arriving at --arrive) and is bitten (0.15 s, gone before the lips close over it). The
+   flight is an arc, as a thing really flies: the outer layer goes across steadily (`-x`), the inner one first lifts a
+   little and then swoops down into the mouth, faster at the end, turned towards where it goes (--tilt) and getting
+   smaller as it goes away from the viewer. At the bite it is squeezed flat and gone, while its bits fall
+   (`teeth-origin-bit`), never just fading out. */
+.origin-sweet-x {
+  animation: teeth-origin-sweet-x 2.6s linear calc(var(--arrive) - 2288ms) both;
+}
+
+@keyframes teeth-origin-sweet-x {
+  from,
+  44% {
+    transform: translateX(var(--sx));
+    animation-timing-function: cubic-bezier(0.35, 0, 0.55, 1);
+  }
+  88%,
+  to {
+    transform: translateX(var(--bx));
+  }
+}
+
 .origin-sweet {
-  animation: teeth-origin-sweet 2.6s ease-in-out calc(var(--arrive) - 2288ms) both;
+  opacity: 0;
+  animation: teeth-origin-sweet 2.6s linear calc(var(--arrive) - 2288ms) both;
 }
 
 @keyframes teeth-origin-sweet {
   from {
-    transform: translate(var(--sx), var(--sy)) scale(0) rotate(-20deg);
+    opacity: 1;
+    transform: translateY(var(--sy)) scale(0) rotate(-20deg);
+    animation-timing-function: cubic-bezier(0.3, 1.4, 0.6, 1);
   }
   19% {
-    transform: translate(var(--sx), var(--sy)) scale(1.5) rotate(6deg);
+    transform: translateY(var(--sy)) scale(1.5) rotate(6deg);
+    animation-timing-function: ease-in-out;
   }
   32% {
-    transform: translate(var(--sx), calc(var(--sy) - 8px)) scale(1.5) rotate(-5deg);
+    transform: translateY(calc(var(--sy) - 8px)) scale(1.5) rotate(-4deg);
+    animation-timing-function: ease-in-out;
   }
   44% {
-    transform: translate(var(--sx), var(--sy)) scale(1.5) rotate(3deg);
+    opacity: 1;
+    transform: translateY(var(--sy)) scale(1.5) rotate(2deg);
+    animation-timing-function: cubic-bezier(0.2, 0.6, 0.4, 1);
+  }
+  58% {
+    transform: translateY(calc(var(--sy) - 26px)) scale(1.35) rotate(var(--tilt));
+    animation-timing-function: cubic-bezier(0.5, 0, 0.85, 0.6);
   }
   88% {
-    transform: translate(220px, 300px) scale(0.55) rotate(0deg);
+    opacity: 1;
+    transform: translateY(var(--by)) scale(0.6) rotate(calc(var(--tilt) / 3));
+    animation-timing-function: ease-out;
+  }
+  91% {
+    opacity: 1;
+    transform: translateY(calc(var(--by) + 2px)) scale(0.66, 0.42) rotate(0deg);
+  }
+  /* Gone before the lips close over it (`teeth-origin-chew-lips` shows them from 8 % of the chewing on). */
+  94%,
+  to {
+    opacity: 0;
+    transform: translateY(calc(var(--by) + 4px)) scale(0.3, 0.2);
+  }
+}
+
+/* The bits a sweet breaks into as it is bitten: flung out a little and up, then falling past the chin as things fall
+   (each keyframe a point on the curve, run linearly), turning and fading. A few of them, two beats. */
+.origin-bit {
+  opacity: 0;
+  animation: teeth-origin-bit 1.072s linear var(--at) backwards;
+}
+
+@keyframes teeth-origin-bit {
+  /* Hidden while it waits for its moment (the animation fills backwards), there as soon as it breaks off. */
+  from {
+    opacity: 0;
+    transform: none;
+  }
+  3% {
     opacity: 1;
   }
+  25% {
+    transform: translate(calc(var(--dx) * 0.25), calc(var(--fall) * 0.0625 - var(--up) * 0.25)) rotate(calc(var(--spin) * 0.25));
+  }
+  50% {
+    opacity: 1;
+    transform: translate(calc(var(--dx) * 0.5), calc(var(--fall) * 0.25 - var(--up) * 0.5)) rotate(calc(var(--spin) * 0.5));
+  }
+  75% {
+    transform: translate(calc(var(--dx) * 0.75), calc(var(--fall) * 0.5625 - var(--up) * 0.75)) rotate(calc(var(--spin) * 0.75));
+  }
   to {
-    transform: translate(220px, 304px) scale(0.2);
+    opacity: 0;
+    transform: translate(var(--dx), calc(var(--fall) - var(--up))) rotate(var(--spin));
+  }
+}
+
+/* The open mouth closes over the sweet and opens again once it is chewed (its animations are set in origin.tsx, one per
+   sweet); meanwhile it is hidden and the closed lips chew. Never the open mouth squashed flat: it looked like a slot of
+   teeth, not chewing (user feedback, November 2026). */
+@keyframes teeth-origin-chew {
+  14%,
+  86% {
+    transform: scaleY(0.25);
     opacity: 0;
   }
 }
 
-/* The mouth closes, chews twice and opens again (its animations are set in origin.tsx, one per sweet). */
-@keyframes teeth-origin-chew {
-  25%,
-  42% {
-    transform: scaleY(0.08);
+/* The closed lips chew: the jaw goes down and up twice, about a beat each, a little to one side and then the other,
+   the lips pushed out round the sweet. */
+.origin-chewing {
+  opacity: 0;
+}
+
+@keyframes teeth-origin-chew-lips {
+  8% {
+    opacity: 0;
+    transform: scale(0.9, 0.6);
   }
-  55% {
-    transform: scaleY(0.3);
+  16% {
+    opacity: 1;
+    transform: none;
   }
-  70% {
-    transform: scaleY(0.08);
+  36% {
+    transform: translate(-3px, 5px) scale(0.94, 1.3);
+  }
+  56% {
+    transform: scale(1.04, 0.95);
+  }
+  74% {
+    transform: translate(3px, 5px) scale(0.94, 1.3);
+  }
+  86% {
+    opacity: 1;
+    transform: none;
+  }
+  94%,
+  to {
+    opacity: 0;
+    transform: scale(0.9, 0.6);
   }
 }
 
@@ -993,8 +1220,20 @@
 
 @keyframes teeth-origin-look-down {
   to {
-    transform: translateY(6px);
+    transform: translateY(4px);
   }
+}
+
+/* The irises show only inside the eyes' whites (origin.tsx, `Pupil`). */
+.origin-eye-clip {
+  overflow: hidden;
+  border-radius: 50%;
+  will-change: auto;
+}
+
+/* The lids lie still over the irises. */
+.teeth-piece.origin-still {
+  will-change: auto;
 }
 
 /* Time goes by: the sun (or the moon) crosses the sky over the head while the monsters grow. */
@@ -1066,24 +1305,29 @@
 }
 
 /* The child is happy about each sweet (the timings are set in origin.tsx, one per sweet): the eyes follow it
-   up to its corner and down into the mouth, the brows go up, and hearts rise for three beats. */
+   up to its corner and down into the mouth, and the brows go up. No hearts rise (taken out, user feedback, November 2026). */
+/* The eyes follow a sweet: up to its corner, gently down to the mouth as it glides in, and back to rest only once the
+   eyes are closed happily over the chewing (the look lasts the sweet's showing and 600 ms of chewing, origin.tsx), so
+   the irises never jump back while seen. Small steps: the iris is clipped to the eye's white and must keep inside it. */
 @keyframes teeth-origin-look-right {
-  22%,
-  70% {
-    transform: translate(7px, -8px);
+  20%,
+  40% {
+    transform: translate(5px, -4px);
   }
-  to {
-    transform: translate(0, 7px);
+  79%,
+  86% {
+    transform: translate(0, 4px);
   }
 }
 
 @keyframes teeth-origin-look-left {
-  22%,
-  70% {
-    transform: translate(-7px, -8px);
+  20%,
+  40% {
+    transform: translate(-5px, -4px);
   }
-  to {
-    transform: translate(0, 7px);
+  79%,
+  86% {
+    transform: translate(0, 4px);
   }
 }
 
@@ -1091,27 +1335,6 @@
   15%,
   70% {
     transform: translateY(-9px);
-  }
-}
-
-.origin-heart {
-  transform-origin: center;
-  opacity: 0;
-  animation: teeth-origin-heart 1.608s ease-out var(--at) backwards;
-}
-
-@keyframes teeth-origin-heart {
-  from {
-    transform: scale(0);
-    opacity: 1;
-  }
-  25% {
-    transform: scale(1.1);
-    opacity: 1;
-  }
-  to {
-    transform: translateY(-48px) scale(0.9);
-    opacity: 0;
   }
 }
 
@@ -1220,7 +1443,7 @@
 }
 
 .prep.at-brush .prep-hand {
-  animation: reach 4.5s ease-out forwards;
+  animation: reach 4.5s ease-in-out forwards;
 }
 
 /* The hand turns against the brush (grab-brush, tidy-brush), so its arm points down off the screen however the brush
@@ -1265,15 +1488,83 @@
   }
 }
 
-/* It starts far enough out to be off the screen however much of the sink shows on a wide one. */
+/* It starts far enough out to be off the screen however much of the sink shows on a wide one, and comes up calmly,
+   open, while the brush still rattles in its cup (`grab-brush`). */
 @keyframes reach {
   0%,
-  25% {
+  8% {
     transform: translateY(1000px);
   }
-  42%,
+  40%,
   100% {
     transform: translateY(0);
+  }
+}
+
+/* The hand comes up open and closes round the handle once it is there, before it lifts the brush (`grab-brush` from
+   45%); at the end it opens again to let go (`let-go` from 81.25%). The fist fades in over the open hand, which goes
+   only once the fist covers it, so the fingers seem to close. */
+.prep-open-hand {
+  opacity: 0;
+}
+
+.prep.at-brush .prep-open-hand {
+  animation: teeth-prep-open-hand 4.5s linear forwards;
+}
+
+@keyframes teeth-prep-open-hand {
+  0%,
+  46% {
+    opacity: 1;
+  }
+  46.5%,
+  100% {
+    opacity: 0;
+  }
+}
+
+.prep.at-brush .prep-fist {
+  animation: teeth-prep-close-hand 4.5s ease-in-out forwards;
+}
+
+@keyframes teeth-prep-close-hand {
+  0%,
+  40% {
+    opacity: 0;
+  }
+  46%,
+  100% {
+    opacity: 1;
+  }
+}
+
+.prep.at-tidy .prep-open-hand {
+  animation: teeth-prep-let-go-open 8.57s linear forwards;
+}
+
+@keyframes teeth-prep-let-go-open {
+  0%,
+  79% {
+    opacity: 0;
+  }
+  79.5%,
+  100% {
+    opacity: 1;
+  }
+}
+
+.prep.at-tidy .prep-fist {
+  animation: teeth-prep-let-go-fist 8.57s ease-in-out forwards;
+}
+
+@keyframes teeth-prep-let-go-fist {
+  0%,
+  80% {
+    opacity: 1;
+  }
+  84%,
+  100% {
+    opacity: 0;
   }
 }
 
@@ -1356,11 +1647,6 @@
 .prep-twinkle {
   transform: scale(0);
   animation: twinkle-once 1.1s ease-in-out 2 forwards;
-}
-
-.prep-twinkle.late {
-  animation-delay: 3.6s;
-  animation-iteration-count: 3;
 }
 
 @keyframes twinkle-once {
@@ -1541,11 +1827,10 @@
 
 /* The end's sheet of paper (user request, November 2026: under the head the week, the trophy and „Menü“ were squeezed
    into one row, ran off a narrow screen and „Heute“ lay on the chin): the week with its new star above the trophy and
-   „Menü“. The same sheet shows the week at the sink before brushing. What lies on it is sized by the sheet's width
+   „Menü“. What lies on it is sized by the sheet's width
    (cqw), so the whole week always fits. On a wide screen the end is two halves, the laughing head filling the left and
    the sheet on the right; held upright, the sheet lies under the head. */
-.teeth-end,
-.teeth-week-before {
+.teeth-end {
   container-type: inline-size;
   flex: none;
   flex-direction: column;
@@ -1564,8 +1849,7 @@
 }
 
 @media (orientation: landscape) {
-  .teeth-end,
-  .teeth-week-before {
+  .teeth-end {
     width: min(50%, 40rem);
     /* Clear of ⚙️ and the fullscreen note hanging from the top right corner. */
     max-height: calc(100% - var(--corner-clear, 0px));
@@ -1573,24 +1857,21 @@
   }
 }
 
-.teeth-end .teeth-week,
-.teeth-week-before .teeth-week {
+.teeth-end .teeth-week {
   justify-content: center;
   gap: 1.2cqw;
   /* Room above for today's „Heute“ tag, which stands over its column. */
   padding-top: clamp(1.5rem, 8cqw, 3.2rem);
 }
 
-.teeth-end .teeth-day,
-.teeth-week-before .teeth-day {
+.teeth-end .teeth-day {
   min-width: 2.3em;
   padding: 3px 1.1cqw;
   border-width: 2.5px;
   font-size: clamp(0.8rem, 3.9cqw, 1.8rem);
 }
 
-.teeth-end .teeth-day.today,
-.teeth-week-before .teeth-day.today {
+.teeth-end .teeth-day.today {
   margin: 0 1cqw;
   padding: 5px 2cqw;
   border-width: 3.5px;
@@ -1598,24 +1879,31 @@
   font-size: clamp(1.1rem, 6.6cqw, 3.1rem);
 }
 
-.teeth-end .teeth-today-tag,
-.teeth-week-before .teeth-today-tag {
+.teeth-end .teeth-today-tag {
   font-size: clamp(0.8rem, 3.6cqw, 1.5rem);
 }
 
 /* The trophy and „Menü“ never grow wider than the sheet either (held upright, „Menü“ ran off the screen). */
 .teeth-end .game-end.inline {
-  --teeth-trophy: min(clamp(72px, 20vh, 170px), 24cqw);
+  --trophy-h: min(clamp(110px, 36vh, 280px), 40cqw);
   max-width: 100%;
 }
 
-.teeth-end .game-end.inline .game-end-trophy {
-  height: var(--teeth-trophy);
-}
+/* On a wide screen the sheet is the right half's height, and the trophy as big as the room under the week allows
+   (user feedback, November 2026: the trophy much bigger) – the room is a size container, so the trophy measures it. */
+@media (orientation: landscape) {
+  .teeth-end {
+    height: calc(100% - var(--corner-clear, 0px));
+  }
 
-.teeth-end .game-end.inline .game-end-board {
-  width: calc(var(--teeth-trophy) * 0.95);
-  height: calc(var(--teeth-trophy) * 0.07);
+  .teeth-end .game-end.inline {
+    container-type: size;
+    flex: 1 1 0;
+    width: 100%;
+    min-height: 0;
+    justify-content: center;
+    --trophy-h: min(300px, 42cqw, 90cqh);
+  }
 }
 
 .teeth-end .game-end.inline .game-end-button {
