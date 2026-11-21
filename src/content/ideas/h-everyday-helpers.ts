@@ -229,6 +229,9 @@ export const everydayHelpersIdeas: IdeaArea = {
       text: "Wie die Milchkette, aber für das Fläschchen, und kürzer: Tapsi trinkt aus der Flasche, wird groß und lernt den offenen Becher; die Flasche am Tag geht zuerst, die am Abend und in der Nacht zuletzt, und am Ende packt Tapsi die Flasche in eine Kiste für ein Baby oder für die Erinnerung. Mit eigener Adresse, eigenem Titel und Text für Suchmaschinen, und so geschrieben, dass sie auch ohne Stillen davor passt.",
       why: "Abstillen erreicht nur Familien, die stillen; die Flasche haben fast alle Kinder. Gesucht wird „bottle weaning 1 year old / 2 year old“, „toddler bottle weaning“, „flasche abgewöhnen nachts“ – und das einzige passende Kinderlied („Time to Say Bye Bye, Bottle!“) hat 2.900 Aufrufe (Recherche „youtube-themen“).",
       effort: "M",
+      done: true,
+      partial:
+        "Gebaut als Kapitelbuch „Bye-Bye, Bottle!“ (/flaeschchen/, Buch „Bottle to Cup“ bei den Alltagshelfern, 21. November 2026): acht Kapitel, 27 Seiten nach den Schritten der Fachstellen (Recherche „flasche-abgewoehnen“) – vorher erzählen, den offenen grünen Becher aussuchen und üben, die Flasche am Tag, dann am Morgen, die Abendflasche zuletzt, die Nacht mit Wasser und Trost, zum Schluss wäscht Tapsi die Flasche mit Papa und legt sie in eine Kiste, zur Erinnerung oder für ein Baby. Baby Tapsi bekommt die Flasche von Papa, nichts setzt Stillen voraus. Texte auf Englisch, Suchtexte in allen sieben Sprachen. Die Bilder warten in der Warteschlange (Claude Cloud); bis sie gemacht sind, steht das Buch unter „🚧 In Arbeit“, das letzte Bild veröffentlicht es (siehe src/games/bottlestory/CLAUDE.md, „Publishing“).",
     },
     {
       id: "H-106",
