@@ -80,6 +80,7 @@ export const PICTURE_SOURCES: Record<string, PictureSource> = {
   pacifierstory: { title: "Schnullerfee", hrefs: ["/schnullerfee/"] },
   kitastory: { title: "Kita-Start", hrefs: ["/kita/"] },
   hairstory: { title: "Haare waschen", hrefs: ["/haare-waschen/"] },
+  bedstory: { title: "Großes Bett", hrefs: ["/grosses-bett/"] },
   teeth: { title: "Zähne putzen", hrefs: ["/zaehne/"] },
   potty: { title: "Aufs Töpfchen", hrefs: ["/toepfchen/"] },
   rewards: { title: "Belohnungstafel, Zeitplan und Wie lange warten?", hrefs: ["/belohnungstafel/", "/tagesplan/", "/wie-lange-warten/"] },

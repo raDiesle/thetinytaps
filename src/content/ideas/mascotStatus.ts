@@ -86,6 +86,11 @@ export const MASCOT_STATUS: MascotStatusRow[] = [
     tasks: [{ label: "Tapsi, Mama und Papa Fuchs in den Bildern", work: "picture", pictures: 25, effort: "M", state: "done" }],
   },
   {
+    href: "/grosses-bett/",
+    note: "Gemini-Bilder wie bei „Abstillen“: Tapsi, Mama und Papa Fuchs in derselben Wohnung, im Bett, das Tapsi in den anderen Büchern hat; dazu Bruno, Tapsis Bärenfreund aus „Kita-Start“, mit Mama und Papa Bär in ihrem Schlafzimmer und in Brunos Zimmer.",
+    tasks: [{ label: "Tapsi, Mama, Papa Fuchs und Brunos Bärenfamilie in den Bildern", work: "picture", pictures: 34, effort: "M" }],
+  },
+  {
     href: "/zaehne/",
     note: "SVG. Das Gesicht im Spiegel ist das Kind und bleibt; die Stimme ist schon Tapsi.",
     tasks: [

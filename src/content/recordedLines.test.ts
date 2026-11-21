@@ -25,6 +25,7 @@ const PLAYERS: Record<string, string> = {
   "src/games/pacifierstory/stimme": "src/games/pacifierstory/PacifierStoryGame.tsx",
   "src/games/kitastory/stimme": "src/games/kitastory/KitaStoryGame.tsx",
   "src/games/hairstory/stimme": "src/games/hairstory/HairStoryGame.tsx",
+  "src/games/bedstory/stimme": "src/games/bedstory/BedStoryGame.tsx",
 };
 
 /**
@@ -37,7 +38,7 @@ const GERMAN_ONLY: Record<string, string> = {};
  * Recorded games written English first (root CLAUDE.md, November 2026) and not translated yet, German included: they say
  * everything in English, so only the English voice records them, and their row in languageStatus.ts says so.
  */
-const ENGLISH_ONLY: Record<string, string> = {};
+const ENGLISH_ONLY: Record<string, string> = { "grosses-bett": "/grosses-bett/" };
 
 test("no two lines of a game share a recording", () => {
   for (const game of RECORDED_GAMES) {

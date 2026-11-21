@@ -7,6 +7,7 @@ import { MILK_CHAIN_PICTURE_QUEUE } from "@/games/milkchain/milkChainPictures";
 import { PACIFIER_PICTURE_QUEUE } from "@/games/pacifierstory/pacifierStoryPictures";
 import { KITA_PICTURE_QUEUE } from "@/games/kitastory/kitaStoryPictures";
 import { HAIR_PICTURE_QUEUE } from "@/games/hairstory/hairStoryPictures";
+import { BED_PICTURE_QUEUE } from "@/games/bedstory/bedStoryPictures";
 import { CAUSE_PICTURE_QUEUE } from "@/games/cause/causePictures";
 import { READER_PICTURE_QUEUE } from "@/components/readerPictures";
 import { SYMBOL_PICTURE_QUEUE } from "@/games/potty/symbolPictures";
@@ -95,4 +96,5 @@ export const PICTURE_QUEUE: QueuedPicture[] = [
   ...CAUSE_PICTURE_QUEUE,
   ...READER_PICTURE_QUEUE,
   ...SYMBOL_PICTURE_QUEUE,
+  ...BED_PICTURE_QUEUE,
 ];
