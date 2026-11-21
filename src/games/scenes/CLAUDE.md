@@ -47,6 +47,15 @@ after `HINT_AFTER_MS` or two misses a ring marks one and the sound comes once mo
   recording yet plays the usual one. The first sound waits for the page to lie still and for its recording (at most
   `RIDDLE_WAIT_MS`).
 
+## „Hier bin ich!“ (idea B-15)
+
+Where the child taps freely (explore and colour mode, never with a question, the torch or roads), nobody tapping a
+picture for `HELLO_AFTER_MS` after it lies still makes one item rock gently on its foot twice (`scene-hello` in
+`scenes.css`, on the item's own layer), then every `HELLO_AGAIN_MS` another, at most `HELLO_TIMES` (`hello.ts`: animals
+first, nearest to the middle first). The first tap or key ends it for the picture. It stays **silent** – no „Hallo!“, no
+sound of the item: the pictures have no voice (see Rules) and nothing sounds before the child acts (root `CLAUDE.md`);
+`hello.test.ts` checks it. Never make it repeat for ever, grow or glow: an invitation, not a task.
+
 ## Working on scenes
 
 - **Every picture is a chunk of its own** (perf analysis, November 2026: all pictures in one chunk were 1.6 MB of code,

@@ -502,7 +502,8 @@ A game may give it before its end where reaching the goal once is enough (Ketten
   buttons with room to spare, a loud topic bubble; `choiceRows` in `src/lib/rounds.ts`).
 - Silent and still until the child acts: no sound without a tap/hover/key, no idle
   animation unless the parent turns it on (`document.getAnimations()` is empty after load; only a `TapHint` left
-  waiting starts to move after its first stage, and on the shelf the trophy sign's two glints). In a game that plays
+  waiting starts to move after its first stage, on the shelf the trophy sign's two glints, and in Lebendige Bilder a
+  few items waving silently, one after the other, before the first tap, B-15). In a game that plays
   at once (`startMode`), the tap on its card is that act: it may start moving and sounding right away – but never
   while the book still opens or a page turns (user feedback, November 2026: Aufs Töpfchen and Zähne putzen talked and
   moved during it). The new screen is drawn before the motion, and everything that starts by itself waits for it to lie

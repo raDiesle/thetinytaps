@@ -15,6 +15,7 @@ import { touchOnly } from "@/lib/device";
 import { tapState } from "@/lib/tapTargets";
 import { preloadScene, SCENE_ENTRIES, scenePath, sceneTitle } from "./catalog";
 import { ARROWS, centre, middleItem, nextInDirection } from "./focus";
+import { HELLO_AFTER_MS, HELLO_AGAIN_MS, HELLO_MS, helloOrder } from "./hello";
 import { HideoutContext, peekTimes, SURPRISES } from "./hideout";
 import { assignKeys, pressedKey } from "./keys";
 import { LaneLayer, type LaneControl } from "./LaneLayer";
@@ -341,6 +342,31 @@ export function ScenePlay({ scene, settings, onKeys }: { scene: Scene; settings:
   const interacted = () => {
     setTouched(true);
   };
+
+  // „Hier bin ich!“ (B-15): nobody tapped yet, so after a while one item waves gently – silent, a few at most, one
+  // after the other – and the first tap or key ends it. Only where the child taps freely: a question, the torch's
+  // light or a road to draw is its own invitation.
+  const greets = !questMode && !torch && !lanes && !touched;
+  const [hello, setHello] = useState<{ id: string; n: number } | null>(null);
+  useEffect(() => {
+    if (!greets) {
+      setHello(null);
+      return;
+    }
+    const order = helloOrder(here(items), scene.width, scene.height);
+    const waits: ReturnType<typeof setTimeout>[] = [];
+    const stop = afterPageMotion(() => {
+      order.forEach((item, n) => {
+        const at = HELLO_AFTER_MS + n * HELLO_AGAIN_MS;
+        waits.push(setTimeout(() => setHello({ id: item.id, n }), at));
+        waits.push(setTimeout(() => setHello((now) => (now?.n === n ? null : now)), at + HELLO_MS));
+      });
+    });
+    return () => {
+      stop();
+      waits.forEach(clearTimeout);
+    };
+  }, [greets, items, here, scene]);
 
   const moveFocus = useCallback((item: SceneItem) => {
     focusRef.current = item;
@@ -822,15 +848,16 @@ export function ScenePlay({ scene, settings, onKeys }: { scene: Scene; settings:
         // A guest keeps the class of its own picture, which its animations use.
         const look = item === guest?.item ? guest.look : item.id;
         const peek = play?.playing && play.surprise !== undefined ? { surprise: SURPRISES[play.surprise], ...peekTimes(item) } : null;
+        const waving = hello?.id === item.id && !play?.playing;
         return (
-          <SceneLayer key={item.id} scene={scene} taps moving={!!play?.playing || !!drive}>
+          <SceneLayer key={item.id} scene={scene} taps moving={!!play?.playing || !!drive || waving}>
             <g
               className={drive && `scene-drive ${drive.phase}`}
               style={drive && ({ "--drive-dx": `${drive.dx}px`, "--drive-ms": `${drive.ms}ms` } as CSSProperties)}
             >
               <g
                 key={`${item.id}-${play?.count ?? 0}`}
-                className={`scene-item item-${look}${play?.playing ? " playing" : ""}${bedtime && discovered.has(item.id) ? " asleep" : ""}`}
+                className={`scene-item item-${look}${play?.playing ? " playing" : ""}${waving ? " scene-hello" : ""}${bedtime && discovered.has(item.id) ? " asleep" : ""}`}
                 style={{ "--party-i": i } as CSSProperties}
                 filter={colouring && !discovered.has(item.id) ? greyFilter : undefined}
                 data-item={item.id}
