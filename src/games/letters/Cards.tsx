@@ -1,4 +1,4 @@
-import { useEffect, useRef, useState, type PointerEvent, type PointerEventHandler, type ReactNode } from "react";
+import { type CSSProperties, useEffect, useRef, useState, type PointerEvent, type PointerEventHandler, type ReactNode } from "react";
 import { Picture } from "@/components/Picture";
 import { letterIndex } from "@/content/languages";
 import { isRightToLeft, joinedForms, spellingOf, textUnits } from "@/content/spelling";
@@ -6,6 +6,7 @@ import type { Countable, LanguagePack, LetterEntry, WordEntry } from "@/content/
 import { tapState } from "@/lib/tapTargets";
 import type { LettersSettings } from "./settings";
 import { TraceGlyphs } from "./TraceGlyphs";
+import { TENS_ROW, TWO_DIGIT_MIN, tensRows } from "./twoDigits";
 import "./letters.css";
 
 /** Item counts per row, arranged so small numbers are easy to count at a glance. */
@@ -179,6 +180,8 @@ export function NumberCard({
         <span className="picture" aria-hidden>
           {zeroEmoji}
         </span>
+      ) : n >= TWO_DIGIT_MIN ? (
+        <TensGrid n={n} thing={thing} />
       ) : (
         <div className={`count-grid count-${n}`} aria-label={`${n} × ${thing.singular}`}>
           {ROWS[n].map((perRow, row) => {
@@ -222,6 +225,45 @@ export function NumberCard({
           </div>
         )}
       </Reveal>
+    </div>
+  );
+}
+
+/**
+ * A two-digit number's things, all at once: a row for each ten, each row two groups of five as on a counting frame,
+ * and the rest in a last row – so 23 shows two full rows and three more.
+ */
+function TensGrid({ n, thing }: { n: number; thing: Countable }) {
+  const rows = tensRows(n);
+  return (
+    <div className="count-grid count-tens" style={{ "--rows": rows.length } as CSSProperties} aria-label={`${n} × ${thing.singular}`}>
+      {rows.map((perRow, row) => (
+        <div key={row} className="count-row">
+          {[0, TENS_ROW / 2].map((from) =>
+            perRow > from ? (
+              <span key={from} className="count-five">
+                {Array.from({ length: Math.min(perRow - from, TENS_ROW / 2) }, (_, j) => (
+                  <span key={j} className="count-item">
+                    {thing.emoji}
+                  </span>
+                ))}
+              </span>
+            ) : null,
+          )}
+        </div>
+      ))}
+    </div>
+  );
+}
+
+/** Two-digit numbers: the first digit pressed, with an empty place beside it waiting for the second. */
+export function HalfNumberCard({ first }: { first: number }) {
+  return (
+    <div className="card">
+      <div className="glyphs">
+        <span>{first}</span>
+        <span className="digit-slot" aria-hidden />
+      </div>
     </div>
   );
 }

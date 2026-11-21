@@ -1,25 +1,20 @@
-import { type RefObject, useCallback, useEffect, useRef, useState } from "react";
-import { MenuTop } from "@/components/MenuTop";
+import { type RefObject, useEffect, useRef, useState } from "react";
+import { VideoRecorder } from "@/components/VideoRecorder";
 import { languagePrefix, SEO_LANGUAGES, type SeoLanguage } from "@/content/seo";
 import { TARGET_LANGUAGES } from "@/content/targetLanguages";
 import { useNoBackgroundMusic } from "@/lib/backgroundMusic";
 import { useAppLanguage, useT } from "@/lib/language";
-import { unlockAudio } from "@/lib/sfx";
-import { canRecord, downloadVideo, type Recording, recordTab, type SavedVideo, useStagePixels, videoExtension } from "@/lib/tabRecording";
 import { useTimers } from "@/lib/timers";
 import { CALL_PICTURE } from "./CallBubble";
 import { picturesFor, scenePicture, scenesFor, STEPS, TAPSI } from "./content";
 import { preloadImages } from "./images";
 import { END_SLATE_MS, HAND_IN_MS, type HandTarget, PARENTS_SCRIPT, PRESS_MS, sampleWeek, TARGET_SELECTORS } from "./parentsScript";
-import { PottyPlay } from "./PottyPlay";
-import type { StarLog } from "./stars";
+import { PottyPlay, preloadPottySounds } from "./PottyPlay";
 import { pottyVoice } from "./voice";
-import { preloadWaitingSong } from "./waitMusic";
+import { loadWaitSong } from "./waitMusic";
 import "./potty.css";
 import "./parentsVideo.css";
 
-/** Between the recording's start and the story: a still first frame to cut at, and time for the setup card to be gone. */
-const LEAD_IN_MS = 600;
 /** How often the script looks whether the story has reached the step it waits for. */
 const POLL_MS = 100;
 /**
@@ -29,14 +24,6 @@ const POLL_MS = 100;
  */
 const SCREEN = { width: 1280, height: 800 };
 
-/** What the page shows: the choices before, the story (recorded or only played), or the video made. */
-type Phase =
-  | { kind: "setup"; note?: string }
-  | { kind: "lead" }
-  | { kind: "play"; recording: boolean }
-  | { kind: "saving" }
-  | { kind: "done"; saved?: SavedVideo };
-
 /** Where the hand's fingertip is on the stage, in pixels, and whether it presses. */
 interface Hand {
   x: number;
@@ -44,33 +31,24 @@ interface Hand {
   pressing: boolean;
 }
 
+/** The game's page in `language`, English where that language has no pages for search engines. */
+const addressFor = (language: string) => {
+  const page: SeoLanguage = SEO_LANGUAGES.find((l) => l === language) ?? "en";
+  return `funforboth.com${languagePrefix(page)}/toepfchen/`;
+};
+
 /**
  * Aufs Töpfchen as a video for parents (idea Y-29, user request, November 2026), reached from /management/: the real
  * game on a drawn tablet lying on a table, a grown-up's drawn hand tapping it through after a fixed script
  * (`PARENTS_SCRIPT`) – the story starting at once, what the child said, the song and the thoughts while sitting, the
  * pause, the ✓ of what came, the week's star – with a short line for grown-ups beside the tablet, and a slate with the
  * game's address at the end for YouTube's end screen. Never a real child: only the tablet and the hand. Nothing is kept
- * (`PottyPlay demo`: no star, no trophy, no play time). Recorded in Chrome like Zähne putzen's video (`tabRecording.ts`);
- * the language follows the shelf.
+ * (`PottyPlay demo`: no star, no trophy, no play time). Recorded in the shared frame (`VideoRecorder`, as the
+ * children's video `PottyVideo` and Zähne putzen's); the language follows the shelf.
  */
 export function ParentsVideo() {
   const language = useAppLanguage();
-  const t = useT();
-  const [phase, setPhase] = useState<Phase>({ kind: "setup" });
   const [songReady, setSongReady] = useState(false);
-  const stage = useRef<HTMLDivElement>(null);
-  const screen = useRef<HTMLDivElement>(null);
-  const recording = useRef<Recording | null>(null);
-  /** The run of the script now going; a new run or Esc makes the old one stop at its next step. */
-  const run = useRef(0);
-  const pixels = useStagePixels(stage);
-  const scale = useScreenScale(screen);
-  const { later } = useTimers();
-  const [hand, setHand] = useState<Hand | null>(null);
-  const [line, setLine] = useState<string | null>(null);
-  const [slate, setSlate] = useState(false);
-  /** The week the end shows, made anew when the story starts, so the video's star lands on today. */
-  const [week, setWeek] = useState<StarLog>({});
 
   // The video's sound is the game's own (voice, sounds, the waiting song): the app's background song stays out of it.
   useNoBackgroundMusic();
@@ -79,7 +57,8 @@ export function ParentsVideo() {
   useEffect(() => {
     setSongReady(false);
     let alive = true;
-    void preloadWaitingSong(language.id).then(() => alive && setSongReady(true));
+    preloadPottySounds();
+    void loadWaitSong(language.id).then(() => alive && setSongReady(true));
     pottyVoice.loadAll(language.id);
     const pictures = STEPS.flatMap((step) => [...picturesFor(step, "pipi"), ...(step.moves ?? [])]);
     const thoughts = scenesFor("pipi").map(scenePicture);
@@ -89,39 +68,48 @@ export function ParentsVideo() {
     };
   }, [language.id]);
 
-  const fileName = (type: string) => `toepfchen-fuer-eltern-${language.id}.${videoExtension(type)}`;
+  const languageName = TARGET_LANGUAGES.find((l) => l.id === language.id)?.label ?? language.id;
+  const address = addressFor(language.id);
 
-  const onSaved = useCallback(
-    (blob: Blob, sound: boolean) => {
-      recording.current = null;
-      const saved = { url: URL.createObjectURL(blob), name: fileName(blob.type), bytes: blob.size, sound };
-      downloadVideo(saved);
-      setPhase({ kind: "done", saved });
-    },
-    [language.id],
+  return (
+    <VideoRecorder
+      title="Aufs Töpfchen: Video für Eltern"
+      about={`Das echte Spiel auf einem Tablet, eine gezeichnete Hand tippt es durch: die Geschichte startet sofort, „Was muss dein Kind?“, das Lied und die Gedanken beim Sitzen, die Pause, das ✓ und der Stern der Woche – daneben kurze Zeilen für Eltern, am Ende ${END_SLATE_MS / 1000} s Name und Adresse für den Abspann von YouTube. Etwa anderthalb Minuten. Kein echtes Kind im Bild, und es zählt nichts: kein Stern, keine Spielzeit. Die Sprache stellt man im Regal um (🌐). Bei YouTube als „nicht speziell für Kinder“ hochladen, dann gehen Link und Abspann.`}
+      facts={[
+        ["Sprache", `${languageName}${language.id !== "en" ? " (die Zeilen für Eltern gibt es bisher nur auf Englisch)" : ""}`],
+        ["Adresse", address],
+      ]}
+      ready={songReady}
+      loading="Warte-Lied lädt …"
+      fileName={(extension) => `toepfchen-fuer-eltern-${language.id}.${extension}`}
+      stageStyle={{ background: "#b9824f" }}
+      play={(onFinished) => <ParentsPlay address={address} onFinished={onFinished} />}
+    />
   );
+}
 
-  // The old video's file is let go when a new one is made or the page is left.
-  const savedUrl = phase.kind === "done" ? phase.saved?.url : undefined;
-  useEffect(() => (savedUrl ? () => URL.revokeObjectURL(savedUrl) : undefined), [savedUrl]);
+/**
+ * The video itself, mounted on the stage while it runs: the table, the tablet with the game, the lines and the hand. The
+ * script goes beat by beat – it waits for its step, shows its line, and brings the hand to tap at the end of its wait –
+ * then the slate stands and the video ends (`onFinished`). Unmounted (Esc), it stops at its next step.
+ */
+function ParentsPlay({ address, onFinished }: { address: string; onFinished: () => void }) {
+  const t = useT();
+  const stage = useRef<HTMLDivElement>(null);
+  const screen = useRef<HTMLDivElement>(null);
+  const scale = useScreenScale(screen);
+  const { later } = useTimers();
+  const [hand, setHand] = useState<Hand | null>(null);
+  const [line, setLine] = useState<string | null>(null);
+  const [slate, setSlate] = useState(false);
+  /** The week the end shows, made as the story starts, so the video's star lands on today. */
+  const [week] = useState(() => sampleWeek(new Date()));
+  const finished = useRef(onFinished);
+  finished.current = onFinished;
 
-  /** The slate has stood long enough: the recording ends and is saved, or the playing simply stops. */
-  const finish = useCallback(() => {
-    run.current++;
-    if (recording.current) {
-      setPhase({ kind: "saving" });
-      recording.current.stop();
-    } else setPhase({ kind: "done" });
-  }, []);
-
-  // The script: beat by beat it waits for its step, shows its line, and brings the hand to tap at the end of its wait.
   useEffect(() => {
-    if (phase.kind !== "play") return;
-    const id = ++run.current;
-    setLine(null);
-    setSlate(false);
+    let going = true;
     const sleep = (ms: number) => new Promise<void>((resolve) => later(resolve, ms));
-    const going = () => run.current === id;
     const root = () => screen.current?.querySelector<HTMLElement>(".potty-play") ?? null;
     /** The hand below the picture again, where it came from: straight down from where it tapped. */
     const away = (x: number) => setHand({ x, y: (stage.current?.clientHeight ?? 0) + 40, pressing: false });
@@ -136,11 +124,11 @@ export function ParentsVideo() {
       const y = at.top + at.height * 0.55;
       setHand({ x: x - box.left, y: y - box.top, pressing: false });
       await sleep(HAND_IN_MS);
-      if (!going()) return;
+      if (!going) return;
       setHand({ x: x - box.left, y: y - box.top, pressing: true });
       button.classList.add("pt-pressed");
       await sleep(PRESS_MS);
-      if (!going()) return;
+      if (!going) return;
       // The game's own answer to the finger: its glow lies in the game's box, so the point is given in it.
       button.dispatchEvent(
         new PointerEvent("pointerdown", {
@@ -160,186 +148,49 @@ export function ParentsVideo() {
     away((stage.current?.clientWidth ?? 0) / 2);
     void (async () => {
       for (const beat of PARENTS_SCRIPT) {
-        while (going() && !root()?.classList.contains(`pt-at-${beat.at}`)) await sleep(POLL_MS);
-        if (!going()) return;
+        while (going && !root()?.classList.contains(`pt-at-${beat.at}`)) await sleep(POLL_MS);
+        if (!going) return;
         if (beat.line) setLine(t(beat.line));
         if (!beat.tap) {
           await sleep(beat.wait);
           continue;
         }
         await sleep(Math.max(0, beat.wait - HAND_IN_MS - PRESS_MS));
-        if (!going()) return;
+        if (!going) return;
         await tap(beat.tap);
       }
-      if (!going()) return;
+      if (!going) return;
       setLine(null);
       setSlate(true);
       await sleep(END_SLATE_MS);
-      if (going()) finish();
+      if (going) finished.current();
     })();
-  }, [phase.kind]);
-
-  const start = (recorded: boolean) => {
-    setWeek(sampleWeek(new Date()));
-    setPhase({ kind: "lead" });
-    later(() => setPhase({ kind: "play", recording: recorded }), LEAD_IN_MS);
-  };
-
-  const record = async () => {
-    unlockAudio();
-    const element = stage.current;
-    if (!element) return;
-    try {
-      // The setup card goes first: the stage is recorded with whatever lies over it.
-      setPhase({ kind: "lead" });
-      await new Promise((resolve) => requestAnimationFrame(() => requestAnimationFrame(resolve)));
-      recording.current = await recordTab(element, onSaved);
-      start(true);
-    } catch {
-      // The grown-up said no to sharing the tab, or the browser can't.
-      recording.current = null;
-      setPhase({ kind: "setup", note: "Keine Aufnahme: Das Teilen des Tabs wurde abgebrochen oder ist hier nicht möglich." });
-    }
-  };
-
-  const playOnly = () => {
-    unlockAudio();
-    void document.documentElement.requestFullscreen?.().catch(() => undefined);
-    start(false);
-  };
-
-  // Esc ends a recording early (keeping what is there) or stops the playing.
-  useEffect(() => {
-    const onKeyDown = (e: KeyboardEvent) => {
-      if (e.key !== "Escape" || (phase.kind !== "play" && phase.kind !== "lead")) return;
-      if (recording.current) finish();
-      else {
-        run.current++;
-        setPhase({ kind: "setup" });
-      }
+    return () => {
+      going = false;
     };
-    window.addEventListener("keydown", onKeyDown);
-    return () => window.removeEventListener("keydown", onKeyDown);
-  }, [phase.kind, finish]);
-
-  // Left in the middle: the capture ends with the page.
-  useEffect(
-    () => () => {
-      run.current++;
-      recording.current?.stop();
-    },
-    [],
-  );
-
-  const languageName = TARGET_LANGUAGES.find((l) => l.id === language.id)?.label ?? language.id;
-  const running = phase.kind === "lead" || phase.kind === "play" || phase.kind === "saving";
-  const sharp = pixels && pixels.height >= 1080;
-  // The game's page in the video's language, English where that language has no pages for search engines.
-  const pageLanguage: SeoLanguage = SEO_LANGUAGES.find((l) => l === language.id) ?? "en";
-  const address = `funforboth.com${languagePrefix(pageLanguage)}/toepfchen/`;
+  }, []);
 
   return (
-    <div className={`pv${running ? " running" : ""}`}>
-      <div className="pv-stage" ref={stage}>
-        <div className="pv-tablet">
-          <div className="pv-screen" ref={screen}>
-            <div className="pv-device" style={{ width: SCREEN.width, height: SCREEN.height, transform: `scale(${scale})` }}>
-              {phase.kind === "play" && <PottyPlay demo={{ stars: week }} />}
-            </div>
+    <div className="pv-stage" ref={stage}>
+      <div className="pv-tablet">
+        <div className="pv-screen" ref={screen}>
+          <div className="pv-device" style={{ width: SCREEN.width, height: SCREEN.height, transform: `scale(${scale})` }}>
+            <PottyPlay demo={{ stars: week }} />
           </div>
         </div>
-        {/* A click of the one recording reaches nothing: only the drawn hand taps the game. */}
-        <div className="pv-shield" />
-        {line && (
-          <p key={line} className="pv-line">
-            {line}
-          </p>
-        )}
-        {hand && <ParentHand {...hand} />}
-        {slate && (
-          <div className="pv-slate">
-            <p className="pv-slate-name">Fun for Both</p>
-            <p className="pv-slate-address">{address}</p>
-          </div>
-        )}
       </div>
-
-      {phase.kind === "setup" && (
-        <div className="pv-card">
-          <MenuTop to="/management/" back="Management" />
-          <h1>Aufs Töpfchen: Video für Eltern</h1>
-          <p>
-            Das echte Spiel auf einem Tablet, eine gezeichnete Hand tippt es durch: die Geschichte startet sofort, „Was muss dein Kind?“, das Lied und die
-            Gedanken beim Sitzen, die Pause, das ✓ und der Stern der Woche – daneben kurze Zeilen für Eltern, am Ende {END_SLATE_MS / 1000} s Name und Adresse
-            für den Abspann von YouTube. Etwa anderthalb Minuten. Kein echtes Kind im Bild, und es zählt nichts: kein Stern, keine Spielzeit.
-          </p>
-          <dl className="pv-facts">
-            <dt>Sprache</dt>
-            <dd>
-              {languageName}
-              {language.id !== "en" && " (die Zeilen für Eltern gibt es bisher nur auf Englisch)"}
-            </dd>
-            <dt>Video</dt>
-            <dd className={sharp ? undefined : "pv-warn"}>
-              {pixels ? `${pixels.width} × ${pixels.height} Pixel` : "…"}
-              {pixels && !sharp && " – für 1080p das Fenster größer ziehen"}
-            </dd>
-            <dt>Lied</dt>
-            <dd>{songReady ? "geladen" : "lädt …"}</dd>
-            <dt>Adresse</dt>
-            <dd>{address}</dd>
-          </dl>
-          <p className="pv-small">
-            Die Sprache stellt man im Regal um (🌐). Bei YouTube als „nicht speziell für Kinder“ hochladen, dann gehen Link und Abspann.
-          </p>
-          {phase.note && <p className="pv-warn">{phase.note}</p>}
-          <div className="pv-actions">
-            {canRecord() && (
-              <button type="button" className="pv-go" disabled={!songReady} onClick={() => void record()}>
-                🎬 Aufnehmen
-              </button>
-            )}
-            <button type="button" disabled={!songReady} onClick={playOnly}>
-              ▶ Nur abspielen
-            </button>
-          </div>
-          <p className="pv-small">
-            {canRecord()
-              ? "🎬 Der Browser fragt, ob er diesen Tab teilen darf: „Tab-Audio teilen“ angehakt lassen. Aufgenommen wird nur das Bild; am Ende speichert er das Video in den Downloads. "
-              : "Dieser Browser kann den Tab nicht selbst aufnehmen (das kann Chrome). "}
-            ▶ spielt im Vollbild, für ein eigenes Aufnahmeprogramm. Esc bricht ab.
-          </p>
-        </div>
+      {/* A click of the one recording reaches nothing: only the drawn hand taps the game. */}
+      <div className="pv-shield" />
+      {line && (
+        <p key={line} className="pv-line">
+          {line}
+        </p>
       )}
-
-      {phase.kind === "saving" && <p className="pv-card pv-small">Video wird gespeichert …</p>}
-
-      {phase.kind === "done" && (
-        <div className="pv-card">
-          <MenuTop to="/management/" back="Management" />
-          {phase.saved ? (
-            <>
-              <h1>Video gespeichert</h1>
-              <p>
-                {phase.saved.name} ({(phase.saved.bytes / 1e6).toFixed(0)} MB) liegt in den Downloads.
-              </p>
-              {!phase.saved.sound && <p className="pv-warn">Ohne Ton aufgenommen: beim Teilen „Tab-Audio teilen“ anhaken.</p>}
-              {/* biome-ignore lint/a11y/useMediaCaption: the lines for grown-ups stand in the picture itself. */}
-              <video className="pv-preview" src={phase.saved.url} controls />
-            </>
-          ) : (
-            <h1>Fertig</h1>
-          )}
-          <div className="pv-actions">
-            {phase.saved && (
-              <button type="button" onClick={() => phase.saved && downloadVideo(phase.saved)}>
-                Nochmal speichern
-              </button>
-            )}
-            <button type="button" className="pv-go" onClick={() => setPhase({ kind: "setup" })}>
-              Neue Aufnahme
-            </button>
-          </div>
+      {hand && <ParentHand {...hand} />}
+      {slate && (
+        <div className="pv-slate">
+          <p className="pv-slate-name">Fun for Both</p>
+          <p className="pv-slate-address">{address}</p>
         </div>
       )}
     </div>

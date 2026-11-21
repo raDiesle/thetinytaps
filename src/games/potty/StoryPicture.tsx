@@ -5,7 +5,7 @@ import { framesFor } from "./images";
 const FRAME_MS = 900;
 
 /** How long each picture of a step's tiny animation (`moves`) stays before the next. */
-const MOVE_MS = 650;
+export const MOVE_MS = 650;
 
 /**
  * A picture of the story; in „Muss mal!“ it fills the screen. Its two frames fade into each

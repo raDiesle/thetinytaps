@@ -3,11 +3,25 @@
 The book „Buchstaben & Zahlen“ holds five games, each a page of its table of contents (`games.ts`), sharing this folder
 and one store of settings (`tinytaps.letters.v2`, so letters, pictures and keys stay as chosen in each):
 - Frei tippen, `/buchstaben/` (`LettersPlay.tsx`): every key shows its letter with a picture and word; a number shows its
-  things and digit at once, or optionally counts them aloud, step by step or by tapping each thing.
+  things and digit at once, or optionally counts them aloud, step by step or by tapping each thing. Every other key
+  without a job of its own, and every tap beside the card, opens a surprise (`Surprises.tsx`, `surprises.css`, below).
 - Zählen, `/zaehlen/` (`LettersPlay.tsx` with `numbersOnly`): only numbers come – a digit shows itself, any other key
   without a meaning of its own (Space, Enter, arrows, Backspace keep theirs) brings a number from 1 to 9 by chance; on
   touch screens only the digit keys. With `digitOnRepeat` (for „Alles sofort“ and „Vorzählen“, in both games) a number
-  shows its things first and its digit only when the same number is pressed again right after.
+  shows its things first and its digit only when the same number is pressed again right after. With `twoDigits`
+  („Two-digit numbers“ behind ⚙️, in both games; user request, November 2026) two keys make one number
+  (`twoDigits.ts`): the first digit waits big beside an empty dashed place (`HalfNumberCard`, a soft note, no voice,
+  Backspace takes it back), the second makes the number – a leading 0 a one-digit number – and Zählen's keys by chance
+  bring 10–99. A two-digit number always shows everything at once, whatever „Zahlen“ says: its things in rows of ten,
+  each row two groups of five as on a counting frame, the rest's row starting under them (`TensGrid`), sized from the
+  stage so 99 fits on a phone on its side – counting 99 aloud or by tapping would be no game. Its word („twenty-three!“,
+  English first, `TWO_DIGIT_WORDS`) waits for its recording and stays silent until then; the second digit always
+  answers, while the same number again within `REPEAT_PAUSE_MS` stays quiet.
+- Frei tippen's dark page (`dark`, „Dark page“ behind ⚙️, Frei tippen only; user request, November 2026): night
+  colours take turns behind the card (`DARK_BACKGROUNDS`), and the stage alone turns its `--ink` and `--accent` light
+  (`.ft-dark .stage`), so letters, words, the letter family's hands and the tracing dots follow – the on-screen keys keep
+  their dark outlines and the letters' eyes their dark pupils. A new colour on the card uses `--ink` or `--accent`, never
+  a fixed dark one, or it vanishes on the dark page.
 - Mitmachen, `/mitmachen/` (`MovePlay.tsx`, `move.css`; L-15): a digit, or any other key for a number by chance, has a
   fox or bear child hop, clap or stamp that many times (the three take turns), alone; it
   invites first („Hüpf mit!“ – hop and clap from the pack's doing words, `joinIn`), then counts each one aloud with a
@@ -60,6 +74,17 @@ the page before it.
   only after `REPEAT_PAUSE_MS` (`repeats`, Space, Enter, arrows and Backspace too: the card still moves, silently), and
   the soft note of a press that sets nothing off at most every `EXTRA_SOUND_GAP_MS` in all four games (`useSoftTap`).
   Presses the game asks for again (the next step, tapping each thing, the digit of `digitOnRepeat`) keep answering at once.
+- Frei tippen's surprises (user request, November 2026): a key that is no letter or number and has no job of its own
+  (Space, Enter, arrows and Backspace keep theirs), or a tap beside the card, opens a surprise – a firework, a present
+  with a toy, an egg a baby animal hatches from, balloons that pop, flowers growing, soap bubbles, a rainbow – a tap
+  right where the finger landed, a key somewhere on the stage clear of the card. The kinds take turns from a shuffled
+  bag, never the same twice in a row, and each is drawn anew every time (colours, pattern, burst, what comes out), so
+  every press brings something new. It appears, does its thing and goes again by itself within `SURPRISE.lifeMs`. Never a
+  storm: a new one at most every `SURPRISE.gapMs`, at most `SURPRISE.maxAtOnce` at once, presses between only ripple; its
+  sound answers at once, a second one only as a spaced extra. Each is a few small HTML layers moved only by transform and
+  opacity (`surprises.test.ts`, perf stretch „Überraschungen“). Zählen and the other games keep their calm ripples: this
+  is Frei tippen's own, never a pattern for other games' answers (root `CLAUDE.md`). A new kind goes into
+  `SURPRISE_KINDS`, its classes into the test's `CLASSES`.
 - Choices show the plain value, not an example to decode: the word length is the number of letters (3, 4, 7).
 - „Wörter tippen“ has no settings of its own: no own letter case, picture reveal, „any key types“ or tablet keys;
   it uses the shared ones (pictures theme, letters, on-screen keys). Don't add them back. The letters

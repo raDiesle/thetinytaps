@@ -304,10 +304,11 @@ export function Bookshelf({ secretProps, legal }: { secretProps: HTMLAttributes<
                */}
               <FullscreenButton className="shelf-fullscreen" />
               {/*
-               * The way to the trophy room: a little sign nailed onto the shelf's right side, above the loudspeaker (user
-               * request, November 2026: the trophies standing on a board took the books' room and sank into the wall).
+               * The way to the trophy room: a sign nailed onto the post at the bottom right of the picture books'
+               * compartment, reaching left into it (user request, November 2026: the trophies standing on a board took
+               * the books' room and sank into the wall, and a small sign above the loudspeaker was hardly seen).
                */}
-              <TrophySign top={trophySignTop(layout)} />
+              <TrophySign {...trophySignAt(layout)} />
               <div className="shelf-offline">
                 <RoomOffline />
               </div>
@@ -499,17 +500,13 @@ function labelOf(cell: ShelfCell, layout: ShelfLayout): Localized | undefined {
 }
 
 /**
- * Where the trophy room's sign is nailed onto the shelf's right side, from its top: on the board over the loudspeaker on
- * a wide shelf, on the board under the things on an upright one.
+ * Where the trophy room's sign is nailed on: the bottom right corner of the lowest compartment holding picture books
+ * (the second board on a wide shelf), on the post right of it, so that it reaches left into that compartment.
  */
-function trophySignTop(layout: ShelfLayout) {
-  const board = layout.frame.board;
-  if (!layout.upright) {
-    const music = layout.cells.find((cell) => cell.things?.includes("music"));
-    if (music) return music.y - board / 2;
-  }
-  const books = layout.cells.filter((cell) => cell.books).sort((a, b) => a.y - b.y)[0];
-  return books ? books.y - board / 2 : layout.frame.crown;
+function trophySignAt(layout: ShelfLayout): { left: number; top: number } {
+  const pictureBooks = layout.cells.filter((cell) => cell.books?.some((b) => !PLACES[b][0].colour));
+  const cell = pictureBooks.sort((a, b) => b.y - a.y || b.x - a.x)[0] ?? layout.cells[layout.cells.length - 1];
+  return { left: cell.x + cell.w, top: cell.y + cell.h };
 }
 
 /** A rectangle of the shelf's plan as a style. */

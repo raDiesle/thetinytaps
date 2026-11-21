@@ -1161,47 +1161,104 @@
 }
 
 /*
- * The way into the trophy room (TrophySign): a little paper sign like the fullscreen button's, nailed onto the shelf's
- * right side over the loudspeaker, tipped a little the other way. Still: it never shines or moves by itself.
+ * The way into the trophy room (TrophySign): a paper sign like the fullscreen button's with a big golden cup, nailed
+ * onto the post at the bottom right of the picture books' compartment (`left`/`top` are that corner) and reaching left
+ * into it, tipped a little. Sized by the books, big enough to be recognised at a glance (user request, November 2026).
+ * Two glints on the cup flash now and then, gently, as a trophy does in a game: the one thing on the shelf that moves
+ * by itself (user request, November 2026), two tiny layers of their own moved by transform and opacity only.
  */
 .shelf-trophy-sign {
+  --trophy-sign: clamp(70px, calc(var(--bh) * 0.56), 124px);
   position: absolute;
-  right: calc(var(--post) * -0.35);
   z-index: 3;
   display: grid;
   place-items: center;
-  width: 54px;
-  height: 62px;
-  padding: 9px 4px 3px;
-  border: 3px solid #9a6a40;
-  border-radius: 6px 6px 4px 4px;
+  width: var(--trophy-sign);
+  height: calc(var(--trophy-sign) * 1.14);
+  /* Room for the nail on top; a percentage would measure the whole shelf. */
+  padding: calc(var(--trophy-sign) * 0.15) calc(var(--trophy-sign) * 0.06) calc(var(--trophy-sign) * 0.05);
+  border: 3px solid #b5843a;
+  border-radius: 7px 7px 5px 5px;
   background: linear-gradient(#ffffff80, #0000 30%, #0000 80%, #a0784a26), var(--paper-grain, none), #fbf3df;
-  rotate: -4deg;
-  translate: 0 -50%;
+  rotate: 2deg;
+  /*
+   * Its right edge lies on the post with the nail in it, never past it onto the next compartment's things; the sign
+   * reaches left over the compartment and hangs a little above its floor.
+   */
+  translate: calc(var(--post) * 0.8 - 100%) calc(-100% - var(--trophy-sign) * 0.1);
   box-shadow:
     inset 0 0 0 1px #00000024,
-    3px 3px 6px #3a261452;
+    3px 4px 8px #3a26145c;
   cursor: pointer;
   -webkit-tap-highlight-color: transparent;
 }
 
-/* The nail it hangs on. */
+/* The nail it hangs on, near its right edge, in the post. */
 .shelf-trophy-sign::before {
   content: "";
   position: absolute;
-  top: 2px;
-  left: 50%;
-  width: 8px;
-  height: 8px;
+  top: 3px;
+  right: max(3px, calc(var(--post) * 0.3 - 7.5px));
+  width: 9px;
+  height: 9px;
   border-radius: 50%;
   background: radial-gradient(circle at 35% 35%, #e4ded5, #7a6f64 55%, #3d3530);
   box-shadow: 0 1px 1px #0000004d;
-  translate: -50% 0;
 }
 
 .shelf-trophy-sign-art {
   width: 100%;
   height: 100%;
+}
+
+/* The glints: one at the bowl's rim on the right, one smaller on its left side, flashing one after the other. */
+.shelf-trophy-glint {
+  position: absolute;
+  top: 18%;
+  left: 66%;
+  width: 26%;
+  aspect-ratio: 1;
+  opacity: 0;
+  pointer-events: none;
+  will-change: transform, opacity;
+  animation: trophy-glint 5s 1.2s ease-in-out infinite;
+}
+
+.shelf-trophy-glint + .shelf-trophy-glint {
+  top: 38%;
+  left: 18%;
+  width: 18%;
+  animation-delay: 1.65s;
+}
+
+.shelf-trophy-glint > svg {
+  display: block;
+  width: 100%;
+  height: 100%;
+}
+
+/* Most of the time nothing; then a short glint, growing and turning a little, and gone again. */
+@keyframes trophy-glint {
+  0%,
+  80%,
+  100% {
+    opacity: 0;
+    transform: scale(0.2) rotate(0deg);
+  }
+  87% {
+    opacity: 0.95;
+    transform: scale(1) rotate(45deg);
+  }
+  94% {
+    opacity: 0;
+    transform: scale(0.4) rotate(90deg);
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .shelf-trophy-glint {
+    animation: none;
+  }
 }
 
 .shelf-trophy-sign:focus-visible {
@@ -1344,7 +1401,7 @@
   top: 9%;
   left: 50%;
   width: 26%;
-  aspect-ratio: 40 / 46;
+  aspect-ratio: 48 / 52;
   padding: 2%;
   border-radius: 6px;
   background: #fbf3df;

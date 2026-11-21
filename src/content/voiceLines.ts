@@ -67,6 +67,7 @@ import { PRELUDE } from "@/games/teeth/TeethPlay";
 import { PICTURE_LINES, SOON_LINE, TURN_LINES } from "@/games/timer/voice";
 import { caseLetters, SMALL_PROMPT } from "@/games/letters/CasePlay";
 import { STOMP_INVITE } from "@/games/letters/MovePlay";
+import { TWO_DIGIT_NUMBERS, TWO_DIGIT_WORDS } from "@/games/letters/twoDigits";
 import { type Localized, pick } from "@/lib/language";
 import { voiceId } from "@/lib/voiceName";
 import goodNightFiles from "../components/stimme/*.mp3?glob";
@@ -290,6 +291,9 @@ function letters(language: TargetLanguageId): VoiceGroup[] {
       lines: once([de.zero.sentence, ...de.countables.flatMap((c) => de.numberWords.slice(1).map((_, i) => de.countSentence(i + 1, c)))]),
       built: "Zahl und Ding: „drei Äpfel!“",
     },
+    ...(TWO_DIGIT_WORDS[language]
+      ? [{ label: "Zweistellige Zahlen", lines: once(TWO_DIGIT_NUMBERS.map(TWO_DIGIT_WORDS[language]!)), built: "die Zahlwörter 10–99" }]
+      : []),
   ];
 }
 

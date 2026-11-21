@@ -5,13 +5,20 @@ import { keyOf, toLower, toUpper } from "@/content/languages";
 import { inTheme } from "@/content/themes";
 import type { Countable, LanguagePack, LetterEntry, WordEntry } from "@/content/types";
 import { loadRecordings, playBoing, playChime, playCountNote, playHonk, playWhistle, recorded } from "@/lib/sfx";
-import { useAppLanguage, useT } from "@/lib/language";
+import { pick, useAppLanguage, useT } from "@/lib/language";
 import { repeatPause } from "@/lib/spacing";
-import { LetterCard, NumberCard } from "./Cards";
+import { HalfNumberCard, LetterCard, NumberCard } from "./Cards";
 import { lettersVoice, useLettersSay } from "./voice";
 import type { LettersSettings } from "./settings";
 import { useSoftTap } from "./softTap";
+import { SurpriseLayer, useSurprises } from "./Surprises";
+import { TWO_DIGIT_MAX, TWO_DIGIT_MIN, TWO_DIGIT_WORDS } from "./twoDigits";
 import "./letters.css";
+
+/** A surprise's size: this share of the play area's shorter side, within these limits in px. */
+const SURPRISE_SHARE = 0.42;
+const SURPRISE_MIN = 120;
+const SURPRISE_MAX = 360;
 
 /**
  * Presses closer together than this only make ripples, so mashing doesn't strobe nor chop line after line. The same key
@@ -43,6 +50,8 @@ const ARROWS: Record<string, [number, number]> = {
 };
 
 const BACKGROUNDS = ["#fff4d6", "#e3f6ff", "#e9ffe0", "#ffe8f0", "#efe9ff", "#fff0e0"];
+/** Frei tippen's dark page (`dark`, user request, November 2026): night colours taking turns like the light ones. */
+const DARK_BACKGROUNDS = ["#1f2340", "#152a3a", "#1b2e26", "#2e1f33", "#26203f", "#33261f"];
 
 type Shown = { kind: "letter"; id: number; letter: LetterEntry; word: WordEntry } | { kind: "number"; id: number; n: number; thing: Countable };
 
@@ -56,9 +65,10 @@ function resolveKey(key: string, pack: LanguagePack): Target | null {
   return letter ? { kind: "letter", letter } : null;
 }
 
-/** Zählen: a number by chance for a key that is no digit, never the one on screen. */
-function randomNumber(shown: Shown | null): Target {
-  const others = [1, 2, 3, 4, 5, 6, 7, 8, 9].filter((n) => shown?.kind !== "number" || n !== shown.n);
+/** Zählen: a number by chance for a key that is no digit, never the one on screen; two-digit with `twoDigits`. */
+function randomNumber(shown: Shown | null, twoDigits: boolean): Target {
+  const [min, max] = twoDigits ? [TWO_DIGIT_MIN, TWO_DIGIT_MAX] : [1, 9];
+  const others = Array.from({ length: max - min + 1 }, (_, i) => min + i).filter((n) => shown?.kind !== "number" || n !== shown.n);
   return { kind: "number", n: others[Math.floor(Math.random() * others.length)] };
 }
 
@@ -70,9 +80,11 @@ function isSame(target: Target | null, shown: Shown) {
 
 // Stages: a letter shows everything at once, at stage 0. A number reveals
 // one item per stage (stage k shows k items); the stage after the last item
-// shows the digit. Zero starts with the empty nest at stage 0.
+// shows the digit. Zero starts with the empty nest at stage 0. A two-digit number shows everything at once, at its
+// last stage (`whole`).
 const firstStage = (s: Shown) => (s.kind === "letter" ? 0 : Math.min(1, s.n));
 const lastStage = (s: Shown) => (s.kind === "letter" ? 0 : s.n + 1);
+const isTwoDigit = (s: Shown) => s.kind === "number" && s.n >= TWO_DIGIT_MIN;
 
 /**
  * Frei tippen: every key shows its letter or number. With `numbersOnly` it plays Zählen: only numbers come, a digit
@@ -83,12 +95,17 @@ export function LettersPlay({ pack, settings, numbersOnly = false }: { pack: Lan
   const [stage, setStage] = useState(0);
   /** Counting by tapping: indices of the tapped things, in order. */
   const [tapped, setTapped] = useState<number[]>([]);
-  const [background, setBackground] = useState(BACKGROUNDS[0]);
+  const [backgroundIndex, setBackgroundIndex] = useState(0);
   const [push, setPush] = useState<[number, number]>([0, 0]);
+  /** Two-digit numbers: the first digit pressed, waiting beside an empty place for the second. */
+  const [firstDigit, setFirstDigit] = useState<number | null>(null);
   const { effects, ripple } = useTapFeedback();
   const t = useT();
   const { id: language } = useAppLanguage();
   const stepByStep = settings.numbers === "step";
+  /** Frei tippen only: Zählen keeps its light page. */
+  const dark = settings.dark && !numbersOnly;
+  const background = (dark ? DARK_BACKGROUNDS : BACKGROUNDS)[backgroundIndex];
   /** A number stops before its digit, which comes only when the same number is pressed again (`digitOnRepeat`). */
   const holdDigit = settings.digitOnRepeat && (settings.numbers === "all" || settings.numbers === "count");
 
@@ -114,7 +131,7 @@ export function LettersPlay({ pack, settings, numbersOnly = false }: { pack: Lan
   const say = useLettersSay();
 
   /** Counting by tapping applies to numbers with things to tap, not to the empty nest. */
-  const byTap = useCallback((s: Shown | null) => settings.numbers === "tap" && s?.kind === "number" && s.n > 0, [settings.numbers]);
+  const byTap = useCallback((s: Shown | null) => settings.numbers === "tap" && s?.kind === "number" && s.n > 0 && s.n < TWO_DIGIT_MIN, [settings.numbers]);
 
   /** What a letter shown with `word` says, as the options ask for it. */
   const letterLine = useCallback(
@@ -129,6 +146,7 @@ export function LettersPlay({ pack, settings, numbersOnly = false }: { pack: Lan
   /** The full sentence for a fully revealed letter or number. */
   const sentenceFor = useCallback(
     (s: Shown) => {
+      if (s.kind === "number" && isTwoDigit(s)) return pick(TWO_DIGIT_WORDS, language)(s.n);
       if (s.kind === "number") {
         // A counting sentence without its recording (a new thing to count) says the number alone.
         const sentence = s.n === 0 ? `${pack.numberWords[0]}!` : pack.countSentence(s.n, s.thing);
@@ -139,12 +157,15 @@ export function LettersPlay({ pack, settings, numbersOnly = false }: { pack: Lan
     [pack, letterLine, language],
   );
 
+  /** The same line in English, whose recording stands in where the app language has none yet (two-digit numbers). */
+  const englishFor = useCallback((s: Shown) => (s.kind === "number" && isTwoDigit(s) ? TWO_DIGIT_WORDS.en(s.n) : undefined), []);
+
   /** Speak and play the sound for reaching `stage`. */
   const announce = useCallback(
     (s: Shown, stage: number, queue = false) => {
       if (stage === lastStage(s)) {
         playChime();
-        say(sentenceFor(s), queue);
+        say(sentenceFor(s), queue, englishFor(s));
       } else if (stage === 0) {
         say(pack.zero.sentence, queue);
       } else {
@@ -152,10 +173,51 @@ export function LettersPlay({ pack, settings, numbersOnly = false }: { pack: Lan
         say(`${pack.numberWords[stage]}!`, queue);
       }
     },
-    [pack, say, sentenceFor],
+    [pack, say, sentenceFor, englishFor],
   );
 
   const softTap = useSoftTap(ripple);
+
+  const root = useRef<HTMLDivElement>(null);
+  const stageBox = useRef<HTMLDivElement>(null);
+  const { surprises, spawn } = useSurprises();
+
+  /**
+   * Frei tippen: a surprise where the finger landed (`at`, client px) or, for a key, somewhere on the stage beside the
+   * card. Too soon after the last one (or too many on screen) it only ripples.
+   */
+  const surprise = useCallback(
+    (at?: { x: number; y: number }) => {
+      const area = root.current?.getBoundingClientRect();
+      const stage = stageBox.current?.getBoundingClientRect();
+      if (!area || !stage) return softTap(at?.x, at?.y);
+      const size = Math.max(SURPRISE_MIN, Math.min(SURPRISE_MAX, Math.min(area.width, area.height) * SURPRISE_SHARE));
+      const clamp = (v: number, min: number, max: number) => Math.max(min, Math.min(Math.max(min, max), v));
+      let x: number;
+      let y: number;
+      if (at) {
+        x = at.x;
+        y = at.y;
+      } else {
+        // A free place on the stage, kept clear of the card where it can be.
+        const card = cardBox.current?.firstElementChild?.getBoundingClientRect();
+        const random = () => ({
+          x: stage.left + size * 0.5 + Math.random() * (stage.width - size),
+          y: stage.top + size * 0.6 + Math.random() * (stage.height - size * 1.1),
+        });
+        const overCard = (p: { x: number; y: number }) =>
+          card !== undefined && p.x > card.left - size * 0.4 && p.x < card.right + size * 0.4 && p.y > card.top - size * 0.4 && p.y < card.bottom + size * 0.4;
+        let spot = random();
+        for (let tries = 0; tries < 12 && overCard(spot); tries++) spot = random();
+        x = spot.x;
+        y = spot.y;
+      }
+      x = clamp(x - area.left, size * 0.45, area.width - size * 0.45);
+      y = clamp(y - area.top, size * 0.5, stage.bottom - area.top - size * 0.4);
+      if (!spawn(x, y, size)) softTap(at?.x, at?.y);
+    },
+    [spawn, softTap],
+  );
 
   /** The word the letter comes with next time: its words take turns, so repeated presses stay interesting. */
   const nextWordOf = useCallback(
@@ -212,6 +274,18 @@ export function LettersPlay({ pack, settings, numbersOnly = false }: { pack: Lan
     lettersVoice.load([...numbers, pack.zero.sentence, ...letters], language);
   }, [pack, numbersOnly, upcomingThing, nextWordOf, letterLine, language]);
 
+  /** Two-digit numbers: the ten numbers the first digit can become, loaded while the second is awaited. */
+  const loadDecade = useCallback(
+    (first: number) => {
+      const decade = Array.from({ length: 10 }, (_, i) => first * 10 + i).filter((n) => n >= TWO_DIGIT_MIN);
+      lettersVoice.load(
+        decade.map((n) => ({ text: pick(TWO_DIGIT_WORDS, language)(n), english: TWO_DIGIT_WORDS.en(n) })),
+        language,
+      );
+    },
+    [language],
+  );
+
   useEffect(() => loadAhead(), [loadAhead]);
 
   /** Put `next` on screen; the one before goes on the history for Backspace. */
@@ -221,7 +295,8 @@ export function LettersPlay({ pack, settings, numbersOnly = false }: { pack: Lan
     countingUntil.current = 0;
     if (current.current) history.current = [...history.current.slice(-(MAX_HISTORY - 1)), current.current];
     current.current = next;
-    setBackground(BACKGROUNDS[next.id % BACKGROUNDS.length]);
+    setFirstDigit(null);
+    setBackgroundIndex(next.id % BACKGROUNDS.length);
     setPush([0, 0]);
     setShown(next);
     setTapped([]);
@@ -234,6 +309,12 @@ export function LettersPlay({ pack, settings, numbersOnly = false }: { pack: Lan
       // A word or things were used up: their successors load now.
       loadAhead();
 
+      if (isTwoDigit(next)) {
+        // A two-digit number: all its rows of ten and its digits at once – too many things to count aloud one by one.
+        setStage(lastStage(next));
+        announce(next, lastStage(next));
+        return;
+      }
       if (byTap(next)) {
         // All things are there, waiting to be tapped one by one.
         setStage(0);
@@ -404,6 +485,37 @@ export function LettersPlay({ pack, settings, numbersOnly = false }: { pack: Lan
     (key: string) => {
       let target = resolveKey(key, pack);
       if (numbersOnly && target?.kind === "letter") target = null;
+      if (settings.twoDigits && target?.kind === "number") {
+        // Two-digit numbers: the first digit waits beside an empty place, the second makes the number (2, then 3 is 23).
+        const now = performance.now();
+        if (firstDigit === null) {
+          if (now - lastChange.current < MIN_CHANGE_MS || (settings.finishCounting && now < countingUntil.current)) {
+            softTap();
+            return;
+          }
+          lastChange.current = now;
+          setFirstDigit(target.n);
+          playCountNote(Math.max(0, target.n - 1));
+          loadDecade(target.n);
+          return;
+        }
+        const n = firstDigit * 10 + target.n;
+        lastChange.current = now;
+        if (!repeats.pass(`#${n}`)) {
+          // The same number again so soon: the one on screen comes back, silently.
+          setFirstDigit(null);
+          softTap(undefined, undefined, true);
+          return;
+        }
+        show({ kind: "number", n });
+        return;
+      }
+      if (key === "Backspace" && firstDigit !== null) {
+        // Backspace takes back the digit still waiting for its partner.
+        setFirstDigit(null);
+        softTap();
+        return;
+      }
       // All things are there and the digit waits: the same number again brings it.
       if (holdDigit && shown?.kind === "number" && stage === shown.n && isSame(target, shown)) {
         const now = performance.now();
@@ -424,7 +536,9 @@ export function LettersPlay({ pack, settings, numbersOnly = false }: { pack: Lan
         return;
       }
       if (!target && specialKey(key)) return;
-      if (!target && numbersOnly) target = randomNumber(shown);
+      // Frei tippen: any other key that is no letter or number opens a surprise; Zählen brings a number by chance.
+      if (!target && !numbersOnly) return surprise();
+      if (!target) target = randomNumber(shown, settings.twoDigits);
       const now = performance.now();
       const counting = settings.finishCounting && now < countingUntil.current;
       if (!target || counting || now - lastChange.current < MIN_CHANGE_MS) {
@@ -438,7 +552,26 @@ export function LettersPlay({ pack, settings, numbersOnly = false }: { pack: Lan
       lastChange.current = now;
       show(target);
     },
-    [pack, numbersOnly, holdDigit, shown, stage, show, announce, tryAdvance, softTap, byTap, specialKey, stepByStep, settings.finishCounting, repeats],
+    [
+      pack,
+      numbersOnly,
+      holdDigit,
+      shown,
+      stage,
+      show,
+      announce,
+      tryAdvance,
+      softTap,
+      byTap,
+      specialKey,
+      stepByStep,
+      settings.finishCounting,
+      settings.twoDigits,
+      firstDigit,
+      loadDecade,
+      repeats,
+      surprise,
+    ],
   );
 
   useEffect(() => {
@@ -461,12 +594,16 @@ export function LettersPlay({ pack, settings, numbersOnly = false }: { pack: Lan
   }, []);
 
   // Step-by-step: any click reveals the next part. Otherwise tapping the card
-  // repeats what it says, and tapping elsewhere makes ripples. Counting by
+  // repeats what it says, and tapping elsewhere opens a surprise there (Frei tippen) or ripples (Zählen). Counting by
   // tapping: only the things count; once all are counted, any click brings new ones.
   const onPlayAreaPointer = (e: PointerEvent) => {
-    const waitingForTaps = shown?.kind === "number" && byTap(shown) && stage <= shown.n;
-    if ((stepByStep || byTap(shown)) && shown && !waitingForTaps && tryAdvance()) return;
-    softTap(e.clientX, e.clientY);
+    if ((stepByStep || byTap(shown)) && shown) {
+      const waitingForTaps = shown.kind === "number" && byTap(shown) && stage <= shown.n;
+      if (waitingForTaps || !tryAdvance()) softTap(e.clientX, e.clientY);
+      return;
+    }
+    if (numbersOnly) softTap(e.clientX, e.clientY);
+    else surprise({ x: e.clientX, y: e.clientY });
   };
   const onItemPointer = (index: number, e: PointerEvent) => {
     if (countItem(index)) e.stopPropagation();
@@ -481,10 +618,11 @@ export function LettersPlay({ pack, settings, numbersOnly = false }: { pack: Lan
   const onCardPointer = stepByStep || byTap(shown) ? undefined : repeat;
 
   return (
-    <div className={`letters-play`} style={{ background }} onPointerDown={onPlayAreaPointer}>
-      <div className="stage">
+    <div ref={root} className={`letters-play${dark ? " ft-dark" : ""}`} style={{ background }} onPointerDown={onPlayAreaPointer}>
+      <div ref={stageBox} className="stage">
         <div ref={cardBox} className="card-box" style={{ translate: `${push[0]}cqw ${push[1]}cqh` }}>
-          {shown === null && (
+          {firstDigit !== null && <HalfNumberCard key="half" first={firstDigit} />}
+          {firstDigit === null && shown === null && (
             <p className="letters-welcome">
               {!touchKeys
                 ? t({
@@ -517,7 +655,7 @@ export function LettersPlay({ pack, settings, numbersOnly = false }: { pack: Lan
                     })}
             </p>
           )}
-          {shown?.kind === "letter" && (
+          {firstDigit === null && shown?.kind === "letter" && (
             <LetterCard
               key={shown.id}
               pack={pack}
@@ -528,7 +666,7 @@ export function LettersPlay({ pack, settings, numbersOnly = false }: { pack: Lan
               onPicturePointerDown={nextWord}
             />
           )}
-          {shown?.kind === "number" && (
+          {firstDigit === null && shown?.kind === "number" && (
             <NumberCard
               key={shown.id}
               n={shown.n}
@@ -545,6 +683,7 @@ export function LettersPlay({ pack, settings, numbersOnly = false }: { pack: Lan
         </div>
       </div>
       {touchKeys && <TouchKeyboard rows={rows} onKey={pressKey} label={(key) => (settings.letterCase === "lower" ? toLower(key, pack) : key)} />}
+      {!numbersOnly && <SurpriseLayer surprises={surprises} />}
       <FeedbackLayer effects={effects} />
     </div>
   );

@@ -129,6 +129,19 @@ never the subject of a gendered verb („टैप्सी को सू-सू
 
 The waiting song (`waitMusic.ts`, `useWaitingMusic`): `musik/musik-toepfchen-warten-<lang>.mp3`, found by its file name, sung in the app language, else German; it loops without end and plays alone (nothing speaks while Tapsi sits; it would still get quiet for a voice). In all seven languages (`LOOPS` holds where each song repeats, a whole number of bars from just before the first word). While there is no file or it loads, the synthesized tune (`playWaitNote`, four bars on `BEAT_MS`) repeats instead. Like the brushing song it is part of the game and plays even with Töne or Musik off. Songs come from Suno (`/musik-erzeugen`, see `musik/README.md`: a seamless loop, no fade-out); `languageStatus.ts` lists the sung languages, `potty.test.ts` checks that against the files.
 
+For a YouTube video (idea Y-21, November 2026) `/management/video-toepfchen/` (linked at the top of `/management/`,
+`PottyVideo.tsx`, noindex) plays the whole story once on the shared 16 : 9 stage (`VideoRecorder` in `src/components/`,
+as Zähne putzen's video): `PottyPlay video` shows only the picture – no row of steps, no buttons, no pause, no week's
+stars (the story ends with the party), no `GameEnd` – answers no tap or key, keeps nothing (no star, no play time) and
+puts no `?seite=` into the address. What a grown-up taps in the game is chosen on the page before (`PottyVideoRun`):
+what Tapsi needs (said from the first step on, so the need's picture and the call already say it), what is in the
+potty, and how many whole passes of the waiting song Tapsi sits (`WaitPasses`, `passesEndMs`: the waiting ends where
+the song would begin its first verse again, never inside one). Every other step goes on by itself once its movement
+has played once (`moves`, without `again`), its line is said (`voiceQuiet`) and `VIDEO_LOOK_MS` has passed; the party
+stays `VIDEO_TAIL_MS` more, then the recording ends. The page fetches the pictures, the thoughts that fit, the sounds
+(`preloadPottySounds`), the waiting song (`loadWaitSong`) and every line before it lets the recording start.
+A new thing shown beside the picture (a button, a chart) stays out of the video (`potty.test.ts`).
+
 The video for parents (idea Y-29, November 2026): `/management/video-toepfchen-eltern/` (linked at the top of
 `/management/`, `ParentsVideo.tsx`, noindex) shows the real game on a drawn tablet lying on a table, and a grown-up's
 drawn hand in a jumper sleeve (`ParentHand`) comes up from below and taps it through after a fixed script
@@ -140,7 +153,7 @@ for its step (`pt-at-<step>`), and the hand presses the button (`pt-pressed`, it
 pointer event, so the game answers as to a finger. `PottyPlay demo` keeps nothing: the week shown is made up
 (`sampleWeek`), the round's star is never saved, no `GameEnd` (no trophy, no game counted), no step in the address, and
 a real click or key of the one recording changes nothing. The background song stays out; voice, sounds and the waiting
-song are fetched before (`preloadWaitingSong`). Recorded in Chrome like Zähne putzen's video (`src/lib/tabRecording.ts`).
+song are fetched before (`loadWaitSong`). Recorded in the same shared frame as the children's video (`VideoRecorder`).
 
 ## Rules
 
