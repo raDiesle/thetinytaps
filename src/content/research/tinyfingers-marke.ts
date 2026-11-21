@@ -20,6 +20,7 @@ export const tinyfingersMarke: Research = {
     "Meta keywords gibt es bei uns ohnehin nicht (Regel in CLAUDE.md, jetzt mit Test): Google liest sie nicht, Bing wertet sie als Spam-Zeichen. Gesuchte Wörter gehören in Titel, Beschreibung und Text.",
     "Ein sichtbarer Satz wie „eine Alternative zu TinyFingers“ wäre vergleichende Werbung (§ 6 UWG): nur sachlich und nachprüfbar erlaubt, angreifbar und gegen unsere Regel, dass ein Text nur sagt, was die Seite selbst tut. Nicht empfohlen.",
     "Was frei ist: die beschreibenden Wörter, nach denen Eltern suchen und die TinyFingers selbst bedient – „baby keyboard smash“, „keyboard game for babies“, „baby computer games“. Solche Gattungswörter sind keine Marke und dürfen in Titel und Text von Frei tippen stehen, soweit die Seite das wirklich bietet (die Seitentexte brauchen dann alle sieben Sprachen). „Baby“ und „toddler“ dürfen dort stehen, nur nie im Namen eines Spiels oder der App.",
+    "Umgesetzt (21. November 2026): Beschreibung und Seitentext von Frei tippen nennen jetzt in allen sieben Sprachen ein Tastatur-Spiel für Babys und Kleinkinder, die am Computer oder Laptop drauflos hauen – am besten auf dem Schoß eines Großen (englisch „keyboard smash game for babies and toddlers“). Die Titel blieben, „Buchstaben lernen mit der Tastatur“ wird selbst gesucht; „BabySmash“ (eine bekannte Gratis-App) und „tiny fingers“ stehen bewusst nirgends.",
   ],
   topics: [
     {

@@ -31,8 +31,8 @@ import {
   trainSteps,
 } from "./pieces";
 import { bulbBelow, CANDLE, FLAME_H, GLASS, HOURGLASS_BOX, PLATE, SAND_FLOOR, STAGE_H, STAGE_W, TRAIN } from "./scenes";
-import { DRAW_STEPS } from "./SwapPlay";
-import { PLANK_BOX, SAW, SAW_GROUND, SAW_TILT, SAW_TOY, TYRE_TOP, TYRE_X } from "./seesaw";
+import { FIRST_TURN } from "./SwapPlay";
+import { PLANK_BOX, SAW, SAW_GROUND, SAW_TILT, SEAT_CUSHION_W, TYRE_TOP, TYRE_X, WALKER } from "./seesaw";
 import { LAMP, SWAP_FLOOR, SWAP_SEATS, TOY } from "./swap";
 import { DEFAULT_TIMER_SETTINGS, TIMER_SECONDS } from "./settings";
 import {
@@ -529,25 +529,32 @@ describe("Timer", () => {
     expect(TOY.onCushion - TOY.h).toBeGreaterThanOrEqual(80);
   });
 
-  // H-109: the seesaw is the time – a seat sinks the whole turn long until it lies on its tyre, then the other child's
-  // seat, up high, carries the toy down. It must touch down for real, stay fair and be seen whole on a phone on its side.
+  // H-109: the seesaw is the time – a seat sinks the whole turn long until it lies on its tyre, as the chick walks over to
+  // it, then the other child's seat, up high, sinks. It must touch down for real, stay fair, tip far (user request,
+  // 21 November 2026: a bigger board, a plainer motion) and be seen whole on a phone on its side.
   test("Wippe: the seat touches down on its tyre, both seats the same either side, and everything stays on the screen (H-109)", () => {
     const rad = (SAW_TILT * Math.PI) / 180;
     // Tipped, the plank's underside under the low seat lies exactly on the tyre's top, and the tyres lie under the seats.
     expect(SAW.y + SAW.thick / 2 + SAW.seat * Math.sin(rad)).toBeCloseTo(TYRE_TOP);
     expect(SAW.x - TYRE_X.fox).toBeCloseTo(TYRE_X.bear - SAW.x);
     expect(TYRE_TOP).toBeLessThan(SAW_GROUND);
-    // A tilt a child sees from the sofa, and the plank's end never sinks into the ground.
-    expect(SAW_TILT).toBeGreaterThanOrEqual(10);
+    // A big board and a tilt a child sees from the sofa, and the plank's end never sinks into the ground.
+    expect(SAW_TILT).toBeGreaterThanOrEqual(22);
+    expect(SAW.thick).toBeGreaterThanOrEqual(40);
     expect(SAW.y + SAW.thick / 2 + SAW.half * Math.sin(rad)).toBeLessThan(SAW_GROUND);
     // Fair: the pivot in the middle of the stage, both seats as far from it.
     expect(SAW.x as number).toBe(STAGE_W / 2);
-    // Level (while the sides draw who begins) the cushions and the toy on a seat stay within the screen's safe part.
-    expect(SAW.x - SAW.seat - SAW_TOY.w / 2).toBeGreaterThanOrEqual(200);
-    expect(SAW.x + SAW.seat + SAW_TOY.w / 2).toBeLessThanOrEqual(RIGHT_EDGE);
-    // The toy on the seat up high stays below the top, and the toy waiting in front of the stand above the bottom.
-    expect(SAW_TOY.onSeat - SAW_TOY.h - SAW.seat * Math.sin(rad)).toBeGreaterThanOrEqual(80);
-    expect(SAW_TOY.waiting).toBeLessThanOrEqual(820);
+    // Level (at the end) the cushions stay within the screen's safe part.
+    expect(SAW.x - SAW.seat - SEAT_CUSHION_W / 2).toBeGreaterThanOrEqual(200);
+    expect(SAW.x + SAW.seat + SEAT_CUSHION_W / 2).toBeLessThanOrEqual(RIGHT_EDGE);
+    // The chick walks between the cushions, never into them, and the cushion up high (its ears) and the chick at the
+    // high end stay below the top.
+    expect(WALKER.reach + WALKER.w / 2).toBeLessThanOrEqual(SAW.seat - SEAT_CUSHION_W / 2);
+    const plankTop = SAW.y - SAW.thick / 2;
+    expect(plankTop - WALKER.h - WALKER.reach * Math.sin(rad)).toBeGreaterThanOrEqual(80);
+    expect(plankTop - 114 - SAW.seat * Math.sin(rad)).toBeGreaterThanOrEqual(80);
+    // The chick walks far each turn, so its way is seen even on a long one.
+    expect(WALKER.reach * 2).toBeGreaterThanOrEqual(500);
     // The plank turns round the pivot in the middle of its layer.
     expect(PLANK_BOX.x + PLANK_BOX.w / 2).toBe(SAW.x as number);
     expect(PLANK_BOX.y + PLANK_BOX.h / 2).toBe(SAW.y as number);
@@ -567,12 +574,12 @@ describe("Timer", () => {
     expect(SWAP_FLOOR).toBe(SAND_FLOOR);
   });
 
-  // User feedback, November 2026: who begins must be plain from the start. The lamps draw it, slower and slower, and
-  // an even count of changes ends on the lamp lit first – the one drawn.
-  test("the lamps' draw of who begins slows down and ends on the lamp lit first", () => {
-    expect(DRAW_STEPS.length % 2).toBe(0);
-    for (let i = 1; i < DRAW_STEPS.length; i++) expect(DRAW_STEPS[i]).toBeGreaterThanOrEqual(DRAW_STEPS[i - 1]);
-    expect(DRAW_STEPS.reduce((a, b) => a + b, 0)).toBeLessThanOrEqual(4000);
+  // User feedback, 21 November 2026: no start sequence drawing a side at random – the fox child begins at once, shown
+  // from the first second, and a grown-up gives the other child the first turn behind ⚙️.
+  test("Abwechseln and the Wippe start with the fox child's turn, never with a draw", async () => {
+    expect(FIRST_TURN).toBe("fox");
+    const play = await Bun.file("src/games/timer/SwapPlay.tsx").text();
+    expect(play).not.toMatch(/Math\.random|DRAW_STEPS|WHO_BEGINS/);
   });
 
   // The book's paper margin and the ⚙️ note lie over the stage's right edge (x 1400 at 4:3): a figure standing to 1380
