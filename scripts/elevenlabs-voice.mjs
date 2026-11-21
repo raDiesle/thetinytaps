@@ -40,6 +40,15 @@ const RAW_DIR = ".voice-raw";
 const FORMAT = "mp3_22050_32";
 /** Always the turbo model: half the credits of eleven_v4, so the monthly credits reach for every language. */
 const DEFAULT_MODEL = "eleven_v4_turbo";
+/**
+ * The only models a recording may come from (user decision, 21 November 2026): what we make must be allowed in our
+ * YouTube videos, and ElevenLabs gives a commercial license only on a paid plan and not for its Beta Services. A model
+ * joins this list only once its page and the terms (elevenlabs.io/docs → „Can I publish the content I generate“, the
+ * service-specific terms) show it is no Beta Service; `src/elevenLabsLicense.test.ts` checks every model named here.
+ */
+const LICENSED_MODELS = ["eleven_v4_turbo", "eleven_ttv_v3"];
+/** Plans without a commercial license: a key of such an account never records (`/user/subscription`'s `tier`). */
+const UNLICENSED_TIERS = ["free"];
 
 /** The voice wanted: a children's sports coach who shows the way and cheers, slowly and clearly for 2-year-olds. */
 const DEFAULT_DESCRIPTION =
@@ -172,8 +181,21 @@ async function call(path, { body, query, soft = false } = {}) {
 async function credits() {
   const response = await call("/user/subscription", { soft: true });
   if (!response) return null;
-  const { character_count: used, character_limit: limit } = await response.json();
-  return { used, limit, left: limit - used };
+  const { character_count: used, character_limit: limit, tier } = await response.json();
+  return { used, limit, left: limit - used, tier: String(tier ?? "") };
+}
+
+/**
+ * Stops before the first paid request when what it would make could not go into a YouTube video: a model not on
+ * `LICENSED_MODELS`, or an account whose plan has no commercial license. An account that can't tell its plan is told
+ * so, never taken as licensed silently.
+ * @param {string} model
+ */
+async function requireLicense(model) {
+  if (!LICENSED_MODELS.includes(model)) fail(`${model} is not on LICENSED_MODELS (scripts/elevenlabs-voice.mjs): only licensed, non-beta models`);
+  const plan = await credits();
+  if (!plan) console.log('The key may not read its plan ("User: Read"), so the commercial license is not checked – check the account yourself.');
+  else if (UNLICENSED_TIERS.includes(plan.tier)) fail(`This account is on the ${plan.tier} plan, which has no commercial license: use a paid account`);
 }
 
 /**
@@ -339,7 +361,9 @@ async function tryLine() {
   if (!TAGS[kind]) fail(`--kind is one of ${Object.keys(TAGS).join(", ")}`);
   mkdirSync(RAW_DIR, { recursive: true });
   const file = join(RAW_DIR, "probe.mp3");
-  writeFileSync(file, await record(readConfig(), spoken({ text, kind }), 1, values.lang ?? "de"));
+  const config = readConfig();
+  await requireLicense(values.model ?? config.model);
+  writeFileSync(file, await record(config, spoken({ text, kind }), 1, values.lang ?? "de"));
   console.log(file);
 }
 
@@ -379,6 +403,7 @@ async function make() {
     return;
   }
   if (!todo.length) return;
+  await requireLicense(values.model ?? config.model);
   const needed = Math.ceil(characters * CREDITS_PER_CHARACTER);
   const before = await credits();
   if (!before) console.log('The key may not read the credits ("User: Read" on elevenlabs.io), so they are not checked.');
