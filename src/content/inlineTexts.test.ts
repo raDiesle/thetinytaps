@@ -45,8 +45,10 @@ const FOLDERS: Record<string, string[]> = {
   "/schnullerfee/": ["src/games/pacifierstory"],
   "/kita/": ["src/games/kitastory"],
   "/haare-waschen/": ["src/games/hairstory"],
+  "/grosses-bett/": ["src/games/bedstory"],
   "/flaeschchen/": ["src/games/bottlestory"],
-  "/abstillen/": ["src/games/milkchain"],
+  // The night story is a volume of the book Abstillen, a part of its row with its own files.
+  "/abstillen/": ["src/games/milkchain", "src/games/nightmilk"],
   "/": ["src/components", "src/pages", "src/lib", "src/content/games.ts"],
 };
 

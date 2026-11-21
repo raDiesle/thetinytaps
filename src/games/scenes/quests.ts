@@ -4,7 +4,8 @@ import { pick } from "@/lib/random";
 import { type ColourTrait, isColourTrait } from "./colourParts";
 import { SCENE_PHRASES } from "./phrases";
 import type { SceneMode } from "./settings";
-import type { Scene, SceneItem, SceneTrait } from "./types";
+import { riddleSoundsOf, SOUND_QUESTION } from "./soundRiddle";
+import type { Scene, SceneItem, SceneSound, SceneTrait } from "./types";
 
 /** What the child is asked to find in find and questions mode. */
 export interface Quest {
@@ -24,6 +25,8 @@ export interface Quest {
   item?: SceneItem;
   /** Questions mode: shown in the bubble. */
   emoji?: string;
+  /** Sound mode: the sound that is the question, played when it is asked (soundRiddle.ts). */
+  sound?: SceneSound;
   /** Said for a right answer: "Das ist der Bagger!" */
   praise: (item: SceneItem) => string;
 }
@@ -51,6 +54,18 @@ export function questsFor(mode: SceneMode, scene: Scene, languageId: TargetLangu
       const colour = isColourTrait(trait) ? trait : undefined;
       return { id: trait, question, answers, colour, partPraise: part, needed: Math.min(MAX_NEEDED, answers.length), emoji, praise };
     }).filter((quest) => quest.answers.length >= 2);
+  }
+  if (mode === "sound") {
+    // Every item making the sound is right, also one that only borrows it (BORROWED_SOUNDS); one is enough.
+    return riddleSoundsOf(scene).map((sound) => ({
+      id: sound,
+      question: pickLanguage(SOUND_QUESTION, languageId),
+      answers: scene.items.filter((item) => item.sound === sound),
+      needed: 1,
+      emoji: "🔊",
+      sound,
+      praise: words.hereIs,
+    }));
   }
   return [];
 }

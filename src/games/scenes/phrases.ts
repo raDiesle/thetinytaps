@@ -2,7 +2,7 @@ import type { Localized } from "@/lib/language";
 import type { SceneItem, SceneTrait } from "./types";
 
 // Every sentence the engine builds itself, in each language: prompts, praise,
-// the party, find and trait questions, vehicles driving between pictures. The
+// the end, find and trait questions, vehicles driving between pictures. The
 // items' own names and sentences come from the scene (localize.ts). A language
 // missing here is German; add a new German line in every language next to it.
 
@@ -39,7 +39,7 @@ export interface ScenePhrases {
   roadPrompts: Record<ScenePrompt, string>;
   /** Said before the praise of a right answer, one at random. */
   praise: string[];
-  /** The party when everything is coloured / discovered. */
+  /** The end when everything is coloured / discovered. */
   allColoured: string;
   allFound: string;
   /** Bedtime picture: all are asleep. */

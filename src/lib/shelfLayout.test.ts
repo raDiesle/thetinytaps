@@ -1,6 +1,6 @@
 import { describe, expect, test } from "bun:test";
 import { readFileSync } from "node:fs";
-import { BOOK_ASPECT, BOOK_GAP, LEAN_CLEAR, planShelf, SHELF_THINGS, SIGN_DIP, type ShelfRect, TAKE_OUT } from "./shelfLayout";
+import { BOOK_ASPECT, BOOK_GAP, LEAN_CLEAR, planShelf, SHELF_THINGS, SIGN_DIP, SIGN_OVER_POST, type ShelfRect, TAKE_OUT } from "./shelfLayout";
 
 /** The home page's places: the everyday helpers' books with the words carved before them, then three picture books. */
 const BOOKS = [3, 1, 1, 1];
@@ -79,7 +79,7 @@ describe("the bookshelf", () => {
     "a wide shelf's sign hangs at its top board's far left, clear of the books, in a %i × %i room",
     (width, height) => {
       const options = OPTIONS(height);
-      const { cells, bookHeight: bh, legs, sign } = planShelf(width, height, BOOKS, options);
+      const { cells, bookHeight: bh, legs, sign, frame } = planShelf(width, height, BOOKS, options);
       expect(legs).toBeGreaterThanOrEqual(options.legs - 0.01);
       const top = cells.find((c) => c.books) as (typeof cells)[number];
       expect(sign).toBeDefined();
@@ -97,12 +97,12 @@ describe("the bookshelf", () => {
       const start = top.x + 2 + BOOK_GAP * bh;
       const words = (CARVED * BOOK_ASPECT - LEAN_CLEAR) * bh + (top.lead ?? 0);
       const helpersStart = start + words + LEAN_CLEAR * bh;
-      // At the far left, clear of the post, and clear of the first book to take, which leans towards it.
-      expect(sign.x).toBeGreaterThanOrEqual(top.x + 0.1 * bh);
+      // At the far left, reaching at most half over the post, and clear of the first book to take, which leans towards it.
+      expect(sign.x).toBeGreaterThanOrEqual(top.x - frame.post * SIGN_OVER_POST - 0.01);
       expect(sign.x).toBeLessThanOrEqual(top.x + BOOK_GAP * bh + 2.01);
       expect(sign.x + sign.w).toBeLessThanOrEqual(helpersStart - LEAN_CLEAR * bh + 0.01);
-      // The carved words stand centred under it.
-      expect(start + words / 2).toBeCloseTo(sign.x + sign.w / 2, 0);
+      // The carved words stand centred under it, narrower by their `pull` at the right.
+      expect(start + (words - (top.pull ?? 0)) / 2).toBeCloseTo(sign.x + sign.w / 2, 0);
       // Everything on the board fits it.
       expect((top.lead ?? 0) + span * BOOK_ASPECT * bh + (books.length + 1) * BOOK_GAP * bh).toBeLessThanOrEqual(top.w + 0.01);
       // The foxes on its o rise 0.4 of its letters above it, inside the shelf: it starts right at the screen's top (`--top`;
@@ -110,6 +110,20 @@ describe("the bookshelf", () => {
       expect(sign.y - 0.4 * SIGN(height)).toBeGreaterThanOrEqual(-0.01);
     },
   );
+
+  // The sign and the carved words at the top board's far left take only the room they need: grown to a heading their
+  // place took the books' room (user feedback, November 2026), and the books are what a child looks for. With the home
+  // page's places (the everyday helpers about 3.8 picture books wide, four picture books), against the shelf without
+  // sign and words; the floors lie just under what the plan gives, above what the bigger place gave.
+  test.each([
+    [1000, 650, 0.63],
+    [1250, 640, 0.77],
+    [1880, 900, 0.93],
+  ])("the sign and the carved words leave the books big in a %i × %i room", (width, height, floor) => {
+    const options = OPTIONS(height);
+    const plain = planShelf(width, height, [3.8, 1, 1, 1, 1], { legs: options.legs }).bookHeight;
+    expect(planShelf(width, height, [3.8 + CARVED, 1, 1, 1, 1], options).bookHeight).toBeGreaterThanOrEqual(plain * floor);
+  });
 
   test.each(ROOMS)("compartments and planks lie inside the frame and never on each other in a %i × %i room", (width, height) => {
     const { cells, planks, frame, width: w, height: h, legs } = planShelf(width, height, BOOKS, OPTIONS(height));

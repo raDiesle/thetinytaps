@@ -68,7 +68,17 @@ export const MASCOT_STATUS: MascotStatusRow[] = [
   {
     href: "/abstillen/",
     note: "Gemini-Bilder: Tapsi, Mama und Papa Fuchs durch die ganze Geschichte, gezeichnet nach der Fuchsfamilie (buch-fuechse.webp).",
-    tasks: [{ label: "Tapsi, Mama und Papa Fuchs in allen Bildern", work: "picture", pictures: 51, effort: "M", state: "done" }],
+    tasks: [
+      { label: "Tapsi, Mama und Papa Fuchs in allen Bildern", work: "picture", pictures: 51, effort: "M", state: "done" },
+      {
+        label: "Tapsi, Mama und Papa Fuchs in „The Milk Sleeps at Night“",
+        work: "picture",
+        pictures: 12,
+        effort: "M",
+        idea: "H-104",
+        note: "In der Bilderliste (nightMilkPictures.ts): Wohnzimmer und Tapsis Zimmer nach Bildern der Milchkette und der Schnullerfee, am Abend, nachts im Mondlicht und am Morgen; Papa nachts im gestreiften Schlafanzug.",
+      },
+    ],
   },
   {
     href: "/flaeschchen/",
@@ -89,6 +99,11 @@ export const MASCOT_STATUS: MascotStatusRow[] = [
     href: "/haare-waschen/",
     note: "Gemini-Bilder wie bei „Abstillen“: Tapsi, Mama und Papa Fuchs in derselben Wohnung, dazu ihr Badezimmer; keine Bären, die Familie wäscht selbst.",
     tasks: [{ label: "Tapsi, Mama und Papa Fuchs in den Bildern", work: "picture", pictures: 25, effort: "M", state: "done" }],
+  },
+  {
+    href: "/grosses-bett/",
+    note: "Gemini-Bilder wie bei „Abstillen“: Tapsi, Mama und Papa Fuchs in derselben Wohnung, im Bett, das Tapsi in den anderen Büchern hat; dazu Bruno, Tapsis Bärenfreund aus „Kita-Start“, mit Mama und Papa Bär in ihrem Schlafzimmer und in Brunos Zimmer.",
+    tasks: [{ label: "Tapsi, Mama, Papa Fuchs und Brunos Bärenfamilie in den Bildern", work: "picture", pictures: 34, effort: "M" }],
   },
   {
     href: "/zaehne/",

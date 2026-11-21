@@ -6,7 +6,7 @@ import { RECORDED_GAMES } from "./recordedLines";
 import { INLINE_LINES, voiceLines } from "./voiceLines";
 
 const GAMES = voiceLines();
-const HREFS = new Set(CATEGORIES.flatMap((c) => c.games.map((g) => g.href)));
+const HREFS = new Set(CATEGORIES.flatMap((c) => c.games.flatMap((g) => [g.href, ...(g.also ?? [])])));
 
 /** Every .ts and .tsx file under `dir`, tests left out. */
 const sources = (dir: string): string[] =>
