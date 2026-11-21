@@ -494,13 +494,13 @@
 
 .teeth-progress {
   --gap: clamp(4px, 0.9vmin, 8px);
+  --symbol: clamp(24px, 4.6vmin, 44px);
   position: relative;
   flex: 1;
   display: flex;
   align-items: center;
-  gap: var(--gap);
-  /* The toothbrush riding along measures the bar's width in cqw. */
-  container-type: inline-size;
+  /* Wider between the phases than between the brushing's steps, so the phases read apart. */
+  gap: calc(var(--gap) * 2);
   /* Room above and below the thin bar, so a finger hits it easily. */
   padding: 12px 0;
   cursor: pointer;
@@ -529,9 +529,34 @@
   transition: transform 0.2s linear;
 }
 
-/* The time before the brushing: story, sink and the first look in the mirror. */
-.teeth-segment.intro {
+/* A phase outside the brushing (eating sweets, getting the brush, putting it away): its symbol beside one groove, as
+   long as two steps. Getting the brush and putting it away happen at the sink, so they share its blue. */
+.teeth-tile {
+  /* The symbol's room first, then the rest shared out: two shares for a phase, seven for the brushing's steps. */
+  flex: 2 1 calc(var(--symbol) + var(--gap));
+  min-width: 0;
+  display: flex;
+  align-items: center;
+  gap: var(--gap);
+}
+
+/* Where a groove (or the brushing's steps) lies: on a screen wider than tall all of them in one column, so the bar
+   runs straight beside its symbols. */
+.teeth-lane {
+  flex: 1;
+  min-width: 0;
+  display: flex;
+  align-items: center;
+}
+
+.teeth-segment.eat,
+.teeth-segment.ready {
   --fill: #b9a4f5;
+}
+
+.teeth-segment.fetch,
+.teeth-segment.tidy {
+  --fill: #8fc9f2;
 }
 
 .teeth-segment.top {
@@ -540,6 +565,28 @@
 
 .teeth-segment.inner {
   --fill: #ff8fab;
+}
+
+/* The brushing itself: its steps in a frame of their own, a soft green tray they lie in, the clean tooth at its end. */
+.teeth-brushing {
+  flex: 7 1 calc(var(--symbol) + var(--gap) + 16px);
+  min-width: 0;
+  display: flex;
+  align-items: center;
+  gap: var(--gap);
+  margin: -4px 0;
+  padding: 3px 4px 3px 8px;
+  border: 2px solid #3d304540;
+  border-radius: 999px;
+  background: #dff3e7;
+  box-shadow: inset 0 1px 2px #3d30451f;
+}
+
+/* The steps, equally wide: the riding toothbrush measures their row's width in cqw. */
+.teeth-track {
+  position: relative;
+  gap: var(--gap);
+  container-type: inline-size;
 }
 
 /* The part running now stands a little taller with a golden ring, still – never pulsing. */
@@ -552,18 +599,18 @@
     0 2px 6px 2px #2a1e5c40;
 }
 
-/* The sweet at the start of the bar and the clean tooth at its end, small pictures from Gemini (`symbols.ts`). */
+/* The phases' symbols and the clean tooth, small pictures from Gemini (`symbols.ts`). */
 .teeth-symbol {
   flex: none;
-  width: clamp(34px, 7vmin, 50px);
-  height: clamp(34px, 7vmin, 50px);
+  width: var(--symbol);
+  height: var(--symbol);
   object-fit: contain;
   pointer-events: none;
   filter: drop-shadow(0 1px 1px #3d304540);
 }
 
-/* The toothbrush riding along the bar: a layer as small as the brush, moved by its transform to where the clock is
-   (`--at` parts of `--parts` equally wide ones, with the gaps between them), its head on that point. */
+/* The toothbrush riding along the brushing's steps: a layer as small as the brush, moved by its transform to where the
+   clock is (`--at` steps of `--parts` equally wide ones, with the gaps between them), its head on that point. */
 .teeth-runner {
   position: absolute;
   top: 50%;
@@ -598,19 +645,31 @@
     gap: clamp(6px, 1.4vmin, 14px);
   }
 
+  /* The two buttons side by side on top, the bar under them, the time at the bottom: beside a picture held sideways
+     the strip may be a little wider, and the bar gets the height. */
   .teeth-controls {
     order: -1;
     flex-direction: column;
+    display: grid;
+    grid-template-columns: auto auto;
+    grid-template-rows: auto minmax(0, 1fr) auto;
+    justify-items: center;
     align-self: flex-start;
-    gap: clamp(5px, 1.2vmin, 10px);
+    gap: clamp(5px, 1.2vmin, 10px) clamp(4px, 0.8vmin, 8px);
     width: auto;
     height: calc(100% - var(--corner-clear, 0px));
     max-height: 640px;
     margin-top: var(--corner-clear, 0px);
-    padding: 6px 4px;
+    padding: 6px;
     border-color: #3d304533;
+    border-radius: 24px;
     background: var(--paper-grain), color-mix(in srgb, var(--paper, #fbf4e3) 55%, #fff0);
     box-shadow: 0 4px 12px -6px #2a1e5c40;
+  }
+
+  .teeth-progress,
+  .teeth-time {
+    grid-column: 1 / -1;
   }
 
   .teeth-button {
@@ -622,23 +681,53 @@
   .teeth-progress {
     flex-direction: column;
     align-self: stretch;
-    align-items: center;
+    align-items: stretch;
     --gap: clamp(3px, 0.7vmin, 6px);
+    --symbol: clamp(26px, 5.4vmin, 40px);
+    --lane: clamp(16px, 3.2vmin, 26px);
     min-height: 0;
     /* Room beside the thin bar, so a finger hits it easily. */
     padding: 4px 0;
-    /* Upright, the riding toothbrush measures the bar's height in cqh. */
+  }
+
+  /* Upright, a phase's symbol stands left of its groove, and every groove lies in one lane. */
+  .teeth-tile {
+    min-height: calc(var(--symbol) + 4px);
+    padding: 0 4px 0 8px;
+    border: 2px solid transparent;
+  }
+
+  .teeth-lane {
+    flex: none;
+    align-self: stretch;
+    flex-direction: column;
+    align-items: center;
+    width: var(--lane);
+  }
+
+  .teeth-brushing {
+    min-height: 0;
+    margin: 0;
+    padding: 4px 4px 4px 8px;
+    border-radius: 20px;
+    align-items: stretch;
+  }
+
+  /* The clean tooth stands in the symbols' column, at the end of the brushing. */
+  .teeth-brushing > .teeth-symbol {
+    order: -1;
+    align-self: flex-end;
+  }
+
+  /* Upright, the riding toothbrush measures the steps' column in cqh. */
+  .teeth-track {
+    min-height: 0;
     container-type: size;
   }
 
-  .teeth-symbol {
-    width: clamp(30px, 6vmin, 44px);
-    height: clamp(30px, 6vmin, 44px);
-  }
-
-  /* Upright the brush rides down the bar, turned so its head points down onto where the clock is. */
+  /* Upright the brush rides down the steps, turned so its head points down onto where the clock is. */
   .teeth-runner {
-    top: 4px;
+    top: 0;
     left: 50%;
     transform: translateY(calc((100cqh - var(--gap) * (var(--parts) - 1)) * var(--at) / var(--parts) + var(--gap) * var(--part)));
   }
@@ -651,6 +740,7 @@
   }
 
   .teeth-segment {
+    flex: 1;
     width: clamp(11px, 2.2vmin, 18px);
     height: auto;
     min-height: 0;
