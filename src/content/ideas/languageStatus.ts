@@ -125,6 +125,12 @@ export const LANGUAGE_STATUS: LanguageStatusRow[] = [
     languages: { de: "text", en: "text", zh: "text", hi: "text", es: "text", ar: "text", ru: "text" },
   },
   {
+    href: "/grosses-bett/",
+    note: 'Das Buch „Großes Bett“ mit „Tapsi\'s Big Bed“, einer Geschichte in Kapiteln (bedStory.ts, 21. November 2026), Englisch zuerst geschrieben (ChapterBook first="en"): Name, Satz fürs Regal (names.ts), Kapitel und Sätze nur auf Englisch, alle anderen Sprachen fehlen, Deutsch eingeschlossen, bis die Übersetzung gewünscht wird. Tapsis Stimme liest jede Seite vor, Aufnahmen gibt es noch keine (bun run voice make --only grosses-bett), bis dahin bleibt es still. Die Texte für Suchmaschinen sind in allen sieben Sprachen da.',
+    recorded: true,
+    languages: { en: "text" },
+  },
+  {
     href: "/zaehne/",
     parts: [
       {

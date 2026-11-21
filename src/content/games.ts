@@ -6,6 +6,7 @@ import { BOTTLE_STORY_BLURB, BOTTLE_STORY_BOOK } from "@/games/bottlestory/names
 import { PACIFIER_STORY_BLURB, PACIFIER_STORY_BOOK } from "@/games/pacifierstory/names";
 import { KITA_STORY_BLURB, KITA_STORY_BOOK } from "@/games/kitastory/names";
 import { HAIR_STORY_BLURB, HAIR_STORY_BOOK } from "@/games/hairstory/names";
+import { BED_STORY_BLURB, BED_STORY_BOOK } from "@/games/bedstory/names";
 import {
   CASE_BLURB,
   CASE_TITLE,
@@ -169,6 +170,17 @@ export const CATEGORIES: Category[] = [
         emoji: "🛁",
         title: HAIR_STORY_BOOK,
         blurb: HAIR_STORY_BLURB,
+      },
+      {
+        // The book „Big Bed“ beside „Hair Washing“ (idea H-106, 21 November 2026): „Tapsi's Big Bed“, a story in
+        // chapters along the steps the guides give for moving a small child from the cot into a bed of its own
+        // (src/games/bedstory), English first. Still being built until its Gemini pictures are made (they wait in the
+        // picture queue, made by a Claude cloud session): players never see a picture that isn't made yet.
+        href: "/grosses-bett/",
+        emoji: "🛏️",
+        title: BED_STORY_BOOK,
+        blurb: BED_STORY_BLURB,
+        unfinished: true,
       },
       {
         href: "/zaehne/",

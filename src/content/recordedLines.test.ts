@@ -27,6 +27,7 @@ const PLAYERS: Record<string, string> = {
   "src/games/hairstory/stimme": "src/games/hairstory/HairStoryGame.tsx",
   "src/games/nightmilk/stimme": "src/games/nightmilk/NightMilkGame.tsx",
   "src/games/bottlestory/stimme": "src/games/bottlestory/BottleStoryGame.tsx",
+  "src/games/bedstory/stimme": "src/games/bedstory/BedStoryGame.tsx",
 };
 
 /**
@@ -42,6 +43,7 @@ const GERMAN_ONLY: Record<string, string> = {};
  */
 const ENGLISH_ONLY: Record<string, { href: string; part?: string }> = {
   flaeschchen: { href: "/flaeschchen/" },
+  "grosses-bett": { href: "/grosses-bett/" },
   "abstillen-nachts": { href: "/abstillen/", part: "🌙 The Milk Sleeps at Night" },
 };
 
