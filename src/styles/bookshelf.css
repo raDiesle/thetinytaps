@@ -882,6 +882,15 @@
   background: radial-gradient(closest-side at 50% 58%, #ffe6a8d9, #ffd78f66 62%, #0000);
 }
 
+/*
+ * On the sign and the carved words at the top board's far left, what a visitor should see first (user request, November
+ * 2026): a brighter light, as of a lamp above them, falling from the top. Still, like the other.
+ */
+.shelf-light.lead {
+  scale: 1.15 1;
+  background: radial-gradient(closest-side at 50% 40%, #fff6dafa, #ffe6a8c0 50%, #ffd78f40 80%, #0000);
+}
+
 /* ----- A compartment: a box going back from its opening, lit from the front ----- */
 
 .shelf-cell {
@@ -1110,15 +1119,12 @@
 }
 
 /*
- * The right end also takes the room kept for the sign hanging in front of it (`ShelfCell.trail`), its books spine out
- * beginning where the carved words, moved to stand under the sign (`--words-shift`), end (`--spines-shift`).
+ * Where the carved words and the sign over them begin the board (`data-leads`), they stand at its far left, a gap from
+ * the post, the books to take right after them, and the books spine out fill only the right end.
  */
-.shelf-end:last-child {
-  flex-basis: var(--trail, 0px);
-}
-
-.shelf-end:last-child > .shelf-spines:first-child {
-  margin-left: var(--spines-shift, 0px);
+.shelf-row[data-leads] > .shelf-end:first-child {
+  flex: none;
+  width: 0;
 }
 
 .shelf-spines {
@@ -1161,49 +1167,65 @@
 }
 
 /*
- * The way into the trophy room (TrophySign): a paper sign like the fullscreen button's with a big golden cup, nailed
- * onto the post at the bottom right of the picture books' compartment (`left`/`top` are that corner) and reaching left
- * into it, tipped a little. Sized by the books, big enough to be recognised at a glance (user request, November 2026).
- * Two glints on the cup flash now and then, gently, as a trophy does in a game: the one thing on the shelf that moves
- * by itself (user request, November 2026), two tiny layers of their own moved by transform and opacity only.
+ * The way into the trophy room (TrophySign): a little wooden board in 3D with a big golden cup painted on it, nailed
+ * into the bottom right corner of the picture books' compartment (`left`/`top` are that corner) and reaching left over
+ * the books spine out there (user request, November 2026: a paper sign hanging above the board looked flat and loose).
+ * Sized by the books, big enough to be recognised at a glance (user request, November 2026). Two glints on the cup
+ * flash now and then, gently, as a trophy does in a game: the one thing on the shelf that moves by itself (user
+ * request, November 2026), two tiny layers of their own moved by transform and opacity only.
  */
 .shelf-trophy-sign {
   --trophy-sign: clamp(70px, calc(var(--bh) * 0.56), 124px);
+  --nail: max(8px, calc(var(--trophy-sign) * 0.1));
+  --edge: max(3px, calc(var(--trophy-sign) * 0.05));
   position: absolute;
   z-index: 3;
   display: grid;
   place-items: center;
   width: var(--trophy-sign);
-  height: calc(var(--trophy-sign) * 1.14);
-  /* Room for the nail on top; a percentage would measure the whole shelf. */
-  padding: calc(var(--trophy-sign) * 0.15) calc(var(--trophy-sign) * 0.06) calc(var(--trophy-sign) * 0.05);
-  border: 3px solid #b5843a;
-  border-radius: 7px 7px 5px 5px;
-  background: linear-gradient(#ffffff80, #0000 30%, #0000 80%, #a0784a26), var(--paper-grain, none), #fbf3df;
-  rotate: 2deg;
+  height: calc(var(--trophy-sign) * 1.1);
+  /* Room for the nails in its corners; a percentage would measure the whole shelf. */
+  padding: calc(var(--trophy-sign) * 0.11);
+  border: 0;
+  border-radius: 4px;
+  /* A board of warm wood: grain running across it, lit from above, its edges bevelled (the inset shadows). */
+  background:
+    linear-gradient(#fff3d84d, #0000 35%, #0000 70%, #3a1e0838),
+    var(--wood-grain-h) 0 0 / 600px 180px,
+    #c48a4f;
   /*
-   * Its right edge lies on the post with the nail in it, never past it onto the next compartment's things; the sign
-   * reaches left over the compartment and hangs a little above its floor.
+   * In the bottom right corner of the compartment (user request, November 2026): its foot on the board and its right
+   * edge against the post, so it sits in the corner, never hanging in the air above the board.
    */
-  translate: calc(var(--post) * 0.8 - 100%) calc(-100% - var(--trophy-sign) * 0.1);
+  translate: calc(var(--post) * 0.35 - 100%) calc(-100% - var(--edge));
+  /* Its thickness: the board's lower and right edges seen below it, then its shadow on the back panel. */
   box-shadow:
-    inset 0 0 0 1px #00000024,
-    3px 4px 8px #3a26145c;
+    inset 0 2px 0 #ffe9c299,
+    inset 2px 0 0 #ffe2b066,
+    inset 0 -2px 0 #5a33144d,
+    inset -2px 0 0 #5a33144d,
+    0 0 0 1px #5a3314,
+    calc(var(--edge) * 0.5) calc(var(--edge) * 0.5) 0 1px #8a5a2c,
+    var(--edge) var(--edge) 0 1px #6b4120,
+    calc(var(--edge) + 3px) calc(var(--edge) + 4px) 8px 1px #2a14066b;
   cursor: pointer;
   -webkit-tap-highlight-color: transparent;
 }
 
-/* The nail it hangs on, near its right edge, in the post. */
+/*
+ * Three nails hold it (user request, November 2026): in its top corners and its bottom left one, each a round head with
+ * a light on it and a little shadow; the bottom right corner sits in the shelf's corner.
+ */
 .shelf-trophy-sign::before {
   content: "";
   position: absolute;
-  top: 3px;
-  right: max(3px, calc(var(--post) * 0.3 - 7.5px));
-  width: 9px;
-  height: 9px;
-  border-radius: 50%;
-  background: radial-gradient(circle at 35% 35%, #e4ded5, #7a6f64 55%, #3d3530);
-  box-shadow: 0 1px 1px #0000004d;
+  inset: calc(var(--trophy-sign) * 0.03);
+  --head: radial-gradient(circle at 38% 34%, #f4efe6, #9a8f84 38%, #4a4038 64%, #2a201a26 72%, #0000 78%);
+  background:
+    var(--head) 0 0 / var(--nail) var(--nail) no-repeat,
+    var(--head) 100% 0 / var(--nail) var(--nail) no-repeat,
+    var(--head) 0 100% / var(--nail) var(--nail) no-repeat;
+  pointer-events: none;
 }
 
 .shelf-trophy-sign-art {

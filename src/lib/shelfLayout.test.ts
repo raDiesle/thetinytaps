@@ -1,12 +1,12 @@
 import { describe, expect, test } from "bun:test";
 import { readFileSync } from "node:fs";
-import { BOOK_ASPECT, BOOK_GAP, planShelf, SHELF_THINGS, SIGN_CLEAR, SIGN_DIP, type ShelfRect, TAKE_OUT } from "./shelfLayout";
+import { BOOK_ASPECT, BOOK_GAP, LEAN_CLEAR, planShelf, SHELF_THINGS, SIGN_DIP, type ShelfRect, TAKE_OUT } from "./shelfLayout";
 
-/** The home page's places: the everyday helpers' books with the words carved beside them, then three picture books. */
+/** The home page's places: the everyday helpers' books with the words carved before them, then three picture books. */
 const BOOKS = [3, 1, 1, 1];
 
-/** Of the everyday helpers' place, the words carved beside their books (`CARVINGS` in Bookshelf.tsx). */
-const CARVED = 1.4;
+/** Of the everyday helpers' place, the words carved before their books (`CARVINGS` in Bookshelf.tsx, with `LEAN_CLEAR`). */
+const CARVED = 1.4 + LEAN_CLEAR / BOOK_ASPECT;
 
 /** A phone on its side, upright, a tablet, a laptop, a big monitor (the room the shelf gets in each). */
 const ROOMS = [
@@ -23,7 +23,7 @@ const SIGN = (height: number) => Math.min(64, Math.max(20, height * 0.09));
 
 /** What the home page asks for besides the room: the sign hanging in front of a wide shelf, the carved words, the legs' least height. */
 const OPTIONS = (height: number) => ({
-  sign: { width: SIGN(height) * 7.8, height: SIGN(height) * 1.5, rise: SIGN(height) * 0.4 },
+  sign: { width: SIGN(height) * 7.1, height: SIGN(height) * 1.5, rise: SIGN(height) * 0.4 },
   carved: CARVED,
   legs: height * 0.1,
 });
@@ -72,44 +72,44 @@ describe("the bookshelf", () => {
   );
 
   // The sign with the app's name hangs on its chains in front of a wide shelf, down into its top compartment over the
-  // carved words, which stand centred under it (user feedback, November 2026): never over a book to take or the wall with the stickers, its foxes
-  // still on the screen; and the bottom of the screen's middle, where browsers note how to leave fullscreen, holds only
-  // the shelf's legs.
-  test.each(ROOMS.filter(([w, h]) => w > h))("a wide shelf's sign hangs into its top compartment, clear of the books, in a %i × %i room", (width, height) => {
-    const options = OPTIONS(height);
-    const { cells, bookHeight: bh, legs, sign, wordsShift } = planShelf(width, height, BOOKS, options);
-    expect(legs).toBeGreaterThanOrEqual(options.legs - 0.01);
-    const top = cells.find((c) => c.books) as (typeof cells)[number];
-    expect(sign).toBeDefined();
-    if (!sign) return;
-    // Down by `SIGN_DIP`, or deeper where the foxes on it would leave the screen.
-    const dip = top.y + top.h * SIGN_DIP;
-    if (Math.abs(sign.y + sign.h - dip) > 0.01) {
-      expect(sign.y + sign.h).toBeGreaterThan(dip);
-      expect(sign.y).toBeCloseTo(options.sign.rise);
-    }
-    // The books stand together in the middle of what the trail leaves (`.shelf-row`): where the helpers' books end.
-    const books = top.books ?? [];
-    const span = books.reduce((sum, b) => sum + BOOKS[b], 0);
-    const free = top.w - 4 - span * BOOK_ASPECT * bh - (books.length + 1) * BOOK_GAP * bh - (top.trail ?? 0);
-    // Only the row's 2 px padding may be wanting, which the plan leaves out.
-    expect(free).toBeGreaterThanOrEqual(-4.01);
-    const helpersEnd = top.x + 2 + free / 2 + BOOK_GAP * bh + (BOOKS[0] - CARVED) * BOOK_ASPECT * bh;
-    expect(books[0]).toBe(0);
-    expect(sign.x).toBeGreaterThanOrEqual(helpersEnd + SIGN_CLEAR.books * bh - 0.01);
-    expect(sign.x + sign.w).toBeLessThanOrEqual(top.x + top.w - SIGN_CLEAR.wall * bh + 0.01);
-    // The carved words stand centred under it (user feedback, November 2026), moved right where it hangs right of them.
-    const wordsMiddle = helpersEnd + (CARVED * BOOK_ASPECT * bh) / 2 + 0.05 * bh + (wordsShift ?? 0);
-    expect(wordsMiddle).toBeCloseTo(sign.x + sign.w / 2, 0);
-    // The foxes on its o rise 0.4 of its letters above it, inside the shelf: it starts right at the screen's top (`--top`;
-    // the fullscreen button is nailed onto its corner, user request, November 2026).
-    expect(sign.y - 0.4 * SIGN(height)).toBeGreaterThanOrEqual(-0.01);
-    // Sign and words hang far right, so the books at their left come towards the shelf's middle (user feedback,
-    // November 2026): right at the wall with the stickers, or no room is left at the board's right to move them into.
-    const atWall = sign.x + sign.w > top.x + top.w - SIGN_CLEAR.wall * bh - 1;
-    const noRoomRight = !top.trail;
-    expect(atWall || noRoomRight).toBe(true);
-  });
+  // carved words, which stand centred under it at the board's far left, where a visitor looks first (user request,
+  // November 2026): the books to take follow at their right, never under the sign, and its foxes stay on the screen;
+  // the bottom of the screen's middle, where browsers note how to leave fullscreen, holds only the shelf's legs.
+  test.each(ROOMS.filter(([w, h]) => w > h))(
+    "a wide shelf's sign hangs at its top board's far left, clear of the books, in a %i × %i room",
+    (width, height) => {
+      const options = OPTIONS(height);
+      const { cells, bookHeight: bh, legs, sign } = planShelf(width, height, BOOKS, options);
+      expect(legs).toBeGreaterThanOrEqual(options.legs - 0.01);
+      const top = cells.find((c) => c.books) as (typeof cells)[number];
+      expect(sign).toBeDefined();
+      if (!sign) return;
+      // Down by `SIGN_DIP`, or deeper where the foxes on it would leave the screen.
+      const dip = top.y + top.h * SIGN_DIP;
+      if (Math.abs(sign.y + sign.h - dip) > 0.01) {
+        expect(sign.y + sign.h).toBeGreaterThan(dip);
+        expect(sign.y).toBeCloseTo(options.sign.rise);
+      }
+      // The row (`.shelf-row`): its 2 px padding, a gap from the post, the carved words' place with the lead, then the books.
+      const books = top.books ?? [];
+      const span = books.reduce((sum, b) => sum + BOOKS[b], 0);
+      expect(books[0]).toBe(0);
+      const start = top.x + 2 + BOOK_GAP * bh;
+      const words = (CARVED * BOOK_ASPECT - LEAN_CLEAR) * bh + (top.lead ?? 0);
+      const helpersStart = start + words + LEAN_CLEAR * bh;
+      // At the far left, clear of the post, and clear of the first book to take, which leans towards it.
+      expect(sign.x).toBeGreaterThanOrEqual(top.x + 0.1 * bh);
+      expect(sign.x).toBeLessThanOrEqual(top.x + BOOK_GAP * bh + 2.01);
+      expect(sign.x + sign.w).toBeLessThanOrEqual(helpersStart - LEAN_CLEAR * bh + 0.01);
+      // The carved words stand centred under it.
+      expect(start + words / 2).toBeCloseTo(sign.x + sign.w / 2, 0);
+      // Everything on the board fits it.
+      expect((top.lead ?? 0) + span * BOOK_ASPECT * bh + (books.length + 1) * BOOK_GAP * bh).toBeLessThanOrEqual(top.w + 0.01);
+      // The foxes on its o rise 0.4 of its letters above it, inside the shelf: it starts right at the screen's top (`--top`;
+      // the fullscreen button is nailed onto its corner, user request, November 2026).
+      expect(sign.y - 0.4 * SIGN(height)).toBeGreaterThanOrEqual(-0.01);
+    },
+  );
 
   test.each(ROOMS)("compartments and planks lie inside the frame and never on each other in a %i × %i room", (width, height) => {
     const { cells, planks, frame, width: w, height: h, legs } = planShelf(width, height, BOOKS, OPTIONS(height));
@@ -136,7 +136,7 @@ describe("the bookshelf", () => {
     for (const cell of cells.filter((c) => c.books)) {
       const n = cell.books?.length ?? 0;
       const span = (cell.books ?? []).reduce((sum, b) => sum + BOOKS[b], 0);
-      expect((cell.trail ?? 0) + span * bookHeight * BOOK_ASPECT + (n + 1) * BOOK_GAP * bookHeight).toBeLessThanOrEqual(cell.w + 0.01);
+      expect((cell.lead ?? 0) + span * bookHeight * BOOK_ASPECT + (n + 1) * BOOK_GAP * bookHeight).toBeLessThanOrEqual(cell.w + 0.01);
       expect(bookHeight).toBeLessThanOrEqual(cell.h * TAKE_OUT + 0.01);
     }
   });

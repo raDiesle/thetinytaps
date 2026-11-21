@@ -455,9 +455,12 @@ In a fresh worktree run `bun install` first.
   Each looks like no other (`Trophy.tsx`: its metal by the game, form, handles, lid and foot by the level, the level's
   own picture in its medallion, `trophyPictures.ts`), drawn still, handed over once slowly – never shining, sparkling or
   bouncing. They stand in the trophy room, a page of its own at `/pokale/` (`TrophyMuseum`, user request, November
-  2026), never in the bookshelf (between its books a trophy stood as if in the wall) nor in a popup: reached by a paper
-  sign with a big golden cup, nailed onto the post at the bottom right of the picture books' compartment (the second
-  board on a wide shelf) and reaching left into it over the books spine out (`TrophySign`, only once a trophy is won;
+  2026), never in the bookshelf (between its books a trophy stood as if in the wall) nor in a popup: reached by a little
+  wooden board in 3D (grain, bevelled edges, its thickness seen below and right of it) with a big golden cup on it,
+  sitting right in the bottom right corner of the picture books' compartment (the second board on a wide shelf) – its
+  foot on the board, its right edge against the post, never hanging in the air above the board – held by three nails in
+  its corners (the top two and the bottom left; user request, November 2026: the paper sign hanging there looked flat
+  and loose) and reaching left over the books spine out (`TrophySign`, only once a trophy is won;
   user feedback, November 2026: a small sign with a cup in a doorway above the loudspeaker was hardly recognised – it is
   sized by the books, `--trophy-sign`, and is the one thing on the shelf that moves by itself: two small glints flash on
   the cup now and then, gently, as a trophy does in a game, each a tiny layer of its own, never a glow or a bounce) – a tap
@@ -624,7 +627,7 @@ A game may give it before its end where reaching the goal once is enough (Ketten
   name screwed onto the board's edge under it (`DailyGroup`; a label from four drafts – bookend, sign, paper band – user
   decision, November 2026, made of wood so it looks mounted, user feedback, November 2026), and the picture books
   standing together on one board just so by „Lernspiele“ on the board under them (`labelOf`); such a sign hangs only a
-  little below its board, never over a book on the board below. Beside the helpers words carved into the back panel tell grown-ups in short what
+  little below its board, never over a book on the board below. Before the helpers words carved into the back panel tell grown-ups in short what
   the shelf is for – „Für Groß & Klein“ – then that it is the first step into the digital world taken together, with
   learning games and little helpers for the day – and nothing else: no „Alles kostenlos.“, no „Seite an Seite“, no „die die Kommunikation fördern“, no „von Eltern für Eltern“ (each tried and
   taken out again, user feedback, November 2026), no pointer to one game („Ein Blick in die
@@ -634,9 +637,9 @@ A game may give it before its end where reaching the goal once is enough (Ketten
   words big enough to read, else a narrow one – never none, since „mehr …“ is the way to those texts (`CARVINGS`). Its
   sentence under the first line stands wherever it fits whole, measured in the page, and is left out only where it
   doesn't (a phone on its side has the room: only „Für Groß & Klein“ there left the board empty, user feedback, November
-  2026). Its place is only as wide as its words need: a wider one left a gap beside them, and the picture
-  book beside it stands close to its words, not a finger's gap away (only „mehr …“ in their middle takes a tap, user
-  feedback, November 2026);
+  2026). Its place is only as wide as its words need (a wider one left a gap beside them), plus the room the first
+  helper's top needs where it leans left towards them (`LEAN_CLEAR`, `--lean-clear`: it reached over the sentence);
+  where there is room its first line grows to a heading (`cqw`), so the eye finds it (user request, November 2026);
   words added to it widen its place (`CARVINGS`), never spill past the board – measure its first and last line against
   its box at 1280×720 and 1920×1080 (the 3D push makes it look smaller than it is laid out). Every picture book's cover shows a picture painted for its
   book (`src/components/bilder/cover-<category>.webp`, made with `/bild-erzeugen`, user decision, October 2026), never
@@ -965,11 +968,15 @@ src/lib/                 speech, sfx (synthesized + recorded sounds), storage, d
   feedback, November 2026), leaving the bottom's middle to the floor, and the app's name is a painted sign hanging
   on its two little chains in front of the shelf, down into its top compartment (`SIGN_DIP`; standing on the floor at
   the bottom left it was taken out again, user feedback, November 2026): over the carved words, which begin below it
-  and stand centred under it, moved right where it hangs right of their place (`ShelfLayout.wordsShift`),
-  the plan keeping room for it there (`ShelfCell.trail`, `ShelfLayout.sign`), so it never covers a book to take nor the
-  wall with the stickers, and the foxes on its o stay on the screen (`shelfLayout.test.ts`). Sign and words hang far right, at the
-  wall with the stickers, so the top board's books come towards the shelf's middle (the trail shrinks, `signOver`; user
-  feedback, November 2026 – hanging them in the shelf's middle pushed the books to the left wall). On an upright screen it
+  and stand centred under it. **Sign and words come first, at the top board's far left**, a gap from the post, and the
+  everyday helpers follow at their right (user request, November 2026: a visitor looks at the left first, and this is
+  what they should see first; at the far right by the stickers' wall it was found last): the plan keeps room for the sign
+  where it is wider than the words (`ShelfCell.lead`, `ShelfLayout.sign`, `signOver`), so it never covers a book to take
+  – the first helper leans towards it (`LEAN_CLEAR`) – and the books keep clear of the wall with the stickers
+  (`STICKERS_CLEAR`), the foxes on its o stay on the screen (`shelfLayout.test.ts`), and the books spine out fill only the
+  board's right end (`data-leads`). A brighter, still light falls on sign and words (`.shelf-light.lead`) so they stand
+  out, and the plan takes the sign's measured width (`SIGN_EMS`), never a wide guess, since every px it reserves comes
+  off the books. Upright, the words stand before the helpers too. On an upright screen it
   hangs above the shelf, never touching it. A new option becomes such a thing in the shelf too (`SHELF_THINGS`); their
   menus open outside the shelf's 3D (`MenuButton` portals them), since a transform would hold them in. The wall's picture (`bilder/buch-cover.webp`,
   only where there is room beside the shelf) shows one family of each mascot: a fox parent with a fox child and a bear parent
@@ -1037,7 +1044,9 @@ src/lib/                 speech, sfx (synthesized + recorded sounds), storage, d
   start screens' cards still being built), opens only where `canTestUnfinished` holds – elsewhere its line is pale and
   takes no tap –, keeps `noindex`, and its ✕ leads back to its book. Its
   rows in the tables (languages, mascots, voice) stay. Removing the mark publishes it; never hide a game by deleting its
-  entry or route. `content.test.ts` checks it.
+  entry or route. `content.test.ts` checks it. A volume of a game still being built (a second story of a book, H-104's
+  night story in Abstillen) is marked on its line in `volumes` (`Volume.unfinished`, with its blurb for the management
+  page): no book on the shelf (`shelfVolumes`, a single book left stands alone), `noindex`, reached from „🚧 In Arbeit“.
 - A new game needs: folder, page, route in `App.tsx`, entry in `CATEGORIES`
   (`src/content/games.ts`, with its `blurb`), a row in `src/content/ideas/languageStatus.ts`, an entry in `src/content/seo.ts` and its translations in `seo.<lang>.ts` – use `/neues-spiel`.
 - The app is called „Fun for Both“ and lives at www.funforboth.com (its main address since November 2026, user decision;

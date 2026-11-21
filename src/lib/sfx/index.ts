@@ -9,6 +9,7 @@ export {
   type Loop,
   loadRecordings,
   loadSound,
+  playBuffer,
   playLoop,
   playRecorded,
   recorded,

@@ -1,6 +1,8 @@
 import { ALLTAG_BLURB, ALLTAG_TITLE, BOOK_BLURB, BOOK_TITLE, MOOD_BLURB, MOOD_TITLE } from "@/games/feelings/names";
 import { CAUSE_BLURB, CAUSE_TITLE } from "@/games/cause/names";
 import { MILK_CHAIN_BLURB, MILK_CHAIN_BOOK } from "@/games/milkchain/names";
+import { NIGHT_MILK_BLURB, NIGHT_MILK_BOOK } from "@/games/nightmilk/names";
+import { BOTTLE_STORY_BLURB, BOTTLE_STORY_BOOK } from "@/games/bottlestory/names";
 import { PACIFIER_STORY_BLURB, PACIFIER_STORY_BOOK } from "@/games/pacifierstory/names";
 import { KITA_STORY_BLURB, KITA_STORY_BOOK } from "@/games/kitastory/names";
 import { HAIR_STORY_BLURB, HAIR_STORY_BOOK } from "@/games/hairstory/names";
@@ -50,6 +52,12 @@ export interface Volume {
   href: string;
   emoji: string;
   title: Texts;
+  /**
+   * Still being built, like `Game.unfinished: true` for a whole game: not on the shelf (the game stands as its other
+   * books, a single one untied), in no search result or sitemap, reached only from the management page, whose way back
+   * leads there. It needs its line for grown-ups there. Drop the mark to publish it (and give it its spine picture).
+   */
+  unfinished?: { blurb: Texts };
 }
 
 export interface Category {
@@ -111,11 +119,30 @@ export const CATEGORIES: Category[] = [
       },
       {
         // The book „Abstillen“ holds „Tapsis Milchkette“, the weaning story in chapters along the steps of gentle
-        // weaning (src/games/milkchain; it replaced a first, shorter story, user decision, 9 November 2026).
+        // weaning (src/games/milkchain; it replaced a first, shorter story, user decision, 9 November 2026), and tied to
+        // it „The Milk Sleeps at Night“ for families who wean only at night (src/games/nightmilk, idea H-104), at an
+        // address of its own below it, so a video or a search lands right there. Until its pictures are made it is a
+        // volume still being built, and „Abstillen“ stands alone.
         href: "/abstillen/",
+        also: ["/abstillen/nachts/"],
         emoji: "🤱",
         title: MILK_CHAIN_BOOK,
         blurb: MILK_CHAIN_BLURB,
+        volumes: [
+          { href: "/abstillen/", emoji: "🤱", title: MILK_CHAIN_BOOK },
+          { href: "/abstillen/nachts/", emoji: "🌙", title: NIGHT_MILK_BOOK, unfinished: { blurb: NIGHT_MILK_BLURB } },
+        ],
+      },
+      {
+        // The book „Bottle to Cup“ beside „Abstillen“ (idea H-105, user request, 21 November 2026): „Bye-Bye, Bottle!“, a
+        // story in chapters along the guides' steps from the bottle to an open cup, for every child that drank from a
+        // bottle, breastfed or not (src/games/bottlestory), English first. Still being built while its pictures wait in
+        // the queue: the last one made drops `unfinished` (`AFTER` in bottleStoryPictures.ts).
+        href: "/flaeschchen/",
+        emoji: "🍼",
+        title: BOTTLE_STORY_BOOK,
+        blurb: BOTTLE_STORY_BLURB,
+        unfinished: true,
       },
       {
         // The book „Schnullerfee“ beside „Abstillen“ (user request, 10 November 2026): „Tapsi und die Schnullerfee“, a
@@ -449,8 +476,27 @@ export const hasPage = (category: Category) => !category.apart && listedGames(ca
  */
 export const listedGames = (category: Category) => category.games.filter((game) => game.unfinished !== true);
 
-/** The games still being built (`Game.unfinished`), listed on the management page and in no search result. */
-export const UNFINISHED: Game[] = CATEGORIES.flatMap((category) => category.games.filter((game) => game.unfinished));
+/**
+ * A game's books on the shelf (`Game.volumes`), all but those still being built; none where only one is left, which
+ * then stands as the game's own book, untied.
+ */
+export function shelfVolumes(game: Game): Volume[] | undefined {
+  const volumes = game.volumes?.filter((volume) => !volume.unfinished);
+  return volumes && volumes.length > 1 ? volumes : undefined;
+}
+
+/**
+ * The games still being built (`Game.unfinished`), listed on the management page and in no search result – and each
+ * volume still being built (`Volume.unfinished`) as one of them, found and left out the same way.
+ */
+export const UNFINISHED: Game[] = CATEGORIES.flatMap((category) =>
+  category.games.flatMap((game) => [
+    ...(game.unfinished ? [game] : []),
+    ...(game.volumes ?? []).flatMap((v) =>
+      v.unfinished ? [{ href: v.href, emoji: v.emoji, title: v.title, blurb: v.unfinished.blurb, unfinished: true as const }] : [],
+    ),
+  ]),
+);
 
 /** Where the category's book on the shelf leads: its page, or its only game; the shelf for one whose games stand apart. */
 export const categoryHref = (category: Category) => (category.apart ? "/" : hasPage(category) ? `/spiele/${category.id}/` : listedGames(category)[0].href);
