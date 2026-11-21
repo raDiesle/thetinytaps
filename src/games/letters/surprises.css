@@ -232,10 +232,9 @@
 .ft-gift-thing {
   left: 0;
   right: 0;
-  top: 30%;
-  text-align: center;
-  font-size: calc(var(--s) * 0.42);
-  line-height: 1;
+  top: 22%;
+  display: flex;
+  justify-content: center;
   animation: ft-gift-thing 2.6s ease-out both;
 }
 
@@ -357,10 +356,9 @@
 .ft-egg-baby {
   left: -20%;
   right: -20%;
-  top: 22%;
-  text-align: center;
-  font-size: calc(var(--s) * 0.4);
-  line-height: 1;
+  top: 14%;
+  display: flex;
+  justify-content: center;
   animation: ft-egg-baby 2.8s ease-out both;
 }
 
@@ -942,4 +940,15 @@
     transform: translateY(0) rotate(var(--turn)) scale(0.9);
     opacity: 0;
   }
+}
+
+/* The drawn toy and baby animal inside the moving span (`SurpriseFigures.tsx`). */
+.ft-gift-thing > svg {
+  width: calc(var(--s) * 0.5);
+  height: calc(var(--s) * 0.5);
+}
+
+.ft-egg-baby > svg {
+  width: calc(var(--s) * 0.46);
+  height: calc(var(--s) * 0.46);
 }

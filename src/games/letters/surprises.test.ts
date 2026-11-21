@@ -38,8 +38,8 @@ test("the rainbow stays out (user feedback, November 2026: not cool)", () => {
   expect(css).not.toMatch(/rainbow/);
 });
 
-test("the effects of the app's own draw no emojis", () => {
-  for (const file of ["SurpriseArt.tsx", "surpriseCanvas.ts"]) {
+test("every surprise is drawn by the app itself, never with emojis – the present's toy and the egg's baby too", () => {
+  for (const file of ["Surprises.tsx", "SurpriseArt.tsx", "SurpriseFigures.tsx", "surpriseCanvas.ts", "surprises.css"]) {
     const source = readFileSync(`src/games/letters/${file}`, "utf8");
     expect({ file, emojis: source.match(/\p{Extended_Pictographic}/gu) ?? [] }).toEqual({ file, emojis: [] });
   }

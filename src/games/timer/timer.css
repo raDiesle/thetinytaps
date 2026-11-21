@@ -1547,12 +1547,14 @@
   opacity: 1;
 }
 
+/* Dark enough that the side waiting is plainly not the one whose turn it is (user feedback, 21 November 2026: the
+   softer shade did not tell it clearly). */
 .tm-swap-shade-fox {
-  background: linear-gradient(to right, rgb(34 36 80 / 0.42) 75%, rgb(34 36 80 / 0.12));
+  background: linear-gradient(to right, rgb(28 30 70 / 0.6) 75%, rgb(28 30 70 / 0.22));
 }
 
 .tm-swap-shade-bear {
-  background: linear-gradient(to left, rgb(34 36 80 / 0.42) 75%, rgb(34 36 80 / 0.12));
+  background: linear-gradient(to left, rgb(28 30 70 / 0.6) 75%, rgb(28 30 70 / 0.22));
 }
 
 .tm-toy {
@@ -1577,11 +1579,13 @@
 }
 
 /* Wippe (H-109): the plank turns round its pivot as one layer, back and forth for ever, one turn each way (`--tm-ms`,
-   started `--tm-delay` ago); the toy riding on it turns back the same way and stays upright. Two names of the same
-   keyframes, so the motion starts anew whenever the turns do (`round`). Before the turns run and at the end it turns
-   slowly to its place instead. */
+   started `--tm-delay` ago), and the chick walks along it by an animation as long (`tm-saw-walk-*`), so its weight and
+   the tilt go together; it turns back the plank's turn and stays upright. Two names of the same keyframes, so the
+   motion starts anew whenever the turns do (`round`). Before the turns run and at the end it turns slowly to its place
+   instead. */
 .tm-saw,
-.tm-saw-upright {
+.tm-saw-upright,
+.tm-saw-walk {
   transition: transform 1.2s ease-in-out;
 }
 
@@ -1599,6 +1603,14 @@
 
 .tm-saw-upright.tm-saw-b {
   animation-name: tm-saw-back-b;
+}
+
+.tm-saw-walk.tm-saw-a {
+  animation-name: tm-saw-walk-a;
+}
+
+.tm-saw-walk.tm-saw-b {
+  animation-name: tm-saw-walk-b;
 }
 
 @keyframes tm-saw-a {
@@ -1637,34 +1649,104 @@
   }
 }
 
-.tm-saw-toy {
+/* While the fox child's seat sinks (forwards) the chick walks from the bear's end to the fox's. */
+@keyframes tm-saw-walk-a {
+  from {
+    transform: translateX(var(--tm-reach));
+  }
+  to {
+    transform: translateX(calc(-1 * var(--tm-reach)));
+  }
+}
+
+@keyframes tm-saw-walk-b {
+  from {
+    transform: translateX(var(--tm-reach));
+  }
+  to {
+    transform: translateX(calc(-1 * var(--tm-reach)));
+  }
+}
+
+.tm-saw-walker {
   position: absolute;
-  transition: transform 1.2s ease-in-out;
+}
+
+.tm-saw-walk,
+.tm-saw-upright,
+.tm-saw-face {
+  position: absolute;
+  inset: 0;
 }
 
 .tm-saw-upright {
   transform-origin: 50% 100%;
 }
 
-.tm-saw-toy div,
-.tm-saw-toy svg {
+.tm-saw-chick-body,
+.tm-saw-leg {
+  position: absolute;
+}
+
+.tm-saw-chick-body {
+  inset: 0;
+}
+
+.tm-saw-walker svg {
   display: block;
   width: 100%;
   height: 100%;
 }
 
-/* Every second the toy bounces softly on its seat (H-63), as a child does on a seesaw. */
-.tm-saw-bob {
-  animation: tm-saw-bob 1s ease-in-out infinite;
+/* Its steps go on at their own pace however long the turn (user request, 21 November 2026: on a long turn the seesaw
+   must still be seen moving): each leg swings round its hip, the two in turn, and the body bobs at every step. */
+.tm-saw-leg {
+  transform-origin: 50% 8%;
 }
 
-@keyframes tm-saw-bob {
-  40% {
-    transform: translateY(-9%);
+.tm-saw-walking .tm-saw-leg {
+  animation: tm-saw-step 0.7s ease-in-out infinite alternate;
+}
+
+.tm-saw-walking .tm-saw-leg-far {
+  animation-delay: -0.7s;
+}
+
+.tm-saw-walking .tm-saw-chick-body {
+  animation: tm-saw-hop 0.7s ease-in-out infinite;
+}
+
+@keyframes tm-saw-step {
+  from {
+    transform: rotate(-26deg);
   }
-  70% {
-    transform: translateY(1%);
+  to {
+    transform: rotate(26deg);
   }
+}
+
+@keyframes tm-saw-hop {
+  50% {
+    transform: translateY(-5%);
+  }
+}
+
+/* Warm sun over the side whose turn it is, fading in and out with it. */
+.tm-saw-sun {
+  opacity: 0;
+  transition: opacity 0.35s ease-out;
+}
+
+.tm-saw-sun.tm-on {
+  opacity: 1;
+}
+
+.tm-saw-sun-fox {
+  background: radial-gradient(ellipse 70% 60% at 45% 55%, rgb(255 240 170 / 0.5), rgb(255 240 170 / 0.2) 55%, transparent 85%);
+}
+
+.tm-saw-sun-bear {
+  background: radial-gradient(ellipse 70% 60% at 55% 55%, rgb(255 240 170 / 0.5), rgb(255 240 170 / 0.2) 55%, transparent 85%);
 }
 
 .tm-saw-goal {

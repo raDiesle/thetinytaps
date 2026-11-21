@@ -111,9 +111,9 @@ the page before it.
   opacity, or one small canvas (`surpriseCanvas.ts`: side `CANVAS_BOX` × its size, pixels capped at `CANVAS_MAX_DPR`,
   at most `MAX_SPARKS`, drawn by its own `requestAnimationFrame` loop, never by React, and ended within
   `CANVAS_SECONDS`) (`surprises.test.ts`, perf stretch „Überraschungen“). The rainbow was taken out (user feedback,
-  November 2026: not cool) – never bring it back. Every kind added since is drawn by the app itself in SVG, CSS or on a
-  canvas, never with emojis (user request, November 2026; the test checks `SurpriseArt.tsx` and `surpriseCanvas.ts`);
-  the letters' and numbers' pictures keep theirs. A surprise's wrapper names its kind as `data-kind`, never as a class
+  November 2026: not cool) – never bring it back. Every surprise is drawn by the app itself in SVG, CSS or on a canvas, never
+  with emojis – the present's toys and the egg's baby animals too (`SurpriseFigures.tsx`; user request, November 2026;
+  the test checks every surprise file); the letters' and numbers' pictures keep theirs. A surprise's wrapper names its kind as `data-kind`, never as a class
   `ft-<kind>`: that is the class its own drawing animates, and once ran the snowflake's grow-and-fade on the whole
   surprise, so its small flakes never showed. Zählen and the other games keep their calm ripples: this
   is Frei tippen's own, never a pattern for other games' answers (root `CLAUDE.md`). A new kind goes into
