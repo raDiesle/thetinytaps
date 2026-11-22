@@ -74,6 +74,8 @@ export interface LanguageTexts {
   hairStory?: MilkChainTranslation;
   /** The Milk Sleeps at Night, written English first: chapter titles and pages (`nightmilk/<id>.ts`, German too). */
   nightMilk?: MilkChainTranslation;
+  /** Three More Sleeps, written English first: chapter titles and pages (`milkgoodbye/<id>.ts`, German too). */
+  goodbyeMilk?: MilkChainTranslation;
   /** Bye-Bye, Bottle!, written English first: chapter titles and pages (`bottlestory/<id>.ts`, German too). */
   bottleStory?: MilkChainTranslation;
   /** Tapsi's Big Bed, written English first: chapter titles and pages (`bedstory/<id>.ts`, German too). */

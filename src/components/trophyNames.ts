@@ -38,12 +38,13 @@ const NAMERS: Record<string, () => Promise<Namer>> = {
       return name && pick(name, language);
     }),
   "/was-ist-passiert/": async () => (level, language) => numbered(level, "runde-", ROUND, language),
-  // The book Abstillen's second story (its volume /abstillen/nachts/) gives a trophy of its own, level „nachts“.
+  // The book Abstillen's other stories give trophies of their own: the night story level „nachts“, „Three More Sleeps“
+  // level „abschied“ (its short version shares the long story's trophy).
   "/abstillen/": () =>
-    import("@/games/nightmilk/names").then(
-      ({ NIGHT_MILK_TITLE }) =>
+    Promise.all([import("@/games/nightmilk/names"), import("@/games/milkgoodbye/names")]).then(
+      ([{ NIGHT_MILK_TITLE }, { GOODBYE_MILK_TITLE }]) =>
         (level, language) =>
-          level === "nachts" ? pick(NIGHT_MILK_TITLE, language) : undefined,
+          level === "nachts" ? pick(NIGHT_MILK_TITLE, language) : level === "abschied" ? pick(GOODBYE_MILK_TITLE, language) : undefined,
     ),
 };
 

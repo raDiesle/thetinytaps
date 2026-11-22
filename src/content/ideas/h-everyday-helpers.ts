@@ -255,5 +255,16 @@ export const everydayHelpersIdeas: IdeaArea = {
       why: "„first dentist visit toddler“, „zahnarzt kinder angst“, „zahnarzt geschichte für kinder“ werden gesucht; auf YouTube stehen echte Praxis-Videos mit 1,7–5 Mio. Aufrufen, aber kaum eine Geschichte für Kleinkinder – und Zähne putzen ist schon unser stärkstes Thema (Recherche „youtube-themen“).",
       effort: "M",
     },
+    {
+      id: "H-143",
+      emoji: "🎂",
+      title: "Abstillen: eine kürzere Geschichte und eine Kurzfassung",
+      text: "Im Buch Abstillen eine weitere Geschichte, kürzer als „Ganz abstillen“, und von der langen eine Kurzfassung aus ihren eigenen Seiten; die Wahl am Anfang zeigt statt der Kapitelnummern nur, wie viele Bilder jede Geschichte hat, wie lange sie ungefähr dauert und wo man sie startet.",
+      why: "Wunsch der Nutzerin am 22. November 2026: „im Menü nur die maximale Anzahl der Bilder bzw. Schritte anzeigen und dass klar wird, wo man die Geschichte starten kann … eine weitere Geschichte, die kürzer ist als ganz abstillen … zusätzlich von der ersten Geschichte eine Kurzfassung“.",
+      effort: "M",
+      done: true,
+      partial:
+        "Umgesetzt am 22. November 2026: Die Wahl im Buch Abstillen zeigt je Geschichte Bild, Name und Papierzettel zum Starten mit „N Bilder · ca. M Min.“ (MilkChainGame.tsx, minutesOf), keine Kapitelnummern mehr. „Ganz abstillen“ hat zwei Zettel, „Ganze Geschichte“ (51 Bilder, ca. 12 Min.) und „Kurzfassung“ (18 Bilder, ca. 4 Min., /abstillen/kurz/, SHORT_PAGES in milkChain.ts, dieselben Bilder, Texte und Aufnahmen). Neu ist „Three More Sleeps“ / „Noch dreimal schlafen“ (src/games/milkgoodbye, /abstillen/abschied/): ganz abstillen an einem festen Tag mit Abschiedsfest, vier Kapitel, zwölf Seiten, Englisch zuerst und in alle sieben Sprachen übersetzt. Ihre zwölf Bilder warten in der Bilder-Warteschlange (Claude Cloud), bis dahin sehen Spielende sie nicht und ihre Seite ist noindex; die Aufnahmen kommen nur auf Wunsch.",
+    },
   ],
 };

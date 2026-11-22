@@ -3,7 +3,7 @@ import { MilkChainGame, titleAt } from "@/games/milkchain/MilkChainGame";
 import { useT } from "@/lib/language";
 import { useTitle } from "@/lib/title";
 
-/** The book „Abstillen“ with its stories: the long one at `/abstillen/`, the night one at `/abstillen/nachts/`. */
+/** The book „Abstillen“ with its stories: the long one at `/abstillen/`, the others below it (`/abstillen/nachts/` …). */
 export function MilkChainPage() {
   const t = useT();
   useTitle(t(titleAt(useLocation().pathname)));

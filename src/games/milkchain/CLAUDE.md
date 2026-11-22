@@ -8,7 +8,9 @@ first, shorter SVG story „Tschüss, Mama-Milch“ that stood at this address (
 Since 21 November 2026 the book holds a second story, „The Milk Sleeps at Night“ (`/abstillen/nachts/`, H-104,
 `src/games/nightmilk`), for weaning only at night. Since 22 November 2026 both are **one book** that opens on the choice
 of its stories (user request: „ein Buch, darin kann man mehrere Varianten auswählen … die Unterkapitel weglassen oder
-sehr minimal anzeigen“), no longer two volumes tied together on the shelf.
+sehr minimal anzeigen“), no longer two volumes tied together on the shelf. Also since 22 November 2026 (H-143) the
+long story has a short version from its own pages (`/abstillen/kurz/`, `SHORT_PAGES`) and the book a third story, „Three
+More Sleeps“ (`/abstillen/abschied/`, `src/games/milkgoodbye`), weaning on a set day with a goodbye party.
 
 Tapsi the fox drank at Mama's breast as a baby and is big now; Mama tells why the milk may go, and over Tapsi's bed hangs
 a chain with one milk drop per milk time. Chapter by chapter one drop goes – the day's, the evening's, the night's and
@@ -18,15 +20,18 @@ Tapsi misses it, lays the head on Mama's breast and hears her heart, and Mama an
   milk times go (`MILK_ORDER`), what comes instead (`INSTEAD`) and which drops are gone on a page (`goneOn`).
 - `milkChainPictures.ts`: the Gemini prompt of every page (place, light, chain, cast and clothes, nursing), as the
   picture queue takes them; a made picture goes on `MADE`.
-- `MilkChainGame.tsx` is the book: `STORIES` (the long story „Ganz abstillen“ here, „Nachts abstillen“ from
-  `src/games/nightmilk/story.ts`), and `WeaningBook`, which opens on the choice (`Choice`, `?seite=inhalt`, `DevTag`
-  `A0`): one big line per story – its picture, what it is for (`MILK_CHAIN_KIND`, `NIGHT_MILK_KIND`) and its title small
-  under it – and under it the story's chapters only as small round numbers, the chapter's name read out and as tooltip.
-  A tap on the line opens the story at its first page, a number at its chapter. Each story is read with the shared
+- `milkChain.ts` also holds `SHORT_PAGES`, the pages of the short version in the long story's order (`MILK_CHAIN_SHORT`,
+  the same pictures, translations and recordings), and `minutesOf`, about how long a story takes read aloud.
+- `MilkChainGame.tsx` is the book: `LINES`, one line per story and in it its versions (the long story whole and short
+  here, „Mit Abschiedsfest“ from `src/games/milkgoodbye/story.ts`, „Nachts abstillen“ from `src/games/nightmilk/story.ts`),
+  and `WeaningBook`, which opens on the choice (`Choice`, `?seite=inhalt`, `DevTag` `A0`): one big line per story – its
+  picture, what it is for (`*_KIND`) and its title small under it – and a paper slip per version to start it („Ganze
+  Geschichte“ / „Kurzfassung“, „Lesen“ where there is one), with its pictures and minutes small under its word
+  („51 Bilder · ca. 12 Min.“, counted from the pages played, `SIZE`). A tap on the line opens its first version. Each story is read with the shared
   `ChapterBook` (`src/components/ChapterBook.tsx`, classes `cb-` in `chapterBook.css`, also the books „Schnullerfee“,
   „Kita-Start“ … – a change there reaches all), opened at that page (`opensAt`), its way back to its contents leading to
-  the choice (`onContents`). Both routes (`/abstillen/`, `/abstillen/nachts/`) show the same page, the address names the
-  story: opening the night story from the book's own address goes there in the history, and its way back steps back
+  the choice (`onContents`). Every route (`/abstillen/`, `/abstillen/kurz/`, `/abstillen/abschied/`, `/abstillen/nachts/`)
+  shows the same page, the address names the story: opening another story from the book's own address goes there in the history, and its way back steps back
   (`goBack`), so the phone's back button does the same. Then one page per tap or key (← and Backspace back, ◀ for the
   grown-up, from the first page back to the choice; a quick second tap or key turns no second page, `screenTap` of
   `src/lib/tapGuard.ts`, user feedback, November 2026), the picture as big as the room allows, under it the chapter's title on its first
@@ -45,12 +50,17 @@ Tapsi misses it, lays the head on Mama's breast and hears her heart, and Mama an
   drinking, the night, the farewell, then missing it. `milkchain.test.ts` checks the order. The milk times go day,
   evening, night, morning (`MILK_ORDER`, checked): the evening only after Tapsi has learnt to fall asleep with book and
   song, the night with Papa comforting, the morning last with a thank-you and a farewell.
-- **A story read over many days opens on its chapters** (user request, 9 November 2026: „von Kapitel zu Kapitel am
-  Anfang springen“), and **a book of several stories opens on the choice of them, each story's chapters only as small
-  numbers under it** (user request, 22 November 2026): the book never starts on page one, and while a page is open the
-  corner goes back to the choice (`useInnerBack`), so a grown-up goes on where they stopped yesterday. A new chapter gets
-  its number there by itself, a new story about weaning its line in `STORIES` – never a book or volume of its own on the
-  shelf. `milkchain.test.ts` checks.
+- **The book opens on the choice of its stories, which shows only how many pictures each has, about how long it takes
+  and where it starts** (user request, 22 November 2026: „nur die maximale Anzahl der Bilder bzw. Schritte anzeigen und
+  dass klar wird, wo man die Geschichte starten kann … die Dauer ca.“, replacing the chapters as small numbers): never
+  chapter numbers there, and every version a slip of its own to start it. The book never starts on page one, and while
+  a page is open the corner goes back to the choice (`useInnerBack`). A new story about weaning gets its line in
+  `LINES`, a shorter telling of one a second slip in its line – never a book or volume of its own on the shelf.
+  `milkchain.test.ts` checks.
+- **The short version is made of the long story's own pages** (`SHORT_PAGES`, checked: in order, from the baby to the
+  love that stays, every milk time, a page holding Tapsi after each one where Tapsi cries), so it needs no picture,
+  translation or recording of its own; it shares the long story's trophy. A page renamed in the long story is renamed
+  there too.
 - The story is gentle and true: the milk is gone and stays gone (no „just once more“), Tapsi may be sad and angry, and a
   grown-up is always close and holds it until it is done – never skipped. Nobody scolds, nothing is bad or naughty
   (`milkchain.test.ts` checks the words). Lines ≤ 110 characters, in the present tense.

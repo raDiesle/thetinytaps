@@ -61,6 +61,7 @@ import { STEPS as TEETH_STEPS } from "@/games/teeth/steps";
 import { KITA_STORY } from "@/games/kitastory/kitaStory";
 import { HAIR_STORY } from "@/games/hairstory/hairStory";
 import { NIGHT_MILK } from "@/games/nightmilk/nightMilk";
+import { GOODBYE_MILK } from "@/games/milkgoodbye/goodbyeMilk";
 import { BOTTLE_STORY } from "@/games/bottlestory/bottleStory";
 import { BED_STORY } from "@/games/bedstory/bedStory";
 import { MILK_CHAIN } from "@/games/milkchain/milkChain";
@@ -79,6 +80,7 @@ import goodNightFiles from "../components/stimme/*.mp3?glob";
 import kitaFiles from "../games/kitastory/stimme/*.mp3?glob";
 import hairFiles from "../games/hairstory/stimme/en/*.mp3?glob";
 import nightMilkFiles from "../games/nightmilk/stimme/en/*.mp3?glob";
+import goodbyeMilkFiles from "../games/milkgoodbye/stimme/en/*.mp3?glob";
 import bottleFiles from "../games/bottlestory/stimme/en/*.mp3?glob";
 import bedFiles from "../games/bedstory/stimme/en/*.mp3?glob";
 import milkChainFiles from "../games/milkchain/stimme/*.mp3?glob";
@@ -379,6 +381,7 @@ const PACIFIER_TEXTS = byLanguage((texts) => texts.pacifierStory);
 const KITA_TEXTS = byLanguage((texts) => texts.kitaStory);
 const HAIR_TEXTS = byLanguage((texts) => texts.hairStory);
 const NIGHT_MILK_TEXTS = byLanguage((texts) => texts.nightMilk);
+const GOODBYE_MILK_TEXTS = byLanguage((texts) => texts.goodbyeMilk);
 const BOTTLE_TEXTS = byLanguage((texts) => texts.bottleStory);
 const BED_TEXTS = byLanguage((texts) => texts.bedStory);
 
@@ -592,6 +595,7 @@ const RECORDED = new Set(
     // An English-first book is recorded in English first (`en-<hash>`): its hash is the line's, as German files' are.
     hairFiles,
     nightMilkFiles,
+    goodbyeMilkFiles,
     bottleFiles,
     bedFiles,
   ].flatMap((files) => Object.keys(files).map((file) => file.slice(file.lastIndexOf("/") + 1, -4).replace(/^en-/, ""))),
@@ -640,6 +644,7 @@ export function voiceLines(language: TargetLanguageId = "de"): VoiceGame[] {
     { href: "/kita/", groups: chapterBook(KITA_STORY, language, KITA_TEXTS) },
     { href: "/haare-waschen/", groups: chapterBook(HAIR_STORY, language, HAIR_TEXTS, "en") },
     { href: "/abstillen/nachts/", groups: chapterBook(NIGHT_MILK, language, NIGHT_MILK_TEXTS, "en") },
+    { href: "/abstillen/abschied/", groups: chapterBook(GOODBYE_MILK, language, GOODBYE_MILK_TEXTS, "en") },
     { href: "/flaeschchen/", groups: chapterBook(BOTTLE_STORY, language, BOTTLE_TEXTS, "en") },
     { href: "/grosses-bett/", groups: chapterBook(BED_STORY, language, BED_TEXTS, "en") },
     {

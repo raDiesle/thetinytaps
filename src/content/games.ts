@@ -124,9 +124,11 @@ export const CATEGORIES: Category[] = [
         // weaning (src/games/milkchain; it replaced a first, shorter story, user decision, 9 November 2026), and „The
         // Milk Sleeps at Night“ for families who wean only at night (src/games/nightmilk, idea H-104), at an address of
         // its own below it, so a video or a search lands right there. One book on the shelf, opening on the choice of
-        // its two stories (user request, 22 November 2026; before, they stood as two books tied together).
+        // its stories (user request, 22 November 2026; before, they stood as two books tied together), since the same
+        // day also the Milchkette's short version and „Three More Sleeps“ (src/games/milkgoodbye) for weaning on one
+        // day with a goodbye party, each at an address of its own.
         href: "/abstillen/",
-        also: ["/abstillen/nachts/"],
+        also: ["/abstillen/kurz/", "/abstillen/abschied/", "/abstillen/nachts/"],
         emoji: "🤱",
         title: MILK_CHAIN_BOOK,
         blurb: MILK_CHAIN_BLURB,
