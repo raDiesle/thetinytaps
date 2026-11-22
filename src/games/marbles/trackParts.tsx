@@ -1,11 +1,13 @@
 // The drawn parts of the marble run's wall (`Run` in TrackLevel.tsx draws them): the spots and their parts, the shelf,
-// xylophones, switch, barrier, looping, drums, chimes, tunnel, and the wooden world (`WOODEN`) the other worlds replace.
+// xylophones, switch, barrier, looping, drums, chimes, tunnel, and the wooden world (`WOODEN`) the other worlds replace,
+// with its own stretch down the lower wall (helix tower, step lifter, tipping troughs).
 import { memo, useContext, useId, type PointerEvent, type ReactNode } from "react";
 import { VIEW_W, wobble } from "./level";
 import { Ball, BAR_COLORS, type BallLook, Rail, STAR_POINTS } from "./parts";
-import { type EndProps, INK, type ThingProps, TrackLook, type TrackTheme } from "./trackTheme";
+import { HELIX, helixAt, LIFTER, lifterAt, sample, STRETCHES, TAU, TROUGHS, UNDER, WOOD_CUES } from "./trackStretches";
+import { type EndProps, INK, type StretchArtProps, type ThingProps, TrackLook, type TrackTheme } from "./trackTheme";
 import { BALL_R, type Pt } from "./path";
-import { playBlub, playBoing, playKnock, playPlop, playPop, playRumble, playThump } from "@/lib/sfx";
+import { playBlub, playBoing, playClimbNote, playClonk, playKnock, playPlop, playPop, playRumble, playThump } from "@/lib/sfx";
 import { playBells } from "@/lib/realSounds";
 import {
   BARS,
@@ -771,6 +773,114 @@ const WoodenBackdrop = memo(function WoodenBackdrop() {
   );
 });
 
+/** How high a slat of the step lifter stands lifted, `age` seconds after it lifted a thing: up, a moment's hold, down. */
+const slatLift = (age: number) => LIFTER.rise * (age < 0 ? 0 : age < 0.4 ? age / 0.4 : age < 0.55 ? 1 : age < 0.95 ? 1 - (age - 0.55) / 0.4 : 0);
+
+/** The helix's rail from round `from` to round `to` (in turns), seen from the side: a rail just under the things' way. */
+const helixRail = (from: number, to: number) =>
+  sample(Math.max(2, Math.round((to - from) * 48)), (k) => helixAt((from + (to - from) * k) * TAU))
+    .map((p, i) => `${i ? "L" : "M"}${p.x.toFixed(1)} ${(p.y + UNDER).toFixed(1)}`)
+    .join(" ");
+
+/**
+ * The wooden run's own stretch: a helix tower the marbles run round four times (a coloured disc on its pole bobs at
+ * each round), a step lifter whose wooden slats lift them up one step after the other, and six troughs down the right
+ * edge that tip them on from one to the next. Behind the things the tower's pole, its rail and the lifter; in front
+ * only the near halves of the helix's rail.
+ */
+function WoodenStretch({ layer, ages, onTap }: StretchArtProps) {
+  const { post } = useLook();
+  const end = helixAt(HELIX.turns * TAU);
+  if (layer === "front") {
+    // The near half of each round, in front of the pole: from a quarter before the round's start to a quarter after it.
+    const near = Array.from({ length: HELIX.turns + 1 }, (_, n) => helixRail(Math.max(0, n - 0.25), Math.min(HELIX.turns, n + 0.25)));
+    return (
+      <g pointerEvents="none" fill="none" strokeLinecap="round">
+        {near.map((d, n) => (
+          <g key={n}>
+            <path d={d} stroke={INK} strokeWidth="14" />
+            <path d={d} stroke="#e0a868" strokeWidth="8" />
+          </g>
+        ))}
+      </g>
+    );
+  }
+  const top = lifterAt(LIFTER.steps);
+  return (
+    <g>
+      {/* The helix tower: its whole rail, then the pole with a disc for each round */}
+      <path d={helixRail(0, HELIX.turns)} fill="none" stroke={INK} strokeWidth="14" strokeLinecap="round" />
+      <path d={helixRail(0, HELIX.turns)} fill="none" stroke="#a8743f" strokeWidth="8" strokeLinecap="round" />
+      <rect x={HELIX.cx - 16} y={HELIX.top - 90} width="32" height={end.y - HELIX.top + 160} rx="10" fill={post} stroke={INK} strokeWidth="4" />
+      <circle cx={HELIX.cx} cy={HELIX.top - 92} r="22" fill="#ff5d73" stroke={INK} strokeWidth="4" />
+      {Array.from({ length: HELIX.turns }, (_, n) => {
+        const y = (helixAt(n * TAU).y + helixAt((n + 1) * TAU).y) / 2 - 10;
+        const bob = wobble(ages[WOOD_CUES.helix + n], 10, 16, 4);
+        return (
+          <g key={n} data-tap onPointerDown={(e) => onTap(WOOD_CUES.helix + n, e)}>
+            <ellipse cx={HELIX.cx} cy={y - bob} rx="34" ry="12" fill={BAR_COLORS[(n * 2) % BAR_COLORS.length]} stroke={INK} strokeWidth="3.5" />
+          </g>
+        );
+      })}
+
+      {/* The step lifter: a frame, a slat under every step, which lifts while a thing is on it, and the landing on top */}
+      <path
+        d={`M${lifterAt(0).x - 30} ${LIFTER.y0 + 80} L${lifterAt(0).x - 30} ${lifterAt(0).y + 40} L${top.x + 30} ${top.y + 40} L${top.x + 30} ${LIFTER.y0 + 80} Z`}
+        fill="#d9a066"
+        stroke={INK}
+        strokeWidth="4"
+        strokeLinejoin="round"
+      />
+      {Array.from({ length: LIFTER.steps }, (_, i) => {
+        const p = lifterAt(i);
+        const up = slatLift(ages[WOOD_CUES.lifter + i]);
+        return (
+          <g key={i} data-tap onPointerDown={(e) => onTap(WOOD_CUES.lifter + i, e)}>
+            <rect
+              x={p.x - 13}
+              y={p.y + BALL_R + 1 - up}
+              width="26"
+              height={LIFTER.y0 + 70 - p.y}
+              rx="4"
+              fill={i % 2 ? "#ffb703" : "#f4a259"}
+              stroke={INK}
+              strokeWidth="3"
+            />
+          </g>
+        );
+      })}
+      <rect x={top.x - 14} y={top.y + BALL_R + 1} width="52" height="20" rx="5" fill={post} stroke={INK} strokeWidth="3" />
+
+      {/* The troughs, each on a peg, tipping on a little as they pour a thing into the next */}
+      {TROUGHS.map((trough, i) => {
+        const dir = Math.sign(trough.low.x - trough.high.x);
+        const a = { x: trough.high.x - dir * 30, y: trough.high.y + UNDER - 2 };
+        const b = { x: trough.low.x + dir * 6, y: trough.low.y + UNDER };
+        const mid = { x: (a.x + b.x) / 2, y: (a.y + b.y) / 2 };
+        const tip = dir * wobble(ages[WOOD_CUES.troughs + i], 7, 12, 3.5);
+        const d = `M${a.x} ${a.y - 40} L${a.x} ${a.y} L${b.x} ${b.y}`;
+        return (
+          <g key={i} data-tap onPointerDown={(e) => onTap(WOOD_CUES.troughs + i, e)}>
+            <rect x={mid.x - 6} y={mid.y} width="12" height="34" fill={post} stroke={INK} strokeWidth="3" />
+            <g transform={`rotate(${tip} ${mid.x} ${mid.y})`} fill="none" strokeLinecap="round" strokeLinejoin="round">
+              <path d={d} stroke={INK} strokeWidth="16" />
+              <path d={d} stroke={BAR_COLORS[(i * 2 + 1) % BAR_COLORS.length]} strokeWidth="9" />
+            </g>
+            <circle cx={mid.x} cy={mid.y} r="6" fill={INK} />
+          </g>
+        );
+      })}
+    </g>
+  );
+}
+
+/** What the wooden stretch sounds like: a knock a step higher for each round of the helix, a rising note for each step of the lifter, a hollow clonk for each trough. */
+function woodenCue(cue: number) {
+  if (cue < WOOD_CUES.lifter) playKnock(480 + 120 * (cue - WOOD_CUES.helix));
+  else if (cue < WOOD_CUES.troughs) playClimbNote(cue - WOOD_CUES.lifter, 0.12);
+  else playClonk();
+}
+
 /** The wooden run, the first and plainest world. */
 export const WOODEN: TrackTheme = {
   level: "track",
@@ -797,6 +907,9 @@ export const WOODEN: TrackTheme = {
   peekers: ["🐭", "🐸", "🐰", "🦊", "🐻", "🐥"],
   magic: true,
   End: WoodenEnd,
+  stretch: STRETCHES.wood,
+  StretchArt: WoodenStretch,
+  cue: woodenCue,
 };
 
 /** The run's world, inside the run. */
@@ -808,4 +921,10 @@ function useLook(): TrackTheme {
 export const TrackRail = still(function TrackRail(props: { a: Pt; b: Pt }) {
   const { Rail: WorldRail } = useLook();
   return <WorldRail {...props} />;
+});
+
+/** The world's own stretch (`TrackTheme.StretchArt`), drawn again only when a cue's age changes. */
+export const StretchArt = still(function StretchArt(props: StretchArtProps) {
+  const { StretchArt: Art } = useLook();
+  return <Art {...props} />;
 });

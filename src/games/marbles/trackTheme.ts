@@ -1,14 +1,15 @@
 // What makes one marble run look like a world of its own (K-18): the same way
-// down the wall, the same parts and the same joining in, but its own wall, rails,
-// things on the shelf and its own end. The wooden run is one of them
-// (`WOODEN` in `trackParts.tsx`); the others each have a file (`snowTrack.tsx`, …).
+// down the upper wall, the same parts and the same joining in, but its own wall, rails,
+// things on the shelf, its own stretch down the lower wall (`trackStretches.ts`) and its
+// own end. The wooden run is one of them (`WOODEN` in `trackParts.tsx`); the others each
+// have a file (`snowTrack.tsx`, …).
 
-import { type ComponentType, createContext } from "react";
+import { type ComponentType, createContext, type PointerEvent } from "react";
 import type { Localized } from "@/lib/language";
 import type { BallLook } from "./parts";
 import type { Pt } from "./path";
 import type { MarbleLevel } from "./settings";
-import type { Roller } from "./track";
+import type { Roller, Stretch } from "./track";
 
 /** The outline colour of every drawing on the run. */
 export const INK = "#2a1e5c";
@@ -59,6 +60,15 @@ export interface ColorSort {
   count: (tube: number, n: number) => Localized | null;
 }
 
+/** What a world draws of its own stretch: behind the things (in the wall's big svg, drawn again only when `ages` change) or in front of them. */
+export interface StretchArtProps {
+  layer: "back" | "front";
+  /** Seconds since each of the stretch's cues last fired, held at a few seconds once it is over. */
+  ages: number[];
+  /** A finger on the thing of cue `cue`: it moves and sounds as when a thing passes. */
+  onTap: (cue: number, e: PointerEvent) => void;
+}
+
 /** One marble run's world. Everything not named here is the same on every run. */
 export interface TrackTheme {
   /** The level it is, for its name. */
@@ -96,6 +106,14 @@ export interface TrackTheme {
   sort?: ColorSort;
   /** How far the things lying at the end are lifted, `fullAge` seconds after it was full (the crane). */
   pileLift?: (fullAge: number) => number;
+  /** The world's own way down the lower wall, from the end of row 9 to its end. */
+  stretch: Stretch;
+  /** Draws that stretch: its rails, towers, hills and whatever moves on it. */
+  StretchArt: ComponentType<StretchArtProps>;
+  /** What cue `cue` of the stretch sounds like, set off by a thing of `kind` or a finger. */
+  cue: (cue: number, kind: Roller) => void;
+  /** Drawn round a thing riding a part with `carry` (a chair, a bucket), around 0, 0, behind or in front of it. */
+  Carrier?: ComponentType<{ layer: "back" | "front" }>;
 }
 
 /** The run's world, for the drawings deep inside it. */

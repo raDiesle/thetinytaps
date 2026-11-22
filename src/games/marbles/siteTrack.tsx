@@ -1,13 +1,16 @@
 // „Baustellen-Bahn“ (K-18): the marble run on a building site. A log, a tyre,
 // a stone, a big nut and a balloon ride conveyor belts down into a skip, and
-// when it is full the crane's hook comes down and lifts it up.
+// when it is full the crane's hook comes down and lifts it up. On the way down
+// the lower wall they hop down scaffold planks, ride a bucket elevator up and
+// drop through a rubble chute.
 
 import { memo, useId } from "react";
 import { playBoing, playClonk, playKnock, playRumble, playSqueak, playThump, playWhirr } from "@/lib/sfx";
-import { VIEW_W } from "./level";
+import { VIEW_W, wobble } from "./level";
 import { BALL_R, type Pt } from "./path";
 import { BASKET, TRACK_H } from "./track";
-import { type EndProps, INK, type ThingProps, type TrackTheme } from "./trackTheme";
+import { CHUTE, ELEVATOR, PLANKS, SITE_CUES, STRETCHES } from "./trackStretches";
+import { type EndProps, INK, type StretchArtProps, type ThingProps, type TrackTheme } from "./trackTheme";
 
 /** The crane's hook comes down for this long after the skip is full, then lifts it. */
 const HOOK_S = 0.7;
@@ -176,6 +179,164 @@ function SkipEnd({ layer, fullAge }: EndProps) {
   );
 }
 
+/** How long a bucket takes from the bottom of the elevator to its top. */
+const BUCKET_S = (ELEVATOR.bottom - ELEVATOR.top) / ELEVATOR.speed;
+/** The links of the elevator's chain, this far apart. */
+const LINK = 40;
+
+/** A bucket of the elevator round `x`, `y` (where a thing sits in it), tipped by `tip` degrees. */
+function Bucket({ x, y, tip = 0 }: { x: number; y: number; tip?: number }) {
+  return (
+    <g transform={`rotate(${tip} ${x} ${y})`}>
+      <path
+        d={`M${x - BALL_R - 10} ${y - 4} L${x + BALL_R + 10} ${y - 4} L${x + BALL_R + 2} ${y + BALL_R + 10} L${x - BALL_R - 2} ${y + BALL_R + 10} Z`}
+        fill="#ffb703"
+        stroke={INK}
+        strokeWidth="4"
+        strokeLinejoin="round"
+      />
+      <line x1={x - BALL_R - 6} y1={y + 6} x2={x + BALL_R + 6} y2={y + 6} stroke="#e09a00" strokeWidth="4" />
+    </g>
+  );
+}
+
+/** One funnel of the rubble chute, `i` from the top, wide at its top and narrower below, hanging into the next. */
+function funnel(i: number) {
+  const step = (CHUTE.bottom - CHUTE.top) / CHUTE.segments;
+  const top = CHUTE.top + i * step - 14;
+  return { top, bottom: top + step + 10, wide: BALL_R + 20, narrow: BALL_R + 11 };
+}
+
+/**
+ * The building site's own stretch: a stair of scaffold planks that bend as a thing lands on each, a bucket elevator –
+ * a thing drops into a bucket at its bottom and is carried up on the chain, then tipped out at the top – and a rubble
+ * chute of hanging funnels that each knock and swing as a thing drops through them into the skip.
+ */
+function SiteStretch({ layer, ages, onTap }: StretchArtProps) {
+  if (layer === "front") {
+    // The funnels' rims in front of the things dropping through them.
+    return (
+      <g pointerEvents="none">
+        {Array.from({ length: CHUTE.segments }, (_, i) => {
+          const f = funnel(i);
+          const swing = wobble(ages[SITE_CUES.chute + i], 3, 9, 4);
+          return (
+            <g key={i} transform={`rotate(${swing} ${CHUTE.x} ${f.top})`}>
+              <path
+                d={`M${CHUTE.x - f.wide} ${f.top} L${CHUTE.x + f.wide} ${f.top} L${CHUTE.x + f.wide - 2} ${f.top + 16} L${CHUTE.x - f.wide + 2} ${f.top + 16} Z`}
+                fill="#e85d04"
+                stroke={INK}
+                strokeWidth="4"
+                strokeLinejoin="round"
+              />
+            </g>
+          );
+        })}
+      </g>
+    );
+  }
+  const ran = Math.min(Math.max(0, ages[SITE_CUES.bucketOn]), BUCKET_S);
+  const shift = (ran * ELEVATOR.speed) % LINK;
+  const turn = (ran * ELEVATOR.speed * 180) / (Math.PI * 30);
+  const wheel = (y: number) => (
+    <g transform={`rotate(${-turn} ${ELEVATOR.x} ${y})`}>
+      <circle cx={ELEVATOR.x} cy={y} r="30" fill="#adb5bd" stroke={INK} strokeWidth="4" />
+      <path d={`M${ELEVATOR.x - 22} ${y} H${ELEVATOR.x + 22} M${ELEVATOR.x} ${y - 22} V${y + 22}`} stroke={INK} strokeWidth="4" />
+    </g>
+  );
+  const chainTop = ELEVATOR.top - 30;
+  const chainBottom = ELEVATOR.bottom + 40;
+  return (
+    <g>
+      {/* The scaffold: a pole down from each plank, and the planks bending a little as a thing lands */}
+      {PLANKS.map((plank, i) => (
+        <rect key={`pole${i}`} x={plank.x0 + 6} y={plank.y} width="12" height={TRACK_H - plank.y} fill="#adb5bd" stroke={INK} strokeWidth="3" />
+      ))}
+      {PLANKS.map((plank, i) => {
+        const sag = wobble(ages[SITE_CUES.planks + i], 7, 12, 4);
+        const top = plank.y - 3;
+        return (
+          <g key={i} data-tap onPointerDown={(e) => onTap(SITE_CUES.planks + i, e)}>
+            <path
+              d={`M${plank.x0} ${top} Q${(plank.x0 + plank.x1) / 2} ${top + 2 * sag} ${plank.x1} ${top + 3} V${top + 17} Q${(plank.x0 + plank.x1) / 2} ${top + 16 + 2 * sag} ${plank.x0} ${top + 14} Z`}
+              fill="#d9a066"
+              stroke={INK}
+              strokeWidth="4"
+              strokeLinejoin="round"
+            />
+            <line x1={plank.x0 + 8} y1={top + 8} x2={plank.x1 - 8} y2={top + 10 + sag} stroke="#b07a42" strokeWidth="3" />
+          </g>
+        );
+      })}
+
+      {/* The bucket elevator: its steel frame, the chain moving up while a bucket rides, its two wheels */}
+      <g data-tap onPointerDown={(e) => onTap(SITE_CUES.bucketOn, e)}>
+        {[-58, 58].map((dx) => (
+          <rect key={dx} x={ELEVATOR.x + dx - 7} y={chainTop - 40} width="14" height={TRACK_H - chainTop + 40} fill="#6c757d" stroke={INK} strokeWidth="3" />
+        ))}
+        {Array.from({ length: 8 }, (_, i) => {
+          const y = chainTop + ((chainBottom - chainTop) * (i + 0.5)) / 8;
+          return <line key={i} x1={ELEVATOR.x - 52} y1={y} x2={ELEVATOR.x + 52} y2={y + (i % 2 ? -70 : 70)} stroke="#6c757d" strokeWidth="5" opacity="0.6" />;
+        })}
+        <rect x={ELEVATOR.x - 12} y={chainTop} width="24" height={chainBottom - chainTop} fill="#3d3d45" stroke={INK} strokeWidth="3" />
+        {Array.from({ length: Math.floor((chainBottom - chainTop) / LINK) }, (_, i) => (
+          <line
+            key={i}
+            x1={ELEVATOR.x - 10}
+            y1={chainBottom - 6 - i * LINK - shift}
+            x2={ELEVATOR.x + 10}
+            y2={chainBottom - 6 - i * LINK - shift}
+            stroke="#adb5bd"
+            strokeWidth="4"
+          />
+        ))}
+        {wheel(chainTop)}
+        {wheel(chainBottom)}
+        {/* A bucket waiting at the bottom, and one tipped out at the top */}
+        <Bucket x={ELEVATOR.x} y={ELEVATOR.bottom} />
+      </g>
+      <g data-tap onPointerDown={(e) => onTap(SITE_CUES.bucketOff, e)}>
+        <Bucket x={ELEVATOR.x + 10} y={ELEVATOR.top - 4} tip={60 - wobble(ages[SITE_CUES.bucketOff], 14, 8, 3)} />
+      </g>
+
+      {/* The rubble chute: its funnels hanging on chains from an arm, each swinging as a thing knocks through */}
+      <line x1={CHUTE.x} y1={CHUTE.top - 70} x2={CHUTE.x + 170} y2={CHUTE.top - 70} stroke="#ffb703" strokeWidth="14" strokeLinecap="round" />
+      <line x1={CHUTE.x + 160} y1={CHUTE.top - 70} x2={CHUTE.x + 160} y2={TRACK_H} stroke="#ffb703" strokeWidth="14" />
+      {Array.from({ length: CHUTE.segments }, (_, i) => {
+        const f = funnel(i);
+        const swing = wobble(ages[SITE_CUES.chute + i], 3, 9, 4);
+        return (
+          <g key={i} data-tap onPointerDown={(e) => onTap(SITE_CUES.chute + i, e)} transform={`rotate(${swing} ${CHUTE.x} ${f.top})`}>
+            {i === 0 && <line x1={CHUTE.x + f.wide - 6} y1={f.top} x2={CHUTE.x + 50} y2={CHUTE.top - 70} stroke={INK} strokeWidth="3" />}
+            <path
+              d={`M${CHUTE.x - f.wide} ${f.top} L${CHUTE.x + f.wide} ${f.top} L${CHUTE.x + f.narrow} ${f.bottom} L${CHUTE.x - f.narrow} ${f.bottom} Z`}
+              fill="#f48c06"
+              stroke={INK}
+              strokeWidth="4"
+              strokeLinejoin="round"
+            />
+            <path d={`M${CHUTE.x - f.narrow + 6} ${f.top + 24} V${f.bottom - 8}`} stroke="#ffd166" strokeWidth="5" strokeLinecap="round" opacity="0.7" />
+          </g>
+        );
+      })}
+    </g>
+  );
+}
+
+/** The bucket the things ride up the elevator in: its back behind them, its front in front of them. */
+function BucketCarrier({ layer }: { layer: "back" | "front" }) {
+  if (layer === "back") return <rect x={-BALL_R - 8} y={-6} width={2 * BALL_R + 16} height={BALL_R + 14} rx="4" fill="#c27c00" stroke={INK} strokeWidth="3" />;
+  return <Bucket x={0} y={0} />;
+}
+
+/** What the building site's stretch sounds like: a knock lower on each plank, the elevator whirring, a hollow knock in each funnel. */
+function siteCue(cue: number) {
+  if (cue < SITE_CUES.bucketOn) playKnock(900 - 50 * (cue - SITE_CUES.planks));
+  else if (cue === SITE_CUES.bucketOn) playWhirr();
+  else if (cue === SITE_CUES.bucketOff) playClonk();
+  else playKnock(340 - 20 * (cue - SITE_CUES.chute));
+}
+
 /** The building-site run. */
 export const SITE_TRACK: TrackTheme = {
   level: "sitetrack",
@@ -203,4 +364,8 @@ export const SITE_TRACK: TrackTheme = {
   magic: false,
   End: SkipEnd,
   pileLift: liftAt,
+  stretch: STRETCHES.site,
+  StretchArt: SiteStretch,
+  cue: siteCue,
+  Carrier: BucketCarrier,
 };

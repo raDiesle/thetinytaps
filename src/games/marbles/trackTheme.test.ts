@@ -6,7 +6,8 @@ import { SITE_TRACK } from "./siteTrack";
 import { SLIDE_TRACK } from "./slideTrack";
 import { SNOW_TRACK } from "./snowTrack";
 import { SPACE_TRACK } from "./spaceTrack";
-import { BASKET_FULL, ROW9, SHELF, TRACK_H, TRACK_W } from "./track";
+import { BASKET_FULL, SHELF, TRACK_H, TRACK_W } from "./track";
+import { COLOR_END, STRETCHES } from "./trackStretches";
 import { BALL_R } from "./path";
 import { WOODEN } from "./trackParts";
 
@@ -27,6 +28,15 @@ describe("marble run worlds", () => {
       expect(w.peekers.length).toBeGreaterThanOrEqual(2);
       expect(new Set(w.peekers).size).toBe(w.peekers.length);
     }
+  });
+
+  test("each world ends in a stretch of its own, drawn and sounded its own way", () => {
+    expect(new Set(WORLDS.map((w) => w.stretch)).size).toBe(WORLDS.length);
+    expect(new Set(WORLDS.map((w) => w.StretchArt)).size).toBe(WORLDS.length);
+    expect(new Set(WORLDS.map((w) => w.cue)).size).toBe(WORLDS.length);
+    expect(new Set([...WORLDS.map((w) => w.stretch), ...Object.values(STRETCHES)]).size).toBe(WORLDS.length);
+    // A world whose stretch carries things (a chair, a bucket) draws what carries them.
+    for (const w of WORLDS) if (w.stretch.parts.some((part) => part.carry)) expect(w.Carrier, w.level).toBeDefined();
   });
 
   test("where things land stays on the wall", () => {
@@ -62,7 +72,7 @@ describe("Farbenbahn (K-10)", () => {
       if (tube > 0) expect(TUBES.x[tube] - TUBES.x[tube - 1]).toBeGreaterThan(2 * TUBES.half + 20);
     }
     // Clear of the last row's end, where the marbles hop off, and of the wall's right edge.
-    expect(TUBES.x[0] - TUBES.half).toBeGreaterThan(ROW9.to.x + BALL_R);
+    expect(TUBES.x[0] - TUBES.half).toBeGreaterThan(COLOR_END.x + BALL_R);
     expect(TUBES.x[TUBES.x.length - 1] + TUBES.half + 30).toBeLessThan(TRACK_W);
   });
 
@@ -75,7 +85,7 @@ describe("Farbenbahn (K-10)", () => {
   });
 
   test("the hop ends where the marble rests, from the run's end", () => {
-    const from = { x: ROW9.to.x, y: ROW9.to.y };
+    const from = { ...COLOR_END };
     const to = tubeSlot(2, 0);
     expect(sort?.hop(from, to, 0)).toEqual(from);
     expect(sort?.hop(from, to, 1)).toEqual(to);

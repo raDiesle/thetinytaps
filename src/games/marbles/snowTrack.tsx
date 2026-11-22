@@ -1,21 +1,24 @@
 // „Schneebahn“ (K-18): the marble run in the snow. The snowball grows on its
 // way down, and at the end every thing that arrives becomes the next part of a
-// snowman: three balls, a face with a carrot, twig arms and buttons, hat and scarf.
+// snowman: three balls, a face with a carrot, twig arms and buttons, hat and scarf. On the
+// way down the lower wall they fly off a ski jump, ride up a chair lift and race
+// round the icy curves of a bobsleigh run.
 
 import { memo, useId } from "react";
-import { playBlub, playPuff, playRumble, playSleigh, playSqueak, playThump, playTwinkle } from "@/lib/sfx";
+import { playBlub, playHop, playLift, playPuff, playRumble, playSleigh, playSlide, playSqueak, playThump, playTwinkle, playWhoosh } from "@/lib/sfx";
 import { VIEW_W, wobble } from "./level";
-import { BALL_R, type Pt } from "./path";
+import { arc, BALL_R, type Pt } from "./path";
 import { TRACK_H } from "./track";
-import { type EndProps, INK, type ThingProps, type TrackTheme } from "./trackTheme";
+import { BOB, CHAIRLIFT, INRUN, JUMP, OUTRUN, railPath, SNOW_CUES, STRETCHES, UNDER } from "./trackStretches";
+import { type EndProps, INK, type ThingProps, type StretchArtProps, type TrackTheme } from "./trackTheme";
 
 /** The snowman stands where the wooden run has its basket. */
 const SX = 1415;
 /** Its three balls, bottom to top. */
 const BALLS = [
-  { y: 2180, r: 58 },
-  { y: 2084, r: 44 },
-  { y: 2012, r: 32 },
+  { y: TRACK_H - 70, r: 58 },
+  { y: TRACK_H - 166, r: 44 },
+  { y: TRACK_H - 238, r: 32 },
 ];
 /** Where each thing that arrives goes: the three balls, the face, the middle (arms and buttons), the hat. */
 const PARTS: Pt[] = [
@@ -59,7 +62,10 @@ const SnowBackdrop = memo(function SnowBackdrop() {
       </defs>
       <rect x="-400" y="-200" width={VIEW_W + 800} height={TRACK_H + 400} fill={`url(#${id}sky)`} />
       <rect x="-400" y="-200" width={VIEW_W + 800} height={TRACK_H + 400} fill={`url(#${id}flakes)`} />
-      <path d={`M-400 ${TRACK_H + 200} L-400 2200 Q300 2130 800 2210 Q1200 2160 2000 2190 L2000 ${TRACK_H + 200} Z`} fill={SNOW} />
+      <path
+        d={`M-400 ${TRACK_H + 200} L-400 ${TRACK_H - 50} Q300 ${TRACK_H - 120} 800 ${TRACK_H - 40} Q1200 ${TRACK_H - 90} 2000 ${TRACK_H - 60} L2000 ${TRACK_H + 200} Z`}
+        fill={SNOW}
+      />
     </g>
   );
 });
@@ -187,7 +193,14 @@ function SnowBall({ i, age }: { i: number; age: number }) {
 function SnowmanEnd({ layer, parts, t, fullAge, tapAge }: EndProps) {
   if (layer === "front") {
     // A drift of snow in front of the snowman's foot.
-    return <path d={`M1250 ${TRACK_H + 20} Q1290 2226 1415 2232 Q1540 2226 1600 ${TRACK_H + 20} Z`} fill={SNOW} stroke={SHADE} strokeWidth="4" />;
+    return (
+      <path
+        d={`M1250 ${TRACK_H + 20} Q1290 ${TRACK_H - 24} 1415 ${TRACK_H - 18} Q1540 ${TRACK_H - 24} 1600 ${TRACK_H + 20} Z`}
+        fill={SNOW}
+        stroke={SHADE}
+        strokeWidth="4"
+      />
+    );
   }
   const age = (i: number) => (i < parts.length ? (t - parts[i]) / 1000 : -1);
   const head = BALLS[2];
@@ -264,6 +277,157 @@ function SnowmanEnd({ layer, parts, t, fullAge, tapAge }: EndProps) {
   );
 }
 
+/** A puff of snow thrown up at `x`, `y`, `age` seconds ago: three snowballs flying apart and fading. */
+function Puff({ x, y, age }: { x: number; y: number; age: number }) {
+  if (age < 0 || age > 0.8) return null;
+  const k = age / 0.8;
+  return (
+    <g opacity={1 - k} fill={SNOW} stroke={SHADE} strokeWidth="2" pointerEvents="none">
+      {[-1, 0, 1].map((i) => (
+        <circle key={i} cx={x + i * 34 * k} cy={y - 34 * Math.sin(Math.PI * Math.min(1, k * 1.4)) - (i === 0 ? 10 * k : 0)} r={9 + 7 * k} />
+      ))}
+    </g>
+  );
+}
+
+/** The bobsleigh run's two curves, as the things go round them. */
+const BOB_CURVES = [arc(BOB.curves[0].x, BOB.curves[0].y, BOB.r, 270, 450), arc(BOB.curves[1].x, BOB.curves[1].y, BOB.r, 270, 90)];
+/** How far down the landing hill reaches, clear above the row under it. */
+const HILL_FOOT = 3040;
+/** The pylon in the middle of the chair lift. */
+const PYLON_X = (CHAIRLIFT.from.x + CHAIRLIFT.to.x) / 2;
+const cableY = (x: number) =>
+  CHAIRLIFT.from.y - CHAIRLIFT.hang + ((x - CHAIRLIFT.from.x) * (CHAIRLIFT.to.y - CHAIRLIFT.from.y)) / (CHAIRLIFT.to.x - CHAIRLIFT.from.x);
+
+/**
+ * The snow run's own stretch: a ski jump (a wooden inrun on its scaffold, a lip they fly off, and a snowy landing
+ * hill with a puff of snow where they land), a chair lift taking them up in a chair on its cable, and a bobsleigh run
+ * with two steep icy curves.
+ */
+function SnowStretch({ layer, ages, onTap }: StretchArtProps) {
+  if (layer === "front") return null;
+  const ground = JUMP.lip.y + 110;
+  const inrun = railPath(INRUN, UNDER, 1);
+  const hill = railPath([JUMP.land, JUMP.hillEnd, ...OUTRUN.slice(1)], UNDER, 1);
+  const lastHill = OUTRUN[OUTRUN.length - 1];
+  const wheel = (x: number, y: number, age: number) => (
+    <g transform={`rotate(${Math.min(Math.max(age, 0), 9) * 90} ${x} ${y})`}>
+      <circle cx={x} cy={y} r="20" fill="#e3f1fb" stroke={INK} strokeWidth="4" />
+      <path d={`M${x - 14} ${y} H${x + 14} M${x} ${y - 14} V${y + 14}`} stroke={INK} strokeWidth="3" />
+    </g>
+  );
+  const bottom = { x: CHAIRLIFT.from.x - 40, y: cableY(CHAIRLIFT.from.x - 40) };
+  const top = { x: CHAIRLIFT.to.x + 20, y: cableY(CHAIRLIFT.to.x + 20) };
+  return (
+    <g>
+      {/* The ski jump: the scaffold under its inrun, the inrun's icy track, and the landing hill */}
+      <g data-tap onPointerDown={(e) => onTap(SNOW_CUES.takeoff, e)}>
+        <path d={`${inrun} L${JUMP.lip.x} ${ground} L${JUMP.start.x} ${ground} Z`} fill="#c98a4b" stroke={INK} strokeWidth="4" strokeLinejoin="round" />
+        {[0.2, 0.45, 0.7].map((k) => {
+          const p = INRUN[Math.round(k * (INRUN.length - 1))];
+          return <line key={k} x1={p.x} y1={p.y + UNDER + 6} x2={p.x + 60} y2={ground} stroke="#9b6330" strokeWidth="6" />;
+        })}
+        <path d={inrun} fill="none" stroke={INK} strokeWidth="18" strokeLinecap="round" />
+        <path d={inrun} fill="none" stroke="#9fd3f5" strokeWidth="12" strokeLinecap="round" />
+        <path d={inrun} fill="none" stroke={SNOW} strokeWidth="5" strokeLinecap="round" transform="translate(0 -5)" />
+      </g>
+      <g data-tap onPointerDown={(e) => onTap(SNOW_CUES.landing, e)}>
+        <path
+          d={`M${JUMP.land.x - 150} ${HILL_FOOT} Q${JUMP.land.x - 70} ${JUMP.land.y + UNDER + 4} ${JUMP.land.x} ${JUMP.land.y + UNDER} ${hill.replace(/^M/, "L")} L${lastHill.x + 60} ${lastHill.y + UNDER + 4} Q${lastHill.x + 90} ${HILL_FOOT} ${lastHill.x + 60} ${HILL_FOOT} Z`}
+          fill={SNOW}
+          stroke={SHADE}
+          strokeWidth="5"
+          strokeLinejoin="round"
+        />
+        <path d={hill} fill="none" stroke="#9fd3f5" strokeWidth="6" strokeLinecap="round" />
+      </g>
+      <Puff x={JUMP.lip.x} y={JUMP.lip.y + 10} age={ages[SNOW_CUES.takeoff]} />
+      <Puff x={JUMP.land.x} y={JUMP.land.y + 18} age={ages[SNOW_CUES.landing]} />
+
+      {/* The chair lift: its pylon, its cable and its two stations with their wheels */}
+      <g data-tap onPointerDown={(e) => onTap(SNOW_CUES.chairOn, e)}>
+        <rect x={PYLON_X - 9} y={cableY(PYLON_X) - 30} width="18" height={TRACK_H - cableY(PYLON_X) + 30} fill="#8fbfe3" stroke={INK} strokeWidth="3.5" />
+        <rect x={PYLON_X - 36} y={cableY(PYLON_X) - 34} width="72" height="12" rx="5" fill="#8fbfe3" stroke={INK} strokeWidth="3.5" />
+        <rect x={bottom.x - 50} y={bottom.y - 60} width="72" height={TRACK_H - bottom.y + 60} rx="8" fill="#e63946" stroke={INK} strokeWidth="4" />
+        <path
+          d={`M${bottom.x - 62} ${bottom.y - 58} L${bottom.x - 14} ${bottom.y - 100} L${bottom.x + 34} ${bottom.y - 58} Z`}
+          fill={SNOW}
+          stroke={INK}
+          strokeWidth="4"
+          strokeLinejoin="round"
+        />
+        <line x1={bottom.x} y1={bottom.y} x2={top.x} y2={top.y} stroke={INK} strokeWidth="5" />
+        {wheel(bottom.x, bottom.y, ages[SNOW_CUES.chairOn])}
+      </g>
+      <g data-tap onPointerDown={(e) => onTap(SNOW_CUES.chairOff, e)}>
+        <rect
+          x={top.x - 10}
+          y={top.y - 60}
+          width="90"
+          height={CHAIRLIFT.to.y + UNDER - top.y + 60}
+          rx="8"
+          fill="#e63946"
+          stroke={INK}
+          strokeWidth="4"
+          opacity="0.9"
+        />
+        <path
+          d={`M${top.x - 24} ${top.y - 58} L${top.x + 35} ${top.y - 104} L${top.x + 94} ${top.y - 58} Z`}
+          fill={SNOW}
+          stroke={INK}
+          strokeWidth="4"
+          strokeLinejoin="round"
+        />
+        {wheel(top.x, top.y, ages[SNOW_CUES.chairOn])}
+      </g>
+      <Puff x={CHAIRLIFT.to.x + 20} y={CHAIRLIFT.to.y + 10} age={ages[SNOW_CUES.chairOff]} />
+
+      {/* The bobsleigh run's icy curves, banked on their outer side */}
+      {BOB_CURVES.map((pts, i) => {
+        const d = pts.map((p, j) => `${j ? "L" : "M"}${p.x.toFixed(1)} ${p.y.toFixed(1)}`).join(" ");
+        const bank = railPath(pts, UNDER + 4, i === 0 ? -1 : 1);
+        const age = ages[SNOW_CUES.bob + i];
+        const out = pts[Math.floor(pts.length / 2)];
+        return (
+          <g key={i} data-tap onPointerDown={(e) => onTap(SNOW_CUES.bob + i, e)} fill="none" strokeLinecap="round">
+            <path d={d} stroke={INK} strokeWidth={2 * UNDER + 8} />
+            <path d={d} stroke="#cfe8fa" strokeWidth={2 * UNDER} />
+            <path d={bank} stroke={SNOW} strokeWidth="12" />
+            <Puff x={out.x + (i === 0 ? 30 : -30)} y={out.y} age={age} />
+          </g>
+        );
+      })}
+    </g>
+  );
+}
+
+/** The chair the things ride up the chair lift in: its hanger up to the cable and its back behind them, its seat and bar in front. */
+function ChairCarrier({ layer }: { layer: "back" | "front" }) {
+  if (layer === "back") {
+    return (
+      <g stroke={INK} strokeLinecap="round" strokeLinejoin="round">
+        <path d={`M0 ${-CHAIRLIFT.hang} V-40 Q0 -34 -28 -32 V${UNDER - 6}`} fill="none" strokeWidth="5" />
+        <rect x="-34" y="-30" width="12" height={UNDER + 26} rx="5" fill="#e63946" strokeWidth="3" />
+      </g>
+    );
+  }
+  return (
+    <g stroke={INK} strokeLinecap="round">
+      <rect x="-32" y={UNDER - 8} width="64" height="12" rx="6" fill="#e63946" strokeWidth="3" />
+      <path d={`M-28 -6 H24 V${UNDER - 8}`} fill="none" strokeWidth="4" />
+    </g>
+  );
+}
+
+/** What the snow stretch sounds like. */
+function snowCue(cue: number) {
+  if (cue === SNOW_CUES.takeoff) playWhoosh();
+  else if (cue === SNOW_CUES.landing) playPuff();
+  else if (cue === SNOW_CUES.chairOn) playLift(1.2, true);
+  else if (cue === SNOW_CUES.chairOff) playHop(0.3);
+  else playSlide();
+}
+
 /** The snow run. */
 export const SNOW_TRACK: TrackTheme = {
   level: "snowtrack",
@@ -292,4 +456,8 @@ export const SNOW_TRACK: TrackTheme = {
   End: SnowmanEnd,
   landAt: (i) => PARTS[Math.min(i, PARTS.length - 1)],
   absorb: true,
+  stretch: STRETCHES.snow,
+  StretchArt: SnowStretch,
+  cue: snowCue,
+  Carrier: ChairCarrier,
 };

@@ -1,7 +1,9 @@
-import { expect, test } from "bun:test";
+import { describe, expect, test } from "bun:test";
 import { BALL_R, type Pt } from "./path";
 import {
+  BASKET,
   BASKET_FULL,
+  BASKET_IN,
   BASKET_SLOTS,
   buildRoutes,
   DEFAULT_BUILD,
@@ -9,10 +11,12 @@ import {
   HOPPER,
   JOIN,
   PIECES,
+  pointAt,
   ROLLER,
   ROLLERS,
   ROW1A,
   ROW2,
+  rolled,
   rowY,
   type Route,
   type Section,
@@ -25,11 +29,12 @@ import {
   TRACK_W,
   TURNS,
 } from "./track";
+import { COLOR_END, STRETCHES } from "./trackStretches";
 
 // The run is many hand-placed numbers; these checks catch a marble that would
 // jump between sections or roll off the wall when one of them changes.
 
-const routes = buildRoutes();
+const routes = buildRoutes(STRETCHES.wood);
 const near = (a: Pt, b: Pt) => Math.hypot(a.x - b.x, a.y - b.y) < 1;
 const first = (route: { pts: Pt[] }) => route.pts[0];
 const last = (route: { pts: Pt[] }) => route.pts[route.pts.length - 1];
@@ -140,4 +145,87 @@ test("the barrier stands on row 2 with room for a long row of waiting marbles be
   // It stands before the funnel in the default build.
   const next = routes.sections[routes.gate.section + 1];
   expect(next.kind === "spot" && DEFAULT_BUILD[next.spot]).toBe("funnel");
+});
+
+// Each world ends in a stretch of its own (`trackStretches.ts`): the same checks for every one of them.
+
+/** Seconds a marble takes along `routes`, rolling as `TrackLevel` rolls it. */
+function seconds(rs: Route[]) {
+  const dt = 1 / 120;
+  let t = 0;
+  let v = 0;
+  for (const r of rs) {
+    let s = 0;
+    while (s < r.total) {
+      const zone = r.zones.find((z) => s >= z.s0 && s < z.s1);
+      v = zone?.speed ?? rolled(v, pointAt(r, s).slope, dt);
+      s += v * dt;
+      t += dt;
+    }
+  }
+  return t;
+}
+
+describe.each(Object.entries(STRETCHES))("the %s stretch", (name, stretch) => {
+  const built = buildRoutes(stretch);
+  const end = built.sections[built.sections.length - 1];
+  const route = end.kind === "fixed" ? end.route : null;
+
+  test("it joins the run and stays on the wall, with no jump", () => {
+    expect(route).not.toBeNull();
+    if (!route) return;
+    route.pts.forEach((pt, i) => {
+      expect(pt.x, `${name} point ${i}`).toBeGreaterThanOrEqual(BALL_R);
+      expect(pt.x, `${name} point ${i}`).toBeLessThanOrEqual(TRACK_W - BALL_R);
+      expect(pt.y, `${name} point ${i}`).toBeLessThanOrEqual(TRACK_H - BALL_R);
+      if (i) expect(Math.hypot(pt.x - route.pts[i - 1].x, pt.y - route.pts[i - 1].y), `${name} step ${i}`).toBeLessThan(80);
+    });
+    for (const rail of stretch.rails)
+      for (const pt of [rail.from, rail.to]) {
+        expect(pt.x).toBeGreaterThanOrEqual(BALL_R);
+        expect(pt.x).toBeLessThanOrEqual(TRACK_W - BALL_R);
+        expect(pt.y).toBeLessThan(TRACK_H - BALL_R);
+      }
+  });
+
+  test("it ends in the basket (or, sorting colours, where the hop into the tubes starts)", () => {
+    if (!route) return;
+    const last = route.pts[route.pts.length - 1];
+    if (name === "color") expect(near(last, COLOR_END)).toBe(true);
+    else {
+      expect(last.y).toBe(BASKET_IN.y);
+      expect(last.x).toBeGreaterThanOrEqual(BASKET.x0 + BALL_R);
+      expect(last.x).toBeLessThan(BASKET.x1 - BALL_R);
+    }
+  });
+
+  test("its walls are on the far side, and every cue fires on the way", () => {
+    expect(built.turns.length).toBe(TURNS.length + stretch.turns.length);
+    for (const turn of stretch.turns) {
+      expect(Math.sign(turn.x - turn.from.x)).toBe(Math.sign(turn.x - turn.to.x));
+      expect(turn.to.y).toBeGreaterThan(turn.from.y + BALL_R);
+      expect(turn.x).toBeGreaterThanOrEqual(0);
+      expect(turn.x).toBeLessThanOrEqual(TRACK_W);
+    }
+    const fired = (route?.events ?? []).flatMap((e) => (e.event.kind === "cue" ? [e.event.cue] : []));
+    expect(new Set(fired)).toEqual(new Set(Array.from({ length: stretch.cues }, (_, i) => i)));
+    expect(stretch.cues).toBeGreaterThanOrEqual(3);
+  });
+
+  test("a round with things let out promptly takes about a minute", () => {
+    // Six things, one let out every two seconds and the barrier opened at once: the first waits at the barrier, the
+    // last comes about ten seconds later and rolls on down. The right way of the switch is the shorter one.
+    const seq = built.sections.map((sec) =>
+      sec.kind === "fixed" ? sec.route : sec.kind === "spot" ? built.pieces[sec.spot][DEFAULT_BUILD[sec.spot]] : built.ways.right,
+    );
+    const round = 10 + seconds(seq.slice(0, built.gate.section)) + 1.1 + seconds(seq.slice(built.gate.section)) + 0.8;
+    expect(round, name).toBeGreaterThan(55);
+    expect(round, name).toBeLessThan(65);
+  });
+});
+
+test("every world's stretch is its own", () => {
+  const all = Object.values(STRETCHES);
+  const shapes = all.map((st) => st.parts.map((p) => `${Math.round(p.pts[p.pts.length - 1].x)},${Math.round(p.pts[p.pts.length - 1].y)}`).join(" "));
+  expect(new Set(shapes).size).toBe(all.length);
 });
