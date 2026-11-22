@@ -5,117 +5,39 @@ import { cameraLayer, cameraPoint, gliding, SETTLE_S, useAnyKey, useFrames, useL
 import { TapHint } from "@/components/TapHint";
 import { cameraOn } from "./machineKit";
 import { Sparkles } from "./scenery";
-import { pickThings, type Thing } from "./things";
-import type { Pt } from "./path";
+import { pickRuns } from "./things";
+import { createSim, DONE_AFTER_DRUM_S, DRUM, FLOOR, focusX, GROUPS, layOut, linkAge, linksSeconds, MARGIN, pushFirst, roomX, SCALE, stepSim } from "./topple";
+import { LinkArt } from "./toppleLinks";
 
 const INK = "#2a1e5c";
-const FLOOR = 790;
-/** Gravity for the tipping, slower than real so the child can follow. */
-const GRAVITY = 1000;
-/** The first push, in radians per second. */
-const PUSH = 1.3;
-/** Each thing stands this share of its height away from the next, so it can reach it. */
-const SPACING = 0.45;
-const DRUM = { w: 150, h: 110 };
-/** Runs of small-to-tall things in the long row (the last one ends with the broom). */
-const GROUPS = 7;
-/** The things are drawn this much bigger than their own numbers. */
-const SCALE = 1.3;
-/** Room before the first thing and after the drum, in the picture's pixels. */
-const MARGIN = 260;
 /** How fast the camera catches up with the falling, per second. */
 const CAMERA_FOLLOW = 2.2;
 /** One after another the things on the first screen drop in from above. */
 const DROP_STAGGER_MS = 130;
 const DROP_MS = 600;
-const DONE_AFTER_DRUM_MS = 2600;
-/** If something got stuck, end anyway after this long per thing. */
+/** If something got stuck, end anyway after this long per thing (plus the links' own seconds). */
 const MAX_FALL_MS_EACH = 1500;
-
-interface Tipping {
-  /** Angle in radians, 0 standing, π/2 lying on the floor. */
-  angle: number;
-  /** Angular speed, radians per second. */
-  spin: number;
-  started: boolean;
-  /** Has already hit the one after it. */
-  touched: boolean;
-}
-
-/** Corners of a thing standing with its left edge at `left`, tipped by `angle` around its bottom right corner. */
-function corners(left: number, w: number, h: number, angle: number): Pt[] {
-  const px = left + w;
-  const c = Math.cos(angle);
-  const s = Math.sin(angle);
-  return [
-    { x: -w, y: 0 },
-    { x: 0, y: 0 },
-    { x: 0, y: -h },
-    { x: -w, y: -h },
-  ].map((p) => ({ x: px + p.x * c - p.y * s, y: p.x * s + p.y * c }));
-}
-
-/** Do two convex shapes overlap? (Separating axis test.) */
-function overlaps(a: Pt[], b: Pt[]) {
-  for (const poly of [a, b]) {
-    for (let i = 0; i < poly.length; i++) {
-      const p = poly[i];
-      const q = poly[(i + 1) % poly.length];
-      const nx = q.y - p.y;
-      const ny = p.x - q.x;
-      const project = (pts: Pt[]) => pts.map((r) => r.x * nx + r.y * ny);
-      const pa = project(a);
-      const pb = project(b);
-      if (Math.max(...pa) <= Math.min(...pb) || Math.max(...pb) <= Math.min(...pa)) return false;
-    }
-  }
-  return true;
-}
-
-interface Layout {
-  things: Thing[];
-  /** Left edge of each thing, before scaling. */
-  lefts: number[];
-  drumLeft: number;
-  /** How many things stand on the first screen; only they drop in. */
-  onFirstScreen: number;
-  /** The whole room, in the picture's pixels. */
-  worldW: number;
-}
-
-/** Where a spot of the row is in the room. */
-const roomX = (x: number) => MARGIN + x * SCALE;
-
-function layOut(things: Thing[]): Layout {
-  const lefts: number[] = [];
-  let x = 0;
-  for (const t of things) {
-    lefts.push(x);
-    x += t.w + Math.max(16, t.h * SPACING);
-  }
-  return {
-    things,
-    lefts,
-    drumLeft: x,
-    onFirstScreen: lefts.filter((l) => roomX(l) < VIEW_W).length,
-    worldW: roomX(x + DRUM.w) + MARGIN,
-  };
-}
 
 type Phase = "dropping" | "ready" | "falling" | "done";
 
 /**
  * Everyday things stand in a long row through the room, small to tall again
  * and again, with a drum at the end. A tap pushes the first one; it tips over
- * onto the next, which tips onto the next … and the camera walks along, until
- * the broom at the end hits the drum and sparkles burst out of it. Every
- * round brings other things.
+ * onto the next, which tips onto the next … and the camera walks along. Between
+ * two runs a link of another kind carries the fall on (`topple.ts`): a bolster
+ * rolls off a bench onto a pop-up tent, a space hopper bounces away, a toy
+ * balloon drifts off with its sandbag, a skateboard rides through a tunnel and
+ * up a ramp, a fan blows a sailboat on wheels, an egg chair swings and flings
+ * its teddy. At the end the broom hits the drum and sparkles burst out of it.
+ * Every round brings other things.
  */
 export function ToppleLevel({ sound, say, onDone }: LevelProps) {
   const label = useLevelName("topple");
-  const layout = useMemo(() => layOut(pickThings(GROUPS)), []);
-  const { things, lefts, drumLeft, onFirstScreen, worldW } = layout;
-  const tipping = useRef<Tipping[]>(things.map(() => ({ angle: 0, spin: 0, started: false, touched: false })));
+  const layout = useMemo(() => layOut(pickRuns(GROUPS)), []);
+  const { things, lefts, links, drumLeft, worldW } = layout;
+  /** How many things stand on the first screen; only they drop in. */
+  const onFirstScreen = useMemo(() => lefts.filter((l) => roomX(l) < VIEW_W).length, [lefts]);
+  const sim = useMemo(() => createSim(layout), [layout]);
   const phase = useRef<Phase>("dropping");
   const fallStart = useRef(0);
   const drumAt = useRef(-Infinity);
@@ -124,13 +46,8 @@ export function ToppleLevel({ sound, say, onDone }: LevelProps) {
   const box = useRef<HTMLDivElement>(null);
   // The knocks, the twinkle after the drum and the end are dropped when the level is left before them.
   const { later } = useTimers();
-
-  const drumBox: Pt[] = [
-    { x: drumLeft, y: 0 },
-    { x: drumLeft + DRUM.w, y: 0 },
-    { x: drumLeft + DRUM.w, y: -DRUM.h },
-    { x: drumLeft, y: -DRUM.h },
-  ];
+  // The room is as wide as the whole row: drawn once, not again in every frame.
+  const room = useMemo(() => <Room width={worldW} />, [worldW]);
 
   // Tock, tock, tock: each one on the first screen lands after dropping in; then the row is ready.
   useEffect(() => {
@@ -148,68 +65,35 @@ export function ToppleLevel({ sound, say, onDone }: LevelProps) {
 
   const finish = () => {
     phase.current = "done";
-    later(onDone, DONE_AFTER_DRUM_MS);
+    later(onDone, DONE_AFTER_DRUM_S * 1000);
   };
 
   useFrames((dt, t) => {
     now.current = t;
-    // The camera looks at the one falling furthest along, or at the drum at the end.
-    let front = -1;
-    tipping.current.forEach((o, i) => {
-      if (o.started) front = i;
-    });
-    const focus = drumAt.current > 0 ? roomX(drumLeft + DRUM.w / 2) : front < 0 ? 0 : roomX(lefts[front] + things[front].w);
-    const target = cameraOn(worldW, focus);
+    // The camera looks at the one falling furthest along, at a link while it carries the fall on, or at the drum at the end.
+    const target = cameraOn(worldW, roomX(focusX(sim)));
     const panning = gliding(camera.current, target);
     camera.current += (target - camera.current) * (1 - Math.exp(-dt * CAMERA_FOLLOW));
     // While the things drop in, draw on, so the hint comes as the row is ready; at the end, until the drum and its sparkles are still.
     if (phase.current !== "falling") return phase.current === "dropping" || panning || t - drumAt.current < SETTLE_S * 1000;
-    const tips = tipping.current;
-    tips.forEach((o, i) => {
-      if (!o.started) return;
-      const thing = things[i];
-      o.spin += ((1.5 * GRAVITY) / thing.h) * Math.sin(Math.max(o.angle, 0.02)) * dt;
-      let angle = Math.min(Math.PI / 2, o.angle + o.spin * dt);
-      const next = i + 1 < things.length ? corners(lefts[i + 1], things[i + 1].w, things[i + 1].h, tips[i + 1].angle) : drumBox;
-      if (overlaps(corners(lefts[i], thing.w, thing.h, angle), next)) {
-        // Lean on the next one: the furthest angle that doesn't go into it.
-        let lo = o.angle;
-        let hi = angle;
-        for (let k = 0; k < 14; k++) {
-          const mid = (lo + hi) / 2;
-          if (overlaps(corners(lefts[i], thing.w, thing.h, mid), next)) hi = mid;
-          else lo = mid;
-        }
-        angle = lo;
-        if (!o.touched) {
-          o.touched = true;
-          sound(thing.sound);
-          if (i + 1 < things.length) {
-            const n = tips[i + 1];
-            n.started = true;
-            n.spin = Math.max(1.2, (o.spin * thing.h * 0.8) / things[i + 1].h);
-          } else {
-            drumAt.current = t;
-            sound(playDrum);
-            later(() => sound(playTwinkle), 350);
-            say({
-              de: "Bumm! Alles umgefallen!",
-              en: "Boom! Everything fell over!",
-              zh: "砰！全倒啦！",
-              hi: "धड़ाम! सब गिर गया!",
-              es: "¡Bum! ¡Todo se cayó!",
-              ar: "بوم! سقط كل شيء!",
-              ru: "Бум! Всё упало!",
-            });
-            finish();
-          }
-        }
-        o.spin = 0;
-      }
-      if (angle >= Math.PI / 2) o.spin = o.spin > 2 ? -o.spin * 0.2 : 0;
-      o.angle = angle;
-    });
-    if (phase.current === "falling" && t - fallStart.current > MAX_FALL_MS_EACH * things.length) finish();
+    const { sounds, drum } = stepSim(sim, dt);
+    for (const s of sounds) sound(s);
+    if (drum) {
+      drumAt.current = t;
+      sound(playDrum);
+      later(() => sound(playTwinkle), 350);
+      say({
+        de: "Bumm! Alles umgefallen!",
+        en: "Boom! Everything fell over!",
+        zh: "砰！全倒啦！",
+        hi: "धड़ाम! सब गिर गया!",
+        es: "¡Bum! ¡Todo se cayó!",
+        ar: "بوم! سقط كل شيء!",
+        ru: "Бум! Всё упало!",
+      });
+      finish();
+    }
+    if (phase.current === "falling" && t - fallStart.current > MAX_FALL_MS_EACH * things.length + linksSeconds(layout) * 1000) finish();
     return true;
   });
 
@@ -217,9 +101,7 @@ export function ToppleLevel({ sound, say, onDone }: LevelProps) {
     if (phase.current !== "ready") return;
     phase.current = "falling";
     fallStart.current = performance.now();
-    const first = tipping.current[0];
-    first.started = true;
-    first.spin = PUSH;
+    pushFirst(sim);
     sound(() => playKnock(1400));
   };
 
@@ -242,17 +124,18 @@ export function ToppleLevel({ sound, say, onDone }: LevelProps) {
     <div className="marble-level" ref={box} onPointerDown={push}>
       <svg className="marble-camera" viewBox={`0 0 ${worldW} ${VIEW_H}`} style={cameraLayer(box.current, world, view)} aria-label={label}>
         <g>
-          <Room width={worldW} />
+          {room}
           <g transform={`translate(${MARGIN} ${FLOOR}) scale(${SCALE})`}>
+            {links.map(({ link, left }, k) => (
+              <LinkArt key={k} link={link} left={left} age={linkAge(sim, k)} />
+            ))}
             {things.map((thing, i) => (
               <g
                 key={i}
                 className={i < onFirstScreen ? "thing-drop" : undefined}
                 style={{ animationDelay: `${i * DROP_STAGGER_MS}ms`, "--drop-ms": `${DROP_MS}ms` } as CSSProperties}
               >
-                <g transform={`translate(${lefts[i] + thing.w} 0) rotate(${(tipping.current[i].angle * 180) / Math.PI}) translate(${-thing.w} 0)`}>
-                  {thing.draw()}
-                </g>
+                <g transform={`translate(${lefts[i] + thing.w} 0) rotate(${(sim.tips[i].angle * 180) / Math.PI}) translate(${-thing.w} 0)`}>{thing.draw()}</g>
               </g>
             ))}
             <g transform={`translate(${drumLeft + DRUM.w / 2} 0) scale(${1 + drumSquash} ${1 - drumSquash}) translate(${-DRUM.w / 2} 0)`}>
