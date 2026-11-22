@@ -1,12 +1,31 @@
 import { describe, expect, test } from "bun:test";
-import { buildGarden, CROQUET, FLOOR, HEDGEHOG, knobAt, LEAF_PILE, LEAVES, MOLEHILL, PINWHEEL, TAP, WORLD_W } from "./garden";
+import {
+  buildGarden,
+  CROQUET,
+  FEEDER,
+  FLOOR,
+  headGap,
+  HEDGEHOG,
+  knobAt,
+  LEAF_PILE,
+  LEAVES,
+  MALLET,
+  malletHead,
+  MOLEHILL,
+  MOWER,
+  NUT_SPOTS,
+  NUT_TREE,
+  PINWHEEL,
+  TAP,
+  WORLD_W,
+} from "./garden";
 
 describe("Im Garten", () => {
   const garden = buildGarden();
 
-  test("the machine runs about forty seconds and ends after everything else", () => {
-    expect(garden.duration).toBeGreaterThan(39);
-    expect(garden.duration).toBeLessThan(43);
+  test("the machine runs about a minute and ends after everything else", () => {
+    expect(garden.duration).toBeGreaterThan(56);
+    expect(garden.duration).toBeLessThan(64);
     const last = garden.events[garden.events.length - 1];
     expect(last.at).toBe(garden.duration);
     expect(last.done).toBe(true);
@@ -17,6 +36,13 @@ describe("Im Garten", () => {
       garden.tCup,
       garden.tPush,
       garden.tStop,
+      garden.tMow,
+      garden.tBump,
+      garden.nutLand[0],
+      garden.eats[0].eat,
+      garden.eats[garden.eats.length - 1].done,
+      garden.tLeap,
+      garden.tOnHead,
       garden.tBall,
       garden.tKnock,
       garden.tPeek,
@@ -43,6 +69,52 @@ describe("Im Garten", () => {
     expect(garden.leverAt(-1)).toBe(0);
     expect(garden.moleAt(-1)).toEqual([0, 0, 0]);
     expect(garden.pileAt(-1)).toBe(1);
+  });
+
+  test("the apple wakes the mower, which mows over to the feeder's pole and bumps it", () => {
+    expect(garden.appleAt(garden.tMow).pt.x + 22).toBeCloseTo(MOWER.x - MOWER.len / 2, 0);
+    expect(garden.mowerAt(garden.tMow).x).toBe(MOWER.x);
+    expect(garden.mowerAt(garden.tBump).x + MOWER.len / 2).toBeCloseTo(FEEDER.x - FEEDER.w / 2, 0);
+    expect(garden.poleAt(garden.tBump - 0.01)).toBe(0);
+    for (let t = 0; t <= garden.duration; t += 0.05) expect(garden.mowerAt(t).x + MOWER.len / 2).toBeLessThanOrEqual(FEEDER.x - FEEDER.w / 2 + 0.5);
+  });
+
+  test("the nuts fall out of the shaken feeder onto the grass between its pole and the squirrel's tree", () => {
+    for (const x of NUT_SPOTS) {
+      expect(x).toBeGreaterThan(FEEDER.x + 30);
+      expect(x).toBeLessThan(NUT_TREE.x - NUT_TREE.trunkW / 2 - 40);
+    }
+    NUT_SPOTS.forEach((x, i) => {
+      expect(garden.nutAt(i, garden.tBump)).toBeNull();
+      expect(garden.nutAt(i, garden.nutLand[i] + 0.3)).toEqual({ x, y: FLOOR - 9 });
+    });
+  });
+
+  test("the squirrel eats every nut where it lies, climbs the trunk and leaps onto the mallet's head", () => {
+    expect(garden.eats.length).toBe(NUT_SPOTS.length);
+    for (const e of garden.eats) {
+      expect(e.eat).toBeGreaterThan(garden.nutLand[e.i]);
+      expect(Math.abs(garden.squirrelAt(e.eat + 0.1).pt.x - NUT_SPOTS[e.i])).toBeLessThan(30);
+      expect(garden.nutAt(e.i, e.done)).toBeNull();
+    }
+    const [, , c, d] = malletHead(MALLET.lean);
+    const onHead = garden.squirrelAt(garden.tOnHead).pt;
+    expect(onHead.x).toBeCloseTo((c.x + d.x) / 2, 0);
+    expect(onHead.y).toBeCloseTo((c.y + d.y) / 2, 0);
+    expect(garden.malletAt(garden.tOnHead - 0.01)).toBe(MALLET.lean);
+    for (let t = 0; t <= garden.duration; t += 0.05) {
+      const { pt } = garden.squirrelAt(t);
+      expect(pt.y).toBeLessThanOrEqual(FLOOR);
+      expect(pt.y).toBeGreaterThan(300);
+      expect(pt.x).toBeGreaterThan(FEEDER.x);
+      expect(pt.x).toBeLessThan(CROQUET.x - CROQUET.r);
+    }
+  });
+
+  test("the falling mallet's head meets the croquet ball and never goes into it", () => {
+    expect(headGap(CROQUET.x, garden.malletAt(garden.tBall))).toBeLessThan(2);
+    for (let t = garden.tOnHead; t <= garden.duration; t += 0.01) expect(headGap(garden.ballAt(t).pt.x, garden.malletAt(t))).toBeGreaterThan(-0.5);
+    expect(Math.max(...malletHead(garden.malletAt(garden.duration)).map((p) => p.y))).toBeLessThanOrEqual(FLOOR + 0.5);
   });
 
   test("the croquet ball rolls right up to the molehill without going into it", () => {

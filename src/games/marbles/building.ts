@@ -1,17 +1,22 @@
 // The building site ("Baustelle"), a Rube Goldberg machine on a construction
 // site: one tap starts the motors, and one thing sets off the next for about
-// forty seconds until the tower crane sets the roof on the new house: mixer,
+// a minute until the tower crane sets the roof on the new house: mixer,
 // spirit level, rubble chute, conveyor belt, traffic cone, wrecking ball, brick
 // tower, cable drum – which plops into a sand pile and bonks the excavator awake –
 // excavator (digs a scoop, swings round, tips it out, pats the roller), road
 // roller (puffs off and presses the sand into a road), jackhammer (rattles and
-// hops onto the winch's crank), winch, crane.
+// hops onto the generator's start button), generator (its spark runs along the
+// cable), pile driver (thumps a post in three times, and the last thump makes a
+// concrete pipe jump off its chocks), the pipe (rolls through a puddle and
+// pushes a ladder's foot), the ladder (lifts a cement sack off the brick stack
+// onto the winch's crank), winch, crane.
 // Everything is worked out ahead as a function of the seconds since the tap,
 // so BuildingLevel.tsx only asks where each thing is at a moment. Coordinates
-// are those of the site, 6600 × 900; the screen shows 1600 of it at a time.
+// are those of the site, 8520 × 900; the screen shows 1600 of it at a time.
 import {
   playBlub,
   playBoing,
+  playClick,
   playClonk,
   playCreak,
   playCrunch,
@@ -30,7 +35,7 @@ import {
   playWhirr,
   playWhoosh,
 } from "@/lib/sfx";
-import { playBells, playEngine, playHonk } from "@/lib/realSounds";
+import { playBells, playEngine, playHonk, playSplash } from "@/lib/realSounds";
 import { wobble } from "./level";
 import {
   along,
@@ -50,10 +55,10 @@ import {
   STEP,
   timeline,
   timeWhen,
+  turn,
 } from "./machineKit";
 import { arc, BALL_R, line, quad, type Pt } from "./path";
 
-export const WORLD_W = 6600;
 export const FLOOR = 800;
 
 /* ---------- Layout ---------- */
@@ -146,8 +151,33 @@ export const HEAP = { x: 3880, w: 66, h: 54 };
 /** The jackhammer standing in the roller's way: where its chisel stands on the ground, and how wide its body is. */
 export const JACK = { x: 4250, w: 36, h: 112 };
 
-/** Everything from the winch on stands this much further right than before the excavator and the roller came. */
-export const SHIFT = 1500;
+/**
+ * The generator beside the jackhammer, on wheels: its body `w` wide and `h` high, standing `wheelR` above the ground; the
+ * jackhammer's last hop lands on its start button, at `button` from its middle, which goes down `press` when pressed.
+ */
+export const GEN = { x: 4560, w: 150, h: 96, wheelR: 16, button: -30, buttonR: 14, press: 8 };
+/** The top of the generator's start button, where the jackhammer's chisel lands. */
+export const BUTTON_TOP = { x: GEN.x + GEN.button, y: FLOOR - GEN.wheelR - GEN.h - 12 };
+/**
+ * The pile driver the generator's cable powers: its mast at x up to `top`; its heavy ram (`ram` wide, `ramH` high)
+ * rises to `lift` and drops onto the post, `post` wide, whose top starts at `post0` and goes `sink` deeper at each thump.
+ */
+export const DRIVER = { x: 4920, top: 300, ram: 78, ramH: 92, lift: 390, post: 40, post0: FLOOR - 120, sink: 32 };
+/** How many times the ram comes down. */
+export const THUMPS = 3;
+/** The concrete pipe lying on two chocks beside the pile driver; the third thump makes it jump over the right one and roll off. */
+export const PIPE = { x: 5080, r: 46, chock: 16 };
+/** A puddle on the way, which the pipe rolls through. */
+export const PUDDLE = { x: 5560, w: 170 };
+/** The stack of brick pallets with a cement sack on top; the ladder leans against its left side. */
+export const STACK = { x0: 6220, x1: 6340, top: 540 };
+/** The ladder: its foot on the ground `len` from its top, which rests at the stack's top left corner. */
+export const LADDER = { len: 300, foot: STACK.x0 - Math.sqrt(300 ** 2 - (FLOOR - STACK.top) ** 2), w: 34, push: 60 };
+/** The cement sack lying on the stack, hanging out over its left side a little, so the ladder's top is under it. */
+export const SACK = { w: 104, h: 46, x0: STACK.x0 - 16 };
+
+/** Everything from the winch on stands this much further right than before the excavator, the roller and the pile driver came. */
+export const SHIFT = STACK.x1 + 190 - 3110;
 
 /** The winch at the crane's foot: its drum lets out the crane rope as its crank turns. */
 export const WINCH = { x: 3110 + SHIFT, y: 712, drum: 26, arm: 66, knob: 9 };
@@ -167,7 +197,12 @@ const CRANK_TURN = ROOF.drop / WINCH.drum;
 export const LIGHT_X = 4480 + SHIFT;
 export const TRUCK_X = 4560 + SHIFT;
 
+export const WORLD_W = 5100 + SHIFT;
+
 /* ---------- Helpers ---------- */
+
+/** Seconds into a free fall from rest until it has dropped `h`. */
+const fallTime = (h: number) => Math.sqrt((2 * h) / GRAVITY);
 
 /** A spot `d` along the mixer drum's middle line at `angle` degrees. */
 export function inDrum(d: number, angle: number): Pt {
@@ -584,50 +619,190 @@ export function buildBuilding() {
   /** Where the flat new road reaches: from the heap's left foot to just behind the drum. */
   const roadTo = (t: number) => Math.max(HEAP.x - HEAP.w, ROLLER.x0 + rolled(t) - ROLLER.drum * 0.3);
 
-  /* The jackhammer switches on, rattles and hops along to the winch, and its last hop lands on the crank's knob. */
+  /* The jackhammer switches on, rattles and hops along to the generator, and its last hop lands on its start button. */
   const tStart = tJack + 0.35;
   const HOPS = 3;
   const HOP_T = 0.42;
-  const knobTop = (turned: number, lean = 0) => {
-    const k = crankKnob(turned);
-    return { x: k.x - WINCH.knob * Math.sin(lean), y: k.y - WINCH.knob * Math.cos(lean) };
-  };
-  const hopFrom = (i: number): Pt => ({ x: lerp(JACK.x, knobTop(0).x, i / HOPS), y: FLOOR });
-  const tCrank = tStart + (HOPS - 1) * HOP_T + 0.55;
+  const hopFrom = (i: number): Pt => ({ x: lerp(JACK.x, BUTTON_TOP.x, i / HOPS), y: FLOOR });
+  const tButton = tStart + (HOPS - 1) * HOP_T + 0.55;
   at(tJack + 0.1, { sound: playRattle });
   for (let i = 1; i < HOPS; i++) at(tStart + i * HOP_T, { sound: () => playKnock(1000 + i * 150) });
   at(tStart + HOP_T, { sound: playRattle });
-
-  /* The jackhammer's weight pushes the crank round, and the roof's weight keeps it going. */
-  const PUSH = 0.65;
-  const tRoofLand = tCrank + 6;
-  /** How far the crank has turned: the jackhammer pushes it round a bit, then the roof's weight keeps it going. */
-  const crankAt = (t: number) => PUSH * easeOut(seg(t, tCrank, tCrank + 0.3)) + (CRANK_TURN - PUSH) * easeInOut(seg(t, tCrank + 0.2, tRoofLand));
-  const restX = WINCH.x - WINCH.arm - 60;
-  const tRest = tCrank + 0.3 + 0.4;
-  at(tCrank, { sound: playClonk });
+  /** How far the start button is pressed down. */
+  const buttonAt = (t: number) => GEN.press * (easeOut(seg(t, tButton, tButton + 0.15)) - easeIn(seg(t, tButton + 0.45, tButton + 0.6)));
+  const restX = GEN.x - GEN.w / 2 - 60;
+  const tRest = tButton + 0.3 + 0.4;
+  at(tButton, { sound: playClick });
   at(tRest, { sound: playThump });
-  at(tCrank + 0.4, { sound: playCreak });
-  for (let k = 0; k < 4; k++) at(tCrank + 0.9 + k * 1.3, { sound: playTick });
 
   /** The jackhammer at a moment: where its chisel's tip is, its lean (radians, clockwise) and its rattling shake. */
   const jackAt = (t: number): { tip: Pt; lean: number; buzz: number } => {
     const rattling = t >= tJack + 0.1 && t < tRest;
     const buzz = rattling ? 2.5 * Math.sin(t * 90) : 0;
     if (t < tStart) return { tip: { x: JACK.x, y: FLOOR }, lean: rad(wobble(t - tJack, 9, 18, 4)), buzz };
-    if (t < tCrank - 0.55) {
+    if (t < tButton - 0.55) {
       const i = Math.floor((t - tStart) / HOP_T);
       const k = seg(t, tStart + i * HOP_T, tStart + (i + 1) * HOP_T);
       return { tip: hop(hopFrom(i), hopFrom(i + 1), 34, k), lean: rad(8 * Math.sin(k * Math.PI)), buzz };
     }
-    if (t < tCrank) return { tip: hop(hopFrom(HOPS - 1), knobTop(0), 120, seg(t, tCrank - 0.55, tCrank)), lean: 0, buzz };
+    if (t < tButton) return { tip: hop(hopFrom(HOPS - 1), BUTTON_TOP, 120, seg(t, tButton - 0.55, tButton)), lean: 0, buzz };
+    const pressed = { x: BUTTON_TOP.x, y: BUTTON_TOP.y + buttonAt(Math.min(t, tButton + 0.3)) };
+    if (t < tButton + 0.3) return { tip: pressed, lean: 0, buzz };
+    // Off the button, down onto the ground beside the generator, where it stands still.
+    const k = seg(t, tButton + 0.3, tRest);
+    return { tip: hop(pressed, { x: restX, y: FLOOR }, 40, k), lean: -rad(20) * Math.sin(Math.PI * k) + rad(wobble(t - tRest, 8, 16, 4)), buzz };
+  };
+
+  /* The generator starts with a few puffs; a spark runs along its cable to the pile driver. */
+  const tPower = tButton + 0.5 + 1.2;
+  const genPuffs = [0.15, 0.4, 0.65, 1.1, 1.6].map((d) => tButton + d);
+  for (const p of genPuffs) at(p, { sound: playPuff });
+  at(tButton + 0.2, { sound: playRumble });
+  at(tButton + 0.5, { sound: playWhirr });
+  /** How far along its cable the spark is (0 … 1), or null when there is none. */
+  const sparkAt = (t: number) => (t < tButton + 0.5 || t > tPower ? null : seg(t, tButton + 0.5, tPower));
+
+  /* The pile driver: its ram climbs the mast, ticking, and drops onto the post three times; the post sinks a bit each time. */
+  const LIFT = 1.8;
+  const HOLD = 0.2;
+  const AFTER = 0.4;
+  const postTop = (n: number) => DRIVER.post0 + n * DRIVER.sink;
+  const ramDrop = (n: number) => fallTime(postTop(n) - DRIVER.lift);
+  const lifts: number[] = [];
+  const thumps: number[] = [];
+  let tCycle = tPower + 0.2;
+  for (let n = 0; n < THUMPS; n++) {
+    lifts.push(tCycle);
+    const tThump = tCycle + LIFT + HOLD + ramDrop(n);
+    thumps.push(tThump);
+    tCycle = tThump + AFTER;
+  }
+  const tLastThump = thumps[THUMPS - 1];
+  lifts.forEach((t0) => {
+    for (let k = 0; k < 5; k++) at(t0 + 0.1 + k * 0.36, { sound: playTick });
+  });
+  thumps.forEach((t, n) => {
+    at(t - ramDrop(n) + 0.05, { sound: playWhoosh });
+    at(t, { sound: playThump });
+    at(t + 0.05, { sound: playCrunch });
+  });
+  /** Where the bottom of the ram is, and how far the post has sunk (thumps so far, 0 … THUMPS). */
+  const driverAt = (t: number): { ram: number; sunk: number } => {
+    let sunk = 0;
+    for (let n = 0; n < THUMPS; n++) {
+      if (t >= thumps[n]) sunk = n + 1 - (1 - easeOut(seg(t, thumps[n], thumps[n] + 0.12)));
+    }
+    for (let n = THUMPS - 1; n >= 0; n--) {
+      if (t < lifts[n]) continue;
+      const top = thumps[n] - ramDrop(n);
+      if (t < lifts[n] + LIFT) return { ram: lerp(postTop(n), DRIVER.lift, easeInOut(seg(t, lifts[n], lifts[n] + LIFT))), sunk };
+      if (t < top) return { ram: DRIVER.lift, sunk };
+      if (t < thumps[n]) return { ram: DRIVER.lift + 0.5 * GRAVITY * (t - top) ** 2, sunk };
+      return { ram: DRIVER.post0 + sunk * DRIVER.sink, sunk };
+    }
+    return { ram: DRIVER.post0, sunk: 0 };
+  };
+  /** Whether the generator is running: from the button until the last thump. */
+  const genRunning = (t: number) => t > tButton + 0.15 && t < tLastThump + 0.6;
+  /** Puffs of dust round the post's top at every thump, and of smoke from the generator. */
+  const dust = thumps.flatMap((t, n) => [-1, 1].map((side) => ({ x: DRIVER.x + side * 46, y: postTop(n + 1), t: t + 0.02 * (side + 1) })));
+
+  /* The third thump makes the pipe jump over its chock; it rolls off through the puddle into the ladder's foot. */
+  const pipeY = FLOOR - PIPE.r;
+  const tJump = tLastThump + 0.05;
+  const JUMP_T = 0.4;
+  const pipeFrom = PIPE.x + 46;
+  const pipeTo = LADDER.foot - LADDER.w / 2 - PIPE.r;
+  const pipePath = pathOf(line({ x: pipeFrom, y: pipeY }, { x: pipeTo, y: pipeY }));
+  const pipeRun = roll(pipePath, 150, 150, 300, 0.2);
+  const tPipeGo = tJump + JUMP_T;
+  const tFoot = tPipeGo + pipeRun.duration;
+  const tSplash = tPipeGo + timeWhen(pipeRun, (pt) => pt.x >= PUDDLE.x - PUDDLE.w / 4);
+  at(tJump, { sound: playBoing });
+  at(tPipeGo, { sound: playRumble });
+  at(tSplash, { sound: playSplash });
+  at(tFoot, { sound: () => playKnock(800) });
+
+  /* The pipe pushes the ladder's foot along; the ladder stands up steeper and its top lifts the sack, which tips off the stack onto the crank's knob. */
+  const PUSH_T = 0.6;
+  const tPushed = tFoot + PUSH_T;
+  /** How far the ladder's foot has been pushed. */
+  const footAt = (t: number) => LADDER.push * easeOut(seg(t, tFoot, tPushed));
+  const pipeX = (t: number) => {
+    if (t < tJump) return PIPE.x;
+    if (t < tPipeGo) return lerp(PIPE.x, pipeFrom, seg(t, tJump, tPipeGo));
+    if (t < tFoot) return along(pipePath, distAt(pipeRun, t - tPipeGo)).pt.x;
+    return pipeTo + footAt(t) - 12 * Math.sin(Math.PI * seg(t, tPushed, tPushed + 0.5));
+  };
+  /** The concrete pipe: its middle and how far it has turned (radians). */
+  const pipeAt = (t: number): { pt: Pt; turned: number } => {
+    const x = pipeX(t);
+    const k = seg(t, tJump, tPipeGo);
+    return { pt: { x, y: pipeY - 4 * PIPE.chock * 1.6 * k * (1 - k) }, turned: (x - PIPE.x) / PIPE.r };
+  };
+  /** Where the ladder's top rests against the stack. */
+  const ladderTop = (t: number): Pt => {
+    const foot = LADDER.foot + footAt(t);
+    return { x: STACK.x0, y: FLOOR - Math.sqrt(LADDER.len ** 2 - (STACK.x0 - foot) ** 2) };
+  };
+  const ladderAt = (t: number) => ({ foot: { x: LADDER.foot + footAt(t), y: FLOOR }, top: ladderTop(t) });
+  /** Splashes of the puddle as the pipe goes through. */
+  const splashAt = (t: number): Pt[] => {
+    const age = t - tSplash;
+    if (age < 0 || age > 0.9) return [];
+    return Array.from({ length: 9 }, (_, i) => {
+      const side = i % 2 ? 1 : -1;
+      const vx = side * (90 + 160 * ((i * 0.618) % 1));
+      const vy = -(260 + 200 * ((i * 0.37) % 1));
+      return { x: PUDDLE.x + side * 20 + vx * age, y: FLOOR - 6 + vy * age + 0.5 * GRAVITY * age * age };
+    }).filter((p) => p.y < FLOOR - 2);
+  };
+
+  /* The sack: lifted at its left end, it tips over its right edge, falls onto the crank's knob and rides it down. */
+  const lifted = (t: number) => ladderTop(0).y - ladderTop(t).y;
+  const tipPivot = { x: SACK.x0 + SACK.w, y: STACK.top };
+  const tSackOff = tPushed;
+  const SACK_FALL = 0.55;
+  const tCrank = tSackOff + SACK_FALL;
+  const knobTop = (turned: number, lean = 0) => {
+    const k = crankKnob(turned);
+    return { x: k.x - WINCH.knob * Math.sin(lean), y: k.y - WINCH.knob * Math.cos(lean) };
+  };
+  at(tFoot + 0.1, { sound: playCreak });
+  at(tSackOff, { sound: playWhoosh });
+
+  /* The sack's weight pushes the crank round, and the roof's weight keeps it going. */
+  const PUSH = 0.65;
+  const tRoofLand = tCrank + 6;
+  /** How far the crank has turned: the sack pushes it round a bit, then the roof's weight keeps it going. */
+  const crankAt = (t: number) => PUSH * easeOut(seg(t, tCrank, tCrank + 0.3)) + (CRANK_TURN - PUSH) * easeInOut(seg(t, tCrank + 0.2, tRoofLand));
+  const sackRest = { x: WINCH.x - WINCH.arm - 52, y: FLOOR };
+  const tSackDown = tCrank + 0.3 + 0.4;
+  at(tCrank, { sound: playClonk });
+  at(tCrank + 0.05, { sound: playThump });
+  at(tSackDown, { sound: playPlop });
+  at(tCrank + 0.4, { sound: playCreak });
+  for (let k = 0; k < 4; k++) at(tCrank + 0.9 + k * 1.3, { sound: playTick });
+
+  /** The cement sack: the middle of its bottom and how far it is turned (radians, clockwise). */
+  const sackAt = (t: number): { pt: Pt; angle: number } => {
+    const rest = { x: SACK.x0 + SACK.w / 2, y: STACK.top };
+    if (t < tFoot) return { pt: rest, angle: 0 };
+    // Its left end goes up with the ladder's top: it turns round its bottom right corner.
+    const tilt = Math.atan2(lifted(Math.min(t, tSackOff)), SACK.w);
+    const tilted = turn(rest, tipPivot, -tilt);
+    if (t < tSackOff) return { pt: tilted, angle: -tilt };
+    if (t < tCrank) {
+      const k = seg(t, tSackOff, tCrank);
+      return { pt: hop(tilted, knobTop(0), 40, k), angle: lerp(-tilt, rad(18), k) };
+    }
     const ride = seg(t, tCrank, tCrank + 0.3);
-    const lean = rad(40) * ride;
-    const ridden = knobTop(crankAt(Math.min(t, tCrank + 0.3)), lean);
-    if (t < tCrank + 0.3) return { tip: ridden, lean: -lean, buzz };
-    // Off the knob, down onto the ground beside the winch, where it stands still.
-    const k = seg(t, tCrank + 0.3, tRest);
-    return { tip: hop(ridden, { x: restX, y: FLOOR }, 30, k), lean: -lean * (1 - k) + rad(wobble(t - tRest, 8, 16, 4)), buzz };
+    const lean = rad(18) + rad(22) * ride;
+    const ridden = knobTop(crankAt(Math.min(t, tCrank + 0.3)), 0);
+    if (t < tCrank + 0.3) return { pt: ridden, angle: lean };
+    // Off the knob, down onto the ground beside the winch.
+    const k = seg(t, tCrank + 0.3, tSackDown);
+    return { pt: hop(ridden, sackRest, 20, k), angle: lerp(rad(40), 0, easeOut(k)) };
   };
 
   /* The finale: the roof sits on the house, the topping-out tree springs up, the light turns green. */
@@ -668,9 +843,14 @@ export function buildBuilding() {
     // The pile, the excavator, the roller and the heap all at once.
     if (t < tRollerGo) return 3572;
     if (t < tStart) return Math.max(3572, rollerAt(t).x + 150);
-    if (t < tCrank) return Math.max(3572, rollerAt(t).x + 150, jackAt(t).tip.x + 150);
+    if (t < tButton) return Math.max(3572, rollerAt(t).x + 150, jackAt(t).tip.x + 150);
+    // The generator, the pile driver and the pipe all at once.
+    if (t < tPipeGo) return Math.max(BUTTON_TOP.x + 150, lerp(BUTTON_TOP.x + 150, DRIVER.x + 120, easeInOut(seg(t, tButton + 0.3, tPower))));
+    if (t < tFoot) return Math.max(DRIVER.x + 120, pipeAt(t).pt.x + 150);
+    // The ladder, the stack and the winch.
+    if (t < tCrank + 0.5) return Math.max(DRIVER.x + 120, lerp(pipeTo + 150, STACK.x1 + 40, easeInOut(seg(t, tFoot - 0.6, tFoot + 0.6))));
     // The winch, the jackhammer resting beside it and the house all at once.
-    if (t < tRoofLand) return WINCH.x - 300 + 672;
+    if (t < tRoofLand) return Math.max(STACK.x1 + 40, lerp(STACK.x1 + 40, WINCH.x - 300 + 672, easeInOut(seg(t, tCrank + 0.5, tCrank + 1.5))));
     return (HOUSE.x0 + HOUSE.x1) / 2 + 300;
   };
   const cameraTarget = (t: number) => cameraOn(WORLD_W, focusX(t));
@@ -700,8 +880,16 @@ export function buildBuilding() {
     tPat,
     tRollerGo,
     tJack,
-    tCrank,
+    tButton,
     tRest,
+    tPower,
+    lifts,
+    thumps,
+    tPipeGo,
+    tSplash,
+    tFoot,
+    tSackOff,
+    tCrank,
     tRoofLand,
     tTree,
     tGreen,
@@ -727,6 +915,16 @@ export function buildBuilding() {
     rollerAt,
     roadTo,
     jackAt,
+    buttonAt,
+    genRunning,
+    genPuffs,
+    sparkAt,
+    driverAt,
+    dust,
+    pipeAt,
+    splashAt,
+    ladderAt,
+    sackAt,
     crankAt,
     roofDrop,
     truckGone,
