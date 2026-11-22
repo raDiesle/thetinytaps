@@ -16,6 +16,20 @@ export const BACK_TO_SHELF: Localized = {
   ar: "العودة إلى رف الكتب",
 };
 
+/**
+ * „Lernspiele“, the picture books' group: on the shelf's sign under them (the everyday helpers' is their category's
+ * title), and in the videos' outro beside „Alltagshelfer“.
+ */
+export const LEARNING_GAMES: Localized = {
+  de: "Lernspiele",
+  ru: "Развивающие игры",
+  en: "Learning Games",
+  zh: "益智游戏",
+  hi: "सीखने के खेल",
+  es: "Juegos para aprender",
+  ar: "ألعاب تعليمية",
+};
+
 /** „Nochmal“: the same again (a level at its end, a page that failed to load). */
 export const AGAIN: Localized = { de: "Nochmal", ru: "Ещё раз", en: "Again", zh: "再来一次", hi: "फिर से", es: "Otra vez", ar: "مرة أخرى" };
 

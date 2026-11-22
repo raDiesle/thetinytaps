@@ -12,6 +12,7 @@ import componentGirlPreviews from "../components/vorschau-maedchen/*.webp?glob";
 import gamePictures from "../games/*/bilder/**/*.webp?glob";
 import gamePreviews from "../games/*/vorschau/*.webp?glob";
 import gameGirlPreviews from "../games/*/vorschau-maedchen/*.webp?glob";
+import videoPictures from "../video/*/bilder/*.webp?glob";
 
 /** One picture file. */
 export interface GalleryPicture {
@@ -97,6 +98,7 @@ export const PICTURE_SOURCES: Record<string, PictureSource> = {
   shadows: { title: "Schatten finden", hrefs: ["/schatten/"] },
   socks: { title: "Socken-Paare", hrefs: ["/socken/"] },
   letters: { title: "Buchstaben & Zahlen, Mitmachen", hrefs: ["/buchstaben/", "/mitmachen/"], numberedFrames: true },
+  outro: { title: "Videos: Abspann", hrefs: ["/management/video-outro/"] },
 };
 
 /** How each kind is named on the page. */
@@ -139,6 +141,7 @@ export function allPictures(): GalleryPicture[] {
   add(gamePictures, "src/games");
   add(gamePreviews, "src/games");
   add(gameGirlPreviews, "src/games");
+  add(videoPictures, "src/video");
   return found.sort((a, b) => a.path.localeCompare(b.path));
 }
 
