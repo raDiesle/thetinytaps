@@ -10,6 +10,10 @@ import {
   BOARD,
   buildSpace,
   BUGGY,
+  CAPSULE,
+  HUT,
+  INTERCOM,
+  KANGAROO_SPOTS,
   TRUSS,
   DECK,
   DISH,
@@ -28,12 +32,15 @@ import {
   type Planet,
   planetSpot,
   PLANETS,
+  RADIO,
+  RADIO_LAMPS,
   RAMP,
   RINGS,
   rampY,
   ROBOT,
   ROCK,
   ROCKET,
+  SAT,
   SCOPE,
   scopeTip,
   SLOT,
@@ -60,12 +67,16 @@ const GLOW = "#7dffb2";
  * A Rube Goldberg machine on a toy launch site at night. One tap lets the
  * marble out of the satellite dish, through the glowing rings and down the
  * zigzag pipe into a sleepy robot, which pushes the moon buggy over the hills
- * into the planet mobile; the earth bonks the telescope, which swings round and
- * points at the sky, where a UFO with a little alien sees it and comes floating
- * in. It beams up a moon rock, carries it over and drops it onto the switch,
+ * against the intercom of a glass dome. The space kangaroo dozing inside wakes,
+ * comes out through the tunnel and hops onto the pedal of the radio mast, whose
+ * waves wake a satellite; it drops a capsule on a parachute, and the capsule's
+ * puff of air sets the planet mobile turning. The earth bonks the telescope,
+ * which swings round and points at the sky, where a UFO with a little alien
+ * sees it and comes floating in. It beams up a moon rock, carries it over and drops it onto the switch,
  * waves and zooms off; the magnet lets go of its iron ball, the ball drops into
- * the countdown board's slot, and after „3, 2, 1“ the rocket lifts off. The
- * camera travels along with whatever moves.
+ * the countdown board's slot, and after „3, 2, 1“ the rocket lifts off and,
+ * small far away, lands on the moon. The camera travels along with whatever
+ * moves.
  */
 export function SpaceLevel(props: LevelProps) {
   const space = useMemo(buildSpace, []);
@@ -73,39 +84,52 @@ export function SpaceLevel(props: LevelProps) {
 
   return (
     <MachineStage machine={space} level="space" start={{ x: DISH.x, y: DISH.y - 6, r: 96 }} {...props}>
-      {(t) => (
-        <>
-          <Sky sky={`${ids}-sky`} t={t} space={space} />
-          <Ground />
-          <DishMast />
-          <RingRail space={space} t={t} />
-          <Deck />
-          <DownRamp space={space} />
-          <PipeBack space={space} t={t} />
-          <Robot space={space} t={t} />
-          <Ufo space={space} t={t} />
-          <StationTruss space={space} t={t} />
-          <Mobile spin={space.spinAt(t)} />
-          <ScopeTripod />
-          <Telescope space={space} t={t} />
-          <LeverBox space={space} t={t} />
-          <SlotHole />
-          <IronBall at={space.ironAt(t)} />
-          <CountdownBoard space={space} t={t} />
-          <LaunchTower angle={space.armAngle(t)} t={t} />
-          <Pad />
-          <Tank />
-          <Hose drop={space.hoseDrop(t)} />
+      {(t) => {
+        const roo = space.kangarooAt(t);
+        return (
+          <>
+            <Sky sky={`${ids}-sky`} t={t} space={space} />
+            <Ground />
+            <DishMast />
+            <RingRail space={space} t={t} />
+            <Deck />
+            <DownRamp space={space} />
+            <Intercom space={space} t={t} />
+            <DomeBack />
+            {roo.pt.x < KANGAROO_SPOTS[1].x && <Kangaroo {...roo} />}
+            <DomeFront open={space.hatchAt(t)} />
+            {roo.pt.x >= KANGAROO_SPOTS[1].x && <Kangaroo {...roo} />}
+            <RadioMast />
+            <RadioWaves space={space} t={t} />
+            <Satellite space={space} t={t} />
+            <PipeBack space={space} t={t} />
+            <Robot space={space} t={t} />
+            <Ufo space={space} t={t} />
+            <StationTruss space={space} t={t} />
+            <Mobile spin={space.spinAt(t)} />
+            <Capsule {...space.capsuleAt(t)} />
+            <AirPuff space={space} t={t} />
+            <ScopeTripod />
+            <Telescope space={space} t={t} />
+            <LeverBox space={space} t={t} />
+            <SlotHole />
+            <IronBall at={space.ironAt(t)} />
+            <CountdownBoard space={space} t={t} />
+            <LaunchTower angle={space.armAngle(t)} t={t} />
+            <Pad />
+            <Tank />
+            <Hose drop={space.hoseDrop(t)} />
 
-          <MovingThings space={space} t={t} />
+            <MovingThings space={space} t={t} />
 
-          <DishFront />
-          <RingFronts space={space} t={t} />
-          <PipeFront space={space} />
-          <Smoke space={space} t={t} />
-          <Sparkles x={ROCKET.x} y={330} age={t - space.tLift - 0.9} n={12} spread={320} />
-        </>
-      )}
+            <DishFront />
+            <RingFronts space={space} t={t} />
+            <PipeFront space={space} />
+            <Smoke space={space} t={t} />
+            <Sparkles x={ROCKET.x} y={330} age={t - space.tLift - 0.9} n={12} spread={320} />
+          </>
+        );
+      }}
     </MachineStage>
   );
 }
@@ -211,7 +235,8 @@ function Sky({ sky, t, space }: { sky: string; t: number; space: Space }) {
         );
       })}
       <RingedPlanet x={2350} y={170} />
-      <Moon awake={t >= space.tLift + 0.8} />
+      <Moon awake={t >= space.tMoonLand} />
+      <MoonLanding space={space} t={t} />
     </g>
   );
 }
@@ -230,7 +255,7 @@ function RingedPlanet({ x, y }: { x: number; y: number }) {
   );
 }
 
-/** The moon sleeps until the rocket is on its way, then opens its eyes. */
+/** The moon sleeps until the rocket lands on it, then opens its eyes and smiles. */
 function Moon({ awake }: { awake: boolean }) {
   const { x, y, r } = MOON;
   return (
@@ -257,7 +282,7 @@ function Moon({ awake }: { awake: boolean }) {
   );
 }
 
-const CRATERS = [180, 640, 1150, 1700, 2300, 2650, 3420, 4000, 4460, 5000, 5360, 6000, 6400, 7000];
+const CRATERS = [180, 640, 1150, 1700, 2300, 2650, 3420, 4000, 4460, 5000, 5360, 6000, 6400, 7000, 7450, 7900, 8300];
 
 function Ground() {
   const x0 = HILLS[0].x - HILLS[0].w / 2;
@@ -1236,4 +1261,316 @@ function Smoke({ space, t }: { space: Space; t: number }) {
     puffs.push(<circle key={i} cx={x} cy={y} r={r} fill="#f4f5fb" stroke="#b9bdd6" strokeWidth="3" opacity={fade} />);
   }
   return <g>{puffs}</g>;
+}
+
+/* ---------- The intercom, the glass dome with the space kangaroo, the radio mast, the satellite and its capsule ---------- */
+
+/** The intercom on its post: a box with a speaker grille and a lamp that lights when the buggy presses its button. */
+function Intercom({ space, t }: { space: Space; t: number }) {
+  const { x, r, post, h, y } = INTERCOM;
+  const pressed = t >= space.tBump && t < space.tBump + 0.35;
+  const lit = t >= space.tBump && t < space.tExit;
+  const box = { x0: x - 34, y0: FLOOR - h - 60, w: 68, h: 60 };
+  return (
+    <g>
+      <rect x={x - post / 2} y={FLOOR - h} width={post} height={h} rx="4" fill={STEEL} stroke={INK} strokeWidth="3" />
+      <rect x={x - post / 2 - 2 * r - (pressed ? 0 : 6)} y={y - 7} width={2 * r + 6} height="14" rx="4" fill={DARK_STEEL} stroke={INK} strokeWidth="2.5" />
+      <circle cx={x - post / 2 - r - (pressed ? -4 : 2)} cy={y} r={r} fill="#ff5d73" stroke={INK} strokeWidth="3" />
+      <rect x={box.x0} y={box.y0} width={box.w} height={box.h} rx="12" fill="#8e7dff" stroke={INK} strokeWidth="3.5" />
+      {[0, 1, 2].map((i) => (
+        <line
+          key={i}
+          x1={box.x0 + 14}
+          y1={box.y0 + 18 + i * 12}
+          x2={box.x0 + 40}
+          y2={box.y0 + 18 + i * 12}
+          stroke={INK}
+          strokeWidth="4"
+          strokeLinecap="round"
+        />
+      ))}
+      {lit && <circle cx={box.x0 + 52} cy={box.y0 + 30} r="16" fill={GLOW} opacity="0.35" />}
+      <circle cx={box.x0 + 52} cy={box.y0 + 30} r="8" fill={lit ? GLOW : "#5a4a7a"} stroke={INK} strokeWidth="2.5" />
+    </g>
+  );
+}
+
+/** The inside of the glass dome behind the kangaroo: its floor ring and a soft round cushion. It never changes, so it is drawn once. */
+const DomeBack = memo(function DomeBack() {
+  const { x, r } = HUT;
+  return (
+    <g>
+      <path d={`M${x - r} ${FLOOR} A${r} ${r} 0 0 1 ${x + r} ${FLOOR} Z`} fill="#1d2a66" opacity="0.55" />
+      <ellipse cx={x - 30} cy={FLOOR - 6} rx="70" ry="14" fill="#ff9bb5" stroke={INK} strokeWidth="3" />
+      <ellipse cx={x - 50} cy={FLOOR - 10} rx="22" ry="4" fill="#fff" opacity="0.5" />
+    </g>
+  );
+});
+
+/** The glass over the kangaroo, its steel ribs, and the tunnel out to the hatch, which slides up by `open` (0–1). */
+function DomeFront({ open }: { open: number }) {
+  const { x, r, tunnel0, x1, door } = HUT;
+  const top = FLOOR - door;
+  return (
+    <g>
+      <path d={`M${x - r} ${FLOOR} A${r} ${r} 0 0 1 ${x + r} ${FLOOR} Z`} fill="#bde9ff" opacity="0.22" stroke={INK} strokeWidth="4" />
+      <path d={`M${x} ${FLOOR - r} L${x} ${FLOOR}`} stroke={STEEL} strokeWidth="4" opacity="0.6" />
+      <path d={`M${x - r * 0.7} ${FLOOR} Q${x - r * 0.7} ${FLOOR - r * 0.72} ${x} ${FLOOR - r}`} fill="none" stroke={STEEL} strokeWidth="4" opacity="0.6" />
+      <path
+        d={`M${x - r * 0.72} ${FLOOR - r * 0.38} Q${x - r * 0.6} ${FLOOR - r * 0.8} ${x - r * 0.2} ${FLOOR - r * 0.92}`}
+        fill="none"
+        stroke="#fff"
+        strokeWidth="6"
+        strokeLinecap="round"
+        opacity="0.7"
+      />
+      <rect x={x - r - 10} y={FLOOR - 14} width={2 * r + 20} height="14" rx="5" fill={DARK_STEEL} stroke={INK} strokeWidth="3" />
+      {/* The tunnel, its ribs, and the hatch at its end */}
+      <rect x={tunnel0} y={top} width={x1 - tunnel0} height={door} rx="10" fill={STEEL} stroke={INK} strokeWidth="3.5" />
+      {[tunnel0 + 30, tunnel0 + 60].map((rx) => (
+        <line key={rx} x1={rx} y1={top + 4} x2={rx} y2={FLOOR - 4} stroke={DARK_STEEL} strokeWidth="4" />
+      ))}
+      <rect x={x1 - 6} y={top - 4} width="14" height={door + 4} rx="5" fill={DARK_STEEL} stroke={INK} strokeWidth="3" />
+      <g transform={`translate(0 ${-open * (door - 6)})`}>
+        <rect x={x1 + 4} y={top + 4} width="12" height={door - 4} rx="4" fill="#ffb703" stroke={INK} strokeWidth="3" />
+        <circle cx={x1 + 10} cy={top + door / 2} r="3.5" fill={INK} />
+      </g>
+    </g>
+  );
+}
+
+const ROO = "#d9944f";
+const ROO_LIGHT = "#f6d6a8";
+
+/** The space kangaroo in its bubble helmet, its feet at `pt`, facing right; asleep it droops its ears, `crouch` (0–1) bends it down for a hop, `lean` tips it forward. */
+function Kangaroo({ pt, awake, crouch, lean }: { pt: Pt; awake: boolean; crouch: number; lean: number }) {
+  const squash = 1 - 0.16 * crouch;
+  const ear = awake ? 0 : -55;
+  return (
+    <g transform={`translate(${pt.x} ${pt.y}) rotate(${lean}) scale(1 ${squash})`}>
+      <path d="M-12 -26 Q-40 -18 -54 -2" fill="none" stroke={INK} strokeWidth="15" strokeLinecap="round" />
+      <path d="M-12 -26 Q-40 -18 -54 -2" fill="none" stroke={ROO} strokeWidth="9" strokeLinecap="round" />
+      <ellipse cx="12" cy="-6" rx="22" ry="6" fill={ROO} stroke={INK} strokeWidth="3" />
+      <ellipse cx="-2" cy="-26" rx="19" ry="20" fill={ROO} stroke={INK} strokeWidth="3" />
+      <ellipse cx="6" cy="-48" rx="17" ry="26" transform="rotate(14 6 -48)" fill={ROO} stroke={INK} strokeWidth="3" />
+      <ellipse cx="11" cy="-42" rx="9" ry="15" transform="rotate(14 11 -42)" fill={ROO_LIGHT} />
+      <path d="M4 -34 Q12 -28 19 -34" fill="none" stroke={INK} strokeWidth="2.5" strokeLinecap="round" />
+      <path d="M16 -56 L26 -44" stroke={INK} strokeWidth="7" strokeLinecap="round" />
+      <path d="M16 -56 L26 -44" stroke={ROO} strokeWidth="3.5" strokeLinecap="round" />
+      {[8, 18].map((ex, i) => (
+        <g key={ex} transform={`rotate(${ear * (i ? 0.8 : 1)} ${ex} -88)`}>
+          <ellipse cx={ex} cy="-101" rx="5.5" ry="14" fill={ROO} stroke={INK} strokeWidth="2.5" />
+          <ellipse cx={ex} cy="-100" rx="2.5" ry="9" fill="#ffb3c1" />
+        </g>
+      ))}
+      <circle cx="15" cy="-78" r="15" fill={ROO} stroke={INK} strokeWidth="3" />
+      <ellipse cx="28" cy="-73" rx="10" ry="7.5" fill={ROO_LIGHT} stroke={INK} strokeWidth="2.5" />
+      <circle cx="37" cy="-75" r="3" fill={INK} />
+      {awake ? (
+        <>
+          <circle cx="20" cy="-82" r="3.5" fill={INK} />
+          <circle cx="21" cy="-83.5" r="1.2" fill="#fff" />
+        </>
+      ) : (
+        <path d="M16 -82 Q20 -78 24 -82" fill="none" stroke={INK} strokeWidth="2.5" strokeLinecap="round" />
+      )}
+      <circle cx="12" cy="-74" r="4" fill="#ffb3c1" opacity="0.8" />
+      {/* The bubble helmet with its collar ring */}
+      <circle cx="16" cy="-86" r="30" fill="#bde9ff" opacity="0.25" stroke={INK} strokeWidth="3" />
+      <path d="M-2 -106 Q6 -114 18 -115" fill="none" stroke="#fff" strokeWidth="4" strokeLinecap="round" opacity="0.8" />
+      <rect x="-6" y="-62" width="40" height="8" rx="4" fill="#ff5d73" stroke={INK} strokeWidth="2.5" transform="rotate(14 14 -58)" />
+    </g>
+  );
+}
+
+/** The radio mast: a lattice with an antenna on top. It never changes, so it is drawn once. */
+const RadioMast = memo(function RadioMast() {
+  const { x, top } = RADIO;
+  return (
+    <g>
+      <Lattice x={x} w={40} top={top + 60} />
+      <rect x={x - 34} y={FLOOR - 18} width="68" height="18" rx="5" fill={DARK_STEEL} stroke={INK} strokeWidth="3" />
+      <Beam
+        pts={[
+          { x, y: top + 60 },
+          { x, y: top + 10 },
+        ]}
+        w={5}
+      />
+      {[-1, 1].map((s) => (
+        <line key={s} x1={x} y1={top + 40} x2={x + s * 22} y2={top + 28} stroke={STEEL} strokeWidth="4" strokeLinecap="round" />
+      ))}
+      <path d={`M${RADIO.pedal + RADIO.pedalW / 2 + 6} ${FLOOR - 6} L${x - 34} ${FLOOR - 6}`} stroke={INK} strokeWidth="6" strokeLinecap="round" />
+    </g>
+  );
+});
+
+/** The mast's moving parts: the pedal pressed down, the lamps lighting one after the other, the glowing antenna tip and the radio waves. */
+function RadioWaves({ space, t }: { space: Space; t: number }) {
+  const { x, top, pedal, pedalW, pedalH, press } = RADIO;
+  const down = press * space.pedalAt(t);
+  const sending = t >= space.tPedal;
+  const waves = space.waveAt(t);
+  const dir = deg(Math.atan2(SAT.y - top, SAT.x - x));
+  return (
+    <g>
+      <rect x={pedal - pedalW / 2 - 6} y={FLOOR - 10} width={pedalW + 12} height="10" rx="3" fill={DARK_STEEL} stroke={INK} strokeWidth="3" />
+      <rect
+        x={pedal - pedalW / 2 + 6}
+        y={FLOOR - pedalH + down + 6}
+        width={pedalW - 12}
+        height={pedalH - 14 - down}
+        fill={STEEL}
+        stroke={INK}
+        strokeWidth="3"
+      />
+      <rect x={pedal - pedalW / 2 - 4} y={FLOOR - pedalH + down} width={pedalW + 8} height="10" rx="5" fill="#3ec300" stroke={INK} strokeWidth="3" />
+      {RADIO_LAMPS.map((y, i) => {
+        const lit = t >= space.lampTimes[i];
+        return (
+          <g key={y}>
+            {lit && <circle cx={x} cy={y} r="22" fill={LAMP_COLORS[i]} opacity="0.35" />}
+            <circle cx={x} cy={y} r="11" fill={lit ? LAMP_COLORS[i] : "#5a4a7a"} stroke={INK} strokeWidth="3" />
+          </g>
+        );
+      })}
+      {sending && <circle cx={x} cy={top} r="20" fill={GLOW} opacity="0.3" />}
+      <circle cx={x} cy={top} r="10" fill={sending ? GLOW : "#ffd23f"} stroke={INK} strokeWidth="3" />
+      {waves.map(({ pt, k }, i) => {
+        const R = 18 + 22 * k;
+        return (
+          <g key={i} transform={`translate(${pt.x} ${pt.y}) rotate(${dir})`} opacity={1 - 0.5 * k}>
+            <path d={`M0 ${-R} A${R} ${R} 0 0 1 0 ${R}`} fill="none" stroke={INK} strokeWidth="9" strokeLinecap="round" />
+            <path d={`M0 ${-R} A${R} ${R} 0 0 1 0 ${R}`} fill="none" stroke={GLOW} strokeWidth="5" strokeLinecap="round" />
+          </g>
+        );
+      })}
+    </g>
+  );
+}
+
+/** The little satellite in the sky: asleep until the radio waves reach it, then it opens its eyes and unfolds its solar wings. */
+function Satellite({ space, t }: { space: Space; t: number }) {
+  const { x, y, wing } = SAT;
+  const { awake, wings } = space.satAt(t);
+  const reach = lerp(18, wing, wings);
+  const bob = awake ? 4 * Math.sin((t - space.tSatWake) * 3) : 0;
+  return (
+    <g transform={`translate(${x} ${y + bob})`}>
+      {[-1, 1].map((s) => {
+        const x0 = s * 30;
+        const x1 = s * (30 + reach);
+        const cells = Math.max(1, Math.round(reach / 30));
+        return (
+          <g key={s}>
+            <line x1={x0} y1="0" x2={x1} y2="0" stroke={STEEL} strokeWidth="5" />
+            <rect x={Math.min(x0 + s * 8, x1)} y="-20" width={Math.abs(x1 - x0 - s * 8)} height="40" rx="3" fill="#2f6fd6" stroke={INK} strokeWidth="3" />
+            {Array.from({ length: cells - 1 }, (_, k) => {
+              const cx = x0 + s * 8 + ((x1 - x0 - s * 8) * (k + 1)) / cells;
+              return <line key={k} x1={cx} y1="-20" x2={cx} y2="20" stroke="#8fc3ff" strokeWidth="2" />;
+            })}
+          </g>
+        );
+      })}
+      <line x1="0" y1="-24" x2="10" y2="-48" stroke={STEEL} strokeWidth="4" strokeLinecap="round" />
+      <path d="M-2 -52 Q10 -40 24 -50 Z" fill={STEEL} stroke={INK} strokeWidth="2.5" strokeLinejoin="round" />
+      <rect x="-30" y="-24" width="60" height="50" rx="10" fill="#ffd23f" stroke={INK} strokeWidth="3.5" />
+      <rect x="-24" y="-18" width="16" height="8" rx="3" fill="#fff" opacity="0.6" />
+      {awake ? (
+        <>
+          <circle cx="-10" cy="-2" r="4.5" fill={INK} />
+          <circle cx="10" cy="-2" r="4.5" fill={INK} />
+          <circle cx="-9" cy="-3.5" r="1.5" fill="#fff" />
+          <circle cx="11" cy="-3.5" r="1.5" fill="#fff" />
+          <path d="M-8 10 Q0 17 8 10" fill="none" stroke={INK} strokeWidth="2.5" strokeLinecap="round" />
+        </>
+      ) : (
+        <>
+          <path d="M-15 -2 Q-10 2 -5 -2 M5 -2 Q10 2 15 -2" fill="none" stroke={INK} strokeWidth="2.5" strokeLinecap="round" />
+          <path d="M-5 12 Q0 14 5 12" fill="none" stroke={INK} strokeWidth="2.5" strokeLinecap="round" />
+        </>
+      )}
+      <rect x="-12" y="26" width="24" height="8" rx="3" fill={DARK_STEEL} stroke={INK} strokeWidth="2.5" />
+    </g>
+  );
+}
+
+const CHUTE_COLORS = ["#ff5d73", "#fff", "#ff5d73", "#fff", "#ff5d73"];
+
+/** The capsule, its bottom's middle at `pt`, and its striped parachute open by `chute` (0–1), swaying `sway` degrees. */
+function Capsule({ pt, chute, sway }: { pt: Pt; chute: number; sway: number }) {
+  const { half, h, nozzle } = CAPSULE;
+  const canopyY = -h - 40 - 90 * chute;
+  const cw = 90 * chute;
+  return (
+    <g transform={`translate(${pt.x} ${pt.y}) rotate(${sway} 0 ${-h})`}>
+      {chute > 0.02 && (
+        <g>
+          {[-1, -0.35, 0.35, 1].map((s) => (
+            <line key={s} x1={s * cw} y1={canopyY} x2={s * 12} y2={-h + 2} stroke={INK} strokeWidth="2" />
+          ))}
+          {CHUTE_COLORS.map((c, i) => {
+            const a = -cw + (2 * cw * i) / CHUTE_COLORS.length;
+            const b = -cw + (2 * cw * (i + 1)) / CHUTE_COLORS.length;
+            const lift = (u: number) => canopyY - 70 * chute * Math.sqrt(Math.max(0, 1 - (u / Math.max(cw, 1)) ** 2));
+            return (
+              <path
+                key={i}
+                d={`M${a} ${canopyY} L${a} ${lift(a)} Q${(a + b) / 2} ${lift((a + b) / 2) - 8 * chute} ${b} ${lift(b)} L${b} ${canopyY} Q${(a + b) / 2} ${canopyY - 10 * chute} ${a} ${canopyY} Z`}
+                fill={c}
+                stroke={INK}
+                strokeWidth="2.5"
+                strokeLinejoin="round"
+              />
+            );
+          })}
+        </g>
+      )}
+      <path d={`M${-half} 0 L${-half * 0.6} ${-h} L${half * 0.6} ${-h} L${half} 0 Z`} fill="#f4f5fb" stroke={INK} strokeWidth="3.5" strokeLinejoin="round" />
+      <rect x={-half + 4} y="-22" width={2 * half - 8} height="10" fill="#ff5d73" />
+      <circle cy={-h * 0.62} r="9" fill="#bde9ff" stroke={INK} strokeWidth="3" />
+      <rect x={half - 8} y={-nozzle - 6} width="14" height="12" rx="3" fill={DARK_STEEL} stroke={INK} strokeWidth="2.5" />
+      <rect x={-12} y={-h - 6} width="24" height="8" rx="3" fill={DARK_STEEL} stroke={INK} strokeWidth="2.5" />
+    </g>
+  );
+}
+
+/** The puff of air from the capsule's nozzle, a small cloud growing on its way to the earth and fading there. */
+function AirPuff({ space, t }: { space: Space; t: number }) {
+  const puff = space.puffAt(t);
+  if (!puff) return null;
+  const { pt, size, fade } = puff;
+  return (
+    <g transform={`translate(${pt.x} ${pt.y}) scale(${size})`} opacity={0.9 * (1 - fade)}>
+      {[
+        { x: -14, y: 4, r: 14 },
+        { x: 4, y: -6, r: 16 },
+        { x: 16, y: 8, r: 12 },
+      ].map((c) => (
+        <circle key={c.x} cx={c.x} cy={c.y} r={c.r} fill="#f4f5fb" stroke="#b9bdd6" strokeWidth="3" />
+      ))}
+    </g>
+  );
+}
+
+/** Far away and small, the rocket coming down on the moon, and the flag that pops out once it has landed. */
+function MoonLanding({ space, t }: { space: Space; t: number }) {
+  const mini = space.miniRocketAt(t);
+  if (!mini) return null;
+  const flag = space.flagAt(t);
+  const { pt, flame } = mini;
+  return (
+    <g transform={`translate(${pt.x} ${pt.y}) scale(1.5)`}>
+      {flame > 0 && <path d={`M-7 0 Q0 ${26 * flame} 7 0 Z`} fill="#ff8c42" stroke={INK} strokeWidth="2" />}
+      {flag > 0 && (
+        <g>
+          <line x1="14" y1="-6" x2="14" y2={-6 - 44 * flag} stroke={INK} strokeWidth="3" strokeLinecap="round" />
+          <path d={`M14 ${-6 - 44 * flag} l${24 * flag} 7 l${-24 * flag} 7 Z`} fill="#ffd23f" stroke={INK} strokeWidth="2" strokeLinejoin="round" />
+        </g>
+      )}
+      <path d="M-14 0 L-10 -10 L10 -10 L14 0 Z" fill="#ff5d73" stroke={INK} strokeWidth="2" strokeLinejoin="round" />
+      <path d="M-9 -8 L-9 -40 Q0 -58 9 -40 L9 -8 Z" fill="#f4f5fb" stroke={INK} strokeWidth="2.5" strokeLinejoin="round" />
+      <circle cy="-30" r="4" fill="#bde9ff" stroke={INK} strokeWidth="1.5" />
+    </g>
+  );
 }

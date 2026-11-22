@@ -1,13 +1,16 @@
 // The rocket launch ("Raketenstart"), a Rube Goldberg machine on a toy space
 // station at night: one tap lets a marble out of the satellite dish, and one
-// thing sets off the next for about forty seconds until the rocket lifts off –
-// the marble wakes the robot, the robot pushes the moon buggy into the planet
-// mobile, the earth bonks the telescope, which spins round and points at the
-// sky, a UFO comes to have a look, beams up a moon rock and drops it onto the
-// switch, the magnet lets go of its iron ball and the countdown begins.
-// Everything is worked out ahead as a function of the seconds since the tap,
-// so SpaceLevel.tsx only asks where each thing is at a moment. Coordinates are
-// those of the launch site, 6900 × 900; the screen shows 1600 of it at a time.
+// thing sets off the next for about a minute until the rocket lands on the
+// moon – the marble wakes the robot, the robot pushes the moon buggy against
+// the intercom of a glass dome, a space kangaroo hops out onto the pedal of a
+// radio mast, whose waves wake a satellite, the satellite drops a capsule on a
+// parachute, the capsule's puff of air sets the planet mobile turning, the
+// earth bonks the telescope, which spins round and points at the sky, a UFO
+// comes to have a look, beams up a moon rock and drops it onto the switch, the
+// magnet lets go of its iron ball and the countdown begins. Everything is
+// worked out ahead as a function of the seconds since the tap, so
+// SpaceLevel.tsx only asks where each thing is at a moment. Coordinates are
+// those of the launch site, 8350 × 900; the screen shows 1600 of it at a time.
 
 import {
   playAlien,
@@ -15,18 +18,23 @@ import {
   playBeeps,
   playBoing,
   playClick,
+  playClimbNote,
   playClonk,
   playCountNote,
   playCreak,
+  playDoorbell,
   playHiss,
+  playHop,
   playHum,
   playKnock,
   playPing,
   playPlop,
   playPoof,
   playPop,
+  playPuff,
   playRobot,
   playRumble,
+  playSlide,
   playThump,
   playTrill,
   playTwinkle,
@@ -56,7 +64,10 @@ import {
 } from "./machineKit";
 import { arc, BALL_R, line, quad, type Pt } from "./path";
 
-export const WORLD_W = 6900;
+/** How far everything from the planet mobile on stands right of where it stood before the dome, the radio mast and the satellite came. */
+const GAP = 1450;
+
+export const WORLD_W = 6900 + GAP;
 export const FLOOR = 800;
 
 /* ---------- Layout ---------- */
@@ -100,8 +111,28 @@ export const HILLS = [
 export const groundY = (x: number) =>
   FLOOR - HILLS.reduce((up, h) => up + (Math.abs(x - h.x) < h.w / 2 ? (h.h * (1 + Math.cos((2 * Math.PI * (x - h.x)) / h.w))) / 2 : 0), 0);
 
+/**
+ * The intercom on its post left of the glass dome, a box with a lamp and a
+ * speaker grille on top: the buggy's bumper presses the round button sticking
+ * out of the post's left side, `r` its radius, at the bumper's height.
+ */
+export const INTERCOM = { x: 3550, r: 12, post: 16, h: 150, y: FLOOR - 53 };
+/** The glass dome where the space kangaroo dozes, its middle at `x` on the ground, and the tunnel out to its hatch at `x1`, `door` high. */
+export const HUT = { x: 3760, r: 150, tunnel0: 3880, x1: 3970, door: 124 };
+/** The radio mast: its antenna's tip at (x, top), three lamps up the mast and the foot pedal left of it. */
+export const RADIO = { x: 4640, top: 300, pedal: 4560, pedalW: 76, pedalH: 24, press: 10 };
+export const RADIO_LAMPS = [FLOOR - 140, FLOOR - 270, FLOOR - 400];
+/** The space kangaroo: where its feet stand inside the dome, outside the hatch, after each hop and on the pedal. */
+export const KANGAROO_SPOTS: Pt[] = [
+  { x: HUT.x - 30, y: FLOOR },
+  { x: HUT.x1 + 50, y: FLOOR },
+  { x: HUT.x1 + 230, y: FLOOR },
+  { x: HUT.x1 + 410, y: FLOOR },
+  { x: RADIO.pedal, y: FLOOR - RADIO.pedalH },
+];
+
 /** The planet mobile hanging from the station truss; it turns round its cord. */
-export const MOBILE = { cx: 3750, barY: 490, sun: { y: 552, r: 38 } };
+export const MOBILE = { cx: 3750 + GAP, barY: 490, sun: { y: 552, r: 38 } };
 /**
  * The planets on the mobile: how far out on the bars (R), how low they hang
  * (y), how big (r) and where they are at rest (radians; 0 is on the left, a
@@ -124,7 +155,7 @@ export type Planet = (typeof PLANETS)[number];
  * the sky (`sky`), wobbling. It swings the way the push sends it and never
  * comes round to the left again, where the earth is still turning.
  */
-export const SCOPE = { pivot: { x: 4024, y: 652 }, front: 120, back: 50, lens: 16, rest: 150, sky: -40 };
+export const SCOPE = { pivot: { x: 4024 + GAP, y: 652 }, front: 120, back: 50, lens: 16, rest: 150, sky: -40 };
 /** The objective's middle, the telescope turned to `angle` degrees. */
 export const scopeTip = (angle: number): Pt => ({
   x: SCOPE.pivot.x + SCOPE.front * Math.cos(rad(angle)),
@@ -132,7 +163,7 @@ export const scopeTip = (angle: number): Pt => ({
 });
 
 /** The moon rock lying on the ground, which the UFO beams up; `r` is about its radius. */
-export const ROCK = { x: 4270, r: 22 };
+export const ROCK = { x: 4270 + GAP, r: 22 };
 /** The UFO's spot above the moon rock, where it hovers while it beams it up. */
 export const UFO_HOVER = { x: ROCK.x, y: 430 };
 /** How far below the UFO's middle its beam starts, and how far below that the moon rock hangs in the beam. */
@@ -140,7 +171,7 @@ export const UFO_BELOW = 22;
 export const ROCK_HANG = 70;
 
 /** How far the parts from the switch on stand right of where they stood before the telescope and the UFO came. */
-const MOVED = 900;
+const MOVED = 900 + GAP;
 
 /** The switch for the magnet: a handle on a box, tilted `rest` degrees (left) until the moon rock knocks it down flat. */
 export const LEVER = { x: 3950 + MOVED, y: FLOOR - 30, len: 64, knob: 13, rest: -28, flipped: -76 };
@@ -148,7 +179,7 @@ export const LEVER = { x: 3950 + MOVED, y: FLOOR - 30, len: 64, knob: 13, rest: 
 export const leverKnob = (tilt: number): Pt => ({ x: LEVER.x + LEVER.len * Math.sin(rad(tilt)), y: LEVER.y - LEVER.len * Math.cos(rad(tilt)) });
 
 /** The space-station truss: a mast at `x` carrying a long beam with solar wings; the mobile hangs from its left end, the magnet from its right. */
-export const TRUSS = { x: 4120 + MOVED, w: 70, jibY: 170, jibH: 26, jib0: 3670, jib1: 4640 + MOVED };
+export const TRUSS = { x: 4120 + MOVED, w: 70, jibY: 170, jibH: 26, jib0: 3670 + GAP, jib1: 4640 + MOVED };
 /** The magnet's bottom, where the iron ball sticks. */
 export const MAGNET = { x: 4560 + MOVED, y: 280 };
 export const IRON = { r: 34 };
@@ -171,7 +202,17 @@ export const HOSE = {
   plug: { x: ROCKET.x + ROCKET.w / 2 + 6, y: ROCKET.bottom - 200 },
   dropped: { x: 5660 + MOVED, y: FLOOR - 9 },
 };
-export const MOON = { x: 5060 + MOVED, y: 150, r: 70 };
+/** The moon in the sky, low enough that the rocket, small far away, can be seen landing on it. */
+export const MOON = { x: 5060 + MOVED, y: 250, r: 70 };
+
+/* ---------- The satellite and its capsule ---------- */
+
+/** Where the capsule lands: left of the earth hanging at rest, with room for its puff of air. */
+export const CAPSULE_X = MOBILE.cx - PLANETS[0].R - PLANETS[0].r - 110;
+/** The sleeping satellite in the sky, right above where its capsule lands; `wing` is how far its solar wings reach out. */
+export const SAT = { x: CAPSULE_X, y: 170, wing: 120 };
+/** The capsule: half its width, its height, and where its puff nozzle sits on its right side (up from the ground). */
+export const CAPSULE = { half: 30, h: 64, nozzle: 30 };
 
 /* ---------- Helpers ---------- */
 
@@ -258,10 +299,9 @@ export function buildSpace() {
     return lerp(0, 145, easeOut(seg(u, 0, 0.4))) * (1 - easeInOut(seg(u, 2.2, 2.7))) + 22 * Math.sin(u * 11) * seg(u, 0.3, 0.6) * (1 - seg(u, 2, 2.3));
   };
 
-  /* The moon buggy: off the deck, down the ramp and over three hills into the earth of the mobile. */
+  /* The moon buggy: off the deck, down the ramp and over three hills against the intercom of the glass dome. */
   const earth = PLANETS[0];
-  const bumperY = FLOOR - BUGGY.bumper - earth.y;
-  const buggyStop = MOBILE.cx - earth.R - Math.sqrt(earth.r ** 2 - bumperY ** 2) - BUGGY.nose;
+  const buggyStop = INTERCOM.x - INTERCOM.post / 2 - 2 * INTERCOM.r - BUGGY.nose;
   const groundFrom = DOWN.x1 + 100;
   const buggyPath = pathOf(
     rounded(
@@ -295,24 +335,138 @@ export function buildSpace() {
       const { pt, angle } = along(buggyPath, d);
       return { pt, angle, turned: d, bob };
     }
-    // It bumps into the earth and rolls back a little.
+    // It bumps into the intercom button and rolls back a little.
     const back = 30 * easeOut(seg(t, tBump, tBump + 0.7));
     return { pt: { x: buggyStop - back, y: FLOOR }, angle: 0, turned: buggyPath.total - back, bob: bob + wobble(t - tBump, 5, 22, 6) };
+  };
+
+  /* The bumper presses the intercom button, which chimes; in the glass dome the space kangaroo wakes, its hatch slides up and it comes out. */
+  const tPerk = tBump + 0.6;
+  const tDoor = tBump + 1.3;
+  const tExit = tDoor + 0.6;
+  const OUT_S = 1.3;
+  at(tBump, { sound: () => playKnock(1300) });
+  at(tBump + 0.1, { sound: playDoorbell });
+  at(tPerk, { sound: playTrill });
+  at(tDoor, { sound: playSlide });
+  /** How far the hatch at the tunnel's end is open: 0 shut, 1 slid all the way up. */
+  const hatchAt = (t: number) => easeInOut(seg(t, tDoor, tDoor + 0.5));
+
+  /* Three big, floaty hops along the moon, the last one onto the pedal at the foot of the radio mast. */
+  const HOP_S = 1.2;
+  const HOP_PAUSE = 0.25;
+  const hopTimes = [0, 1, 2].map((i) => tExit + OUT_S + 0.3 + i * (HOP_S + HOP_PAUSE));
+  const tPedal = hopTimes[2] + HOP_S;
+  hopTimes.forEach((t) => at(t, { sound: () => playHop(HOP_S) }));
+  at(tPedal + 0.02, { sound: playClonk });
+  /** The kangaroo: where its feet are, whether it is awake, how far it crouches (0–1) and how far it leans into a hop (degrees). */
+  const kangarooAt = (t: number): { pt: Pt; awake: boolean; crouch: number; lean: number } => {
+    const [inside, outside] = KANGAROO_SPOTS;
+    const awake = t >= tPerk;
+    if (t < tExit) return { pt: inside, awake, crouch: awake ? 0 : 1, lean: 0 };
+    if (t < tExit + OUT_S) {
+      // Little steps through the tunnel, low enough to keep its ears in it.
+      const k = seg(t, tExit, tExit + OUT_S);
+      return { pt: { x: lerp(inside.x, outside.x, easeInOut(k)), y: FLOOR - 6 * Math.abs(Math.sin(3 * Math.PI * k)) }, awake, crouch: 0, lean: 6 };
+    }
+    for (let i = 2; i >= 0; i--) {
+      if (t < hopTimes[i]) continue;
+      const from = KANGAROO_SPOTS[i + 1];
+      const to = KANGAROO_SPOTS[i + 2];
+      const k = seg(t, hopTimes[i], hopTimes[i] + HOP_S);
+      const since = t - hopTimes[i] - HOP_S;
+      // Its feet sink with the pedal once it stands on it.
+      const press = i === 2 && since >= 0 ? RADIO.press * easeOut(seg(since, 0, 0.12)) : 0;
+      const crouch = since >= 0 ? Math.max(0, 1 - since / 0.25) : k < 0.15 ? 1 - k / 0.15 : 0;
+      const pt = k < 1 ? hop(from, to, 200, easeInOut(k)) : { x: to.x, y: to.y + press };
+      return { pt, awake, crouch, lean: k < 1 ? 18 * Math.sin(Math.PI * k) : 0 };
+    }
+    // Waiting outside the hatch, crouched for its first hop.
+    return { pt: outside, awake, crouch: seg(t, hopTimes[0] - 0.25, hopTimes[0]), lean: 0 };
+  };
+  /** How far the pedal is pressed down: 0–1. */
+  const pedalAt = (t: number) => easeOut(seg(t, tPedal, tPedal + 0.12));
+
+  /* The pedal lights the mast's lamps from the bottom up; its antenna sends three radio waves up to the satellite. */
+  const lampTimes = RADIO_LAMPS.map((_, i) => tPedal + 0.3 + i * 0.3);
+  lampTimes.forEach((t, i) => at(t, { sound: () => playClimbNote(i * 2) }));
+  const WAVE_S = 1.0;
+  const waveTimes = [0, 1, 2].map((i) => lampTimes[2] + 0.3 + i * 0.5);
+  at(waveTimes[0], { sound: playBeeps });
+  const antenna = { x: RADIO.x, y: RADIO.top };
+  /** The radio waves on their way: where each arc's middle is, and how far it has gone (0–1). */
+  const waveAt = (t: number) =>
+    waveTimes
+      .filter((tw) => t >= tw && t < tw + WAVE_S)
+      .map((tw) => {
+        const k = seg(t, tw, tw + WAVE_S);
+        return { pt: { x: lerp(antenna.x, SAT.x, k), y: lerp(antenna.y, SAT.y, k) }, k };
+      });
+
+  /* The last wave wakes the satellite: it opens its eyes and its solar wings, then lets its capsule go. */
+  const tSatWake = waveTimes[2] + WAVE_S;
+  const tCapsule = tSatWake + 1.2;
+  at(tSatWake, { sound: playPing });
+  at(tSatWake + 0.15, { sound: playWhirr });
+  at(tCapsule, { sound: playPop });
+  /** The satellite: awake or asleep, and how far its wings have unfolded (0–1). */
+  const satAt = (t: number) => ({ awake: t >= tSatWake, wings: easeInOut(seg(t, tSatWake + 0.15, tSatWake + 0.95)) });
+
+  /* The capsule falls, its striped parachute opens and it floats down, swaying, to land beside the mobile. */
+  const tChute = tCapsule + 0.4;
+  const tLand = tChute + 4.2;
+  at(tChute, { sound: playWhoosh });
+  at(tLand, { sound: playThump });
+  const held = { x: SAT.x, y: SAT.y + 30 + CAPSULE.h };
+  const chuteFrom = { x: held.x, y: held.y + 0.5 * GRAVITY * (tChute - tCapsule) ** 2 };
+  const landed = { x: CAPSULE_X, y: FLOOR };
+  /** The capsule: the middle of its bottom, how far its parachute is open (0–1) and how far it sways (degrees). */
+  const capsuleAt = (t: number): { pt: Pt; chute: number; sway: number } => {
+    if (t < tCapsule) return { pt: held, chute: 0, sway: 0 };
+    if (t < tChute) return { pt: { x: held.x, y: held.y + 0.5 * GRAVITY * (t - tCapsule) ** 2 }, chute: 0, sway: 0 };
+    if (t < tLand) {
+      const k = seg(t, tChute, tLand);
+      const swing = Math.sin(k * 3 * Math.PI) * (1 - k);
+      return {
+        pt: { x: landed.x + 40 * swing, y: lerp(chuteFrom.y, landed.y, easeOut(k) * 0.4 + k * 0.6) },
+        chute: easeOut(seg(t, tChute, tChute + 0.3)),
+        sway: 10 * swing,
+      };
+    }
+    // Landed, the parachute sinks down behind it.
+    return { pt: landed, chute: 1 - easeIn(seg(t, tLand, tLand + 0.8)), sway: 0 };
+  };
+
+  /* A puff of air from the capsule's nozzle pushes the earth, and the mobile starts to turn. */
+  const tPuff = tLand + 0.9;
+  const tSpin = tPuff + 0.4;
+  at(tPuff, { sound: playPuff });
+  const nozzle = { x: CAPSULE_X + CAPSULE.half, y: FLOOR - CAPSULE.nozzle };
+  const earthLeft = { x: planetSpot(earth, 0).x - earth.r, y: earth.y };
+  /** The puff of air on its way to the earth: its middle, its size and how faded it is (null when there is none). */
+  const puffAt = (t: number) => {
+    if (t < tPuff || t >= tSpin + 0.5) return null;
+    const k = seg(t, tPuff, tSpin);
+    return {
+      pt: { x: lerp(nozzle.x, earthLeft.x - 10, easeOut(k)), y: lerp(nozzle.y, earthLeft.y, easeOut(k)) },
+      size: lerp(0.4, 1, k),
+      fade: seg(t, tSpin, tSpin + 0.5),
+    };
   };
 
   /* The mobile turns; half a turn on, the earth comes round and bonks the telescope's objective. */
   const SPIN = 2.4 * Math.PI;
   const SPIN_SLOW = 3.4;
-  const spinAt = (t: number) => (t < tBump ? 0 : SPIN * (1 - Math.exp(-(t - tBump) / SPIN_SLOW)));
+  const spinAt = (t: number) => (t < tSpin ? 0 : SPIN * (1 - Math.exp(-(t - tSpin) / SPIN_SLOW)));
   const tip0 = scopeTip(SCOPE.rest);
   let u = 0;
   for (; u < 6; u += STEP) {
-    const e = planetSpot(earth, spinAt(tBump + u));
+    const e = planetSpot(earth, spinAt(tSpin + u));
     if (Math.hypot(e.x - tip0.x, e.y - tip0.y) <= earth.r * e.scale + SCOPE.lens) break;
   }
-  const tScope = tBump + u;
-  at(tBump, { sound: () => playKnock(1300) });
-  at(tBump + 0.15, { sound: playTwinkle });
+  const tScope = tSpin + u;
+  at(tSpin, { sound: () => playKnock(1300) });
+  at(tSpin + 0.15, { sound: playTwinkle });
 
   /* The telescope swings down and round, overshoots, wobbles and stays pointing at the sky; its lens glints. */
   const SCOPE_SPIN = 1.4;
@@ -455,7 +609,6 @@ export function buildSpace() {
   const tHose = tCount[0] + 0.45;
   const tArm = tCount[1] + 0.35;
   const tIgnite = tCount[2] + 0.4;
-  const tDone = tLift + 2.8;
   [
     { de: "Drei!", en: "Three!", zh: "三！", hi: "तीन!", es: "¡Tres!", ar: "ثلاثة!", ru: "Три!" },
     { de: "Zwei!", en: "Two!", zh: "二！", hi: "दो!", es: "¡Dos!", ar: "اثنان!", ru: "Два!" },
@@ -481,7 +634,24 @@ export function buildSpace() {
   });
   at(tLift + 1.2, { sound: playTwinkle });
   at(tLift + 1.8, { sound: playTwinkle });
+
+  /* Far away, small, the rocket comes down on the moon, which wakes up and smiles; a little flag pops out. */
+  const tMoonIn = tLift + 2.1;
+  const tMoonLand = tMoonIn + 1.6;
+  const tFlag = tMoonLand + 0.45;
+  const tDone = tFlag + 1.6;
+  at(tMoonLand, { sound: playThump });
+  at(tFlag, { sound: playPop });
+  at(tFlag + 0.4, { sound: playGiggle });
   at(tDone, { done: true });
+  /** The little rocket on its way down to the moon: the middle of its bottom and its flame (null before it shows). */
+  const miniRocketAt = (t: number) => {
+    if (t < tMoonIn) return null;
+    const k = easeOut(seg(t, tMoonIn, tMoonLand));
+    return { pt: { x: MOON.x, y: lerp(-80, MOON.y - MOON.r, k) }, flame: 1 - seg(t, tMoonLand - 0.2, tMoonLand + 0.1) };
+  };
+  /** How far the flag has come out of the little rocket: 0–1. */
+  const flagAt = (t: number) => easeOut(seg(t, tFlag, tFlag + 0.35));
 
   /** How far the countdown is: 0 before it starts, then 1, 2, 3 for „3, 2, 1“ and 4 for „Start!“. */
   const countAt = (t: number) => (t >= tLift ? 4 : tCount.filter((tc) => t >= tc).length);
@@ -503,6 +673,10 @@ export function buildSpace() {
     if (t < tRobot) return marbleAt(t).pt.x;
     if (t < tPush) return ROBOT.cx + 100;
     if (t < tBump) return buggyAt(t).pt.x;
+    if (t < tExit) return HUT.x;
+    if (t < tPedal) return kangarooAt(t).pt.x + 120;
+    if (t < tSatWake) return (RADIO.x + SAT.x) / 2;
+    if (t < tLand) return SAT.x;
     if (t < tScope) return MOBILE.cx + 120;
     if (t < tGrab) return (SCOPE.pivot.x + ROCK.x) / 2 + 40;
     if (t < tLever) return ufoSpot(t).pt.x;
@@ -511,10 +685,10 @@ export function buildSpace() {
   };
   const cameraTarget = (t: number) => cameraOn(WORLD_W, focusX(t));
 
-  /** Where it could wait for the child's tap (R-03): the sleeping robot, the earth the buggy bumped, the hovering UFO, the countdown board with the iron ball in it. Only the countdown board waits; the machine runs through the others. */
+  /** Where it could wait for the child's tap (R-03): the sleeping robot, the capsule just landed, the hovering UFO, the countdown board with the iron ball in it. Only the countdown board waits; the machine runs through the others. */
   const stops = [
     { at: tRobot, x: ROBOT.cx, y: DECK.y - 110 },
-    { at: tBump, x: planetSpot(earth, 0).x, y: earth.y },
+    { at: tLand, x: CAPSULE_X, y: FLOOR - CAPSULE.h / 2 },
     { at: tBeam, x: UFO_HOVER.x, y: UFO_HOVER.y },
     { at: tWake, x: BOARD.x + BOARD.w / 2, y: BOARD.y + BOARD.h / 2, active: true },
   ];
@@ -529,6 +703,18 @@ export function buildSpace() {
     tRobot,
     tPush,
     tBump,
+    tDoor,
+    tExit,
+    hopTimes,
+    tPedal,
+    lampTimes,
+    waveTimes,
+    tSatWake,
+    tCapsule,
+    tChute,
+    tLand,
+    tPuff,
+    tSpin,
     tScope,
     tSettle,
     tGlint,
@@ -546,10 +732,20 @@ export function buildSpace() {
     tCount,
     tIgnite,
     tLift,
+    tMoonIn,
+    tMoonLand,
+    tFlag,
     marbleAt,
     frontArm,
     backArm,
     buggyAt,
+    hatchAt,
+    kangarooAt,
+    pedalAt,
+    waveAt,
+    satAt,
+    capsuleAt,
+    puffAt,
     spinAt,
     scopeAngle,
     ufoAt,
@@ -562,6 +758,8 @@ export function buildSpace() {
     armAngle,
     rocketRise,
     flameAt,
+    miniRocketAt,
+    flagAt,
     cameraTarget,
     width: WORLD_W,
   };

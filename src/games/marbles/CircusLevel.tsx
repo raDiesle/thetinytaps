@@ -2,13 +2,17 @@ import { memo, useId, useMemo } from "react";
 import { MASCOT_COLORS, MascotHead } from "@/components/Mascot";
 import { wobble, VIEW_H, type LevelProps } from "./level";
 import {
+  BALLOONS,
   BASKET,
   BASKET_RIM,
+  BIG_BALL,
+  BOW_SPOT,
   buildCircus,
   CANNON,
   CHUTE,
   chuteY,
   CLOWN,
+  CORD,
   CORD_END,
   CYMBAL,
   DRUMS,
@@ -28,10 +32,13 @@ import {
   NECK,
   NET,
   PEDESTAL_W,
+  PERCH,
+  PERCH_TOP,
   PLATFORM,
   RAIL,
   SEAL,
   STAGE,
+  STRIKER,
   TRAMPOLINE,
   TRAPEZE,
   TRUNK_W,
@@ -61,8 +68,10 @@ const GOLD = "#ffc93c";
  * into the mane of a dozing lion; the lion wakes with a start, roars, leaps
  * onto the next pedestal and shakes the marble out into the bear acrobat's basket, and
  * the bear rides a unicycle along the high wire through a ring of paper flames,
- * pulling the ribbon of the cannon that shoots the clown doll into the net. Then the curtain opens. The camera travels along
- * with whatever moves.
+ * pulling the ribbon of the cannon that shoots the clown doll into the net. The net throws the clown onto a big starry
+ * ball, which it treads along the ring onto the pad of a high striker; the puck flies up, the box on top opens and a
+ * bunch of balloons rises to the swing of a dozing parrot, who wakes, flies a loop and pulls the curtain's cord. The
+ * clown hops onto the stage and takes a bow. The camera travels along with whatever moves.
  */
 export function CircusLevel(props: LevelProps) {
   const circus = useMemo(buildCircus, []);
@@ -74,10 +83,12 @@ export function CircusLevel(props: LevelProps) {
         const uni = circus.unicycleAt(t);
         const clown = circus.clownAt(t);
         const marble = circus.marbleAt(t);
+        const ball = circus.bigBallAt(t);
         return (
           <>
             <Tent stripes={`${ids}-stripes`} />
             <Stage open={seg(t, circus.tShow, circus.tShow + 1.3)} />
+            <Cord tassel={circus.tasselY(t)} />
             <Spotlights on={seg(t, circus.tShow, circus.tShow + 0.4)} />
             <StripedRail a={{ x: RAIL.from.x - 20, y: RAIL.from.y - 5 }} b={RAIL.to} />
             <Pole x={RAIL.to.x - 24} y0={RAIL.to.y + BALL_R + 14} y1={FLOOR} />
@@ -98,7 +109,9 @@ export function CircusLevel(props: LevelProps) {
             <Mast />
             <Hoop t={t} tPass={circus.tHoop} part="back" />
             <Net sag={circus.sagAt(t)} />
-            <Clown at={clown.pt} turn={clown.turn} wave={t > circus.tNet + 0.3 ? t - circus.tNet : 0} />
+            <BigBall at={ball.pt} spin={ball.spin} />
+            <Striker circus={circus} t={t} />
+            <Clown at={clown.pt} turn={clown.turn} arms={clown.arms} stride={clown.stride} />
             <Cannon age={t - circus.tFire} />
             <Unicycle at={uni.pt} turned={uni.turned} lean={uni.lean} />
             <Ball color={MARBLE_COLOR} x={marble.pt.x} y={marble.pt.y} spin={marble.spin} />
@@ -106,6 +119,8 @@ export function CircusLevel(props: LevelProps) {
             <Ribbon tassel={circus.tasselAt(t)} pulled={circus.pulledAt(t)} fired={t >= circus.tFire} />
             <Hoop t={t} tPass={circus.tHoop} part="front" />
             <TopHat />
+            <Swing angle={circus.swingOf(t)} />
+            <Parrot {...circus.parrotAt(t)} />
           </>
         );
       }}
@@ -128,7 +143,7 @@ const Tent = memo(function Tent({ stripes }: { stripes: string }) {
       </defs>
       <rect x="-400" y="-200" width={WORLD_W + 800} height={FLOOR + 200} fill={`url(#${stripes})`} />
       {/* Soft spots of light on the tent wall */}
-      {[700, 2100, 3300, 4760, 5560].map((x) => (
+      {[700, 2100, 3300, 4760, 5560, 6900, 7560].map((x) => (
         <ellipse key={x} cx={x} cy="330" rx="230" ry="170" fill="#fff" opacity="0.18" />
       ))}
       {[
@@ -137,12 +152,15 @@ const Tent = memo(function Tent({ stripes }: { stripes: string }) {
         { x: 4160, y: 330 },
         { x: 5010, y: 420 },
         { x: 5820, y: 330 },
+        { x: 6860, y: 330 },
+        { x: 7260, y: 250 },
       ].map((p) => (
         <Star key={p.x} x={p.x} y={p.y} r={34} fill={GOLD} />
       ))}
       <Bunting x0={1500} x1={2700} y={86} />
       <Bunting x0={3420} x1={3880} y={86} />
       <Bunting x0={4160} x1={5360} y={86} />
+      <Bunting x0={6480} x1={7480} y={86} />
       {/* The scalloped edge at the top, with light bulbs */}
       <rect x="-400" y="-200" width={WORLD_W + 800} height="236" fill="#c8323f" />
       {Array.from({ length: bulbs }, (_, i) => {
@@ -986,19 +1004,24 @@ function Cannon({ age }: { age: number }) {
   );
 }
 
-/** The clown doll, a fox in a clown's suit, its middle `at`, turned `turn` degrees; `wave` counts the seconds since it landed. */
-function Clown({ at, turn, wave }: { at: Pt; turn: number; wave: number }) {
-  const arm = wave > 0 ? -50 + 22 * Math.sin(wave * 9) : 0;
+/**
+ * The clown doll, a fox in a clown's suit, its middle `at`, turned `turn` degrees; `arms` turns its arms (negative is
+ * up), and `stride` lifts its feet one after the other as it treads the big ball.
+ */
+function Clown({ at, turn, arms, stride }: { at: Pt; turn: number; arms: number; stride: number }) {
   return (
     <g transform={`translate(${at.x} ${at.y}) rotate(${turn})`}>
+      {[-1, 1].map((side) => {
+        const lift = stride ? 8 * Math.max(0, Math.sin(stride + (side > 0 ? Math.PI : 0))) : 0;
+        return (
+          <g key={side}>
+            <line x1={side * 10} y1="24" x2={side * 14} y2={CLOWN.seat - 6 - lift} stroke={INK} strokeWidth="10" strokeLinecap="round" />
+            <ellipse cx={side * 20} cy={CLOWN.seat - 5 - lift} rx="16" ry="8" fill="#ff3b3b" stroke={INK} strokeWidth="2.5" />
+          </g>
+        );
+      })}
       {[-1, 1].map((side) => (
-        <g key={side}>
-          <line x1={side * 10} y1="24" x2={side * 14} y2={CLOWN.seat - 6} stroke={INK} strokeWidth="10" strokeLinecap="round" />
-          <ellipse cx={side * 20} cy={CLOWN.seat - 5} rx="16" ry="8" fill="#ff3b3b" stroke={INK} strokeWidth="2.5" />
-        </g>
-      ))}
-      {[-1, 1].map((side) => (
-        <g key={side} transform={`rotate(${side * arm} ${side * 22} -8)`}>
+        <g key={side} transform={`rotate(${side * arms} ${side * 22} -8)`}>
           <line x1={side * 22} y1="-8" x2={side * 44} y2="14" stroke={side < 0 ? "#8e7dff" : GOLD} strokeWidth="11" strokeLinecap="round" />
           <circle cx={side * 46} cy="16" r="8" fill="#fff" stroke={INK} strokeWidth="2.5" />
         </g>
@@ -1123,12 +1146,12 @@ function Stage({ open }: { open: number }) {
   );
 }
 
-/** Two spotlights hanging from the tent, shining on the clown once they are `on` (0–1). */
+/** Two spotlights hanging from the tent, shining on the clown's spot in front of the stage once they are `on` (0–1). */
 function Spotlights({ on }: { on: number }) {
-  const target = { x: (NET.x0 + NET.x1) / 2, y: NET.y + NET.sag - 30 };
+  const target = { x: BOW_SPOT.x, y: BOW_SPOT.y - 20 };
   return (
     <g>
-      {[5780, 6720].map((x) => {
+      {[7600, 8700].map((x) => {
         const lamp = { x, y: 150 };
         const a = deg(Math.atan2(target.y - lamp.y, target.x - lamp.x));
         const n = { x: Math.cos(rad(a + 90)), y: Math.sin(rad(a + 90)) };
@@ -1150,6 +1173,163 @@ function Spotlights({ on }: { on: number }) {
           </g>
         );
       })}
+    </g>
+  );
+}
+
+/* ---------- After the net: the big ball, the high striker, the balloons and the parrot ---------- */
+
+/** The big starry ball the clown treads along the ring, its middle `at`, turned `spin` radians. */
+function BigBall({ at, spin }: { at: Pt; spin: number }) {
+  const { r } = BIG_BALL;
+  return (
+    <g transform={`translate(${at.x} ${at.y})`}>
+      <circle r={r} fill="#3a86ff" stroke={INK} strokeWidth="4" />
+      <g transform={`rotate(${deg(spin)})`}>
+        <rect x={-r + 2} y="-13" width={2 * r - 4} height="26" fill="#fff" />
+        {[-34, 0, 34].map((x, i) => (
+          <Star key={x} x={x} y={0} r={11} fill={i === 1 ? "#ff5d73" : GOLD} />
+        ))}
+        <Star x={0} y={-44} r={13} fill={GOLD} />
+        <Star x={0} y={44} r={13} fill={GOLD} />
+      </g>
+      <circle r={r} fill="none" stroke={INK} strokeWidth="4" />
+      <path
+        d={`M${-r * 0.55} ${-r * 0.55} Q${-r * 0.3} ${-r * 0.8} 0 ${-r * 0.82}`}
+        fill="none"
+        stroke="#fff"
+        strokeWidth="6"
+        strokeLinecap="round"
+        opacity="0.6"
+      />
+    </g>
+  );
+}
+
+const BALLOON_COLORS = ["#ff5d73", "#3ec300", GOLD];
+
+/** The bunch of balloons, its point `at`, unfolded `grow` (they come out of the box small). */
+function Balloons({ at, grow }: { at: Pt; grow: number }) {
+  const { r } = BALLOONS;
+  const knot = { x: at.x + 4, y: at.y + (r * 1.15 + 50) * grow };
+  const balloons = BALLOONS.at.map((o) => ({ x: at.x + o.x * grow, y: at.y + o.y * grow }));
+  return (
+    <g>
+      {balloons.map((c, i) => {
+        const bottom = c.y + r * 1.15 * grow;
+        return (
+          <path
+            key={i}
+            d={`M${c.x} ${bottom} Q${(c.x + knot.x) / 2 + 6} ${(bottom + knot.y) / 2} ${knot.x} ${knot.y}`}
+            stroke={INK}
+            strokeWidth="2"
+            fill="none"
+          />
+        );
+      })}
+      <path d={`M${knot.x} ${knot.y} q-8 ${16 * grow} 0 ${34 * grow}`} stroke={INK} strokeWidth="2" fill="none" />
+      {balloons.map((c, i) => (
+        <g key={i}>
+          <path
+            d={`M${c.x - 5 * grow} ${c.y + r * 1.15 * grow + 7 * grow} L${c.x} ${c.y + r * 1.15 * grow - 2} L${c.x + 5 * grow} ${c.y + r * 1.15 * grow + 7 * grow} Z`}
+            fill={BALLOON_COLORS[i]}
+            stroke={INK}
+            strokeWidth="2"
+            strokeLinejoin="round"
+          />
+          <ellipse cx={c.x} cy={c.y} rx={r * grow} ry={r * 1.15 * grow} fill={BALLOON_COLORS[i]} stroke={INK} strokeWidth="3" />
+          <ellipse
+            cx={c.x - r * 0.35 * grow}
+            cy={c.y - r * 0.45 * grow}
+            rx={5 * grow}
+            ry={9 * grow}
+            fill="#fff"
+            opacity="0.6"
+            transform={`rotate(25 ${c.x} ${c.y})`}
+          />
+        </g>
+      ))}
+    </g>
+  );
+}
+
+/** The high striker: the pad in the floor, the striped column with its puck, and the box on top that the balloons come out of. */
+function Striker({ circus, t }: { circus: Circus; t: number }) {
+  const { x, w, top, box, padHalf } = STRIKER;
+  const pad = BIG_BALL.x1;
+  const sink = circus.padSink(t);
+  const puckY = lerp(FLOOR - 40, top + 16, circus.puckAt(t));
+  const bunch = circus.balloonsAt(t);
+  const hinge = { x: x - 46, y: top - box };
+  return (
+    <g>
+      <rect x={pad - padHalf - 8} y={FLOOR - 2} width={2 * padHalf + 16} height="14" rx="4" fill="#3b3b4f" stroke={INK} strokeWidth="3" />
+      <rect x={pad - padHalf} y={FLOOR - 3 + sink} width={2 * padHalf} height="10" rx="5" fill="#ff5d73" stroke={INK} strokeWidth="3" />
+      <Pole x={x} y0={top} y1={FLOOR} w={w} />
+      {[0.2, 0.4, 0.6, 0.8].map((k) => (
+        <line key={k} x1={x + w / 2} y1={lerp(FLOOR, top, k)} x2={x + w / 2 + 12} y2={lerp(FLOOR, top, k)} stroke={INK} strokeWidth="3" strokeLinecap="round" />
+      ))}
+      <rect x={x - 32} y={puckY - 11} width="64" height="22" rx="9" fill={GOLD} stroke={INK} strokeWidth="3" />
+      <Balloons at={bunch.pt} grow={bunch.grow} />
+      <rect x={x - 46} y={top - box} width="92" height={box} rx="6" fill="#8e7dff" stroke={INK} strokeWidth="3" />
+      <Star x={x} y={top - box / 2} r={14} fill={GOLD} />
+      <g transform={`rotate(${-circus.lidAt(t)} ${hinge.x} ${hinge.y})`}>
+        <rect x={hinge.x - 4} y={hinge.y - 10} width="100" height="12" rx="4" fill="#6c5ce7" stroke={INK} strokeWidth="3" />
+      </g>
+    </g>
+  );
+}
+
+/** The swing under the tent roof, pushed `angle` degrees round where its ropes are tied. */
+function Swing({ angle }: { angle: number }) {
+  const { x, y, half } = PERCH;
+  return (
+    <g transform={`rotate(${angle} ${x} ${PERCH_TOP})`}>
+      {[-1, 1].map((side) => (
+        <line key={side} x1={x + side * (half - 8)} y1={PERCH_TOP} x2={x + side * (half - 8)} y2={y} stroke="#8a6a4a" strokeWidth="4" />
+      ))}
+      <rect x={x - half} y={y - 5} width={2 * half} height="10" rx="5" fill="#c58a4a" stroke={INK} strokeWidth="3" />
+    </g>
+  );
+}
+
+const PARROT_RED = "#e63946";
+
+/** The parrot, its middle `pt`, looking right (`face` 1) or left (-1), its wing beating with `flap`, its eyes shut until `awake`. */
+function Parrot({ pt, face, flap, awake }: { pt: Pt; face: number; flap: number; awake: boolean }) {
+  return (
+    <g transform={`translate(${pt.x} ${pt.y}) scale(${face} 1)`}>
+      <path d="M-8 12 L-34 50 L-22 54 L-2 20 Z" fill="#3a86ff" stroke={INK} strokeWidth="2.5" strokeLinejoin="round" />
+      <path d="M-2 16 L-22 58 L-10 58 L5 20 Z" fill={GOLD} stroke={INK} strokeWidth="2.5" strokeLinejoin="round" />
+      <path d="M-4 22 l-3 8 M6 22 l3 8" stroke={INK} strokeWidth="3.5" strokeLinecap="round" />
+      <ellipse cx="0" cy="4" rx="17" ry="22" fill={PARROT_RED} stroke={INK} strokeWidth="3" />
+      <circle cx="8" cy="-20" r="14" fill={PARROT_RED} stroke={INK} strokeWidth="3" />
+      <path d="M9 -29 Q22 -28 21 -16 Q14 -13 9 -18 Z" fill="#fff" />
+      <path d="M19 -25 Q33 -23 28 -9 Q25 -14 19 -14 Z" fill="#f4e1c1" stroke={INK} strokeWidth="2.5" strokeLinejoin="round" />
+      {awake ? <circle cx="14" cy="-22" r="3" fill={INK} /> : <path d="M11 -22 q3 3 6 0" stroke={INK} strokeWidth="2" fill="none" />}
+      <g transform={`rotate(${-flap * 45} -2 -6)`}>
+        <path d="M-2 -6 Q-30 0 -26 28 Q-10 22 -2 -6 Z" fill="#3a86ff" stroke={INK} strokeWidth="2.5" strokeLinejoin="round" />
+        <path d="M-6 0 Q-19 6 -20 20" stroke={GOLD} strokeWidth="5" fill="none" strokeLinecap="round" />
+      </g>
+    </g>
+  );
+}
+
+/** The curtain's pull cord down the stage's left post, its tassel at height `tassel`. */
+function Cord({ tassel }: { tassel: number }) {
+  const { x, top } = CORD;
+  return (
+    <g>
+      <line x1={x} y1={top} x2={x} y2={tassel} stroke={GOLD} strokeWidth="5" />
+      <circle cx={x} cy={top} r="6" fill={GOLD} stroke={INK} strokeWidth="2.5" />
+      <path
+        d={`M${x - 6} ${tassel + 4} L${x - 12} ${tassel + 28} L${x + 12} ${tassel + 28} L${x + 6} ${tassel + 4} Z`}
+        fill={GOLD}
+        stroke={INK}
+        strokeWidth="2.5"
+        strokeLinejoin="round"
+      />
+      <circle cx={x} cy={tassel} r="7" fill="#d62839" stroke={INK} strokeWidth="2.5" />
     </g>
   );
 }
