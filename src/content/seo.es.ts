@@ -144,6 +144,11 @@ export const SEO_ES: SeoTranslation = {
       description: "Una letra grande busca a su pequeña: de tres minúsculas solo una es la suya, que camina hasta ella.",
       text: "Un juego de letras sobre mayúsculas y minúsculas: una letra grande busca a su pequeña. Abajo hay tres minúsculas y solo una es la suya. Al tocarla, camina hasta la grande y se pone a su lado; una equivocada niega con la cabeza. Primero las tres son muy distintas, después parecidas, como b, d y p. El juego empieza enseguida y no hay nada que ajustar: al tocar la letra que corresponde o pulsar su tecla, esta cruza dando saltitos y la voz dice su nombre. Cuando el niño acierta a la primera tres veces seguidas, las tres letras se parecen más, y tras un fallo vuelven a ser muy distintas; así no resulta ni demasiado fácil ni demasiado difícil. Las letras están dibujadas con sencillez, sin ojos ni caras, para que la mirada se quede en su forma. De paso, se descubre que la A grande y la a pequeña van juntas.",
     },
+    "/haende-waschen/": {
+      title: "Lavarse las manos para niños – paso a paso",
+      description: "Lávate las manos a la vez: arriba las mangas, agua, jabón, cinco maneras de frotar, y los monstruos de suciedad se deshacen en la espuma.",
+      text: "Un compañero para lavarse las manos, de unos cuarenta segundos, que avanza solo al ritmo mientras el niño se lava a la vez en el lavabo de verdad. La imagen muestra las propias manos desde arriba, tal como las ve un niño: primero se suben las mangas, luego se abre el agua, las manos se mojan y una mano toma jabón del dosificador. Después se frota, como se aprende en la guardería – palma con palma, el dorso de las manos, entre los dedos, los pulgares y las puntas de los dedos – y en cada paso un pequeño monstruo de suciedad se deshace en la espuma: barro, hierba, pintura, mermelada, arena y cacao. En total se frota algo más de veinte segundos, lo que debe durar un buen lavado de manos. Luego se enjuagan, se cierra el agua, una toalla suave las seca y las manos limpias brillan. Por la mañana el niño lleva camiseta y por la noche pijama. Un toque en la imagen hace reír a un monstruito, y los adultos pueden pausar o saltar a cualquier paso con la barra de abajo.",
+    },
     "/zaehne/": {
       title: "Cepillarse los dientes: canción y temporizador",
       description:

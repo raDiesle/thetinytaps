@@ -7,6 +7,7 @@ import { PACIFIER_STORY_BLURB, PACIFIER_STORY_BOOK } from "@/games/pacifierstory
 import { KITA_STORY_BLURB, KITA_STORY_BOOK } from "@/games/kitastory/names";
 import { HAIR_STORY_BLURB, HAIR_STORY_BOOK } from "@/games/hairstory/names";
 import { BED_STORY_BLURB, BED_STORY_BOOK } from "@/games/bedstory/names";
+import { HANDWASH_BLURB, HANDWASH_TITLE } from "@/games/handwash/names";
 import {
   CASE_BLURB,
   CASE_TITLE,
@@ -190,6 +191,16 @@ export const CATEGORIES: Category[] = [
           ar: "تنظيف الأسنان مع أغنية ومؤقّت",
           ru: "Чистим зубы с песенкой и таймером",
         },
+      },
+      {
+        // Hände waschen beside Zähne putzen (idea H-136, 22 November 2026): the child's own hands over the basin, washed
+        // step by step to the beat (src/games/handwash). Still being built until its song is made with Suno (H-142): until
+        // then it plays to a placeholder tune and is found only under „🚧 In Arbeit“ on /management/.
+        href: "/haende-waschen/",
+        emoji: "🧼",
+        title: HANDWASH_TITLE,
+        blurb: HANDWASH_BLURB,
+        unfinished: true,
       },
       {
         href: "/toepfchen/",

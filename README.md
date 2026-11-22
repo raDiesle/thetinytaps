@@ -65,6 +65,7 @@ where its parts are. Skills in `.claude/skills/`: `/neues-spiel`, `/neue-szene`,
 | `src/games/rewards/` | „Belohnungstafel & Zeitplan“: one page for the Belohnungstafel (a reward chart grown-ups design freely, stars on screen, printable as A4) and the Tagesplan (`/tagesplan/`, the day and week in picture cards to tick off and print), both made with one wizard that shows every choice as a picture. Details in its [`CLAUDE.md`](src/games/rewards/CLAUDE.md) |
 | `src/games/timer/` | „Timer“: a visual timer without numbers – a train rolls to the station, an hourglass runs, a candle burns down for 1–10 minutes. Details in its [`CLAUDE.md`](src/games/timer/CLAUDE.md) |
 | `src/games/teeth/` | Game „Zähne putzen“: brushing timer with a 3D mouth and brush. Details in its [`CLAUDE.md`](src/games/teeth/CLAUDE.md) |
+| `src/games/handwash/` | Game „Hände waschen“ (still being built): the child's own hands over the basin, washed step by step to the beat while dirt monsters dissolve in the foam, with a video page. Details in its [`CLAUDE.md`](src/games/handwash/CLAUDE.md) |
 | `src/games/feelings/` | Book „Gefühle“: „Wie geht's dir?“ (the child tells how it feels by a weather) and „Alltagssituationen“ (everyday scenes by feeling, one picture choice each). Details in its [`CLAUDE.md`](src/games/feelings/CLAUDE.md) |
 | `src/games/marbles/` | Game „Kettenreaktion“: the Klingende Kugelbahn (a long marble run with parts to swap), „Alles fällt um“, eight Rube Goldberg machines, and Nagelbrett, Hatschi-Kette and Wasserbahn to join in. Details in its [`CLAUDE.md`](src/games/marbles/CLAUDE.md) |
 | `src/games/elevator/` | Game „Kleine Abenteuer“ (was „Spaß im Aufzug“): picture stories in a house with a lift, and trail adventures through a scrolling world with a bag of things, and films told from place to place. Details in its [`CLAUDE.md`](src/games/elevator/CLAUDE.md), the trail adventures' in [`trail/CLAUDE.md`](src/games/elevator/trail/CLAUDE.md) and the films' in [`film/CLAUDE.md`](src/games/elevator/film/CLAUDE.md) |
@@ -172,3 +173,4 @@ Cmd+Q / Cmd+Tab can't be blocked by any website.
 16. ~~Die Schnullerfee~~
 17. ~~Abstillen (Bildgeschichte „Tschüss, Mama-Milch“)~~
 18. ~~Was gehört zusammen? (Dinge aus dem Alltag, Helfer und ihr Werkzeug)~~
+19. Hände waschen (first version without its song, H-136; the song H-142)

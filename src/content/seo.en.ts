@@ -140,6 +140,11 @@ export const SEO_EN: SeoTranslation = {
       description: "A big letter looks for its little one: three small letters to choose from, and the right one walks over to it.",
       text: "A letter game about capital and small letters: a big letter looks for its child. Three small letters stand below, and only one belongs to it. Tapped, it walks over to the big one and stands beside it; a wrong one shakes its head. First the three look plainly different, later alike, like b, d and p. The game starts at once, and there is nothing to set: when the child taps the matching letter or presses its key, it hops over in little jumps, and the voice says its name. When the child finds the right one at the first try three times in a row, the three become more alike, and after a miss they are plainly different again – so it stays neither too easy nor too hard. The letters are drawn plainly, without eyes or faces, so the eye stays on their shape. Along the way the child notices that the big A and the small a belong together.",
     },
+    "/haende-waschen/": {
+      title: "Hand Washing for Kids – Step by Step",
+      description: "Wash hands along: sleeves up, water, soap, five ways of rubbing, and the dirt monsters dissolve in the foam. For toddlers at the sink.",
+      text: "A hand washing buddy, about forty seconds long, that runs to the beat all by itself while the child washes along at the real sink. The picture shows your own hands from above, just as a child sees them: first the sleeves are pushed up, then the water goes on, the hands get wet, and one hand fetches soap from the pump. Then comes the rubbing, the way children learn it at daycare – palm to palm, the backs of the hands, between the fingers, the thumbs and the fingertips – and at every step a little dirt monster dissolves in the foam: mud, grass, paint, jam, sand and cocoa. Together the rubbing lasts a good twenty seconds, as long as hand washing should. Then the hands are rinsed, the water goes off, a soft towel dries them, and the clean hands shine. In the morning the child wears a T-shirt, in the evening pajamas. A tap on the picture makes a monster giggle, and grown-ups can pause or jump to any step with the bar below.",
+    },
     "/zaehne/": {
       title: "Tooth Brushing for Kids – Song and Timer",
       description:

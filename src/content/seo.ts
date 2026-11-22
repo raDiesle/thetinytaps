@@ -230,6 +230,13 @@ export const SEO_TEXTS: PageSeo[] = [
     text: "Ein Buchstaben-Spiel über große und kleine Buchstaben: Ein großer Buchstabe sucht sein Kind. Unten stehen drei kleine Buchstaben, nur einer gehört zu ihm. Angetippt läuft er zum großen hinüber und stellt sich neben ihn; ein falscher schüttelt den Kopf. Erst sehen die drei ganz verschieden aus, später ähnlich, wie b, d und p. Das Spiel beginnt sofort, und einzustellen gibt es nichts: Tippt das Kind den passenden Buchstaben an oder drückt seine Taste, hüpft er in kleinen Sprüngen hinüber, und die Stimme nennt seinen Namen. Findet das Kind dreimal hintereinander gleich den richtigen, werden die drei einander ähnlicher, und nach einem Griff daneben sind sie wieder deutlich verschieden – so bleibt es weder zu leicht noch zu schwer. Die Buchstaben sind schlicht gezeichnet, ohne Augen und Gesichter, damit der Blick auf ihrer Form bleibt. Nebenbei merkt das Kind, dass das große A und das kleine a zusammengehören.",
   },
   {
+    path: "/haende-waschen/",
+    title: "Hände waschen für Kinder – Schritt für Schritt",
+    description:
+      "Händewaschen zum Mitmachen: Ärmel hoch, Wasser, Seife, fünfmal reiben, und die Schmutzmonster lösen sich im Schaum auf. Für Kleinkinder am Waschbecken.",
+    text: "Ein Begleiter fürs Händewaschen, etwa vierzig Sekunden lang, der ganz von selbst im Takt läuft, während das Kind am echten Waschbecken mitwäscht. Das Bild zeigt die eigenen Hände von oben, so wie das Kind sie sieht: Erst werden die Ärmel hochgeschoben, dann geht das Wasser an, die Hände werden nass, und eine Hand holt Seife aus dem Spender. Danach wird gerieben, wie es in der Kita gelernt wird – Handflächen, Handrücken, zwischen den Fingern, die Daumen und die Fingerspitzen –, und bei jedem Schritt löst sich ein kleines Schmutzmonster im Schaum auf: Matsch, Gras, Farbe, Marmelade, Sand und Kakao. Zusammen dauert das Reiben gut zwanzig Sekunden, so lange, wie Händewaschen dauern soll. Dann wird abgespült, das Wasser geht aus, ein weiches Handtuch trocknet ab, und die sauberen Hände glänzen. Morgens trägt das Kind sein T-Shirt, abends den Schlafanzug. Ein Tippen aufs Bild lässt ein Monster kichern, und über die Leiste unten halten Große an oder springen zu jedem Schritt.",
+  },
+  {
     path: "/zaehne/",
     title: "Zähneputzen für Kinder – Zahnputzlied mit Timer",
     description:
@@ -484,6 +491,7 @@ export const NO_INDEX_PATHS = [
   "/management/bilder/",
   "/management/recherchen/",
   "/management/video-zaehne/",
+  "/management/video-haende/",
   "/management/video-intro/",
   "/management/video-outro/",
   "/management/video-toepfchen/",

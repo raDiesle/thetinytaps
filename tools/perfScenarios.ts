@@ -129,6 +129,19 @@ export const SCENARIOS: Scenario[] = [
     ],
   },
   {
+    // Hände waschen plays at once: sleeves, water and soap, then the rubbing with the foam and the monsters dissolving,
+    // and the rinse with the stream and the towel. The stretches follow the clock with no waits between them.
+    name: "haende-waschen",
+    path: "/haende-waschen/",
+    parts: [
+      { label: "Ärmel, Wasser, Seife", ms: 8500 },
+      { label: "Reiben: Handflächen und Handrücken", ms: 8500 },
+      { label: "Reiben: Monster antippen", ms: 8500, tap: { selector: ".hw-monster", every: 700 } },
+      { label: "Reiben: springen", ms: 6000, type: { keys: ["ArrowRight"], every: 2000 } },
+      { label: "Abspülen, Handtuch, Glanz", ms: 12000 },
+    ],
+  },
+  {
     name: "menues",
     path: "/",
     parts: [
