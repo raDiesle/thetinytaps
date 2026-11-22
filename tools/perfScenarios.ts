@@ -236,7 +236,7 @@ export const SCENARIOS: Scenario[] = [
   // The timer's pictures in their order on its start screen, each running for a while with a tap now and then (the
   // steam, the twinkling, the flame, what is left lighting up), the moon setting and the sun rising, the pizza's slices
   // lifted off, the ladybug crawling round the red disc, the alarm clock's digits ticking, the toy crane carrying toys
-  // into the box, in „Abwechseln“ the toy hopping onto the first cushion and the hourglass running, and on the Wippe the
+  // into the box, the toys hopping into their five boxes, the toy car driving on as the toys hop off the road rug, in „Abwechseln“ the toy hopping onto the first cushion and the hourglass running, and on the Wippe the
   // chick stepping along the plank as the seesaw tips slowly. Each card is tapped by its name (its
   // tooltip), so the cards' order and groups may change.
   ...(
@@ -248,13 +248,15 @@ export const SCENARIOS: Scenario[] = [
       ["blume", "Blume"],
       ["pizza", "Pizza"],
       ["wecker", "Wecker"],
-      // Tidy Up is English only so far, so its card is named so in the German app too.
-      ["aufraeumen", "Tidy Up"],
+      // Tidy Up, Five Boxes and the road rug were written English first; the German app names their cards in German since they were translated.
+      ["aufraeumen", "Aufräumen"],
+      ["kisten", "Fünf Kisten"],
+      ["strassenteppich", "Straßenteppich"],
       ["zug", "Zug zum Bahnhof"],
       ["raupe", "Raupe"],
       ["sonne", "Sonnenaufgang"],
       ["abwechseln", "Abwechseln"],
-      ["wippe", "Seesaw"],
+      ["wippe", "Wippe"],
     ] as const
   ).map(([name, title]) => ({
     name: `timer-${name}`,
@@ -280,7 +282,7 @@ export const SCENARIOS: Scenario[] = [
   {
     name: "timer-wippe-wechsel",
     path: "/timer/?sekunden=5",
-    parts: [{ label: "Wechsel", before: [{ tap: `.mode-card[title^="Seesaw"]` }, { wait: 500 }], ms: 10000, tap: { selector: ".tm-play", every: 1500 } }],
+    parts: [{ label: "Wechsel", before: [{ tap: `.mode-card[title^="Wippe"]` }, { wait: 500 }], ms: 10000, tap: { selector: ".tm-play", every: 1500 } }],
   },
   // A timer's last moments and its end, with the shortest length (10 s, the first slip): the bar along the bottom
   // filling, the warm light gathering from the edges, the bar's marker and flag beating, then the end's light and trophy.

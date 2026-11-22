@@ -20,7 +20,7 @@ request, November 2026; the middle rather than the end, user feedback, November 
 `GameMode.art`): the very drawing of a run (`SceneParts`), cut as for 5 minutes and started half of it ago, every
 animation in it put at that moment and then stopped (`holdAt`, `.tm-card-art.tm-still`), so the menu stands still. The cards come as wide as
 the picture (`ART_ASPECT`). Names are only read out and their tooltip. They stand in the order the user chose (November
-2026, `PICTURES`): Rote Scheibe, Sanduhr, Kerze, Apfelbaum, Blume, Pizza, Wecker, then Tidy Up and the others, on one frame with
+2026, `PICTURES`): Rote Scheibe, Sanduhr, Kerze, Apfelbaum, Blume, Pizza, Wecker, then Tidy Up, Five Boxes, Road Rug and the others, on one frame with
 no name; after all of them Abwechseln is a category of its own, named on its frame (`GameMode.kind`): its two children
 with the toy, the lamps and the hourglass, then the Wippe, and that they run on without end is said in their tooltip (`SWAP_NOTE`). Where there is
 room, its frame stands beside the pictures' rather than in a row of its own below (`packGroups`' `reserve`), so all
@@ -107,6 +107,34 @@ taken out (user request, November 2026). The pictures:
   were written English first and translated into every app language on 22 November 2026 (`tidyNames.ts`, their own
   part in `languageStatus.ts`); its lines wait for their recordings. The
   Aufräumlied (H-119, a fixed five minutes with a Suno song) is an idea of its own, not built.
+- „Five Boxes“ 📦 (`boxes.tsx`, H-120, user request, 22 November 2026: more timers for tidying up): five open boxes
+  stand against the wall side by side, red, green, blue, yellow and purple, each with its sort's picture on a round
+  label (block, car, ball, duck, book – the Tidy Up's own `ToyArt`), and in front of each its sort's toys lie on the rug
+  in different colours (`hue-rotate`). Box after box from the left, its toys hop into it one at a time in a high arc,
+  landing smaller side by side with their tops over the rim (`boxSlot`), and once its last is in, its lid folds shut
+  over its hinge – two layers, the half standing behind the toys shrinking to its edge and the half lying over them
+  growing from there (`Lid`, `LID_SHUT`). Each box is a fifth of the time, the last lid shuts as it is up
+  (`boxesPlan`): five minutes are five boxes, three toys each (`perBox`, `MIN_PER_BOX` to `MAX_PER_BOX`). No figure
+  throws them (see the rules): the toys hop by themselves, as Abwechseln's toy does. The toy whose turn comes wiggles
+  once a second while it waits (`Hopper`'s `waitFrom`). A hop is three small layers inside each other on keyframes
+  written for the run (`hop.tsx`: across at an even pace, up and down slower at the top and faster falling, smaller
+  from its foot), shared with the Road Rug; `keyframes.ts` writes them, as for the crane. A landing
+  clonks, a lid shutting knocks (both spaced); a tap makes a toy hop sound and lights the toys still on the floor.
+  Its name and lines (`boxesNames.ts`) were written English first and translated into every app language at once.
+- „Road Rug“ 🛣️ (`road.tsx`, H-122, user request, 22 November 2026): a green play rug lies on the floor with a winding
+  grey road (`ROAD`, `roadY`, swinging gently so nothing on it tilts more than a little, `roadTilt`), the Tidy Up's toy
+  car (`ToyArt`, bigger, `CAR`) at its chequered start line and a toy house with a chequered flag on its roof at its
+  end, the goal seen from the start (`HOUSE`); the toy box stands at the wall behind the rug (`ROAD_BOX`). Toys lie on
+  the road in the car's way (`roadToyX`, never a car among them). One after the other, from the nearest, a toy hops
+  into the box (`Hopper`, landing on its own place, `roadBoxSlot`), and as it lies there the car drives on along the
+  road to just behind the next (`carStop`), setting off gently and braking, tilting with the road (`carFrames`, one
+  keyframe every `ROAD_STEP` of road), with a little honk; after the last it drives home, arriving as the time is up
+  (`roadPlan`, each toy the same share of the time). The idea had the car drive the whole road only at the end; it
+  drives on with every toy instead, so the road coming free shows at every piece. Five minutes take eight toys
+  (`roadToyCount`, `MIN_ROAD_TOYS` to `MAX_ROAD_TOYS`: more would stand on each other on the road). The toy whose turn
+  comes wiggles once a second. The road and the house stay bright from afar (the way the time goes); a tap makes the
+  car's engine hum and lights the toys still on the road. Its name and lines (`roadNames.ts`) were written English
+  first and translated into every app language at once.
 - „Abwechseln“ 🔁 (H-52): two children take turns with a toy. The time set is one turn. Its hourglass is the
   Sanduhr's own (`Hourglass` in `scenes.tsx`, user request, November 2026: one drawing, never a second one built
   beside it), standing between two floor cushions (`SWAP_SEATS`, the same way left and right of it): the fox child's
@@ -164,7 +192,8 @@ Files: `TimerGame.tsx` (start screen: cards, minutes and the own time's slip), `
 run: working out its length, the question when a clock time is past, the clock, the phases `running` →
 `blow` (candle only) → `done`, taps, the end, the sounds of the pieces), `pieces.ts` (how a run is cut into pieces, the
 train's halts, where the apples hang; tested), `SwapPlay.tsx` and `swap.tsx` („Abwechseln“: its turns, and its room,
-lamps, cushions and toys), `seesaw.tsx` (the Wippe's playground, plank, stand and chick), `apples.tsx`, `caterpillar.tsx`, `clock.tsx`, `disc.tsx`, `flower.tsx`, `sunset.tsx`, `pizza.tsx`, `tidy.tsx` (one picture each; `tidyNames.ts` Tidy Up's texts), `shown.tsx`
+lamps, cushions and toys), `seesaw.tsx` (the Wippe's playground, plank, stand and chick), `apples.tsx`, `caterpillar.tsx`, `clock.tsx`, `disc.tsx`, `flower.tsx`, `sunset.tsx`, `pizza.tsx`, `tidy.tsx`, `boxes.tsx`, `road.tsx` (one picture each; `tidyNames.ts`, `boxesNames.ts` and `roadNames.ts` their texts), `hop.tsx` (a toy hopping
+into its box, shared), `keyframes.ts` (keyframes written for a run), `shown.tsx`
 („Zeit im Bild“: its choice, the note with digits or tally marks), `scenes.tsx` (the other drawings
 and the shared `Layer`, `Draw`, `LeftGlow`), `timer.css`, `content.ts`
 (names, order), `settings.ts`.
@@ -244,7 +273,7 @@ and the shared `Layer`, `Draw`, `LeftGlow`), `timer.css`, `content.ts`
 - **One drawing for one thing**: a thing two pictures show (the hourglass) is one component both use, never copied and
   drawn again with its own sizes (user request, November 2026; `timer.test.ts` checks the hourglass).
 - **The cards' order is the user's** (November 2026: Rote Scheibe, Sanduhr, Kerze, Apfelbaum, Blume, Pizza, then the
-  Wecker, then Tidy Up; Abwechseln last): keep it when adding a picture (a new one goes after these, before Abwechseln, unless the
+  Wecker, then Tidy Up, Five Boxes and Road Rug; Abwechseln last): keep it when adding a picture (a new one goes after these, before Abwechseln, unless the
   user says otherwise), and add it to the perf scenarios' list in `tools/perfScenarios.ts`, which taps each card by its
   name (`timer.test.ts` checks the order). Abwechseln is another thing to do than the pictures that run until the time
   is up – taking turns without end – so it stands in a group of its own after them (`GameMode.kind`, user request,

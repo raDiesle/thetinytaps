@@ -2346,6 +2346,93 @@
   transform: rotate(calc(var(--tm-side) * 24deg));
 }
 
+/* A toy hopping into its box (`hop.tsx`: Five Boxes): three layers inside each other, across, up and down, and its
+   size from its foot, each on keyframes written for the run; while it waits its turn it wiggles a second at a time. At
+   the end each stands where it landed. */
+.tm-hop {
+  will-change: transform;
+  animation: var(--tm-anim) var(--tm-ms) linear both;
+}
+
+.tm-hop-y,
+.tm-hop-s,
+.tm-hop-wait {
+  position: absolute;
+  inset: 0;
+}
+
+.tm-hop-s,
+.tm-hop-wait {
+  transform-origin: 50% 100%;
+}
+
+.tm-hop-wait > svg {
+  display: block;
+  width: 100%;
+  height: 100%;
+  overflow: visible;
+}
+
+.tm-hop-wait[data-waits] {
+  animation: tm-hop-wiggle 1s ease-in-out var(--tm-wait) var(--tm-waits);
+}
+
+@keyframes tm-hop-wiggle {
+  25% {
+    transform: rotate(-5deg);
+  }
+  50% {
+    transform: translateY(-5%) rotate(0deg);
+  }
+  75% {
+    transform: rotate(5deg);
+  }
+}
+
+.tm-done .tm-hop,
+.tm-done .tm-hop-wait {
+  animation: none;
+}
+
+.tm-done .tm-hop {
+  transform: var(--tm-end);
+}
+
+/* The road rug's car (H-122) rides on a hop's layer (.tm-hop) and tilts with the road round its wheels. */
+.tm-road-car {
+  transform-origin: 50% 100%;
+}
+
+.tm-road-car > svg {
+  display: block;
+  width: 100%;
+  height: 100%;
+  overflow: visible;
+}
+
+/* Five Boxes (H-120, boxes.tsx): each box's lid folds over its hinge, the half behind the toys shrinking to its edge,
+   then the half in front of them growing from it until it lies shut on the opening. */
+.tm-boxes-lid {
+  transform-origin: 50% 100%;
+  will-change: transform;
+  animation: var(--tm-anim) var(--tm-ms) linear both;
+}
+
+.tm-boxes-label {
+  position: absolute;
+}
+
+.tm-boxes-label > svg {
+  display: block;
+  width: 100%;
+  height: 100%;
+}
+
+.tm-done .tm-boxes-lid {
+  animation: none;
+  transform: var(--tm-end);
+}
+
 /* The bar along the bottom (`TimeBar`, user request, 22 November 2026): a paper track over nearly the whole width,
    filling from the start at the left to the flag at the right in the picture's own colour, a round marker at its
    front. Fill, way still to go and marker each move by one animation of `transform` as long as the run. Its sizes are
@@ -2423,6 +2510,18 @@
 .tm-play[data-picture="train"] .tm-bar {
   --tm-bar-a: #a5d8ff;
   --tm-bar-b: #339af0;
+}
+
+.tm-play[data-picture="boxes"] .tm-bar {
+  --tm-bar-a: #d0bfff;
+  --tm-bar-b: #9775fa;
+  --tm-bar-flag: #fcc419;
+}
+
+.tm-play[data-picture="road"] .tm-bar {
+  --tm-bar-a: #ced4da;
+  --tm-bar-b: #868e96;
+  --tm-bar-flag: #fa5252;
 }
 
 .tm-play[data-picture="caterpillar"] .tm-bar {

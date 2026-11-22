@@ -17,6 +17,10 @@ import {
   playClonk,
   playDing,
   playDrops,
+  playEngine,
+  playHonk,
+  playHop,
+  playKnock,
   playLeaves,
   playMelody,
   playPlink,
@@ -32,6 +36,8 @@ import { hush } from "@/lib/voice";
 import { useTimers } from "@/lib/timers";
 import { useWakeLock } from "@/lib/wakeLock";
 import { AppleScene } from "./apples";
+import { BoxesScene, boxesPlan, perBox } from "./boxes";
+import { RoadScene, roadPlan, roadToyCount } from "./road";
 import { FINAL_NOTES, FinalLight, finalMs, TimeBar, TimeBarChoice } from "./bar";
 import { CaterpillarScene } from "./caterpillar";
 import { ClockScene } from "./clock";
@@ -336,6 +342,10 @@ function TimerRun({
       return tidyTimes(total, toyCount(set))
         .slice(0, -1)
         .map((t) => t.land);
+    // Five Boxes (H-120): each toy landing in its box, and each lid shutting but the last, whose shutting is the end.
+    if (picture === "boxes") return boxMoments(total, perBox(set)).map((m) => m.at);
+    // The road rug (H-122): each toy landing in the box, and the car arriving behind the next toy, but home at the end.
+    if (picture === "road") return roadMoments(total, roadToyCount(set)).map((m) => m.at);
     // The ladybug leaves a dot as it is back at the top (H-67).
     if (picture === "disc") return pieceMoments(total, ladybugLaps(set).dots);
     return [];
@@ -381,6 +391,8 @@ function TimerRun({
           if (picture === "apple") playPlop();
           else if (picture === "pizza") playMunch();
           else if (picture === "tidy") playClonk();
+          else if (picture === "boxes") (boxMoments(total, perBox(set))[nextMoment.current - 1]?.lid ? playKnock : playClonk)();
+          else if (picture === "road") (roadMoments(total, roadToyCount(set))[nextMoment.current - 1]?.honk ? playHonk : playClonk)();
           else if (picture === "disc") playPlink(nextMoment.current);
           else playDing();
         }
@@ -400,7 +412,7 @@ function TimerRun({
       clearTimeout(timer);
       document.removeEventListener("visibilitychange", onVisible);
     };
-  }, [phase, endsAt, total, picture, moments, soonAt, finalAt, say]);
+  }, [phase, endsAt, total, picture, moments, soonAt, finalAt, say, set]);
 
   // The last seconds rise note by note, softly, the last one a second before the end, so the end's own sound follows.
   useEffect(() => {
@@ -430,6 +442,8 @@ function TimerRun({
       else if (picture === "pizza") playYum();
       else if (picture === "clock") playBeeps();
       else if (picture === "tidy") playClonk();
+      else if (picture === "boxes") playKnock();
+      else if (picture === "road") playHonk();
       say(lines.end, true);
       // The time is up, plain to see and hear (user feedback, November 2026): children cheer, the picture
       // lights up warmly, then the friendly tune – and the trophy with the end's buttons, nothing rising (user decision).
@@ -465,6 +479,10 @@ function TimerRun({
       else if (picture === "clock") playClick();
       // The crane's motor whirrs.
       else if (picture === "tidy") playWhirr();
+      // The toys still on the floor giggle with a little hop.
+      else if (picture === "boxes") playHop();
+      // The little car's engine hums.
+      else if (picture === "road") playEngine();
       else playChimeNote(Math.floor(Math.random() * 8));
     },
     [phase, picture, ripple, glow, endsAt, total, apples],
@@ -512,6 +530,24 @@ function TimerRun({
       </PlayOptions>
     </>
   );
+}
+
+/**
+ * Five Boxes' moments with a sound, in time order: each toy landing in its box (a clonk) and each lid shutting (a knock),
+ * but the last lid's, which is the end's own sound.
+ */
+function boxMoments(total: number, count: number): { at: number; lid: boolean }[] {
+  const { toys, lids } = boxesPlan(total, count);
+  return [...toys.map((t) => ({ at: t.hop.land, lid: false })), ...lids.slice(0, -1).map((l) => ({ at: l.shut, lid: true }))].sort((a, b) => a.at - b.at);
+}
+
+/**
+ * The road rug's moments with a sound, in time order: each toy landing in the box (a clonk) and the car arriving behind
+ * the next toy (a little honk), but its arrival home, which is the end's own sound.
+ */
+function roadMoments(total: number, count: number): { at: number; honk: boolean }[] {
+  const { toys, drives } = roadPlan(total, count);
+  return [...toys.map((t) => ({ at: t.hop.land, honk: false })), ...drives.slice(0, -1).map((d) => ({ at: d.arrive, honk: true }))].sort((a, b) => a.at - b.at);
 }
 
 /** The stage's lengths for the CSS: the run's, its seconds, the train's way, and the train's own keyframes when it halts. */
@@ -568,6 +604,8 @@ export function SceneParts({
       {picture === "disc" && <DiscScene glow={poke} total={total} set={set} />}
       {picture === "pizza" && <PizzaScene glow={poke} />}
       {picture === "tidy" && <TidyScene count={toyCount(set)} total={total} glow={poke} />}
+      {picture === "boxes" && <BoxesScene count={perBox(set)} total={total} glow={poke} />}
+      {picture === "road" && <RoadScene count={roadToyCount(set)} total={total} glow={poke} />}
       {picture === "clock" && <ClockScene glow={poke} endsAt={startedAt + total} total={total} running={phase === "running"} still={still} />}
       {picture === "flower" && <FlowerScene glow={poke} total={total} />}
       {picture === "sunset" && <SunsetScene glow={poke} />}

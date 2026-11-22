@@ -1,5 +1,7 @@
 import type { Localized, Texts } from "@/lib/language";
 import type { TimerPicture, TurnPicture } from "./settings";
+import { BOXES_NAME } from "./boxesNames";
+import { ROAD_NAME } from "./roadNames";
 import { TIDY_NAME } from "./tidyNames";
 
 /** The game's name, on its start screen, its spine on the shelf and in the browser tab. */
@@ -52,6 +54,10 @@ export const PICTURES: { id: TimerPicture; emoji: string; name: Texts }[] = [
   { id: "clock", emoji: "⏰", name: { de: "Wecker", en: "Alarm Clock", zh: "闹钟", hi: "अलार्म घड़ी", es: "Despertador", ar: "المنبّه", ru: "Будильник" } },
   // Tidy Up (H-118): a toy crane puts the toys into the box, best at five minutes; written English first, translated on 22 November 2026.
   { id: "tidy", emoji: "🧸", name: TIDY_NAME },
+  // Five Boxes (H-120, 22 November 2026): a box for each sort, its toys hopping in and its lid shutting, one a minute at five minutes.
+  { id: "boxes", emoji: "📦", name: BOXES_NAME },
+  // The road rug (H-122, 22 November 2026): toys hop off a play rug's road into the box, and the toy car drives on to the next one.
+  { id: "road", emoji: "🛣️", name: ROAD_NAME },
   {
     id: "train",
     emoji: "🚂",

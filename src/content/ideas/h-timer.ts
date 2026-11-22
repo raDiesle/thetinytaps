@@ -416,6 +416,9 @@ export const timerIdeas: IdeaArea = {
       text: "Fünf bunte Kisten nebeneinander, jede für eine Sorte (Bausteine, Autos, Bälle, Kuscheltiere, Bücher). In jeder Minute füllt sich eine Kiste mit ihrer Sorte, Stück für Stück, und am Ende der Minute klappt ihr Deckel zu. Nach fünf Minuten sind alle Deckel zu.",
       why: "Fünf Minuten werden zu fünf sichtbaren Stücken: „Noch zwei Kisten“ versteht ein Kind ohne Uhr. Und Große können sagen: „Jetzt die Autos“, während die Autokiste dran ist.",
       effort: "M",
+      done: true,
+      partial:
+        "Gebaut als Bild „Fünf Kisten“ (Five Boxes) im Timer (22. November 2026, boxes.tsx): fünf offene Kisten in Rot, Grün, Blau, Gelb und Lila an der Wand, vorne auf jeder ein rundes Schild mit ihrer Sorte (Bauklotz, Auto, Ball, Ente, Buch – die Spielsachen von „Aufräumen“), davor liegen auf dem Teppich die Sachen jeder Sorte in verschiedenen Farben. Kiste für Kiste von links hüpft ein Spielzeug nach dem anderen in hohem Bogen in seine Kiste (hop.tsx, ohne Figur, die es wirft), und ist das letzte drin, klappt der Deckel zu – der letzte, wenn die Zeit um ist. Bei 5 Minuten drei Sachen je Kiste, sonst zwei bis vier. Das Spielzeug, das als Nächstes dran ist, wackelt jede Sekunde. Name und Sätze Englisch zuerst und in alle sieben Sprachen übersetzt, Aufnahmen folgen auf Wunsch.",
     },
     {
       id: "H-121",
@@ -432,6 +435,9 @@ export const timerIdeas: IdeaArea = {
       text: "Von oben gesehen liegt ein Spielteppich mit Straßen voller Spielsachen. Mit jedem Stück, das in die Kiste kommt, wird ein Stück Straße frei. Ist alles weg, fährt ein kleines Auto einmal die ganze freie Straße entlang.",
       why: "Das Freiwerden ist die Belohnung, die Kinder vom echten Aufräumen kennen: Jetzt ist Platz zum Spielen.",
       effort: "M",
+      done: true,
+      partial:
+        "Gebaut als Bild „Straßenteppich“ (Road Rug) im Timer (22. November 2026, road.tsx): ein grüner Spielteppich mit einer kurvigen Straße, vorne an der Startlinie das Spielzeugauto von „Aufräumen“, am Ende ein Spielzeughaus mit Zielflagge auf dem Dach (von Anfang an zu sehen), an der Wand die Spielzeugkiste. Die Spielsachen liegen dem Auto im Weg; eins nach dem anderen hüpft von der Straße in die Kiste, und sobald es drin ist, fährt das Auto bis zum nächsten vor (statt erst am Ende die ganze Straße entlang – so sieht man den Fortschritt bei jedem Stück) und hupt leise. Nach dem letzten fährt es nach Hause, wenn die Zeit um ist. Bei 5 Minuten acht Spielsachen, sonst vier bis acht. Das Spielzeug, das als Nächstes dran ist, wackelt jede Sekunde. Name und Sätze Englisch zuerst und in alle sieben Sprachen übersetzt, Aufnahmen folgen auf Wunsch.",
     },
     {
       id: "H-123",
