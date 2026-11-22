@@ -2,19 +2,24 @@ import { Suspense, use, useCallback, useEffect, useState, type PointerEvent } fr
 import { useLocation } from "react-router";
 import { FeedbackLayer, useTapFeedback } from "@/components/TapFeedback";
 import { GameEnd } from "@/components/GameEnd";
-import { useLevelOnScreen } from "@/components/GameShell";
+import { useCountsPlaytime, useLevelOnScreen } from "@/components/GameShell";
 import { PageLoading } from "@/components/PageLoading";
 import { useNoBackgroundMusic } from "@/lib/backgroundMusic";
 import { playLullaby, playMelody } from "@/lib/sfx";
 import { type Localized, pick, useAppLanguage } from "@/lib/language";
+import { turnPageWith } from "@/lib/look";
+import { countGame } from "@/lib/playtime";
 import { savesData } from "@/lib/pwa";
+import { useStore } from "@/lib/store";
 import { useTimers } from "@/lib/timers";
 import { awardTrophy, gameOfPath } from "@/lib/trophies";
 import { type LevelEntry, LEVELS, loadLevel, prefetchLevel, RUNS } from "./catalog";
 import { LEVEL_TEXTS } from "./content";
-import { useAnyKey, type LevelProps } from "./level";
+import { paused, useAnyKey, type LevelProps } from "./level";
+import { PauseVeil } from "./PauseVeil";
 import type { MarbleLevel, MarbleSettings } from "./settings";
 import { marblesVoice } from "./voice";
+import previews from "./vorschau/*.webp?glob";
 import "./marbles.css";
 
 /** The levels in turn, beginning with the chosen one (`/kettenreaktion/garden/` opens that one), so „Weiter“ always has a next. */
@@ -52,6 +57,7 @@ export function MarblePlay({ settings }: { settings: MarbleSettings }) {
   // „Weiter“ plays the next level without changing the card picked: the address names the one on screen.
   useLevelOnScreen(level.id);
   const { effects, ripple } = useTapFeedback();
+  const isPaused = useStore(paused);
   // The marble runs play their own notes and scales, and the good-night machine its music box: a song on top would clash with them.
   useNoBackgroundMusic(RUNS.includes(level.id) || level.id === "night");
   const { later } = useTimers();
@@ -87,6 +93,16 @@ export function MarblePlay({ settings }: { settings: MarbleSettings }) {
   };
   const again = () => startLevel(index);
   const goOn = () => startLevel(index + 1);
+  // From the pause the next level comes on a new page, as from a level's end; it gives no trophy, but starts one more game.
+  const counts = useCountsPlaytime();
+  const skip = () => {
+    paused.set(false);
+    if (!savesData()) prefetchLevel(next);
+    if (counts) countGame();
+    turnPageWith("forward", goOn);
+  };
+  const nextName = pick(LEVEL_TEXTS[next.id].name, language.id);
+  const nextPicture = previews[`${next.id}.webp`];
 
   // Keys start each level, so a key goes on after one too.
   useAnyKey(() => {
@@ -99,12 +115,15 @@ export function MarblePlay({ settings }: { settings: MarbleSettings }) {
   };
 
   return (
-    <div className={`marble-play${party ? " party" : ""}`} data-level={level.id} onPointerDown={onPointerDown}>
+    <div className={`marble-play${party ? " party" : ""}${isPaused ? " paused" : ""}`} data-level={level.id} onPointerDown={onPointerDown}>
       {/* The paper with the paw track while the level's code still loads – never a dark screen. */}
       <Suspense fallback={<PageLoading />}>
         <PlayedLevel key={round} entry={level} sound={play} say={say} onDone={onDone} onGoal={onGoal} watch={settings.play === "watch"} />
       </Suspense>
-      {ended && <GameEnd level={level.id} onAgain={again} next={{ name: pick(LEVEL_TEXTS[next.id].name, language.id), onNext: goOn }} />}
+      {/* Pause at any moment of a level, and from there skip it; not during the party or at the end. */}
+      {!party && !ended && <PauseVeil next={nextPicture} nextName={nextName} onSkip={skip} />}
+      {/* Children don't read: „Weiter“ shows the next level's picture, „Nochmal“ the round arrow (user request, November 2026). */}
+      {ended && <GameEnd level={level.id} onAgain={again} next={{ name: nextName, onNext: goOn, picture: nextPicture }} />}
       <FeedbackLayer effects={effects} />
     </div>
   );

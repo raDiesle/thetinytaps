@@ -1,5 +1,6 @@
 import { type CSSProperties, useEffect, useRef, useState } from "react";
 import { type Localized, useT } from "@/lib/language";
+import { createStore } from "@/lib/store";
 import { LEVEL_TEXTS } from "./content";
 import type { MarbleLevel } from "./settings";
 
@@ -118,9 +119,10 @@ export function useFrames(step: (dt: number, now: number) => boolean) {
   useEffect(() => {
     let frame = 0;
     const draw = () => setFrame((f) => f + 1);
-    const tick = frameTicker((dt, now) => stepRef.current(dt, now), draw, performance.now());
-    const loop = (now: number) => {
-      tick(now);
+    const tick = frameTicker((dt, now) => stepRef.current(dt, now), draw, levelNow());
+    // While paused no step runs, so nothing moves, sounds or ends; `now` is the level clock, which stands still meanwhile.
+    const loop = () => {
+      if (!paused.get()) tick(levelNow());
       frame = requestAnimationFrame(loop);
     };
     frame = requestAnimationFrame(loop);
@@ -138,12 +140,98 @@ export function useAnyKey(onKey: (e: KeyboardEvent) => void) {
   ref.current = onKey;
   useEffect(() => {
     const onKeyDown = (e: KeyboardEvent) => {
-      if (e.key === "Escape" || e.repeat) return;
+      // While paused a key only goes on with the level (`PauseVeil`), never into it.
+      if (e.key === "Escape" || e.repeat || paused.get()) return;
       ref.current(e);
     };
     window.addEventListener("keydown", onKeyDown);
     return () => window.removeEventListener("keydown", onKeyDown);
   }, []);
+}
+
+/*
+ * Pause (user request, November 2026: „jederzeit Pause drücken oder ein Level überspringen“). A level runs on the level
+ * clock: the wall's time without the time spent paused. While paused, `useFrames` runs no step and the level timers
+ * wait, so a machine, a falling marble, a sound or a level's end all hold where they are and go on from there. A level
+ * never reads `performance.now()` or `Date.now()` itself and never waits with `setTimeout`: it takes `now` from
+ * `useFrames`, `levelNow()` in a tap's handler, and `later` of `useLevelTimers` (`pause.test.ts`).
+ */
+
+/** Whether the level on screen is paused. */
+export const paused = createStore(false);
+/** When the pause began (wall time), and how long earlier pauses lasted together. */
+let pausedSince = 0;
+let pausedFor = 0;
+paused.subscribe(() => {
+  if (paused.get()) pausedSince = performance.now();
+  else pausedFor += performance.now() - pausedSince;
+});
+
+/** The level clock in milliseconds: the wall's time minus every pause, standing still while paused. */
+export const levelNow = () => (paused.get() ? pausedSince : performance.now()) - pausedFor;
+
+/** A handle of `later`, to drop that one wait early. */
+export interface LevelTimer {
+  cancel: () => void;
+}
+
+/**
+ * Waits on the level clock, dropped when the level is left (like `useTimers`) and held while paused: `later(fn, ms)`
+ * calls `fn` once the level has run `ms` more milliseconds. Stable from render to render.
+ */
+export function useLevelTimers() {
+  const [timers] = useState(levelTimerSet);
+  useEffect(() => timers.clearAll, [timers]);
+  return timers;
+}
+
+/** The part of `useLevelTimers` that needs no component. */
+export function levelTimerSet() {
+  interface Wait {
+    fn: () => void;
+    due: number;
+    timer?: ReturnType<typeof setTimeout>;
+  }
+  const waits = new Set<Wait>();
+  const arm = (wait: Wait) => {
+    wait.timer = setTimeout(
+      () => {
+        waits.delete(wait);
+        wait.fn();
+      },
+      Math.max(0, wait.due - levelNow()),
+    );
+  };
+  const stop = (wait: Wait) => {
+    if (wait.timer !== undefined) clearTimeout(wait.timer);
+    wait.timer = undefined;
+  };
+  // Paused, every wait stops; going on, each is set again for what was left of it.
+  let unsubscribe: (() => void) | undefined;
+  const follow = () => {
+    if (unsubscribe || waits.size === 0) return;
+    unsubscribe = paused.subscribe(() => waits.forEach((wait) => (paused.get() ? stop(wait) : arm(wait))));
+  };
+  return {
+    later(fn: () => void, ms: number): LevelTimer {
+      const wait: Wait = { fn, due: levelNow() + ms };
+      waits.add(wait);
+      if (!paused.get()) arm(wait);
+      follow();
+      return {
+        cancel: () => {
+          stop(wait);
+          waits.delete(wait);
+        },
+      };
+    },
+    clearAll() {
+      waits.forEach(stop);
+      waits.clear();
+      unsubscribe?.();
+      unsubscribe = undefined;
+    },
+  };
 }
 
 /** The level's name in the app language, for its picture's label. */

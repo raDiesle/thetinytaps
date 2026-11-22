@@ -40,7 +40,7 @@
   font-size: clamp(1.4rem, 8vh, 2.8rem);
 }
 
-/* Words only, no emoji or symbols (user feedback, November 2026). */
+/* No emoji (user feedback, November 2026): words, or where the game hands over the next picture that and the drawn round arrow. */
 .game-end-button {
   position: relative;
   padding: 0.35em 0.9em 0.4em;
@@ -77,6 +77,39 @@
   white-space: normal;
   font-size: 0.5em;
   -webkit-text-stroke: 0.08em var(--ink);
+}
+
+/* „Weiter“ as the next level's picture (`next.picture`, children don't read; user request, November 2026): a photo of
+   it taped onto the page, as big as the trophy beside it allows, the painted label's colour only as its frame. */
+.game-end-button.next.pictured {
+  display: block;
+  padding: clamp(5px, 1.2vh, 10px);
+  border-radius: 14px;
+  background: #fff;
+  rotate: -2deg;
+}
+
+.game-end-next-picture {
+  display: block;
+  height: clamp(90px, 34vh, 280px);
+  aspect-ratio: 3 / 2;
+  border-radius: 8px;
+  object-fit: cover;
+  pointer-events: none;
+}
+
+/* „Nochmal“ as the drawn round arrow beside it, on the same paper slip. */
+.game-end-button.again.arrow {
+  display: grid;
+  place-items: center;
+  padding: 0.2em;
+  border-radius: 50%;
+}
+
+.game-end-again-arrow {
+  display: block;
+  width: clamp(56px, 14vh, 100px);
+  height: clamp(56px, 14vh, 100px);
 }
 
 /* „Menü“ (`menu`): the ribbon's round label with the shelf and the yellow arrow beside the word, so it looks like the

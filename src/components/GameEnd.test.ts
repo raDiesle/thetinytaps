@@ -1,12 +1,17 @@
 import { expect, test } from "bun:test";
 
 // The end buttons once showed 🔁, the next level's emoji and ▶, which the user found ugly (November 2026): „Menü“,
-// „Nochmal“ and „Weiter“ are words only, told apart by size and colour.
-test("the end of a level shows words only, no emoji or symbols", async () => {
+// „Nochmal“ and „Weiter“ are words, told apart by size and colour – or, where a game hands over the next level's
+// picture (Kettenreaktion, user request, November 2026: children don't read), that picture and the drawn round arrow.
+test("the end of a level shows words or the next level's picture, never an emoji", async () => {
   const source = await Bun.file("src/components/GameEnd.tsx").text();
   expect(source).not.toMatch(/\p{Extended_Pictographic}|[▶►→]/u);
   // The one picture there is the ribbon's shelf label on „Menü“, the way back drawn as in the corner (ShelfLabelArt).
   expect(source).not.toMatch(/<svg|<MenuIcon|\bemoji[:?}]/);
+  // The picture and the arrow come together, only where `next.picture` is given.
+  expect(source).toContain("const pictured = Boolean(next?.picture);");
+  expect(source).toContain('{pictured ? <ControlIcon kind="again"');
+  expect(source).toMatch(/<img className="game-end-next-picture" src=\{next\.picture\}/);
 });
 
 // Zähne putzen and Gefühle had end buttons of their own (🔁, round symbols without words): every end is `GameEnd`, and

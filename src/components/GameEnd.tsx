@@ -14,6 +14,7 @@ import { museumHref, TROPHY_ROOM } from "@/lib/museum";
 import { recordedVoice } from "@/lib/voice";
 import { TapHint } from "@/components/TapHint";
 import { Trophy } from "@/components/Trophy";
+import { ControlIcon } from "@/components/ControlIcon";
 import endFiles from "./stimme/**/*.mp3?glob";
 
 /**
@@ -59,7 +60,15 @@ interface GameEndProps {
    * The next level, after the last one the first again, and its name, read out with „Weiter“. Left out only where there
    * is no other level, so „Weiter“ would just be „Nochmal“.
    */
-  next?: { name?: string; onNext: () => void };
+  next?: {
+    name?: string;
+    onNext: () => void;
+    /**
+     * The next level's picture (its menu card's cut, `vorschau/<id>.webp`): „Weiter“ shows it instead of the word, and
+     * „Nochmal“ is the round arrow – children don't read (user request for Kettenreaktion, November 2026).
+     */
+    picture?: string;
+  };
   /** Waits this long before showing up, so the party can be watched first. */
   delayMs?: number;
   /**
@@ -89,7 +98,9 @@ interface GameEndProps {
  * level's trophy, won now or before (Trophy.tsx, user decision, November 2026): handed over big in the middle with
  * „Geschafft!“, then on its board beside them (`AWARD_MS`). Nothing else stands beside
  * them: a fox or bear family cheering there (D-12) was only decoration a child wanted to tap, and was taken out again
- * (user feedback, November 2026). Words only, no emoji or symbols (user feedback, November 2026): „Weiter“ is a big painted label, „Nochmal“ a smaller paper slip beside it. The way back is
+ * (user feedback, November 2026). No emoji (user feedback, November 2026): „Weiter“ is a big painted label, „Nochmal“ a smaller paper slip beside it –
+ * or, where the game hands over the next level's picture (`next.picture`), that picture taped on as „Weiter“ and the
+ * drawn round arrow as „Nochmal“, since children don't read (user request, November 2026). The way back is
  * no button here but the page's corner in the top left, as in every menu – the ✕, or the book's ribbon where the game
  * goes back onto the shelf (GameShell, told by `useEndShown`; a „Menü“ button was one way back too many, user feedback,
  * November 2026). Only Zähne putzen and Aufs Töpfchen, played once and done, show „Menü“ instead of „Nochmal“ (`menu`),
@@ -200,6 +211,9 @@ export function GameEnd({ onAgain, menu = false, next, delayMs = 0, corners = fa
 
   if (!shown) return null;
 
+  // The next level's picture for „Weiter“ and the round arrow for „Nochmal“, where the game hands one over.
+  const pictured = Boolean(next?.picture);
+
   // Pointer down, not click: it reacts right away, and the game underneath doesn't get the tap.
   // „Nochmal“ and „Weiter“ each start one more game, for a game limit.
   const press = (event: "nochmal" | "weiter", action: () => void) => {
@@ -281,8 +295,13 @@ export function GameEnd({ onAgain, menu = false, next, delayMs = 0, corners = fa
           </button>
         ) : (
           onAgain && (
-            <button type="button" className="game-end-button again" {...press("nochmal", onAgain)}>
-              {t(AGAIN)}
+            <button
+              type="button"
+              className={`game-end-button again${pictured ? " arrow" : ""}`}
+              aria-label={pictured ? t(AGAIN) : undefined}
+              {...press("nochmal", onAgain)}
+            >
+              {pictured ? <ControlIcon kind="again" className="game-end-again-arrow" /> : t(AGAIN)}
             </button>
           )
         )}
@@ -290,13 +309,17 @@ export function GameEnd({ onAgain, menu = false, next, delayMs = 0, corners = fa
       {next && (
         <button
           type="button"
-          className="game-end-button next"
+          className={`game-end-button next${pictured ? " pictured" : ""}`}
           aria-label={[t({ de: "Weiter", ru: "Дальше", en: "Next", zh: "下一个", hi: "आगे", es: "Siguiente", ar: "التالي" }), next.name]
             .filter(Boolean)
             .join(": ")}
           {...press("weiter", next.onNext)}
         >
-          {t({ de: "Weiter", ru: "Дальше", en: "Next", zh: "下一个", hi: "आगे", es: "Siguiente", ar: "التالي" })}
+          {pictured ? (
+            <img className="game-end-next-picture" src={next.picture} alt="" draggable={false} />
+          ) : (
+            t({ de: "Weiter", ru: "Дальше", en: "Next", zh: "下一个", hi: "आगे", es: "Siguiente", ar: "التالي" })
+          )}
           {showNext && next.name && <span className="game-end-next-name">{next.name}</span>}
         </button>
       )}

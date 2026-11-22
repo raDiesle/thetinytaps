@@ -775,9 +775,12 @@ A game may give it before its end where reaching the goal once is enough (Ketten
   the ✕ while the end is shown (`useEndShown`, GameShell); there it takes one tap even where ✕ is held while playing.
   The one exception are Zähne putzen and Aufs Töpfchen, done once played: they show „Menü“ instead of „Nochmal“
   (`GameEnd menu`), a paper slip with the ribbon's round shelf label beside the word, so it looks like the way back in
-  the corner (user request, November 2026; `GameEnd.test.ts` keeps it to those two). They are words only, never an emoji, a symbol or the next level's picture (🔁, ▶
+  the corner (user request, November 2026; `GameEnd.test.ts` keeps it to those two). They are words, never an emoji (🔁, ▶
   and the level's emoji looked bad, user feedback, November 2026; `GameEnd.test.ts`): „Weiter“, what most want next, is
-  a big painted label taped onto the page, „Nochmal“ a smaller paper slip beside it. So a start screen has no „all in turn“ card (`GameMode` has no such kind):
+  a big painted label taped onto the page, „Nochmal“ a smaller paper slip beside it – or, where a game hands over the
+  next level's picture (`next.picture`, its menu card's cut from `vorschau/`), that picture taped on as „Weiter“ and the
+  drawn round arrow (`ControlIcon`) as „Nochmal“, since children don't read (user request for Kettenreaktion, 22
+  November 2026). So a start screen has no „all in turn“ card (`GameMode` has no such kind):
   the picked level plays first and „Weiter“ goes on from there. A game with only one level or story leaves „Weiter“ out (`next` is optional):
   two buttons doing the same thing confuse. A game that flows on from round to round by itself (Socken-Paare: the next
   wash comes on its own) has no end to show it at; it counts each round as a game itself (`gameEnded`, `countGame`). No game draws its own end buttons: one that places them in its own layout (Gefühle's

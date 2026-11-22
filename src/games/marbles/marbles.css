@@ -100,3 +100,93 @@
     opacity: 1;
   }
 }
+
+/*
+ * Pause (PauseVeil.tsx, user request, November 2026): a round paper button in the bottom right corner, its two bars
+ * drawn in the book's ink like Zähne putzen's (`ControlIcon`). Paused, a veil darkens the picture with the big ▶ to go
+ * on and the next level's picture to skip to it, side by side and no words; the level's own CSS animations stand still.
+ */
+.marble-pause-button,
+.marble-pause-go-on {
+  display: grid;
+  place-items: center;
+  padding: 0;
+  border: 2.5px solid var(--ink);
+  border-radius: 50%;
+  background: radial-gradient(circle at 38% 30%, #fff 45%, #f1e8d4);
+  box-shadow:
+    inset 0 -3px 0 #3d30451f,
+    0 2px 4px #2a1e5c44;
+  cursor: pointer;
+  touch-action: manipulation;
+}
+
+.marble-pause-button {
+  position: absolute;
+  right: max(14px, env(safe-area-inset-right));
+  bottom: max(14px, env(safe-area-inset-bottom));
+  z-index: 9;
+  width: clamp(46px, 8vmin, 62px);
+  height: clamp(46px, 8vmin, 62px);
+}
+
+.marble-pause-icon {
+  width: 62%;
+  height: 62%;
+}
+
+.marble-pause {
+  position: absolute;
+  inset: 0;
+  z-index: 9;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: clamp(24px, 7vw, 90px);
+  background: #1d1438a8;
+}
+
+.marble-pause-go-on {
+  width: clamp(110px, 30vmin, 220px);
+  height: clamp(110px, 30vmin, 220px);
+  border-width: 4px;
+}
+
+.marble-pause-play {
+  width: 60%;
+  height: 60%;
+  translate: 5% 0;
+}
+
+/* The next level's picture, taped on like „Weiter“ at a level's end. */
+.marble-pause-skip {
+  padding: clamp(5px, 1.2vh, 10px);
+  border: var(--outline);
+  border-radius: 14px;
+  background: #fff;
+  box-shadow: var(--lift);
+  rotate: -2deg;
+  cursor: pointer;
+  touch-action: manipulation;
+}
+
+.marble-pause-skip img {
+  display: block;
+  height: clamp(90px, 34vh, 280px);
+  aspect-ratio: 3 / 2;
+  border-radius: 8px;
+  object-fit: cover;
+  pointer-events: none;
+}
+
+.marble-pause-button:active,
+.marble-pause-go-on:active,
+.marble-pause-skip:active {
+  translate: 0 2px;
+}
+
+/* Paused, what a level moves by CSS stands still with its clock. */
+.marble-play.paused :is(.marble-level, .run-level),
+.marble-play.paused :is(.marble-level, .run-level) * {
+  animation-play-state: paused !important;
+}
