@@ -3,6 +3,7 @@ import type { TimerPicture, TurnPicture } from "./settings";
 import { BLOCKS_NAME } from "./blocksNames";
 import { BOXES_NAME } from "./boxesNames";
 import { TUNNEL_NAME } from "./tunnelNames";
+import { JUMP_NAME } from "./jumpNames";
 import { ROAD_NAME } from "./roadNames";
 import { TIDY_NAME } from "./tidyNames";
 
@@ -64,6 +65,8 @@ export const PICTURES: { id: TimerPicture; emoji: string; name: Texts }[] = [
   { id: "blocks", emoji: "🧱", name: BLOCKS_NAME },
   // The treasure tunnel (H-126, 22 November 2026), the second like a block world played by itself: a tunnel dug block by block to a chest.
   { id: "tunnel", emoji: "⛏️", name: TUNNEL_NAME },
+  // Hop to the Flag (H-127, 22 November 2026), the first game look that is no block world: a jump-and-run, a hopper catching a trail of stars on its way to the flag.
+  { id: "jump", emoji: "🏃", name: JUMP_NAME },
   {
     id: "train",
     emoji: "🚂",

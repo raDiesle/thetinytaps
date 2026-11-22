@@ -116,6 +116,13 @@ export const LANGUAGE_STATUS: LanguageStatusRow[] = [
         note: "Das zweite Bild im Stil einer Klötzchenwelt, in dem eine Spitzhacke Klotz für Klotz einen Tunnel zur Schatzkiste gräbt (H-126, tunnel.tsx, 22. November 2026), Englisch zuerst geschrieben und gleich in alle Sprachen übersetzt: sein Name „Treasure Tunnel“ („Schatztunnel“) und seine zwei Sätze am Anfang und am Ende (tunnelNames.ts). Aufgenommen ist noch nichts (bun run voice make --only timer, nur auf Wunsch), bis dahin bleibt es still. Die Texte für Suchmaschinen nennen es in allen sieben Sprachen.",
         files: ["src/games/timer/tunnelNames.ts"],
       },
+      {
+        label: "🏃 Hop to the Flag",
+        languages: { de: "text", en: "text", zh: "text", hi: "text", es: "text", ar: "text", ru: "text" },
+        recorded: true,
+        note: "Das dritte Spiel-Video-Bild und das erste, das keine Klötzchenwelt ist: ein Jump'n'Run, in dem ein kleiner Hüpfer Stern für Stern bis zur Fahne auf dem Hügel springt (H-127, jump.tsx, 22. November 2026), Englisch zuerst geschrieben und gleich in alle Sprachen übersetzt: sein Name „Hop to the Flag“ („Hüpf zur Fahne“) und seine zwei Sätze am Anfang und am Ende (jumpNames.ts). Aufgenommen ist noch nichts (bun run voice make --only timer, nur auf Wunsch), bis dahin bleibt es still. Die Texte für Suchmaschinen nennen es in allen sieben Sprachen.",
+        files: ["src/games/timer/jumpNames.ts"],
+      },
     ],
   },
   {

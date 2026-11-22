@@ -58,6 +58,23 @@ import {
   TUNNEL,
   tunnelPlan,
 } from "./tunnel";
+import {
+  FLAG,
+  GROUND,
+  HOP_H,
+  HOP_MS,
+  hopCount,
+  ISLANDS,
+  jumpPlan,
+  MAX_HOPS,
+  MIN_HOPS,
+  POLE,
+  RUNNER,
+  runnerFrames,
+  SPOTS as HOP_SPOTS,
+  STAR,
+  starAt,
+} from "./jump";
 import { BOX_COUNT, BOXES, boxesPlan, boxLeft, boxSlot, floorPlaces, IN_BOX, LID_H, MAX_PER_BOX, MIN_PER_BOX, OPENING, perBox, TOY as BOX_TOY } from "./boxes";
 import { BITE_R, BUTTERFLY, biteSpot, bodyFront, frontAfter, LEAF, LEAF_FLOOR, leafLeft, leafShape, leafSpan, planBites, REACH } from "./caterpillar";
 import { DISC, DOTS, dotAt } from "./disc";
@@ -831,6 +848,59 @@ describe("Timer", () => {
     const css = await Bun.file(new URL("./timer.css", import.meta.url)).text();
     for (const part of ["tunnel-block", "tunnel-crack", "tunnel-swing", "tunnel-pick", "tunnel-cracks", "tunnel-lid", "tunnel-light"])
       expect(css, part).toMatch(new RegExp(`\\.tm-done \\.tm-${part}[,\\s{]`));
+  });
+
+  test("Hop to the Flag: every hop at five minutes, each landing at the end of its share, the last as the time is up, its star caught at the top of the arc (H-127)", () => {
+    expect(hopCount(5 * 60_000)).toBe(MAX_HOPS);
+    expect(hopCount(10_000)).toBe(MIN_HOPS);
+    expect(hopCount(3 * 3600_000)).toBe(MAX_HOPS);
+    for (const total of [10_000, 60_000, 5 * 60_000, 3 * 3600_000]) {
+      const { first, unit, hops } = jumpPlan(total, hopCount(total));
+      expect(first + hops.length).toBe(MAX_HOPS);
+      for (const [i, h] of hops.entries()) {
+        expect(h.k).toBe(first + i);
+        expect(h.land).toBeCloseTo((i + 1) * unit);
+        // A hop takes a moment, never more than half its share, and the star is caught in its middle.
+        expect(h.land - h.start).toBeLessThanOrEqual(Math.min(HOP_MS, unit / 2) + 1e-6);
+        expect(h.star).toBeGreaterThan(h.start);
+        expect(h.star).toBeLessThan(h.land);
+      }
+      expect(hops.at(-1)?.land).toBeCloseTo(total);
+      // The keyframes go forward in time, so the hopper never jumps back.
+      const { across, upDown } = runnerFrames(first, hops);
+      for (const frames of [across, upDown]) for (let i = 1; i < frames.length; i++) expect(frames[i].at).toBeGreaterThanOrEqual(frames[i - 1].at);
+    }
+  });
+
+  test("Hop to the Flag: the way goes left to right, the hopper, its stars and the flag stay on every screen, and the flag waiting at the pole never stands behind the hopper (H-127)", () => {
+    for (let k = 1; k < HOP_SPOTS.length; k++) {
+      const hop = HOP_SPOTS[k].x - HOP_SPOTS[k - 1].x;
+      // Each hop goes on to the right, far enough to be seen as a hop, never further than a hopper can leap.
+      expect(hop).toBeGreaterThanOrEqual(55);
+      expect(hop).toBeLessThanOrEqual(2 * RUNNER);
+      expect(Math.abs(HOP_SPOTS[k].y - HOP_SPOTS[k - 1].y)).toBeLessThan(HOP_H + 20);
+    }
+    // Within what a tablet shows (x 200–1400 less the paper's margin) and above a phone's cut-off.
+    expect(HOP_SPOTS[0].x - RUNNER / 2).toBeGreaterThanOrEqual(235);
+    expect(HOP_SPOTS.at(-1)!.x + RUNNER / 2).toBeLessThanOrEqual(POLE.x - FLAG.w);
+    expect(POLE.x).toBeLessThanOrEqual(RIGHT_EDGE);
+    for (const s of HOP_SPOTS) expect(s.y).toBeLessThanOrEqual(GROUND);
+    for (let k = 0; k < MAX_HOPS; k++) {
+      const star = starAt(k);
+      expect(star.y - STAR / 2).toBeGreaterThanOrEqual(80);
+      expect(star.x + STAR / 2).toBeLessThan(POLE.x - FLAG.w);
+    }
+    expect(FLAG.top).toBeGreaterThanOrEqual(80);
+    expect(FLAG.low + FLAG.h).toBeLessThanOrEqual(POLE.foot);
+    // Each island stands under its spot.
+    for (const i of ISLANDS) expect(HOP_SPOTS.some((s) => s.y === i.top && s.x > i.x && s.x < i.x + i.w)).toBe(true);
+  });
+
+  test("Hop to the Flag: hopper, stars and flag are layers on CSS animations that stop at the end, with no clip path (H-127)", async () => {
+    const code = await Bun.file(new URL("./jump.tsx", import.meta.url)).text();
+    expect(code).not.toMatch(/clip-?[pP]ath/);
+    const css = await Bun.file(new URL("./timer.css", import.meta.url)).text();
+    for (const part of ["jump-bob", "jump-star", "jump-flag"]) expect(css, part).toMatch(new RegExp(`\\.tm-done \\.tm-${part}[,\\s{]`));
   });
 
   // User feedback, November 2026: the drawn fox and bear children in the timer's pictures (holding the basket and the

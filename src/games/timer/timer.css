@@ -2634,6 +2634,82 @@
   opacity: 1;
 }
 
+/* Hop to the Flag (H-127, jump.tsx): the hopper rides on two hop layers (`.tm-hop`, keyframes written for the run) and
+   bounces once a second while it waits – squashing on its feet, springing up a little, landing –, a small layer by
+   `transform` alone. */
+.tm-jump-bob {
+  position: absolute;
+  inset: 0;
+  transform-origin: 50% 100%;
+  will-change: transform;
+  animation: tm-jump-bob 1s infinite;
+}
+
+.tm-jump-bob > svg,
+.tm-jump-star > svg {
+  display: block;
+  width: 100%;
+  height: 100%;
+  overflow: visible;
+}
+
+@keyframes tm-jump-bob {
+  0% {
+    transform: scale(1);
+    animation-timing-function: ease-out;
+  }
+  14% {
+    transform: scale(1.08, 0.9);
+    animation-timing-function: ease-out;
+  }
+  42% {
+    transform: translateY(-12%) scale(0.96, 1.05);
+    animation-timing-function: ease-in;
+  }
+  70%,
+  100% {
+    transform: scale(1);
+  }
+}
+
+/* A star is caught at the top of its hop (`--tm-at`): it grows a little and fades, a small layer by `transform` and
+   `opacity`. */
+.tm-jump-star {
+  position: absolute;
+  inset: 0;
+  animation: tm-jump-caught 0.35s ease-out var(--tm-at) both;
+}
+
+@keyframes tm-jump-caught {
+  0% {
+    opacity: 1;
+    transform: scale(1);
+  }
+  100% {
+    opacity: 0;
+    transform: scale(1.5);
+  }
+}
+
+/* The flag waits at the pole's foot, and goes up as the hopper lands on the hilltop at the end. */
+.tm-jump-flag {
+  transform: var(--tm-flag-low);
+  transition: transform 1.6s ease-out;
+}
+
+.tm-done .tm-jump-flag {
+  transform: none;
+}
+
+.tm-done .tm-jump-bob,
+.tm-done .tm-jump-star {
+  animation: none;
+}
+
+.tm-done .tm-jump-star {
+  visibility: hidden;
+}
+
 /* The bar along the bottom (`TimeBar`, user request, 22 November 2026): a paper track over nearly the whole width,
    filling from the start at the left to the flag at the right in the picture's own colour, a round marker at its
    front. Fill, way still to go and marker each move by one animation of `transform` as long as the run. Its sizes are
@@ -2735,6 +2811,12 @@
   --tm-bar-a: #e9d8c4;
   --tm-bar-b: #a8703c;
   --tm-bar-flag: #fab005;
+}
+
+.tm-play[data-picture="jump"] .tm-bar {
+  --tm-bar-a: #d3f9d8;
+  --tm-bar-b: #40c057;
+  --tm-bar-flag: #e03131;
 }
 
 .tm-play[data-picture="caterpillar"] .tm-bar {
