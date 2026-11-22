@@ -3,14 +3,19 @@
 // puddle in fright, the splash of mud wakes the cat, the cat knocks its ball of
 // wool down the hay bale onto the cow's nose, the cow's moo wakes the goat on
 // her rocks, the goat hops down them and butts the milk can, the can tumbles
-// klong, klong into the kennel, the dog comes out barking and chases the ducks
-// off the pond, the ducks land one by one on the donkey's back, the donkey
-// brays „I-aah“ and kicks the barn with his hind legs – the ducks fly up onto
-// the roof with a somersault, the barn doors swing open, and all the animals
-// in the stable sing, the donkey too, then everyone together.
+// klong, klong into the kennel, the dog comes out barking at the turkey, the
+// turkey gobbles and fans its tail, which tips the grain sack over, a grain
+// wakes the hen, she pecks her way along the grains onto the tractor and
+// pecks its horn, the fox farmer drives off to the pond, a second honk wakes
+// the goose, who jumps into the pond and honks at the ducks, the ducks land
+// one by one on the donkey's back, the donkey brays „I-aah“ and kicks the barn
+// with his hind legs – the ducks fly up onto the roof with a somersault, a
+// swallow darts out of her nest and turns the door's latch, the barn doors
+// swing open, and all the animals in the stable sing, the donkey too, then
+// everyone together.
 // Everything is worked out ahead as a function of the seconds since the tap,
 // so FarmLevel.tsx only asks where each thing is at a moment. Coordinates are
-// those of the farmyard, 6700 × 900; the screen shows 1600 of it at a time.
+// those of the farmyard, 9080 × 900; the screen shows 1600 of it at a time.
 
 import {
   playBaa,
@@ -21,28 +26,53 @@ import {
   playCreak,
   playCrow,
   playCrunch,
+  playEngine,
+  playHonk,
   playKnock,
   playMeow,
   playMoo,
   playNeigh,
   playOink,
+  playPeck,
   playPop,
   playQuack,
   playRecorded,
+  playRustle,
   playSplash,
+  playSqueak,
   playThump,
+  playTick,
   playTusch,
+  playTweet,
   playTwinkle,
   playWhoosh,
 } from "@/lib/sfx";
-import { along, cameraOn, distAt, easeIn, easeInOut, easeOut, hop, lerp, pathOf, rad, roll, seg, timeline, turn } from "./machineKit";
+import { along, cameraOn, deg, distAt, easeIn, easeInOut, easeOut, hop, lerp, pathOf, rad, roll, seg, timeline, turn } from "./machineKit";
 import { line, quad, type Pt } from "./path";
 
-export const WORLD_W = 6700;
+export const WORLD_W = 9080;
 export const FLOOR = 800;
 
-/** The recordings the animals call with, loaded when the level opens. */
-export const FARM_SOUNDS = ["crow", "oink", "splash", "meow", "moo", "bark", "quack", "neigh", "baa", "cluck"];
+/** The recordings the animals (and the tractor) call with, loaded when the level opens. */
+export const FARM_SOUNDS = [
+  "crow",
+  "oink",
+  "splash",
+  "meow",
+  "moo",
+  "bark",
+  "quack",
+  "neigh",
+  "baa",
+  "cluck",
+  "goat",
+  "heehaw",
+  "gobble",
+  "peep",
+  "goose",
+  "engine",
+  "tweet",
+];
 
 // Each animal calls with its recording, or the synthesized call while that is still loading.
 const crow = () => playRecorded("crow", playCrow);
@@ -55,11 +85,14 @@ const quack = () => playRecorded("quack", playQuack);
 const neigh = () => playRecorded("neigh", playNeigh);
 const baa = () => playRecorded("baa", playBaa);
 const cluck = () => playRecorded("cluck", playCluck);
-// There are no recordings of a goat or a donkey: the goat bleats with the synthesized bleat (thinner and quicker than
-// the sheep's recording), and the donkey's „I-aah“ is a whinny („I…“) and a low moo („…aah“) one after the other.
-const bleat = playBaa;
-const hee = playNeigh;
-const haw = playMoo;
+const bleat = () => playRecorded("goat", playBaa);
+/** The donkey's whole „I-aah, I-aah“ (about 2.7 s). */
+const heehaw = () => playRecorded("heehaw", playNeigh);
+const gobble = () => playRecorded("gobble", playCluck);
+const peep = () => playRecorded("peep", playSqueak);
+const honkGoose = () => playRecorded("goose", playHonk);
+const engine = () => playRecorded("engine", playEngine);
+const tweet = () => playRecorded("tweet", playTweet);
 /** The hoof hitting the barn wall: a deep wooden knock with a thump. */
 const bang = () => {
   playKnock(260);
@@ -107,15 +140,54 @@ export const CAN = { x: 3200, w: 64, h: 110 };
 const CAN_TUMBLES = 3;
 /** The dog's kennel; its round door looks to the right. The tumbling milk can just reaches its wall. */
 export const KENNEL = { x0: CAN.x - CAN.w / 2 + 2 * CAN.w + 2 * CAN.h + 2, x1: CAN.x - CAN.w / 2 + 2 * CAN.w + 2 * CAN.h + 202, top: 590 };
+/** The turkey stands in the meadow facing left, towards the kennel; its tail feathers grow from `TAIL` and are `r` long. */
+export const TURKEY = { x: 4150 };
+export const TAIL = { x: TURKEY.x + 40, y: FLOOR - 90, r: 150 };
+/** The tail's feathers: folded they all point up and back (`FOLDED` degrees), fanned they spread from `FAN_FROM` to `FAN_TO`. */
+export const FEATHERS = 7;
+const FOLDED = -60;
+const FAN_FROM = -165;
+const FAN_TO = -12;
+/** The angle (degrees) of tail feather `i` (0 at the front) with the tail fanned `fan` (0 folded to 1 open). */
+export const featherAngle = (i: number, fan: number) => lerp(FOLDED, lerp(FAN_FROM, FAN_TO, i / (FEATHERS - 1)), fan);
+/** The tip of tail feather `i`. */
+export const featherTip = (i: number, fan: number): Pt => ({
+  x: TAIL.x + TAIL.r * Math.cos(rad(featherAngle(i, fan))),
+  y: TAIL.y + TAIL.r * Math.sin(rad(featherAngle(i, fan))),
+});
+/** The open sack of grain standing behind the turkey, `w` wide and `h` high; the last feather's tip just reaches its side. */
+export const SACK = { x0: Math.round(TAIL.x + TAIL.r * Math.cos(rad(-15))), w: 92, h: 140 };
+/** The sack's corner it tips over, to the right. */
+export const SACK_PIVOT = { x: SACK.x0 + SACK.w, y: FLOOR };
+/** The brown hen dozes in her straw nest beyond the sack with her three chicks; she looks right. */
+export const HEN = { x: 4720 };
+export const CHICKS = 3;
+/** Where the hen's head is (its middle) while she sits, and how far her beak reaches in front of her middle when she pecks. */
+export const henHead = (x: number) => ({ x: x + 38, y: FLOOR - 86 });
+export const HEN_REACH = 60;
+/** The grains the hen pecks, one after the other, from the nest to the tractor. */
+export const GRAINS = [4800, 4900, 5000, 5100];
+/**
+ * The tractor, facing right: `x` is its big back wheel's middle, which has a mudguard over it with a bulb horn at
+ * its front; the fox farmer sits behind the steering wheel. `DRIVE` is how far it drives to the pond.
+ */
+export const TRACTOR = { x: 5260, wheel: 88, guard: FLOOR - 190, front: 330 };
+export const TRACTOR_DRIVE = 680;
+/** The rubber bulb of the horn on the mudguard, relative to the back wheel's middle. */
+export const HORN_BULB = { dx: -2, y: TRACTOR.guard - 14, r: 13 };
+/** Where the hen stands on the mudguard (her feet), relative to the back wheel's middle: her beak just reaches the bulb. */
+export const GUARD_SPOT = { dx: HORN_BULB.dx - HORN_BULB.r - HEN_REACH + 1, y: TRACTOR.guard };
 /** The duck pond lies further back in the meadow. */
-export const POND = { x: 4380, y: 690, rx: 330, ry: 60 };
+export const POND = { x: 6760, y: 690, rx: 330, ry: 60 };
 export const DUCKS = 3;
+/** The grey goose dozes on the bank in front of the pond, looking right; it jumps in at `water`. */
+export const GOOSE = { x: 6360, half: 58, water: 6490 };
 /**
  * The donkey stands in front of the barn facing left, his rump to its wall. `hip` is where his hind legs hang
  * (from his middle on the ground), `leg` how long they are, `pivot` where he rocks forward when he kicks, and `back`
  * his body (an ellipse's middle height and radii), where the ducks sit.
  */
-export const DONKEY = { x: 5650, hip: { x: 70, y: -135 }, leg: 135, pivot: { x: -60, y: 0 }, back: { y: -150, rx: 118, ry: 52 } };
+export const DONKEY = { x: 8030, hip: { x: 70, y: -135 }, leg: 135, pivot: { x: -60, y: 0 }, back: { y: -150, rx: 118, ry: 52 } };
 /** How far the donkey leans (degrees, his rump up) and swings his hind legs back when he kicks. */
 const KICK_TILT = -12;
 const KICK_SWING = -80;
@@ -138,7 +210,13 @@ export const SINGERS = [
   { id: "hen", x: BARN.x0 + 460 },
 ] as const;
 /** Where the dog sits at the end, in front of the donkey's nose. */
-export const DOG_END = 5230;
+export const DOG_END = 7610;
+/** The swallows' nest of mud under the barn's eaves, at its left wall. */
+export const NEST = { x: BARN.x0 + 56, y: BARN.wallTop + 26 };
+/** The wooden turn button on the left door's free edge, lying across both doors to keep them shut: it turns on its nail, `half` long each way. */
+export const LATCH = { x: BARN_MID, y: BARN.doorTop + 8, half: 62 };
+/** Where the swallow sits on the roof at the end, between the ducks. */
+export const PERCH = { x: BARN_MID + 75, y: roofY(BARN_MID + 75) };
 
 /* ---------- The machine ---------- */
 
@@ -149,6 +227,8 @@ const FLIGHT = 3;
 const DUCK_GAP = 0.7;
 /** Seconds the ducks fly from the donkey's back up onto the roof. */
 const ROOF_HOP = 0.9;
+/** Where the camera looks while the grains fly and the hen wakes: turkey, sack, hen and grains all in the picture. */
+const HEN_VIEW = 4500;
 
 export type Farm = ReturnType<typeof buildFarm>;
 
@@ -312,32 +392,156 @@ export function buildFarm() {
     return age < 0 || t >= tButt ? 0 : 10 * Math.exp(-3 * age) * Math.sin(age * 16);
   };
 
-  /* The kennel shakes, the dog comes out barking and runs to the pond. */
+  /* The kennel shakes, the dog comes out barking and runs to the turkey, his nose just short of its head. */
   const tDog = tKennelHit + 0.55;
   const tRun = tDog + 0.9;
   const door = { x: KENNEL.x1 - 40 };
-  // He stops at the near end of the pond, clear of the ducks.
-  const pondEdge = POND.x - POND.rx - 30;
-  const tPond = tRun + (pondEdge - door.x) / RUN_SPEED;
+  const dogStop = TURKEY.x - 250;
+  const tTurkeyBark = tRun + (dogStop - door.x - 20) / RUN_SPEED;
   at(tDog, { sound: bark });
-  at(tPond, { sound: bark });
+  at(tTurkeyBark, { sound: bark });
   /** The dog's middle, and whether he is running. */
   const dogAt = (t: number): { x: number; running: boolean } => {
     if (t < tDog) return { x: door.x - 70, running: false };
     if (t < tRun) return { x: lerp(door.x - 70, door.x + 20, easeInOut(seg(t, tDog, tDog + 0.5))), running: false };
-    if (t < tPond) return { x: lerp(door.x + 20, pondEdge, seg(t, tRun, tPond)), running: true };
-    if (t < tOnward) return { x: pondEdge, running: false };
-    return { x: Math.min(DOG_END, pondEdge + (t - tOnward) * RUN_SPEED), running: t < tAtBarn };
+    if (t < tTurkeyBark) return { x: lerp(door.x + 20, dogStop, seg(t, tRun, tTurkeyBark)), running: true };
+    if (t < tOnward) return { x: dogStop, running: false };
+    return { x: Math.min(DOG_END, dogStop + (t - tOnward) * RUN_SPEED), running: t < tAtBarn };
   };
 
-  /* The ducks quack and fly off the pond, one after the other, onto the donkey's back. */
-  const tQuack = tPond + 0.25;
+  /* The turkey jumps with fright, gobbles and fans its tail: the last feather sweeps against the sack and tips it over. */
+  const tGobble = tTurkeyBark + 0.45;
+  const tFan = tGobble + 0.25;
+  const FAN_TIME = 0.8;
+  at(tGobble, { sound: gobble });
+  at(tFan, { sound: playRustle });
+  /** How far the tail is fanned, 0 folded to 1 open. */
+  const fanAt = (t: number) => easeOut(seg(t, tFan, tFan + FAN_TIME));
+  // The moment the last feather's tip reaches the sack's side.
+  const fanTouch = (-deg(Math.acos((SACK.x0 - TAIL.x) / TAIL.r)) - FOLDED) / (FAN_TO - FOLDED);
+  const tTip = tFan + FAN_TIME * (1 - Math.sqrt(1 - fanTouch));
+  const tSackDown = tTip + 0.6;
+  at(tSackDown, { sound: playThump });
+  /** The turkey: how high it jumps with fright, how far its beak is open, and how far its tail is fanned. */
+  const turkeyAt = (t: number) => ({
+    lift: 40 * Math.sin(Math.PI * seg(t, tTurkeyBark + 0.1, tTurkeyBark + 0.45)),
+    mouth: Math.max(0, Math.sin(Math.PI * seg(t, tGobble, tGobble + 1.2)) * Math.abs(Math.sin((t - tGobble) * 14))),
+    fan: fanAt(t),
+  });
+  /** How far the sack has tipped over (degrees, clockwise round its right corner). */
+  const sackTilt = (t: number) => 90 * easeIn(seg(t, tTip, tSackDown));
+
+  /* The grains spill out of the sack's mouth: the first lands on the dozing hen's head, the others in a row to the tractor. */
+  const mouth = turn({ x: SACK.x0 + SACK.w / 2, y: FLOOR - SACK.h }, SACK_PIVOT, rad(90));
+  const tGrainOff = (i: number) => tSackDown + 0.1 + 0.12 * i;
+  const tGrain = (i: number) => tGrainOff(i) + 0.75;
+  const onHead = { x: henHead(HEN.x).x, y: henHead(HEN.x).y - 26 };
+  const tHenWake = tGrain(0);
+  for (let i = 1; i < GRAINS.length; i++) at(tGrain(i), { sound: playTick });
+  at(tHenWake, { sound: playPop });
+  /** Where grain `i` is now, or null once the hen has eaten it (or before it is out). */
+  const grainAt = (i: number, t: number): Pt | null => {
+    if (t < tGrainOff(i) || t >= tPeck(i)) return null;
+    const ground = { x: GRAINS[i], y: FLOOR - 6 };
+    if (i > 0) return hop(mouth, ground, 110 + 30 * i, seg(t, tGrainOff(i), tGrain(i)));
+    // The first one bounces off her head onto the grass in front of her.
+    if (t < tGrain(0)) return hop(mouth, onHead, 120, seg(t, tGrainOff(0), tGrain(0)));
+    return hop(onHead, ground, 40, seg(t, tGrain(0), tGrain(0) + 0.35));
+  };
+
+  /* The hen wakes with a cluck, the chicks peep, and she pecks the grains one by one, walking towards the tractor. */
+  at(tHenWake + 0.1, { sound: cluck });
+  at(tHenWake + 0.7, { sound: peep });
+  const tPeck = (i: number) => tHenWake + 1.1 + 0.8 * i;
+  GRAINS.forEach((_, i) => at(tPeck(i), { sound: playPeck }));
+  const PECKS = GRAINS.length;
+  /** Where the hen stands on the grass (her middle) while she walks from grain to grain. */
+  const henOnGround = (t: number) => {
+    let x = HEN.x;
+    GRAINS.forEach((g, i) => {
+      x = lerp(x, g - HEN_REACH, easeInOut(seg(t, tPeck(i) - 0.55, tPeck(i) - 0.12)));
+    });
+    return x;
+  };
+
+  /* She flutters up onto the tractor's mudguard and pecks the rubber bulb of its horn: honk! */
+  const tHenHop = tPeck(PECKS - 1) + 0.45;
+  const tOnGuard = tHenHop + 0.5;
+  const tHorn = tOnGuard + 0.6;
+  at(tHenHop, { sound: playWhoosh });
+  at(tOnGuard, { sound: cluck });
+  at(tHorn, { sound: playHonk });
+
+  /* The honk wakes the fox farmer under his straw hat; he pushes it up, starts the engine – puff, puff – and drives
+     slowly to the pond, the hen riding on the mudguard. At the pond the hen pecks the horn once more. */
+  const tFarmerUp = tHorn + 0.3;
+  const tEngine = tFarmerUp + 0.8;
+  const tDrive = tEngine + 0.8;
+  const tDriveEnd = tDrive + 4.2;
+  const tHorn2 = tDriveEnd + 0.5;
+  for (const ts of [tEngine, tDrive + 0.8, tDrive + 2.4]) at(ts, { sound: engine });
+  at(tHorn2, { sound: playHonk });
+  /** The tractor's back wheel middle, how far its wheels have turned (degrees), and how much it shakes with its engine on. */
+  const tractorAt = (t: number) => {
+    const k = easeInOut(seg(t, tDrive, tDriveEnd));
+    const x = TRACTOR.x + TRACTOR_DRIVE * k;
+    const running = t >= tEngine && t < tHorn2 + 1.2;
+    return { x, spin: (deg(TRACTOR_DRIVE * k) / TRACTOR.wheel) % 360, shake: running ? 1.6 * Math.sin(t * 40) : 0 };
+  };
+  /** How far the farmer has pushed his hat up off his eyes: 0 asleep, 1 awake. */
+  const farmerAwake = (t: number) => easeInOut(seg(t, tFarmerUp, tFarmerUp + 0.5));
+  /** When each little cloud of the exhaust puffs out, from the start of the engine until the tractor stands again. */
+  const puffs = Array.from({ length: Math.floor((tHorn2 + 0.6 - tEngine) / 0.42) }, (_, i) => tEngine + 0.1 + 0.42 * i);
+  /** The hen: her middle on the ground or on the mudguard, how far she is up (0 sitting, 1 standing), her pecking head (0 to 1), awake. */
+  const henAt = (t: number) => {
+    const pecks = [...GRAINS.map((_, i) => tPeck(i)), tHorn, tHorn2];
+    const peck = Math.max(...pecks.map((p) => Math.sin(Math.PI * seg(t, p - 0.14, p + 0.2))));
+    const up = easeInOut(seg(t, tHenWake + 0.25, tHenWake + 0.6));
+    const awake = t >= tHenWake;
+    const guard = (when: number) => ({ x: tractorAt(when).x + GUARD_SPOT.dx, y: GUARD_SPOT.y + tractorAt(when).shake });
+    if (t >= tOnGuard) return { pt: guard(t), up, peck, awake };
+    if (t >= tHenHop) return { pt: hop({ x: henOnGround(tHenHop), y: FLOOR }, guard(tOnGuard), 70, seg(t, tHenHop, tOnGuard)), up, peck: 0, awake };
+    const startle = 22 * Math.sin(Math.PI * seg(t, tHenWake, tHenWake + 0.3));
+    return { pt: { x: henOnGround(t), y: FLOOR - startle }, up, peck, awake };
+  };
+  /** Where chick `j` is: they follow the hen's way along the grains, hopping, and stay on the grass when she flies up. */
+  const chickAt = (j: number, t: number): Pt => {
+    const lag = 0.35 * (j + 1);
+    const x = henOnGround(Math.min(t, tHenHop) - lag) - 52 - 30 * j;
+    const moving = Math.abs(henOnGround(Math.min(t, tHenHop) - lag + 0.05) - henOnGround(Math.min(t, tHenHop) - lag)) > 0.2;
+    return { x, y: FLOOR - (moving ? 10 * Math.abs(Math.sin(t * 14 + j)) : 0) };
+  };
+
+  /* The second honk wakes the goose on the bank: it honks back, flaps, jumps into the pond with a splash, stretches its
+     neck towards the ducks and honks at them. */
+  const tGooseWake = tHorn2 + 0.35;
+  const tGooseJump = tGooseWake + 0.9;
+  const tGooseSplash = tGooseJump + 0.6;
+  const tGooseHonk = tGooseSplash + 1.15;
+  for (const ts of [tGooseWake, tGooseWake + 0.4, tGooseHonk, tGooseHonk + 0.35]) at(ts, { sound: honkGoose });
+  at(tGooseJump, { sound: playWhoosh });
+  at(tGooseSplash, { sound: splash });
+  /** The goose: its middle, how far its wings are spread, its neck stretched out (0 to 1), its beak open, and whether it swims. */
+  const gooseAt = (t: number) => {
+    const startle = 30 * Math.sin(Math.PI * seg(t, tGooseWake, tGooseWake + 0.35));
+    const bank = { x: GOOSE.x, y: FLOOR - startle };
+    const water = { x: GOOSE.water, y: POND.y };
+    const pt = t < tGooseJump ? bank : hop(bank, water, 120, easeInOut(seg(t, tGooseJump, tGooseSplash)));
+    const wings = Math.sin(Math.PI * seg(t, tGooseWake + 0.2, tGooseSplash + 0.2));
+    const neck = easeInOut(seg(t, tGooseSplash + 0.55, tGooseHonk)) * (1 - easeInOut(seg(t, tGooseHonk + 1, tGooseHonk + 1.6)));
+    const honks = [tGooseWake, tGooseWake + 0.4, tGooseHonk, tGooseHonk + 0.35];
+    const beak = Math.max(...honks.map((h) => Math.sin(Math.PI * seg(t, h, h + 0.3))));
+    return { pt, wings: Math.abs(wings * Math.sin((t - tGooseWake) * 22)), neck, beak, awake: t >= tGooseWake, swimming: t >= tGooseSplash };
+  };
+
+  /* The ducks quack and fly off the pond, one after the other, onto the donkey's back; the dog runs on to the barn. */
+  const tQuack = tGooseHonk + 0.3;
   at(tQuack, { sound: quack });
-  const tTakeOff = (i: number) => tPond + 0.6 + DUCK_GAP * i;
+  const tTakeOff = (i: number) => tGooseHonk + 0.6 + DUCK_GAP * i;
   const tLand = (i: number) => tTakeOff(i) + FLIGHT;
-  const tOnward = tTakeOff(0) + 0.4;
-  const tAtBarn = tOnward + (DOG_END - pondEdge) / RUN_SPEED;
-  const swim = (i: number): Pt => ({ x: POND.x - 140 + 140 * i, y: POND.y });
+  const tOnward = tGooseSplash;
+  const tAtBarn = tOnward + (DOG_END - dogStop) / RUN_SPEED;
+  const swim = (i: number): Pt => ({ x: POND.x - 100 + 130 * i, y: POND.y });
   const roofSpot = (i: number): Pt => {
     const x = BARN_MID - 150 + 150 * i;
     return { x, y: roofY(x) };
@@ -364,10 +568,7 @@ export function buildFarm() {
   for (const ts of tStamp) at(ts, { sound: () => playKnock(330) });
   const tBray = tLand(DUCKS - 1) + 1.5;
   const tHaw = [tBray + 0.55, tBray + 1.8];
-  [tBray, tBray + 1.25].forEach((ts, i) => {
-    at(ts, { sound: hee });
-    at(tHaw[i], { sound: haw });
-  });
+  at(tBray, { sound: heehaw });
   const tKick = tBray + 3;
   at(tKick, {
     sound: bang,
@@ -423,19 +624,51 @@ export function buildFarm() {
     return { pt: p, flying: true, spin: 0 };
   };
 
-  /* The kick shakes the barn and its doors swing open; one by one the animals sing, then all of them together. */
-  const tDoors = tKick + 0.35;
+  /* The kick shakes the barn: the swallow darts out of her nest under the eaves, swoops round over the donkey and lands
+     on the end of the wooden turn button that keeps the doors shut. It turns under her – klack – and she flutters up
+     onto the roof. */
+  const tSwallowOut = tKick + 0.35;
+  const tSwallowLand = tSwallowOut + 2.2;
+  const tTurned = tSwallowLand + 0.55;
+  const tPerch = tTurned + 0.9;
+  at(tSwallowOut, { sound: tweet });
+  at(tTurned, { sound: () => playKnock(720) });
+  at(tPerch, { sound: tweet });
+  /** Where the swallow lands: on the turn button's right end. */
+  const latchEnd = { x: LATCH.x + LATCH.half - 12, y: LATCH.y - 8 };
+  const swoop = pathOf(
+    quad(NEST, { x: NEST.x - 120, y: NEST.y + 150 }, { x: NEST.x - 260, y: NEST.y + 20 }),
+    quad({ x: NEST.x - 260, y: NEST.y + 20 }, { x: NEST.x - 300, y: NEST.y - 200 }, { x: NEST.x + 40, y: NEST.y - 150 }),
+    quad({ x: NEST.x + 40, y: NEST.y - 150 }, { x: latchEnd.x - 40, y: latchEnd.y - 160 }, latchEnd),
+  );
+  /** How far the turn button has turned (degrees, clockwise: its right end goes down under the swallow). */
+  const latchTurn = (t: number) => 90 * easeIn(seg(t, tSwallowLand + 0.1, tTurned));
+  /** The swallow: where she is, which way she flies (radians), whether her wings beat, and whether she is out of the nest. */
+  const swallowAt = (t: number): { pt: Pt; angle: number; flying: boolean; out: boolean } => {
+    if (t < tSwallowOut) return { pt: NEST, angle: Math.PI, flying: false, out: false };
+    if (t < tSwallowLand) {
+      const p = along(swoop, swoop.total * easeInOut(seg(t, tSwallowOut, tSwallowLand)));
+      return { pt: p.pt, angle: p.angle, flying: true, out: true };
+    }
+    // She rides the button's end down a little, then flutters up onto the roof.
+    const riding = turn(latchEnd, LATCH, rad(Math.min(latchTurn(t), 25)));
+    if (t < tTurned) return { pt: riding, angle: 0, flying: false, out: true };
+    if (t < tPerch) return { pt: hop(turn(latchEnd, LATCH, rad(25)), PERCH, 120, easeInOut(seg(t, tTurned, tPerch))), angle: 0, flying: true, out: true };
+    return { pt: PERCH, angle: 0, flying: false, out: true };
+  };
+
+  /* The barn doors swing open; one by one the animals sing, then all of them together. */
+  const tDoors = tTurned + 0.1;
   at(tDoors, { sound: playCreak });
   const doorsOpen = (t: number) => easeInOut(seg(t, tDoors, tDoors + 1));
-  /** When each one sings alone: the three in the stable, the dog, the ducks, the donkey. */
-  const tSolo = [neigh, baa, cluck, bark, quack, hee].map((sound, i) => {
+  /** When each one sings alone: the three in the stable, the dog, the ducks, the swallow, the donkey. */
+  const tSolo = [neigh, baa, cluck, bark, quack, tweet, heehaw].map((sound, i) => {
     const ts = tDoors + 1.3 + 0.9 * i;
     at(ts, { sound });
     return ts;
   });
   const DONKEY_SOLO = tSolo.length - 1;
-  at(tSolo[DONKEY_SOLO] + 0.5, { sound: haw });
-  const tChoir = tSolo[DONKEY_SOLO] + 1.7;
+  const tChoir = tSolo[DONKEY_SOLO] + 2.2;
   at(tChoir, {
     sound: playTusch,
     say: {
@@ -448,14 +681,13 @@ export function buildFarm() {
       ru: "Все звери поют вместе!",
     },
   });
-  [neigh, baa, cluck, bark, quack, moo, bleat, hee].forEach((sound, i) => at(tChoir + 0.15 + 0.05 * i, { sound }));
-  at(tChoir + 0.9, { sound: haw });
+  [neigh, baa, cluck, bark, quack, moo, bleat, heehaw, tweet].forEach((sound, i) => at(tChoir + 0.15 + 0.05 * i, { sound }));
   at(tChoir + 1, { sound: playTwinkle });
   const tDone = tChoir + 3.4;
   at(tDone, { done: true });
   /** How much a singer opens its mouth now: when it sings alone (`solo`, an index of `tSolo`) and in the choir. */
   const singing = (solo: number, t: number) => {
-    const alone = Math.sin(Math.PI * seg(t, tSolo[solo], tSolo[solo] + (solo === DONKEY_SOLO ? 1.3 : 0.7)));
+    const alone = Math.sin(Math.PI * seg(t, tSolo[solo], tSolo[solo] + (solo === DONKEY_SOLO ? 2 : 0.7)));
     const together = t >= tChoir && t < tDone ? 0.6 + 0.4 * Math.sin((t - tChoir) * 9 + solo) : 0;
     return Math.max(alone, together);
   };
@@ -471,18 +703,25 @@ export function buildFarm() {
     // The tumbling can, then the goat and the shaking kennel, until the dog runs off.
     if (t < tKennelHit) return Math.max(goatAt(tButt).pt.x - 100, canAt(t).pt.x);
     if (t < tRun) return KENNEL.x0;
-    if (t < tPond) return Math.max(KENNEL.x0, dogAt(t).x);
-    if (t < tTakeOff(0)) return POND.x;
-    if (t < tLand(0)) return Math.max(POND.x, duckAt(0, t).pt.x);
+    if (t < tTurkeyBark) return Math.max(KENNEL.x0, dogAt(t).x);
+    // The dog and the turkey with its sack, then the hen's way along the grains to the tractor.
+    if (t < tSackDown) return TURKEY.x;
+    if (t < tHenWake) return HEN_VIEW;
+    if (t < tDrive) return Math.max(HEN_VIEW, henAt(t).pt.x + 100);
+    // The tractor driving to the pond, then the goose and the ducks.
+    if (t < tDriveEnd) return tractorAt(t).x + GUARD_SPOT.dx + 100;
+    const pond = POND.x - 260;
+    if (t < tTakeOff(0)) return lerp(tractorAt(tDriveEnd).x + GUARD_SPOT.dx + 100, pond, easeInOut(seg(t, tDriveEnd, tGooseSplash)));
+    if (t < tLand(0)) return Math.max(pond, duckAt(0, t).pt.x);
     return BARN_MID;
   };
   const cameraTarget = (t: number) => cameraOn(WORLD_W, focusX(t));
 
-  /** Where it could wait for the child's tap (R-03): the cow with the wool at her nose, the goat ready to charge, the dog at the pond, the donkey with all three ducks on his back. Only the goat ready to charge waits; the machine runs through the others. */
+  /** Where it could wait for the child's tap (R-03): the cow with the wool at her nose, the goat ready to charge, the hen on the tractor's mudguard by the horn, the donkey with all three ducks on his back. Only the goat ready to charge waits; the machine runs through the others. */
   const stops = [
     { at: tNose, x: COW.x - 180, y: FLOOR - 100 },
     { at: tCharge1, x: ground.x, y: FLOOR - 80, active: true },
-    { at: tPond, x: pondEdge + 20, y: FLOOR - 70 },
+    { at: tOnGuard, x: TRACTOR.x + GUARD_SPOT.dx + 30, y: TRACTOR.guard - 50 },
     { at: tLand(DUCKS - 1), x: DONKEY.x, y: FLOOR + DONKEY.back.y },
   ];
 
@@ -508,9 +747,29 @@ export function buildFarm() {
     tTumble,
     tKennelHit,
     tDog,
-    tPond,
+    tTurkeyBark,
+    tGobble,
+    tTip,
+    tSackDown,
+    tGrain,
+    tHenWake,
+    tPeck,
+    tHenHop,
+    tOnGuard,
+    tHorn,
+    tEngine,
+    tDrive,
+    tDriveEnd,
+    tHorn2,
+    tGooseWake,
+    tGooseSplash,
+    tGooseHonk,
     tBray,
     tKick,
+    tSwallowOut,
+    tSwallowLand,
+    tTurned,
+    tPerch,
     tDoors,
     tChoir,
     tDone,
@@ -528,6 +787,17 @@ export function buildFarm() {
     canAt,
     canRock,
     dogAt,
+    turkeyAt,
+    sackTilt,
+    grainAt,
+    henAt,
+    chickAt,
+    tractorAt,
+    farmerAwake,
+    puffs,
+    gooseAt,
+    swallowAt,
+    latchTurn,
     duckAt,
     donkeyAt,
     tTakeOff,

@@ -1,14 +1,21 @@
-import { memo, useId, useMemo } from "react";
+import { memo, useEffect, useId, useMemo } from "react";
+import { loadRecordings } from "@/lib/sfx";
 import { VIEW_H, type LevelProps } from "./level";
-import { deg, easeOut, seg } from "./machineKit";
+import { deg, easeOut, lerp, seg } from "./machineKit";
 import { MachineStage } from "./MachineStage";
 import {
   BASKET,
+  BEAM_TOP,
+  BED,
   BIRD,
+  BOTTLE,
   buildNight,
+  CAGE,
+  CAR,
   CAROUSEL,
   CHAIN,
   CHAIR,
+  CHEST,
   CLOCK,
   CRADLE,
   CRANK,
@@ -20,17 +27,21 @@ import {
   LEGS,
   MOON,
   MUSICBOX,
+  NIGHT_SOUNDS,
   type Night,
   PENDULUM,
   PULLEY1,
   PULLEY2,
   RAIL,
+  ROPE,
   ROUND_WINDOW,
   SHELF,
+  SHUTTER,
   STAR_R,
   TEDDY,
   TURN1,
   TURN2,
+  WHEEL,
   WINDOW,
   WORLD_W,
 } from "./night";
@@ -53,13 +64,16 @@ const MOON_YELLOW = "#fff3b0";
  * tips the rocking chair in the reading corner, whose backrest taps the cuckoo
  * clock's pendulum. Tick, tack – at the full hour the sleepy cuckoo slides out,
  * calls a soft „kuckuck“ and yawns, and its beak pushes the lamp's pull chain:
- * click, the light goes out, and the moon rises in the round window. The teddy
- * yawns and everything falls asleep while the camera glides slowly back to the
- * music box. Slow and quiet throughout.
+ * click, the light goes out. In the dark the hamster wakes, drinks from its
+ * bottle and runs in its wheel, whose pulley draws the toy cable car up to the
+ * round window; the car bumps the shutter open and the moon rises there. Its
+ * light creeps down to the teddy, who yawns, and everything falls asleep while
+ * the camera glides slowly back to the music box. Slow and quiet throughout.
  */
 export function NightLevel(props: LevelProps) {
   const night = useMemo(buildNight, []);
   const ids = useId();
+  useEffect(() => loadRecordings(NIGHT_SOUNDS), []);
   // The carousel's sheep stops facing us when the crank has run down.
   const finalTurn = night.crankTurn(1000);
 
@@ -84,6 +98,12 @@ export function NightLevel(props: LevelProps) {
             <g transform={`rotate(${deg(night.chairAngle(t))} ${CHAIR.x} ${FLOOR})`}>
               <RockingChair />
             </g>
+            <HamsterNook />
+            <CableCar night={night} t={t} />
+            <Wheel turn={night.wheelTurn(t)} />
+            <Bottle night={night} t={t} />
+            <Hamster h={night.hamsterAt(t)} />
+            <CageBars />
             <Cradle night={night} t={t} />
 
             <rect x="-400" y="-200" width={WORLD_W + 800} height={VIEW_H + 400} fill={NIGHT} opacity={night.dark(t)} />
@@ -92,6 +112,7 @@ export function NightLevel(props: LevelProps) {
             <StarGlow night={night} t={t} ids={ids} />
             <Zzz x={TEDDY.x + 40} y={TEDDY.y - 50} from={night.tTeddy} t={end} />
             <Zzz x={MOON.x + 60} y={MOON.y1 - 40} from={night.tMoonSleep} t={end} />
+            <Zzz x={WHEEL.x + 24} y={WHEEL.y - 44} from={night.tHamsterSleep} t={end} />
             <Zzz x={DOOR.x + 34} y={DOOR.y - 30} from={night.tCuckoo} t={end} />
             <Zzz x={BASKET.x + 34} y={BASKET.rim1 - 50} from={night.tStar} t={end} />
             <Zzz x={CAROUSEL.x + 80} y={CAROUSEL.y - 30} from={night.tSheep} t={end} />
@@ -667,6 +688,233 @@ function ArcLamp({ night, t, ids }: { night: Night; t: number; ids: string }) {
   );
 }
 
+/* ---------- The hamster's nook ---------- */
+
+const CAGE_MID = (CAGE.x0 + CAGE.x1) / 2;
+const CAGE_HALF = (CAGE.x1 - CAGE.x0) / 2;
+/** The height of the cage's rounded roof above its sides. */
+const ARCH = 60;
+const ARCH_FOOT = CAGE.top + ARCH;
+const TRAY_TOP = CAGE.floor - 8;
+
+/** The chest of drawers, the cage's tray, the bedding and the wheel's stand: drawn once, they never move. */
+const HamsterNook = memo(function HamsterNook() {
+  const { x0, x1, top } = CHEST;
+  return (
+    <g>
+      <rect x={x0} y={top} width={x1 - x0} height={FLOOR - top - 6} rx="8" fill={WOOD} stroke={INK} strokeWidth="4" />
+      {[0, 1].map((i) => {
+        const y = top + 14 + i * 64;
+        return (
+          <g key={i}>
+            <rect x={x0 + 16} y={y} width={x1 - x0 - 32} height="52" rx="6" fill={MID_WOOD} stroke={INK} strokeWidth="3" />
+            <circle cx={(x0 + x1) / 2} cy={y + 26} r="7" fill={GOLD} stroke={INK} strokeWidth="2.5" />
+          </g>
+        );
+      })}
+      {[x0 + 22, x1 - 22].map((x) => (
+        <rect key={x} x={x - 10} y={FLOOR - 10} width="20" height="12" rx="3" fill={DARK_WOOD} stroke={INK} strokeWidth="2.5" />
+      ))}
+      {/* The cage's back wall, a faint blue, and its tray */}
+      <path
+        d={`M${CAGE.x0} ${TRAY_TOP} L${CAGE.x0} ${ARCH_FOOT} A${CAGE_HALF} ${ARCH} 0 0 1 ${CAGE.x1} ${ARCH_FOOT} L${CAGE.x1} ${TRAY_TOP} Z`}
+        fill="#e4f1ff"
+        opacity="0.55"
+      />
+      <rect x={CAGE.x0 - 8} y={TRAY_TOP} width={CAGE.x1 - CAGE.x0 + 16} height={CAGE.bottom - TRAY_TOP} rx="6" fill="#8fd3c1" stroke={INK} strokeWidth="4" />
+      {/* The bedding: a soft heap of wood shavings */}
+      <path
+        d={`M${BED.x - 52} ${TRAY_TOP} Q${BED.x - 40} ${BED.y + 4} ${BED.x - 10} ${BED.y + 8} Q${BED.x + 30} ${BED.y + 4} ${BED.x + 48} ${TRAY_TOP} Z`}
+        fill="#f6dc8c"
+        stroke={INK}
+        strokeWidth="3"
+        strokeLinejoin="round"
+      />
+      {[-34, -14, 8, 28].map((dx, i) => (
+        <path key={dx} d={`M${BED.x + dx} ${TRAY_TOP - 4 - (i % 2) * 5} q6 -5 12 0`} fill="none" stroke="#d9a94a" strokeWidth="2.5" strokeLinecap="round" />
+      ))}
+      {/* The wheel's stand */}
+      <path
+        d={`M${WHEEL.x - 42} ${TRAY_TOP} L${WHEEL.x} ${WHEEL.y} L${WHEEL.x + 42} ${TRAY_TOP}`}
+        fill="none"
+        stroke={INK}
+        strokeWidth="9"
+        strokeLinejoin="round"
+      />
+      <path
+        d={`M${WHEEL.x - 42} ${TRAY_TOP} L${WHEEL.x} ${WHEEL.y} L${WHEEL.x + 42} ${TRAY_TOP}`}
+        fill="none"
+        stroke="#9aa3c8"
+        strokeWidth="4"
+        strokeLinejoin="round"
+      />
+    </g>
+  );
+});
+
+/** The cage's wire bars and roof, in front of the hamster: drawn once. */
+const CageBars = memo(function CageBars() {
+  const bars: number[] = [];
+  for (let x = CAGE.x0; x <= CAGE.x1 + 0.5; x += 20) bars.push(x);
+  return (
+    <g stroke={INK} fill="none" strokeLinecap="round">
+      {bars.map((x) => {
+        const u = (x - CAGE_MID) / CAGE_HALF;
+        const top = ARCH_FOOT - ARCH * Math.sqrt(Math.max(0, 1 - u * u));
+        return <line key={x} x1={x} y1={top} x2={x} y2={TRAY_TOP} strokeWidth="2" opacity="0.5" />;
+      })}
+      <path d={`M${CAGE.x0} ${ARCH_FOOT} A${CAGE_HALF} ${ARCH} 0 0 1 ${CAGE.x1} ${ARCH_FOOT}`} strokeWidth="4" />
+      <line x1={CAGE.x0} y1={ARCH_FOOT} x2={CAGE.x0} y2={TRAY_TOP} strokeWidth="4" />
+      <line x1={CAGE.x1} y1={ARCH_FOOT} x2={CAGE.x1} y2={TRAY_TOP} strokeWidth="4" />
+      <line x1={CAGE.x0} y1={ARCH_FOOT} x2={CAGE.x1} y2={ARCH_FOOT} strokeWidth="3" opacity="0.7" />
+      <circle cx={CAGE_MID} cy={CAGE.top - 8} r="9" strokeWidth="4" />
+    </g>
+  );
+});
+
+/** The hamster wheel, turned by `turn` radians: its rungs go round as the hamster runs. */
+function Wheel({ turn }: { turn: number }) {
+  const { x, y, r } = WHEEL;
+  const rungs = 18;
+  return (
+    <g>
+      <g transform={`rotate(${deg(turn)} ${x} ${y})`}>
+        {[0, 1, 2, 3, 4, 5].map((i) => {
+          const a = (i * Math.PI) / 3;
+          return <line key={i} x1={x} y1={y} x2={x + (r - 4) * Math.cos(a)} y2={y + (r - 4) * Math.sin(a)} stroke="#9aa3c8" strokeWidth="4" />;
+        })}
+        {Array.from({ length: rungs }, (_, i) => {
+          const a = (i * 2 * Math.PI) / rungs;
+          return (
+            <line
+              key={i}
+              x1={x + (r - 8) * Math.cos(a)}
+              y1={y + (r - 8) * Math.sin(a)}
+              x2={x + r * Math.cos(a)}
+              y2={y + r * Math.sin(a)}
+              stroke={INK}
+              strokeWidth="2.5"
+            />
+          );
+        })}
+      </g>
+      <circle cx={x} cy={y} r={r} fill="none" stroke={INK} strokeWidth="5" />
+      <circle cx={x} cy={y} r={r - 8} fill="none" stroke="#7fb3d5" strokeWidth="4" />
+      <circle cx={x} cy={y} r="7" fill={GOLD} stroke={INK} strokeWidth="3" />
+    </g>
+  );
+}
+
+/** A grooved pulley turned by `turn` radians. */
+function Pulley({ x, y, r, turn }: { x: number; y: number; r: number; turn: number }) {
+  return (
+    <g transform={`rotate(${deg(turn)} ${x} ${y})`}>
+      <circle cx={x} cy={y} r={r} fill={MID_WOOD} stroke={INK} strokeWidth="3.5" />
+      <circle cx={x} cy={y} r={r * 0.6} fill="none" stroke={DARK_WOOD} strokeWidth="2" />
+      <line x1={x - r * 0.6} y1={y} x2={x + r * 0.6} y2={y} stroke={INK} strokeWidth="2.5" />
+      <circle cx={x} cy={y} r="3" fill={INK} />
+    </g>
+  );
+}
+
+/** The rope loop between the pulley on the wheel's axle and the one by the round window, and the little cable car on it. */
+function CableCar({ night, t }: { night: Night; t: number }) {
+  const { drive, turn } = ROPE;
+  const run = night.wheelTurn(t) * drive.r;
+  const grip = night.carAt(t);
+  const upper = { x1: drive.x, y1: drive.y - drive.r, x2: turn.x, y2: turn.y - turn.r };
+  const lower = { x1: drive.x, y1: drive.y + drive.r, x2: turn.x, y2: turn.y + turn.r };
+  // Little knots on the rope show it running: up on the upper strand, down on the lower one.
+  const knots = (s: { x1: number; y1: number; x2: number; y2: number }, dir: number) => {
+    const len = Math.hypot(s.x2 - s.x1, s.y2 - s.y1);
+    const gap = 160;
+    const off = (((dir * run) % gap) + gap) % gap;
+    const out: { x: number; y: number }[] = [];
+    for (let d = off + 40; d < len - 30; d += gap) out.push({ x: s.x1 + ((s.x2 - s.x1) * d) / len, y: s.y1 + ((s.y2 - s.y1) * d) / len });
+    return out;
+  };
+  const cabinTop = grip.y + CAR.hanger;
+  return (
+    <g>
+      {/* The turning pulley's bracket on the wall */}
+      <path d={`M${turn.x} ${turn.y} L${turn.x - 26} ${turn.y - 26}`} stroke={INK} strokeWidth="7" strokeLinecap="round" />
+      <rect x={turn.x - 40} y={turn.y - 40} width="24" height="24" rx="4" fill={DARK_WOOD} stroke={INK} strokeWidth="3" />
+      <Pulley x={drive.x} y={drive.y} r={drive.r} turn={night.wheelTurn(t)} />
+      <Pulley x={turn.x} y={turn.y} r={turn.r} turn={run / turn.r} />
+      {[upper, lower].map((s, i) => (
+        <g key={i}>
+          <line {...s} stroke={INK} strokeWidth="3" />
+          {knots(s, i === 0 ? 1 : -1).map((p, j) => (
+            <circle key={j} cx={p.x} cy={p.y} r="3.5" fill="#c0392b" />
+          ))}
+        </g>
+      ))}
+      {/* The car: grip on the rope, hanger, and a red cabin with a window and a roof */}
+      <rect x={grip.x - 7} y={grip.y - 6} width="14" height="10" rx="3" fill="#5b4a6e" stroke={INK} strokeWidth="2.5" />
+      <line x1={grip.x} y1={grip.y + 2} x2={grip.x} y2={cabinTop + 4} stroke={INK} strokeWidth="4" />
+      <rect x={grip.x - CAR.w / 2} y={cabinTop} width={CAR.w} height={CAR.h} rx="9" fill="#e07a5f" stroke={INK} strokeWidth="3.5" />
+      <rect x={grip.x - CAR.w / 2 + 9} y={cabinTop + 9} width={CAR.w - 18} height="16" rx="4" fill="#cfe8ff" stroke={INK} strokeWidth="2.5" />
+      <path
+        d={`M${grip.x - CAR.w / 2 - 4} ${cabinTop + 2} Q${grip.x} ${cabinTop - 12} ${grip.x + CAR.w / 2 + 4} ${cabinTop + 2} Z`}
+        fill="#3d405b"
+        stroke={INK}
+        strokeWidth="3"
+        strokeLinejoin="round"
+      />
+    </g>
+  );
+}
+
+/** The water bottle on the cage's left wall: the water sinks a little with each sip, and a bubble rises after it. */
+function Bottle({ night, t }: { night: Night; t: number }) {
+  const { x0, x1, top, bottom, spout } = BOTTLE;
+  const w = x1 - x0;
+  const waterTop = bottom - 6 - (bottom - top - 16) * 0.85 * night.water(t);
+  return (
+    <g>
+      <line x1={x1 - 6} y1={bottom + 4} x2={spout.x} y2={spout.y} stroke="#9aa3c8" strokeWidth="5" strokeLinecap="round" />
+      <line x1={x1 - 6} y1={bottom + 4} x2={spout.x} y2={spout.y} stroke={INK} strokeWidth="1.5" strokeLinecap="round" opacity="0.5" />
+      <rect x={x0} y={waterTop} width={w} height={bottom - waterTop} rx="6" fill="#7fc8f8" />
+      {night
+        .bubbles(t)
+        .map((k, i) =>
+          k === null ? null : (
+            <circle key={i} cx={x0 + w / 2 + (i ? 4 : -4)} cy={lerp(bottom - 8, waterTop + 6, k)} r="4" fill="#e8f6ff" opacity={1 - k * 0.6} />
+          ),
+        )}
+      <rect x={x0} y={top} width={w} height={bottom - top} rx="10" fill="#e8f6ff" fillOpacity="0.25" stroke={INK} strokeWidth="3" />
+      <rect x={x0 - 3} y={bottom - 2} width={w + 6} height="10" rx="3" fill="#ff8c42" stroke={INK} strokeWidth="2.5" />
+      <path d={`M${x0 + 4} ${top + 8} L${CAGE.x0 - 2} ${top + 8}`} stroke={INK} strokeWidth="3" />
+    </g>
+  );
+}
+
+/** The hamster: facing right in its drawing (mirrored by `face`), rearing up by `rear`, its feet pattering with `step`. */
+function Hamster({ h }: { h: ReturnType<Night["hamsterAt"]> }) {
+  const fur = "#e9a96b";
+  const light = "#fbe3c4";
+  const p = Math.sin(h.step * 2 * Math.PI) * 4;
+  return (
+    <g transform={`translate(${h.x} ${h.y}) scale(${h.face} 1) rotate(${-deg(h.rear)} -20 16)`}>
+      <ellipse cx={-14 - p} cy="18" rx="8" ry="5" fill={light} stroke={INK} strokeWidth="2.5" />
+      <ellipse cx={14 + p} cy="18" rx="7" ry="5" fill={light} stroke={INK} strokeWidth="2.5" />
+      <circle cx="-30" cy="4" r="4" fill={light} stroke={INK} strokeWidth="2" />
+      <ellipse rx="31" ry="21" fill={fur} stroke={INK} strokeWidth="3" />
+      <ellipse cx="6" cy="9" rx="19" ry="10" fill={light} />
+      {[2, 15].map((ex) => (
+        <g key={ex}>
+          <circle cx={ex} cy="-19" r="7.5" fill={fur} stroke={INK} strokeWidth="2.5" />
+          <circle cx={ex} cy="-19" r="3.5" fill="#ffb3c1" />
+        </g>
+      ))}
+      <circle cx="24" cy="4" r="8" fill={light} />
+      <Eye x={20} y={-5} r={3.5} sleep={1 - h.awake} />
+      <circle cx="33" cy="-3" r="3.2" fill="#ff8fa3" stroke={INK} strokeWidth="1.5" />
+      <path d="M30 1 l12 -3 M30 3 l12 3" stroke={INK} strokeWidth="1.2" opacity="0.6" />
+    </g>
+  );
+}
+
 /* ---------- Round window, moon, cradle ---------- */
 
 /** The round window over the cradle: the evening sky turns to night, stars come out and the sleepy moon rises. Drawn over the dark veil, as it is outside. */
@@ -677,14 +925,20 @@ function RoundWindow({ night, t, ids }: { night: Night; t: number; ids: string }
   const moonY = night.moonY(t);
   const up = seg(moonY, MOON.y0, MOON.y1);
   const sleep = night.asleep(t, night.tMoonSleep);
+  // The moonlight creeps down from the window to the cradle's foot: its sides run on to where its lowest point is.
+  const low = night.beamY(t);
+  const reach = (low - BEAM_TOP) / (CRADLE.bottom - BEAM_TOP);
+  const shut = night.shutterTurn(t);
   return (
     <g>
       {/* Moonlight falling onto the cradle */}
-      <path
-        d={`M${x - 70} ${y + 80} L${x + 70} ${y + 80} L${CRADLE.x1 + 10} ${CRADLE.bottom} L${CRADLE.x0 - 10} ${CRADLE.bottom} Z`}
-        fill={LIGHT}
-        opacity={0.16 * up}
-      />
+      {reach > 0 && (
+        <path
+          d={`M${x - 70} ${BEAM_TOP} L${x + 70} ${BEAM_TOP} L${lerp(x + 70, CRADLE.x1 + 10, reach)} ${low} L${lerp(x - 70, CRADLE.x0 - 10, reach)} ${low} Z`}
+          fill={LIGHT}
+          opacity={0.2 * up}
+        />
+      )}
       <defs>
         <clipPath id={clip}>
           <circle cx={x} cy={y} r={r} />
@@ -725,6 +979,32 @@ function RoundWindow({ night, t, ids }: { night: Night; t: number; ids: string }
       <circle cx={x} cy={y} r={r} fill="none" stroke={WOOD} strokeWidth="18" />
       <circle cx={x} cy={y} r={r + 9} fill="none" stroke={INK} strokeWidth="4" />
       <circle cx={x} cy={y} r={r - 9} fill="none" stroke={INK} strokeWidth="3" />
+      <Shutter turn={shut} dark={night.dark(t)} />
+    </g>
+  );
+}
+
+/** The round wooden shutter over the window, hinged at its right side; swung open by `turn` radians it is seen edge-on. */
+function Shutter({ turn, dark }: { turn: number; dark: number }) {
+  const { r, hingeX } = SHUTTER;
+  const y = ROUND_WINDOW.y;
+  const planks = [-r / 2, 0, r / 2];
+  return (
+    <g>
+      <g transform={`translate(${hingeX} ${y}) scale(${Math.cos(turn)} 1)`}>
+        <circle cx={-r} cy={0} r={r} fill={MID_WOOD} stroke={INK} strokeWidth="4" vectorEffect="non-scaling-stroke" />
+        {planks.map((py) => {
+          const half = Math.sqrt(r * r - py * py);
+          return <line key={py} x1={-r - half + 4} y1={py} x2={-r + half - 4} y2={py} stroke={DARK_WOOD} strokeWidth="3" vectorEffect="non-scaling-stroke" />;
+        })}
+        {/* A little crescent cut into it, and its knob at the free side */}
+        <path d={`M${-r - 8} -40 a22 22 0 1 0 22 30 a17 17 0 1 1 -22 -30 Z`} fill={NIGHT} opacity="0.75" />
+        <circle cx={-2 * r + 16} cy={0} r={7} fill={GOLD} stroke={INK} strokeWidth="3" vectorEffect="non-scaling-stroke" />
+        <circle cx={-r} cy={0} r={r} fill={NIGHT} opacity={dark} />
+      </g>
+      {[-r / 2, r / 2].map((dy) => (
+        <rect key={dy} x={hingeX - 6} y={y + dy - 10} width="12" height="20" rx="3" fill="#5b4a6e" stroke={INK} strokeWidth="2.5" />
+      ))}
     </g>
   );
 }
