@@ -10,7 +10,7 @@ import { type Localized, pick, useAppLanguage } from "@/lib/language";
 import { savesData } from "@/lib/pwa";
 import { useTimers } from "@/lib/timers";
 import { awardTrophy, gameOfPath } from "@/lib/trophies";
-import { type LevelEntry, LEVELS, loadedLevel, loadLevel, prefetchLevel, RUNS } from "./catalog";
+import { type LevelEntry, LEVELS, loadLevel, prefetchLevel, RUNS } from "./catalog";
 import { LEVEL_TEXTS } from "./content";
 import { useAnyKey, type LevelProps } from "./level";
 import type { MarbleLevel, MarbleSettings } from "./settings";
@@ -112,7 +112,7 @@ export function MarblePlay({ settings }: { settings: MarbleSettings }) {
 
 /** One level played: waits (suspends) for its code, then says its first line and plays it. */
 function PlayedLevel({ entry, ...props }: LevelProps & { entry: LevelEntry }) {
-  const Level = loadedLevel(entry) ?? use(loadLevel(entry));
+  const Level = use(loadLevel(entry));
   const { say } = props;
   // Its first line comes with its picture, not while its code still loads; a level's first line cuts off what is still said from before.
   useEffect(() => {

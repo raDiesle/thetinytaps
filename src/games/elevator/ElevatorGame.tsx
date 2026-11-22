@@ -4,7 +4,7 @@ import { PageLoading } from "@/components/PageLoading";
 import { useGameSettings } from "@/lib/common";
 import { useFigurePictures } from "@/lib/figurePictures";
 import { useAppLanguage, useT } from "@/lib/language";
-import { CARDS, type CardEntry, cardOf, loadCard, loadedCard, type PlayProps } from "./catalog";
+import { CARDS, type CardEntry, cardOf, loadCard, type PlayProps } from "./catalog";
 import { titleIn } from "./phrases";
 import { DEFAULT_ELEVATOR_SETTINGS, ELEVATOR_SETTINGS_KEY, type ElevatorSettings } from "./settings";
 import "./elevator.css";
@@ -65,6 +65,6 @@ function Stories({ settings }: { settings: ElevatorSettings }) {
 
 /** One story, level or film played: waits (suspends) for its code, then plays it. */
 function Played({ card, ...props }: PlayProps & { card: CardEntry }) {
-  const Play = loadedCard(card) ?? use(loadCard(card));
+  const Play = use(loadCard(card));
   return <Play {...props} />;
 }

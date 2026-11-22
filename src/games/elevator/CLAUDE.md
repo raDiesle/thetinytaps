@@ -9,7 +9,7 @@ Picture adventures of a few minutes for 2–3-year-olds. Three kinds, picked on 
 - **Every level is a chunk of its own, loaded only when it is played** (November 2026: all 20 in the start screen's chunk
   were 591 KB of code, 166 KB gzip, fetched before the cards showed). `catalog.ts` holds what the start screen,
   the address and „Weiter“ need – id, emoji, title, kind (`CARDS`) – and loads a card's code when its card is pressed
-  (`GameShell prepare`) or it is played (`Played` in `ElevatorGame.tsx`, read as `loadedCard(card) ?? use(loadCard(card))`
+  (`GameShell prepare`) or it is played (`Played` in `ElevatorGame.tsx`, read as `use(loadCard(card))`
   under `Suspense` with the loading paper). The three lift stories share one chunk (`ElevatorPlay.tsx` with the house and
   rooms), each trail level and each film is its own, with its player shared. Only the end (`StoryEnd`) fetches ahead, the
   next card „Weiter“ starts – never on the start screen, nothing in the idle (user decision: load only what the child

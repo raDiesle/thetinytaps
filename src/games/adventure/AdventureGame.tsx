@@ -6,7 +6,7 @@ import { type CommonSettings, useCommonSettings } from "@/lib/common";
 import { canPlayUnfinished } from "@/lib/localTest";
 import { useAppLanguage, useT } from "@/lib/language";
 import { useStoredSettings } from "@/lib/storage";
-import { entryTitle, entryToldIn, loadedPlay, loadedStory, loadPlay, loadStory, STORIES, type StoryEntry } from "./catalog";
+import { entryTitle, entryToldIn, loadPlay, loadStory, STORIES, type StoryEntry } from "./catalog";
 import { ADVENTURE_SETTINGS_KEY, type AdventureStoryId, DEFAULT_ADVENTURE_SETTINGS } from "./settings";
 import { storyIn } from "./stories/story";
 import previews from "./vorschau/*.webp?glob";
@@ -83,8 +83,8 @@ function StoryPlay({
   next?: { name: string; onNext: () => void };
 }) {
   // Read at once where they were fetched ahead, so the story's first picture is drawn before the page turns to it.
-  const loaded = loadedStory(entry) ?? use(loadStory(entry));
-  const { AdventurePlay } = loadedPlay() ?? use(loadPlay());
+  const loaded = use(loadStory(entry));
+  const { AdventurePlay } = use(loadPlay());
   // Built once per story and language: the game starts anew when the story changes.
   const story = useMemo(() => storyIn(loaded, language.id), [loaded, language.id]);
   // Its own music, which plays while music is on for all games.

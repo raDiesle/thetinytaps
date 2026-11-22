@@ -909,7 +909,7 @@ src/lib/                 speech, sfx (synthesized + recorded sounds), storage, d
   that stand below the screen or in something folded load lazily (`loading="lazy"`, the Belohnungstafel's
   `LazyPictures`: 45 chips in a folded „Weitere Einstellungen“ were 2 MB on every first visit). A game made of many big parts (pictures, levels drawn in code) loads each
   part's code only when it is played, through an `import()` per part – wrapped in `lazyPart` (`src/lib/lazyPart.ts`),
-  read as `part.loaded() ?? use(part.load())`, with the start screen passing `GameShell prepare`, so a level fetched
+  read as `use(part.load())` (it marks its promise fulfilled, so `use()` draws a part fetched ahead at once), with the start screen passing `GameShell prepare`, so a level fetched
   ahead is drawn before the page turns to it: `use()` alone showed the loading paper first and drew the level in the
   turn's middle, a 450 ms frame on an old phone (`bun run perf`, November 2026; `lazyPart.test.ts`) – and keeps what its menu needs before that (id,
   emoji, title) in a small catalog: Lebendige Bilder's 23 pictures in one chunk were 1.6 MB that its menu and every

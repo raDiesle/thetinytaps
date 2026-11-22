@@ -107,9 +107,6 @@ const partOf = (card: CardEntry) => {
 /** The card's code, loaded once (the same promise every time, as `use()` needs); a failed download is tried again next time. */
 export const loadCard = (card: CardEntry): Promise<ComponentType<PlayProps>> => partOf(card).load();
 
-/** The card's code once it is loaded, so it is drawn at once – before the page turns to it, not in the turn's middle. */
-export const loadedCard = (card: CardEntry): ComponentType<PlayProps> | undefined => partOf(card).loaded();
-
 /** Fetches a card's code ahead, quietly: a failure (offline) leaves it to the tap, which shows the loading paper and tries again. */
 export function prefetchCard(card: CardEntry) {
   loadCard(card).catch(() => {});

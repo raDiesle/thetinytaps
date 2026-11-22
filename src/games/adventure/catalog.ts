@@ -78,13 +78,7 @@ const partOf = (entry: StoryEntry) => {
 /** The story's code, loaded once (the same promise every time, as `use()` needs); a failed download is tried again next time. */
 export const loadStory = (entry: StoryEntry): Promise<Story> => partOf(entry).load();
 
-/** The story once it is loaded, so its first picture is drawn at once – before the page turns to it. */
-export const loadedStory = (entry: StoryEntry): Story | undefined => partOf(entry).loaded();
-
 const player = lazyPart(() => import("./AdventurePlay"));
 
 /** The player's code with three.js, loaded once: fetched ahead on the start screen, awaited when a story starts. */
 export const loadPlay = player.load;
-
-/** The player's code once it is loaded (see `loadedStory`). */
-export const loadedPlay = player.loaded;

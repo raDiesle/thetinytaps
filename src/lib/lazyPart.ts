@@ -4,26 +4,30 @@
 export interface LazyPart<T> {
   /** Loads it once (the same promise every time, as `use()` needs); a failed download (offline) is tried again next time. */
   load(): Promise<T>;
-  /**
-   * It, once it is loaded. A screen reads it as `part.loaded() ?? use(part.load())`: `use()` suspends for a moment even
-   * on a promise long settled, so without this a level fetched ahead still showed the loading paper first and was drawn
-   * in the middle of the page's turn instead of before it (a 450 ms frame on an old phone, `bun run perf`, November 2026).
-   */
-  loaded(): T | undefined;
 }
 
-/** Wraps a part's `import()` so it is fetched once and can be drawn at once when it is there. */
+/** A promise as React's `use()` reads it: once it says it is fulfilled, `use()` returns its value without suspending. */
+type Tracked<T> = Promise<T> & { status?: "fulfilled"; value?: T };
+
+/**
+ * Wraps a part's `import()` so it is fetched once and can be drawn at once when it is there. A screen reads it as
+ * `use(part.load())`: the promise is marked fulfilled as it settles, so `use()` returns a part fetched ahead in the
+ * same render – an unmarked promise suspended for a moment even when long settled, and the level showed the loading
+ * paper first and was drawn in the middle of the page's turn (a 450 ms frame on an old phone, `bun run perf`, November
+ * 2026). Never read it beside `use()` (`loaded ?? use(…)`): that calls `use()` in one render and not in the next,
+ * which React warns about.
+ */
 export function lazyPart<T>(fetch: () => Promise<T>): LazyPart<T> {
-  let promise: Promise<T> | undefined;
-  let value: { it: T } | undefined;
+  let promise: Tracked<T> | undefined;
   return {
     load() {
       if (!promise) {
-        const started = fetch();
+        const started: Tracked<T> = fetch();
         promise = started;
         started.then(
           (it) => {
-            value = { it };
+            started.status = "fulfilled";
+            started.value = it;
           },
           () => {
             if (promise === started) promise = undefined;
@@ -32,7 +36,6 @@ export function lazyPart<T>(fetch: () => Promise<T>): LazyPart<T> {
       }
       return promise;
     },
-    loaded: () => value?.it,
   };
 }
 
