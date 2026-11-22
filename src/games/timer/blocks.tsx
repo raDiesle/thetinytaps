@@ -1,15 +1,18 @@
 import { type CSSProperties, memo, useMemo } from "react";
-import { type Hop, Hopper, hopKeyframes } from "./hop";
 import { type Frame, holdToEnd, keyframes } from "./keyframes";
 import { Draw, INK, Layer, LeftGlow, STAGE_H, STAGE_W } from "./scenes";
 
 // The block house (H-125, user request, 22 November 2026: timers that look like watching a well-known kind of game,
 // starting with a block-building world, for tidying up): a meadow of blocks under a blue sky, a jumble of loose blocks –
 // stone, wood and red roof tiles – lying on the left, and on the right a house's plan, its blocks' places drawn dashed
-// like a blueprint (the goal, seen from the start). One after the other a block hops out of the jumble onto its place in
-// the house, from the bottom row up as one builds, while a block outline like a game's cursor already stands on the
-// place of the next. When the roof is shut, the light goes on inside. The jumble getting smaller is the time left, the
-// house growing the time gone. A genre's look of our own – own blocks and colours, no figure, nothing of one game.
+// like a blueprint (the goal, seen from the start). A crystal floats in the sky over the jumble, and its beam carries one
+// block after the other onto its place in the house as if by telekinesis, from the bottom row up as one builds: the
+// beam turns onto the block, lifts it, carries it floating across – now and then it lets go for a moment, the block
+// slips and is caught again – and lowers it onto its place, while a block outline like a game's cursor already stands
+// there. Every block is on its way all its share of the time (user request, 22 November 2026: the more movement towards
+// the goal is seen, the better). When the roof is shut, the light goes on inside. The jumble getting smaller is the time
+// left, the house growing the time gone. A genre's look of our own – own blocks and colours, no figure, nothing of one
+// game.
 
 /** A block's front face and how deep it is seen (its top and right side), and its square layer. */
 export const FACE = 72;
@@ -41,7 +44,7 @@ export const MAX_BLOCKS = SLOTS.length;
 /** The fewest blocks a run moves: a short time starts with the lower part of the house already standing. */
 export const MIN_BLOCKS = 8;
 
-/** How many blocks hop into the house in a run of `ms`. */
+/** How many blocks the beam carries into the house in a run of `ms`. */
 export function blockCount(ms: number): number {
   return Math.max(MIN_BLOCKS, Math.min(MAX_BLOCKS, Math.round(ms / 15_000)));
 }
@@ -75,52 +78,254 @@ export const jumbleRow = (place: number): number => (place < 7 ? 0 : place < 13 
 /** Which place of the jumble the block for each place of the house lies on: mixed, so stone, wood and tiles lie anywhere. */
 const FROM: readonly number[] = [9, 2, 16, 5, 12, 0, 18, 7, 14, 3, 11, 19, 6, 1, 15, 10, 4, 17, 8, 13];
 
-/** One block that hops: the place of the house it goes to (`SLOTS`), its kind and its hop. */
+/**
+ * The crystal floating in the sky over the jumble, whose beam carries the blocks one after the other like telekinesis
+ * (user request, 22 November 2026: blocks wander slowly to their place, moving all the time, rather than hopping at the
+ * end of their share): its box and the tip at its foot where the beam starts.
+ */
+export const GEM = { x: 520, y: 110, w: 80, h: 96, tip: { x: 560, y: 202 } } as const;
+
+/** The beam's layer: as wide as its glow, `BEAM_L` long pointing straight down, turned and stretched onto its block. */
+export const BEAM_W = 96;
+export const BEAM_L = 100;
+
+/** How high a block's foot floats over the jumble, clear of every block lying there. */
+export const FLOAT_FOOT = 430;
+
+/** How far above its place a block comes before it is lowered onto it. */
+export const OVER_PLACE = 110;
+
+/** Each block's share of the time, in parts: the beam turns onto it, lifts it, carries it over, lowers it. */
+export const PHASES = { aim: 0.07, lift: 0.3, lower: 0.8 } as const;
+
+/** How far a block slips down when the beam lets go for a moment, how long it falls, and from what share it does. */
+export const SLIP = 60;
+export const SLIP_FALL_MS = 380;
+const DROP_FROM_MS = 6000;
+
+/** The gentle bob of a floating block, one up and down this long. */
+export const BOB_MS = 2000;
+
+/** One block the beam carries: the place of the house it goes to (`SLOTS`), its kind and its way. */
 export interface MovingBlock {
   k: number;
   kind: BlockKind;
-  hop: Hop;
+  /** Its foot's middle in the jumble, and how askew it lies there (degrees). */
+  from: { x: number; y: number };
+  tilt: number;
+  /** Its foot's middle on its place in the house. */
+  to: { x: number; y: number };
+  /** How high its foot comes over its place before it is lowered. */
+  over: number;
+  /** When the beam leaves the block before it and turns onto this one (the one before has just landed). */
+  start: number;
+  /** When it lands on its place: at the end of its share. */
+  land: number;
+  /** When the beam lets go of it for a moment and it slips down a little, caught again; none for most. */
+  drop?: number;
 }
 
-/** How long a hop takes at most (less when blocks come quickly). */
-export const BLOCK_HOP_MS = 900;
+/** When each phase of a block's share begins after the beam has turned onto it: lifted, carried across, lowered. */
+export function phaseTimes(b: MovingBlock) {
+  const share = b.land - b.start;
+  return {
+    lift: b.start + share * PHASES.aim,
+    carry: b.start + share * PHASES.lift,
+    lower: b.start + share * PHASES.lower,
+  };
+}
+
+/** How long the beam takes to catch a block that slipped and lift it back up. */
+export const catchMs = (b: MovingBlock) => Math.min(1400, (b.land - b.start) * 0.15);
 
 /**
  * Works out a run of `total` ms moving `count` blocks: the house's first places beyond those stand from the start
- * (`built`), and each block moved has the same share of the time – it waits its turn (wiggling once a second), hops
- * and lands at the end of its share, the last as the time is up.
+ * (`built`), and each block moved has the same share of the time, all of it on its way – the beam turns onto it, lifts
+ * it out of the jumble, carries it over floating and lowers it onto its place, landing at the end of its share, the
+ * last as the time is up. Every third block slips once on its way where its share is long enough.
  */
 export function blocksPlan(total: number, count: number): { built: number; blocks: MovingBlock[] } {
   const built = MAX_BLOCKS - count;
   const unit = total / count;
-  const hopMs = Math.min(BLOCK_HOP_MS, unit * 0.4);
   const blocks: MovingBlock[] = [];
   for (let i = 0; i < count; i++) {
     const k = built + i;
     const slot = SLOTS[k];
     const { tilt, ...from } = JUMBLE[FROM[k]];
     const to = slotFoot(slot.c, slot.r);
-    const land = (i + 1) * unit;
-    const start = land - hopMs;
-    const since = i * unit + 300;
+    const start = i * unit;
     blocks.push({
       k,
       kind: slot.kind,
-      hop: {
-        from,
-        to,
-        scale: 1,
-        start,
-        land,
-        // High over the jumble's back row, so it never seems to pass behind a block lying there.
-        peak: Math.min(from.y, to.y, 600) - 110,
-        waitFrom: start - since >= 1000 ? since : undefined,
-        tilt: tilt || undefined,
-      },
+      from,
+      tilt,
+      to,
+      over: Math.min(FLOAT_FOOT, to.y - OVER_PLACE),
+      start,
+      land: (i + 1) * unit,
+      // Halfway across, while it floats.
+      drop: i % 3 === 1 && unit >= DROP_FROM_MS ? start + unit * 0.5 : undefined,
     });
   }
   return { built, blocks };
 }
+
+const smooth = (v: number) => v * v * (3 - 2 * v);
+const clamp01 = (v: number) => Math.max(0, Math.min(1, v));
+
+/** Where a carried block's foot is at `t` ms, how it is turned, and whether the beam holds it. */
+export interface Pose {
+  x: number;
+  y: number;
+  rot: number;
+  held: boolean;
+}
+
+/** A carried block's pose on its way at `t` ms after the run's start, without slipping. */
+function wayPose(b: MovingBlock, t: number): Pose {
+  const p = phaseTimes(b);
+  if (t <= p.lift) return { ...b.from, rot: b.tilt, held: t >= p.lift };
+  if (t >= b.land) return { ...b.to, rot: 0, held: false };
+  if (t <= p.carry) {
+    // Straight up out of the jumble, straightening as it rises.
+    const v = (t - p.lift) / (p.carry - p.lift);
+    return { x: b.from.x, y: b.from.y + (FLOAT_FOOT - b.from.y) * smooth(v), rot: b.tilt * (1 - smooth(v)), held: true };
+  }
+  if (t <= p.lower) {
+    // Across in a gentle arc, leaning back a little as it is pulled along, rising to over its place.
+    const v = (t - p.carry) / (p.lower - p.carry);
+    const s = smooth(v);
+    return {
+      x: b.from.x + (b.to.x - b.from.x) * s,
+      y: FLOAT_FOOT + (b.over - FLOAT_FOOT) * s - 36 * Math.sin(Math.PI * v),
+      rot: -5 * Math.sin(Math.PI * v) * Math.sign(b.to.x - b.from.x),
+      held: true,
+    };
+  }
+  // Lowered slowly onto its place.
+  const v = (t - p.lower) / (b.land - p.lower);
+  return { x: b.to.x, y: b.over + (b.to.y - b.over) * smooth(v), rot: 0, held: true };
+}
+
+/**
+ * A carried block's pose at `t` ms after the run's start (`MovingBlock`): on its way, except where the beam lets go –
+ * then it falls straight down from where it was, and the beam catches it and draws it back onto its way.
+ */
+export function blockPose(b: MovingBlock, t: number): Pose {
+  if (b.drop === undefined || t < b.drop) return wayPose(b, t);
+  const fell = t - b.drop;
+  const there = wayPose(b, b.drop);
+  if (fell <= SLIP_FALL_MS) return { ...there, y: there.y + SLIP * (fell / SLIP_FALL_MS) ** 2, held: false };
+  const w = (fell - SLIP_FALL_MS) / catchMs(b);
+  if (w >= 1) return wayPose(b, t);
+  const back = wayPose(b, t);
+  const k = smooth(w);
+  return { x: there.x + (back.x - there.x) * k, y: there.y + SLIP + (back.y - there.y - SLIP) * k, rot: there.rot + (back.rot - there.rot) * k, held: true };
+}
+
+/**
+ * The moments a block's way is written at: the phases cut into even steps, finer where it slips, so the block (on its
+ * own keyframes) and the beam's tip (turned and stretched onto it) follow one way and never part.
+ */
+function poseTimes(b: MovingBlock): number[] {
+  const p = phaseTimes(b);
+  const steps = (a: number, z: number, n: number) => Array.from({ length: n + 1 }, (_, i) => a + ((z - a) * i) / n);
+  const times = [...steps(b.start, p.lift, 4), ...steps(p.lift, p.carry, 8), ...steps(p.carry, p.lower, 18), ...steps(p.lower, b.land, 8)];
+  if (b.drop !== undefined) times.push(...steps(b.drop, b.drop + SLIP_FALL_MS, 6), ...steps(b.drop + SLIP_FALL_MS, b.drop + SLIP_FALL_MS + catchMs(b), 8));
+  return [...new Set(times)].sort((a, c) => a - c);
+}
+
+/** The middle of a block's front at a pose: where the beam's tip lies on it. */
+const poseMiddle = (pose: { x: number; y: number }) => ({ x: pose.x, y: pose.y - BLOCK / 2 });
+
+/** The beam's transform reaching from the crystal's tip to `point`: turned from straight down, stretched to its length. */
+export function beamTransform(point: { x: number; y: number }): string {
+  const dx = point.x - GEM.tip.x;
+  const dy = point.y - GEM.tip.y;
+  const angle = (Math.atan2(-dx, dy) * 180) / Math.PI;
+  return `rotate(${angle.toFixed(2)}deg) scaleY(${(Math.hypot(dx, dy) / BEAM_L).toFixed(3)})`;
+}
+
+/** The beam's way as keyframes: onto each block in turn while the one before rests, then along with it to its place. */
+export function beamFrames(blocks: MovingBlock[]): Frame[] {
+  const frames: Frame[] = [];
+  blocks.forEach((b, i) => {
+    const target = poseMiddle(b.from);
+    // From the place of the block before, or for the first from just under the crystal.
+    const before = i ? poseMiddle(blocks[i - 1].to) : { x: GEM.tip.x + (target.x - GEM.tip.x) * 0.15, y: GEM.tip.y + (target.y - GEM.tip.y) * 0.15 };
+    const p = phaseTimes(b);
+    for (const t of poseTimes(b)) {
+      const point =
+        t <= p.lift
+          ? (() => {
+              const v = smooth(clamp01((t - b.start) / (p.lift - b.start)));
+              return { x: before.x + (target.x - before.x) * v, y: before.y + (target.y - before.y) * v };
+            })()
+          : poseMiddle(blockPose(b, t));
+      frames.push({ at: t, transform: beamTransform(point), ease: "linear" });
+    }
+  });
+  return frames;
+}
+
+/** An opacity at a moment, for keyframes of `opacity` written for the run. */
+type Shade = { at: number; o: number };
+
+/** A `@keyframes` rule of `opacity` for a run of `total` ms, linear between its points. */
+function opacityKeyframes(name: string, total: number, shades: Shade[]): string {
+  const percent = (ms: number) => ((Math.max(0, Math.min(ms, total)) / total) * 100).toFixed(4);
+  return `@keyframes ${name} {${shades.map((s) => `${percent(s.at)}% { opacity: ${s.o}; }`).join(" ")}}`;
+}
+
+/** The beam's light: coming on at the start, flickering off where a block slips and on as it is caught, off at the end. */
+export function beamShades(blocks: MovingBlock[]): Shade[] {
+  const first = phaseTimes(blocks[0]).lift;
+  const shades: Shade[] = [
+    { at: 0, o: 0 },
+    { at: Math.min(400, first), o: 1 },
+  ];
+  for (const b of blocks)
+    if (b.drop !== undefined)
+      shades.push(
+        { at: b.drop, o: 1 },
+        { at: b.drop + 40, o: 0.2 },
+        { at: b.drop + 80, o: 0.8 },
+        { at: b.drop + 120, o: 0 },
+        { at: b.drop + SLIP_FALL_MS, o: 0 },
+        { at: b.drop + SLIP_FALL_MS + 80, o: 1 },
+      );
+  const end = blocks[blocks.length - 1].land;
+  shades.push({ at: end, o: 1 }, { at: end + 500, o: 0 });
+  return shades;
+}
+
+/** A carried block's own glow while the beam holds it: on as the beam reaches it, off while it slips, off as it lands. */
+function auraShades(b: MovingBlock): Shade[] {
+  const held = phaseTimes(b).lift;
+  const shades: Shade[] = [
+    { at: 0, o: 0 },
+    { at: b.start, o: 0 },
+    { at: held, o: 1 },
+  ];
+  if (b.drop !== undefined)
+    shades.push({ at: b.drop + 60, o: 1 }, { at: b.drop + 120, o: 0 }, { at: b.drop + SLIP_FALL_MS, o: 0 }, { at: b.drop + SLIP_FALL_MS + 80, o: 1 });
+  shades.push({ at: b.land - 1, o: 1 }, { at: b.land + 300, o: 0 });
+  return shades;
+}
+
+/** A block's way as keyframes: lying in the jumble, then along its pose, resting on its place after it lands. */
+function blockFrames(b: MovingBlock): Frame[] {
+  const move = (pose: Pose) =>
+    `translate(${(((pose.x - b.from.x) / BLOCK) * 100).toFixed(2)}%, ${(((pose.y - b.from.y) / BLOCK) * 100).toFixed(2)}%) rotate(${pose.rot.toFixed(2)}deg)`;
+  return [
+    { at: 0, transform: move(blockPose(b, 0)), ease: "linear" },
+    ...poseTimes(b).map((t) => ({ at: t, transform: move(blockPose(b, t)), ease: "linear" })),
+  ];
+}
+
+/** Where a block rests after landing, as its layer's transform (for the end, once animations are off). */
+const restTransform = (b: MovingBlock) =>
+  `translate(${(((b.to.x - b.from.x) / BLOCK) * 100).toFixed(2)}%, ${(((b.to.y - b.from.y) / BLOCK) * 100).toFixed(2)}%) rotate(0deg)`;
 
 /** A transform moving a layer standing on place `a` of the house to place `b`, in % of its own size. */
 function slotShift(a: number, b: number): string {
@@ -132,23 +337,29 @@ function slotShift(a: number, b: number): string {
 /** The cursor's keyframes: on the next block's place from the moment the one before has landed, jumping on at once. */
 export function cursorFrames(blocks: MovingBlock[]): Frame[] {
   const first = blocks[0].k;
-  return blocks.map((b, i) => ({ at: i ? blocks[i - 1].hop.land : 0, transform: slotShift(first, b.k), ease: "step-end" }));
+  return blocks.map((b, i) => ({ at: i ? blocks[i - 1].land : 0, transform: slotShift(first, b.k), ease: "step-end" }));
 }
 
 /**
  * A block's stacking as keyframes: lying in the jumble by its row (the front rows over the back ones) and under every
- * block of the house, and from the moment it hops over all of them and the jumble, and under the ones built after it –
+ * block of the house, and from the moment it rises over all of them and the jumble, and under the ones built after it –
  * so the house's blocks always cover each other rightly.
  */
 function stackKeyframes(name: string, total: number, block: MovingBlock): string {
-  const at = ((Math.max(0, block.hop.start) / total) * 100).toFixed(3);
+  const at = ((phaseTimes(block).lift / total) * 100).toFixed(3);
   const row = jumbleRow(FROM[block.k]);
   return `@keyframes ${name} {0% { z-index: ${row}; animation-timing-function: step-end; } ${at}% { z-index: ${100 + block.k}; } 100% { z-index: ${100 + block.k}; }}`;
 }
 
-/** The blocks' hops, their stacking and the cursor's way as keyframes made for this run. */
+/** The blocks' ways, glows and stacking, the beam's way and light and the cursor's way as keyframes made for this run. */
 function BlocksKeyframes({ total, blocks }: { total: number; blocks: MovingBlock[] }) {
-  const rules = blocks.flatMap((b) => [...hopKeyframes(`tm-blocks-${b.k}`, total, b.hop, BLOCK), stackKeyframes(`tm-blocks-z-${b.k}`, total, b)]);
+  const rules = blocks.flatMap((b) => [
+    keyframes(`tm-blocks-${b.k}`, total, holdToEnd(blockFrames(b), total)),
+    opacityKeyframes(`tm-blocks-aura-${b.k}`, total, auraShades(b)),
+    stackKeyframes(`tm-blocks-z-${b.k}`, total, b),
+  ]);
+  rules.push(keyframes("tm-blocks-beam", total, holdToEnd(beamFrames(blocks), total)));
+  rules.push(opacityKeyframes("tm-blocks-beam-on", total, beamShades(blocks)));
   rules.push(keyframes("tm-blocks-cursor", total, holdToEnd(cursorFrames(blocks), total)));
   return <style>{rules.join("\n")}</style>;
 }
@@ -375,7 +586,7 @@ const Cursor = memo(function Cursor({ blocks }: { blocks: MovingBlock[] }) {
 
 /** Little square crumbs springing off a block as it lands, as in a block game: one small layer per block, at its landing. */
 function Crumbs({ block }: { block: MovingBlock }) {
-  const { to } = block.hop;
+  const { to } = block;
   const colors = KIND_COLORS[block.kind];
   return (
     <Layer
@@ -384,7 +595,7 @@ function Crumbs({ block }: { block: MovingBlock }) {
       w={2 * BLOCK}
       h={BLOCK}
       className="tm-blocks-crumbs"
-      style={{ "--tm-at": `${block.hop.land}ms`, zIndex: 200 } as CSSProperties}
+      style={{ "--tm-at": `${block.land}ms`, zIndex: 200 } as CSSProperties}
     >
       <svg viewBox={`0 0 ${2 * BLOCK} ${BLOCK}`}>
         {[
@@ -402,17 +613,120 @@ function Crumbs({ block }: { block: MovingBlock }) {
   );
 }
 
-/** Each moving block on its hop inside a stacking box of its own; while it lies in the jumble a tap lights it (H-51). */
+/** The beam's colours: a violet magic light, unlike anything else in the picture and clear on the blue sky and the grass. */
+const BEAM = { glow: "#b197fc", core: "#ffffff", deep: "#7048e8" } as const;
+
+/**
+ * The crystal floating over the jumble: a cut gem of facets in cool blues and violets, a soft halo round it that pulses
+ * once a second while it works (a layer of its own), its tip where the beam starts. Drawn once.
+ */
+const Gem = memo(function Gem() {
+  const { x, y, w, h } = GEM;
+  const line = { stroke: INK, strokeWidth: 3, strokeLinejoin: "round" as const };
+  return (
+    <>
+      <Layer x={x - 50} y={y - 40} w={w + 100} h={h + 80} className="tm-blocks-halo" style={{ zIndex: 97 }}>
+        <svg viewBox={`0 0 ${w + 100} ${h + 80}`}>
+          <defs>
+            <radialGradient id="tm-blocks-halo">
+              <stop offset="0" stopColor={BEAM.glow} stopOpacity="0.95" />
+              <stop offset="0.55" stopColor={BEAM.glow} stopOpacity="0.4" />
+              <stop offset="1" stopColor={BEAM.glow} stopOpacity="0" />
+            </radialGradient>
+          </defs>
+          <ellipse cx={(w + 100) / 2} cy={(h + 80) / 2} rx={(w + 100) / 2} ry={(h + 80) / 2} fill="url(#tm-blocks-halo)" />
+        </svg>
+      </Layer>
+      <Layer x={x} y={y} w={w} h={h} style={{ zIndex: 98 }}>
+        <svg viewBox={`0 0 ${w} ${h}`}>
+          {/* Top half: a flat table and two slanting facets; bottom half: three long facets down to the tip. */}
+          <path d={`M14 30 L26 8 H54 L66 30 Z`} fill="#c5f6fa" {...line} />
+          <path d={`M14 30 L40 ${h - 4} L2 30 Z`} fill="#4c6ef5" {...line} />
+          <path d={`M66 30 L40 ${h - 4} L78 30 Z`} fill="#364fc7" {...line} />
+          <path d={`M14 30 H66 L40 ${h - 4} Z`} fill="#74c0fc" {...line} />
+          <path d={`M2 30 L14 30 L26 8 Z`} fill="#91a7ff" {...line} />
+          <path d={`M78 30 L66 30 L54 8 Z`} fill="#5c7cfa" {...line} />
+          <path d="M30 34 L40 70" stroke="#e7f5ff" strokeWidth="5" strokeLinecap="round" opacity="0.8" />
+          <path d="M32 14 H44" stroke="#fff" strokeWidth="4" strokeLinecap="round" />
+        </svg>
+      </Layer>
+    </>
+  );
+});
+
+/**
+ * The beam from the crystal's tip to the block it carries: a layer pointing straight down, turned and stretched onto
+ * the block by keyframes written for the run (`beamFrames`), its light on its own (`beamShades`), and little sparks
+ * running along it to the block, so the pull is seen all the time. Drawn once.
+ */
+const Beam = memo(function Beam() {
+  return (
+    <Layer
+      x={GEM.tip.x - BEAM_W / 2}
+      y={GEM.tip.y}
+      w={BEAM_W}
+      h={BEAM_L}
+      className="tm-blocks-beam"
+      style={{ "--tm-anim": "tm-blocks-beam", zIndex: 99 } as CSSProperties}
+    >
+      <div className="tm-blocks-beam-on" style={{ "--tm-light": "tm-blocks-beam-on" } as CSSProperties}>
+        <svg viewBox={`0 0 ${BEAM_W} ${BEAM_L}`} preserveAspectRatio="none">
+          <defs>
+            <linearGradient id="tm-blocks-beam" x1="0" y1="0" x2="1" y2="0">
+              <stop offset="0" stopColor={BEAM.glow} stopOpacity="0" />
+              <stop offset="0.22" stopColor={BEAM.glow} stopOpacity="0.45" />
+              <stop offset="0.4" stopColor={BEAM.deep} stopOpacity="0.8" />
+              <stop offset="0.6" stopColor={BEAM.deep} stopOpacity="0.8" />
+              <stop offset="0.78" stopColor={BEAM.glow} stopOpacity="0.45" />
+              <stop offset="1" stopColor={BEAM.glow} stopOpacity="0" />
+            </linearGradient>
+          </defs>
+          <rect width={BEAM_W} height={BEAM_L} fill="url(#tm-blocks-beam)" />
+          <rect x={BEAM_W / 2 - 7} width="14" height={BEAM_L} fill={BEAM.core} />
+        </svg>
+        <div className="tm-blocks-sparks">
+          <svg viewBox="0 0 20 200" preserveAspectRatio="none">
+            {Array.from({ length: 8 }, (_, i) => (
+              <rect key={i} x={i % 2 ? 3 : 11} y={i * 25 + 4} width="6" height="9" rx="3" fill={BEAM.deep} />
+            ))}
+          </svg>
+        </div>
+      </div>
+    </Layer>
+  );
+});
+
+/**
+ * Each carried block on its way inside a stacking box of its own: its layer on keyframes written for the run, a gentle
+ * bob while it floats, a cool glow round it while the beam holds it; while it lies in the jumble a tap lights it (H-51).
+ */
 const MovingBlocks = memo(function MovingBlocks({ blocks, glow }: { blocks: MovingBlock[]; glow: number }) {
   return (
     <>
-      {blocks.map((b) => (
-        <div key={b.k} className="tm-blocks-z" style={{ "--tm-anim": `tm-blocks-z-${b.k}`, "--tm-z-end": 100 + b.k } as CSSProperties}>
-          <Hopper name={`tm-blocks-${b.k}`} hop={b.hop} size={BLOCK} extra={<LeftGlow n={glow} />}>
-            <BlockArt kind={b.kind} />
-          </Hopper>
-        </div>
-      ))}
+      {blocks.map((b) => {
+        const p = phaseTimes(b);
+        const bobs = Math.floor((p.lower - p.lift) / BOB_MS);
+        return (
+          <div key={b.k} className="tm-blocks-z" style={{ "--tm-anim": `tm-blocks-z-${b.k}`, "--tm-z-end": 100 + b.k } as CSSProperties}>
+            <Layer
+              x={b.from.x - BLOCK / 2}
+              y={b.from.y - BLOCK}
+              w={BLOCK}
+              h={BLOCK}
+              className="tm-blocks-block"
+              style={{ "--tm-anim": `tm-blocks-${b.k}`, "--tm-end": restTransform(b) } as CSSProperties}
+            >
+              <div className="tm-blocks-bob" style={{ "--tm-at": `${p.lift}ms`, "--tm-bobs": bobs } as CSSProperties} data-bobs={bobs > 0 ? "" : undefined}>
+                <div className="tm-blocks-aura" style={{ "--tm-anim": `tm-blocks-aura-${b.k}` } as CSSProperties} />
+                <BlockArt kind={b.kind} />
+              </div>
+              <div className="tm-toy-left" style={{ "--tm-at": `${p.lift}ms` } as CSSProperties}>
+                <LeftGlow n={glow} />
+              </div>
+            </Layer>
+          </div>
+        );
+      })}
     </>
   );
 });
@@ -428,7 +742,7 @@ const AllCrumbs = memo(function AllCrumbs({ blocks }: { blocks: MovingBlock[] })
   );
 });
 
-/** The whole picture: the meadow, the house's plan and its light, the blocks built and those still to come, the cursor. */
+/** The whole picture: the meadow, the house's plan and its light, the blocks built and those still to come, the cursor, the crystal and its beam. */
 export function BlocksScene({ count, total, glow }: { count: number; total: number; glow: number }) {
   // Worked out once for the run, so the memoised parts are not drawn again when a tap lights the blocks.
   const { built, blocks } = useMemo(() => blocksPlan(total, count), [total, count]);
@@ -441,6 +755,8 @@ export function BlocksScene({ count, total, glow }: { count: number; total: numb
         <BlocksKeyframes total={total} blocks={blocks} />
         <BuiltBlocks built={built} />
         <Cursor blocks={blocks} />
+        <Gem />
+        <Beam />
         <MovingBlocks blocks={blocks} glow={glow} />
         <AllCrumbs blocks={blocks} />
       </div>

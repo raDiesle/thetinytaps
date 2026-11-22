@@ -53,7 +53,7 @@ import { appleCount, appleTimes, haltMs, ladybugLaps, MAX_STOPS, pieceCount, pie
 import { PizzaScene, SLICES } from "./pizza";
 import { CandleBackdrop, Candles, Hourglass, Layer, RAIL_Y, RailAhead, SandBackdrop, TRAIN, Train, TrainBackdrop, TrainStops } from "./scenes";
 import type { SwapToy, TimeShown, TimerPicture, TimerSettings } from "./settings";
-import { TimeShownChoice, TimeShownNote } from "./shown";
+import { noteRoom, TimeShownChoice, TimeShownNote } from "./shown";
 import { SunsetScene } from "./sunset";
 import { SwapRun } from "./SwapPlay";
 import { TidyScene, tidyTimes, toyCount } from "./tidy";
@@ -355,7 +355,7 @@ function TimerRun({
     if (picture === "blocks")
       return blocksPlan(total, blockCount(set))
         .blocks.slice(0, -1)
-        .map((b) => b.hop.land);
+        .map((b) => b.land);
     // The treasure tunnel (H-126): each block crumbling away, the last one being the end's.
     if (picture === "tunnel")
       return tunnelPlan(total, digCount(set))
@@ -535,9 +535,18 @@ function TimerRun({
   const nextInfo = PICTURES.find((p) => p.id === next);
   const name = PICTURES.find((p) => p.id === picture)?.name;
   const clock = picture === "clock";
+  // The note's room is kept for the whole run, so the bar never changes its length.
+  const room = noteRoom(clock ? "off" : shown, total);
   return (
     <>
-      <div className={`tm-play${bar ? " tm-with-bar" : ""}`} data-picture={picture} onPointerDown={down} role="img" aria-label={name ? t(name) : undefined}>
+      <div
+        className={`tm-play${bar ? " tm-with-bar" : ""}${room.className}`}
+        style={room.style}
+        data-picture={picture}
+        onPointerDown={down}
+        role="img"
+        aria-label={name ? t(name) : undefined}
+      >
         <div className={`tm-stage tm-${phase}${far ? " tm-far" : ""}`} style={stageStyle(picture, total, stops)}>
           <SceneParts picture={picture} phase={phase} total={total} set={set} poke={poke} startedAt={endsAt - total} />
           {phase === "done" && <div className="tm-done-light" />}

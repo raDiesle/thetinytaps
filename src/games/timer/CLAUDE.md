@@ -139,12 +139,21 @@ taken out (user request, November 2026). The pictures:
   played by itself, like a video, the first a block-building game for tidying up): on a meadow of square grass a
   jumble of blocks lies in three rows (`JUMBLE`, each a little tilted), beside a house's plan drawn in dashed outlines
   (`HOUSE`, `SLOTS`: stone at the foot, wood walls with a door and two windows, a stepped roof). A cursor's cube
-  outline stands on the next place (`cursorFrames`), and one block after the other hops from the jumble onto it
-  (`Hopper`, `FROM` says which), from the bottom up, with a little puff of crumbs as it lands; the last lands as the
-  time is up, and then the windows and the door light up. Five minutes are all twenty blocks; a shorter run starts
-  with the lower places already built (`blockCount`, at least `MIN_BLOCKS` moving), so blocks never hop too fast.
+  outline stands on the next place (`cursorFrames`). A crystal floats in the sky over the jumble (`GEM`, its halo
+  pulsing softly) and its violet beam carries one block after the other to its place like telekinesis (user request,
+  22 November 2026: blocks wander slowly to their place, the more movement towards the goal the better), from the
+  bottom up, each **all its share long** (`blocksPlan`: a block starts where the one before lands): the beam swings
+  over to it and it glows (`PHASES.aim`), it rises straight up out of the jumble, straightening (`lift`), floats across
+  in a low arch, leaning into the way (`carry`), and is lowered onto its place (`lower`), landing with a puff of crumbs
+  as its share ends; the last lands as the time is up, and then the windows and the door light up. On a long share
+  it bobs gently while held (`.tm-blocks-bob`, a finite CSS animation), and every third block on a share of 6 s or
+  more slips once – the beam flickers off, the block falls `SLIP`, the beam catches it and carries on (`blockPose`,
+  `drop`). The block's way and the beam's turn and length are sampled at the same moments into keyframes written for
+  the run (`blockFrames`, `beamFrames`, linear between them), so the beam's tip stays on the block; its light and the
+  block's glow are opacity keyframes of their own (`beamShades`). Five minutes are all twenty blocks; a shorter run
+  starts with the lower places already built (`blockCount`, at least `MIN_BLOCKS` moving).
   Each block is a layer of its own; that a block further right or higher covers its neighbour comes from an animated
-  z-index per block (`stackKeyframes`, stepping at its hop) inside `.tm-blocks`, which isolates it so none reaches over
+  z-index per block (`stackKeyframes`, stepping as it lifts) inside `.tm-blocks`, which isolates it so none reaches over
   the end's light or trophy. A landing knocks, a tap knocks higher and lights the blocks still lying. Its name and
   lines (`blocksNames.ts`) were written English first and translated into every app language at once. **Such a game
   look is a genre of our own** (user request with H-125): blocks, a cursor, a meadow of squares – never another
@@ -261,8 +270,11 @@ and the shared `Layer`, `Draw`, `LeftGlow`), `timer.css`, `content.ts`
   run, started from the clock (`--tm-bar-delay`) and started again after a page turn or when the page comes back –
   never React per frame (`timer.test.ts`). With it the stage's middle moves up into the room above it
   (`.tm-with-bar .tm-stage`), so it lies under what matters instead of over the picture's foot, while the stage still
-  reaches the screen's bottom edge (a dark strip showed under it on a tablet); the time note stands above its right
-  end, and at the end it fades for the end's light, trophy and buttons. A tap lights its way still to go too (H-51).
+  reaches the screen's bottom edge (a dark strip showed under it on a tablet). The digits' note stands in the very
+  bottom right corner beside the bar's end, and the bar ends left of it (user feedback, 22 November 2026: above the
+  bar it looked set somewhere; `noteRoom` in `shown.tsx` gives `.tm-play` the note's width, `--tm-note-em`, and
+  `.tm-note-digits .tm-bar` its room); tally marks, a row too wide for the corner, stay above the bar's right end. At
+  the end the bar fades for the end's light, trophy and buttons. A tap lights its way still to go too (H-51).
 - **The last moments are felt, never hurried** (H-124): `finalMs` (ten seconds, a quarter of a short run) before the
   end a warm light gathers from the screen's edges (`FinalLight`, one layer by `opacity`), the bar's marker and the
   flag's light swell softly once a second, and the last `FINAL_NOTES` seconds each sound one soft rising note, the
@@ -353,7 +365,13 @@ and the shared `Layer`, `Draw`, `LeftGlow`), `timer.css`, `content.ts`
 - **A clock time behind us is never quietly tomorrow's** (H-60): the sheet asks „Bis morgen um …?“ and keeps the answer
   for that day only (`tomorrowFrom`); a kept „bis 17:30“ started after 17:30 asks again before it runs (`TimerStart`).
   The time left stands small in the picture's bottom right corner, letting taps through: minutes and seconds by default,
-  tally marks or nothing when a grown-up chooses so behind ⚙️ („Zeit im Bild“).
+  tally marks or nothing when a grown-up chooses so behind ⚙️ („Zeit im Bild“). **The note never changes its width**
+  while it runs (user feedback, 22 November 2026): its digits stand in cells of one width each (`DIGIT_EM`, the colon
+  `COLON_EM`), the note as wide as the run's longest text (`digitsEm`), and gone tally bundles keep their room
+  (`Tally slots`) – never a box that shrinks as „10:00“ becomes „9:59“ or a narrow 1 follows a wide 4.
+- **A game-like picture moves towards its goal all the time** (user feedback on the Block House, 22 November 2026):
+  what makes progress (a block carried, a toy put away) is seen moving the whole of its share – slowly, every second a
+  little nearer, now and then a playful slip – never standing still and then hopping into place at its share's end.
 - **Tally marks start many** (user feedback, November 2026: ten were too few to see them go): every way of marks starts
   with a full row or, for a short time, one a second (10 s: ten marks), never a handful (`timer.test.ts` checks). A
   changed default of `timeNote` gets the field a new name, or everyone who played before keeps the old one.

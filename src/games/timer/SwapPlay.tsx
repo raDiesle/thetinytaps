@@ -11,7 +11,7 @@ import { useWakeLock } from "@/lib/wakeLock";
 import { TimeBar, TimeBarChoice } from "./bar";
 import { nextPicture, PICTURES, SWAP_NAME } from "./content";
 import type { SwapToy, TimeShown, TimerPicture, TurnPicture } from "./settings";
-import { TimeShownChoice, TimeShownNote } from "./shown";
+import { noteRoom, TimeShownChoice, TimeShownNote } from "./shown";
 import { SAW, Seesaw, SeesawBackdrop, SeesawGoal, SeesawStand, SeesawSun } from "./seesaw";
 import { type Holder, SWAP_TOYS, SwapBackdrop, SwapCushions, SwapHourglass, SwapLight, SwapShade, Toy } from "./swap";
 import { TimeLeft } from "./TimerPlay";
@@ -229,10 +229,18 @@ export function SwapRun({
   const next = nextPicture(picture);
   const nextInfo = PICTURES.find((p) => p.id === next);
   const name = PICTURES.find((p) => p.id === picture)?.name;
+  const room = noteRoom(timeShown, turnMs);
 
   return (
     <>
-      <div className={`tm-play${bar ? " tm-with-bar" : ""}`} data-picture={picture} onPointerDown={down} role="img" aria-label={name ? t(name) : undefined}>
+      <div
+        className={`tm-play${bar ? " tm-with-bar" : ""}${room.className}`}
+        style={room.style}
+        data-picture={picture}
+        onPointerDown={down}
+        role="img"
+        aria-label={name ? t(name) : undefined}
+      >
         {seesaw ? (
           <div className={`tm-stage ${done ? "tm-done" : "tm-running"}`}>
             <SeesawBackdrop />
