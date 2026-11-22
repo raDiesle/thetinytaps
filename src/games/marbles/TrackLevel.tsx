@@ -60,8 +60,10 @@ import {
   ROW7,
   ROW8,
   ROW9,
+  ROLL,
   ROLLER,
   ROLLERS,
+  rolled,
   rowY,
   SEESAW,
   seesawSpot,
@@ -71,7 +73,6 @@ import {
   SLOTS,
   TRACK_H,
   TUNNEL,
-  TURNS,
   wheelIn,
   ZIGS,
   type Piece,
@@ -100,6 +101,7 @@ import {
   Spot,
   SpotBoard,
   STAR_GOLD,
+  StretchArt,
   Switch,
   TrackRail,
   Tunnel,
@@ -109,16 +111,10 @@ import {
 } from "./trackParts";
 import "./track.css";
 
-const GRAVITY = 1600;
-const FRICTION = 0.3;
-const MIN_SPEED = 280;
-const MAX_SPEED = 950;
 const LAND_MS = 380;
 const DONE_AFTER_FULL_MS = 2200;
 /** A thing picked from the shelf flies into the hopper first. */
 const FLY_MS = 380;
-/** The soap bubble's even speed, before its pace. */
-const FLOAT_SPEED = 330;
 /** The tennis ball's hops on the rows: how high, and how far apart. */
 const HOP_H = 34;
 const HOP_LEN = 130;
@@ -266,7 +262,8 @@ const never = (n: number) => Array.from({ length: n }, () => -Infinity);
  * over a xylophone, through spots that hold a bell, a funnel, a paddle wheel or
  * a trampoline, rides the seesaw, goes through the tunnel, zigzags down past
  * bumpers, loops the loop, hops over three drums, knocks the chimes and plays
- * a whole scale before it drops into the basket – each its own way: the tennis
+ * a whole scale, and goes down its world's own stretch (`trackStretches.ts`: the
+ * wooden run's helix tower, step lifter and tipping troughs) into the basket – each its own way: the tennis
  * ball hops, the iron ball rumbles slowly with deep notes, the soap bubble
  * floats and bursts above the basket. The camera follows them down. When the
  * basket is full a flag springs up out of it. Tapping a spot swaps its part,
@@ -277,8 +274,8 @@ const never = (n: number) => Array.from({ length: n }, () => -Infinity);
  * when tapped, and the bare wall sparkles (K-04). Every marble comes out of
  * the tunnel changed (K-06).
  *
- * The same run comes in other worlds too (K-18, `look`): snow, space, a water
- * slide and a building site, each with its own wall, things and end.
+ * The same run comes in other worlds too (K-18, `look`): colours, snow, space, a water
+ * slide and a building site, each with its own wall, things, stretch down the lower wall and end.
  */
 function Run({ sound, say, onDone, onGoal, watch = false, look }: LevelProps & { look: TrackTheme }) {
   const label = useLevelName(look.level);
@@ -286,7 +283,7 @@ function Run({ sound, say, onDone, onGoal, watch = false, look }: LevelProps & {
   const tr = useT();
   // What comes a moment after a landing (its note, the end) is dropped when the run is left before it.
   const { later } = useTimers();
-  const routes = useMemo(buildRoutes, []);
+  const routes = useMemo(() => buildRoutes(look.stretch), [look]);
   useEffect(() => loadRealSounds([...Object.values(look.release), look.landSound, look.fullSound]), [look]);
   /** How long the whole run is with the parts it starts with, for how much of it lies behind a thing. */
   const runLength = useMemo(
@@ -314,7 +311,9 @@ function Run({ sound, say, onDone, onGoal, watch = false, look }: LevelProps & {
   /** How long a thing takes from the run's end to where it comes to rest. */
   const landMs = look.sort?.hopMs ?? LAND_MS;
   const bars = useRef(never(BARS.length));
-  const bumps = useRef(never(TURNS.length));
+  const bumps = useRef(never(routes.turns.length));
+  /** When each cue of the world's own stretch last fired (its tower, ski jump, orbit, …). */
+  const cues = useRef(never(look.stretch.cues));
   const drums = useRef(never(DRUMS.length));
   const chimes = useRef(never(CHIMES.length));
   const looped = useRef(-Infinity);
@@ -459,6 +458,10 @@ function Run({ sound, say, onDone, onGoal, watch = false, look }: LevelProps & {
         flapHit.current = t;
         sound(() => playKnock(760));
         break;
+      case "cue":
+        cues.current[event.cue] = t;
+        sound(() => look.cue(event.cue, kind));
+        break;
       case "gate":
       case "basket":
         break;
@@ -557,12 +560,21 @@ function Run({ sound, say, onDone, onGoal, watch = false, look }: LevelProps & {
   /** Something on the run was tapped: it reacts, and the wall behind doesn't sparkle. */
   const tapped = (e: PointerEvent) => e.stopPropagation();
 
+  /** A finger on a thing of the world's own stretch: it moves and sounds as when a marble passes (the tap's time is `stirred`, set as the finger landed). */
+  const tapCue = (cue: number, e: PointerEvent) => {
+    tapped(e);
+    cues.current[cue] = stirred.current;
+    sound(() => look.cue(cue, "marble"));
+  };
+
   /** A rolling thing gets a little push: a hop with a twirl, and a bit more speed (K-03). */
   const nudge = (m: Marble, t: number) => {
     if (m.fly) return;
     const nearTunnel = m.x > NO_HOP.x0 && m.x < NO_HOP.x1 && Math.abs(m.y - rowY(ROW3, m.x)) < 60;
-    if (!nearTunnel) m.nudged = t;
-    if (!zoneAt(routeOf(m), m.s)?.speed && !ROLLER[m.kind].float) m.v = Math.min(MAX_SPEED, m.v + NUDGE_BOOST);
+    const zone = zoneAt(routeOf(m), m.s);
+    // Riding a chair or a bucket, or inside a wormhole, it stays where it is.
+    if (!nearTunnel && !zone?.carry && !zone?.scale) m.nudged = t;
+    if (!zone?.speed && !ROLLER[m.kind].float) m.v = Math.min(ROLL.max, m.v + NUDGE_BOOST);
     sound(playWhoosh);
   };
 
@@ -638,11 +650,8 @@ function Run({ sound, say, onDone, onGoal, watch = false, look }: LevelProps & {
       const before = m.s;
       const zone = zoneAt(routeOf(m), m.s);
       if (zone?.speed) m.v = zone.speed;
-      else if (kind.float) m.v = FLOAT_SPEED;
-      else {
-        const { slope } = pointAt(routeOf(m), m.s);
-        m.v = Math.min(MAX_SPEED, Math.max(MIN_SPEED, m.v + (GRAVITY * slope - FRICTION * m.v) * dt));
-      }
+      else if (kind.float) m.v = ROLL.float;
+      else m.v = rolled(m.v, pointAt(routeOf(m), m.s).slope, dt);
       m.s += m.v * kind.pace * dt;
       m.dist += m.v * kind.pace * dt;
       waitAtGate(m, before, t);
@@ -700,7 +709,7 @@ function Run({ sound, say, onDone, onGoal, watch = false, look }: LevelProps & {
     // Still while nothing is on the run (waiting things fidget), every part has swung back and the last tap's, key's or
     // landing's wobble is over (`SETTLED_S`); once full, the end draws on, since some ends keep moving (the pool's fountains).
     const g = gate.current;
-    const lastStir = Math.max(stirred.current, ...landed.current.map((l) => l.at + landMs));
+    const lastStir = Math.max(stirred.current, ...cues.current, ...landed.current.map((l) => l.at + landMs));
     return (
       done.current ||
       panning ||
@@ -916,6 +925,7 @@ function Run({ sound, say, onDone, onGoal, watch = false, look }: LevelProps & {
   const cam = camera.current;
   const age = (hit: number) => Math.min(SETTLED_S, (t - hit) / 1000);
   const barAges = bars.current.map(age);
+  const cueAges = cues.current.map(age);
   const basketAge = age(basketTapped.current);
   const tapBar = (i: number, e: PointerEvent) => {
     tapped(e);
@@ -951,7 +961,7 @@ function Run({ sound, say, onDone, onGoal, watch = false, look }: LevelProps & {
 
           {/* The ledge, the walls the marble turns at, and the rows */}
           <TrackRail a={{ x: LEDGE.x0, y: LEDGE.y }} b={{ x: LEDGE.x1, y: LEDGE.y }} />
-          {TURNS.map((turn, i) => (
+          {routes.turns.map((turn, i) => (
             <Wall key={i} turn={turn} index={i} age={age(bumps.current[i])} />
           ))}
           <TrackRail a={{ x: ROW2.from.x + 10, y: ROW2.from.y - 1 }} b={ROW2.to} />
@@ -990,6 +1000,12 @@ function Run({ sound, say, onDone, onGoal, watch = false, look }: LevelProps & {
             }}
           />
           <Xylophone row={ROW9} ages={barAges} onTap={tapBar} />
+
+          {/* The world's own stretch down the lower wall: its rails, and its towers, hills and things */}
+          {look.stretch.rails.map((row, i) => (
+            <TrackRail key={i} a={inset(row.from, row, 10)} b={row.to} />
+          ))}
+          <StretchArt layer="back" ages={cueAges} onTap={tapCue} />
 
           {SLOTS.map((_, i) => spot(i, "back"))}
 
@@ -1073,6 +1089,11 @@ function Run({ sound, say, onDone, onGoal, watch = false, look }: LevelProps & {
         <div className="marble-camera run-layer" style={layerStyle}>
           {marbles.current.map((m) => {
             const k = (t - m.nudged) / NUDGE_MS;
+            // Riding a chair or a bucket (`carry`), or shrinking into a wormhole and growing out of it (`scale`).
+            const zone = m.fly || m.waiting ? undefined : zoneAt(routeOf(m), m.s);
+            const along = zone ? Math.min(1, Math.max(0, (m.s - zone.s0) / (zone.s1 - zone.s0))) : 0;
+            const size = zone?.scale ? zone.scale[0] + (zone.scale[1] - zone.scale[0]) * along : 1;
+            const Carrier = zone?.carry ? look.Carrier : undefined;
             // Waiting behind the barrier, it can't keep still.
             const fidget = m.waiting ? { x: 1.8 * Math.sin(t / 55 + m.id * 1.7), y: 3 * Math.abs(Math.sin(t / 120 + m.id)) } : { x: 0, y: 0 };
             return (
@@ -1093,6 +1114,7 @@ function Run({ sound, say, onDone, onGoal, watch = false, look }: LevelProps & {
                 }}
               >
                 <circle r="56" fill="transparent" />
+                {Carrier && <Carrier layer="back" />}
                 <RollerBody
                   kind={m.kind}
                   color={m.color}
@@ -1101,8 +1123,9 @@ function Run({ sound, say, onDone, onGoal, watch = false, look }: LevelProps & {
                   y={0}
                   spin={m.spin + fidget.x / 20 + (k >= 0 && k < 1 ? 4 * Math.PI * k : 0)}
                   grow={Math.min(1, m.dist / runLength)}
-                  scale={m.fly ? SHELF.scale - (SHELF.scale - 1) * Math.min(1, (t - m.fly.at) / FLY_MS) : 1}
+                  scale={m.fly ? SHELF.scale - (SHELF.scale - 1) * Math.min(1, (t - m.fly.at) / FLY_MS) : size}
                 />
+                {Carrier && <Carrier layer="front" />}
               </svg>
             );
           })}
@@ -1127,6 +1150,7 @@ function Run({ sound, say, onDone, onGoal, watch = false, look }: LevelProps & {
           >
             <Tunnel />
           </g>
+          <StretchArt layer="front" ages={cueAges} onTap={tapCue} />
           <g data-tap onPointerDown={tapBasket}>
             <look.End layer="front" {...end} />
           </g>

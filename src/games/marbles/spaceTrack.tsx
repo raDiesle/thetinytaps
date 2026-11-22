@@ -1,14 +1,16 @@
 // „Weltraumbahn“ (K-18): the marble run in space. Planets, a ringed planet, the
 // moon, a smiling star and a comet roll on glowing rails down to a little moon,
-// and when everything has landed there, shooting stars fly over it.
+// and when everything has landed there, shooting stars fly over it. On the way
+// down the lower wall they orbit a big planet and go through a wormhole.
 
-import { memo, useId } from "react";
-import { playBeam, playBoing, playPing, playRumble, playThump, playTrill, playTwinkle, playWhoosh } from "@/lib/sfx";
+import { memo, type PointerEvent, useId } from "react";
+import { playBeam, playBoing, playPing, playPlink, playPop, playRumble, playSwirl, playThump, playTrill, playTwinkle, playWhoosh } from "@/lib/sfx";
 import { VIEW_W, wobble } from "./level";
 import { STAR_POINTS } from "./parts";
 import { BALL_R, type Pt } from "./path";
 import { BASKET, TRACK_H } from "./track";
-import { type EndProps, INK, type ThingProps, type TrackTheme } from "./trackTheme";
+import { ORBIT, ORBIT_IN, railPath, sample, SPACE_CUES, STRETCHES, UNDER, WORMHOLE } from "./trackStretches";
+import { type EndProps, INK, type StretchArtProps, type ThingProps, type TrackTheme } from "./trackTheme";
 
 const GOLD = "#ffd23f";
 const MOON = "#c9ccd6";
@@ -159,9 +161,9 @@ function MoonEnd({ layer, fullAge, tapAge }: EndProps) {
         <ellipse cx={cx} cy={BASKET.rimY + dip} rx={(BASKET.x1 - BASKET.x0) / 2} ry="16" fill="#6e7282" />
         {fullAge >= 0 &&
           [
-            { x: 620, y: 1520 },
-            { x: 820, y: 1440 },
-            { x: 700, y: 1660 },
+            { x: 620, y: TRACK_H - 730 },
+            { x: 820, y: TRACK_H - 810 },
+            { x: 700, y: TRACK_H - 590 },
           ].map((from, i) => <ShootingStar key={i} from={from} age={fullAge - i * 0.35} />)}
       </g>
     );
@@ -169,18 +171,126 @@ function MoonEnd({ layer, fullAge, tapAge }: EndProps) {
   return (
     <g transform={`translate(0 ${dip})`}>
       <path
-        d={`M1225 ${TRACK_H + 30} C1250 2205 1285 2182 1300 ${BASKET.rimY} L1530 ${BASKET.rimY} C1560 2186 1600 2206 1640 ${TRACK_H + 30} Z`}
+        d={`M1225 ${TRACK_H + 30} C1250 ${TRACK_H - 45} 1285 ${TRACK_H - 68} 1300 ${BASKET.rimY} L1530 ${BASKET.rimY} C1560 ${TRACK_H - 64} 1600 ${TRACK_H - 44} 1640 ${TRACK_H + 30} Z`}
         fill={MOON}
         stroke={INK}
         strokeWidth="4"
         strokeLinejoin="round"
       />
-      <ellipse cx="1330" cy="2222" rx="22" ry="8" fill={CRATER} />
-      <ellipse cx="1470" cy="2214" rx="30" ry="9" fill={CRATER} />
-      <ellipse cx="1405" cy="2240" rx="14" ry="5" fill={CRATER} />
+      <ellipse cx="1330" cy={TRACK_H - 28} rx="22" ry="8" fill={CRATER} />
+      <ellipse cx="1470" cy={TRACK_H - 36} rx="30" ry="9" fill={CRATER} />
+      <ellipse cx="1405" cy={TRACK_H - 10} rx="14" ry="5" fill={CRATER} />
       <path d={`M1300 ${BASKET.rimY + 6} L1530 ${BASKET.rimY + 6}`} stroke="#fff" strokeWidth="5" opacity="0.6" strokeLinecap="round" />
     </g>
   );
+}
+
+/** The big striped planet the things orbit, with a friendly face; it rocks a little each time one comes round. */
+function Planet({ rock }: { rock: number }) {
+  const { cx, cy, planet: r } = ORBIT;
+  return (
+    <g transform={`rotate(${rock} ${cx} ${cy + r})`}>
+      <circle cx={cx} cy={cy} r={r} fill="#ff9f1c" stroke={INK} strokeWidth="5" />
+      <path d={`M${cx - r + 8} ${cy - 40} Q${cx} ${cy - 62} ${cx + r - 8} ${cy - 40}`} fill="none" stroke="#ffd166" strokeWidth="16" strokeLinecap="round" />
+      <path d={`M${cx - r + 4} ${cy + 46} Q${cx} ${cy + 26} ${cx + r - 4} ${cy + 46}`} fill="none" stroke="#e76f51" strokeWidth="18" strokeLinecap="round" />
+      <circle cx={cx - 34} cy={cy - 6} r="10" fill={INK} />
+      <circle cx={cx + 34} cy={cy - 6} r="10" fill={INK} />
+      <circle cx={cx - 31} cy={cy - 10} r="3.5" fill="#fff" />
+      <circle cx={cx + 37} cy={cy - 10} r="3.5" fill="#fff" />
+      <path d={`M${cx - 22} ${cy + 18} Q${cx} ${cy + 36} ${cx + 22} ${cy + 18}`} fill="none" stroke={INK} strokeWidth="5" strokeLinecap="round" />
+      <circle cx={cx - 60} cy={cy + 12} r="11" fill="#ff7bd0" opacity="0.55" />
+      <circle cx={cx + 60} cy={cy + 12} r="11" fill="#ff7bd0" opacity="0.55" />
+    </g>
+  );
+}
+
+/** A swirl of the wormhole at `at`, three arms turning once round when a thing goes in or comes out (`turn` from 0 to 1). */
+function Swirl({ at, turn, dir }: { at: Pt; turn: number; dir: 1 | -1 }) {
+  const arm = (i: number) =>
+    sample(24, (u) => {
+      const a = dir * (u * 2.2 * Math.PI + (i * 2 * Math.PI) / 3);
+      const r = 6 + 56 * u;
+      return { x: r * Math.cos(a), y: r * Math.sin(a) };
+    })
+      .map((p, j) => `${j ? "L" : "M"}${p.x.toFixed(1)} ${p.y.toFixed(1)}`)
+      .join(" ");
+  return (
+    <g transform={`translate(${at.x} ${at.y}) scale(1 0.7) rotate(${dir * 360 * turn})`}>
+      <circle r="64" fill="#2c1f62" stroke="#8e7dff" strokeWidth="4" />
+      {[0, 1, 2].map((i) => (
+        <path key={i} d={arm(i)} fill="none" stroke={["#ff7bd0", "#8e7dff", "#4cc9f0"][i]} strokeWidth="9" strokeLinecap="round" />
+      ))}
+      <circle r="9" fill="#17123a" />
+    </g>
+  );
+}
+
+/** How far a swirl has turned, `age` seconds after a thing went in or came out: once round, slowing down. */
+const swirlTurn = (age: number) => (age < 0 ? 0 : 1 - Math.exp(-age * 1.5));
+
+/**
+ * The space run's own stretch: a big striped planet with a friendly face, which the things orbit two and a quarter
+ * times on a dotted track – behind it on the far side, in front of it on the near side – and a wormhole: a thing
+ * rolls into one swirl, is gone, and comes out of the other one far below.
+ */
+function SpaceStretch({ layer, ages, onTap }: StretchArtProps) {
+  const lap = Math.min(...[0, 1, 2].map((i) => ages[SPACE_CUES.orbit + i]));
+  const rock = wobble(lap, 3, 10, 3);
+  const id = useId();
+  const tapPlanet = (e: PointerEvent) => onTap(SPACE_CUES.orbit, e);
+  if (layer === "front") {
+    // The planet's upper half again, in front of the things on the far side of their orbit.
+    return (
+      <g data-tap onPointerDown={tapPlanet}>
+        <defs>
+          <clipPath id={`${id}far`}>
+            <rect x={ORBIT.cx - ORBIT.planet - 20} y={ORBIT.cy - ORBIT.planet - 20} width={2 * ORBIT.planet + 40} height={ORBIT.planet + 20} />
+          </clipPath>
+        </defs>
+        <g clipPath={`url(#${id}far)`}>
+          <Planet rock={rock} />
+        </g>
+      </g>
+    );
+  }
+  const into = railPath(ORBIT_IN, UNDER, -1);
+  return (
+    <g>
+      {/* The curve down onto the orbit, the orbit's dotted track and the planet */}
+      <g fill="none" strokeLinecap="round">
+        <path d={into} stroke={INK} strokeWidth="18" />
+        <path d={into} stroke="#8e7dff" strokeWidth="12" />
+      </g>
+      <ellipse
+        cx={ORBIT.cx}
+        cy={ORBIT.cy}
+        rx={ORBIT.rx}
+        ry={ORBIT.ry}
+        fill="none"
+        stroke="#e3dcff"
+        strokeWidth="5"
+        strokeDasharray="4 18"
+        strokeLinecap="round"
+      />
+      <g data-tap onPointerDown={tapPlanet}>
+        <Planet rock={rock} />
+      </g>
+      {/* The wormhole's two swirls */}
+      <g data-tap onPointerDown={(e) => onTap(SPACE_CUES.wormIn, e)}>
+        <Swirl at={WORMHOLE.in} turn={swirlTurn(ages[SPACE_CUES.wormIn])} dir={1} />
+      </g>
+      <g data-tap onPointerDown={(e) => onTap(SPACE_CUES.wormOut, e)}>
+        <Swirl at={WORMHOLE.out} turn={swirlTurn(ages[SPACE_CUES.wormOut])} dir={-1} />
+      </g>
+    </g>
+  );
+}
+
+/** What the space stretch sounds like: a note higher for each time round the planet, a swirl into the wormhole and a pop out of it. */
+function spaceCue(cue: number) {
+  if (cue < SPACE_CUES.wormIn) playPlink(2 * (cue - SPACE_CUES.orbit) + 1);
+  else if (cue === SPACE_CUES.wormIn) playSwirl();
+  else playPop();
 }
 
 /** The space run. */
@@ -209,4 +319,7 @@ export const SPACE_TRACK: TrackTheme = {
   peekers: ["👽", "🤖", "🧑‍🚀", "👾", "🐙", "🦄"],
   magic: false,
   End: MoonEnd,
+  stretch: STRETCHES.space,
+  StretchArt: SpaceStretch,
+  cue: spaceCue,
 };

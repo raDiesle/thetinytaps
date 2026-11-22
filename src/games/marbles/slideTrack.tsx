@@ -1,14 +1,17 @@
 // „Wasserrutsche“ (K-18): the marble run in a swimming hall. A beach ball, a
 // swim ring, a melon, a rubber duck and a water drop slide down blue water
 // chutes into a little pool, and when it is full fountains spray up out of it.
+// On the way down the lower wall they bump over wave slides, dive off a diving
+// board into a whirlpool and go down its drain.
 
 import { memo, useId } from "react";
-import { playBlub, playBoing, playDrops, playPop, playThump } from "@/lib/sfx";
+import { playBlub, playBoing, playDrops, playGlug, playPop, playSlide, playThump } from "@/lib/sfx";
 import { playQuack, playSplash } from "@/lib/realSounds";
 import { VIEW_W, wobble } from "./level";
 import { BALL_R, type Pt } from "./path";
 import { BASKET, TRACK_H } from "./track";
-import { type EndProps, INK, type ThingProps, type TrackTheme } from "./trackTheme";
+import { BOARD, DRAIN, railPath, SLIDE_CUES, STRETCHES, sample, UNDER, WAVES, WHIRL, waveAt, whirlAt } from "./trackStretches";
+import { type EndProps, INK, type StretchArtProps, type ThingProps, type TrackTheme } from "./trackTheme";
 
 const WATER = "#4cc9f0";
 const FOAM = "#e0f7ff";
@@ -32,7 +35,7 @@ const SlideBackdrop = memo(function SlideBackdrop() {
       </defs>
       <rect x="-400" y="-200" width={VIEW_W + 800} height={TRACK_H + 400} fill={`url(#${id}tiles)`} />
       {/* A band of darker tiles along the bottom */}
-      <rect x="-400" y="2200" width={VIEW_W + 800} height="250" fill="#7fd4ef" />
+      <rect x="-400" y={TRACK_H - 50} width={VIEW_W + 800} height="250" fill="#7fd4ef" />
     </g>
   );
 });
@@ -175,6 +178,141 @@ function PoolEnd({ layer, fullAge, tapAge }: EndProps) {
   );
 }
 
+/** A few drops of water thrown up at `x`, `y`, `age` seconds ago, falling back. */
+function Drops({ x, y, age, size = 1 }: { x: number; y: number; age: number; size?: number }) {
+  if (age < 0 || age > 0.7) return null;
+  const k = age / 0.7;
+  return (
+    <g opacity={1 - k * k} fill={FOAM} stroke="#1b8fc4" strokeWidth="1.5" pointerEvents="none">
+      {[-1, -0.4, 0.4, 1].map((i) => (
+        <circle key={i} cx={x + i * 40 * size * k} cy={y - 70 * size * k * (1 - k) * (1.2 - Math.abs(i) * 0.4)} r={4 + 3 * size} />
+      ))}
+    </g>
+  );
+}
+
+/** A blue chute under `pts`, water running in it; `side` as for `railPath`. */
+function Chute({ pts, side }: { pts: Pt[]; side: 1 | -1 }) {
+  const d = railPath(pts, BALL_R + 7, side);
+  const water = railPath(pts, BALL_R + 1, side);
+  return (
+    <g fill="none" strokeLinecap="round" strokeLinejoin="round">
+      <path d={d} stroke={INK} strokeWidth="20" />
+      <path d={d} stroke="#1b8fc4" strokeWidth="14" />
+      <path d={water} stroke={WATER} strokeWidth="6" opacity="0.9" />
+    </g>
+  );
+}
+
+/** The whirlpool's basin, a little from above: its water, and a swirl in it that turns as things go round. */
+function whirlEllipse(grow: number) {
+  return { cx: WHIRL.cx, cy: WHIRL.cy + WHIRL.sink / 2, rx: WHIRL.rx + grow, ry: WHIRL.ry + WHIRL.sink / 2 + grow * 0.4 };
+}
+
+/**
+ * The water slide's own stretch: two long wave slides whose humps splash as a thing goes over them, a diving board
+ * that bends and springs back, and a whirlpool – a thing dives into it, circles round and round, closer to the middle
+ * each time, and is swallowed by the drain in its middle, which lets it out through a glass pipe below.
+ */
+function SlideStretch({ layer, ages, onTap }: StretchArtProps) {
+  const basin = whirlEllipse(26);
+  if (layer === "front") {
+    // The basin's near wall in front of the things swimming round, half see-through like water, and the glass pipe.
+    return (
+      <g pointerEvents="none">
+        <path
+          d={`M${basin.cx - basin.rx} ${basin.cy} A${basin.rx} ${basin.ry} 0 0 0 ${basin.cx + basin.rx} ${basin.cy} L${basin.cx + basin.rx - 20} ${basin.cy + 70} Q${basin.cx} ${basin.cy + basin.ry + 80} ${basin.cx - basin.rx + 20} ${basin.cy + 70} Z`}
+          fill={WATER}
+          opacity="0.4"
+          stroke={INK}
+          strokeWidth="4"
+        />
+        <path d={railPath(DRAIN, 0, 1)} fill="none" stroke="#fff" strokeWidth={2 * BALL_R + 14} strokeLinecap="round" opacity="0.3" />
+        <path d={railPath(DRAIN, BALL_R + 7, 1)} fill="none" stroke="#fff" strokeWidth="4" opacity="0.8" />
+        <path d={railPath(DRAIN, BALL_R + 7, -1)} fill="none" stroke="#fff" strokeWidth="4" opacity="0.8" />
+      </g>
+    );
+  }
+  const swirl = -720 * (1 - Math.exp(-Math.max(0, ages[SLIDE_CUES.splash]) * 0.4));
+  const bend = wobble(ages[SLIDE_CUES.board], 16, 14, 3.5);
+  const humps = (w: number) => Array.from({ length: WAVES[w].humps }, (_, i) => (w === 0 ? 0 : WAVES[0].humps) + i);
+  const humpCue = (h: number) => (h < WAVES[0].humps ? SLIDE_CUES.waves[0] + h : SLIDE_CUES.waves[1] + h - WAVES[0].humps);
+  return (
+    <g>
+      {/* The two wave slides; a hump splashes as a thing goes over it */}
+      {WAVES.map((w, i) => (
+        <g key={i}>
+          <Chute pts={sample(48 * w.humps, (k) => waveAt(w, k))} side={i === 0 ? -1 : 1} />
+          {humps(i).map((h) => {
+            const k = (h - (i === 0 ? 0 : WAVES[0].humps) + 0.25) / w.humps;
+            const top = waveAt(w, k);
+            return (
+              <g key={h} data-tap onPointerDown={(e) => onTap(humpCue(h), e)}>
+                <circle cx={top.x} cy={top.y + 10} r="34" fill="transparent" />
+                <Drops x={top.x} y={top.y + 4} age={ages[humpCue(h)]} size={0.6} />
+              </g>
+            );
+          })}
+        </g>
+      ))}
+
+      {/* The diving board on its stand, bending at its tip */}
+      <g data-tap onPointerDown={(e) => onTap(SLIDE_CUES.board, e)}>
+        <rect x={BOARD.x0 - 4} y={BOARD.y + UNDER} width="26" height="150" rx="6" fill="#adb5bd" stroke={INK} strokeWidth="4" />
+        <path
+          d={`M${BOARD.x0 - 10} ${BOARD.y + UNDER} Q${(BOARD.x0 + BOARD.x1) / 2} ${BOARD.y + UNDER + 1} ${BOARD.x1 + 8} ${BOARD.y + UNDER + 4 + bend}`}
+          fill="none"
+          stroke={INK}
+          strokeWidth="18"
+          strokeLinecap="round"
+        />
+        <path
+          d={`M${BOARD.x0 - 10} ${BOARD.y + UNDER} Q${(BOARD.x0 + BOARD.x1) / 2} ${BOARD.y + UNDER + 1} ${BOARD.x1 + 8} ${BOARD.y + UNDER + 4 + bend}`}
+          fill="none"
+          stroke="#ffb703"
+          strokeWidth="11"
+          strokeLinecap="round"
+        />
+      </g>
+
+      {/* The whirlpool: its basin, the water and the swirl in it */}
+      <g data-tap onPointerDown={(e) => onTap(SLIDE_CUES.splash, e)}>
+        <ellipse cx={basin.cx} cy={basin.cy} rx={basin.rx} ry={basin.ry} fill="#fff" stroke={INK} strokeWidth="5" />
+        <ellipse cx={basin.cx} cy={basin.cy + 4} rx={basin.rx - 12} ry={basin.ry - 8} fill={WATER} />
+        <g transform={`translate(${basin.cx} ${basin.cy + 6}) scale(1 ${(basin.ry - 8) / (basin.rx - 12)}) rotate(${swirl})`}>
+          {[0, 1, 2].map((i) => (
+            <path
+              key={i}
+              d={sample(20, (u) => {
+                const a = u * 1.6 * Math.PI + (i * 2 * Math.PI) / 3;
+                const r = 30 + (basin.rx - 50) * u;
+                return { x: r * Math.cos(a), y: r * Math.sin(a) };
+              })
+                .map((p, j) => `${j ? "L" : "M"}${p.x.toFixed(1)} ${p.y.toFixed(1)}`)
+                .join(" ")}
+              fill="none"
+              stroke={FOAM}
+              strokeWidth="10"
+              strokeLinecap="round"
+              opacity="0.8"
+            />
+          ))}
+          <circle r="22" fill="#1b8fc4" />
+        </g>
+      </g>
+      <Drops x={whirlAt(0).x} y={whirlAt(0).y} age={ages[SLIDE_CUES.splash]} />
+    </g>
+  );
+}
+
+/** What the water slide's stretch sounds like. */
+function slideCue(cue: number) {
+  if (cue === SLIDE_CUES.board) playBoing();
+  else if (cue === SLIDE_CUES.splash) playSplash();
+  else if (cue === SLIDE_CUES.drain) playGlug();
+  else playSlide();
+}
+
 /** The water slide. */
 export const SLIDE_TRACK: TrackTheme = {
   level: "slidetrack",
@@ -201,4 +339,7 @@ export const SLIDE_TRACK: TrackTheme = {
   peekers: ["🐬", "🐠", "🐳", "🦦", "🐢", "🐙"],
   magic: false,
   End: PoolEnd,
+  stretch: STRETCHES.slide,
+  StretchArt: SlideStretch,
+  cue: slideCue,
 };

@@ -1,7 +1,8 @@
 // The marble run's route: where the middle of a marble goes, from the hopper
 // at the top left down to the basket at the bottom right, in the coordinates
-// of a wall 1600 wide and two and a half screens tall (the camera follows the
-// marbles down). Six spots along the way hold a part that can be swapped by
+// of a wall 1600 wide and four screens tall (the camera follows the marbles
+// down). The upper part is the same in every world; below row 9 each world has
+// a stretch of its own (`trackStretches.ts`). Six spots along the way hold a part that can be swapped by
 // tapping it (X-08), and a switch sends the marble one of two ways (K-01), so
 // the route comes in sections: the fixed stretches between them, one section
 // for every part in every spot, and one for each way at the switch. The
@@ -11,7 +12,7 @@ import { arc, BALL_R, indexAt, line, quad, type Pt } from "./path";
 
 /** The whole wall; the picture shows 1600 × 900 of it (more on a tall screen). */
 export const TRACK_W = 1600;
-export const TRACK_H = 2250;
+export const TRACK_H = 3700;
 
 /** The parts that fit into a spot. */
 export type Piece = "bell" | "trampoline" | "funnel" | "wheel";
@@ -31,7 +32,9 @@ export type TrackEvent =
   | { kind: "tunnel" }
   | { kind: "flap"; fork: number }
   | { kind: "gate" }
-  | { kind: "basket" };
+  | { kind: "basket" }
+  /** Something in a world's own stretch (its helix, ski jump, orbit, …): number `cue` of that stretch. */
+  | { kind: "cue"; cue: number };
 
 /* ---------- Layout ---------- */
 
@@ -146,19 +149,22 @@ export const turnSide = (turn: Turn) => (turn.x > turn.from.x ? 1 : -1);
 
 /* The turns are listed after the spots, which the first one starts from. */
 
-export const BASKET = { x0: 1300, x1: 1530, rimY: 2180, bottomY: 2235 };
+export const BASKET = { x0: 1300, x1: 1530, rimY: TRACK_H - 70, bottomY: TRACK_H - 15 };
 
 /** Where marbles come to rest in the basket: four peeking over the rim, then piled on top. */
 export const BASKET_SLOTS: Pt[] = [
-  { x: 1345, y: 2176 },
-  { x: 1392, y: 2178 },
-  { x: 1439, y: 2178 },
-  { x: 1486, y: 2176 },
-  { x: 1368, y: 2136 },
-  { x: 1462, y: 2136 },
-  { x: 1415, y: 2134 },
-  { x: 1415, y: 2096 },
+  { x: 1345, y: BASKET.rimY - 4 },
+  { x: 1392, y: BASKET.rimY - 2 },
+  { x: 1439, y: BASKET.rimY - 2 },
+  { x: 1486, y: BASKET.rimY - 4 },
+  { x: 1368, y: BASKET.rimY - 44 },
+  { x: 1462, y: BASKET.rimY - 44 },
+  { x: 1415, y: BASKET.rimY - 46 },
+  { x: 1415, y: BASKET.rimY - 84 },
 ];
+
+/** Where a thing drops off the run into the basket (or whatever a world has there). */
+export const BASKET_IN: Pt = { x: 1322, y: BASKET.rimY - 22 };
 
 /** Marbles in the basket that make it full. */
 export const BASKET_FULL = 6;
@@ -179,6 +185,15 @@ export interface RollerKind {
   /** Floats along at an even speed instead of rolling faster downhill. */
   float?: boolean;
 }
+
+/**
+ * How things roll where nothing sets their speed: gravity pulls them down a slope, friction holds them back, and they
+ * never get slower than `min` (so one always reaches the end) nor faster than `max`; the soap bubble floats at `float`.
+ */
+export const ROLL = { gravity: 1600, friction: 0.3, min: 280, max: 950, float: 330 };
+
+/** The speed after `dt` seconds on a slope (dy/ds) of `slope`, starting at `v`. */
+export const rolled = (v: number, slope: number, dt: number) => Math.min(ROLL.max, Math.max(ROLL.min, v + (ROLL.gravity * slope - ROLL.friction * v) * dt));
 
 export const ROLLER: Record<Roller, RollerKind> = {
   marble: { r: BALL_R, pace: 1 },
@@ -286,7 +301,8 @@ export function seesawSpot(k: number, tilt: number): Pt {
 
 /* ---------- Building the route ---------- */
 
-interface Part {
+/** A piece of the route with what happens on it. */
+export interface Part {
   pts: Pt[];
   /** Fired when a marble starts this part. */
   event?: TrackEvent;
@@ -294,10 +310,14 @@ interface Part {
   speed?: number;
   /** The marble rides the seesaw; its spot depends on the beam's tilt. */
   seesaw?: boolean;
+  /** The thing rides in something its world draws round it (a chair lift's chair, a bucket). */
+  carry?: boolean;
+  /** The thing grows or shrinks along the part, from the first size to the second (0: gone, in a wormhole). */
+  scale?: [number, number];
 }
 
 /** Along a row, split at each stop (in the order the marble passes them), which fires its event. */
-function rowParts(row: Row, stops: { x: number; event: TrackEvent }[] = []): Part[] {
+export function rowParts(row: Row, stops: { x: number; event: TrackEvent }[] = []): Part[] {
   const on = (x: number) => ({ x, y: rowY(row, x) });
   const xs = [row.from.x, ...stops.map((stop) => stop.x), row.to.x];
   return xs.slice(1).map((x, i) => ({ pts: line(on(xs[i]), on(x)), event: i ? stops[i - 1].event : undefined }));
@@ -312,14 +332,29 @@ function barStops(row: Row) {
   return right ? stops : stops.reverse();
 }
 
-/** Against the wall of turn `i` (its bumper sounds) and down onto the next row. */
-function turnPart(i: number): Part {
-  const turn = TURNS[i];
+/** Against the wall of `turn` (its bumper, number `i` of all the run's turns, sounds) and down onto the next row. */
+export function wallPart(turn: Turn, i: number): Part {
   return { pts: quad(turn.from, { x: turn.x - turnSide(turn) * 4, y: turn.from.y + 3 }, turn.to), event: { kind: "bump", turn: i } };
 }
 
-/** The fixed sections: hopper to the first spot, between the spots and the switch, and from the last spot to the basket. */
-function fixedParts(): Part[][] {
+const turnPart = (i: number) => wallPart(TURNS[i], i);
+
+/**
+ * A world's own stretch below row 9 (K-18): from the end of row 9 to where the things leave the run, with its own walls
+ * and its own things that happen (`cue` events), drawn by the world (`TrackTheme.stretch`).
+ */
+export interface Stretch {
+  parts: Part[];
+  /** Its walls, after `TURNS`: a part against the i-th fires the bump of turn `TURNS.length + i`. */
+  turns: Turn[];
+  /** The rows to draw a rail under. */
+  rails: Row[];
+  /** How many cues it fires, numbered from 0. */
+  cues: number;
+}
+
+/** The fixed sections: hopper to the first spot, between the spots and the switch, and from the last spot to the world's stretch. */
+function fixedParts(stretch: Stretch): Part[][] {
   const start: Part[] = [
     { pts: [...line(HOPPER, { x: 120, y: 88 }), ...quad({ x: 120, y: 88 }, { x: 121, y: 108 }, ROW1A.from).slice(1)] },
     ...rowParts(ROW1A, barStops(ROW1A)),
@@ -359,13 +394,8 @@ function fixedParts(): Part[][] {
       CHIMES.map((chime, i) => ({ x: chime.x + 14, event: { kind: "chime", chime: i } })),
     ),
   ];
-  // Against the left wall, over the last xylophone into the basket.
-  const end: Part[] = [
-    ...rowParts(ROW8),
-    turnPart(6),
-    ...rowParts(ROW9, barStops(ROW9)),
-    { pts: quad(ROW9.to, { x: 1295, y: ROW9.to.y }, { x: 1322, y: BASKET.rimY - 22 }), event: { kind: "basket" } },
-  ];
+  // Against the left wall, over the last xylophone and down the world's own stretch to the end.
+  const end: Part[] = [...rowParts(ROW8), turnPart(6), ...rowParts(ROW9, barStops(ROW9)), ...stretch.parts];
   return [start, middle, turn, tunnel, afterSwitch, drums, chimes, end];
 }
 
@@ -454,12 +484,12 @@ export interface Route {
   s: number[];
   total: number;
   events: { s: number; event: TrackEvent }[];
-  /** Parts with a fixed speed or a moving seesaw, and what they are. */
-  zones: { s0: number; s1: number; speed?: number; seesaw?: boolean; kind?: TrackEvent["kind"] }[];
+  /** Parts with a fixed speed, a moving seesaw, a carrier or a change of size, and what they are. */
+  zones: { s0: number; s1: number; speed?: number; seesaw?: boolean; carry?: boolean; scale?: [number, number]; kind?: TrackEvent["kind"] }[];
 }
 
 /** Parts as one list of points with their distance along the way. */
-function toRoute(parts: Part[]): Route {
+export function toRoute(parts: Part[]): Route {
   const pts: Pt[] = [];
   const s: number[] = [];
   const events: Route["events"] = [];
@@ -474,7 +504,8 @@ function toRoute(parts: Part[]): Route {
       s.push(total);
     });
     if (part.event) events.push({ s: s0, event: part.event });
-    if (part.speed || part.seesaw) zones.push({ s0, s1: total, speed: part.speed, seesaw: part.seesaw, kind: part.event?.kind });
+    if (part.speed || part.seesaw || part.carry || part.scale)
+      zones.push({ s0, s1: total, speed: part.speed, seesaw: part.seesaw, carry: part.carry, scale: part.scale, kind: part.event?.kind });
   }
   return { pts, s, total, events, zones };
 }
@@ -491,15 +522,17 @@ export interface Routes {
   ways: Record<Way, Route>;
   /** The section with the barrier, the distance along it where the first waiting marble's front touches it, and where row 2 begins on it (the waiting row may reach back that far). */
   gate: { section: number; s: number; start: number };
+  /** Every wall of the run: `TURNS`, then the stretch's. */
+  turns: Turn[];
 }
 
 /**
- * All sections of the run. A marble goes fixed, spot 0, fixed, spot 1, …, with
+ * All sections of the run, ending in a world's own `stretch`. A marble goes fixed, spot 0, fixed, spot 1, …, with
  * the switch between the third and the fourth spot; it takes whatever part is
  * in a spot, and the way the switch is set to, when it gets there.
  */
-export function buildRoutes(): Routes {
-  const fixed = fixedParts().map(toRoute);
+export function buildRoutes(stretch: Stretch): Routes {
+  const fixed = fixedParts(stretch).map(toRoute);
   const sections: Section[] = [];
   fixed.forEach((route, i) => {
     sections.push({ kind: "fixed", route });
@@ -518,6 +551,7 @@ export function buildRoutes(): Routes {
       s: gateRoute.events.find((e) => e.event.kind === "gate")?.s ?? 0,
       start: gateRoute.s[gateRoute.pts.findIndex((pt) => pt.x === ROW2.from.x && pt.y === ROW2.from.y)],
     },
+    turns: [...TURNS, ...stretch.turns],
   };
 }
 
