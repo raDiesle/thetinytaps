@@ -1,4 +1,4 @@
-import { useEffect, useId, useMemo, useRef, type PointerEvent } from "react";
+import { memo, useEffect, useId, useMemo, useRef, type PointerEvent } from "react";
 import { playPlop } from "@/lib/sfx";
 import { loadRealSounds, playCroak, playFlush, playQuack, playSplash } from "@/lib/realSounds";
 import { cameraLayer, cameraPoint, gliding, SETTLE_S, useAnyKey, useFrames, useLevelName, VIEW_H, VIEW_W, worldHint, type LevelProps } from "./level";
@@ -7,7 +7,6 @@ import { deg, svgLine } from "./machineKit";
 import type { Pt } from "./path";
 import { INK, Sparkles } from "./scenery";
 import {
-  BABIES,
   BASINS,
   BELL,
   BELL_ANGLE,
@@ -15,29 +14,38 @@ import {
   brookY,
   buildWater,
   cameraFor,
-  FISH,
   flowAt,
   FLUME,
   FOUNTAIN,
+  FROG,
   GATE,
   gateAt,
   gateX,
+  GEYSER,
   GROUND,
   groundY,
+  HOT_SPRING,
   PIPE,
   PIPE_LINE,
   POOL,
   POOL_SPOT,
   poseAt,
+  REED_POND,
+  REEDS,
   SKY_TOP,
   SLIDE_LINE,
+  STORK,
   TOWER,
+  TURTLE,
+  TURTLE_POND,
   waterAt,
   WHEEL,
   WORLD_H,
   WORLD_W,
   type Basin,
+  type Bubble,
   type Pose,
+  type StorkPose,
   gateWaits,
 } from "./water";
 import "./water.css";
@@ -75,9 +83,11 @@ interface Ripple {
  * It waits, all still, at the first lock gate and at one more on the way
  * (`gateWaits`) until the child taps (or presses a key) anywhere; the other
  * gates open by themselves. As a gate lifts, the water rushes through and
- * carries it down to the next basin – past a water wheel ringing a bell, a
- * leaping fish and a frog, down a twisty slide and through a pipe – into the
- * paddling pool where its ducklings wait. While it is on its way, a tap on the
+ * carries it down to the next basin – past a water wheel ringing a bell and a
+ * stork that flies it out of the reeds, a leaping fish, a turtle ferrying it
+ * across its pond and a frog, down a twisty slide onto a geyser and through a
+ * pipe – into the paddling pool where its ducklings wait and follow it in a
+ * row. While it is on its way, a tap on the
  * water splashes a ripple and any other tap or key makes the duck quack and hop.
  */
 export function WaterLevel({ sound, say, onDone, watch }: LevelProps) {
@@ -204,6 +214,7 @@ export function WaterLevel({ sound, say, onDone, watch }: LevelProps) {
   const t2 = timeOf(1);
   const t3 = timeOf(2);
   const t4 = timeOf(3);
+  const turtle = water.turtleAt(t2);
 
   return (
     <div className="marble-level" ref={box} onPointerDown={onPointerDown}>
@@ -216,23 +227,32 @@ export function WaterLevel({ sound, say, onDone, watch }: LevelProps) {
         <g ref={world}>
           <Sky gradient={`${ids}-sky`} />
           <Hill />
+          <NestPole />
           {BASINS.map((b, i) => (
             <BasinBack key={i} basin={b} />
           ))}
+          <PondBack pond={REED_POND} kind="reeds" />
+          <PondBack pond={TURTLE_POND} kind="grass" />
+          <PondBack pond={HOT_SPRING} kind="stones" />
           <Bell swing={water.bellAt(t1)} />
           <WaterWheel turned={water.wheelAt(t1)} />
-          <Waterfall pts={[FLUME.to, { x: 1440, y: FLUME.to.y + 10 }, { x: 1470, y: BASINS[1].y }]} flow={flowAt(stretches[0], t1)} t={t1} />
+          <Waterfall pts={[FLUME.to, { x: 1440, y: FLUME.to.y + 10 }, { x: 1470, y: REED_POND.y }]} flow={flowAt(stretches[0], t1)} t={t1} />
           <FlumeBack flow={flowAt(stretches[0], t1)} t={t1} />
+          <Reeds sway={water.reedsAt(t1)} front={false} />
           <Brook flow={flowAt(stretches[1], t2)} t={t2} />
-          <Waterfall pts={[BROOK.to, { x: 2800, y: BROOK.to.y + 10 }, { x: 2830, y: BASINS[2].y }]} flow={flowAt(stretches[1], t2)} t={t2} />
+          <Waterfall pts={[BROOK.to, { x: 4220, y: BROOK.to.y + 10 }, { x: 4250, y: TURTLE_POND.y }]} flow={flowAt(stretches[1], t2)} t={t2} />
+          <TurtleRock />
+          {turtle && <Turtle {...turtle} />}
           <LilyPads />
           <Frog {...water.frogAt(t2)} />
           <Tower />
+          <GeyserColumn top={water.geyserAt(t3)} t={t3} />
           <PoolBack />
           <Fountain drops={water.dropsAt(t4)} />
-          {BABIES.map((x, i) => (
-            <Duck key={i} x={x} y={POOL.y - 70 * water.babyAt(i, t4)} tilt={-8 * water.babyAt(i, t4)} flip scale={0.5} />
-          ))}
+          {[0, 1, 2].map((i) => {
+            const baby = water.babyAt(i, t4);
+            return <Duck key={i} x={baby.x} y={POOL.y - 70 * baby.hop} tilt={-8 * baby.hop} flip scale={0.5} />;
+          })}
 
           {!duck.hidden && (
             <Duck
@@ -243,10 +263,17 @@ export function WaterLevel({ sound, say, onDone, watch }: LevelProps) {
               scale={duck.scale * (hopping ? 1 + 0.08 * Math.sin(hopK * Math.PI) : 1)}
             />
           )}
+          <Stork {...water.storkAt(t1)} />
+          <NestFront />
 
           {BASINS.map((b, i) => (
             <BasinFront key={i} basin={b} />
           ))}
+          <PondFront pond={REED_POND} />
+          <PondFront pond={TURTLE_POND} />
+          <PondFront pond={HOT_SPRING} />
+          <Reeds sway={water.reedsAt(t1)} front />
+          <Bubbles bubbles={[...water.turtleBubbles(t2), ...water.geyserBubbles(t3)]} />
           <FlumeFront />
           <BrookFront />
           <Slide flow={flowAt(stretches[2], t3)} t={t3} />
@@ -257,13 +284,7 @@ export function WaterLevel({ sound, say, onDone, watch }: LevelProps) {
           ))}
           <Fish at={water.fishAt(t2)} />
 
-          <Splash x={1500} y={BASINS[1].y} age={t1 - stretches[0].land} />
-          <Splash x={2880} y={BASINS[2].y} age={t2 - stretches[1].land} />
-          <Splash x={FISH.from} y={brookY(FISH.from)} age={t2 - water.fishFrom} size={0.6} />
-          <Splash x={FISH.to} y={brookY(FISH.to)} age={t2 - water.fishFrom - FISH.duration} size={0.6} />
-          <Splash x={3200} y={BASINS[2].y} age={t2 - water.frog.splash} size={0.8} />
-          <Splash x={4160} y={BASINS[3].y} age={t3 - stretches[2].land} />
-          <Splash x={5300} y={POOL.y} age={t4 - stretches[3].land} />
+          {stretches.map((st, k) => st.splashes.map((sp, j) => <Splash key={`${k}-${j}`} x={sp.pt.x} y={sp.pt.y} age={timeOf(k) - sp.at} size={sp.size} />))}
           {ripples.current.map((r, i) => (
             <Splash key={i} x={r.pt.x} y={r.pt.y} age={life.current - r.at} size={0.5} />
           ))}
@@ -310,7 +331,8 @@ function Duck({ x, y, tilt, flip = false, scale = 1 }: { x: number; y: number; t
 
 /* ---------- Sky and hill ---------- */
 
-function Sky({ gradient }: { gradient: string }) {
+/** The sky with its sun and clouds, and soft far hills behind the near one; drawn once. */
+const Sky = memo(function Sky({ gradient }: { gradient: string }) {
   return (
     <g>
       <defs>
@@ -330,10 +352,12 @@ function Sky({ gradient }: { gradient: string }) {
       </g>
       {[
         [1300, -90, 1],
-        [2500, 260, 0.8],
-        [3300, 520, 1.1],
-        [4500, 860, 0.9],
-        [5500, 1180, 1],
+        [2500, 120, 0.8],
+        [3700, 380, 1.1],
+        [5000, 700, 0.9],
+        [6300, 940, 1],
+        [7700, 1260, 0.85],
+        [9100, 1560, 1],
       ].map(([x, y, s], i) => (
         <g key={i} transform={`translate(${x} ${y}) scale(${s})`} fill="#fff">
           <ellipse cx="0" cy="0" rx="90" ry="34" />
@@ -344,21 +368,25 @@ function Sky({ gradient }: { gradient: string }) {
       {/* Soft far hills behind, going down with the near one. */}
       {[
         [700, 300, 900],
-        [2300, 700, 900],
-        [3900, 1040, 900],
-        [5500, 1460, 1000],
+        [2400, 640, 900],
+        [4100, 980, 900],
+        [5800, 1260, 900],
+        [7400, 1600, 950],
+        [9000, 1900, 1000],
       ].map(([x, y, r], i) => (
         <ellipse key={i} cx={x} cy={y + r * 0.55} rx={r} ry={r * 0.75} fill="#bfeaa0" />
       ))}
     </g>
   );
-}
+});
 
-const FLOWERS = [-260, -120, 1080, 1180, 2200, 2420, 2620, 3600, 3660, 4820, 4900, 5020, 6040, 6120];
-const TREES = [-220, 2330, 4300, 6080];
-const BUSHES = [1700, 2650, 4540];
+// Trees, bushes and flowers stand clear of the duck's way, the stork's flight and the geyser's throw.
+const FLOWERS = [-260, -120, 1080, 1180, 2480, 2620, 3600, 3700, 4120, 7400, 9640, 9690];
+const TREES = [-220, 3760, 9620];
+const BUSHES = [2560, 3900, 7470, 9560];
 
-function Hill() {
+/** The near hillside with its grass, trees, bushes and flowers; drawn once. */
+const Hill = memo(function Hill() {
   const top = svgLine(GROUND);
   return (
     <g>
@@ -380,11 +408,12 @@ function Hill() {
       {FLOWERS.map((x, i) => (
         <Flower key={x} x={x} y={groundY(x)} color={["#ff5d73", "#ffd23f", "#b388ff", "#ffffff"][i % 4]} />
       ))}
-      {/* The stony cliff the slide goes down. */}
-      <path d="M3560 990 L3640 1380 L3600 1380 L3530 1000 Z" fill={STONE_DARK} />
+      {/* The stony cliffs the brook falls over and the slide goes down. */}
+      <path d="M4180 1020 L4210 1130 L4185 1130 L4165 1030 Z" fill={STONE_DARK} />
+      <path d="M6220 1250 L6300 1640 L6260 1640 L6190 1260 Z" fill={STONE_DARK} />
     </g>
   );
-}
+});
 
 function Tree({ x, y }: { x: number; y: number }) {
   return (
@@ -405,6 +434,243 @@ function Flower({ x, y, color }: { x: number; y: number; color: string }) {
         <circle key={a} cx={10 * Math.cos((a * Math.PI) / 180)} cy={-40 + 10 * Math.sin((a * Math.PI) / 180)} r="8" fill={color} stroke={INK} strokeWidth="2" />
       ))}
       <circle cx="0" cy="-40" r="6" fill="#ffb703" />
+    </g>
+  );
+}
+
+/* ---------- Ponds ---------- */
+
+/** A wild pond's bank and its deep water, behind the duck: earth round the reed and turtle ponds, stone round the warm spring. */
+const PondBack = memo(function PondBack({ pond: b, kind }: { pond: Basin; kind: "reeds" | "grass" | "stones" }) {
+  const rim = kind === "stones" ? STONE : "#8d6e4a";
+  const mid = (b.x0 + b.x1) / 2;
+  return (
+    <g>
+      <path
+        d={`M${b.x0 - 24} ${b.y - 20} Q${b.x0 - 10} ${b.y + b.depth + 20} ${mid} ${b.y + b.depth + 18} Q${b.x1 + 10} ${b.y + b.depth + 20} ${b.x1 + 24} ${b.y - 20} Z`}
+        fill={rim}
+        stroke={INK}
+        strokeWidth="4"
+        strokeLinejoin="round"
+      />
+      <path
+        d={`M${b.x0} ${b.y - 4} Q${b.x0 + 10} ${b.y + b.depth} ${mid} ${b.y + b.depth} Q${b.x1 - 10} ${b.y + b.depth} ${b.x1} ${b.y - 4} Z`}
+        fill={kind === "stones" ? "#2fb5b0" : WATER_DEEP}
+      />
+    </g>
+  );
+});
+
+/** A wild pond's water in front of the duck, and what rims it: tufts of grass, or the warm spring's round stones. */
+const PondFront = memo(function PondFront({ pond: b }: { pond: Basin }) {
+  const spring = b === HOT_SPRING;
+  const w = b.x1 - b.x0;
+  const shine = spring ? "#c8fff8" : "#bdeeff";
+  return (
+    <g>
+      <path
+        d={`M${b.x0} ${b.y + 3} H${b.x1} Q${b.x1 - 10} ${b.y + b.depth} ${(b.x0 + b.x1) / 2} ${b.y + b.depth} Q${b.x0 + 10} ${b.y + b.depth} ${b.x0} ${b.y + 3} Z`}
+        fill={spring ? "#5fd6cf" : WATER}
+      />
+      <path d={`M${b.x0} ${b.y + 4} H${b.x1}`} stroke={shine} strokeWidth="5" />
+      {[0.25, 0.55, 0.8].map((k) => (
+        <path key={k} d={`M${b.x0 + w * k - 40} ${b.y + 40} q20 -10 40 0 t40 0`} fill="none" stroke={shine} strokeWidth="4" strokeLinecap="round" />
+      ))}
+      {spring
+        ? Array.from({ length: 11 }, (_, i) => (
+            <ellipse key={i} cx={b.x0 + (w * i) / 10} cy={b.y + b.depth + 8} rx="34" ry="20" fill={STONE} stroke={INK} strokeWidth="3" />
+          ))
+        : // The turtle's rock takes the far shore of its pond, so no grass there.
+          [b.x0 - 14, ...(b === TURTLE_POND ? [] : [b.x1 + 14])].map((x) => (
+            <path
+              key={x}
+              d={`M${x - 24} ${b.y - 4} l10 -34 l8 30 l8 -40 l8 40 l10 -30 l4 34 Z`}
+              fill={GRASS_DARK}
+              stroke={INK}
+              strokeWidth="3"
+              strokeLinejoin="round"
+            />
+          ))}
+      {spring && [b.x0 - 14, b.x1 + 14].map((x) => <ellipse key={x} cx={x} cy={b.y - 4} rx="30" ry="22" fill={STONE} stroke={INK} strokeWidth="3" />)}
+    </g>
+  );
+});
+
+/** The reeds at the reed pond's end, swaying from their roots once the duck bumps in; every other one behind the duck, the rest before it. */
+function Reeds({ sway, front }: { sway: number; front: boolean }) {
+  const y = REED_POND.y + 4;
+  return (
+    <g>
+      {REEDS.map((x, i) => {
+        if (i % 2 === (front ? 1 : 0)) return null;
+        const h = 190 + ((i * 47) % 60);
+        return (
+          <g key={x} transform={`rotate(${sway * (0.6 + (i % 3) * 0.25)} ${x} ${y})`}>
+            <path d={`M${x} ${y} Q${x + 6} ${y - h / 2} ${x + 2} ${y - h}`} fill="none" stroke="#4f8f2f" strokeWidth="7" strokeLinecap="round" />
+            <path d={`M${x} ${y} Q${x - 30} ${y - h / 3} ${x - 44} ${y - h / 2}`} fill="none" stroke="#6cbf43" strokeWidth="6" strokeLinecap="round" />
+            <rect x={x - 9} y={y - h - 4} width="20" height="54" rx="10" fill="#8a5a2b" stroke={INK} strokeWidth="3" />
+          </g>
+        );
+      })}
+    </g>
+  );
+}
+
+/** The pole the stork's nest sits on, standing behind the second basin; drawn once. */
+const NestPole = memo(function NestPole() {
+  const { x, y } = STORK.nest;
+  return <rect x={x - 11} y={y} width="22" height={groundY(x) - y + 10} rx="5" fill={WOOD_DARK} stroke={INK} strokeWidth="3" />;
+});
+
+/** The stork's nest of twigs on its pole: drawn in front of the stork, so it sits in it. */
+const NestFront = memo(function NestFront() {
+  const { x, y } = STORK.nest;
+  return (
+    <g strokeLinecap="round">
+      <path d={`M${x - 78} ${y - 14} Q${x} ${y + 40} ${x + 78} ${y - 14} Z`} fill="#a77a45" stroke={INK} strokeWidth="4" strokeLinejoin="round" />
+      {[-60, -30, 0, 30, 60].map((dx, i) => (
+        <line key={dx} x1={x + dx - 24} y1={y - 10 + (i % 2) * 12} x2={x + dx + 26} y2={y - 2 - (i % 2) * 10} stroke="#6e4a22" strokeWidth="5" />
+      ))}
+    </g>
+  );
+});
+
+const STORK_RED = "#e8453c";
+
+/** The white stork, facing right: standing on long red legs, bent down to the duck, flying with it in its beak, or sitting in its nest. */
+function Stork({ body: b, head: h, tip, wing, legs }: StorkPose) {
+  const shoulder = { x: b.x + 40, y: b.y - 14 };
+  const angle = Math.atan2(tip.y - h.y, tip.x - h.x);
+  const side = { x: -Math.sin(angle) * 6, y: Math.cos(angle) * 6 };
+  const base = { x: h.x + Math.cos(angle) * 8, y: h.y + Math.sin(angle) * 8 };
+  const feetY = REED_POND.y + 70;
+  const neck = `M${shoulder.x} ${shoulder.y} Q${(shoulder.x + h.x) / 2 + 16} ${(shoulder.y + h.y) / 2} ${h.x} ${h.y}`;
+  /** One wing, flapping from its root on the back: `w` 1 up, -1 down; its outer half black. */
+  const wingPaths = (w: number, reach: number) => {
+    const end = { x: b.x - 50, y: b.y - 12 - reach * w };
+    return {
+      white: `M${b.x + 26} ${b.y - 12} Q${b.x} ${end.y + (b.y - end.y) * 0.3} ${end.x} ${end.y} L${b.x - 46} ${b.y - 4} Z`,
+      black: `M${b.x - 12} ${(b.y + end.y) / 2} L${end.x} ${end.y} L${b.x - 46} ${b.y - 4} Z`,
+    };
+  };
+  const far = wing === null ? null : wingPaths(-wing * 0.8, 110);
+  const near = wing === null ? null : wingPaths(wing, 140);
+  return (
+    <g strokeLinejoin="round" strokeLinecap="round">
+      {legs === "stand" &&
+        [-14, 12].map((dx) => (
+          <path
+            key={dx}
+            d={`M${b.x + dx * 0.5} ${b.y + 22} L${STORK.x + dx + 6} ${(b.y + feetY) / 2} L${STORK.x + dx} ${feetY}`}
+            fill="none"
+            stroke={STORK_RED}
+            strokeWidth="7"
+          />
+        ))}
+      {legs === "trail" &&
+        [0, 12].map((dy) => (
+          <path key={dy} d={`M${b.x - 20} ${b.y + 16 + dy / 2} L${b.x - 150} ${b.y + 34 + dy}`} fill="none" stroke={STORK_RED} strokeWidth="7" />
+        ))}
+      {far && (
+        <g>
+          <path d={far.white} fill="#e9edf0" stroke={INK} strokeWidth="3" />
+          <path d={far.black} fill="#333" stroke={INK} strokeWidth="3" />
+        </g>
+      )}
+      <path d={`M${b.x - 52} ${b.y - 6} L${b.x - 86} ${b.y + 4} L${b.x - 50} ${b.y + 14} Z`} fill="#fff" stroke={INK} strokeWidth="3" />
+      <ellipse cx={b.x} cy={b.y} rx="60" ry="30" fill="#fff" stroke={INK} strokeWidth="4" />
+      {wing === null && (
+        <path
+          d={`M${b.x + 30} ${b.y - 16} Q${b.x - 20} ${b.y - 30} ${b.x - 78} ${b.y + 6} Q${b.x - 20} ${b.y + 14} ${b.x + 30} ${b.y - 16} Z`}
+          fill="#333"
+          stroke={INK}
+          strokeWidth="3"
+        />
+      )}
+      <path d={neck} fill="none" stroke={INK} strokeWidth="22" />
+      <path d={neck} fill="none" stroke="#fff" strokeWidth="15" />
+      <path
+        d={`M${base.x + side.x} ${base.y + side.y} L${tip.x} ${tip.y} L${base.x - side.x} ${base.y - side.y} Z`}
+        fill={STORK_RED}
+        stroke={INK}
+        strokeWidth="3"
+      />
+      <circle cx={h.x} cy={h.y} r="15" fill="#fff" stroke={INK} strokeWidth="3.5" />
+      <circle cx={h.x + 4} cy={h.y - 4} r="3.5" fill={INK} />
+      {near && (
+        <g>
+          <path d={near.white} fill="#fff" stroke={INK} strokeWidth="3.5" />
+          <path d={near.black} fill="#333" stroke={INK} strokeWidth="3" />
+        </g>
+      )}
+    </g>
+  );
+}
+
+/** The flat rock at the turtle pond's far shore, where the turtle climbs out; drawn once. */
+const TurtleRock = memo(function TurtleRock() {
+  const { x0, x1, y } = TURTLE.rock;
+  return (
+    <path
+      d={`M${x0} ${y + 40} Q${x0 - 6} ${y + 2} ${x0 + 30} ${y} H${x1 - 30} Q${x1 + 6} ${y + 2} ${x1} ${y + 50} Z`}
+      fill={STONE}
+      stroke={INK}
+      strokeWidth="4"
+      strokeLinejoin="round"
+    />
+  );
+});
+
+/** The turtle, facing right, the top of its shell at `top`: its flippers swing while it swims, and it leans `tilt` degrees nose down. */
+function Turtle({ top, tilt, paddle }: { top: Pt; tilt: number; paddle: number }) {
+  const green = "#6fbf4a";
+  return (
+    <g transform={`translate(${top.x} ${top.y}) rotate(${tilt})`} strokeLinejoin="round">
+      <ellipse cx="44" cy="46" rx="24" ry="9" transform={`rotate(${20 + 28 * paddle} 44 46)`} fill={green} stroke={INK} strokeWidth="3" />
+      <ellipse cx="-50" cy="46" rx="19" ry="8" transform={`rotate(${-20 - 28 * paddle} -50 46)`} fill={green} stroke={INK} strokeWidth="3" />
+      <path d="M60 30 Q80 14 92 24" fill="none" stroke={INK} strokeWidth="20" strokeLinecap="round" />
+      <path d="M60 30 Q80 14 92 24" fill="none" stroke={green} strokeWidth="13" strokeLinecap="round" />
+      <circle cx="94" cy="24" r="16" fill={green} stroke={INK} strokeWidth="3.5" />
+      <circle cx="99" cy="19" r="3.5" fill={INK} />
+      <path d="M96 30 Q102 33 108 28" fill="none" stroke={INK} strokeWidth="2.5" strokeLinecap="round" />
+      <rect x="-76" y="36" width="152" height="12" rx="6" fill="#e2cf8a" stroke={INK} strokeWidth="3" />
+      <path d="M-72 40 C-72 -14 72 -14 72 40 Z" fill="#7a9e3a" stroke={INK} strokeWidth="4" />
+      {[
+        [-30, 18],
+        [0, 8],
+        [30, 18],
+      ].map(([x, y]) => (
+        <path key={x} d={`M${x - 14} ${y + 6} l7 -12 h14 l7 12 l-7 12 h-14 Z`} fill="#5a7f2a" stroke={INK} strokeWidth="2.5" />
+      ))}
+    </g>
+  );
+}
+
+/** The geyser's column of water from the warm spring up to `top`, with foam running up it and a crown of drops. */
+function GeyserColumn({ top, t }: { top: number | null; t: number }) {
+  if (top === null || top > HOT_SPRING.y - 4) return null;
+  const { x } = GEYSER;
+  const base = HOT_SPRING.y + 10;
+  const d = `M${x - 40} ${base} Q${x - 22} ${(base + top) / 2} ${x - 26} ${top} H${x + 26} Q${x + 22} ${(base + top) / 2} ${x + 40} ${base} Z`;
+  return (
+    <g>
+      <path d={d} fill={WATER} stroke="#fff" strokeWidth="4" />
+      <path d={`M${x - 6} ${base} V${top + 10}`} stroke={FOAM} strokeWidth="6" strokeDasharray="26 34" strokeDashoffset={t * 600} strokeLinecap="round" />
+      <path d={`M${x + 12} ${base} V${top + 20}`} stroke={FOAM} strokeWidth="4" strokeDasharray="18 40" strokeDashoffset={t * 520} strokeLinecap="round" />
+      {[-34, -12, 12, 34].map((dx, i) => (
+        <circle key={dx} cx={x + dx} cy={top + 4 - 6 * Math.abs(Math.sin(t * 9 + i))} r={14 - Math.abs(dx) / 6} fill={WATER} stroke="#fff" strokeWidth="3" />
+      ))}
+    </g>
+  );
+}
+
+/** Bubbles rising to the surface of a pond. */
+function Bubbles({ bubbles }: { bubbles: Bubble[] }) {
+  return (
+    <g>
+      {bubbles.map((b, i) => (
+        <circle key={i} cx={b.pt.x} cy={b.pt.y} r={b.r} fill="#bdeeff" fillOpacity="0.6" stroke="#fff" strokeWidth="3" />
+      ))}
     </g>
   );
 }
@@ -542,7 +808,7 @@ function WaterWheel({ turned }: { turned: number }) {
   return (
     <g>
       <path
-        d={`M${x} ${y} L${x - 70} ${BASINS[1].y + 90} M${x} ${y} L${x + 70} ${BASINS[1].y + 90}`}
+        d={`M${x} ${y} L${x - 70} ${REED_POND.y + 90} M${x} ${y} L${x + 70} ${REED_POND.y + 90}`}
         stroke={WOOD_DARK}
         strokeWidth="16"
         strokeLinecap="round"
@@ -609,7 +875,7 @@ function BrookFront() {
     <g>
       <path d={`M${from.x} ${from.y + 3} L${to.x} ${to.y + 3} L${to.x} ${to.y + depth} L${from.x} ${from.y + depth} Z`} fill={WATER} />
       <path d={`M${from.x} ${from.y + depth} L${to.x} ${to.y + depth}`} stroke={GRASS_DARK} strokeWidth="6" />
-      {[2300, 2560].map((x) => (
+      {[3720, 3980].map((x) => (
         <ellipse key={x} cx={x} cy={brookY(x) + depth + 6} rx="30" ry="14" fill={STONE} stroke={INK} strokeWidth="3" />
       ))}
     </g>
@@ -635,7 +901,7 @@ function LilyPads() {
   const y = BASINS[2].y - 4;
   return (
     <g>
-      {[3040, 3270].map((x) => (
+      {[FROG.pad, FROG.rest].map((x) => (
         <path key={x} d={`M${x} ${y} L${x + 54} ${y - 4} A54 12 0 1 1 ${x + 40} ${y + 8} Z`} fill="#3f9f3a" stroke={INK} strokeWidth="3" />
       ))}
     </g>
@@ -708,8 +974,8 @@ function Slide({ flow, t }: { flow: number; t: number }) {
   const chute = svgLine(SLIDE_LINE.map((p) => ({ x: p.x, y: p.y + 16 })));
   return (
     <g fill="none" strokeLinecap="round" strokeLinejoin="round">
-      {[3620, 3960].map((x) => (
-        <line key={x} x1={x} x2={x} y1={x < 3800 ? 1060 : 1370} y2={groundY(x)} stroke={WOOD_DARK} strokeWidth="12" />
+      {[6280, 6620].map((x) => (
+        <line key={x} x1={x} x2={x} y1={x < TOWER.x ? 1320 : 1630} y2={groundY(x)} stroke={WOOD_DARK} strokeWidth="12" />
       ))}
       <path d={chute} stroke={INK} strokeWidth="40" />
       <path d={chute} stroke="#ff5d73" strokeWidth="32" />
