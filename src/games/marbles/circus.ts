@@ -5,28 +5,39 @@
 // swings high and drops it into a dozing lion's mane, the lion that wakes with
 // a start, roars and leaps onto the next pedestal and shakes the marble out
 // into the basket of a bear acrobat on a unicycle on the high wire, a cannon that
-// shoots the clown into the net – while the camera travels along. Everything
-// is worked out ahead as a function of the seconds since the tap, so
-// CircusLevel.tsx only asks where each thing is at a moment. Coordinates are
-// those of the tent, 6860 × 900; the screen shows 1600 of it at a time.
+// shoots the clown into the net, the net that throws it onto a big rolling ball,
+// the ball it walks along the ring onto the pad of the high striker, whose puck
+// lets a bunch of balloons out to wake a parrot, and the parrot that pulls the
+// curtain open – while the camera travels along. Everything is worked out
+// ahead as a function of the seconds since the tap, so CircusLevel.tsx only
+// asks where each thing is at a moment. Coordinates are those of the tent,
+// 8760 × 900; the screen shows 1600 of it at a time.
 
 import {
   playBoing,
+  playClap,
+  playClick,
+  playClimbNote,
+  playClonk,
   playCreak,
+  playCurtain,
   playDing,
   playDrum,
+  playInflate,
   playKnock,
   playLeaves,
   playMelody,
+  playPing,
   playPlop,
   playPop,
   playSqueak,
   playThump,
   playTick,
+  playTusch,
   playTwinkle,
   playWhoosh,
 } from "@/lib/sfx";
-import { playBark, playChatter, playGiggle, playLaunch, playRing, playRoar, playTrumpet } from "@/lib/realSounds";
+import { playBark, playChatter, playGiggle, playLaunch, playRing, playRoar, playSquawk, playTrumpet } from "@/lib/realSounds";
 import { wobble } from "./level";
 import {
   along,
@@ -45,13 +56,14 @@ import {
   rounded,
   seg,
   STEP,
+  steady,
   timeline,
   timeWhen,
   turn,
 } from "./machineKit";
 import { arc, BALL_R, line, quad, type Pt } from "./path";
 
-export const WORLD_W = 6860;
+export const WORLD_W = 8760;
 export const FLOOR = 800;
 
 /* ---------- Layout ---------- */
@@ -195,11 +207,61 @@ export const CORD_END: Pt = onBarrel(CANNON.cord, -CANNON.r);
 
 /** The safety net on two poles; `sag` is how far its middle hangs below the poles' hooks. */
 export const NET = { x0: 6090, x1: 6410, y: 640, sag: 24 };
-/** The stage with the curtain, behind the net. */
-export const STAGE = { x0: 5980, x1: 6520, top: 250 };
+
+/**
+ * The big starry ball a clown walks on (a „Laufkugel“): it waits between two
+ * chocks at `x0`, and the clown treads it along the ring to `x1`, where it
+ * rolls onto the high striker's pad.
+ */
+export const BIG_BALL = { x0: 6640, x1: 7700, r: 70 };
+/**
+ * The high striker („Hau den Lukas“): a striped column with a puck that races
+ * up it when the pad in the floor is pressed. In the box on top a bunch of
+ * balloons waits under a lid; `sink` is how far the pad gives under the ball.
+ */
+export const STRIKER = { x: 7792, w: 40, top: 420, box: 44, padHalf: 64, sink: 10 };
+/** The swing hanging from two ropes under the tent roof, where the parrot dozes on its bar at (x, y). */
+export const PERCH = { x: 7990, y: 160, half: 46 };
+/** Where the swing's ropes are tied to the tent roof. */
+export const PERCH_TOP = 30;
+/** The stage with the curtain, at the end of the ring. */
+export const STAGE = { x0: 8080, x1: 8620, top: 250 };
+/** The curtain's pull cord down the stage's left post: its tassel hangs at `y` and is pulled down `pull`. */
+export const CORD = { x: STAGE.x0 + 16, top: STAGE.top + 70, y: 520, pull: 80 };
 
 /** The clown doll's middle is this far above its seat, and this far below the middle of its head. */
 export const CLOWN = { seat: 38, head: 38 };
+/** The clown's feet reach this far below its middle. */
+export const CLOWN_FEET = CLOWN.seat + 3;
+/** Where the clown takes its bow at the end, in front of the open curtain (its middle). */
+export const BOW_SPOT: Pt = { x: (STAGE.x0 + STAGE.x1) / 2, y: FLOOR - CLOWN_FEET };
+
+/** The three balloons' middles around the point of the bunch, and their size. */
+export const BALLOONS = {
+  r: 26,
+  at: [
+    { x: -24, y: 6 },
+    { x: 0, y: -14 },
+    { x: 24, y: 6 },
+  ],
+};
+/** The balloons start inside the high striker's box, and end pressed up under the parrot's bar. */
+export const BUNCH_FROM: Pt = { x: STRIKER.x, y: STRIKER.top - STRIKER.box / 2 };
+export const BUNCH_TO: Pt = { x: PERCH.x, y: PERCH.y + 5 + 14 + BALLOONS.r };
+
+/**
+ * Trapezoid speed: speeding up evenly for the first `ramp` of the time, steady,
+ * then slowing evenly to a stop. `k` (0–1) is the share of the time gone; the
+ * result the share of the way.
+ */
+export function glide(k: number, ramp = 0.2) {
+  const v = 1 / (1 - ramp);
+  if (k <= 0) return 0;
+  if (k >= 1) return 1;
+  if (k < ramp) return (0.5 * v * k * k) / ramp;
+  if (k < 1 - ramp) return v * (k - ramp / 2);
+  return 1 - (0.5 * v * (1 - k) * (1 - k)) / ramp;
+}
 
 /* ---------- The machine ---------- */
 
@@ -496,20 +558,115 @@ export function buildCircus() {
   /** How far the middle of the net hangs down: it gives with the clown and springs back. */
   const sagAt = (t: number) => NET.sag + (t < tNet ? 0 : 46 * Math.sin((t - tNet) * 9) * Math.exp(-(t - tNet) * 3));
 
-  const clownAt = (t: number): { pt: Pt; turn: number } => {
-    const aim = 90 - CANNON.angle;
-    if (t < tFire) return { pt: clownIn, turn: aim };
-    if (t < tNet) {
-      const k = seg(t, tFire, tNet);
-      return { pt: hop(clownIn, clownLand, clownRise, k), turn: aim + (360 - aim) * easeInOut(k) };
+  /*
+   * The net springs back and throws the clown on: a somersault onto the big
+   * starry ball. It finds its balance, then treads the ball along the ring –
+   * a note higher at every stride – onto the high striker's pad.
+   */
+  const tToss = tNet + Math.PI / 9;
+  const ballY = FLOOR - BIG_BALL.r;
+  const onBall0: Pt = { x: BIG_BALL.x0, y: ballY - BIG_BALL.r - CLOWN_FEET };
+  const tOnBall = tToss + 1.2;
+  const tWalk = tOnBall + 0.6;
+  const tPad = tWalk + 6.4;
+  const STRIDES = 8;
+  at(tToss, { sound: playWhoosh });
+  at(tOnBall, { sound: playThump });
+  for (let i = 0; i < STRIDES; i++) at(tWalk + (i + 0.5) * ((tPad - tWalk) / STRIDES), { sound: () => playClimbNote(i, 0.12) });
+  at(tPad, { sound: playClonk });
+
+  /** How far the striker's pad has given under the ball. */
+  const padSink = (t: number) => STRIKER.sink * easeOut(seg(t, tPad, tPad + 0.15));
+  /** The big ball: where its middle is and how far it has turned (radians). */
+  const bigBallAt = (t: number) => {
+    // It rocks a little as the clown lands on it and finds its balance.
+    const rock = t < tWalk ? wobble(t - tOnBall, 6, 9, 4) * (1 - seg(t, tWalk - 0.25, tWalk)) : 0;
+    const x = BIG_BALL.x0 + rock + (BIG_BALL.x1 - BIG_BALL.x0) * glide(seg(t, tWalk, tPad));
+    return { pt: { x, y: ballY + padSink(t) }, spin: (x - BIG_BALL.x0) / BIG_BALL.r };
+  };
+  const onBallAt = (t: number): Pt => {
+    const ball = bigBallAt(t).pt;
+    return { x: ball.x, y: ball.y - BIG_BALL.r - CLOWN_FEET };
+  };
+
+  /* The pad sends the puck up the striker's column: ping! The lid of the box on top flies open, and the balloons come out. */
+  const tPuck = tPad + 0.15;
+  const tRing = tPuck + 0.8;
+  const tRise = tRing + 0.05;
+  const tBump = tRise + 2.6;
+  at(tPuck, { sound: playInflate });
+  at(tRing, { sound: playPing });
+  at(tRing + 0.08, { sound: playPop });
+  at(tBump, { sound: playSqueak });
+  /** The puck's height on the column: 0 at its foot, 1 against the box. */
+  const puckAt = (t: number) => {
+    const k = seg(t, tPuck, tRing);
+    if (t < tRing) return 1.6 * k - 0.6 * k * k;
+    return 1 - easeIn(seg(t, tRing + 0.5, tRing + 1.6));
+  };
+  /** How far the box's lid has swung open, in degrees. */
+  const lidAt = (t: number) => 115 * easeOut(seg(t, tRing, tRing + 0.18)) + wobble(t - tRing - 0.18, 12, 14, 4);
+  /** The bunch of balloons: where its point is and how big they are (they unfold as they come out). */
+  const balloonsAt = (t: number) => {
+    const k = seg(t, tRise, tBump);
+    const grow = 0.35 + 0.65 * easeOut(seg(t, tRise, tRise + 0.45));
+    if (t < tBump) {
+      const pt = { x: lerp(BUNCH_FROM.x, BUNCH_TO.x, easeInOut(k)) + 14 * Math.sin(3 * Math.PI * k), y: lerp(BUNCH_FROM.y, BUNCH_TO.y, k) };
+      return { pt, grow };
     }
-    return { pt: { x: clownLand.x, y: NET.y + sagAt(t) - CLOWN.seat }, turn: 0 };
+    // Pressed up under the bar, they bob after the bump.
+    return { pt: { x: BUNCH_TO.x, y: BUNCH_TO.y + Math.abs(wobble(t - tBump, 12, 8, 2.5)) }, grow: 1 };
+  };
+
+  /*
+   * The balloons bump the swing awake: the parrot squawks, flies a loop over
+   * the ring and takes the curtain's tassel in its claws, and its weight pulls
+   * the cord down.
+   */
+  /** How far the swing has been pushed (degrees around the ropes' tops). */
+  const swingOf = (t: number) => wobble(t - tBump, 7, 5, 1.2);
+  const onPerch = (t: number): Pt => {
+    const a = rad(swingOf(t));
+    const rope = PERCH.y - PERCH_TOP;
+    return { x: PERCH.x - rope * Math.sin(a), y: PERCH_TOP + rope * Math.cos(a) - 28 };
+  };
+  const tWake = tBump + 0.35;
+  const tFly = tWake + 0.9;
+  const grip: Pt = { x: CORD.x, y: CORD.y - 30 };
+  const flight = steady(
+    pathOf(
+      rounded(
+        [onPerch(tFly), { x: 7760, y: 260 }, { x: 7480, y: 330 }, { x: 7360, y: 470 }, { x: 7480, y: 560 }, { x: 7700, y: 470 }, { x: 7940, y: 430 }, grip],
+        80,
+      ),
+    ),
+    360,
+  );
+  const tTassel = tFly + flight.duration;
+  at(tWake, { sound: playSquawk });
+  at(tFly, { sound: playWhoosh });
+  at(tTassel, { sound: playClick });
+  /** The tassel's height: pulled down by the parrot hanging on it. */
+  const tasselY = (t: number) => CORD.y + CORD.pull * easeInOut(seg(t, tTassel, tTassel + 0.6));
+  /** The parrot: its middle, which way it looks (1 right, -1 left), its wings' beat (-1–1) and whether it is awake. */
+  const parrotAt = (t: number): { pt: Pt; face: number; flap: number; awake: boolean } => {
+    if (t < tFly) return { pt: onPerch(t), face: -1, flap: t > tWake ? 0.4 * Math.sin((t - tWake) * 10) * seg(t, tWake, tWake + 0.2) : 0, awake: t >= tWake };
+    if (t < tTassel) {
+      const d = distAt(flight, t - tFly);
+      const { pt, angle } = along(flight.path, d);
+      return { pt, face: Math.cos(angle) < 0 ? -1 : 1, flap: Math.sin((t - tFly) * 16), awake: true };
+    }
+    return {
+      pt: { x: grip.x, y: tasselY(t) - 30 },
+      face: 1,
+      flap: 0.5 * Math.sin((t - tTassel) * 12) * (1 - seg(t, tTassel + 0.6, tTassel + 1.2)),
+      awake: true,
+    };
   };
 
   /* The finale: the curtain opens, the spotlights come on, „Tusch“ – no confetti (A-30). */
-  const tShow = tNet + 0.7;
-  const tDone = tShow + 2.4;
-  at(tShow, { sound: playWhoosh });
+  const tShow = tTassel + 0.3;
+  at(tShow, { sound: playCurtain });
   at(tShow + 0.15, { sound: playMelody });
   at(tShow + 0.3, {
     say: {
@@ -524,7 +681,49 @@ export function buildCircus() {
   });
   at(tShow + 1.2, { sound: playTwinkle });
   at(tShow + 1.6, { sound: playGiggle });
+
+  /* The clown hops off the ball onto the stage, with a somersault, lands and takes a bow. */
+  const tHopOff = tShow + 1.6;
+  const tBow = tHopOff + 1.1;
+  const tDone = tBow + 1.6;
+  const hopFrom = onBallAt(tHopOff);
+  at(tHopOff, { sound: playBoing });
+  at(tBow, { sound: playThump });
+  at(tBow, { sound: playTusch });
+  at(tBow + 0.5, { sound: playClap });
+  at(tBow + 0.8, { sound: playClap });
   at(tDone, { done: true });
+
+  /** The clown: its middle, how far it is turned, its arms (degrees, negative is up) and its feet's stride. */
+  const clownAt = (t: number): { pt: Pt; turn: number; arms: number; stride: number } => {
+    const aim = 90 - CANNON.angle;
+    const wave = (t0: number) => -50 + 22 * Math.sin((t - t0) * 9);
+    if (t < tFire) return { pt: clownIn, turn: aim, arms: 0, stride: 0 };
+    if (t < tNet) {
+      const k = seg(t, tFire, tNet);
+      return { pt: hop(clownIn, clownLand, clownRise, k), turn: aim + (360 - aim) * easeInOut(k), arms: 0, stride: 0 };
+    }
+    if (t < tToss) return { pt: { x: clownLand.x, y: NET.y + sagAt(t) - CLOWN.seat }, turn: 0, arms: wave(tNet) * seg(t, tNet, tNet + 0.15), stride: 0 };
+    if (t < tOnBall) {
+      const k = seg(t, tToss, tOnBall);
+      return { pt: hop(clownLand, onBall0, 240, k), turn: 360 * easeInOut(k), arms: -60, stride: 0 };
+    }
+    if (t < tPad) {
+      // Arms out for balance, swaying a little, the feet treading the ball.
+      const stride = (bigBallAt(t).pt.x - BIG_BALL.x0) / 34;
+      const sway = 5 * Math.sin(stride / 2) * seg(t, tWalk, tWalk + 0.5) + wobble(t - tOnBall, 8, 9, 4);
+      return { pt: onBallAt(t), turn: sway, arms: -40 + 8 * Math.sin(t * 5), stride };
+    }
+    if (t < tHopOff) return { pt: onBallAt(t), turn: 0, arms: wave(tPad), stride: 0 };
+    if (t < tBow) {
+      const k = seg(t, tHopOff, tBow);
+      return { pt: hop(hopFrom, BOW_SPOT, 220, k), turn: 360 * easeInOut(k), arms: -60, stride: 0 };
+    }
+    // The bow, turned around its feet.
+    const bow = 30 * Math.sin(Math.PI * seg(t, tBow + 0.25, tBow + 1.25));
+    const feet = { x: BOW_SPOT.x, y: BOW_SPOT.y + CLOWN_FEET };
+    return { pt: { x: feet.x + CLOWN_FEET * Math.sin(rad(bow)), y: feet.y - CLOWN_FEET * Math.cos(rad(bow)) }, turn: bow, arms: 10, stride: 0 };
+  };
 
   /** Where the camera looks: the thing that moves right now. */
   const focusX = (t: number) => {
@@ -538,8 +737,10 @@ export function buildCircus() {
     if (t < tUni) return marbleAt(t).pt.x;
     if (t < tStop) return unicycleAt(t).pt.x;
     if (t < tFire) return CANNON.x;
-    if (t < tNet) return clownAt(t).pt.x;
-    return clownLand.x;
+    if (t < tPad) return clownAt(t).pt.x;
+    // The striker, the balloons, the parrot's loop and the stage all in one view.
+    if (t < tShow) return BIG_BALL.x1 + 40;
+    return BOW_SPOT.x;
   };
   const cameraTarget = (t: number) => cameraOn(WORLD_W, focusX(t));
 
@@ -577,7 +778,19 @@ export function buildCircus() {
     tStop,
     tFire,
     tNet,
+    tToss,
+    tOnBall,
+    tWalk,
+    tPad,
+    tPuck,
+    tRing,
+    tBump,
+    tWake,
+    tFly,
+    tTassel,
     tShow,
+    tHopOff,
+    tBow,
     marbleAt,
     dipAt,
     nodAt,
@@ -589,6 +802,14 @@ export function buildCircus() {
     pulledAt,
     clownAt,
     sagAt,
+    bigBallAt,
+    padSink,
+    puckAt,
+    lidAt,
+    balloonsAt,
+    swingOf,
+    parrotAt,
+    tasselY,
     cameraTarget,
     width: WORLD_W,
   };
