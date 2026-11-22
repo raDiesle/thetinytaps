@@ -2,7 +2,6 @@ import { ALLTAG_BLURB, ALLTAG_TITLE, BOOK_BLURB, BOOK_TITLE, MOOD_BLURB, MOOD_TI
 import { CAUSE_BLURB, CAUSE_TITLE } from "@/games/cause/names";
 import { TOWER_BLURB, TOWER_TITLE } from "@/games/tower/names";
 import { MILK_CHAIN_BLURB, MILK_CHAIN_BOOK } from "@/games/milkchain/names";
-import { NIGHT_MILK_BOOK } from "@/games/nightmilk/names";
 import { BOTTLE_STORY_BLURB, BOTTLE_STORY_BOOK } from "@/games/bottlestory/names";
 import { PACIFIER_STORY_BLURB, PACIFIER_STORY_BOOK } from "@/games/pacifierstory/names";
 import { KITA_STORY_BLURB, KITA_STORY_BOOK } from "@/games/kitastory/names";
@@ -121,19 +120,15 @@ export const CATEGORIES: Category[] = [
       },
       {
         // The book „Abstillen“ holds „Tapsis Milchkette“, the weaning story in chapters along the steps of gentle
-        // weaning (src/games/milkchain; it replaced a first, shorter story, user decision, 9 November 2026), and tied to
-        // it „The Milk Sleeps at Night“ for families who wean only at night (src/games/nightmilk, idea H-104), at an
-        // address of its own below it, so a video or a search lands right there. Published once its pictures were made
-        // (21 November 2026): „Abstillen“ stands as two books tied together.
+        // weaning (src/games/milkchain; it replaced a first, shorter story, user decision, 9 November 2026), and „The
+        // Milk Sleeps at Night“ for families who wean only at night (src/games/nightmilk, idea H-104), at an address of
+        // its own below it, so a video or a search lands right there. One book on the shelf, opening on the choice of
+        // its two stories (user request, 22 November 2026; before, they stood as two books tied together).
         href: "/abstillen/",
         also: ["/abstillen/nachts/"],
         emoji: "🤱",
         title: MILK_CHAIN_BOOK,
         blurb: MILK_CHAIN_BLURB,
-        volumes: [
-          { href: "/abstillen/", emoji: "🤱", title: MILK_CHAIN_BOOK },
-          { href: "/abstillen/nachts/", emoji: "🌙", title: NIGHT_MILK_BOOK },
-        ],
       },
       {
         // The book „Bottle to Cup“ beside „Abstillen“ (idea H-105, user request, 21 November 2026): „Bye-Bye, Bottle!“, a

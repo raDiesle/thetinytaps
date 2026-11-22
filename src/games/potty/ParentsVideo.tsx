@@ -77,7 +77,7 @@ export function ParentsVideo() {
       title="Aufs Töpfchen: Video für Eltern"
       about={`Das echte Spiel auf einem Tablet, eine gezeichnete Hand tippt es durch: die Geschichte startet sofort, „Was muss dein Kind?“, das Lied und die Gedanken beim Sitzen, die Pause, das ✓ und der Stern der Woche – daneben kurze Zeilen für Eltern, am Ende ${END_SLATE_MS / 1000} s Name und Adresse für den Abspann von YouTube. Etwa anderthalb Minuten. Kein echtes Kind im Bild, und es zählt nichts: kein Stern, keine Spielzeit. Die Sprache stellt man im Regal um (🌐). Bei YouTube als „nicht speziell für Kinder“ hochladen, dann gehen Link und Abspann.`}
       facts={[
-        ["Sprache", `${languageName}${language.id !== "en" ? " (die Zeilen für Eltern gibt es bisher nur auf Englisch)" : ""}`],
+        ["Sprache", languageName],
         ["Adresse", address],
       ]}
       ready={songReady}

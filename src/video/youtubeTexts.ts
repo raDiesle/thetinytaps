@@ -5,12 +5,12 @@
 import type { SeoLanguage } from "@/content/seo";
 import type { TargetLanguageId } from "@/content/targetLanguages";
 import { seoWords } from "@/lib/seoText";
-import { addressFor, type CodeTarget } from "./outro/content";
+import { addressFor, type VideoPage } from "./outro/content";
 
 /** One kind of video: the game it is made from, whether it is for children, and its title. */
 export interface YouTubeVideo {
   /** The game's address, where the description leads. */
-  path: CodeTarget;
+  path: VideoPage;
   /**
    * Set as „made for kids“ on YouTube: no comments, no end screens or cards, so the address in the description and
    * in the picture (the outro's QR code) is the only way to the site.

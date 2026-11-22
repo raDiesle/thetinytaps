@@ -175,8 +175,9 @@ points with their times, then `to`; `sway` swings them (120 for the kite, 0 for 
    Append it to `TRAIL_LEVELS`. The levels so far are German first, their phrasebooks (`src/games/elevator/en.ts`,
    `ru.ts`, …) keyed by the German sentence: the first English-first level teaches `levels.ts` and the phrasebooks a
    level's first language (its own sentences English, German a translation like the others, the level said in English
-   where one is missing), with a test – never by writing it German first after all. Other languages, German included,
-   only when the user asks for them; add an English-only row part for it in `src/content/ideas/languageStatus.ts`.
+   where one is missing), with a test – never by writing it German first after all. Its lines in the other six
+   languages, German included, come in the same commit (user decision, 22 November 2026); add a row part for it in
+   `src/content/ideas/languageStatus.ts`, `"text"` where the recordings still wait (made only when the user asks).
    When you change a sentence in its first language that already has translations, delete or update them
    (`phrases.test.ts` fails on a left-over one).
 5. **Add a mode** in `ElevatorGame.tsx`: `{ id: "<level id>", emoji, title: title("…"), kind: t(TRAIL) }` after the

@@ -16,7 +16,8 @@ const BOOKS = [
   { file: "src/games/pacifierstory/PacifierStoryGame.tsx", href: "/schnullerfee/", name: "schnullerfee", folder: "src/games/pacifierstory/stimme" },
   { file: "src/games/kitastory/KitaStoryGame.tsx", href: "/kita/", name: "kita", folder: "src/games/kitastory/stimme" },
   { file: "src/games/hairstory/HairStoryGame.tsx", href: "/haare-waschen/", name: "haare-waschen", folder: "src/games/hairstory/stimme" },
-  { file: "src/games/nightmilk/NightMilkGame.tsx", href: "/abstillen/nachts/", name: "abstillen-nachts", folder: "src/games/nightmilk/stimme" },
+  // The night story is read in the same book (`WeaningBook`), its voice from its own folder.
+  { file: "src/games/milkchain/MilkChainGame.tsx", href: "/abstillen/nachts/", name: "abstillen-nachts", folder: "src/games/nightmilk/stimme" },
   { file: "src/games/bottlestory/BottleStoryGame.tsx", href: "/flaeschchen/", name: "flaeschchen", folder: "src/games/bottlestory/stimme" },
   { file: "src/games/bedstory/BedStoryGame.tsx", href: "/grosses-bett/", name: "grosses-bett", folder: "src/games/bedstory/stimme" },
 ];
@@ -29,7 +30,7 @@ describe("the voice switch", () => {
 
   test("the chapter books read aloud, with their lines on the recording list", () => {
     for (const book of BOOKS) {
-      expect(readFileSync(book.file, "utf8"), book.file).toContain("voice={VOICE}");
+      expect(readFileSync(book.file, "utf8"), book.file).toMatch(/voice=\{(VOICE|story\.voice)\}/);
       expect(RECORDED_GAMES.find((g) => g.name === book.name)?.folder, book.name).toBe(book.folder);
       expect(voiceLines().find((g) => g.href === book.href)?.groups.length ?? 0, book.href).toBeGreaterThan(0);
     }

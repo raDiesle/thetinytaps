@@ -86,16 +86,22 @@ export function glows(t: number) {
   });
 }
 
-/** How far the end card has come, 0 to 1, and each of its parts. */
-export function cardPose(t: number, signs: number) {
+/** When the end card's parts come: the card, its signs one after another, the code. */
+export type CardBeats = Record<"card" | "signs" | "code", readonly [number, number]>;
+
+/** How far the end card has come, 0 to 1, and each of its parts – at the shelf outro's times, or another's `beats`. */
+export function cardPose(t: number, signs: number, beats: CardBeats = OUTRO_BEATS) {
   // Each sign takes 1.6 steps to come, the next starting one step later: the last one has come at the end of `signs`.
-  const signStep = (OUTRO_BEATS.signs[1] - OUTRO_BEATS.signs[0]) / (signs + 0.6);
+  const signStep = (beats.signs[1] - beats.signs[0]) / (signs + 0.6);
   return {
-    card: easeOut(progress(t, OUTRO_BEATS.card)),
-    signs: Array.from({ length: signs }, (_, k) => easeOut(progress(t, [OUTRO_BEATS.signs[0] + k * signStep, OUTRO_BEATS.signs[0] + (k + 1.6) * signStep]))),
-    code: easeOut(progress(t, OUTRO_BEATS.code)),
+    card: easeOut(progress(t, beats.card)),
+    signs: Array.from({ length: signs }, (_, k) => easeOut(progress(t, [beats.signs[0] + k * signStep, beats.signs[0] + (k + 1.6) * signStep]))),
+    code: easeOut(progress(t, beats.code)),
   };
 }
+
+/** How far the end card has come, as `cardPose` gives it. */
+export type CardPose = ReturnType<typeof cardPose>;
 
 /** How much of the picture shows through the paper it fades in from. */
 export const outroFadeIn = (t: number) => easeOut(progress(t, OUTRO_BEATS.fadeIn));

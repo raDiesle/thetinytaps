@@ -1,7 +1,9 @@
 import { expect, test } from "bun:test";
+import { join } from "node:path";
 import { CATEGORIES } from "@/content/games";
+import { read } from "@/testSources";
 import { bookPose, BEATS as INTRO_BEATS, INTRO_SECONDS } from "../intro/timeline";
-import { addressFor, CODE_TARGETS, SIGNS, shortAddress } from "./content";
+import { addressFor, codeAddress, SIGNS, shortAddress, VIDEO_PAGES } from "./content";
 import { OUTRO_SOUND_END } from "./outroSound";
 import { cardPose, glows, OUTRO_BEATS, OUTRO_SECONDS, outroBookPose, titleLeft } from "./timeline";
 
@@ -55,9 +57,15 @@ test("everything happens, the card stands whole for a while to scan its code, an
   expect(INTRO_BEATS.address[1]).toBeLessThanOrEqual(INTRO_SECONDS);
 });
 
-test("every address the code can lead to is a page of the site, German at the root and the others under their prefix", () => {
+test("the code always leads to the home page in the video's language, so one outro serves every video", () => {
+  expect(codeAddress("de")).toBe("https://www.funforboth.com/");
+  expect(codeAddress("en")).toBe("https://www.funforboth.com/en/");
+  expect(read(join(import.meta.dir, "../../../tools/video.ts"))).not.toContain("ziel");
+});
+
+test("every page a video links to is a page of the site, German at the root and the others under their prefix", () => {
   const pages = new Set(["/", ...CATEGORIES.flatMap((category) => category.games.map((game) => game.href))]);
-  for (const [path] of CODE_TARGETS) expect(pages.has(path)).toBe(true);
+  for (const [path] of VIDEO_PAGES) expect(pages.has(path)).toBe(true);
   expect(addressFor("/zaehne/", "de")).toBe("https://www.funforboth.com/zaehne/");
   expect(addressFor("/zaehne/", "en")).toBe("https://www.funforboth.com/en/zaehne/");
   expect(shortAddress(addressFor("/", "de"))).toBe("funforboth.com");

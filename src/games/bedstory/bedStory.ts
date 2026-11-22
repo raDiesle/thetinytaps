@@ -12,7 +12,7 @@ import type { StoryChapter } from "@/components/ChapterBook";
 // No sticker chart: the guides disagree on rewards for sleep (Graf & Seide advise against them where fear or the wish
 // for closeness is behind it), so the story ends in pride and love, as all of them advise.
 //
-// English first (root CLAUDE.md, user decision, 11 November 2026): other languages, German too, come when the user asks.
+// English first (root CLAUDE.md, user decision, 11 November 2026), translated into the other six (`<lang>.ts`, 22 November 2026).
 // Played at `/grosses-bett/`, the book „Big Bed“ among the Alltagshelfer (`ChapterBook`, `first="en"`); its pictures
 // come from Gemini (`bedStoryPictures.ts`).
 

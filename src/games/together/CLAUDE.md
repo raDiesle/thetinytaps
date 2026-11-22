@@ -184,7 +184,8 @@ play-time limit (`gameEnded`, `countGame`). A thing comes again only after all o
   Christmas's sleigh, so `weihnachtsmann` and `reiterin`). Never name another pair's partner in a wish either
   („Schlitten“ in Father Christmas's would point at the Rodlerin's).
 - A new pair comes with its wish in the same commit (`content.test.ts` wants one on every pair, also painted pairs not
-  made yet), English only (see Languages below) and unrecorded until the user asks.
+  made yet), written English first and translated into every app language at once (see Languages below), and
+  unrecorded until the user asks.
 
 ### Picture and caption come together (user feedback, November 2026)
 
@@ -220,12 +221,12 @@ which differ from the German, the names of things excepted in languages with Lat
 game says exactly them; and that no wish holds its partner's name in that language). A translated wish keeps the rules
 of the German one: it never names its partner, nor in the helper's name where that holds it in that language (English
 „guitarist“, Chinese 水管工 – say „the fox“, „the bear“ then), nor another pair's partner where the German doesn't.
-The topics' names are translated inline in `topics.ts`. A new pair or topic comes in English only until the user asks
-for its translations, German included (root `CLAUDE.md`, Language): the pairs and the topics' names so far
+The topics' names are translated inline in `topics.ts`. A new pair or topic is written English first and gets its
+translations, German included, in the same commit (root `CLAUDE.md`, user decision, 22 November 2026): the pairs and the topics' names so far
 are German first (their words, `GERMAN_SAYS`, a topic's `name: Localized`), so the first English-first pair or topic
 teaches them a part's first language (a name: `Texts` of `src/lib/language.ts`), with a test – never by writing it
 German first after all –, and `languageStatus.ts` says what is missing. A
-changed line of an older pair is changed in its German. A pair added German first and not translated yet stands on
+changed line of an older pair is changed in its German and in its translations. A pair added German first and not translated yet stands on
 `GERMAN_ONLY` in `content.test.ts` (empty now), and `languageStatus.ts` says so, until its
 sentences are added to each `content.scenes.<lang>.ts`. Every sentence is said from its ElevenLabs recording (`voice.ts`, files in `stimme/`), recorded in every app
 language but German and Russian for the painted pairs and the wishes (November 2026, the month's credits ran out): a

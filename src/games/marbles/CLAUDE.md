@@ -48,11 +48,11 @@ Kettenreaktion follows the app language (home page): start screen, the level nam
   with `bun run voice make --only kettenreaktion`, only when the user asks.
 - Text drawn in a picture (the „START!“/„ПУСК!“/„发射！“ on the rocket's board) uses `useT()`; in files where `t` is the time,
   name the helper differently (`tr`, or call `useT()(…)` directly).
-- New lines come in English only (root `CLAUDE.md`, Language): inline texts as `t({ en: "…" })`; `say` and the levels'
-  texts take a `Localized` (`{ de: "…" }`, German first) so far, so the first English-first line there teaches them a
-  line's first language (`EnglishFirst`/`Texts` in `src/lib/language.ts`), with a test. Translations, German included,
-  are added only when the user asks. A changed line of the older German-first ones is changed in its German; when it
-  has translations, update or drop them with it, so they never say different things.
+- New lines are written English first (root `CLAUDE.md`, Language): inline texts as `t({ en: "…", de: "…", … })`; `say`
+  and the levels' texts take a `Localized` (`{ de: "…" }`, German first) so far, so the first English-first line there
+  teaches them a line's first language (`EnglishFirst`/`Texts` in `src/lib/language.ts`), with a test. Translations,
+  German included, are added in the same commit (user decision, 22 November 2026). A changed line of the older
+  German-first ones is changed in its German and its translations are updated with it, so they never say different things.
   `content.test.ts` checks every name, first line and machine line: German there, Russian, Chinese, Hindi and Arabic (if
   any) in their own script with no Latin letters, and a line with Russian has all five other languages too.
 - The game is „Chain Reaction“ / „连锁反应“ / „चेन रिएक्शन“ / „Reacción en cadena“ / „تفاعل متسلسل“. Arabic lines speak

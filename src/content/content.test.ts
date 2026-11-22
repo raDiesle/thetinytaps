@@ -691,8 +691,8 @@ test("the Alltagshelfer stand first on the shelf, the Timer top left, Abstillen 
     "/belohnungstafel/",
   ]);
   expect(SHELF[8].game?.volumes?.map((v) => v.href)).toEqual(["/wie-lange-warten/", "/tagesplan/", "/belohnungstafel/"]);
-  // „Abstillen“ stands as two books tied together since the night story's pictures were made (H-104, 21 November 2026).
-  expect(shelfVolumes(SHELF[1].game!)?.map((v) => v.href)).toEqual(["/abstillen/", "/abstillen/nachts/"]);
+  // „Abstillen“ is one book holding both its stories, chosen on its first page (user request, 22 November 2026).
+  expect(shelfVolumes(SHELF[1].game!)).toBeUndefined();
 });
 
 // User decision, November 2026: a game still being built is reached only from the management page, so no child or

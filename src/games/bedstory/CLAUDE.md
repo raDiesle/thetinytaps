@@ -27,13 +27,18 @@ close and love Tapsi in the little bed and the big one.
   to how the book reads goes there, so all chapter books get it. Tapsi's voice reads each page (`voice`, from `stimme/`,
   listed in `recordedLines.ts` as `grosses-bett`, recorded only when the user asks), and the loudspeaker switches it off
   (`VoiceSwitch`); a page without its recording stays silent.
-- `names.ts`: the book's name on the shelf, the story's title and its blurb.
+- `names.ts`: the book's name on the shelf, the story's title and its blurb, in all seven languages.
+- `de.ts`, `zh.ts`, `hi.ts`, `es.ts`, `ar.ts`, `ru.ts`: the chapters and pages in the other languages (`StoryTranslation`,
+  keyed by chapter and page id), loaded only with their language's texts (`texts-<lang>.ts`, `bedStory`) and read by
+  `BedStoryGame.tsx` through `byLanguage`; never import them from game code (`texts.test.ts`).
 
 ## Rules
 
-- **English first** (root CLAUDE.md, Language): pages, title, book name and blurb are English; other languages, German
-  too, come only when the user asks (`languageStatus.ts` says what is missing). The search texts (`seo.ts`,
-  `seo.<lang>.ts`) are the exception and stand in all seven languages.
+- **English first** (root CLAUDE.md, Language): pages, title, book name and blurb are written in English, and the whole
+  story is translated into all seven app languages (22 November 2026); a new or changed page, chapter or name gets the
+  other languages, German too, in the same commit (user decision, 22 November 2026; `bedstory.test.ts` checks every
+  language has every chapter, page and name, Tapsi and Bruno in each script). Tapsi's recordings are still missing in
+  every language (`languageStatus.ts` says what is missing). The search texts (`seo.ts`, `seo.<lang>.ts`) stand in all seven languages.
 - **The chapters follow the guides' steps in their order** (`BED_STEPS`, checked): the signs that it is time (climbing
   out, too small), telling and reading about it beforehand, choosing and helping, the bed where the cot stood with the
   old blanket, the cuddly toy, a rail and a night light and naps first, the same evening ritual with a promise to look in

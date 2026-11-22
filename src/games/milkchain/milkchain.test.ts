@@ -1,3 +1,4 @@
+import { CATEGORIES } from "@/content/games";
 import { readFileSync } from "node:fs";
 import { describe, expect, test } from "bun:test";
 import { MILK_CHAIN_AR } from "./ar";
@@ -58,9 +59,23 @@ describe("Tapsis Milchkette", () => {
 // User request, 9 November 2026: a story read over many days opens on its chapters, and the corner goes back to them.
 test("the book opens on its table of contents, and the corner leads back to it", () => {
   const play = readFileSync("src/components/ChapterBook.tsx", "utf8");
-  // Only a link to one of its pages (`?seite=7`) opens it there.
-  expect(play).toContain("useState(() => stepIndexInAddress(pages.length) ?? CONTENTS)");
-  expect(play).toMatch(/useInnerBack\(index === CONTENTS \? undefined/);
+  // Only a link to one of its pages (`?seite=7`), or a chapter picked outside the book (`opensAt`), opens it there.
+  expect(play).toContain("useState(() => opensAt ?? stepIndexInAddress(pages.length) ?? CONTENTS)");
+  expect(play).toMatch(/useInnerBack\(index === CONTENTS \? undefined : toContents\)/);
+});
+
+// User request, 22 November 2026: „Abstillen“ is one book whose first page chooses its story – the long one or night
+// weaning – with each story's chapters left out or shown only very small.
+test("the book Abstillen opens on the choice of its two stories, their chapters only as small numbers", () => {
+  const book = readFileSync("src/games/milkchain/MilkChainGame.tsx", "utf8");
+  expect([...book.matchAll(/^ {4}href: "([^"]+)",$/gm)].map((m) => m[1])).toEqual(["/abstillen/", "/abstillen/nachts/"]);
+  // Without a link to a page, nothing is open: the choice.
+  expect(book).toContain('return typeof opened?.page === "number" ? { story: here, page: opened.page, from } : undefined;');
+  // Each story's way back to its contents leads to the choice, and a chapter's line is its number alone.
+  expect(book).toContain("onContents={toChoice}");
+  expect(book).toMatch(/className="cb-story-chapter"[\s\S]*?>\s*\{c \+ 1\}\s*<\/button>/);
+  // One book on the shelf, no longer two tied together.
+  expect(CATEGORIES.flatMap((c) => c.games).find((g) => g.href === "/abstillen/")?.volumes).toBeUndefined();
 });
 
 describe("Tapsis Milchkette in every language", () => {

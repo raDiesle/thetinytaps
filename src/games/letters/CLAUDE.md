@@ -151,8 +151,9 @@ the app language (🌐, `useLanguagePack()`), never in another one and never wit
   while this one is played, and a round comes on screen only once its lines are there (`useVoiceReady`, the paw track
   meanwhile), so its first line comes with its picture. A new line the game says goes into those lists.
 - Grown-up texts (start screen, options, hints on the play screen) go through `useT()` (`t({ de, ru, en, zh, hi, es, ar })`);
-  new lines come in English only (`t({ en: "…" })`, root `CLAUDE.md`, Language) until translations are asked for,
-  German included, and a changed line of the older German-first ones is changed in its German; both marked in `languageStatus.ts`.
+  new lines are written English first and come with every other app language, German included, in the same commit
+  (`t({ en: "…", de: "…", … })`, root `CLAUDE.md`, user decision, 22 November 2026), and a changed line of the older
+  German-first ones is changed in its German and in its translations; both marked in `languageStatus.ts`.
 - Every key event goes through `keyOf(e, pack)` before the game looks at it: a pack with `letterOfKey` types by key
   place on its own keyboard, also on a German one (Russian ЙЦУКЕН Q = Й, Hindi InScript K = क, Arabic F = ب, Spanish Ñ
   right of L). Compare keys only with `keyMatches`/`toUpper(…, pack)`, never with `e.key` directly. `keyMatches` lets the

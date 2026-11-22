@@ -694,14 +694,11 @@ describe("Timer", () => {
 
 // What the Timer says comes in every app language (H-72): no line falls back to German in another language, and Russian,
 // Chinese, Hindi and Arabic have no Latin letters in theirs.
-test("every line the Timer says is in every app language, but a new picture's English-first lines until they are asked for", () => {
+test("every line the Timer says is in every app language, a new picture's English-first lines too", () => {
   const lines = [...Object.values(PICTURE_LINES).flatMap((p) => [p.start, p.end]), SOON_LINE, ...TURN_LINES];
-  // The older lines are German first and translated into every language; an English-first one (Tidy Up, H-118) has
-  // English, and the languages it lacks are marked in languageStatus.ts until translations are asked for.
-  for (const line of lines) {
-    if (firstLanguage(line) === "de") expect(APP_LANGUAGES.filter((language) => line[language] === undefined)).toEqual([]);
-    else expect(line.en?.trim()).toBeTruthy();
-  }
+  // The older lines are German first; a new picture's come English first (Tidy Up, H-118) and are translated into every
+  // app language, German included, in the same commit (user decision, 22 November 2026).
+  for (const line of lines) expect(APP_LANGUAGES.filter((language) => !line[language]?.trim())).toEqual([]);
   const german = new Set(timerSaid("de"));
   for (const language of APP_LANGUAGES) {
     const said = timerSaid(language);

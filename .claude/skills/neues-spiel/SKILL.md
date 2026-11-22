@@ -36,11 +36,11 @@ Wire it up (the tests in `src/content/content.test.ts` fail if one is missing):
    The same three in English in `src/content/seo.en.ts` (what English-speaking parents search for), for the
    page under `/en/`, and in the other five app languages in `seo.<lang>.ts` (search texts always come in all seven).
 4. One line in the README structure table and the roadmap.
-5. English only, unless the user asks for other languages – German included (see the root `CLAUDE.md`: everything
-   new is written English first since November 2026): the title and blurb in the game's `names.ts` as `{ en: "…" }`
-   (`EnglishFirst`), start-screen and in-game texts as `t({ en: "…" })`, so a translation can be added later without
-   rewriting; the game's row in `src/content/ideas/languageStatus.ts` with only `en`. Its search texts still come
-   in all seven languages (step 3).
+5. Written English first and translated at once into all seven app languages, German as one of them (root
+   `CLAUDE.md`, user decision, 22 November 2026): the title and blurb in the game's `names.ts` as
+   `{ en: "…", de: "…", … }` (`EnglishFirst`), start-screen and in-game texts as `t({ en: "…", de: "…", … })`; the
+   game's row in `src/content/ideas/languageStatus.ts` marks every language, `"text"` where its lines still wait for
+   their recording (recordings only when the user asks). Its search texts come in all seven languages too (step 3).
 
 ## Settings and shared parts
 
