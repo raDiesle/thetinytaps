@@ -1,5 +1,34 @@
 import { describe, expect, test } from "bun:test";
-import { buildKitchen, COOKTOP, COUNTER, CRANK, JAR, KNOB_Y, onPan, PAN, PAN_DOWN, PAN_REST, PANCAKE, PLATE, SPINNER, TIMER, WEDGE, WORLD_W } from "./kitchen";
+import {
+  BREADBOX,
+  buildKitchen,
+  COFFEE,
+  COOKTOP,
+  CORK,
+  CORK0,
+  COUNTER,
+  CRANK,
+  EGG,
+  EGG0,
+  HONEY,
+  HONEY_MOUTH_X,
+  JAR,
+  JELLY,
+  JELLY_TOP,
+  KNOB_Y,
+  MILL,
+  onPan,
+  PAN,
+  PAN_DOWN,
+  PAN_REST,
+  PANCAKE,
+  PLATE,
+  SPINNER,
+  TIMER,
+  TRAY,
+  WEDGE,
+  WORLD_W,
+} from "./kitchen";
 import { VIEW_W } from "./level";
 
 describe("Verrückte Küche", () => {
@@ -8,9 +37,9 @@ describe("Verrückte Küche", () => {
   /** Every moment from the tap to the end, a tenth of a second apart. */
   const moments = Array.from({ length: Math.ceil(end * 10) + 1 }, (_, i) => i / 10);
 
-  test("the machine runs about forty seconds and ends after everything else", () => {
-    expect(end).toBeGreaterThan(39);
-    expect(end).toBeLessThan(43);
+  test("the machine runs about a minute and ends after everything else", () => {
+    expect(end).toBeGreaterThan(56);
+    expect(end).toBeLessThan(64);
     const last = kitchen.events[kitchen.events.length - 1];
     expect(last.at).toBe(end);
     expect(last.done).toBe(true);
@@ -35,6 +64,18 @@ describe("Verrückte Küche", () => {
       k.tHandle,
       k.tToss,
       k.tCake,
+      ...k.nudges,
+      k.tPress,
+      k.tGrind,
+      k.tPour,
+      k.tBrewed,
+      k.tCork,
+      k.tEggHit,
+      k.tEggOut,
+      k.tTray,
+      k.tJar,
+      k.tJarDown,
+      k.tOoze,
       k.tBeep,
       k.tLever,
       k.tPop,
@@ -47,7 +88,20 @@ describe("Verrückte Küche", () => {
   });
 
   test("nothing new moves before the plate bumps the crank", () => {
-    const still = (t: number) => [kitchen.crankAngle(t), kitchen.lidAt(t), kitchen.timerAt(t), kitchen.panAngle(t), kitchen.pancakeAt(t), kitchen.leafAt(0, t)];
+    const still = (t: number) => [
+      kitchen.crankAngle(t),
+      kitchen.lidAt(t),
+      kitchen.timerAt(t),
+      kitchen.panAngle(t),
+      kitchen.pancakeAt(t),
+      kitchen.leafAt(0, t),
+      kitchen.jellyAt(t),
+      kitchen.millTilt(t),
+      kitchen.corkAt(t),
+      kitchen.eggAt(t),
+      kitchen.jarTilt(t),
+      kitchen.honeyLidAt(t),
+    ];
     expect(still(kitchen.tCrank - 0.01)).toEqual(still(-1));
   });
 
@@ -99,7 +153,7 @@ describe("Verrückte Küche", () => {
     expect(kitchen.panAngle(end)).toBeCloseTo(PAN_DOWN, 5);
   });
 
-  test("the pancake flies high over the cookie jar and lands flat on the touch field", () => {
+  test("the pancake flies high over the cookie jar and lands flat on the jelly", () => {
     for (let t = kitchen.tToss; t <= kitchen.tCake; t += 0.02) {
       const { pt } = kitchen.pancakeAt(t);
       expect(pt.y - PANCAKE.r).toBeGreaterThan(0);
@@ -109,8 +163,100 @@ describe("Verrückte Küche", () => {
       expect(Math.hypot(pt.x - nearest.x, pt.y - nearest.y)).toBeGreaterThan(PANCAKE.r + 10);
     }
     const landed = kitchen.pancakeAt(kitchen.tCake);
-    expect(landed.pt).toEqual({ x: COOKTOP.touchX, y: COUNTER - PANCAKE.h / 2 });
+    expect(landed.pt).toEqual({ x: JELLY.cx, y: JELLY_TOP - PANCAKE.h / 2 });
     expect(landed.angle % 360).toBe(0);
+  });
+
+  test("the pancake rides the jelly, whose sways nudge the pepper mill twice and tip it over the third time", () => {
+    const k = kitchen;
+    const millPivot = MILL.x0 + MILL.w;
+    /** The mill's left side at height `up` above the counter, while it tilts. */
+    const millLeft = (t: number, up: number) => {
+      const a = (k.millTilt(t) * Math.PI) / 180;
+      return millPivot - MILL.w * Math.cos(a) + up * Math.sin(a);
+    };
+    for (let t = k.tCake; t < k.tPress; t += 0.01) {
+      const { sway, squash } = k.jellyAt(t);
+      expect(k.pancakeAt(t).pt.x).toBeCloseTo(JELLY.cx + sway, 5);
+      // The jelly's top right corner never pushes into the mill.
+      const up = JELLY.plateH + JELLY.h * squash;
+      expect(JELLY.cx + JELLY.top / 2 + sway).toBeLessThan(millLeft(t, up) + 0.5);
+    }
+    // At each nudge it really touches the upright mill.
+    for (const tn of k.nudges) {
+      expect(k.millTilt(tn)).toBeCloseTo(0, 5);
+      expect(JELLY.cx + JELLY.top / 2 + k.jellyAt(tn).sway).toBeCloseTo(MILL.x0, 3);
+    }
+    expect(k.millTilt(k.nudges[0] + 0.3)).toBeGreaterThan(2);
+    expect(k.millTilt(k.nudges[1] + 0.3)).toBeGreaterThan(k.millTilt(k.nudges[0] + 0.3));
+  });
+
+  test("the falling mill comes to rest on the coffee machine's button and pushes it in", () => {
+    const k = kitchen;
+    expect(k.buttonIn(k.tTopple)).toBe(0);
+    expect(k.buttonIn(k.tPress - 0.2)).toBeLessThan(COFFEE.button - COFFEE.pressed);
+    expect(k.buttonIn(k.tPress)).toBeCloseTo(COFFEE.button - COFFEE.pressed, 3);
+    expect(k.buttonIn(end)).toBeCloseTo(COFFEE.button - COFFEE.pressed, 3);
+    // Its top right corner rests at the button's height.
+    const a = (k.millTilt(k.tPress) * Math.PI) / 180;
+    expect(COUNTER - MILL.h * Math.cos(a)).toBeCloseTo(COFFEE.buttonY, 3);
+  });
+
+  test("the machine grinds, then pours the cup full, and only then the cork pops", () => {
+    const k = kitchen;
+    expect(k.coffeeShake(k.tPress)).toBe(0);
+    expect(Math.max(...[0.1, 0.5, 1.3].map((d) => Math.abs(k.coffeeShake(k.tGrind + d))))).toBeGreaterThan(0.5);
+    expect(k.coffeeShake(k.tPour + 0.1)).toBe(0);
+    expect(k.pouring(k.tGrind + 1)).toBe(false);
+    expect(k.pouring(k.tPour + 1)).toBe(true);
+    expect(k.cupFull(k.tPour)).toBe(0);
+    expect(k.cupFull(k.tBrewed)).toBe(1);
+    expect(k.fizz(k.tGrind)).toBe(0);
+    expect(k.fizz(k.tBrewed)).toBe(1);
+    // Until it pops, the cork sits in the neck (creeping up a little).
+    expect(k.corkAt(k.tPour).pt).toEqual(CORK0);
+    expect(CORK0.y - k.corkAt(k.tCork - 0.01).pt.y).toBeLessThan(CORK.h);
+  });
+
+  test("the cork flies over the machine onto the egg, and drops onto the bread box", () => {
+    const k = kitchen;
+    for (let t = k.tCork; t < k.tEggHit; t += 0.02) {
+      const { pt } = k.corkAt(t);
+      expect(pt.y).toBeGreaterThan(20);
+      if (pt.x < COFFEE.x0 + COFFEE.w + CORK.h) expect(pt.y).toBeLessThan(COFFEE.top - CORK.h);
+    }
+    const hit = k.corkAt(k.tEggHit).pt;
+    expect(Math.hypot(hit.x - EGG0.x, hit.y - EGG0.y)).toBeLessThan(EGG.ry + CORK.h / 2);
+    expect(k.eggAt(k.tEggHit - 0.01).pt).toEqual(EGG0);
+    const lying = k.corkAt(end);
+    expect(lying.pt.y + CORK.w / 2).toBeCloseTo(BREADBOX.top, 5);
+    expect(lying.angle % 180).toBe(90);
+  });
+
+  test("the egg wobbles down the tray and along the counter, never sinking in, and lies still against the honey jar", () => {
+    const k = kitchen;
+    const surface = (x: number) => (x < TRAY.to.x ? TRAY.from.y + ((x - TRAY.from.x) * (TRAY.to.y - TRAY.from.y)) / (TRAY.to.x - TRAY.from.x) : COUNTER);
+    for (let t = k.tTray; t <= k.tJar; t += 0.02) {
+      const { pt } = k.eggAt(t);
+      expect(pt.y).toBeLessThanOrEqual(surface(pt.x) - EGG.rx + 0.5);
+    }
+    const rest = k.eggAt(k.tJar);
+    expect(((rest.angle % 180) + 180) % 180).toBeCloseTo(90, 3);
+    expect(rest.pt.x + EGG.ry).toBeCloseTo(HONEY.x0, 3);
+    expect(rest.pt.y).toBeCloseTo(COUNTER - EGG.rx, 3);
+  });
+
+  test("the honey jar falls on its side, its lid lands clear of the egg, and the honey reaches the touch field at the beep", () => {
+    const k = kitchen;
+    expect(k.jarTilt(k.tJar - 0.01)).toBe(0);
+    expect(k.jarTilt(end)).toBeCloseTo(90, 5);
+    expect(HONEY_MOUTH_X).toBeLessThan(COOKTOP.x0);
+    const lid = k.honeyLidAt(end);
+    expect(lid.pt.y + HONEY.lid / 2).toBeCloseTo(COUNTER, 5);
+    expect(lid.pt.x + HONEY.w / 2 + 4).toBeLessThan(k.eggAt(end).pt.x - EGG.ry);
+    expect(k.honeyFront(k.tOoze)).toBe(HONEY_MOUTH_X);
+    expect(k.honeyFront(k.tBeep - 0.1)).toBeLessThan(COOKTOP.touchX);
+    expect(k.honeyFront(k.tBeep)).toBe(COOKTOP.touchX);
   });
 
   test("the camera never looks past the ends of the kitchen", () => {
