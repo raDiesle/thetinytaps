@@ -15,28 +15,35 @@ import {
   CRANE,
   DECK1,
   DECK2,
+  DRIVER,
   EXC,
   FLOOR,
   FOOT_PULLEY,
+  GEN,
   HEAP,
   HOUSE,
   JACK,
+  LADDER,
   LIGHT_X,
   MIXER,
   moundY,
   onScoop,
   PILE,
+  PIPE,
   PIVOT,
   PLUG_X,
+  PUDDLE,
   POLE_X,
   ROLLER,
   ROOF,
+  SACK,
   SCAFFOLD_POLES,
   SCOOP,
   SHIFT,
   ARM,
   SPIRIT,
   SPOOL,
+  STACK,
   TOP_DECK,
   TOP_PULLEY,
   TOWER,
@@ -63,15 +70,19 @@ const BRICK = "#e0533d";
 
 /**
  * The building site: one tap starts the motors, and then one thing sets off
- * the next for about forty seconds: the cement mixer tips the marble onto a
+ * the next for about a minute: the cement mixer tips the marble onto a
  * spirit level, it rattles down the rubble chute, rides the conveyor belt up
  * and knocks over a traffic cone, which lets the wrecking ball go. The ball
  * smashes a brick tower, which bumps a cable drum along the scaffold and plop
  * into a sand pile, over it and against the excavator. The excavator wakes up,
  * digs a scoop of sand, swings round and tips it in front of the road roller
  * and pats the roller's roof; the roller puffs off, presses the sand into a
- * road and bumps the jackhammer, which rattles and hops onto the winch's crank,
- * and the tower crane lowers the roof onto the house. The camera travels along
+ * road and bumps the jackhammer, which rattles and hops onto the generator's
+ * start button. Its spark runs along the cable to the pile driver, which thumps
+ * a post in three times; the last thump makes a concrete pipe jump off its
+ * chocks and roll through a puddle against a ladder's foot, the ladder's top
+ * lifts a cement sack off the brick stack onto the winch's crank, and the tower
+ * crane lowers the roof onto the house. The camera travels along
  * with whatever moves.
  */
 export function BuildingLevel(props: LevelProps) {
@@ -97,7 +108,14 @@ export function BuildingLevel(props: LevelProps) {
           <Cable machine={machine} t={t} />
           <Tower angle={machine.towerAngle(t)} />
           <Pile machine={machine} t={t} />
+          <Puddle />
+          <PileDriver machine={machine} t={t} />
+          <Pipe machine={machine} t={t} />
+          <Splash pts={machine.splashAt(t)} />
+          <Stack />
+          <Ladder machine={machine} t={t} />
           <Winch turned={machine.crankAt(t)} />
+          <Sack machine={machine} t={t} />
           <Crane drop={machine.roofDrop(t)} />
           <House />
           <Roof drop={machine.roofDrop(t)} />
@@ -110,6 +128,8 @@ export function BuildingLevel(props: LevelProps) {
           <Road machine={machine} t={t} />
           <Roller machine={machine} t={t} />
           <Pour machine={machine} t={t} />
+          <PowerCable machine={machine} t={t} />
+          <Generator machine={machine} t={t} />
           <Jackhammer machine={machine} t={t} />
           <Cone angle={machine.coneAngle(t)} />
 
@@ -165,6 +185,8 @@ function Site({ ids }: { ids: string }) {
       <Cloud x={2350} y={110} />
       <Cloud x={2980} y={260} s={0.7} />
       <Cloud x={3900} y={150} s={0.8} />
+      <Cloud x={4800} y={120} s={0.9} />
+      <Cloud x={5900} y={200} s={0.7} />
       <Cloud x={4700 + SHIFT} y={90} s={0.9} />
       <path
         d={`M-400 ${FLOOR - 120} Q400 ${FLOOR - 260} 1200 ${FLOOR - 140} T2800 ${FLOOR - 150} T4400 ${FLOOR - 130} T${WORLD_W + 400} ${FLOOR - 160} L${WORLD_W + 400} ${FLOOR} L-400 ${FLOOR} Z`}
@@ -911,6 +933,235 @@ function Jackhammer({ machine, t }: { machine: Building; t: number }) {
           <rect key={side} x={side > 0 ? 26 : -46} y={-h - 3} width="20" height="19" rx="7" fill="#3b3b4f" stroke={INK} strokeWidth="2.5" />
         ))}
       </g>
+    </g>
+  );
+}
+
+/* ---------- Generator, pile driver, pipe, ladder and sack ---------- */
+
+const CONCRETE = "#b8b8c4";
+const CONCRETE_DARK = "#8e8e9e";
+
+/** The generator on its wheels: shaking a little while it runs, puffing smoke from its exhaust, its start button on top. */
+function Generator({ machine, t }: { machine: Building; t: number }) {
+  const { x, w, h, wheelR, button, buttonR } = GEN;
+  const running = machine.genRunning(t);
+  const shake = running ? 1.5 * Math.sin(t * 70) : 0;
+  const bottom = FLOOR - wheelR;
+  const top = bottom - h;
+  const exhaust = { x: x + w / 2 - 22, y: top - 26 };
+  return (
+    <g>
+      <Puffs puffs={machine.genPuffs.map((p) => ({ x: exhaust.x, y: exhaust.y, age: t - p }))} />
+      <g transform={`translate(0 ${shake})`}>
+        <rect x={x + w / 2 - 30} y={top - 26} width="16" height="30" rx="3" fill="#4a4a5e" stroke={INK} strokeWidth="2.5" />
+        <rect x={x - w / 2} y={top} width={w} height={h} rx="12" fill={YELLOW} stroke={INK} strokeWidth="4" />
+        <rect x={x - w / 2 + 14} y={top + 22} width={w - 28} height={h - 40} rx="6" fill="#4a4a5e" stroke={INK} strokeWidth="2.5" />
+        {[0, 1, 2, 3].map((i) => (
+          <line
+            key={i}
+            x1={x - w / 2 + 24}
+            y1={top + 34 + i * 12}
+            x2={x + w / 2 - 24}
+            y2={top + 34 + i * 12}
+            stroke="#2e2e3e"
+            strokeWidth="4"
+            strokeLinecap="round"
+          />
+        ))}
+        <circle cx={x + w / 2 - 30} cy={top + 12} r="6" fill={running ? "#3ec300" : "#9aa0a6"} stroke={INK} strokeWidth="2" />
+        <rect x={x + button - buttonR - 4} y={top - 6} width={2 * buttonR + 8} height="8" rx="3" fill="#4a4a5e" stroke={INK} strokeWidth="2" />
+        <rect
+          x={x + button - buttonR}
+          y={top - 12 + machine.buttonAt(t)}
+          width={2 * buttonR}
+          height={12 - machine.buttonAt(t)}
+          rx="4"
+          fill="#3ec300"
+          stroke={INK}
+          strokeWidth="2.5"
+        />
+      </g>
+      {[x - w / 2 + 26, x + w / 2 - 26].map((wx) => (
+        <g key={wx}>
+          <circle cx={wx} cy={FLOOR - wheelR} r={wheelR} fill="#333" stroke={INK} strokeWidth="3" />
+          <circle cx={wx} cy={FLOOR - wheelR} r={wheelR * 0.4} fill="#bbb" />
+        </g>
+      ))}
+    </g>
+  );
+}
+
+const CABLE_FROM = { x: GEN.x + GEN.w / 2, y: FLOOR - GEN.wheelR - 30 };
+const CABLE_TO = { x: DRIVER.x - 70, y: FLOOR - 40 };
+const cableD = `M${CABLE_FROM.x} ${CABLE_FROM.y} Q${CABLE_FROM.x + 40} ${FLOOR - 4} ${(CABLE_FROM.x + CABLE_TO.x) / 2} ${FLOOR - 4} Q${CABLE_TO.x - 40} ${FLOOR - 4} ${CABLE_TO.x} ${CABLE_TO.y}`;
+/** The spot `k` (0 … 1) along the power cable. */
+function onCable(k: number): Pt {
+  const mid = { x: (CABLE_FROM.x + CABLE_TO.x) / 2, y: FLOOR - 4 };
+  const quadAt = (a: Pt, c: Pt, b: Pt, u: number) => ({
+    x: (1 - u) ** 2 * a.x + 2 * u * (1 - u) * c.x + u * u * b.x,
+    y: (1 - u) ** 2 * a.y + 2 * u * (1 - u) * c.y + u * u * b.y,
+  });
+  return k < 0.5
+    ? quadAt(CABLE_FROM, { x: CABLE_FROM.x + 40, y: FLOOR - 4 }, mid, k * 2)
+    : quadAt(mid, { x: CABLE_TO.x - 40, y: FLOOR - 4 }, CABLE_TO, k * 2 - 1);
+}
+
+/** The power cable from the generator to the pile driver, with the spark running along it when the generator starts. */
+function PowerCable({ machine, t }: { machine: Building; t: number }) {
+  const k = machine.sparkAt(t);
+  const spark = k === null ? null : onCable(k);
+  return (
+    <g>
+      <path d={cableD} fill="none" stroke={INK} strokeWidth="9" strokeLinecap="round" />
+      <path d={cableD} fill="none" stroke={ORANGE} strokeWidth="5" strokeLinecap="round" />
+      {spark && (
+        <g transform={`translate(${spark.x} ${spark.y})`}>
+          <circle r="13" fill="#fff3a0" opacity="0.8" />
+          <path d="M0 -12 L3 -3 L12 0 L3 3 L0 12 L-3 3 L-12 0 L-3 -3 Z" fill="#ffd23f" stroke={INK} strokeWidth="1.5" />
+        </g>
+      )}
+    </g>
+  );
+}
+
+/** The pile driver: a tracked base with a tall lattice mast, its heavy ram sliding on it, and the post below it sinking into the ground. */
+function PileDriver({ machine, t }: { machine: Building; t: number }) {
+  const { x, top, ram, ramH, post, post0, sink } = DRIVER;
+  const { ram: ramBottom, sunk } = machine.driverAt(t);
+  const postTop = post0 + sunk * sink;
+  return (
+    <g>
+      <rect x={x + 30} y={top} width="22" height={FLOOR - 70 - top} fill="none" stroke="#c9302c" strokeWidth="5" />
+      {Array.from({ length: Math.floor((FLOOR - 70 - top) / 36) }, (_, i) => (
+        <line key={i} x1={x + 30} y1={top + i * 36} x2={x + 52} y2={top + (i + 1) * 36} stroke="#c9302c" strokeWidth="4" />
+      ))}
+      <rect x={x + 22} y={top - 18} width="38" height="20" rx="4" fill="#c9302c" stroke={INK} strokeWidth="3" />
+      <rect x={x - 70} y={FLOOR - 74} width="190" height="46" rx="8" fill="#ff5d73" stroke={INK} strokeWidth="3.5" />
+      <rect x={x - 80} y={FLOOR - 30} width="210" height="30" rx="15" fill="#4a4a5e" stroke={INK} strokeWidth="3" />
+      {[-56, -20, 16, 52, 88].map((dx) => (
+        <circle key={dx} cx={x + dx + 14} cy={FLOOR - 15} r="8" fill="#7d7d96" stroke={INK} strokeWidth="2" />
+      ))}
+      <rect x={x - post / 2} y={postTop} width={post} height={FLOOR - postTop} fill={MID_WOOD} stroke={INK} strokeWidth="3" />
+      <line x1={x - post / 2 + 8} y1={postTop + 10} x2={x - post / 2 + 8} y2={FLOOR - 6} stroke={DARK_WOOD} strokeWidth="3" />
+      <ellipse cx={x} cy={FLOOR} rx={post / 2 + 16} ry="6" fill="#c48a52" stroke={INK} strokeWidth="2" />
+      <line x1={x + 20} y1={ramBottom - ramH / 2} x2={x + 41} y2={ramBottom - ramH / 2} stroke={INK} strokeWidth="8" />
+      <rect x={x - ram / 2} y={ramBottom - ramH} width={ram} height={ramH} rx="8" fill="#4a4a5e" stroke={INK} strokeWidth="4" />
+      <rect x={x - ram / 2 + 10} y={ramBottom - ramH + 12} width={ram - 20} height="14" rx="4" fill={YELLOW} stroke={INK} strokeWidth="2" />
+      <Puffs puffs={machine.dust.map((d) => ({ x: d.x, y: d.y, age: t - d.t }))} />
+    </g>
+  );
+}
+
+/** The concrete pipe, first lying on its two wooden chocks, then rolling. */
+function Pipe({ machine, t }: { machine: Building; t: number }) {
+  const { pt, turned } = machine.pipeAt(t);
+  const r = PIPE.r;
+  return (
+    <g>
+      {[-1, 1].map((side) => (
+        <path
+          key={side}
+          d={`M${PIPE.x + side * (r - 6) - 16} ${FLOOR} L${PIPE.x + side * (r - 6)} ${FLOOR - PIPE.chock} L${PIPE.x + side * (r - 6) + 16} ${FLOOR} Z`}
+          fill={WOOD}
+          stroke={INK}
+          strokeWidth="3"
+          strokeLinejoin="round"
+        />
+      ))}
+      <g transform={`translate(${pt.x} ${pt.y}) rotate(${deg(turned)})`}>
+        <circle r={r} fill={CONCRETE} stroke={INK} strokeWidth="4" />
+        <circle r={r * 0.62} fill={CONCRETE_DARK} stroke={INK} strokeWidth="3" />
+        <circle r={r * 0.5} fill="#5b5b6e" />
+        {[0, 120, 240].map((a) => (
+          <circle key={a} cx={r * 0.8 * Math.cos(rad(a))} cy={r * 0.8 * Math.sin(rad(a))} r="3" fill={CONCRETE_DARK} />
+        ))}
+      </g>
+    </g>
+  );
+}
+
+/** A puddle in the sand. */
+const Puddle = memo(function Puddle() {
+  return <ellipse cx={PUDDLE.x} cy={FLOOR + 6} rx={PUDDLE.w / 2} ry="14" fill="#6fb8e8" stroke={INK} strokeWidth="3" />;
+});
+
+/** Drops of the puddle splashed up by the pipe. */
+function Splash({ pts }: { pts: Pt[] }) {
+  return (
+    <g>
+      {pts.map((p, i) => (
+        <circle key={i} cx={p.x} cy={p.y} r={6 - (i % 3)} fill="#6fd3ff" stroke={INK} strokeWidth="2" />
+      ))}
+    </g>
+  );
+}
+
+/** Brick pallets stacked up beside the winch. */
+const Stack = memo(function Stack() {
+  const { x0, x1, top } = STACK;
+  const rows = 4;
+  const rowH = (FLOOR - top) / rows;
+  return (
+    <g>
+      {Array.from({ length: rows }, (_, r) => {
+        const y = top + r * rowH;
+        return (
+          <g key={r}>
+            <rect x={x0} y={y} width={x1 - x0} height={rowH - 14} fill={BRICK} stroke={INK} strokeWidth="3" />
+            {[0, 1, 2].map((k) => (
+              <line key={k} x1={x0} y1={y + ((rowH - 14) * (k + 1)) / 4} x2={x1} y2={y + ((rowH - 14) * (k + 1)) / 4} stroke="#b33d2c" strokeWidth="2" />
+            ))}
+            <rect x={x0 - 4} y={y + rowH - 14} width={x1 - x0 + 8} height="14" fill={MID_WOOD} stroke={INK} strokeWidth="2.5" />
+          </g>
+        );
+      })}
+    </g>
+  );
+});
+
+/** The aluminium ladder leaning against the stack; pushed at its foot, it stands up steeper. */
+function Ladder({ machine, t }: { machine: Building; t: number }) {
+  const { foot, top } = machine.ladderAt(t);
+  const len = Math.hypot(top.x - foot.x, top.y - foot.y);
+  const u = { x: (top.x - foot.x) / len, y: (top.y - foot.y) / len };
+  const n = { x: -u.y, y: u.x };
+  const half = LADDER.w / 2;
+  // Both rails end at the wall, the near one a little in front.
+  const rail = (side: number) =>
+    `M${foot.x + n.x * side * half} ${foot.y + n.y * side * half} L${top.x + n.x * side * half - u.x * 4} ${top.y + n.y * side * half - u.y * 4}`;
+  return (
+    <g>
+      {Array.from({ length: 8 }, (_, i) => {
+        const d = 24 + i * ((len - 40) / 8);
+        const c = { x: foot.x + u.x * d, y: foot.y + u.y * d };
+        return <line key={i} x1={c.x - n.x * half} y1={c.y - n.y * half} x2={c.x + n.x * half} y2={c.y + n.y * half} stroke={INK} strokeWidth="5" />;
+      })}
+      {[-1, 1].map((side) => (
+        <g key={side}>
+          <path d={rail(side)} stroke={INK} strokeWidth="9" strokeLinecap="round" />
+          <path d={rail(side)} stroke="#d8d8e4" strokeWidth="5" strokeLinecap="round" />
+        </g>
+      ))}
+    </g>
+  );
+}
+
+/** The cement sack: on the stack, tipping off, riding the crank's knob down and lying beside the winch. */
+function Sack({ machine, t }: { machine: Building; t: number }) {
+  const { pt, angle } = machine.sackAt(t);
+  const { w, h } = SACK;
+  return (
+    <g transform={`translate(${pt.x} ${pt.y}) rotate(${deg(angle)})`}>
+      <path
+        d={`M${-w / 2 + 6} 0 Q${-w / 2} ${-h / 2} ${-w / 2 + 8} ${-h} L${w / 2 - 8} ${-h} Q${w / 2} ${-h / 2} ${w / 2 - 6} 0 Z`}
+        fill="#e8e3d3"
+        stroke={INK}
+        strokeWidth="3"
+        strokeLinejoin="round"
+      />
+      <rect x={-w / 4} y={-h + 12} width={w / 2} height={h - 24} rx="4" fill="#9fb0c4" stroke={INK} strokeWidth="2" />
+      <path d={`M${-w / 2 + 10} ${-h + 4} q6 4 0 8 M${w / 2 - 10} ${-h + 4} q-6 4 0 8`} fill="none" stroke={INK} strokeWidth="2" />
     </g>
   );
 }

@@ -14,6 +14,7 @@ import {
   CHIMES,
   CROQUET,
   CUP,
+  FEEDER,
   FENCE_TOP,
   FLOOR,
   GROUND,
@@ -26,8 +27,14 @@ import {
   LEAF_PILE,
   LEAVES,
   LOW_BRANCH,
+  MALLET,
   MOLE_PEEK_X,
   MOLEHILL,
+  MOWED,
+  MOWER,
+  NUT_R,
+  NUT_SPOTS,
+  NUT_TREE,
   PINWHEEL,
   RAKE,
   RAKE_PIVOT,
@@ -58,10 +65,13 @@ const WATER = "#6fd3ff";
 
 /**
  * Level 5: the garden. One tap lets the marble roll out of the birdhouse, and
- * then one thing sets off the next for about forty seconds: wind chimes, a
+ * then one thing sets off the next for about a minute: wind chimes, a
  * watering can that tips onto a water wheel, whose arm pushes a wheelbarrow
  * down the bank onto a rake, whose handle shakes the apple tree; the apple
- * rolls down the slide into a croquet ball, which bonks the molehill. The
+ * rolls down the slide and starts the robot mower, which mows a stripe and
+ * bumps the bird feeder's pole; the nuts it shakes out wake the squirrel, which
+ * eats them and leaps onto the croquet mallet's head, and the falling mallet
+ * hits the croquet ball, which bonks the molehill. The
  * dizzy mole digs under the lawn and pops up under the sleeping hedgehog,
  * which flies up, curls into a ball and rolls through a pile of leaves; the
  * leaves whirl up and spin the pinwheel, whose string pulls open the garden
@@ -81,9 +91,12 @@ export function GardenLevel(props: LevelProps) {
           <OldTree />
           <Chimes garden={garden} t={t} />
           <AppleTree sway={garden.swayAt(t)} />
+          <NutTree />
           <FallingLeaves age={t - garden.tStop} />
           <Shed />
           <Lawn />
+          <MownStripe length={garden.stripeAt(t)} />
+          <FeederPole garden={garden} t={t} />
           <Snail t={t} />
           <Birdhouse garden={garden} t={t} />
           <GutterBack />
@@ -102,6 +115,7 @@ export function GardenLevel(props: LevelProps) {
           <PinwheelString garden={garden} t={t} />
 
           <MovingThings garden={garden} t={t} />
+          <Clippings pts={garden.clippingsAt(t)} />
 
           <GutterFront />
           <Downpipe />
@@ -134,6 +148,10 @@ function MovingThings({ garden, t }: { garden: Garden; t: number }) {
         <Wheelbarrow turned={barrow.turned} />
       </g>
       <Apple at={apple.pt} spin={apple.spin} hanging={apple.hanging} sway={garden.swayAt(t)} />
+      <Mower garden={garden} t={t} />
+      <Mallet angle={garden.malletAt(t)} />
+      <Nuts garden={garden} t={t} />
+      <Squirrel garden={garden} t={t} />
       <CroquetBall at={ball.pt} spin={ball.spin} />
       <Hedgehog garden={garden} t={t} />
     </g>
@@ -161,11 +179,13 @@ function Sky({ gradient }: { gradient: string }) {
       {[
         [1750, 150, 1],
         [2650, 100, 0.8],
-        [3350, 190, 1.1],
-        [4250, 110, 0.9],
-        [5050, 200, 1],
-        [5850, 120, 0.9],
-        [6600, 180, 1.1],
+        [3450, 170, 0.9],
+        [4250, 110, 1],
+        [3350 + MOWED, 190, 1.1],
+        [4250 + MOWED, 110, 0.9],
+        [5050 + MOWED, 200, 1],
+        [5850 + MOWED, 120, 0.9],
+        [6600 + MOWED, 180, 1.1],
       ].map(([x, y, s]) => (
         <Cloud key={x} x={x} y={y} s={s} />
       ))}
@@ -721,6 +741,239 @@ function CroquetBall({ at, spin }: { at: Pt; spin: number }) {
       </g>
       <circle r={r} fill="none" stroke={INK} strokeWidth="3" />
       <circle cx="-8" cy="-10" r="5" fill="#fff" opacity="0.75" />
+    </g>
+  );
+}
+
+/* ---------- Robot mower, bird feeder, squirrel and mallet ---------- */
+
+const MOWER_BODY = "#ff8c42";
+const NUT = "#a8682f";
+const SQUIRREL = "#c8642c";
+const SQUIRREL_LIGHT = "#f3d2a8";
+
+/** The stripe of short, lighter grass the mower leaves behind it, `length` long. */
+function MownStripe({ length }: { length: number }) {
+  if (length <= 0) return null;
+  const x0 = MOWER.x - MOWER.len / 2 + 8;
+  return (
+    <g>
+      <rect x={x0} y={FLOOR + 4} width={length} height="36" fill="#a8e27a" />
+      {Array.from({ length: Math.floor(length / 40) }, (_, i) => (
+        <line key={i} x1={x0 + 20 + i * 40} y1={FLOOR + 12} x2={x0 + 32 + i * 40} y2={FLOOR + 12} stroke="#8fd060" strokeWidth="3" strokeLinecap="round" />
+      ))}
+    </g>
+  );
+}
+
+/** The robot mower: a low orange shell on two wheels, its light green while it runs; it jolts back at the bump. */
+function Mower({ garden, t }: { garden: Garden; t: number }) {
+  const { x, roll, running, jolt } = garden.mowerAt(t);
+  const half = MOWER.len / 2;
+  const r = MOWER.wheelR;
+  return (
+    <g transform={`translate(${x} ${FLOOR}) rotate(${-jolt} ${-half} 0)`}>
+      <rect x={-half + 4} y={-r - 8} width={MOWER.len - 8} height="12" rx="5" fill="#4a4a4a" stroke={INK} strokeWidth="3" />
+      <path
+        d={`M${-half} ${-r - 2} Q${-half + 2} ${-MOWER.h - 4} ${-6} ${-MOWER.h - 4} Q${half - 14} ${-MOWER.h - 4} ${half} ${-r - 2} Z`}
+        fill={MOWER_BODY}
+        stroke={INK}
+        strokeWidth="4"
+        strokeLinejoin="round"
+      />
+      <path
+        d={`M${-half + 18} ${-MOWER.h + 8} Q${-6} ${-MOWER.h - 2} ${half - 26} ${-MOWER.h + 10}`}
+        fill="none"
+        stroke="#fff8"
+        strokeWidth="5"
+        strokeLinecap="round"
+      />
+      <rect x="-14" y={-MOWER.h - 12} width="28" height="10" rx="4" fill="#ddd" stroke={INK} strokeWidth="2.5" />
+      <circle cx="22" cy={-MOWER.h + 6} r="5" fill={running ? "#3ec300" : "#9aa0a6"} stroke={INK} strokeWidth="2" />
+      {[-half + 22, half - 20].map((wx) => (
+        <g key={wx} transform={`translate(${wx} ${-r}) rotate(${deg(roll)})`}>
+          <circle r={r} fill="#333" stroke={INK} strokeWidth="3" />
+          <circle r={r * 0.45} fill="#bbb" />
+          <line x1={-r * 0.45} y1="0" x2={r * 0.45} y2="0" stroke={INK} strokeWidth="3" />
+        </g>
+      ))}
+    </g>
+  );
+}
+
+/** Grass clippings flying up behind the mower. */
+function Clippings({ pts }: { pts: Pt[] }) {
+  return (
+    <g stroke="#3e9a2e" strokeWidth="4" strokeLinecap="round">
+      {pts.map((p, i) => (
+        <line key={i} x1={p.x} y1={p.y} x2={p.x + (i % 2 ? 6 : -5)} y2={p.y - 7} />
+      ))}
+    </g>
+  );
+}
+
+/** The bird feeder's pole, shaking when the mower bumps it, with the wire tube of nuts swinging from its arm. */
+function FeederPole({ garden, t }: { garden: Garden; t: number }) {
+  const pole = garden.poleAt(t);
+  const swing = garden.feederSwingAt(t);
+  const hook = garden.hookAt(t);
+  const left = NUT_SPOTS.filter((_, i) => t < garden.nutOut[i]).length;
+  const { r, len } = FEEDER;
+  return (
+    <g>
+      <g transform={`rotate(${pole} ${FEEDER.x} ${FLOOR})`}>
+        <rect
+          x={FEEDER.x - FEEDER.w / 2}
+          y={FEEDER.top - 6}
+          width={FEEDER.w}
+          height={FLOOR - FEEDER.top + 10}
+          rx="4"
+          fill="#5c6670"
+          stroke={INK}
+          strokeWidth="3"
+        />
+        <path
+          d={`M${FEEDER.x} ${FEEDER.top} L${FEEDER.x + FEEDER.arm} ${FEEDER.top} l0 10`}
+          fill="none"
+          stroke={INK}
+          strokeWidth="7"
+          strokeLinecap="round"
+          strokeLinejoin="round"
+        />
+        <path
+          d={`M${FEEDER.x} ${FEEDER.top} L${FEEDER.x + FEEDER.arm} ${FEEDER.top} l0 10`}
+          fill="none"
+          stroke="#5c6670"
+          strokeWidth="3"
+          strokeLinecap="round"
+          strokeLinejoin="round"
+        />
+        <circle cx={FEEDER.x} cy={FEEDER.top - 10} r="9" fill="#5c6670" stroke={INK} strokeWidth="3" />
+      </g>
+      <g transform={`translate(${hook.x} ${hook.y}) rotate(${-swing - pole})`}>
+        <line x1="0" y1="8" x2="0" y2="26" stroke={INK} strokeWidth="3" />
+        <path d={`M${-r - 8} 34 Q0 14 ${r + 8} 34 Z`} fill="#3ec300" stroke={INK} strokeWidth="3" strokeLinejoin="round" />
+        <rect x={-r} y="34" width={2 * r} height={len - 44} fill="#fff6" stroke={INK} strokeWidth="3" />
+        {Array.from({ length: left }, (_, i) => (
+          <circle key={i} cx={i % 2 ? 5 : -5} cy={len - 22 - i * 13} r={NUT_R - 1} fill={NUT} stroke={INK} strokeWidth="2" />
+        ))}
+        {[-r / 2, 0, r / 2].map((x) => (
+          <line key={x} x1={x} y1="34" x2={x} y2={len - 10} stroke="#9aa0a6" strokeWidth="1.5" />
+        ))}
+        <rect x={-r - 6} y={len - 12} width={2 * r + 12} height="10" rx="4" fill="#3ec300" stroke={INK} strokeWidth="3" />
+      </g>
+    </g>
+  );
+}
+
+/** A hazelnut: brown, with its pale cap. */
+function Nut({ x, y, s = 1 }: { x: number; y: number; s?: number }) {
+  return (
+    <g transform={`translate(${x} ${y}) scale(${s})`}>
+      <circle r={NUT_R} fill={NUT} stroke={INK} strokeWidth="2.5" />
+      <path d={`M${-NUT_R + 2} ${-NUT_R / 3} Q0 ${-NUT_R - 4} ${NUT_R - 2} ${-NUT_R / 3}`} fill="#e6c08a" stroke={INK} strokeWidth="2" />
+    </g>
+  );
+}
+
+/** The nuts falling out of the feeder and lying on the grass, until the squirrel picks them up. */
+function Nuts({ garden, t }: { garden: Garden; t: number }) {
+  return (
+    <g>
+      {NUT_SPOTS.map((_, i) => {
+        const p = garden.nutAt(i, t);
+        return p ? <Nut key={i} x={p.x} y={p.y} /> : null;
+      })}
+    </g>
+  );
+}
+
+/** The squirrel's tree: a trunk, a low branch on the left where it sits, and a round crown. */
+const NutTree = memo(function NutTree() {
+  const { x, trunkW, crownY, perch } = NUT_TREE;
+  const half = trunkW / 2;
+  const branch = `M${x} ${perch.y + 12} Q${perch.x + 40} ${perch.y + 14} ${perch.x - 30} ${perch.y + 4}`;
+  return (
+    <g>
+      <path
+        d={`M${x - half - 10} ${FLOOR + 4} Q${x - half} ${FLOOR - 30} ${x - half} ${FLOOR - 80} L${x - half + 6} ${crownY} L${x + half - 6} ${crownY} L${x + half} ${FLOOR - 80} Q${x + half} ${FLOOR - 30} ${x + half + 10} ${FLOOR + 4} Z`}
+        fill={BARK}
+        stroke={INK}
+        strokeWidth="4"
+        strokeLinejoin="round"
+      />
+      <path
+        d={`M${x + 4} ${FLOOR - 70} q-8 -30 0 -60 M${x - 6} ${crownY + 140} q8 -30 0 -50`}
+        fill="none"
+        stroke="#7a4a26"
+        strokeWidth="4"
+        strokeLinecap="round"
+      />
+      <path d={branch} fill="none" stroke={INK} strokeWidth="22" strokeLinecap="round" />
+      <path d={branch} fill="none" stroke={BARK} strokeWidth="15" strokeLinecap="round" />
+      {[
+        [x, crownY - 40, 150],
+        [x - 150, crownY + 10, 95],
+        [x + 140, crownY + 20, 100],
+        [x - 50, crownY - 170, 105],
+        [x + 90, crownY - 140, 100],
+      ].map(([cx, cy, r]) => (
+        <circle key={`${cx}-${cy}`} cx={cx} cy={cy} r={r} fill={LEAF} stroke={INK} strokeWidth="4" />
+      ))}
+      <circle cx={x - 10} cy={crownY - 70} r="140" fill={LEAF} />
+      <circle cx={x + 50} cy={crownY - 120} r="60" fill={LEAF_LIGHT} />
+      {[
+        [x - 80, crownY - 30],
+        [x + 70, crownY - 10],
+        [x + 10, crownY - 150],
+      ].map(([nx, ny]) => (
+        <Nut key={nx} x={nx} y={ny} />
+      ))}
+    </g>
+  );
+});
+
+/** The squirrel: feet at its spot, facing `face`, turned `angle` degrees on the trunk, a nut in its paws while it eats. */
+function Squirrel({ garden, t }: { garden: Garden; t: number }) {
+  const { pt, face, angle, nut, left, running } = garden.squirrelAt(t);
+  const bob = running ? -5 * Math.abs(Math.sin(t * 18)) : 0;
+  const nibble = nut >= 0 ? 6 * Math.sin(t * 22) : 0;
+  return (
+    <g transform={`translate(${pt.x} ${pt.y + bob}) rotate(${angle}) scale(${face} 1)`}>
+      <path d="M-12 -12 C-52 -8 -62 -62 -34 -74 C-12 -82 -2 -60 -18 -50" fill="none" stroke={INK} strokeWidth="24" strokeLinecap="round" />
+      <path d="M-12 -12 C-52 -8 -62 -62 -34 -74 C-12 -82 -2 -60 -18 -50" fill="none" stroke={SQUIRREL} strokeWidth="17" strokeLinecap="round" />
+      <path d="M-30 -30 C-40 -50 -34 -64 -26 -68" fill="none" stroke="#e08a4e" strokeWidth="5" strokeLinecap="round" />
+      <ellipse cx="0" cy="-18" rx="20" ry="16" fill={SQUIRREL} stroke={INK} strokeWidth="3" />
+      <ellipse cx="7" cy="-15" rx="9" ry="10" fill={SQUIRREL_LIGHT} />
+      <ellipse cx="-8" cy="-3" rx="9" ry="4" fill={SQUIRREL} stroke={INK} strokeWidth="2.5" />
+      <ellipse cx="12" cy="-3" rx="7" ry="4" fill={SQUIRREL} stroke={INK} strokeWidth="2.5" />
+      <g transform={`rotate(${nibble} 14 -30)`}>
+        <path d="M12 -44 L14 -58 L22 -46 Z" fill={SQUIRREL} stroke={INK} strokeWidth="2.5" strokeLinejoin="round" />
+        <circle cx="20" cy="-36" r="12" fill={SQUIRREL} stroke={INK} strokeWidth="3" />
+        <ellipse cx="26" cy="-31" rx="6" ry="5" fill={SQUIRREL_LIGHT} />
+        <circle cx="23" cy="-39" r="2.8" fill={INK} />
+        <circle cx="32" cy="-34" r="2.4" fill={INK} />
+      </g>
+      {nut >= 0 && left > 0.05 && <Nut x={24} y={-20} s={0.5 + 0.5 * left} />}
+      <ellipse cx="20" cy="-20" rx="5" ry="4" fill={SQUIRREL} stroke={INK} strokeWidth="2" />
+    </g>
+  );
+}
+
+/** The croquet mallet: its handle from the foot on the grass, turned `angle` degrees from upright, the striped head across its top. */
+function Mallet({ angle }: { angle: number }) {
+  const top = FLOOR - MALLET.len;
+  const h = MALLET.head / 2;
+  const w = MALLET.thick / 2;
+  return (
+    <g transform={`rotate(${angle} ${MALLET.x} ${FLOOR})`}>
+      <line x1={MALLET.x} y1={FLOOR} x2={MALLET.x} y2={top} stroke={INK} strokeWidth="13" strokeLinecap="round" />
+      <line x1={MALLET.x} y1={FLOOR} x2={MALLET.x} y2={top} stroke={WOOD} strokeWidth="7" strokeLinecap="round" />
+      <rect x={MALLET.x - h} y={top - w} width={MALLET.head} height={MALLET.thick} rx="6" fill={MID_WOOD} stroke={INK} strokeWidth="3.5" />
+      {[-h + 12, h - 18].map((x) => (
+        <rect key={x} x={MALLET.x + x} y={top - w} width="6" height={MALLET.thick} fill="#3a86ff" />
+      ))}
+      <rect x={MALLET.x - h} y={top - w} width={MALLET.head} height={MALLET.thick} rx="6" fill="none" stroke={INK} strokeWidth="3.5" />
     </g>
   );
 }

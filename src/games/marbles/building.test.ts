@@ -1,5 +1,29 @@
 import { describe, expect, test } from "bun:test";
-import { buildBuilding, crankKnob, EXC, FLOOR, HEAP, JACK, moundY, onScoop, PILE, ROLLER, SCOOP, SPOOL, WINCH, WORLD_W } from "./building";
+import {
+  BUTTON_TOP,
+  buildBuilding,
+  crankKnob,
+  DRIVER,
+  EXC,
+  FLOOR,
+  GEN,
+  HEAP,
+  JACK,
+  LADDER,
+  moundY,
+  onScoop,
+  PILE,
+  PIPE,
+  PUDDLE,
+  ROLLER,
+  SACK,
+  SCOOP,
+  SPOOL,
+  STACK,
+  THUMPS,
+  WINCH,
+  WORLD_W,
+} from "./building";
 
 describe("Baustelle", () => {
   const site = buildBuilding();
@@ -12,9 +36,9 @@ describe("Baustelle", () => {
   };
   const bottom = { x: SCOOP.mouth * 0.4, y: SCOOP.deep };
 
-  test("the machine runs 39 to 43 seconds and ends after everything else", () => {
-    expect(site.duration).toBeGreaterThan(39);
-    expect(site.duration).toBeLessThan(43);
+  test("the machine runs about a minute and ends after everything else", () => {
+    expect(site.duration).toBeGreaterThan(56);
+    expect(site.duration).toBeLessThan(64);
     expect(Math.max(...site.events.map((e) => e.at))).toBe(site.duration);
     expect(site.events[site.events.length - 1].done).toBe(true);
   });
@@ -33,8 +57,15 @@ describe("Baustelle", () => {
       site.tPat,
       site.tRollerGo,
       site.tJack,
-      site.tCrank,
+      site.tButton,
       site.tRest,
+      site.tPower,
+      ...site.thumps,
+      site.tPipeGo,
+      site.tSplash,
+      site.tFoot,
+      site.tSackOff,
+      site.tCrank,
       site.tRoofLand,
       site.tTree,
       site.duration,
@@ -93,16 +124,69 @@ describe("Baustelle", () => {
     for (const t of times(0, site.duration)) expect(site.rollerAt(t).lift).toBeLessThan(HEAP.h);
   });
 
-  test("the jackhammer hops onto the winch's knob and stays in the site", () => {
-    const k = crankKnob(0);
-    const tip = site.jackAt(site.tCrank - 0.001).tip;
-    expect(Math.hypot(tip.x - k.x, tip.y - (k.y - WINCH.knob))).toBeLessThan(4);
+  test("the jackhammer hops onto the generator's start button, presses it and stays in the site", () => {
+    const tip = site.jackAt(site.tButton - 0.001).tip;
+    expect(Math.hypot(tip.x - BUTTON_TOP.x, tip.y - BUTTON_TOP.y)).toBeLessThan(4);
+    expect(site.buttonAt(site.tButton + 0.2)).toBeCloseTo(GEN.press, 0);
+    expect(site.genRunning(site.tButton - 0.01)).toBe(false);
+    expect(site.genRunning(site.tPower)).toBe(true);
+    const rest = site.jackAt(site.duration).tip;
+    expect(rest.y).toBe(FLOOR);
+    expect(rest.x + JACK.w).toBeLessThan(GEN.x - GEN.w / 2);
     for (const t of times(0, site.duration)) {
       const j = site.jackAt(t).tip;
       expect(j.y).toBeLessThanOrEqual(FLOOR);
       expect(j.x).toBeGreaterThan(0);
       expect(j.x).toBeLessThan(WORLD_W);
     }
+  });
+
+  test("the pile driver's ram starts with the spark's arrival and lands on the sinking post at each thump", () => {
+    expect(site.driverAt(site.tPower)).toEqual({ ram: DRIVER.post0, sunk: 0 });
+    expect(site.lifts[0]).toBeGreaterThan(site.tPower);
+    site.thumps.forEach((t, n) => {
+      expect(site.driverAt(t - 0.3).ram).toBeLessThan(DRIVER.post0 + n * DRIVER.sink - 40);
+      expect(site.driverAt(t + 0.3).ram).toBeCloseTo(DRIVER.post0 + (n + 1) * DRIVER.sink, 3);
+    });
+    for (const t of times(0, site.duration)) {
+      const { ram, sunk } = site.driverAt(t);
+      expect(ram).toBeGreaterThanOrEqual(DRIVER.lift - 0.01);
+      expect(ram).toBeLessThanOrEqual(DRIVER.post0 + sunk * DRIVER.sink + 0.01);
+    }
+    expect(site.driverAt(site.duration).sunk).toBe(THUMPS);
+  });
+
+  test("the pipe lies still until the last thump, rolls through the puddle and pushes the ladder's foot", () => {
+    const last = site.thumps[THUMPS - 1];
+    expect(site.pipeAt(last - 0.01).pt).toEqual({ x: PIPE.x, y: FLOOR - PIPE.r });
+    expect(site.tSplash).toBeGreaterThan(site.tPipeGo);
+    expect(site.pipeAt(site.tSplash).pt.x).toBeGreaterThan(PUDDLE.x - PUDDLE.w / 2);
+    expect(site.pipeAt(site.tSplash).pt.x).toBeLessThan(PUDDLE.x + PUDDLE.w / 2);
+    const foot = site.ladderAt(site.tFoot).foot;
+    expect(site.pipeAt(site.tFoot).pt.x + PIPE.r).toBeCloseTo(foot.x - LADDER.w / 2, 0);
+    expect(site.ladderAt(site.tFoot - 0.01).foot.x).toBe(LADDER.foot);
+    for (const t of times(0, site.duration)) {
+      const { foot: f, top } = site.ladderAt(t);
+      expect(Math.hypot(top.x - f.x, top.y - f.y)).toBeCloseTo(LADDER.len, 3);
+      expect(site.pipeAt(t).pt.x + PIPE.r).toBeLessThanOrEqual(f.x - LADDER.w / 2 + 0.5);
+      expect(site.pipeAt(t).pt.y).toBeLessThanOrEqual(FLOOR - PIPE.r + 0.01);
+    }
+  });
+
+  test("the ladder's top lifts the sack's overhang, and the sack tips off onto the winch's knob", () => {
+    expect(LADDER.foot + LADDER.push).toBeLessThan(STACK.x0);
+    expect(site.ladderAt(0).top.y).toBeCloseTo(STACK.top, 3);
+    expect(SACK.x0).toBeLessThan(STACK.x0);
+    expect(site.ladderAt(site.tSackOff).top.y).toBeLessThan(STACK.top - 15);
+    expect(site.sackAt(site.tFoot - 0.01)).toEqual({ pt: { x: SACK.x0 + SACK.w / 2, y: STACK.top }, angle: 0 });
+    const k = crankKnob(0);
+    const pt = site.sackAt(site.tCrank - 0.001).pt;
+    expect(Math.hypot(pt.x - k.x, pt.y - (k.y - WINCH.knob))).toBeLessThan(4);
+    expect(site.crankAt(site.tCrank - 0.01)).toBe(0);
+    const lying = site.sackAt(site.duration).pt;
+    expect(lying.y).toBe(FLOOR);
+    expect(lying.x - SACK.w / 2).toBeGreaterThan(STACK.x1);
+    for (const t of times(0, site.duration)) expect(site.sackAt(t).pt.y).toBeLessThanOrEqual(FLOOR);
   });
 
   test("the camera stays inside the site", () => {

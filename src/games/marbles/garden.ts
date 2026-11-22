@@ -1,8 +1,10 @@
 // The garden machine ("Im Garten"), a Rube Goldberg machine through a long
 // garden: one tap lets a marble roll out of the birdhouse, and one thing sets
-// off the next for about forty seconds while the camera travels along – wind
+// off the next for about a minute while the camera travels along – wind
 // chimes, a watering can, a water wheel, a wheelbarrow, a rake, an apple tree,
-// a slide and a croquet ball that bonks the mole's hill. The dizzy mole digs
+// a slide, a robot mower that bumps the bird feeder's pole, the nuts it shakes
+// out, a squirrel eating them and leaping onto a croquet mallet's head, and the
+// croquet ball the falling mallet hits, which bonks the mole's hill. The dizzy mole digs
 // off under the lawn, looks out once on the way and pops up right under the
 // sleeping hedgehog, which flies up, curls into a prickly ball and rolls
 // through a pile of leaves; the leaves whirl up in a gust that spins the
@@ -10,15 +12,18 @@
 // tap, and the sprinkler waters the sunflower until it blooms. Everything is
 // worked out ahead as a function of the seconds since the tap, so
 // GardenLevel.tsx only asks where each thing is at a moment. Coordinates are
-// those of the garden, 7110 × 900; the screen shows 1600 of it at a time.
+// those of the garden, 8925 × 900; the screen shows 1600 of it at a time.
 
 import {
   playBlub,
+  playChatter,
+  playClick,
   playClonk,
   playCountNote,
   playCreak,
   playDing,
   playDrops,
+  playHop,
   playKnock,
   playLeaves,
   playPlop,
@@ -26,21 +31,24 @@ import {
   playPoof,
   playPop,
   playRumble,
+  playRustle,
   playSneeze,
   playSniff,
   playSqueak,
   playSwirl,
   playThump,
+  playTrickle,
   playTrill,
   playTwinkle,
   playWhirr,
   playWhoosh,
 } from "@/lib/sfx";
-import { playFlush, playSplash, playTweet } from "@/lib/realSounds";
+import { playFlush, playMunch, playSplash, playTweet } from "@/lib/realSounds";
 import { wobble } from "./level";
 import {
   along,
   beside,
+  clamp01,
   cameraOn,
   distAt,
   easeIn,
@@ -62,7 +70,6 @@ import {
 } from "./machineKit";
 import { BALL_R, line, quad, type Pt } from "./path";
 
-export const WORLD_W = 7110;
 export const FLOOR = 800;
 
 /* ---------- Layout ---------- */
@@ -73,8 +80,6 @@ const GROUND_CORNERS = [
   { x: TERRACE.edge, y: TERRACE.y },
   { x: TERRACE.foot, y: FLOOR },
 ];
-/** The top of the lawn from one end of the garden to the other. */
-export const GROUND = rounded([{ x: -400, y: TERRACE.y }, ...GROUND_CORNERS, { x: WORLD_W + 400, y: FLOOR }], 30);
 
 /** The birdhouse on its pole; the marble comes out of the round door at (x, doorY). */
 export const BIRDHOUSE = { x: 170, doorY: 88 };
@@ -139,22 +144,98 @@ export const SLIDE = { top: { x: 2470, y: 672 }, bottom: { x: 2760, y: 752 }, en
 export const SLIDE_LINE = rounded([SLIDE.top, SLIDE.bottom, { x: SLIDE.end, y: SLIDE.bottom.y }], 60);
 const slideY = (x: number) => SLIDE.top.y + ((x - SLIDE.top.x) * (SLIDE.bottom.y - SLIDE.top.y)) / (SLIDE.bottom.x - SLIDE.top.x);
 
-export const CROQUET = { x: 3060, r: 32 };
-export const HOOP = { x: 3300, h: 104 };
+/**
+ * The robot mower asleep on the lawn after the slide, its middle at x: `len` long, `h` high on wheels of `wheelR`. The
+ * apple bumps it awake, and it mows a stripe across the lawn up to the bird feeder's pole.
+ */
+export const MOWER = { x: 3060, len: 116, h: 44, wheelR: 15 };
+/**
+ * The bird feeder: a pole `w` thick stuck in the lawn at x, up to `top`, with an arm `arm` long to the right at its
+ * top; the wire tube of nuts hangs `len` below the arm's end, `r` wide each way.
+ */
+export const FEEDER = { x: 4000, top: 420, w: 12, arm: 86, len: 120, r: 17 };
+/** The squirrel's tree, right of the feeder; the squirrel sits on its low branch at `perch`. */
+export const NUT_TREE = { x: 4520, trunkW: 56, crownY: 380, perch: { x: 4430, y: 478 } };
+/** The nuts that fall out of the shaken feeder: where each comes to lie on the grass, in the order they fall. */
+export const NUT_SPOTS = [4420, 4130, 4350, 4200, 4060, 4280];
+export const NUT_R = 9;
+/**
+ * The croquet mallet, leaning against the nut tree's trunk: its handle `len` long from the foot on the grass at x,
+ * leaning `lean` degrees to the left, its head `head` long and `thick` thick across the handle's top.
+ */
+export const MALLET = { x: 4618, len: 210, head: 68, thick: 26, lean: -10 };
+/** The four corners of the mallet's head with the handle turned `angle` degrees from upright (positive to the right). */
+export function malletHead(angle: number): Pt[] {
+  const a = rad(angle);
+  const top = { x: MALLET.x + MALLET.len * Math.sin(a), y: FLOOR - MALLET.len * Math.cos(a) };
+  const along = { x: Math.cos(a), y: Math.sin(a) };
+  const up = { x: Math.sin(a), y: -Math.cos(a) };
+  const h = MALLET.head / 2;
+  const w = MALLET.thick / 2;
+  return [
+    [-h, -w],
+    [h, -w],
+    [h, w],
+    [-h, w],
+  ].map(([i, j]) => ({ x: top.x + along.x * i + up.x * j, y: top.y + along.y * i + up.y * j }));
+}
+/** Fallen over, the mallet lies with the lower end of its head on the grass. */
+export const MALLET_DOWN = (() => {
+  let a = 60;
+  while (Math.max(...malletHead(a + 0.1).map((p) => p.y)) <= FLOOR) a += 0.1;
+  return a;
+})();
+
+/** The croquet ball lies where the falling mallet's head just reaches it as it comes to lie on the grass. */
+const CROQUET_R = 32;
+/** How far the mallet's head, its handle turned `angle` degrees, is from a croquet ball lying with its middle at x. */
+export function headGap(x: number, angle: number) {
+  const c = { x, y: FLOOR - CROQUET_R };
+  const corners = malletHead(angle);
+  return (
+    Math.min(
+      ...corners.map((p, i) => {
+        const q = corners[(i + 1) % 4];
+        // The point of this side nearest to the ball's middle.
+        const k = clamp01(((c.x - p.x) * (q.x - p.x) + (c.y - p.y) * (q.y - p.y)) / ((q.x - p.x) ** 2 + (q.y - p.y) ** 2));
+        return Math.hypot(lerp(p.x, q.x, k) - c.x, lerp(p.y, q.y, k) - c.y);
+      }),
+    ) - CROQUET_R
+  );
+}
+const FALLING = Array.from({ length: 401 }, (_, i) => lerp(MALLET.lean, MALLET_DOWN, i / 400));
+/** The croquet ball lies just beyond where the falling mallet's head comes closest to it. */
+const CROQUET_X = (() => {
+  // From just inside the fallen head's right side outwards, so the ball lies beyond the head, not under it.
+  let x = Math.ceil(Math.max(...malletHead(MALLET_DOWN).map((p) => p.x)));
+  while (FALLING.some((a) => headGap(x, a) < 0.5)) x += 1;
+  return x;
+})();
+/** The angle of the falling mallet at which its head meets the ball. */
+export const MALLET_HIT = FALLING.find((a) => headGap(CROQUET_X, a) < 1.5) ?? MALLET_DOWN;
+/** How far the ball, the molehill and everything after them stand to the right of where they stood before the mower came. */
+export const MOWED = CROQUET_X - 3060;
+
+export const CROQUET = { x: CROQUET_X, r: CROQUET_R };
+export const HOOP = { x: 3300 + MOWED, h: 104 };
+
+export const WORLD_W = 7110 + MOWED;
+/** The top of the lawn from one end of the garden to the other. */
+export const GROUND = rounded([{ x: -400, y: TERRACE.y }, ...GROUND_CORNERS, { x: WORLD_W + 400, y: FLOOR }], 30);
 
 /** The mole's home: a mound of earth `rx` wide each way and `h` high, which the croquet ball runs into. */
-export const MOLEHILL = { x: 3600, rx: 105, h: 78 };
+export const MOLEHILL = { x: 3600 + MOWED, rx: 105, h: 78 };
 /** Where the mole comes up once on its way under the lawn, to look around. */
-export const MOLE_PEEK_X = 3900;
+export const MOLE_PEEK_X = 3900 + MOWED;
 /**
  * The hedgehog, asleep on the grass at x (the mole comes up right under it); curled up it is a ball of radius r,
  * lands at `land` and rolls to `stop`.
  */
-export const HEDGEHOG = { x: 4200, r: 58, land: 4420, stop: 5150 };
+export const HEDGEHOG = { x: 4200 + MOWED, r: 58, land: 4420 + MOWED, stop: 5150 + MOWED };
 /** The pile of raked leaves the hedgehog bursts through: middle, width and height. */
-export const LEAF_PILE = { x: 4950, w: 190, h: 60 };
+export const LEAF_PILE = { x: 4950 + MOWED, w: 190, h: 60 };
 /** The pinwheel stuck in a flower pot: its hub at (x, hubY), blades r long; the pot's rim is at potTop. */
-export const PINWHEEL = { x: 5320, hubY: 600, r: 58, potTop: FLOOR - 74 };
+export const PINWHEEL = { x: 5320 + MOWED, hubY: 600, r: 58, potTop: FLOOR - 74 };
 
 /** The croquet ball stops where it first touches the molehill's side. */
 const HILL_CONTACT = (() => {
@@ -168,7 +249,7 @@ const HILL_CONTACT = (() => {
   return x;
 })();
 
-export const SHED = { x0: 5400, x1: 5820, wallTop: 540, roofTop: 420 };
+export const SHED = { x0: 5400 + MOWED, x1: 5820, wallTop: 540, roofTop: 420 };
 /**
  * The garden tap on the shed: its lever hangs down (shut) from the pivot, with a knob at the end; turned by `open`
  * degrees (to the left, towards the pinwheel's string) the water runs.
@@ -177,25 +258,22 @@ export const TAP = { x: SHED.x0 + 120, y: 650, lever: 112, knob: 12, open: -80 }
 /** Where the lever's knob is when the lever is turned `angle` degrees (positive swings it to the right). */
 export const knobAt = (angle: number): Pt => ({ x: TAP.x + TAP.lever * Math.sin(rad(angle)), y: TAP.y + TAP.lever * Math.cos(rad(angle)) });
 
-export const SPRINKLER = { x: 6080, headY: FLOOR - 120, arm: 56 };
+export const SPRINKLER = { x: 6080 + MOWED, headY: FLOOR - 120, arm: 56 };
 /** The orange garden hose from the tap's spout along the grass to the sprinkler. */
 export const HOSE = pathOf(
   quad({ x: TAP.x + 24, y: TAP.y + 40 }, { x: TAP.x + 24, y: FLOOR - 8 }, { x: TAP.x + 90, y: FLOOR - 8 }),
   line({ x: TAP.x + 90, y: FLOOR - 8 }, { x: SPRINKLER.x - 36, y: FLOOR - 8 }),
 );
 
-export const BED = { x0: 6190, x1: 6700 };
+export const BED = { x0: 6190 + MOWED, x1: 6700 + MOWED };
 /** The sunflower grows out of the bed at x, up to its head at headY. */
-export const SUN = { x: 6360, headY: 300 };
+export const SUN = { x: 6360 + MOWED, headY: 300 };
 export const FENCE_TOP = 620;
 
 /* ---------- Helpers ---------- */
 
 /** Seconds into a free fall from rest until it has dropped `h`. */
 const fallTime = (h: number) => Math.sqrt((2 * h) / GRAVITY);
-
-/** Speed at the end of a run, from its last two steps. */
-const endSpeed = (d: number[]) => (d[d.length - 1] - d[d.length - 2]) / STEP;
 
 /** A spot along `path` at distance `d`, carrying on straight left of its start for d < 0. */
 function alongOrBefore(path: Path, d: number): Pt {
@@ -315,7 +393,7 @@ export function buildGarden() {
 
   const appleLine = rounded([{ x: APPLE.x, y: landY }, SLIDE.bottom, { x: SLIDE.end, y: SLIDE.bottom.y }], 60);
   const appleOnGrass = FLOOR - APPLE.r;
-  const appleHit = CROQUET.x - CROQUET.r - APPLE.r;
+  const appleHit = MOWER.x - MOWER.len / 2 - APPLE.r;
   const applePath = pathOf(
     appleLine,
     quad({ x: SLIDE.end, y: SLIDE.bottom.y }, { x: SLIDE.end + 20, y: SLIDE.bottom.y }, { x: SLIDE.end + 44, y: appleOnGrass }),
@@ -324,26 +402,180 @@ export function buildGarden() {
   // On landing, the part of its fall along the slide keeps it going.
   const slope = Math.atan2(SLIDE.bottom.y - SLIDE.top.y, SLIDE.bottom.x - SLIDE.top.x);
   const apple = roll(applePath, GRAVITY * fallTime(landY - APPLE.y) * Math.sin(slope), 150, 560, 0.25);
-  const tBall = tLand + apple.duration;
+  const tMow = tLand + apple.duration;
   at(tLand + 0.3, { sound: playWhoosh });
-  at(tBall, { sound: () => playKnock(1500) });
+  at(tMow, { sound: () => playKnock(1500) });
 
   const appleAt = (t: number): { pt: Pt; spin: number; hanging: boolean } => {
     if (t < tLoose) return { pt: turn(APPLE, { x: TREE.x, y: TREE.crownY }, rad(swayAt(t))), spin: 0, hanging: true };
     if (t < tLand) return { pt: { x: APPLE.x, y: APPLE.y + 0.5 * GRAVITY * (t - tLoose) ** 2 }, spin: 0, hanging: false };
-    if (t < tBall) {
+    if (t < tMow) {
       const d = distAt(apple, t - tLand);
       return { pt: along(applePath, d).pt, spin: d / APPLE.r, hanging: false };
     }
-    // It stops at the ball and rolls back a little.
-    const back = 14 * easeOut(seg(t, tBall, tBall + 0.5));
+    // It stops at the mower and rolls back a little.
+    const back = 14 * easeOut(seg(t, tMow, tMow + 0.5));
     return { pt: { x: appleHit - back, y: appleOnGrass }, spin: (apple.path.total - back) / APPLE.r, hanging: false };
+  };
+
+  /* The robot mower wakes up, drives off across the lawn and mows a stripe until it bumps into the bird feeder's pole. */
+  const tGo = tMow + 0.6;
+  const MOW_V = 150;
+  const MOW_UP = 0.6;
+  const mowFrom = MOWER.x;
+  const mowTo = FEEDER.x - FEEDER.w / 2 - MOWER.len / 2;
+  const tBump = tGo + MOW_UP / 2 + (mowTo - mowFrom) / MOW_V;
+  /** How far the mower has driven: speeding up, then steady until the bump, then backing off a little. */
+  const mowerX = (t: number) => {
+    const u = t - tGo;
+    if (u <= 0) return mowFrom;
+    if (t < tBump) return mowFrom + (u < MOW_UP ? (MOW_V * u * u) / (2 * MOW_UP) : MOW_V * (u - MOW_UP / 2));
+    return mowTo - 40 * easeInOut(seg(t, tBump + 0.3, tBump + 1.1));
+  };
+  /** The mower: its middle, how far its wheels have turned (radians), whether it is running, and its jolt at the bump (degrees). */
+  const mowerAt = (t: number) => {
+    const x = mowerX(t);
+    return { x, roll: (x - mowFrom) / MOWER.wheelR, running: t > tMow + 0.3 && t < tBump + 1.1, jolt: wobble(t - tBump, 3, 24, 7) };
+  };
+  /** Where the mown stripe ends: from the mower's start to its back. */
+  const stripeAt = (t: number) => (t < tGo ? 0 : Math.min(mowerX(t), mowTo) - mowFrom);
+  /** The grass clippings flying up behind the mower. */
+  const CLIP_EVERY = 0.07;
+  const clippingsAt = (t: number): Pt[] => {
+    const out: Pt[] = [];
+    const first = Math.max(0, Math.ceil((t - 0.6 - tGo) / CLIP_EVERY));
+    for (let i = first; ; i++) {
+      const te = tGo + 0.3 + i * CLIP_EVERY;
+      if (te > t || te > tBump) break;
+      const age = t - te;
+      const y = FLOOR - 12 - (150 + 120 * ((i * 0.37) % 1)) * age + 0.5 * GRAVITY * age * age;
+      if (y < FLOOR - 2) out.push({ x: mowerX(te) - MOWER.len / 2 + 6 - (60 + 90 * ((i * 0.618) % 1)) * age, y });
+    }
+    return out;
+  };
+  at(tMow + 0.3, { sound: playClick });
+  at(tGo, { sound: playWhirr });
+  for (let k = tGo + 0.8; k < tBump - 0.5; k += 1.6) at(k, { sound: playRustle });
+  at(tBump, { sound: () => playKnock(700) });
+  at(tBump + 0.3, { sound: playClick });
+
+  /* The pole shakes, the feeder swings, and nuts tumble out of it onto the grass. */
+  const poleAt = (t: number) => wobble(t - tBump, 4, 11, 1.6);
+  const feederSwingAt = (t: number) => wobble(t - tBump - 0.05, 16, 6.5, 0.9);
+  const POLE_FOOT = { x: FEEDER.x, y: FLOOR };
+  /** The end of the feeder's arm, where the tube hangs from. */
+  const hookAt = (t: number) => turn({ x: FEEDER.x + FEEDER.arm, y: FEEDER.top }, POLE_FOOT, rad(poleAt(t)));
+  const feederBottom = (t: number) => {
+    const hook = hookAt(t);
+    return turn({ x: hook.x, y: hook.y + FEEDER.len }, hook, rad(-feederSwingAt(t) - poleAt(t)));
+  };
+  const NUT_EVERY = 0.38;
+  const NUT_FALL = 0.5;
+  const nutOut = NUT_SPOTS.map((_, i) => tBump + 0.3 + i * NUT_EVERY);
+  const nutLand = nutOut.map((t) => t + NUT_FALL);
+  nutOut.forEach((t) => at(t, { sound: playTrickle }));
+  nutLand.forEach((t, i) => at(t, { sound: () => playKnock(1700 + 120 * i) }));
+
+  /*
+   * The squirrel runs down its tree, eats the nuts one after the other, runs back, climbs the trunk and leaps onto the
+   * mallet's head; the mallet tips over and whacks the croquet ball.
+   */
+  const SQ_FEET = FLOOR;
+  const trunkFront = NUT_TREE.x - 8;
+  const tWake = nutLand[0] + 0.1;
+  const tDown0 = tWake + 0.9;
+  const tDown1 = tDown0 + 0.35;
+  const CLIMB_V = 300;
+  const tFloor = tDown1 + (SQ_FEET - NUT_TREE.perch.y) / CLIMB_V;
+  const RUN_V = 280;
+  const EAT = 1;
+  // It eats the nuts from the tree outwards, whatever order they fell in.
+  const order = NUT_SPOTS.map((x, i) => ({ x, i })).sort((a, b) => b.x - a.x);
+  const eats: { i: number; x: number; run: number; eat: number; done: number }[] = [];
+  let tRun = Math.max(tFloor, nutLand[nutLand.length - 1]);
+  let from = trunkFront;
+  for (const { x, i } of order) {
+    const stand = x + NUT_R + 14;
+    const run = tRun + Math.abs(from - stand) / RUN_V;
+    eats.push({ i, x: stand, run: tRun, eat: run, done: run + EAT });
+    tRun = run + EAT;
+    from = stand;
+  }
+  const tBack = tRun + (trunkFront - from) / (RUN_V * 1.2);
+  /** Where the squirrel leaps from: on the trunk, level with the mallet's head. */
+  const leapFrom = { x: trunkFront, y: malletHead(MALLET.lean)[0].y - 6 };
+  const tClimbed = tBack + (SQ_FEET - leapFrom.y) / CLIMB_V;
+  const tLeap = tClimbed + 0.35;
+  const headTop = (angle: number) => {
+    const [, , c, d] = malletHead(angle);
+    return { x: (c.x + d.x) / 2, y: (c.y + d.y) / 2 };
+  };
+  const tOnHead = tLeap + 0.4;
+  const FALL_T = 0.85;
+  // It falls faster and faster (easeIn) and meets the ball on the way down to the grass.
+  const tBall = tOnHead + FALL_T * Math.sqrt((MALLET_HIT - MALLET.lean) / (MALLET_DOWN - MALLET.lean));
+  const tDown = tOnHead + FALL_T;
+  /** How far the mallet is turned from upright, in degrees: leaning on the trunk, then tipped over by the squirrel. */
+  const malletAt = (t: number) => {
+    if (t < tOnHead) return MALLET.lean;
+    if (t < tDown) return lerp(MALLET.lean, MALLET_DOWN, easeIn(seg(t, tOnHead, tDown)));
+    return MALLET_DOWN - Math.abs(wobble(t - tDown, 5, 18, 7));
+  };
+  const tSpring = tOnHead + 0.15;
+  const tHome = tSpring + 0.45;
+  eats.forEach((e) => {
+    at(e.eat, { sound: playMunch });
+    at(e.eat + 0.55, { sound: playMunch });
+  });
+  at(tWake, { sound: playChatter });
+  at(tLeap, { sound: playHop });
+  at(tOnHead, { sound: playCreak });
+  at(tHome + 0.2, { sound: playChatter });
+
+  /**
+   * The squirrel: where its feet are, which way it looks (1 right, -1 left), how far it is turned (degrees: -90 climbing
+   * down head first, 90 climbing up), and whether it holds a nut (its index) and how much of it is left.
+   */
+  const squirrelAt = (t: number): { pt: Pt; face: number; angle: number; nut: number; left: number; running: boolean } => {
+    const still = { face: -1, angle: 0, nut: -1, left: 0, running: false };
+    if (t < tDown0) return { ...still, pt: NUT_TREE.perch, face: t < tWake ? 1 : -1 };
+    if (t < tDown1) return { ...still, pt: hop(NUT_TREE.perch, { x: trunkFront, y: NUT_TREE.perch.y + 10 }, 20, seg(t, tDown0, tDown1)), running: true };
+    if (t < tFloor) return { ...still, pt: { x: trunkFront, y: lerp(NUT_TREE.perch.y + 10, SQ_FEET, seg(t, tDown1, tFloor)) }, angle: -90, running: true };
+    let x = trunkFront;
+    for (const e of eats) {
+      if (t < e.eat) return { ...still, pt: { x: lerp(x, e.x, seg(t, e.run, e.eat)), y: SQ_FEET }, running: t > e.run };
+      if (t < e.done) return { ...still, pt: { x: e.x, y: SQ_FEET }, nut: e.i, left: 1 - seg(t, e.eat, e.done) };
+      x = e.x;
+    }
+    if (t < tBack) return { ...still, pt: { x: lerp(x, trunkFront, seg(t, tRun, tBack)), y: SQ_FEET }, face: 1, running: true };
+    if (t < tClimbed) return { ...still, pt: { x: trunkFront, y: lerp(SQ_FEET, leapFrom.y, seg(t, tBack, tClimbed)) }, face: 1, angle: -90, running: true };
+    if (t < tLeap) return { ...still, pt: leapFrom, face: 1, angle: -90 };
+    if (t < tOnHead) return { ...still, pt: hop(leapFrom, headTop(MALLET.lean), 50, seg(t, tLeap, tOnHead)), face: 1 };
+    if (t < tSpring) return { ...still, pt: headTop(malletAt(t)), face: 1 };
+    if (t < tHome) return { ...still, pt: hop(headTop(malletAt(tSpring)), leapFrom, 70, seg(t, tSpring, tHome)), face: -1 };
+    return { ...still, pt: leapFrom, face: -1, angle: -90 };
+  };
+  /** Where each nut is: falling out of the feeder, lying on the grass, held while eaten; null once it is eaten. */
+  const nutAt = (i: number, t: number): Pt | null => {
+    if (t < nutOut[i]) return null;
+    const e = eats.find((x) => x.i === i);
+    if (e && t >= e.done) return null;
+    if (e && t >= e.eat) return null;
+    if (t < nutLand[i]) {
+      const p = feederBottom(nutOut[i]);
+      const k = seg(t, nutOut[i], nutLand[i]);
+      return { x: lerp(p.x, NUT_SPOTS[i], k), y: lerp(p.y, FLOOR - NUT_R, k * k) };
+    }
+    const u = seg(t, nutLand[i], nutLand[i] + 0.25);
+    return { x: NUT_SPOTS[i], y: FLOOR - NUT_R - 40 * u * (1 - u) };
   };
 
   /* The croquet ball: through the hoop and into the side of the molehill. */
   const ballY = FLOOR - CROQUET.r;
   const ballPath = pathOf(line({ x: CROQUET.x, y: ballY }, { x: HILL_CONTACT, y: ballY }));
-  const ball = roll(ballPath, endSpeed(apple.d) * 0.85, 160, 600, 0.15);
+  const ball = roll(ballPath, 160, 160, 600, 0.15);
+  at(tBall, { sound: () => playKnock(1100) });
+  at(tDown, { sound: playThump });
   const tKnock = tBall + ball.duration;
   at(tBall + timeWhen(ball, (pt) => pt.x >= HOOP.x), { sound: playDing });
   at(tKnock, { sound: () => playKnock(500) });
@@ -605,6 +837,8 @@ export function buildGarden() {
 
   const events = sorted();
 
+  /** Between the feeder and the mallet, where the squirrel gathers the nuts: the croquet ball is in the picture too. */
+  const NUTS_MID = (FEEDER.x + MALLET.x) / 2 + 60;
   /** Where the camera looks: the thing that moves right now. */
   const focusX = (t: number) => {
     if (t < 0) return 0;
@@ -612,8 +846,10 @@ export function buildGarden() {
     if (t < tPush) return (CAN.pivot.x + WATERWHEEL.cx) / 2 + 120;
     if (t < tStop) return Math.max(barrowAt(t).pt.x, 1100);
     if (t < tLand) return (RAKE.x + APPLE.x) / 2;
-    if (t < tBall) return Math.max(appleAt(t).pt.x, (RAKE.x + APPLE.x) / 2);
-    if (t < tKnock) return ballAt(t).pt.x;
+    if (t < tMow) return Math.max(appleAt(t).pt.x, (RAKE.x + APPLE.x) / 2);
+    if (t < tBump) return Math.max(mowerX(t), (RAKE.x + APPLE.x) / 2);
+    if (t < tOnHead) return lerp(mowTo, NUTS_MID, easeInOut(seg(t, tBump, tBump + 1.5)));
+    if (t < tKnock) return Math.max(NUTS_MID, ballAt(t).pt.x);
     if (t < tDig) return MOLEHILL.x + 200;
     if (t < tPopB) return Math.max(MOLEHILL.x + 200, ridgeAt(t) + 80);
     if (t < tOpen) return Math.max(HEDGEHOG.x + 80, hogAt(t).pt.x);
@@ -639,6 +875,13 @@ export function buildGarden() {
     tCup,
     tPush,
     tStop,
+    tMow,
+    tBump,
+    nutOut,
+    nutLand,
+    eats,
+    tLeap,
+    tOnHead,
     tBall,
     tKnock,
     tPeek,
@@ -678,6 +921,15 @@ export function buildGarden() {
     rakeAt,
     swayAt,
     appleAt,
+    mowerAt,
+    stripeAt,
+    clippingsAt,
+    poleAt,
+    feederSwingAt,
+    hookAt,
+    nutAt,
+    squirrelAt,
+    malletAt,
     ballAt,
     moleAt,
     hillsAt,
