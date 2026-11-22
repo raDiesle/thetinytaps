@@ -24,6 +24,22 @@ import {
   roadToyX,
   roadY,
 } from "./road";
+import {
+  BLOCK,
+  BLOCK_HOP_MS,
+  blockCount,
+  blocksPlan,
+  cursorFrames,
+  DOOR,
+  FACE,
+  HOUSE as BLOCK_HOUSE,
+  JUMBLE,
+  MAX_BLOCKS,
+  MIN_BLOCKS,
+  SLOTS,
+  slotFoot,
+  WINDOWS,
+} from "./blocks";
 import { BOX_COUNT, BOXES, boxesPlan, boxLeft, boxSlot, floorPlaces, IN_BOX, LID_H, MAX_PER_BOX, MIN_PER_BOX, OPENING, perBox, TOY as BOX_TOY } from "./boxes";
 import { BITE_R, BUTTERFLY, biteSpot, bodyFront, frontAfter, LEAF, LEAF_FLOOR, leafLeft, leafShape, leafSpan, planBites, REACH } from "./caterpillar";
 import { DISC, DOTS, dotAt } from "./disc";
@@ -678,6 +694,70 @@ describe("Timer", () => {
     // The car is the Tidy Up's own toy car, never a second drawing of one.
     expect(code).toContain('<ToyArt kind="car" />');
     expect(code).toContain('className="tm-hop tm-road-car"');
+  });
+
+  test("Block House: all twenty blocks at five minutes, one hop at a time, the house built from the bottom up, the last block landing as the time is up (H-125)", () => {
+    expect(blockCount(5 * 60_000)).toBe(MAX_BLOCKS);
+    expect(blockCount(10_000)).toBe(MIN_BLOCKS);
+    expect(blockCount(3 * 3600_000)).toBe(MAX_BLOCKS);
+    for (const total of [10_000, 60_000, 5 * 60_000, 3 * 3600_000]) {
+      const count = blockCount(total);
+      const { built, blocks } = blocksPlan(total, count);
+      expect(built + blocks.length).toBe(MAX_BLOCKS);
+      let before = 0;
+      for (const [i, b] of blocks.entries()) {
+        expect(b.k).toBe(built + i);
+        expect(b.hop.start).toBeGreaterThanOrEqual(before);
+        expect(b.hop.land - b.hop.start).toBeLessThanOrEqual(BLOCK_HOP_MS);
+        expect(b.hop.land).toBeGreaterThan(b.hop.start);
+        if (b.hop.waitFrom !== undefined) expect(b.hop.waitFrom).toBeGreaterThanOrEqual(before);
+        before = b.hop.land;
+      }
+      expect(blocks.at(-1)?.hop.land).toBeCloseTo(total);
+      // The cursor stands on each block's place until the one before has landed, never on a place already built.
+      const frames = cursorFrames(blocks);
+      expect(frames).toHaveLength(blocks.length);
+      for (const [i, f] of frames.entries()) expect(f.at).toBe(i ? blocks[i - 1].hop.land : 0);
+    }
+  });
+
+  test("Block House: every block rests on the one below or over an opening, built before it; the house, the jumble and every hop stay on the screen (H-125)", () => {
+    const opening = (c: number, r: number) => WINDOWS.some((w) => w.c === c && w.r === r) || (c === DOOR.c && r >= DOOR.r && r < DOOR.r + DOOR.h);
+    const places = SLOTS.map((s) => `${s.c},${s.r}`);
+    expect(new Set(places).size).toBe(SLOTS.length);
+    SLOTS.forEach((s, k) => {
+      expect(opening(s.c, s.r)).toBe(false);
+      if (s.r > 0) {
+        const below = places.indexOf(`${s.c},${s.r - 1}`);
+        expect(below >= 0 ? below < k : opening(s.c, s.r - 1), `${s.c},${s.r}`).toBe(true);
+      }
+      const foot = slotFoot(s.c, s.r);
+      expect(foot.x + BLOCK / 2).toBeLessThanOrEqual(RIGHT_EDGE);
+      expect(foot.y - BLOCK).toBeGreaterThanOrEqual(80);
+    });
+    expect(BLOCK_HOUSE.x).toBeGreaterThan(Math.max(...JUMBLE.map((j) => j.x + BLOCK / 2)) + 8);
+    expect(JUMBLE).toHaveLength(MAX_BLOCKS);
+    for (const j of JUMBLE) {
+      expect(j.x - BLOCK / 2).toBeGreaterThanOrEqual(225);
+      expect(j.y).toBeLessThanOrEqual(780);
+      expect(Math.abs(j.tilt)).toBeLessThanOrEqual(10);
+      // Blocks side by side in a row never stand in each other.
+      for (const other of JUMBLE) if (other !== j && Math.abs(other.y - j.y) < 30) expect(Math.abs(other.x - j.x)).toBeGreaterThanOrEqual(BLOCK);
+    }
+    // Every place of the jumble is taken by exactly one block of the house.
+    const { blocks } = blocksPlan(5 * 60_000, MAX_BLOCKS);
+    expect(new Set(blocks.map((b) => `${b.hop.from.x},${b.hop.from.y}`)).size).toBe(MAX_BLOCKS);
+    for (const b of blocks) expect(b.hop.peak - BLOCK).toBeGreaterThanOrEqual(80);
+    expect(FACE + 20).toBe(BLOCK);
+  });
+
+  test("Block House: blocks, cursor and crumbs are layers on CSS animations that snap to their place at the end, with no clip path (H-125)", async () => {
+    const code = await Bun.file(new URL("./blocks.tsx", import.meta.url)).text();
+    expect(code).not.toMatch(/clip-?[pP]ath/);
+    const css = await Bun.file(new URL("./timer.css", import.meta.url)).text();
+    for (const part of ["blocks-z", "blocks-cursor", "blocks-crumbs", "blocks-light"]) expect(css, part).toMatch(new RegExp(`\\.tm-done \\.tm-${part}[,\\s{]`));
+    // Their stacking stays inside the picture, never above the end's light and trophy.
+    expect(css).toMatch(/\.tm-blocks \{\s*isolation: isolate;/);
   });
 
   // User feedback, November 2026: the drawn fox and bear children in the timer's pictures (holding the basket and the

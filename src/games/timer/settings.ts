@@ -20,6 +20,7 @@ export type TimerPicture =
   | "tidy"
   | "boxes"
   | "road"
+  | "blocks"
   | TurnPicture;
 
 /**

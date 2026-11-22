@@ -102,6 +102,13 @@ export const LANGUAGE_STATUS: LanguageStatusRow[] = [
         note: "Das Bild mit dem Straßenteppich, von dessen Straße die Spielsachen in die Kiste hüpfen, während das Spielzeugauto nachrückt (H-122, road.tsx, 22. November 2026), Englisch zuerst geschrieben und gleich in alle Sprachen übersetzt: sein Name „Road Rug“ („Straßenteppich“) und seine zwei Sätze am Anfang und am Ende (roadNames.ts). Aufgenommen ist noch nichts (bun run voice make --only timer, nur auf Wunsch), bis dahin bleibt es still. Die Texte für Suchmaschinen nennen es in allen sieben Sprachen.",
         files: ["src/games/timer/roadNames.ts"],
       },
+      {
+        label: "🧱 Block House",
+        languages: { de: "text", en: "text", zh: "text", hi: "text", es: "text", ar: "text", ru: "text" },
+        recorded: true,
+        note: "Das Bild im Stil eines Klötzchen-Bauspiels, in dem Klötze aus einem Durcheinander an ihren Platz in einem Haus hüpfen (H-125, blocks.tsx, 22. November 2026), Englisch zuerst geschrieben und gleich in alle Sprachen übersetzt: sein Name „Block House“ („Klötzchenhaus“) und seine zwei Sätze am Anfang und am Ende (blocksNames.ts). Aufgenommen ist noch nichts (bun run voice make --only timer, nur auf Wunsch), bis dahin bleibt es still. Die Texte für Suchmaschinen nennen es in allen sieben Sprachen.",
+        files: ["src/games/timer/blocksNames.ts"],
+      },
     ],
   },
   {

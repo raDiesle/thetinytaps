@@ -3,6 +3,7 @@ import { type Localized, pick, type Texts } from "@/lib/language";
 import { recordedVoice } from "@/lib/voice";
 import type { TimerPicture, TurnPicture } from "./settings";
 import type { Holder } from "./swap";
+import { BLOCKS_LINES } from "./blocksNames";
 import { BOXES_LINES } from "./boxesNames";
 import { ROAD_LINES } from "./roadNames";
 import { TIDY_LINES } from "./tidyNames";
@@ -237,6 +238,7 @@ export const PICTURE_LINES: Record<TimedPicture, { start: Texts; end: Texts }> =
   tidy: TIDY_LINES,
   boxes: BOXES_LINES,
   road: ROAD_LINES,
+  blocks: BLOCKS_LINES,
 };
 
 /** Said with the bell a while before the end (H-49). */

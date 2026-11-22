@@ -36,6 +36,7 @@ import { hush } from "@/lib/voice";
 import { useTimers } from "@/lib/timers";
 import { useWakeLock } from "@/lib/wakeLock";
 import { AppleScene } from "./apples";
+import { BlocksScene, blockCount, blocksPlan } from "./blocks";
 import { BoxesScene, boxesPlan, perBox } from "./boxes";
 import { RoadScene, roadPlan, roadToyCount } from "./road";
 import { FINAL_NOTES, FinalLight, finalMs, TimeBar, TimeBarChoice } from "./bar";
@@ -346,6 +347,11 @@ function TimerRun({
     if (picture === "boxes") return boxMoments(total, perBox(set)).map((m) => m.at);
     // The road rug (H-122): each toy landing in the box, and the car arriving behind the next toy, but home at the end.
     if (picture === "road") return roadMoments(total, roadToyCount(set)).map((m) => m.at);
+    // The block house (H-125): each block landing on its place, the last one being the end's.
+    if (picture === "blocks")
+      return blocksPlan(total, blockCount(set))
+        .blocks.slice(0, -1)
+        .map((b) => b.hop.land);
     // The ladybug leaves a dot as it is back at the top (H-67).
     if (picture === "disc") return pieceMoments(total, ladybugLaps(set).dots);
     return [];
@@ -393,6 +399,7 @@ function TimerRun({
           else if (picture === "tidy") playClonk();
           else if (picture === "boxes") (boxMoments(total, perBox(set))[nextMoment.current - 1]?.lid ? playKnock : playClonk)();
           else if (picture === "road") (roadMoments(total, roadToyCount(set))[nextMoment.current - 1]?.honk ? playHonk : playClonk)();
+          else if (picture === "blocks") playKnock(520);
           else if (picture === "disc") playPlink(nextMoment.current);
           else playDing();
         }
@@ -444,6 +451,7 @@ function TimerRun({
       else if (picture === "tidy") playClonk();
       else if (picture === "boxes") playKnock();
       else if (picture === "road") playHonk();
+      else if (picture === "blocks") playChime();
       say(lines.end, true);
       // The time is up, plain to see and hear (user feedback, November 2026): children cheer, the picture
       // lights up warmly, then the friendly tune – and the trophy with the end's buttons, nothing rising (user decision).
@@ -483,6 +491,8 @@ function TimerRun({
       else if (picture === "boxes") playHop();
       // The little car's engine hums.
       else if (picture === "road") playEngine();
+      // The blocks still in the jumble give a soft knock.
+      else if (picture === "blocks") playKnock(880);
       else playChimeNote(Math.floor(Math.random() * 8));
     },
     [phase, picture, ripple, glow, endsAt, total, apples],
@@ -606,6 +616,7 @@ export function SceneParts({
       {picture === "tidy" && <TidyScene count={toyCount(set)} total={total} glow={poke} />}
       {picture === "boxes" && <BoxesScene count={perBox(set)} total={total} glow={poke} />}
       {picture === "road" && <RoadScene count={roadToyCount(set)} total={total} glow={poke} />}
+      {picture === "blocks" && <BlocksScene count={blockCount(set)} total={total} glow={poke} />}
       {picture === "clock" && <ClockScene glow={poke} endsAt={startedAt + total} total={total} running={phase === "running"} still={still} />}
       {picture === "flower" && <FlowerScene glow={poke} total={total} />}
       {picture === "sunset" && <SunsetScene glow={poke} />}

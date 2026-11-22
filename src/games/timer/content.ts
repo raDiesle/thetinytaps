@@ -1,5 +1,6 @@
 import type { Localized, Texts } from "@/lib/language";
 import type { TimerPicture, TurnPicture } from "./settings";
+import { BLOCKS_NAME } from "./blocksNames";
 import { BOXES_NAME } from "./boxesNames";
 import { ROAD_NAME } from "./roadNames";
 import { TIDY_NAME } from "./tidyNames";
@@ -58,6 +59,8 @@ export const PICTURES: { id: TimerPicture; emoji: string; name: Texts }[] = [
   { id: "boxes", emoji: "📦", name: BOXES_NAME },
   // The road rug (H-122, 22 November 2026): toys hop off a play rug's road into the box, and the toy car drives on to the next one.
   { id: "road", emoji: "🛣️", name: ROAD_NAME },
+  // The block house (H-125, 22 November 2026), the first timer like a game played by itself: blocks hop out of a jumble into a house.
+  { id: "blocks", emoji: "🧱", name: BLOCKS_NAME },
   {
     id: "train",
     emoji: "🚂",

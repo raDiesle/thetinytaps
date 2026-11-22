@@ -236,7 +236,7 @@ export const SCENARIOS: Scenario[] = [
   // The timer's pictures in their order on its start screen, each running for a while with a tap now and then (the
   // steam, the twinkling, the flame, what is left lighting up), the moon setting and the sun rising, the pizza's slices
   // lifted off, the ladybug crawling round the red disc, the alarm clock's digits ticking, the toy crane carrying toys
-  // into the box, the toys hopping into their five boxes, the toy car driving on as the toys hop off the road rug, in „Abwechseln“ the toy hopping onto the first cushion and the hourglass running, and on the Wippe the
+  // into the box, the toys hopping into their five boxes, the toy car driving on as the toys hop off the road rug, the blocks hopping out of their jumble into the block house, in „Abwechseln“ the toy hopping onto the first cushion and the hourglass running, and on the Wippe the
   // chick stepping along the plank as the seesaw tips slowly. Each card is tapped by its name (its
   // tooltip), so the cards' order and groups may change.
   ...(
@@ -252,6 +252,7 @@ export const SCENARIOS: Scenario[] = [
       ["aufraeumen", "Aufräumen"],
       ["kisten", "Fünf Kisten"],
       ["strassenteppich", "Straßenteppich"],
+      ["kloetzchen", "Klötzchenhaus"],
       ["zug", "Zug zum Bahnhof"],
       ["raupe", "Raupe"],
       ["sonne", "Sonnenaufgang"],

@@ -2433,6 +2433,68 @@
   transform: var(--tm-end);
 }
 
+/* The block house (H-125, blocks.tsx): its blocks stack in a box of their own (`isolation`), so their z-indices never
+   reach past the picture to the end's light. Each moving block lies in a full-size box whose z-index steps from its
+   row in the jumble to its place in the house as it hops (keyframes written for the run). */
+.tm-blocks,
+.tm-blocks-z {
+  position: absolute;
+  inset: 0;
+}
+
+.tm-blocks {
+  isolation: isolate;
+}
+
+.tm-blocks-z {
+  animation: var(--tm-anim) var(--tm-ms) linear both;
+}
+
+.tm-done .tm-blocks-z {
+  animation: none;
+  z-index: var(--tm-z-end);
+}
+
+/* The cursor round the next block's place jumps on as each block lands, and is gone at the end. */
+.tm-done .tm-blocks-cursor {
+  visibility: hidden;
+}
+
+/* Square crumbs spring off a block as it lands: hidden before, spreading and fading after. */
+.tm-blocks-crumbs {
+  opacity: 0;
+  animation: tm-blocks-crumbs 0.7s ease-out var(--tm-at) both;
+}
+
+@keyframes tm-blocks-crumbs {
+  0% {
+    opacity: 0;
+    transform: scale(0.5);
+  }
+  2% {
+    opacity: 1;
+    transform: scale(0.5);
+  }
+  100% {
+    opacity: 0;
+    transform: translateY(-14%) scale(1.3);
+  }
+}
+
+.tm-done .tm-blocks-crumbs {
+  animation: none;
+}
+
+/* The light inside the house goes on at the end. */
+.tm-blocks-light {
+  opacity: 0;
+  transition: opacity 1.2s ease-out;
+}
+
+.tm-done .tm-blocks-light {
+  opacity: 1;
+}
+
 /* The bar along the bottom (`TimeBar`, user request, 22 November 2026): a paper track over nearly the whole width,
    filling from the start at the left to the flag at the right in the picture's own colour, a round marker at its
    front. Fill, way still to go and marker each move by one animation of `transform` as long as the run. Its sizes are
@@ -2522,6 +2584,12 @@
   --tm-bar-a: #ced4da;
   --tm-bar-b: #868e96;
   --tm-bar-flag: #fa5252;
+}
+
+.tm-play[data-picture="blocks"] .tm-bar {
+  --tm-bar-a: #b2f2bb;
+  --tm-bar-b: #5aa84a;
+  --tm-bar-flag: #e2574c;
 }
 
 .tm-play[data-picture="caterpillar"] .tm-bar {

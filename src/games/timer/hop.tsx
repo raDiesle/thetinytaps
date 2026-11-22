@@ -5,7 +5,7 @@ import { Layer } from "./scenes";
 // A toy hopping from the floor into its box (Five Boxes, the road rug): one hop in a high arc, as a child tosses it,
 // landing smaller where it lies in the box. Three small layers inside each other, each on one keyframe rule written for
 // the run: the outer moves it across at an even pace, the middle up and down (rising slower at the top, falling faster,
-// as a thrown thing does), the inner makes it smaller from its foot. While it waits its turn it wiggles a second at a
+// as a thrown thing does), the inner makes it smaller from its foot (and straightens one lying askew, `tilt`). While it waits its turn it wiggles a second at a
 // time (`wait`), so the picture shows every second that something is about to happen (H-63).
 
 /** One hop: where the toy's foot is before and after (stage units), how big it lies there, and when it goes and lands. */
@@ -24,6 +24,8 @@ export interface Hop {
   peak: number;
   /** When it starts waiting its turn, wiggling once a second until it goes; none for a toy that goes at once. */
   waitFrom?: number;
+  /** How far it lies askew before it goes (degrees, from its foot), straightened during the hop; none for upright. */
+  tilt?: number;
 }
 
 /** The three transforms a hop ends on, as percentages of the toy's own box `size`: across, up or down, and its size. */
@@ -51,9 +53,10 @@ export function hopKeyframes(name: string, total: number, hop: Hop, size: number
     { at: mid, transform: top, ease: "cubic-bezier(0.6, 0, 0.8, 0.4)" },
     { at: hop.land, transform: end.y },
   ];
+  const lying = hop.tilt ? `scale(1) rotate(${hop.tilt}deg)` : "scale(1)";
   const size_: Frame[] = [
-    { at: 0, transform: "scale(1)" },
-    { at: hop.start, transform: "scale(1)" },
+    { at: 0, transform: lying },
+    { at: hop.start, transform: lying },
     { at: hop.land, transform: end.s },
   ];
   return [
