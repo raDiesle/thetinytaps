@@ -30,11 +30,10 @@ wants milk, is angry and cries, held by Mama and Papa; every day gets easier –
 
 ## Rules
 
-- **Not published until its pictures are made**: players don't see it (the book's choice leaves out a story without a
-  picture, `ChapterBook`'s `withPictures`), and `/abstillen/abschied/` stays in `WAITING_PATHS` (`seo.ts`: out of the search
-  pages, `noindex`) with its search texts waiting. The twelve pictures wait in the picture queue for a Claude cloud session (`/paid-queue`); their `after` says
-  what to do then (MADE, WAITING_PATHS, naming the story in the search texts of `/abstillen/` and in `MILK_CHAIN_BLURB`,
-  the language row, this file, `bun run previews /abstillen/`).
+- **Published since its twelve pictures were made** (Claude cloud session, 22 November 2026; all on `MADE`): the book's
+  choice shows it, `/abstillen/abschied/` is a search page, and the search texts of `/abstillen/` and `MILK_CHAIN_BLURB`
+  name it. A page added later waits like the first twelve did: its picture in the queue (not on `MADE`), the page left
+  out for players until it is made (`ChapterBook`'s `withPictures`).
 - **Written English first, translated into all seven languages** (`<language>.ts`, checked in `goodbyeMilk.test.ts`:
   every chapter and page, Tapsi in each language's script, the breast named, no Latin letters in Russian, Chinese, Hindi
   or Arabic). A changed page changes its line in every language in the same commit. Tapsi's grammar follows the other
@@ -51,4 +50,8 @@ wants milk, is angry and cries, held by Mama and Papa; every day gets easier –
   the living room and the kitchen are drawn from the Milchkette's „kette-fragen-nicht“ and „kette-essen“, Tapsi's room
   from the Schnullerfee's „fee-drei“ – never from a Milchkette picture of Tapsi's room, whose chain of milk drops would
   come back (checked). Count the foxes and the paper hearts on every picture (three, then two on the shelf and one in
-  Tapsi's paw, then none) and look for a second cup or cake.
+  Tapsi's paw, then none) and look for a second cup or cake. Lessons of the first twelve (22 November 2026): with three
+  at the kitchen table Gemini drew Mama and Papa as one fox with the flower and the glasses – a page with both grown-ups
+  says they are two separate figures and what each has and has not (flower and no glasses, glasses and no flower); „holds
+  up three fingers“ came back twice as a V of two – name the fingers (index, middle and ring finger up, thumb and little
+  finger folded); and a character the reference shows on the rug stays there however often the prompt says „on the sofa“.

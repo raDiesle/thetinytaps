@@ -25,15 +25,15 @@ export const MILK_CHAIN_BOOK: Localized = {
   ar: "الفطام",
 };
 
-/** Its line for grown-ups: the book's two stories. */
+/** Its line for grown-ups: the book's stories. */
 export const MILK_CHAIN_BLURB: Localized = {
-  de: "Ganz oder nur nachts, in Kapiteln",
-  en: "Completely or only at night, in chapters",
-  zh: "完全断奶或只在夜里，分章节",
-  hi: "पूरी तरह या सिर्फ़ रात में, अध्यायों में",
-  es: "Del todo o solo de noche, por capítulos",
-  ar: "كليًا أو في الليل فقط، في فصول",
-  ru: "Полностью или только ночью, по главам",
+  de: "Ganz, nur nachts oder mit Abschiedsfest",
+  en: "Fully, by night or with a goodbye party",
+  zh: "完全断奶、只在夜里或办告别派对",
+  hi: "पूरी तरह, सिर्फ़ रात में या विदाई दावत से",
+  es: "Del todo, de noche o con fiesta de adiós",
+  ar: "كليًا، أو في الليل فقط، أو مع حفلة وداع",
+  ru: "Совсем, ночью или с прощальным праздником",
 };
 
 /**
