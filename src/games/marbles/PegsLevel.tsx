@@ -1,6 +1,6 @@
 import { useEffect, useMemo, useRef, type PointerEvent, type ReactNode } from "react";
-import { playPlink, playPop } from "@/lib/sfx";
-import { loadRealSounds, playBark, playCroak, playMeow, playMoo, playOink, playQuack } from "@/lib/realSounds";
+import { playBoing, playKnock, playPlink, playPop, playTrill } from "@/lib/sfx";
+import { loadRealSounds, playBark, playBuzz, playCroak, playMeow, playMoo, playOink, playQuack } from "@/lib/realSounds";
 import { useTimers } from "@/lib/timers";
 import { cameraPoint, gliding, SETTLE_S, useAnyKey, useFrames, useLevelName, VIEW_H, VIEW_W, wobble, worldHint, type LevelProps } from "./level";
 import { TapHint } from "@/components/TapHint";
@@ -21,12 +21,20 @@ import {
   fall,
   freeSlot,
   keyDropX,
+  LADYBUG,
+  type Movers,
+  moversMoving,
   newFalling,
   PEG_R,
   PEG_ROWS,
   PEGS,
+  PILE_ROWS,
   PILE_SLOTS,
   SPAWN_Y,
+  STAR,
+  STAR_ARMS,
+  stepMovers,
+  stillMovers,
 } from "./pegs";
 import { DARK_WOOD, INK, MID_WOOD, Sparkles, WOOD } from "./scenery";
 import "./pegs.css";
@@ -34,9 +42,28 @@ import "./pegs.css";
 /** At most this many marbles in the air; a tap beyond it rings the top nails instead. */
 const MAX_FALLING = 12;
 /** After this many marbles have landed, the level ends. */
-const DONE_AFTER = 10;
-/** The short moment between the last marble landing and the party. */
-const DONE_DELAY_MS = 1500;
+const DONE_AFTER = 20;
+/** Between the last marble landing and the party: every animal does its trick once more, one after the other. */
+const DONE_DELAY_MS = 3000;
+/** How far apart the animals start their tricks at the end. */
+const FINALE_STEP_MS = 280;
+/** Once this many marbles have landed, the ladybug flies in and settles on its vine. */
+const BUG_AFTER = 4;
+/** How long the ladybug's flight in takes. */
+const BUG_FLIGHT_MS = 1800;
+/** The marble in a bin that makes its animal do its trick, and the one that fills the first row, so it climbs onto its pile. */
+const TRICK_AT = 3;
+const CLIMB_AT = PILE_ROWS[0];
+/** How long a trick takes, and the climb onto the pile. */
+const TRICK_MS = 1300;
+const CLIMB_MS = 500;
+/** How high an animal stands on its pile, and how far it is lifted while it climbs. */
+const CLIMB_H = 2 * BALL_R;
+/** The star and the ladybug knock at most this often. */
+const KNOCK_GAP_MS = 120;
+const BOING_GAP_MS = 220;
+/** How long the star's arms and the ladybug glow after a marble hit them. */
+const MOVER_GLOW_MS = 400;
 /** A marble still falling after this long (it never should) goes straight into the bin below it. */
 const STUCK_S = 8;
 /** Nails ring at most this often, so twelve marbles at once don't turn into noise. */
@@ -71,19 +98,32 @@ interface Lying {
 /** What one animal looks like when it is happy (`happy`) and how far its tail, ears or wings swing (`wag`, degrees). */
 type Draw = (p: { happy: boolean; wag: number }) => ReactNode;
 
-/** An animal waiting in a bin: its drawing, its sound and how high it hops for joy. */
+/**
+ * What an animal does when its pile has grown to `TRICK_AT` marbles (and all
+ * together at the end), each its own: the frog's somersault, the dog chasing
+ * its tail round, the cat's long stretch, the pig rolling over on the floor,
+ * the duck fluttering up and the cow's slow sway.
+ */
+type Trick = "flip" | "spin" | "stretch" | "roll" | "flutter" | "sway";
+
+/** An animal waiting in a bin: its drawing, its sound, how high it hops for joy, and its trick. */
 interface Animal {
   draw: Draw;
   sound: () => void;
   hop: number;
+  trick: Trick;
 }
 
 /**
  * „Nagelbrett“ (K-13): an upright wooden board full of nails. Wherever the
  * child taps (only the x counts), a marble appears at the top above it and
- * falls, plinking from nail to nail – higher rows, higher notes – into one of
- * five bins, where an animal waits and hops with joy. After ten marbles the
- * level ends.
+ * falls, plinking from nail to nail – higher rows, higher notes – past the
+ * wooden star in the middle, which it knocks round, into one of five bins,
+ * where an animal waits and hops with joy. The board changes as it fills: a
+ * ladybug flies in and crawls along the vine over the bins, bouncing marbles
+ * off its back; an animal whose pile grows does its own trick and then climbs
+ * onto its pile. After twenty marbles every animal does its trick once more
+ * and the level ends.
  */
 export function PegsLevel({ sound, onDone, onGoal }: LevelProps) {
   const label = useLevelName("pegs");
@@ -104,10 +144,45 @@ export function PegsLevel({ sound, onDone, onGoal }: LevelProps) {
   /** Sparkles where a marble found its bin full. */
   const pops = useRef<{ x: number; y: number; at: number }[]>([]);
   const landed = useRef(0);
+  /** The star's turn and the ladybug, and when the ladybug set off to fly in (ms; Infinity: not yet). */
+  const movers = useRef<Movers>(stillMovers());
+  const bugFlight = useRef(Infinity);
+  /** When the star and the ladybug were last hit and knocked (ms). */
+  const starHit = useRef(-Infinity);
+  const bugHit = useRef(-Infinity);
+  const lastKnock = useRef(-Infinity);
+  const lastBoing = useRef(-Infinity);
+  /** Marbles landed in each bin; when each animal last started its trick, and when it climbed onto its pile (ms). */
+  const inBin = useRef(animals.map(() => 0));
+  const trickAt = useRef(animals.map(() => -Infinity));
+  const climbAt = useRef(animals.map(() => Infinity));
   // The end is dropped when the level is left before it.
   const { later } = useTimers();
 
-  useEffect(() => loadRealSounds([playBark, playCroak, playMeow, playMoo, playOink, playQuack]), []);
+  useEffect(() => loadRealSounds([playBark, playBuzz, playCroak, playMeow, playMoo, playOink, playQuack]), []);
+
+  /** The star or the ladybug was hit: it glows, the star knocks like wood, the ladybug's shell boings. */
+  const knock = (part: "star" | "bug") => {
+    const t = now.current;
+    if (part === "star") {
+      starHit.current = t;
+      if (t - lastKnock.current < KNOCK_GAP_MS) return;
+      lastKnock.current = t;
+      sound(() => playKnock(1100));
+    } else {
+      bugHit.current = t;
+      if (t - lastBoing.current < BOING_GAP_MS) return;
+      lastBoing.current = t;
+      sound(playBoing);
+    }
+  };
+
+  /** Animal `i` does its trick, calling out as it starts. */
+  const doTrick = (i: number) => {
+    trickAt.current[i] = now.current;
+    lastCall.current[i] = now.current;
+    sound(animals[i].sound);
+  };
 
   const plink = (peg: number) => {
     pegHit.current[peg] = now.current;
@@ -123,14 +198,26 @@ export function PegsLevel({ sound, onDone, onGoal }: LevelProps) {
     else pops.current.push({ x: d.x, y: d.y, at: now.current });
     const t = now.current;
     joy.current[d.bin] = t;
-    if (t - lastCall.current[d.bin] > ANIMAL_GAP_MS) {
+    const count = ++inBin.current[d.bin];
+    // The pile has grown: the animal does its trick, and with the first row full it climbs on top.
+    if (count === TRICK_AT) doTrick(d.bin);
+    else if (t - lastCall.current[d.bin] > ANIMAL_GAP_MS) {
       lastCall.current[d.bin] = t;
       sound(animals[d.bin].sound);
     }
+    if (count === CLIMB_AT) climbAt.current[d.bin] = t;
     landed.current++;
     // The first marble in a bin wins the level's trophy.
     if (landed.current === 1) onGoal?.();
-    if (landed.current === DONE_AFTER) later(onDone, DONE_DELAY_MS);
+    if (landed.current === BUG_AFTER) {
+      bugFlight.current = t;
+      sound(playBuzz);
+    }
+    if (landed.current === DONE_AFTER) {
+      animals.forEach((_, i) => later(() => doTrick(i), 400 + i * FINALE_STEP_MS));
+      later(() => sound(playTrill), 400 + animals.length * FINALE_STEP_MS);
+      later(onDone, DONE_DELAY_MS);
+    }
   };
 
   /** Once below the dividers' tops, a marble picks its bin and the place in it it will lie. */
@@ -142,10 +229,18 @@ export function PegsLevel({ sound, onDone, onGoal }: LevelProps) {
 
   useFrames((dt, t) => {
     now.current = t;
+    const m = movers.current;
+    const busy = falling.current.length > 0;
+    // The ladybug lands on its vine at the end of its flight; from then on marbles bounce off it.
+    if (!m.bug && t - bugFlight.current >= BUG_FLIGHT_MS) {
+      m.bug = true;
+      sound(() => playKnock(1500));
+    }
+    stepMovers(m, dt, busy);
     const still: Drop[] = [];
     for (const d of falling.current) {
       const x0 = d.x;
-      fall(d, dt, Math.random, plink);
+      fall(d, dt, Math.random, plink, m, busy, knock);
       d.spin += (d.x - x0) / BALL_R;
       if (d.bin < 0 && (d.y > BIN_TOP + BALL_R || d.age > STUCK_S)) enterBin(d);
       if (d.bin >= 0) {
@@ -169,9 +264,12 @@ export function PegsLevel({ sound, onDone, onGoal }: LevelProps) {
       m.spin += step / BALL_R;
     }
     pops.current = pops.current.filter((p) => t - p.at < 3000);
-    // Still once every marble lies and every nail's glow and animal's hop is over.
-    const lastHit = Math.max(lastPlink.current, ...pegHit.current, ...joy.current);
-    return falling.current.length > 0 || rolling || pops.current.length > 0 || t - lastHit < SETTLE_S * 1000;
+    // Still once every marble lies, the star stands, the ladybug sits, and every glow, hop, trick and climb is over.
+    const during = (since: number, ms: number) => since >= 0 && since < ms;
+    const flying = during(t - bugFlight.current, BUG_FLIGHT_MS);
+    const climbing = climbAt.current.some((at) => during(t - at, CLIMB_MS));
+    const lastHit = Math.max(lastPlink.current, ...pegHit.current, ...joy.current, ...trickAt.current, starHit.current, bugHit.current);
+    return falling.current.length > 0 || rolling || pops.current.length > 0 || moversMoving(m, busy) || flying || climbing || t - lastHit < SETTLE_S * 1000;
   });
 
   /** One marble from the top, above `x`; with too many in the air, the top nails above `x` ring instead. */
@@ -202,16 +300,25 @@ export function PegsLevel({ sound, onDone, onGoal }: LevelProps) {
     <div className="marble-level pegs-level" ref={box} onPointerDown={onPointerDown}>
       <svg ref={svg} className="marble-svg" viewBox={`0 0 ${VIEW_W} ${VIEW_H}`} preserveAspectRatio="xMidYMid meet" aria-label={label}>
         <Board />
+        <Vine />
         {PEGS.map((p, i) => (
           <Nail key={i} x={p.x} y={p.y} color={BAR_COLORS[p.row % BAR_COLORS.length]} age={(t - pegHit.current[i]) / 1000} />
         ))}
+        <Star angle={movers.current.starAngle} glow={(t - starHit.current) / MOVER_GLOW_MS} />
         {animals.map((a, i) => {
           const age = (t - joy.current[i]) / 1000;
-          const hop = age >= 0 && age < 0.5 ? a.hop * Math.sin((Math.PI * age) / 0.5) : 0;
-          const squash = age >= 0.5 && age < 1.5 ? 0.1 * Math.exp(-(age - 0.5) * 7) * Math.cos((age - 0.5) * 28) : 0;
+          const trick = (t - trickAt.current[i]) / TRICK_MS;
+          const inTrick = trick >= 0 && trick < 1;
+          // A trick takes the place of the hop for joy.
+          const hop = !inTrick && age >= 0 && age < 0.5 ? a.hop * Math.sin((Math.PI * age) / 0.5) : 0;
+          const squash = !inTrick && age >= 0.5 && age < 1.5 ? 0.1 * Math.exp(-(age - 0.5) * 7) * Math.cos((age - 0.5) * 28) : 0;
+          const climb = Math.max(0, Math.min(1, (t - climbAt.current[i]) / CLIMB_MS));
+          const up = CLIMB_H * climb + 30 * Math.sin(Math.PI * climb);
           return (
-            <g key={i} transform={`translate(${binCenter(i)} ${FLOOR - hop}) scale(${1 + squash} ${1 - squash})`}>
-              {a.draw({ happy: age >= 0 && age < 1.4, wag: wobble(age, 28, 22, 2.5) })}
+            <g key={i} transform={`translate(${binCenter(i)} ${FLOOR - hop - up}) scale(${1 + squash} ${1 - squash})`}>
+              <g transform={inTrick ? trickTransform(a.trick, trick) : undefined}>
+                {a.draw({ happy: inTrick || (age >= 0 && age < 1.4), wag: inTrick ? 26 * Math.sin(trick * 18) : wobble(age, 28, 22, 2.5) })}
+              </g>
             </g>
           );
         })}
@@ -234,6 +341,9 @@ export function PegsLevel({ sound, onDone, onGoal }: LevelProps) {
         {pops.current.map((p, i) => (
           <Sparkles key={i} x={p.x} y={p.y} age={(t - p.at) / 1000} n={8} spread={90} />
         ))}
+        {(movers.current.bug || t >= bugFlight.current) && (
+          <Ladybug {...bugPose(movers.current, (t - bugFlight.current) / BUG_FLIGHT_MS)} glow={(t - bugHit.current) / MOVER_GLOW_MS} />
+        )}
         {falling.current.map((d) => {
           const s = Math.min(1, d.age / SPAWN_S);
           return (
@@ -257,6 +367,132 @@ export function PegsLevel({ sound, onDone, onGoal }: LevelProps) {
 
 /** The whole board, as the svg shows it (`preserveAspectRatio` meet). */
 const PICTURE = { x: 0, y: 0, w: VIEW_W, h: VIEW_H };
+
+const easeInOut = (k: number) => (k < 0.5 ? 2 * k * k : 1 - 2 * (1 - k) * (1 - k));
+
+/** An animal's trick `k` of the way through (0 to 1), as a transform of its drawing (feet at 0, 0, about 170 tall). */
+function trickTransform(trick: Trick, k: number) {
+  const up = Math.sin(Math.PI * k);
+  switch (trick) {
+    case "flip":
+      return `translate(0 ${-170 * up}) rotate(${-360 * easeInOut(k)} 0 -80)`;
+    case "spin":
+      return `translate(0 ${-24 * Math.abs(Math.sin(4 * Math.PI * k))}) scale(${Math.cos(4 * Math.PI * k)} 1)`;
+    case "stretch":
+      return `scale(${1 - 0.1 * up} ${1 + 0.28 * up})`;
+    case "roll":
+      return `translate(${40 * up} 0) rotate(${360 * easeInOut(k)} 0 -60)`;
+    case "flutter":
+      return `translate(0 ${-110 * up}) rotate(${10 * Math.sin(k * 30) * up} 0 -60)`;
+    case "sway":
+      return `rotate(${14 * Math.sin(4 * Math.PI * k) * (1 - k)} 0 0) translate(0 ${-10 * Math.abs(Math.sin(4 * Math.PI * k))})`;
+  }
+}
+
+/** Where the ladybug start its flight in: over the frame's top right corner. */
+const BUG_FROM = { x: BOARD.right + 70, y: 30 };
+
+/** Where the ladybug is and how it looks: crawling on its vine, or `k` of the way through its flight in. */
+function bugPose(m: Movers, k: number) {
+  if (m.bug) return { x: m.bugX, y: LADYBUG.y, dir: m.bugDir, wings: 0, step: m.bugX / 6 };
+  const e = easeInOut(Math.max(0, Math.min(1, k)));
+  const to = { x: m.bugX, y: LADYBUG.y };
+  const via = { x: 1250, y: 520 };
+  const x = (1 - e) * (1 - e) * BUG_FROM.x + 2 * e * (1 - e) * via.x + e * e * to.x;
+  const y = (1 - e) * (1 - e) * BUG_FROM.y + 2 * e * (1 - e) * via.y + e * e * to.y;
+  return { x, y: y - 40 * Math.sin(k * 14) * (1 - e), dir: -1 as const, wings: k < 0.93 ? 1 : 0, step: 0 };
+}
+
+/**
+ * The ladybug: a red shell with black dots, a black head looking the way it
+ * crawls and six little legs stepping; flying, its shell halves open and its
+ * wings whirr. It glows for a moment when a marble bounces off it.
+ */
+function Ladybug({ x, y, dir, wings, step, glow }: { x: number; y: number; dir: 1 | -1; wings: number; step: number; glow: number }) {
+  const r = LADYBUG.r;
+  const lit = glow >= 0 && glow < 1;
+  const flap = wings ? 0.6 + 0.4 * Math.sin(step + x * 0.9) : 0;
+  return (
+    <g transform={`translate(${x} ${y}) scale(${dir} 1)`} {...LINE} strokeWidth="2.5">
+      {lit && <circle r={r + 8 + 14 * glow} fill="none" stroke="#ff5d73" strokeWidth={6 * (1 - glow)} opacity={1 - glow} />}
+      {[-10, 0, 10].map((lx, i) => (
+        <path key={lx} d={`M${lx} ${r - 6} l${-4 + 4 * Math.sin(step + i * 2)} 9`} fill="none" />
+      ))}
+      {wings > 0 &&
+        [-1, 1].map((side) => (
+          <ellipse
+            key={side}
+            cx={-6}
+            cy={-r * 0.5}
+            rx={22 * flap}
+            ry={10}
+            transform={`rotate(${side * 35 - 20})`}
+            fill="#e9f6ff"
+            opacity="0.8"
+            strokeWidth="1.5"
+          />
+        ))}
+      <circle cx={r * 0.85} cy={2} r={r * 0.5} fill={INK} />
+      <circle cx={r * 1.05} cy={-1} r={2.2} fill="#fff" stroke="none" />
+      <g transform={wings ? `rotate(-12 ${r} 0)` : undefined}>
+        <circle r={r} fill={lit && glow < 0.5 ? "#ff8a9b" : "#e63946"} />
+        <path d={`M${r * 0.75} ${-r * 0.65} L${-r} 0`} fill="none" strokeWidth="2" />
+        {[
+          [-6, -9],
+          [5, 8],
+          [-9, 6],
+          [6, -6],
+        ].map(([dx, dy]) => (
+          <circle key={`${dx} ${dy}`} cx={dx} cy={dy} r="3.6" fill={INK} stroke="none" />
+        ))}
+        <circle cx={-5} cy={-r * 0.55} r="3" fill="#fff" opacity="0.7" stroke="none" />
+      </g>
+    </g>
+  );
+}
+
+/** The vine painted along the board above the bins, with little leaves: where the ladybug crawls. */
+function Vine() {
+  const y = LADYBUG.y + LADYBUG.r + 3;
+  const { left, right } = BOARD;
+  const d = `M${left} ${y} ${Array.from({ length: 10 }, (_, i) => `q${(right - left) / 20} ${i % 2 ? 7 : -7} ${(right - left) / 10} 0`).join(" ")}`;
+  return (
+    <g>
+      <path d={d} fill="none" stroke="#3f8f2a" strokeWidth="6" strokeLinecap="round" />
+      {Array.from({ length: 9 }, (_, i) => {
+        const lx = left + ((right - left) * (i + 0.5)) / 9 + 30;
+        return <path key={i} d={`M${lx} ${y} q10 ${i % 2 ? 14 : -14} 24 ${i % 2 ? 8 : -8} q-14 ${i % 2 ? -4 : 4} -24 ${i % 2 ? -8 : 8} z`} fill="#6cc24a" />;
+      })}
+    </g>
+  );
+}
+
+/** The wooden star in the middle of the board: five rounded arms in the rainbow's colours round a brass axle, turned by `angle`; it glows for a moment when hit. */
+function Star({ angle, glow }: { angle: number; glow: number }) {
+  const lit = glow >= 0 && glow < 1;
+  return (
+    <g transform={`translate(${STAR.x} ${STAR.y})`}>
+      <circle cx="3" cy="5" r={STAR.r * 0.35} fill="#0002" />
+      {lit && <circle r={STAR.r + 8 + 18 * glow} fill="none" stroke="#ffd23f" strokeWidth={8 * (1 - glow)} opacity={1 - glow} />}
+      <g transform={`rotate(${(angle * 180) / Math.PI})`}>
+        {Array.from({ length: STAR_ARMS }, (_, i) => (
+          <g key={i} transform={`rotate(${(i * 360) / STAR_ARMS})`}>
+            <path
+              d={`M-12 0 L-10 ${-STAR.r + 12} Q0 ${-STAR.r - 4} 10 ${-STAR.r + 12} L12 0 Z`}
+              fill={BAR_COLORS[(i * 2) % BAR_COLORS.length]}
+              stroke={INK}
+              strokeWidth="3"
+              strokeLinejoin="round"
+            />
+            <circle cy={-STAR.r + 14} r="4" fill="#fff" opacity={lit ? 0.95 : 0.6} />
+          </g>
+        ))}
+      </g>
+      <circle r="15" fill="#f4c542" stroke={INK} strokeWidth="3" />
+      <circle r="5" fill={DARK_WOOD} />
+    </g>
+  );
+}
 
 /** A nail: a brass head that glows in its row's colour for a moment after a marble hit it. */
 function Nail({ x, y, color, age }: { x: number; y: number; color: string; age: number }) {
@@ -327,12 +563,12 @@ function Frame() {
 /** Five of the six animals, in a new order every round. */
 function pickAnimals(n: number): Animal[] {
   const all: Animal[] = [
-    { draw: Frog, sound: playCroak, hop: 85 },
-    { draw: Cow, sound: playMoo, hop: 40 },
-    { draw: Dog, sound: playBark, hop: 55 },
-    { draw: Duck, sound: playQuack, hop: 50 },
-    { draw: Cat, sound: playMeow, hop: 60 },
-    { draw: Pig, sound: playOink, hop: 45 },
+    { draw: Frog, sound: playCroak, hop: 85, trick: "flip" },
+    { draw: Cow, sound: playMoo, hop: 40, trick: "sway" },
+    { draw: Dog, sound: playBark, hop: 55, trick: "spin" },
+    { draw: Duck, sound: playQuack, hop: 50, trick: "flutter" },
+    { draw: Cat, sound: playMeow, hop: 60, trick: "stretch" },
+    { draw: Pig, sound: playOink, hop: 45, trick: "roll" },
   ];
   for (let i = all.length - 1; i > 0; i--) {
     const j = Math.floor(Math.random() * (i + 1));

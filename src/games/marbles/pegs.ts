@@ -35,8 +35,30 @@ export interface Peg extends Pt {
 }
 
 /**
+ * The wooden star in the middle of the board, turning on its axle: a marble
+ * that hits one of its five arms knocks it round, and a turning star flicks
+ * the marble off to the side. For the marbles it is a round thing as big as
+ * its arms reach (`r`); the nails that would stand in its way are left out.
+ */
+export const STAR = { x: 800, y: PEG_TOP + 3 * PEG_ROW_STEP, r: 58 } as const;
+/** How many arms the star has. */
+export const STAR_ARMS = 5;
+
+/**
+ * The ladybug that comes once the board has started to fill: it crawls to and
+ * fro along a painted vine below the last row of nails, over the bins' tops,
+ * and a marble landing on its back bounces off with a „boing“ – often into
+ * the next bin. Round for the marbles; `r` is its shell.
+ */
+export const LADYBUG = { y: 611, r: 20, left: BOARD.left + 60, right: BOARD.right - 60, speed: 130 } as const;
+
+/** Whether a nail at `p` would stand too close to the star for a marble to pass between. */
+const besideStar = (p: Pt) => Math.hypot(p.x - STAR.x, p.y - STAR.y) < STAR.r + 2 * BALL_R + PEG_R + 8;
+
+/**
  * The nails, row by row. Rows with an odd number also get a nail in each side
- * wall, so a marble that slides down along the wall is pushed back in.
+ * wall, so a marble that slides down along the wall is pushed back in. Round
+ * the star in the middle there are none.
  */
 export const PEGS: Peg[] = Array.from({ length: PEG_ROWS }, (_, row) => {
   const y = PEG_TOP + row * PEG_ROW_STEP;
@@ -44,7 +66,51 @@ export const PEGS: Peg[] = Array.from({ length: PEG_ROWS }, (_, row) => {
   return row % 2 === 0
     ? Array.from({ length: count }, (_, k) => ({ x: BOARD.left + PEG_STEP * (k + 0.5), y, row }))
     : Array.from({ length: count + 1 }, (_, k) => ({ x: BOARD.left + PEG_STEP * k, y, row }));
-}).flat();
+})
+  .flat()
+  .filter((p) => !besideStar(p));
+
+/** What moves on the board besides the marbles: the star's turn and the ladybug on its vine. */
+export interface Movers {
+  /** The star's angle (radians) and how fast it turns (radians a second, + clockwise in the picture). */
+  starAngle: number;
+  starSpin: number;
+  /** Whether the ladybug is on its vine yet, where it is, and which way it crawls (+1 right, -1 left). */
+  bug: boolean;
+  bugX: number;
+  bugDir: 1 | -1;
+}
+
+/** The board as it stands before the first tap: the star still, no ladybug yet. */
+export const stillMovers = (): Movers => ({ starAngle: 0, starSpin: 0, bug: false, bugX: (LADYBUG.left + LADYBUG.right) / 2, bugDir: 1 });
+
+/** How fast the star slows down by itself, per second. */
+const STAR_FRICTION = 1.1;
+/** The star never turns faster than this, however many marbles hit it. */
+const STAR_MAX_SPIN = 9;
+
+/**
+ * Moves the star and the ladybug on by `dt` seconds. The ladybug crawls only
+ * while marbles fall (`busy`), so the board is still again once they all lie.
+ */
+export function stepMovers(m: Movers, dt: number, busy: boolean) {
+  m.starAngle += m.starSpin * dt;
+  m.starSpin *= Math.exp(-dt * STAR_FRICTION);
+  if (Math.abs(m.starSpin) < 0.05) m.starSpin = 0;
+  if (m.bug && busy) {
+    m.bugX += m.bugDir * LADYBUG.speed * dt;
+    if (m.bugX > LADYBUG.right) {
+      m.bugX = LADYBUG.right;
+      m.bugDir = -1;
+    } else if (m.bugX < LADYBUG.left) {
+      m.bugX = LADYBUG.left;
+      m.bugDir = 1;
+    }
+  }
+}
+
+/** Whether the star or the ladybug is moving (the level draws on while they do). */
+export const moversMoving = (m: Movers, busy: boolean) => m.starSpin !== 0 || (m.bug && busy);
 
 /** The dividers between the bins: x of each, running from `BIN_TOP` to the floor. */
 export const DIVIDERS = Array.from({ length: BINS - 1 }, (_, j) => BOARD.left + BIN_W * (j + 1));
@@ -141,11 +207,51 @@ function bounceOff(b: Falling, c: Pt, r: number, bounce: number, random: () => n
   return -vn;
 }
 
+/** A marble hit the star or the ladybug, this hard. */
+export type OnMover = (part: "star" | "bug", speed: number) => void;
+
+/** The star: bounce off its round reach, turn it by the push along its rim, and let a turning star carry the marble along. */
+function hitStar(b: Falling, m: Movers, random: () => number) {
+  const vx = b.vx;
+  const vy = b.vy;
+  const hit = bounceOff(b, STAR, STAR.r, 0.35, random);
+  if (hit === 0) return 0;
+  // Along the rim, clockwise in the picture (y points down).
+  const reach = STAR.r + BALL_R;
+  const nx = (b.x - STAR.x) / reach;
+  const ny = (b.y - STAR.y) / reach;
+  const along = vx * -ny + vy * nx;
+  m.starSpin = Math.max(-STAR_MAX_SPIN, Math.min(STAR_MAX_SPIN, m.starSpin + (along / STAR.r) * 0.6));
+  const rim = m.starSpin * STAR.r * 0.35;
+  b.vx += -ny * rim;
+  b.vy += nx * rim;
+  return hit;
+}
+
+/** The ladybug: bounce off its shell as it crawls, with a spring in it. */
+function hitBug(b: Falling, m: Movers, busy: boolean, random: () => number) {
+  const bugV = busy ? m.bugDir * LADYBUG.speed : 0;
+  b.vx -= bugV;
+  const hit = bounceOff(b, { x: m.bugX, y: LADYBUG.y }, LADYBUG.r, 0.75, random);
+  b.vx += bugV;
+  return hit;
+}
+
 /**
- * Moves a falling marble on by `dt` seconds: gravity, the nails, the side walls
- * and the dividers. `onPeg` hears each nail that rings, with how hard it was hit.
+ * Moves a falling marble on by `dt` seconds: gravity, the nails, the star and
+ * the ladybug (`movers` as they stand; `busy` while the ladybug crawls), the
+ * side walls and the dividers. `onPeg` hears each nail that rings, with how
+ * hard it was hit, and `onMover` each knock on the star or the ladybug.
  */
-export function fall(b: Falling, dt: number, random: () => number, onPeg: (peg: number, speed: number) => void) {
+export function fall(
+  b: Falling,
+  dt: number,
+  random: () => number,
+  onPeg: (peg: number, speed: number) => void,
+  movers?: Movers,
+  busy = true,
+  onMover?: OnMover,
+) {
   const steps = Math.max(1, Math.ceil(dt / SUBSTEP));
   const h = dt / steps;
   for (let s = 0; s < steps; s++) {
@@ -170,6 +276,14 @@ export function fall(b: Falling, dt: number, random: () => number, onPeg: (peg: 
           b.lastPeg = i;
           b.lastPegAt = b.age;
         }
+      }
+    }
+    if (movers) {
+      const star = hitStar(b, movers, random);
+      if (star > RING_SPEED) onMover?.("star", star);
+      if (movers.bug) {
+        const bug = hitBug(b, movers, busy, random);
+        if (bug > RING_SPEED) onMover?.("bug", bug);
       }
     }
     // The dividers: a round top, then a straight wall down to the floor.
