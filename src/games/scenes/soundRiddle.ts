@@ -2,14 +2,30 @@ import type { EnglishFirst } from "@/lib/language";
 import type { Scene, SceneSound } from "./types";
 
 // „Geräusch-Rätsel“ (idea B-02): only a sound is played – a dog barking, a digger's engine – and the child finds who
-// made it. Written English first (root CLAUDE.md, Language), so its texts stand here, the part of the language status
-// that has only English so far; the other modes' texts are in phrases.ts.
+// made it. Written English first (root CLAUDE.md, Language) and translated into every app language on 22 November 2026;
+// its texts stand here, a part of its own in the language status, while the other modes' texts are in phrases.ts.
 
 /** The mode's label in the row above the pictures on `/bilder/`; short, so all modes fit in one row at 844 px. */
-export const SOUND_MODE_LABEL: EnglishFirst = { en: "🔊 Sounds" };
+export const SOUND_MODE_LABEL: EnglishFirst = {
+  en: "🔊 Sounds",
+  de: "🔊 Geräusche",
+  zh: "🔊 听声音",
+  hi: "🔊 आवाज़ें",
+  es: "🔊 Sonidos",
+  ar: "🔊 أصوات",
+  ru: "🔊 Звуки",
+};
 
 /** The question, only read out (the bubble shows a loudspeaker and nothing to read). */
-export const SOUND_QUESTION: EnglishFirst = { en: "Who makes this sound?" };
+export const SOUND_QUESTION: EnglishFirst = {
+  en: "Who makes this sound?",
+  de: "Wer macht dieses Geräusch?",
+  zh: "这是谁的声音？",
+  hi: "यह आवाज़ किसकी है?",
+  es: "¿Quién hace este sonido?",
+  ar: "صوتُ مَن هذا؟",
+  ru: "Чей это звук?",
+};
 
 /**
  * The sounds asked about: those a small child knows by ear, played by items that make that very sound themselves. A

@@ -29,8 +29,8 @@ wakes up like in the torch's light (moves, sounds, is counted), so the picture e
 
 ## Geräusch-Rätsel (idea B-02)
 
-Mode `sound`, „🔊 Sounds“ in the row (English first, its texts in `soundRiddle.ts`, a part of its own in
-`languageStatus.ts`). Only a sound plays – a dog barks, a digger rumbles – and the child taps who made it. The bubble at
+Mode `sound`, „🔊 Sounds“ in the row (English first and in every app language, „🔊 Geräusche“ in German, its texts in
+`soundRiddle.ts`, a part of its own in `languageStatus.ts`). Only a sound plays – a dog barks, a digger rumbles – and the child taps who made it. The bubble at
 the top shows a loudspeaker and nothing to read; a tap on it plays the sound again, after `REPEAT_PAUSE_MS` (meanwhile
 it only ripples), and so does a key where the key badges are off. Every item with that sound is right (`needed: 1`);
 after `HINT_AFTER_MS` or two misses a ring marks one and the sound comes once more.

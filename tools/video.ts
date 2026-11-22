@@ -9,8 +9,8 @@ import { evaluate, launchChrome, open, siteUrl } from "./chrome";
 //
 //   bun run video intro                      builds the site and serves it
 //   bun run video intro --url http://localhost:3000   uses a running dev server instead
-//   bun run video outro --ziel /zaehne/ --sprache en  the outro whose code leads to that game, in that language
-//                     (default: the home page, in the browser's language)
+//   bun run video outro --sprache en        the outro in that language (default: the browser's); its code always
+//                     leads to the home page, so one outro per language serves every video
 //   bun run video outro --variante regal     the outro's other way: the shelf instead of the games' pictures
 //   --fps 30          frames per second (default 60)
 //   --shots 0.9,2.8   only pictures of these seconds, as PNG, to look at (no video)
@@ -33,14 +33,12 @@ const shots = option("shots")
   .map(Number)
   .filter((n) => Number.isFinite(n));
 /** The outro's choices, passed on to its page; they also name the file. */
-const target = option("ziel");
 const language = option("sprache");
 const variant = option("variante");
 const query = new URLSearchParams({ render: "" });
-if (target) query.set("ziel", target);
 if (language) query.set("sprache", language);
 if (variant) query.set("variante", variant);
-const fileName = [name, variant, target?.replaceAll("/", ""), language].filter(Boolean).join("-");
+const fileName = [name, variant, language].filter(Boolean).join("-");
 const outDir = option("out") ?? join(import.meta.dir, "..", "video-out");
 mkdirSync(outDir, { recursive: true });
 

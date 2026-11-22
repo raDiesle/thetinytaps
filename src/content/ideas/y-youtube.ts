@@ -47,7 +47,7 @@ export const youtubeIdeas: IdeaArea = {
       effort: "M",
       done: true,
       partial:
-        "Umgesetzt am 21. November 2026 als /management/video-outro/ (12 s): das Intro rückwärts – die erste Seite mit dem Namen, das Buch klappt zu und geht zurück in seine Lücke –, dann leuchten die vier Bilderbücher nacheinander auf und zeigen je ein Bild eines ihrer Spiele (die Vorschaubilder der Menüs, ohne Wörter darin), dann eine Karte mit Logo, funforboth.com, fünf Zeichen „Free · No ads · Plays offline · 7 languages · Play-time limit“ (englisch zuerst) und dem QR-Code aus Y-05. Eigener Klang: Zuklappen, Klopfen, ein Ton je Buch, die drei Glockentöne des Intros, Akkord. `bun run video outro` macht das MP4. Tapsi sagt die Adresse noch nicht, die Aufnahme wäre bezahlt.",
+        "Umgesetzt am 21. November 2026 als /management/video-outro/ (12 s): das Intro rückwärts – die erste Seite mit dem Namen, das Buch klappt zu und geht zurück in seine Lücke –, dann leuchten die vier Bilderbücher nacheinander auf und zeigen je ein Bild eines ihrer Spiele (die Vorschaubilder der Menüs, ohne Wörter darin), dann eine Karte mit Logo, funforboth.com, fünf Zeichen „Free · No ads · Plays offline · 7 languages · Play-time limit“ (englisch zuerst) und dem QR-Code aus Y-05. Eigener Klang: Zuklappen, Klopfen, ein Ton je Buch, die drei Glockentöne des Intros, Akkord. `bun run video outro` macht das MP4. Tapsi sagt die Adresse noch nicht, die Aufnahme wäre bezahlt. Am 22. November 2026 kam die Variante „Bilder aus den Spielen“ dazu und ist jetzt die erste (Wunsch des Nutzers, ~17 s): erst die zwei Kategorien Alltagshelfer und Lernspiele nebeneinander, dann sechs Alltagshelfer und sechs Lernspiele, ein Bild nach dem anderen groß aus der Tiefe in die Mitte, mit dem Namen des Spiels darunter und der Kategorie darüber, je ein steigender Ton; dann dieselbe Karte. Das Regal bleibt als Variante „Regal“ (`--variante regal`).",
     },
     {
       id: "Y-05",
@@ -58,7 +58,7 @@ export const youtubeIdeas: IdeaArea = {
       effort: "S",
       done: true,
       partial:
-        "Im Abspann (Y-04): rechts auf der Karte ein großer QR-Code mit „Scan to play“ und der kurzen Adresse darunter (funforboth.com/en/zaehne). Er führt zur Startseite oder zu Zähne putzen, Aufs Töpfchen, Timer, Schnullerfee, Abstillen oder Kita-Start, in der Sprache des Videos (Wahl auf der Seite, `--ziel` und `--sprache` beim Werkzeug). Geprüft durch Lesen des gerenderten Bildes, auch auf 480 × 270 verkleinert. Ob Umami Besucher von YouTube erkennt, ist noch nicht gemessen; die Adresse in der Videobeschreibung gehört zu Y-18.",
+        "Im Abspann (Y-04): rechts auf der Karte ein großer QR-Code mit „Scan to play“ und der kurzen Adresse darunter (funforboth.com/en/zaehne). Er führt immer zur Startseite in der Sprache des Videos (`--sprache` beim Werkzeug): Seit dem 22. November 2026 ist der Abspann in jedem Video derselbe (Entscheidung des Nutzers), einmal je Sprache gerendert; zum Spiel des Videos führt der Link in der Beschreibung (Y-18). Geprüft durch Lesen des gerenderten Bildes, auch auf 480 × 270 verkleinert. Ob Umami Besucher von YouTube erkennt, ist noch nicht gemessen; die Adresse in der Videobeschreibung gehört zu Y-18.",
     },
     {
       id: "Y-06",

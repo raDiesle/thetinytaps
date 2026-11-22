@@ -72,8 +72,8 @@ export const LANGUAGE_STATUS: LanguageStatusRow[] = [
       },
       {
         label: "⚖️ Wippe",
-        languages: { en: "done" },
-        note: "Das Bild „Wippe“ in der Gruppe Abwechseln (H-109, 21. November 2026): nur sein Name („Seesaw“, Tooltip und Vorlesen) ist neuer Text, englisch zuerst; die anderen Sprachen fehlen bis zum Wunsch. Es sagt dieselben Sätze wie Abwechseln, die schon in allen Sprachen aufgenommen sind.",
+        languages: { de: "done", en: "done", zh: "done", hi: "done", es: "done", ar: "done", ru: "done" },
+        note: "Das Bild „Wippe“ in der Gruppe Abwechseln (H-109, 21. November 2026): nur sein Name („Seesaw“, Tooltip und Vorlesen) ist neuer Text, englisch zuerst, am 22. November 2026 in alle anderen Sprachen übersetzt („Wippe“). Es sagt dieselben Sätze wie Abwechseln, die schon in allen Sprachen aufgenommen sind.",
       },
       {
         label: "🗣️ Stimme",
@@ -83,9 +83,9 @@ export const LANGUAGE_STATUS: LanguageStatusRow[] = [
       },
       {
         label: "🧸 Tidy Up",
-        languages: { en: "text" },
+        languages: { de: "text", en: "text", zh: "text", hi: "text", es: "text", ar: "text", ru: "text" },
         recorded: true,
-        note: "Das Bild fürs Aufräumen mit dem Spielzeugkran (H-118, tidy.tsx, 21. November 2026), Englisch zuerst geschrieben: sein Name „Tidy Up“ und seine zwei Sätze am Anfang und am Ende (tidyNames.ts). Übersetzt wird erst auf Wunsch, Deutsch eingeschlossen – bis dahin heißt es auch in den anderen Sprachen „Tidy Up“. Aufgenommen ist noch nichts (bun run voice make --only timer, nur Englisch), bis dahin bleibt es still. Die Texte für Suchmaschinen nennen es in allen sieben Sprachen.",
+        note: "Das Bild fürs Aufräumen mit dem Spielzeugkran (H-118, tidy.tsx, 21. November 2026), Englisch zuerst geschrieben: sein Name „Tidy Up“ und seine zwei Sätze am Anfang und am Ende (tidyNames.ts). Am 22. November 2026 in alle anderen Sprachen übersetzt („Aufräumen“). Aufgenommen ist noch nichts (bun run voice make --only timer, nur auf Wunsch), bis dahin bleibt es still. Die Texte für Suchmaschinen nennen es in allen sieben Sprachen.",
         files: ["src/games/timer/tidyNames.ts"],
       },
     ],
@@ -103,8 +103,8 @@ export const LANGUAGE_STATUS: LanguageStatusRow[] = [
       {
         label: "🌙 The Milk Sleeps at Night",
         recorded: true,
-        languages: { en: "text" },
-        note: 'Die Geschichte fürs nächtliche Abstillen (H-104, nightMilk.ts, /abstillen/nachts/, 21. November 2026), Englisch zuerst geschrieben (ChapterBook first="en"): Kapitel und Sätze. Ihr Titel und ihr Name in der Auswahl des Buchs („Nachts abstillen“, names.ts) sind seit dem 22. November 2026 in allen sieben Sprachen da; Kapitel und Sätze werden erst auf Wunsch übersetzt, Deutsch eingeschlossen – bis dahin liest auch ein deutsches Kind sie auf Englisch; dann kommen Kapitel und Sätze in <Sprache>.ts im Ordner, geladen über texts-<Sprache>.ts, wie bei „Haare waschen“. Aufnahmen gibt es noch keine (bun run voice make --only abstillen-nachts, nur die englische Stimme), bis dahin bleibt es still. Die Texte für Suchmaschinen sind in allen sieben Sprachen da. Seit dem 21. November 2026 mit allen Bildern veröffentlicht; seit dem 22. November 2026 ist „Abstillen“ wieder ein Buch, das auf der Wahl zwischen „Ganz abstillen“ und „Nachts abstillen“ aufgeht.',
+        languages: { de: "text", en: "text", zh: "text", hi: "text", es: "text", ar: "text", ru: "text" },
+        note: 'Die Geschichte fürs nächtliche Abstillen (H-104, nightMilk.ts, /abstillen/nachts/, 21. November 2026), Englisch zuerst geschrieben (ChapterBook first="en"): Titel, Name in der Auswahl des Buchs (names.ts), Kapitel und Sätze. Am 22. November 2026 in alle sechs anderen Sprachen übersetzt, Deutsch eingeschlossen: Kapitel und Sätze in <Sprache>.ts im Ordner, geladen über texts-<Sprache>.ts, wie bei „Haare waschen“. Aufnahmen gibt es noch keine (bun run voice make --only abstillen-nachts, nur auf Wunsch), bis dahin bleibt es still. Die Texte für Suchmaschinen sind in allen sieben Sprachen da. Seit dem 21. November 2026 mit allen Bildern veröffentlicht; seit dem 22. November 2026 ist „Abstillen“ wieder ein Buch, das auf der Wahl zwischen „Ganz abstillen“ und „Nachts abstillen“ aufgeht.',
         files: ["src/games/nightmilk/names.ts", "src/games/nightmilk/story.ts", "src/games/nightmilk/nightMilk.ts", "src/games/nightmilk/nightMilkPictures.ts"],
       },
     ],
@@ -135,9 +135,9 @@ export const LANGUAGE_STATUS: LanguageStatusRow[] = [
   },
   {
     href: "/grosses-bett/",
-    note: 'Das Buch „Großes Bett“ mit „Tapsi\'s Big Bed“, einer Geschichte in Kapiteln (bedStory.ts, 21. November 2026), Englisch zuerst geschrieben (ChapterBook first="en"): Name, Satz fürs Regal (names.ts), Kapitel und Sätze nur auf Englisch, alle anderen Sprachen fehlen, Deutsch eingeschlossen, bis die Übersetzung gewünscht wird. Tapsis Stimme liest jede Seite vor, Aufnahmen gibt es noch keine (bun run voice make --only grosses-bett), bis dahin bleibt es still. Die Texte für Suchmaschinen sind in allen sieben Sprachen da.',
+    note: 'Das Buch „Großes Bett“ mit „Tapsi\'s Big Bed“, einer Geschichte in Kapiteln (bedStory.ts, 21. November 2026), Englisch zuerst geschrieben (ChapterBook first="en"): Name, Satz fürs Regal (names.ts), Kapitel und Sätze; am 22. November 2026 in alle sechs anderen Sprachen übersetzt, Deutsch eingeschlossen (<Sprache>.ts im Ordner, geladen über texts-<Sprache>.ts). Tapsis Stimme liest jede Seite vor, Aufnahmen gibt es noch keine (bun run voice make --only grosses-bett, nur auf Wunsch), bis dahin bleibt es still. Die Texte für Suchmaschinen sind in allen sieben Sprachen da.',
     recorded: true,
-    languages: { en: "text" },
+    languages: { de: "text", en: "text", zh: "text", hi: "text", es: "text", ar: "text", ru: "text" },
   },
   {
     href: "/zaehne/",
@@ -173,15 +173,15 @@ export const LANGUAGE_STATUS: LanguageStatusRow[] = [
       },
       {
         label: "📺 Kapitelnamen der Videos",
-        languages: { en: "done" },
+        languages: { de: "done", en: "done", zh: "done", hi: "done", es: "done", ar: "done", ru: "done" },
         files: ["src/games/potty/videoChapters.ts"],
-        note: "Die Namen der Kapitelmarken für die Beschreibung der Töpfchen-Videos auf YouTube (Y-26, 21. November 2026), englisch zuerst; in den anderen Sprachen stehen sie bis zur Übersetzung auf Englisch. Im Video „Nur Sitzen“ heißen die Kapitel nach den Gedanken, deren Zeilen es schon in jeder Sprache gibt.",
+        note: "Die Namen der Kapitelmarken für die Beschreibung der Töpfchen-Videos auf YouTube (Y-26, 21. November 2026), englisch zuerst, am 22. November 2026 in alle anderen Sprachen übersetzt. Im Video „Nur Sitzen“ heißen die Kapitel nach den Gedanken, deren Zeilen es schon in jeder Sprache gibt.",
       },
       {
         label: "👪 Video für Eltern (Zeilen neben dem Tablet)",
-        languages: { en: "done" },
+        languages: { de: "done", en: "done", zh: "done", hi: "done", es: "done", ar: "done", ru: "done" },
         files: ["src/games/potty/parentsScript.ts", "src/games/potty/ParentsVideo.tsx"],
-        note: "Die zehn kurzen Zeilen für Eltern im Elternvideo (/management/video-toepfchen-eltern/, Y-29, 21. November 2026), englisch zuerst; in den anderen Sprachen zeigt das Video sie bis zur Übersetzung auf Englisch, während das Spiel selbst schon in der Sprache spielt. Name und Adresse am Ende brauchen keine.",
+        note: "Die zehn kurzen Zeilen für Eltern im Elternvideo (/management/video-toepfchen-eltern/, Y-29, 21. November 2026), englisch zuerst, am 22. November 2026 in alle anderen Sprachen übersetzt (Erwachsene förmlich angesprochen). Name und Adresse am Ende brauchen keine.",
       },
     ],
   },
@@ -247,8 +247,8 @@ export const LANGUAGE_STATUS: LanguageStatusRow[] = [
       },
       {
         label: "🔊 Geräusch-Rätsel",
-        languages: { en: "done" },
-        note: "Neu seit B-02 (21. November 2026), englisch zuerst: der Name der Spielart in der Zeile über den Bildern („🔊 Sounds“) und die nur vorgelesene Frage „Who makes this sound?“ (soundRiddle.ts). Die Geräusche selbst brauchen keine Sprache; ihre Aufnahmen von ElevenLabs warten in der Sound-Warteschlange. Die Texte für Suchmaschinen nennen den Modus schon in allen sieben Sprachen.",
+        languages: { de: "done", en: "done", zh: "done", hi: "done", es: "done", ar: "done", ru: "done" },
+        note: "Neu seit B-02 (21. November 2026), englisch zuerst, am 22. November 2026 in alle anderen Sprachen übersetzt („🔊 Geräusche“): der Name der Spielart in der Zeile über den Bildern („🔊 Sounds“) und die nur vorgelesene Frage „Who makes this sound?“ (soundRiddle.ts). Die Geräusche selbst brauchen keine Sprache; ihre Aufnahmen von ElevenLabs warten in der Sound-Warteschlange. Die Texte für Suchmaschinen nennen den Modus schon in allen sieben Sprachen.",
         files: ["src/games/scenes/soundRiddle.ts"],
       },
     ],
@@ -558,8 +558,8 @@ export const LANGUAGE_STATUS: LanguageStatusRow[] = [
   {
     href: "/gross-klein/",
     recorded: true,
-    languages: { de: "done", en: "text", zh: "text", es: "text", ru: "text" },
-    note: "Neu (November 2026, L-23), für alle spielbar. Der Name „Wo ist das kleine b?“, die Zeile im Inhaltsverzeichnis und die Frage „Wo ist das kleine …?“ auf Wunsch übersetzt am 19. November 2026 (Name und Zeile auch auf Hindi und Arabisch, wie die Seiten für Suchmaschinen sie nennen; Chinesisch nennt den Pinyin-Buchstaben wie seine Kinder, „小写的玻在哪里？“); die Frage ist außer auf Deutsch noch nicht aufgenommen, bis dahin still. Der Name des gefundenen Buchstabens und das Lob kommen aus den Aufnahmen von „Buchstaben & Zahlen“, in jeder Sprache. Hindi und Arabisch haben keine Groß- und Kleinbuchstaben: dort spielt es auf Englisch (Deutsch, solange das englische Paket nicht geladen ist). Deutsch am 12. November 2026 von ElevenLabs gesprochen mit dem Klon von Tapsis Stimme aus ihren deutschen Aufnahmen („Tapsi Coach (Klon de)“, zweites Konto). Russisch am 12. November 2026 von ElevenLabs gesprochen mit dem Klon von Tapsis Stimme aus ihren russischen Aufnahmen („Tapsi Coach (Klon ru)“, zweites Konto), ohne die Tags, wie ein Satz gesagt wird („[warmly]“), da die Credits nur so reichten – ganz, auch die Zählsätze (die Aufnahmen von „Buchstaben & Zahlen“ gelten für alle Spiele dieses Buchs).",
+    languages: { de: "done", en: "text", zh: "text", hi: "partial", es: "text", ar: "partial", ru: "text" },
+    note: "Neu (November 2026, L-23), für alle spielbar. Der Name „Wo ist das kleine b?“, die Zeile im Inhaltsverzeichnis und die Frage „Wo ist das kleine …?“ auf Wunsch übersetzt am 19. November 2026 (Name und Zeile auch auf Hindi und Arabisch, wie die Seiten für Suchmaschinen sie nennen; Chinesisch nennt den Pinyin-Buchstaben wie seine Kinder, „小写的玻在哪里？“); die Frage ist außer auf Deutsch noch nicht aufgenommen, bis dahin still. Der Name des gefundenen Buchstabens und das Lob kommen aus den Aufnahmen von „Buchstaben & Zahlen“, in jeder Sprache. Hindi und Arabisch („partial“: Name und Zeile übersetzt, mehr gibt es dort nicht zu übersetzen) haben keine Groß- und Kleinbuchstaben: dort spielt es auf Englisch (Deutsch, solange das englische Paket nicht geladen ist). Deutsch am 12. November 2026 von ElevenLabs gesprochen mit dem Klon von Tapsis Stimme aus ihren deutschen Aufnahmen („Tapsi Coach (Klon de)“, zweites Konto). Russisch am 12. November 2026 von ElevenLabs gesprochen mit dem Klon von Tapsis Stimme aus ihren russischen Aufnahmen („Tapsi Coach (Klon ru)“, zweites Konto), ohne die Tags, wie ein Satz gesagt wird („[warmly]“), da die Credits nur so reichten – ganz, auch die Zählsätze (die Aufnahmen von „Buchstaben & Zahlen“ gelten für alle Spiele dieses Buchs).",
   },
   {
     href: "/",
@@ -593,9 +593,9 @@ export const LANGUAGE_STATUS: LanguageStatusRow[] = [
       },
       {
         label: "📚 Abspann der YouTube-Videos",
-        languages: { en: "done" },
+        languages: { de: "done", en: "done", zh: "done", hi: "done", es: "done", ar: "done", ru: "done" },
         files: ["src/video/outro/content.ts"],
-        note: "Die Wörter auf der Karte am Ende jedes Videos (/management/video-outro/, Y-04 und Y-05, 21. November 2026), englisch zuerst: die fünf Zeichen „Free“, „No ads“, „Plays offline“, „7 languages“, „Play-time limit“ und „Scan to play“ über dem QR-Code. In den anderen Sprachen zeigt der Abspann sie bis zur Übersetzung auf Englisch; die Adresse des Codes folgt schon der Sprache (/en/zaehne/). Name und Adresse brauchen keine. Tapsi sagt die Adresse noch nicht (bezahlte Aufnahme).",
+        note: "Die Wörter auf der Karte am Ende jedes Videos (/management/video-outro/, Y-04 und Y-05, 21. November 2026), englisch zuerst: die fünf Zeichen „Free“, „No ads“, „Plays offline“, „7 languages“, „Play-time limit“ und „Scan to play“ über dem QR-Code. Am 22. November 2026 in alle anderen Sprachen übersetzt; die Adresse des Codes folgt schon der Sprache (/en/). Name und Adresse brauchen keine. Tapsi sagt die Adresse noch nicht (bezahlte Aufnahme).",
       },
     ],
   },

@@ -1,18 +1,18 @@
 import type { EnglishFirst } from "@/lib/language";
 
 // The story's name and its name in the book's choice of stories, kept here rather than in `games.ts`: the story's own
-// row in the language table answers for them, not the home page's (`inlineTexts.test.ts`). Written English first and
-// translated into every app language (root CLAUDE.md, Language); the story's pages are still English only.
+// row in the language table answers for them, not the home page's (`inlineTexts.test.ts`). English first (root
+// CLAUDE.md, user decision, 11 November 2026), translated into every app language (22 November 2026).
 
 /** The story's name, in the browser tab and under its name in the book's choice of stories. */
 export const NIGHT_MILK_TITLE: EnglishFirst = {
   en: "The Milk Sleeps at Night",
-  de: "Nachts schläft die Milch",
-  zh: "月亮出来，奶就睡了",
+  de: "Die Milch schläft in der Nacht",
+  zh: "夜里，奶要睡觉",
   hi: "रात में दूध सो जाता है",
   es: "La leche duerme de noche",
   ar: "الحليب ينام في الليل",
-  ru: "Ночью молочко спит",
+  ru: "Молочко спит ночью",
 };
 
 /**

@@ -7,7 +7,7 @@ import { FeedbackLayer, useTapFeedback } from "@/components/TapFeedback";
 import { byLanguage, type TextsLanguageId } from "@/content/texts";
 import { NIGHT_MILK } from "@/games/nightmilk/nightMilk";
 import { NIGHT_MILK_KIND, NIGHT_MILK_TITLE } from "@/games/nightmilk/names";
-import { NIGHT_VOICE, nightPictureOf } from "@/games/nightmilk/story";
+import { NIGHT_TRANSLATIONS, NIGHT_VOICE, nightPictureOf } from "@/games/nightmilk/story";
 import { goBack } from "@/lib/goBack";
 import { type Texts, useAppLanguage, useT } from "@/lib/language";
 import { noPointerClick } from "@/lib/press";
@@ -72,6 +72,7 @@ const STORIES: Story[] = [
     pictureOf: nightPictureOf,
     cover: "weiter",
     voice: NIGHT_VOICE,
+    translations: NIGHT_TRANSLATIONS,
     first: "en",
     code: "N",
   },

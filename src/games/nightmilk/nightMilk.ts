@@ -10,8 +10,8 @@ import type { StoryChapter } from "@/components/ChapterBook";
 // the two, waving good night to the milk, Papa's humming, the blue cup of water and the teddy.
 //
 // The same fox family and home as the other chapter books. It is plainly about Mama's breast, as „Tapsis Milchkette“
-// (`NURSING` in its pictures). English first (root CLAUDE.md, user decision, 11 November 2026): other languages, German
-// too, come when the user asks. Played at `/abstillen/nachts/`, a volume tied to the book „Abstillen“ (`ChapterBook`,
+// (`NURSING` in its pictures). English first (root CLAUDE.md, user decision, 11 November 2026), translated into every app
+// language, German too (`<language>.ts`, 22 November 2026). Played at `/abstillen/nachts/`, one of the two stories of the book „Abstillen“ (`ChapterBook`,
 // `first="en"`); its pictures come from Gemini (`nightMilkPictures.ts`).
 
 /** A step of gentle night weaning as the guides give it; each has a chapter of its own. */
