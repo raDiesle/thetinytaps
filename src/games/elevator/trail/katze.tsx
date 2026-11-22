@@ -2,7 +2,9 @@ import type { ReactNode } from "react";
 import { Cloud } from "@/components/drawing";
 import { INK } from "@/components/drawing";
 import { Bone, Cat, Torch, Yarn } from "./items";
-import type { Point, SceneryProps } from "./types";
+import type { Point, SceneryProps, TrailLevel } from "./types";
+import { playBoing, playClick, playClonk, playCreak, playCrunch, playDoorbell, playPop, playSneeze, playTwinkle } from "@/lib/sfx";
+import { playBark, playGiggle, playMeow } from "@/lib/realSounds";
 
 // "Wo ist die Katze?" (G-04): the cat jumps out of the child's arms and runs up the stairwell, and the world rolls up
 // instead of sideways. The house is seen cut open from the front: the stairs zigzag up between the walls, one flight
@@ -523,3 +525,115 @@ export function KatzeBackdrop() {
     </g>
   );
 }
+
+// G-04: the cat runs up the stairwell, and the world rolls up instead of sideways – one flight per floor, turning
+// round on the landings. The ground's x is the way walked; `at`, `wants` and the flights are where things are drawn.
+export const KATZE_LEVEL: TrailLevel = {
+  id: "katze",
+  title: "Wo ist die Katze?",
+  goal: "cat",
+  Scenery: KatzeScenery,
+  Front: KatzeFront,
+  Backdrop: KatzeBackdrop,
+  ground: KATZE_GROUND,
+  turns: TURNS,
+  start: 140,
+  away: {
+    // Out of the arms, across the hall and up the stairs, past the dog, up the ladder into the attic.
+    via: [
+      [[300, FLOOR[0]], 300],
+      [[560, FLOOR[0]], 450],
+      [[1040, FLOOR[1]], 600],
+      [[560, FLOOR[2]], 600],
+      [[1040, FLOOR[3]], 600],
+      [[1460, FLOOR[3]], 450],
+      [[1480, FLOOR[4]], 600],
+    ],
+    to: CAT_AT,
+    ms: 1300,
+    sway: 0,
+    pose: "reach",
+    sounds: [
+      [0, playMeow],
+      [1700, playBark],
+      [3800, playMeow],
+    ],
+    say: "Huch! Die Katze springt weg und läuft die Treppe hoch. Hinterher!",
+  },
+  stations: [
+    { kind: "pickup", id: "torch", x: 380, item: "torch", at: [452, 632], sound: playClonk, ask: "Eine Taschenlampe!", done: "Ab in den Rucksack!" },
+    { kind: "pickup", id: "bone", x: 1340, item: "bone", at: [1416, 276], sound: playPop, ask: "Ein Knochen beim Napf.", done: "Den nehmen wir mit." },
+    {
+      kind: "obstacle",
+      id: "dog",
+      x: 1550,
+      need: "bone",
+      why: { wants: DOG_WANTS },
+      at: DOG_MOUTH,
+      meet: [[100, playBark]],
+      sounds: [
+        [300, playCrunch],
+        [1100, playBark],
+        [1700, playCrunch],
+      ],
+      ms: 2400,
+      nope: playSneeze,
+      ask: "Der Hund sitzt auf der Treppe. Was möchte er?",
+      done: "Den Knochen! Der Hund geht nach Hause.",
+    },
+    {
+      kind: "moment",
+      id: "bell",
+      x: 2156,
+      pose: "reach",
+      sounds: [
+        [100, playDoorbell],
+        [1200, playCreak],
+        [1900, playGiggle],
+      ],
+      ms: 2600,
+      ask: "Hier wohnt die Oma. Wir klingeln.",
+      done: "Die Oma rollt uns einen Wollknäuel!",
+    },
+    { kind: "pickup", id: "yarn", x: 2376, item: "yarn", at: [232, -166], sound: playPop, ask: "Ein Wollknäuel!", done: "Danke, Oma!" },
+    { kind: "climb", id: "ladder", x: 3512, steps: LADDER, ask: "Die Leiter hoch.", done: "Oben auf dem Dachboden!" },
+    {
+      kind: "obstacle",
+      id: "dark",
+      x: 3800,
+      need: "torch",
+      why: { worry: "dark" },
+      at: [1140, FLOOR[4] - 86],
+      meet: [[100, playMeow]],
+      sounds: [
+        [0, playClick],
+        [200, playTwinkle],
+      ],
+      ms: 1600,
+      nope: playBoing,
+      ask: "Auf dem Dachboden ist es dunkel. Was hilft?",
+      done: "Die Taschenlampe! Jetzt ist es hell.",
+    },
+    {
+      kind: "obstacle",
+      id: "kittens",
+      x: 4320,
+      need: "yarn",
+      why: { wants: [530, FLOOR[4] - 175] },
+      at: [520, FLOOR[4] - 150],
+      meet: [[100, playMeow]],
+      sounds: [
+        [200, playMeow],
+        [900, playGiggle],
+        [1700, playMeow],
+      ],
+      ms: 2600,
+      nope: playSneeze,
+      frees: true,
+      ask: "Da ist die Katze! Mit drei Kätzchen. Was möchten die Kätzchen?",
+      done: "Den Wollknäuel! Die Kätzchen spielen.",
+    },
+  ],
+  // The child holds the cat (in the left hand at x 646, y -1098): it hops up once and back into the arms.
+  finale: { via: [[[620, -1260], 500]], to: [646, -1098], ms: 500, sway: 0, say: "Da ist die Katze wieder! Hurra!" },
+};

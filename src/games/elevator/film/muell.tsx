@@ -5,8 +5,8 @@ import { playBeeps, playChime, playClonk, playPlop, playRecorded, playRip, playR
 import { Kid, KidHead, type Look, type Pose, useHero } from "../kid";
 import type { Picture } from "../trail/items";
 import type { Cue, Point } from "../trail/types";
-import { Wheel } from "./korn";
 import { Go, route } from "./move";
+import { Wheel } from "./parts";
 import { Grownup } from "./people";
 import { BackHouse, Outdoors, Road } from "./places";
 import { type Film, GROUND, type Scene, type SceneProps } from "./types";

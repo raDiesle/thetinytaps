@@ -1,28 +1,12 @@
+import { useEffect } from "react";
 import { GameEnd } from "@/components/GameEnd";
 import { useAppLanguage } from "@/lib/language";
-import { STORIES } from "./content";
-import { FILMS } from "./film/films";
+import { savesData } from "@/lib/pwa";
+import { CARDS, type CardEntry, prefetchCard } from "./catalog";
 import { titleIn } from "./phrases";
-import { TRAIL_LEVELS } from "./trail/levels";
-
-/** A story or level, named on its „Weiter“ button for screen readers. */
-export interface StoryCard {
-  id: string;
-  /** In its first language; shown through `titleIn` in the app language. */
-  title: string;
-  /** The title's first language: German when absent. */
-  first?: "en";
-}
-
-/** Every story of the game in play order: the lift stories first, then the trail levels, then the films. */
-export const CARDS: StoryCard[] = [
-  ...STORIES.map((s) => ({ id: s.id, title: s.title })),
-  ...TRAIL_LEVELS.map((l) => ({ id: l.id, title: l.title })),
-  ...FILMS.map((f) => ({ id: f.id, title: f.title, first: f.first })),
-];
 
 /** The story after this one; after the last comes the first again. */
-export function nextCard(id: string) {
+export function nextCard(id: string): CardEntry {
   const index = CARDS.findIndex((card) => card.id === id);
   return CARDS[(index + 1) % CARDS.length];
 }
@@ -31,5 +15,9 @@ export function nextCard(id: string) {
 export function StoryEnd({ id, onPick }: { id: string; onPick: (id: string) => void }) {
   const language = useAppLanguage();
   const next = nextCard(id);
+  // „Weiter“ is what comes next for certain: its code is fetched while the end shows, so it starts at once – nothing else ahead.
+  useEffect(() => {
+    if (!savesData()) prefetchCard(next);
+  }, [next]);
   return <GameEnd level={id} onAgain={() => onPick(id)} next={{ name: titleIn(next.title, language.id, next.first), onNext: () => onPick(next.id) }} />;
 }

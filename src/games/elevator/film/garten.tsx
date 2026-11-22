@@ -7,6 +7,7 @@ import { Carrot, Strawberry } from "../things";
 import type { Picture } from "../trail/items";
 import type { Cue, Point } from "../trail/types";
 import { Go, route } from "./move";
+import { RainCloud } from "./parts";
 import { Grownup, type GrownPose } from "./people";
 import { Outdoors, RoundTree } from "./places";
 import type { Film, Scene, SceneProps } from "./types";
@@ -904,35 +905,6 @@ const bed: Scene = {
 const CLOUD_REST: Point = [600, 210];
 const CLOUD_RAIN: Point = [PLANT[0], 330];
 const CLOUD_GONE: Point = [2000, 200];
-
-/** The grey-white rain cloud, centred on (0, 0); while it rains (`raining`) drops fall from it down to the bed. */
-export function RainCloud({ raining }: { raining: boolean }) {
-  return (
-    <g>
-      {raining && (
-        <g stroke="#4dabf7" strokeWidth="7" strokeLinecap="round">
-          {[0, 1, 2].map((n) => (
-            <g key={n} className="fm-gt-rain" style={{ animationDelay: `calc(${2 + n * 0.35}s * var(--fm-pace))` }}>
-              {[-110, -60, -10, 40, 90].map((x, i) => (
-                <path key={x} d={`M${x + n * 16} ${50 + ((i + n) % 3) * 30} l-6 26`} />
-              ))}
-            </g>
-          ))}
-        </g>
-      )}
-      <g transform="scale(1.4)">
-        <path
-          d="M-90 20 Q-112 20 -110 0 Q-108 -22 -80 -20 Q-74 -54 -36 -52 Q-14 -80 22 -66 Q52 -78 66 -44 Q104 -46 106 -12 Q110 20 82 20 Z"
-          fill="#e9ecef"
-          stroke="#868e96"
-          strokeWidth="5"
-          strokeLinejoin="round"
-        />
-        <path d="M-70 4 Q-20 14 60 4" stroke="#f8f9fa" strokeWidth="10" strokeLinecap="round" fill="none" />
-      </g>
-    </g>
-  );
-}
 
 function WeatherDraw({ step, busy, picks }: SceneProps) {
   const plant = picks[0] as Plant;

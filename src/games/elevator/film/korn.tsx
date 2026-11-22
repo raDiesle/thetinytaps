@@ -6,8 +6,8 @@ import { Kid, KidHead, type Look, type Pose, useHero } from "../kid";
 import type { Picture } from "../trail/items";
 import type { Point } from "../trail/types";
 import { BAKE_CARD, BAKE_ICON, BAKE_SOUND, BAKER, type Bake, Bakery, DOOR_X, home as bakersHome, IN_WINDOW, oven as bakersOven, SHOP_ICON } from "./baecker";
-import { RainCloud } from "./garten";
 import { Go, route } from "./move";
+import { RainCloud, Wheel } from "./parts";
 import { Grownup } from "./people";
 import { Outdoors, RoundTree } from "./places";
 import { type Beat, type Film, GROUND, PACE, type Scene, type SceneProps } from "./types";
@@ -178,22 +178,8 @@ function seedDots(left: number, right: number) {
 /** The tractor's colours, and where its parts are: it faces right with its wheels on (0, 0). */
 const TRACTOR_GREEN = "#37b24d";
 const TRACTOR_DARK = "#2b8a3e";
-const RIM = "#fab005";
 /** Where a trailer or the seed drill hangs on. */
 const HITCH: Point = [-200, -60];
-
-/** A wheel with its tread and a yellow rim, centred on (0, 0); it turns while `spin`. */
-export function Wheel({ r, spin }: { r: number; spin: boolean }) {
-  return (
-    <g className={spin ? "fm-wheel spin" : "fm-wheel"}>
-      <circle r={r} fill="#343a40" stroke={INK} strokeWidth="4" />
-      <circle r={r - 6} fill="none" stroke="#212529" strokeWidth="10" strokeDasharray="10 12" />
-      <circle r={r * 0.56} fill={RIM} stroke={INK} strokeWidth="4" />
-      <path d={`M${-r * 0.4} 0 H${r * 0.4} M0 ${-r * 0.4} V${r * 0.4}`} stroke="#e8a317" strokeWidth="5" />
-      <circle r={r * 0.16} fill="#495057" stroke={INK} strokeWidth="3" />
-    </g>
-  );
-}
 
 /**
  * The green tractor, facing right with its wheels on (0, 0): a big back wheel under its mudguard, the cab with

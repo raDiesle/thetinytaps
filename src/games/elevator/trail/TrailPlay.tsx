@@ -4,7 +4,7 @@ import { INK } from "@/components/drawing";
 import { useDevice } from "@/lib/device";
 import { playCountNote, playMelody, playPop, playRandomNote, playSlide } from "@/lib/sfx";
 import { loadRealSounds, playGiggle } from "@/lib/realSounds";
-import { TRAIL_SOUNDS } from "./levels";
+import { TRAIL_SOUNDS } from "./sounds";
 import { type TargetLanguage, targetLanguageFor } from "@/content/targetLanguages";
 import { tapState } from "@/lib/tapTargets";
 import { StoryEnd, nextCard } from "../cards";

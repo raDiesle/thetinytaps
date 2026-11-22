@@ -2,7 +2,22 @@ import type { ReactNode } from "react";
 import { Cloud } from "@/components/drawing";
 import { INK } from "@/components/drawing";
 import { Apple, Carrot, Corn, Lantern } from "./items";
-import type { Point, SceneryProps } from "./types";
+import type { Point, SceneryProps, TrailLevel } from "./types";
+import {
+  playBoing,
+  playClonk,
+  playCreak,
+  playDrops,
+  playLeaves,
+  playPeck,
+  playPop,
+  playRustle,
+  playSneeze,
+  playSniff,
+  playTrain,
+  playTwinkle,
+} from "@/lib/sfx";
+import { playCluck, playMunch, playNeigh, playSquawk, playWhistle } from "@/lib/realSounds";
 
 // "Die kleine Lok": from the farmhouse past the vegetable patch, the corn field and the rabbit to
 // the big hill. There the way forks (G-09): up the stairs and over the hill, past the apple tree
@@ -504,3 +519,148 @@ export function LokBackdrop() {
     </g>
   );
 }
+
+// G-09: at the hill the way forks – up the stairs and over the top (apple, pony) or through the dark
+// tunnel (lantern); both meet again at the gate of the hen yard.
+export const LOK_LEVEL: TrailLevel = {
+  id: "lok",
+  title: "Die kleine Lok",
+  goal: "loco",
+  Scenery: LokScenery,
+  Front: LokFront,
+  Backdrop: LokBackdrop,
+  ground: [
+    [-3000, GROUND_Y],
+    [9000, GROUND_Y],
+  ],
+  start: 300,
+  away: {
+    via: [[[450, 740], 350]],
+    to: LOK_AT,
+    ms: 3600,
+    sway: 0,
+    pose: "reach",
+    sounds: [
+      [200, playTrain],
+      [1600, playWhistle],
+    ],
+    say: "Huch! Die Lok fährt allein los. Hinterher!",
+  },
+  stations: [
+    { kind: "pickup", id: "carrot", x: 540, item: "carrot", at: [640, 690], sound: playPop, ask: "Eine Karotte!", done: "Ab in den Rucksack!" },
+    { kind: "pickup", id: "corn", x: 880, item: "corn", at: [970, 690], sound: playRustle, ask: "Ein Maiskolben.", done: "Den nehmen wir mit." },
+    {
+      kind: "obstacle",
+      id: "rabbit",
+      x: 1240,
+      need: "carrot",
+      why: { wants: [1350, 600] },
+      at: [1340, 690],
+      meet: [[100, playSniff]],
+      sounds: [
+        [300, playMunch],
+        [1000, playMunch],
+        [1700, playMunch],
+      ],
+      ms: 2200,
+      nope: playSneeze,
+      ask: "Der Hase sitzt im Weg. Er hat Hunger. Was geben wir ihm?",
+      done: "Die Karotte! Mmh, lecker.",
+    },
+    {
+      kind: "fork",
+      id: "fork",
+      x: 1560,
+      ask: "Zwei Wege! Die Treppe hoch oder durch den Tunnel?",
+      ways: [
+        {
+          id: "over",
+          Sign: StairsSign,
+          sign: SIGN_OVER,
+          ground: OVER_GROUND,
+          say: "Die Treppe hoch!",
+          stations: [
+            { kind: "climb", id: "stairs", x: 1780, steps: STAIRS, ask: "Hoch geht's.", done: "Oben! Wie weit man sieht." },
+            { kind: "pickup", id: "apple", x: 2540, item: "apple", at: [2598, 300], sound: playLeaves, ask: "Ein Apfel!", done: "Plopp, in den Rucksack." },
+            {
+              kind: "obstacle",
+              id: "pony",
+              x: 2820,
+              need: "apple",
+              why: { wants: [3000, 250] },
+              at: [2950, 300],
+              meet: [[100, playNeigh]],
+              sounds: [
+                [300, playMunch],
+                [1000, playMunch],
+                [1700, playNeigh],
+              ],
+              ms: 2400,
+              nope: playBoing,
+              ask: "Das Pony steht im Weg. Es hat Hunger. Was geben wir ihm?",
+              done: "Den Apfel! Danke, Pony.",
+            },
+          ],
+        },
+        {
+          id: "through",
+          Sign: TunnelSign,
+          sign: SIGN_THROUGH,
+          say: "Durch den Tunnel!",
+          stations: [
+            { kind: "pickup", id: "lantern", x: 2260, item: "lantern", at: [2336, 664], sound: playClonk, ask: "Eine Laterne.", done: "Die nehmen wir mit." },
+            {
+              kind: "obstacle",
+              id: "dark",
+              x: 2460,
+              need: "lantern",
+              why: { worry: "dark" },
+              at: [2580, 660],
+              meet: [[100, playDrops]],
+              sounds: [[0, playTwinkle]],
+              ms: 1500,
+              nope: playBoing,
+              ask: "Im Tunnel ist es ganz dunkel. Was hilft?",
+              done: "Die Laterne! Jetzt ist es hell.",
+            },
+          ],
+        },
+      ],
+    },
+    {
+      kind: "moment",
+      id: "gate",
+      x: 3760,
+      pose: "reach",
+      sounds: [
+        [100, playCreak],
+        [1000, playClonk],
+      ],
+      ms: 1600,
+      ask: "Ein Tor. Wir machen es auf.",
+      done: "Offen!",
+    },
+    {
+      kind: "obstacle",
+      id: "hen",
+      x: 4160,
+      need: "corn",
+      why: { wants: [4276, 578] },
+      at: [4236, 700],
+      meet: [[100, playCluck]],
+      sounds: [
+        [200, playCluck],
+        [1100, playPeck],
+        [1600, playPeck],
+        [2600, playWhistle],
+      ],
+      ms: 2400,
+      nope: playSquawk,
+      frees: true,
+      ask: "Ein Huhn sitzt auf der Lok! Was geben wir ihm?",
+      done: "Den Mais! Das Huhn pickt.",
+    },
+  ],
+  // Up into the air and back into the hands (they hold it at x 4226, y 662).
+  finale: { via: [[[4260, 330], 1000]], to: [4226, 662], ms: 1000, sway: 0, say: "Die Lok ist wieder da! Tuut, tuut!" },
+};

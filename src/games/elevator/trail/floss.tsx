@@ -2,7 +2,9 @@ import type { ReactNode } from "react";
 import { Cloud } from "@/components/drawing";
 import { INK } from "@/components/drawing";
 import { Saw, Stick, Umbrella } from "./items";
-import type { Point, SceneryProps } from "./types";
+import type { Point, SceneryProps, TrailLevel } from "./types";
+import { playBoing, playClonk, playCrunch, playLeaves, playPlop, playPoof, playRustle, playSneeze, playTrickle, playWhoosh } from "@/lib/sfx";
+import { playChatter, playQuack, playSaw, playSplash, playTweet } from "@/lib/realSounds";
 
 // "Das Floß" (G-08): the child stands on a raft on the river and paddles instead of walking. From the jetty at
 // home past the woodpile (saw) and the angler's spot (umbrella), to the branch hanging into the water, the willow
@@ -499,3 +501,111 @@ export function FlossBackdrop() {
     </g>
   );
 }
+
+// G-08: on a raft down the river – the child paddles instead of walking, floats down the waterfall under the open
+// umbrella, and gets off at the jetty on the lake, where the beaver has the toy boat.
+export const FLOSS_LEVEL: TrailLevel = {
+  id: "floss",
+  title: "Das Floß",
+  goal: "sailboat",
+  Scenery: FlossScenery,
+  Front: FlossFront,
+  Backdrop: FlossBackdrop,
+  raft: { Raft, until: RAFT_UNTIL },
+  ground: [[-3000, RIVER_Y], [2660, RIVER_Y], FALL_TO, [RAFT_UNTIL, LAKE_Y], ...LADDER, [9000, JETTY_Y]],
+  start: 300,
+  away: {
+    via: [
+      [[440, 758], 500],
+      [[1300, 758], 1300],
+    ],
+    to: BOAT_AT,
+    ms: 1800,
+    sway: 0,
+    pose: "reach",
+    sounds: [
+      [300, playPlop],
+      [900, playTrickle],
+    ],
+    say: "Huch! Das Boot schwimmt weg. Hinterher!",
+  },
+  stations: [
+    { kind: "pickup", id: "saw", x: 560, item: "saw", at: [657, 681], sound: playClonk, ask: "Eine Säge.", done: "Die nehmen wir mit." },
+    { kind: "pickup", id: "umbrella", x: 900, item: "umbrella", at: [1000, 656], sound: playPoof, ask: "Ein Regenschirm.", done: "Den nehmen wir mit." },
+    {
+      kind: "obstacle",
+      id: "branch",
+      x: 1290,
+      need: "saw",
+      why: { worry: "blocked" },
+      at: CUT,
+      meet: [[100, playRustle]],
+      sounds: [
+        [0, playSaw],
+        [1500, playSplash],
+      ],
+      ms: 3000,
+      nope: playBoing,
+      ask: "Ein Ast hängt ins Wasser. Wir kommen nicht vorbei. Was hilft?",
+      done: "Die Säge! Ritsch, ratsch – der Ast ist weg.",
+    },
+    { kind: "pickup", id: "stick", x: 1710, item: "stick", at: [1816, 718], sound: playLeaves, ask: "Ein Stock.", done: "Den nehmen wir mit." },
+    {
+      kind: "moment",
+      id: "ducks",
+      x: 2090,
+      pose: "reach",
+      sounds: [
+        [0, playQuack],
+        [700, playRustle],
+        [1200, playTweet],
+        [2000, playTweet],
+        [2600, playQuack],
+      ],
+      ms: 3400,
+      ask: "Die Entenmama sucht ihre Küken. Wo sind sie?",
+      done: "Da sind sie! Piep, piep.",
+    },
+    {
+      kind: "obstacle",
+      id: "waterfall",
+      x: 2560,
+      need: "umbrella",
+      why: { worry: "fall" },
+      at: [2600, RIVER_Y - 242],
+      meet: [[100, playSplash]],
+      sounds: [
+        [0, playPoof],
+        [600, playWhoosh],
+        [4900, playSplash],
+      ],
+      ms: 1400,
+      nope: playSplash,
+      float: { to: [[2660, RIVER_Y], FALL_TO], put: UMBRELLA_PUT },
+      ask: "Ein Wasserfall! Wie kommen wir hinunter?",
+      done: "Mit dem Regenschirm! Wir schweben hinunter.",
+    },
+    { kind: "climb", id: "ladder", x: RAFT_UNTIL, steps: LADDER, ask: "Eine Leiter! Hoch geht's.", done: "Oben!" },
+    {
+      kind: "obstacle",
+      id: "beaver",
+      x: 3660,
+      need: "stick",
+      why: { wants: [3872, 778] },
+      at: [3840, 830],
+      meet: [[100, playChatter]],
+      sounds: [
+        [300, playCrunch],
+        [900, playCrunch],
+        [1500, playCrunch],
+      ],
+      ms: 2400,
+      nope: playSneeze,
+      frees: true,
+      ask: "Der Biber hat das Boot. Was geben wir ihm?",
+      done: "Den Stock! Danke, Biber.",
+    },
+  ],
+  // Up into the air and back into the hands (they hold it at x 3726, y 822).
+  finale: { via: [[[3760, 560], 1000]], to: [3726, 822], ms: 1000, sway: 0, say: "Das Boot ist wieder da! Hurra!" },
+};

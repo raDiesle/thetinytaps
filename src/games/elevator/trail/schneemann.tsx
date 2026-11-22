@@ -2,7 +2,23 @@ import type { ReactNode } from "react";
 import { Cloud } from "@/components/drawing";
 import { INK } from "@/components/drawing";
 import { Cabbage, SandBucket, Seeds, Snowman, SnowShovel } from "./items";
-import type { Point, SceneryProps } from "./types";
+import type { Point, SceneryProps, TrailLevel } from "./types";
+import {
+  playBoing,
+  playClonk,
+  playCreak,
+  playCrunch,
+  playLeaves,
+  playPeck,
+  playPoof,
+  playPop,
+  playRustle,
+  playSlide,
+  playSneeze,
+  playSniff,
+  playTwinkle,
+} from "@/lib/sfx";
+import { playMunch, playTweet } from "@/lib/realSounds";
 
 // "Der Schneemann" (G-06): a hare snatches the carrot nose and hops off, and the child follows its tracks through the
 // snow – past the house (snow shovel), the shed (bird seed), a deep snow drift, the grit box (a bucket of sand), the
@@ -501,3 +517,134 @@ export function SchneemannBackdrop() {
     </g>
   );
 }
+
+// G-06: the hare snatches the snowman's carrot nose and hops off; the child follows its tracks through the snow, rides
+// the sled down the hill, and at the end the snowman gets its nose back and dances.
+export const SCHNEEMANN_LEVEL: TrailLevel = {
+  id: "schneemann",
+  title: "Der Schneemann",
+  goal: "nose",
+  Scenery: SchneemannScenery,
+  Backdrop: SchneemannBackdrop,
+  ground: [[-3000, GROUND_Y], [3110, GROUND_Y], ...STAIRS, ...SLED_RUN, [9000, GROUND_Y]],
+  start: 300,
+  away: {
+    // The hare jumps up at the carrot's tip, pulls it out of the hands, turns round and hops away with it.
+    via: [
+      [[600, 650], 700],
+      [[760, 702], 300],
+      [[900, 610], 280],
+      [[1040, 702], 280],
+      [[1180, 610], 280],
+      [[1320, 702], 280],
+    ],
+    to: CARROT_AT,
+    ms: 1400,
+    sway: 0,
+    thief: HareThief,
+    pose: "reach",
+    sounds: [
+      [0, playPop],
+      [200, playSniff],
+      [900, playBoing],
+      [1460, playBoing],
+      [2020, playBoing],
+    ],
+    say: "Huch! Der Hase nimmt die Nase vom Schneemann mit. Hinterher!",
+  },
+  stations: [
+    {
+      kind: "pickup",
+      id: "snowshovel",
+      x: 540,
+      item: "snowshovel",
+      at: [640, 680],
+      sound: playClonk,
+      ask: "Eine Schneeschaufel.",
+      done: "Die nehmen wir mit.",
+    },
+    { kind: "pickup", id: "seeds", x: 860, item: "seeds", at: [950, 660], sound: playRustle, ask: "Ein Sack Körner.", done: "Ab in den Rucksack!" },
+    {
+      kind: "obstacle",
+      id: "drift",
+      x: 1180,
+      need: "snowshovel",
+      why: { worry: "stuck" },
+      at: [1300, 660],
+      meet: [[100, playPoof]],
+      sounds: [
+        [0, playCrunch],
+        [500, playCrunch],
+        [1000, playCrunch],
+        [1500, playPoof],
+      ],
+      ms: 2200,
+      nope: playBoing,
+      ask: "Ganz viel Schnee! Wie kommen wir durch?",
+      done: "Mit der Schaufel! Wir schaufeln den Weg frei.",
+    },
+    { kind: "pickup", id: "sand", x: 1560, item: "sand", at: [1660, 620], sound: playClonk, ask: "Ein Eimer Sand.", done: "Den nehmen wir mit." },
+    {
+      kind: "obstacle",
+      id: "birds",
+      x: 1880,
+      need: "seeds",
+      why: { wants: [1990, 640] },
+      at: [2236, 590],
+      meet: [[100, playTweet]],
+      sounds: [
+        [0, playRustle],
+        [700, playTweet],
+        [1600, playPeck],
+        [2100, playPeck],
+        [2600, playPeck],
+        [3000, playTweet],
+      ],
+      ms: 3400,
+      nope: playSneeze,
+      ask: "Die Vögel haben Hunger. Das Vogelhaus ist leer. Was geben wir ihnen?",
+      done: "Die Körner! Piep, piep, lecker.",
+    },
+    { kind: "pickup", id: "cabbage", x: 2460, item: "cabbage", at: [2560, 688], sound: playLeaves, ask: "Ein Kohlkopf!", done: "Ab in den Rucksack!" },
+    {
+      kind: "obstacle",
+      id: "pond",
+      x: 2740,
+      need: "sand",
+      why: { worry: "slip" },
+      at: [2860, 700],
+      meet: [[100, playCreak]],
+      sounds: [
+        [200, playRustle],
+        [900, playRustle],
+        [1500, playTwinkle],
+      ],
+      ms: 2000,
+      nope: playSlide,
+      ask: "Der Teich ist zugefroren. Ganz glatt! Was hilft?",
+      done: "Der Sand! Jetzt rutschen wir nicht.",
+    },
+    { kind: "climb", id: "hill", x: 3100, steps: STAIRS, slide: SLED_RUN, sled: Sled, ask: "Ein Berg! Hoch geht's.", done: "Mit dem Schlitten! Hui!" },
+    {
+      kind: "obstacle",
+      id: "hare",
+      x: 4680,
+      need: "cabbage",
+      why: { wants: [4865, 590] },
+      at: [4835, 686],
+      meet: [[100, playSniff]],
+      sounds: [
+        [300, playMunch],
+        [1000, playMunch],
+        [1700, playMunch],
+      ],
+      ms: 2400,
+      nope: playSneeze,
+      frees: true,
+      ask: "Da ist der Hase mit der Nase! Was geben wir ihm?",
+      done: "Den Kohl! Danke, Hase.",
+    },
+  ],
+  // Up and onto the snowman's face; there it stays, and the snowman dances.
+  finale: { via: [[[5020, 380], 700]], to: NOSE_AT, ms: 600, sway: 0, into: "nose", say: "Der Schneemann hat seine Nase wieder! Er tanzt!" },
+};
