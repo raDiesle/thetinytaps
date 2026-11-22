@@ -224,9 +224,9 @@ In a fresh worktree run `bun install` first.
   is missing, per game, as `parts` where a part (a story, a mode, the song) differs, and `"text"` where it is
   translated but not yet recorded. `content.test.ts` checks it where files tell, `inlineTexts.test.ts` checks that every
   inline `t({ en: … })` (or older `t({ de: … })`) of a game has each language its row marks as there, German included,
-  and `languageGaps.test.ts` fails on any part missing an app language that is not on its list of gaps left from before
-  22 November 2026 (`OLD_GAPS`) – so a new text can't be marked missing instead of translated, and a gap translated
-  later leaves that list in the same commit. A new game keeps its card's title and blurb in its own folder (`names.ts`,
+  and `languageGaps.test.ts` fails on any part missing an app language (the gaps left from before were all translated on
+  22 November 2026) – so a new text can't be marked missing instead of translated; `"partial"` only where a language
+  can't have the thing at all, its note saying why. A new game keeps its card's title and blurb in its own folder (`names.ts`,
   imported by `games.ts`, like `/zusammen/`).
   **One language for everything, never mixed**: menus, letters and keys, words and voice all follow the app language
   (🌐 on the home page, `useAppLanguage()`); no game, menu or option adds a language choice of its own (a „Spielsprache“ once

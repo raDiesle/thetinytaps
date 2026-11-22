@@ -1,6 +1,22 @@
 import { describe, expect, test } from "bun:test";
 import { BED_PAGES, BED_STEPS, BED_STORY } from "./bedStory";
 import { BED_PICTURE_QUEUE, bedPicture, pictureFile, SAFE_BED } from "./bedStoryPictures";
+import { BED_STORY_AR } from "./ar";
+import { BED_STORY_DE } from "./de";
+import { BED_STORY_ES } from "./es";
+import { BED_STORY_HI } from "./hi";
+import { BED_STORY_RU } from "./ru";
+import { BED_STORY_ZH } from "./zh";
+import { BED_STORY_BLURB, BED_STORY_BOOK, BED_STORY_TITLE } from "./names";
+
+/** Every translation of the story (user request, 22 November 2026). */
+const TRANSLATIONS = { de: BED_STORY_DE, zh: BED_STORY_ZH, hi: BED_STORY_HI, es: BED_STORY_ES, ar: BED_STORY_AR, ru: BED_STORY_RU };
+
+/** Tapsi's name in each language's own script (root CLAUDE.md, Language). */
+const TAPSI = { de: "Tapsi", zh: "塔普西", hi: "टैप्सी", es: "Tapsi", ar: "تابسي", ru: "Тапси" };
+
+/** Bruno's name in each language's own script, as „Kita-Start“ writes it. */
+const BRUNO = { de: "Bruno", zh: "布鲁诺", hi: "ब्रूनो", es: "Bruno", ar: "برونو", ru: "Бруно" };
 
 describe("Tapsi's Big Bed", () => {
   test("every page has its own id, a short English text and a picture", () => {
@@ -119,6 +135,31 @@ describe("Tapsi's Big Bed", () => {
       const prompt = bedPicture(page).prompt;
       expect(prompt.includes("light-blue pyjamas"), page.id).toBe(/Tapsi in pyjamas/.test(page.picture));
       if (page.cast.includes("mama")) expect(prompt.includes("long yellow nightgown"), page.id).toBe(/Mama in her nightgown/.test(page.picture));
+    }
+  });
+
+  // Translated on request: every language has every chapter and page, no more, and the name, the book and its line.
+  test("every language has every chapter, page and name", () => {
+    for (const [language, t] of Object.entries(TRANSLATIONS)) {
+      expect(Object.keys(t.chapters).sort(), language).toEqual(BED_STORY.map((c) => c.id).sort());
+      expect(Object.keys(t.pages).sort(), language).toEqual(BED_PAGES.map((p) => p.id).sort());
+      for (const text of [...Object.values(t.chapters), ...Object.values(t.pages)]) expect(text.trim().length, language).toBeGreaterThan(0);
+      for (const names of [BED_STORY_TITLE, BED_STORY_BOOK, BED_STORY_BLURB]) expect(names[language as keyof typeof names], language).toBeTruthy();
+    }
+  });
+
+  // Names the voice says are written in the language's own script, never in Latin letters inside a sentence of another
+  // script, and every page naming Tapsi or Bruno in English names them in each translation too.
+  test("Tapsi and Bruno in each script, no Latin letters in Russian, Chinese, Hindi and Arabic", () => {
+    for (const [language, t] of Object.entries(TRANSLATIONS)) {
+      const tapsi = TAPSI[language as keyof typeof TAPSI];
+      const bruno = BRUNO[language as keyof typeof BRUNO];
+      for (const page of BED_PAGES) {
+        if (page.text.includes("Tapsi")) expect(t.pages[page.id], `${language} ${page.id}`).toContain(tapsi);
+        if (page.text.includes("Bruno")) expect(t.pages[page.id], `${language} ${page.id}`).toContain(bruno);
+      }
+      if (["ru", "zh", "hi", "ar"].includes(language))
+        for (const text of [...Object.values(t.chapters), ...Object.values(t.pages)]) expect(text, language).not.toMatch(/[A-Za-z]/);
     }
   });
 });

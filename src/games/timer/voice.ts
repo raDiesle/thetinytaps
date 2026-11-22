@@ -29,7 +29,7 @@ export type TimedPicture = Exclude<TimerPicture, TurnPicture>;
 
 /**
  * Each picture's two lines: where it goes, said as it starts, and what is there at the end. The older pictures' lines
- * are German first; a new picture's come English first (`Texts`) and only in English until translations are asked for.
+ * are German first; a new picture's come English first (`Texts`), translated into every app language with it.
  */
 export const PICTURE_LINES: Record<TimedPicture, { start: Texts; end: Texts }> = {
   disc: {

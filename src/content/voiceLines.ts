@@ -378,7 +378,9 @@ const MILK_CHAIN_TEXTS = byLanguage((texts) => texts.milkChain);
 const PACIFIER_TEXTS = byLanguage((texts) => texts.pacifierStory);
 const KITA_TEXTS = byLanguage((texts) => texts.kitaStory);
 const HAIR_TEXTS = byLanguage((texts) => texts.hairStory);
+const NIGHT_MILK_TEXTS = byLanguage((texts) => texts.nightMilk);
 const BOTTLE_TEXTS = byLanguage((texts) => texts.bottleStory);
+const BED_TEXTS = byLanguage((texts) => texts.bedStory);
 
 /**
  * A chapter book read aloud (`ChapterBook`'s `voice`): each page's sentence, in `language` where it is translated, else
@@ -637,9 +639,9 @@ export function voiceLines(language: TargetLanguageId = "de"): VoiceGame[] {
     { href: "/schnullerfee/", groups: chapterBook(PACIFIER_STORY, language, PACIFIER_TEXTS) },
     { href: "/kita/", groups: chapterBook(KITA_STORY, language, KITA_TEXTS) },
     { href: "/haare-waschen/", groups: chapterBook(HAIR_STORY, language, HAIR_TEXTS, "en") },
-    { href: "/abstillen/nachts/", groups: chapterBook(NIGHT_MILK, language, {}, "en") },
+    { href: "/abstillen/nachts/", groups: chapterBook(NIGHT_MILK, language, NIGHT_MILK_TEXTS, "en") },
     { href: "/flaeschchen/", groups: chapterBook(BOTTLE_STORY, language, BOTTLE_TEXTS, "en") },
-    { href: "/grosses-bett/", groups: chapterBook(BED_STORY, language, {}, "en") },
+    { href: "/grosses-bett/", groups: chapterBook(BED_STORY, language, BED_TEXTS, "en") },
     {
       href: "",
       groups: [

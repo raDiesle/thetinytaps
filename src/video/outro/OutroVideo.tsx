@@ -52,7 +52,7 @@ export function OutroVideo() {
       }
       facts={[
         ["Länge", `${OUTRO_SECONDS} Sekunden`],
-        ["Sprache", `${OWN_NAMES[language]} (wie im Regal; neue Wörter erst auf Englisch)`],
+        ["Sprache", `${OWN_NAMES[language]} (wie im Regal)`],
         ["Code führt zu", shortAddress(addressFor(target, language))],
         ["Ton", "eigener Klang (Zuklappen, Klopfen, ein Ton je Buch, die drei Glockentöne des Intros, Akkord), noch ohne Stimme"],
       ]}

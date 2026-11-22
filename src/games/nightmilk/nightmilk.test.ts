@@ -1,6 +1,12 @@
 import { describe, expect, test } from "bun:test";
 import { MILK_CHAIN_PICTURE_QUEUE } from "@/games/milkchain/milkChainPictures";
+import { NIGHT_MILK_AR } from "./ar";
+import { NIGHT_MILK_DE } from "./de";
+import { NIGHT_MILK_ES } from "./es";
+import { NIGHT_MILK_HI } from "./hi";
 import { NIGHT_MILK, NIGHT_PAGES, NIGHT_STEPS } from "./nightMilk";
+import { NIGHT_MILK_RU } from "./ru";
+import { NIGHT_MILK_ZH } from "./zh";
 import { NIGHT_PICTURE_QUEUE, nightPicture } from "./nightMilkPictures";
 
 describe("The Milk Sleeps at Night", () => {
@@ -115,4 +121,37 @@ describe("The Milk Sleeps at Night", () => {
       expect(prompt.includes("Tapsi drinks"), page.id).toBe(Boolean(page.nursing) || /Tapsi drinks/.test(page.picture));
     }
   });
+});
+
+// Translated into every app language at once (22 November 2026), as „Hair Washing“: each language has every chapter
+// and page, names Tapsi as its voice says it, and keeps the story's rule of the moon.
+describe("The Milk Sleeps at Night in every language", () => {
+  const chapterIds = NIGHT_MILK.map((c) => c.id).sort();
+  const pageIds = NIGHT_PAGES.map((p) => p.id).sort();
+  const LANGUAGES = { de: NIGHT_MILK_DE, zh: NIGHT_MILK_ZH, hi: NIGHT_MILK_HI, es: NIGHT_MILK_ES, ar: NIGHT_MILK_AR, ru: NIGHT_MILK_RU };
+  /** Tapsi's name and the moon, as each language writes them. */
+  const SAYS = {
+    de: ["Tapsi", "Mond"],
+    zh: ["塔普西", "月亮"],
+    hi: ["टैप्सी", "चाँद"],
+    es: ["Tapsi", "luna"],
+    ar: ["تابسي", "القمر"],
+    ru: ["Тапси", "луна"],
+  };
+
+  for (const [language, translation] of Object.entries(LANGUAGES)) {
+    test(`${language}: every chapter and page, nothing else`, () => {
+      expect(Object.keys(translation.chapters).sort()).toEqual(chapterIds);
+      expect(Object.keys(translation.pages).sort()).toEqual(pageIds);
+      for (const text of [...Object.values(translation.chapters), ...Object.values(translation.pages)]) expect(text.trim()).not.toBe("");
+    });
+
+    test(`${language}: Tapsi in its own script, and the moon's rule told`, () => {
+      const all = Object.values(translation.pages).join(" ");
+      for (const word of SAYS[language as keyof typeof SAYS]) expect(all).toContain(word);
+      expect(translation.pages.sagen).toContain(SAYS[language as keyof typeof SAYS][1]);
+      // Russian, Chinese, Hindi and Arabic are written without Latin letters.
+      if (language !== "de" && language !== "es") expect(all + Object.values(translation.chapters).join(" ")).not.toMatch(/[A-Za-z]/);
+    });
+  }
 });
