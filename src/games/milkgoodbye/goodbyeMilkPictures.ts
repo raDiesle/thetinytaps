@@ -55,7 +55,12 @@ function castOf(page: GoodbyePage): string {
     papa: "Papa, a grown-up fox man with round glasses, in a green sweater and brown trousers",
   };
   const n = page.cast.length;
-  return `Exactly ${n === 1 ? "one character" : `${n} characters, each once`}: ${page.cast.map((c) => who[c]).join("; ")}. Nobody else: only ONE of each in the whole picture, nobody more in a doorway, on the furniture or peeking in from an edge.`;
+  // With both grown-ups at the kitchen table Gemini once drew one fox with Mama's flower and Papa's glasses.
+  const both =
+    page.cast.includes("mama") && page.cast.includes("papa")
+      ? " Mama and Papa are two separate grown-ups: Mama has the flower and no glasses, Papa has the glasses and no flower."
+      : "";
+  return `Exactly ${n === 1 ? "one character" : `${n} characters, each once`}: ${page.cast.map((c) => who[c]).join("; ")}. Nobody else: only ONE of each in the whole picture, nobody more in a doorway, on the furniture or peeking in from an edge.${both}`;
 }
 
 /** What the things that come back look like, so they stay the same from page to page – each at one place only. */
@@ -130,7 +135,7 @@ export function goodbyePicture(page: GoodbyePage): QueuedPicture {
 }
 
 /** The pages whose pictures are made (`bilder/fest-<id>.webp`); the others wait in the queue. */
-const MADE = new Set<string>([]);
+const MADE = new Set<string>(["trinken", "sagen", "traurig", "herzen", "morgen", "kuchen", "letzte", "danke", "fest", "will", "weinen", "immer"]);
 
 /** Every picture of the story still to make. */
 export const GOODBYE_PICTURE_QUEUE: QueuedPicture[] = GOODBYE_PAGES.filter((p) => !MADE.has(p.id)).map(goodbyePicture);

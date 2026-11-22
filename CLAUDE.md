@@ -97,7 +97,7 @@ In a fresh worktree run `bun install` first.
   (`P8WiXqMIbsXF2nUgvRI0`) and „Tapsi Coach (Klon ru)“ for Russian (`wlDm46LsfSYnFAMs48Uv`) – the user chose the clone
   of the language's own takes over the English one by ear (November 2026), always with `--parallel 2` (Starter allows 3
   requests at once, the default 4 stopped a run); check a key's account first
-  (`bun run voice credits`: Creator is the first, Starter the second). The clone sounds close, not the same: use it for
+  (`bun run voice credits`; both are Creator plans since November 2026, the first with Tapsi's own voice). The clone sounds close, not the same: use it for
   whole parts or languages or whole rounds (a pair, a scene: what is heard together comes from one voice), never a few lines among the original's, and say so in `languageStatus.ts`. It speaks Chinese, Hindi, Spanish and Arabic well though made from English takes (checked with `whisper-cli`, which writes Hindi in Urdu letters).
 - **Only what ElevenLabs licenses for commercial use is made with it** (user decision, 21 November 2026): every
   recording, sound or song from ElevenLabs must be allowed in our YouTube videos (monetized too), so it comes from a

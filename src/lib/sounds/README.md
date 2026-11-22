@@ -120,7 +120,10 @@ On the Mac behind Zscaler no request reaches ElevenLabs: a sound asked for there
 `/paid-queue` (root CLAUDE.md, „Working here“).
 
 Animal calls Freesound has none of are made with ElevenLabs' sound effects (`POST /v1/sound-generation`, model
-`eleven_text_to_sound_v2`) on the first account (`ELEVENLABS_API_KEY`; paid plans may use them commercially). They
+`eleven_text_to_sound_v3` passed as `model_id` – v2, used for the calls below, is deprecated and goes in March 2027) on
+whichever paid account has credits (check both with `bun run voice credits` first; since November 2026 both are Creator
+plans). ElevenLabs' own pages, read 22 November 2026: Sound Effects is no Beta Service, and paid plans may use its
+output commercially, built into videos, games and apps (Creative Terms, Exhibit 4), never sold as loose samples. They
 are **not free**: about 11 credits a second asked for (a 1.5 s call cost 17, a 2 s one 22, November 2026), counted
 like the voice's characters, so check what the account has left first. Ask for the animal's own voice and nothing
 else – „A single … , close up, clean recording, no background noise“, 1.5–2 s, `prompt_influence` 0.7 –, look at the
@@ -131,7 +134,7 @@ mono, 22.05 kHz, 32 kbit/s, which makes 4–7 KB a call instead of the 15–30 K
 ```bash
 curl -s -o raw.mp3 -X POST "https://api.elevenlabs.io/v1/sound-generation?output_format=mp3_44100_128" \
   -H "xi-api-key: $ELEVENLABS_API_KEY" -H "content-type: application/json" \
-  -d '{"text":"A pet hamster squeaking, a few tiny high-pitched squeaks, close up, clean recording, no background noise","duration_seconds":1.5,"prompt_influence":0.7}'
+  -d '{"text":"A pet hamster squeaking, a few tiny high-pitched squeaks, close up, clean recording, no background noise","duration_seconds":1.5,"prompt_influence":0.7,"model_id":"eleven_text_to_sound_v3"}'
 ffmpeg -ss 0.3 -t 1.05 -i raw.mp3 -af "highpass=f=60,afade=t=in:d=0.01,afade=t=out:st=0.93:d=0.12,loudnorm=I=-16:TP=-1.5:LRA=11" -ac 1 -ar 22050 -c:a libmp3lame -b:a 32k hamster.mp3
 ```
 
