@@ -7,31 +7,46 @@ import {
   buildFarm,
   CAN,
   CAT,
+  CHICKS,
   COW,
   DOG_END,
   DONKEY,
   DUCKS,
   FARM_SOUNDS,
   type Farm,
+  FEATHERS,
   FLOOR,
+  featherAngle,
+  GOOSE,
+  GRAINS,
+  HEN,
+  HORN_BULB,
   KENNEL,
+  LATCH,
   MOO_MOUTH,
   MOO_RING_GROW,
   MOO_RING_R0,
+  NEST,
+  PERCH,
   PLANK,
   POND,
   POST,
   PUDDLE,
   ROCKS,
+  SACK,
+  SACK_PIVOT,
   SINGERS,
+  TAIL,
+  TRACTOR,
+  TURKEY,
   WORLD_W,
   YARN_R,
 } from "./farm";
 import { VIEW_H, type LevelProps, wobble } from "./level";
-import { along, easeOut, seg } from "./machineKit";
+import { along, easeOut, lerp, seg } from "./machineKit";
 import { MachineStage } from "./MachineStage";
 import { BAR_COLORS } from "./parts";
-import { INK, Sparkles } from "./scenery";
+import { CabDriver, INK, Sparkles } from "./scenery";
 
 const GRASS = "#7cc94e";
 const MUD = "#8d5a3b";
@@ -44,9 +59,13 @@ const BEAK = "#ff8c42";
  * tap, and the rooster crows, the pig jumps into the puddle, the mud wakes the
  * cat, her ball of wool rolls onto the cow's nose, the moo wakes the goat, who
  * hops down her rocks and butts the milk can (twice – the first time it only
- * wobbles) into the kennel, the dog comes out and chases the ducks onto the
+ * wobbles) into the kennel, the dog comes out barking at the turkey, whose
+ * fanned tail tips the grain sack over, a grain wakes the hen, she pecks her
+ * way onto the tractor and honks its horn, the fox farmer drives to the pond,
+ * a second honk wakes the goose, who jumps in and honks the ducks onto the
  * donkey's back, the donkey brays „I-aah“ and kicks the barn, the ducks fly
- * up onto its roof, the barn doors open, and all the animals sing together.
+ * up onto its roof, the swallow turns the door's latch, the barn doors open,
+ * and all the animals sing together.
  * The camera walks along the farmyard.
  */
 export function FarmLevel(props: LevelProps) {
@@ -76,8 +95,18 @@ export function FarmLevel(props: LevelProps) {
           <Goat farm={farm} t={t} />
           <Kennel farm={farm} t={t} />
           <MilkCan farm={farm} t={t} />
+          <Sack farm={farm} t={t} />
+          <Turkey farm={farm} t={t} />
+          <Nest />
+          <Grains farm={farm} t={t} />
+          <Tractor farm={farm} t={t} />
+          <Chicks farm={farm} t={t} />
+          <MotherHen farm={farm} t={t} />
+          <Puffs farm={farm} t={t} />
           <Pond />
+          <Goose farm={farm} t={t} />
           <Barn farm={farm} t={t} still={still(t)} />
+          <Swallow farm={farm} t={t} still={still(t)} />
           <Donkey farm={farm} t={t} still={still(t)} />
           <Dog farm={farm} t={t} still={still(t)} />
           {Array.from({ length: DUCKS }, (_, i) => (
@@ -99,14 +128,19 @@ function Yard() {
   return (
     <g>
       <rect x="-400" y="-200" width={WORLD_W + 800} height="800" fill="#9ad8ff" />
-      {[300, 1500, 2700, 3900, 5000].map((x, i) => (
+      {[300, 1500, 2700, 3900, 5000, 6200, 7400, 8500].map((x, i) => (
         <g key={x} transform={`translate(${x} ${110 + (i % 2) * 60})`} fill="#fff">
           <ellipse cx="0" cy="0" rx="70" ry="30" />
           <ellipse cx="50" cy="-18" rx="50" ry="30" />
           <ellipse cx="100" cy="0" rx="60" ry="26" />
         </g>
       ))}
-      <path d={`M-400 600 Q300 470 1000 580 T2400 560 T3800 580 T5200 550 T${WORLD_W + 400} 580 V900 H-400 Z`} fill="#a8d672" stroke={INK} strokeWidth="3" />
+      <path
+        d={`M-400 600 Q300 470 1000 580 T2400 560 T3800 580 T5200 550 T6600 580 T8000 550 T${WORLD_W + 400} 580 V900 H-400 Z`}
+        fill="#a8d672"
+        stroke={INK}
+        strokeWidth="3"
+      />
       <rect x="-400" y="600" width={WORLD_W + 800} height={VIEW_H + 200} fill={GRASS} />
       <line x1="-400" y1="600" x2={WORLD_W + 400} y2="600" stroke="#5fae3a" strokeWidth="4" />
       {Array.from({ length: Math.ceil(WORLD_W / 140) }, (_, i) => (
@@ -550,7 +584,7 @@ function Dog({ farm, t, still }: { farm: Farm; t: number; still: number }) {
   const d = farm.dogAt(t);
   const stride = d.running ? 30 * Math.sin(t * 18) : 0;
   const bob = d.running ? 6 * Math.abs(Math.sin(t * 18)) : 0;
-  const barks = [farm.tDog, farm.tPond];
+  const barks = [farm.tDog, farm.tTurkeyBark];
   const mouth = Math.max(farm.singing(3, t), ...barks.map((b) => Math.sin(Math.PI * seg(t, b, b + 0.4))));
   const wag = still > farm.tDog && still < farm.tDone ? 20 * Math.sin(still * 16) : 0;
   const fur = "#b5835a";
@@ -582,7 +616,7 @@ function Dog({ farm, t, still }: { farm: Farm; t: number; still: number }) {
  */
 function Donkey({ farm, t, still }: { farm: Farm; t: number; still: number }) {
   const d = farm.donkeyAt(t);
-  const mouth = Math.max(d.mouth, farm.singing(5, t));
+  const mouth = Math.max(d.mouth, farm.singing(6, t));
   const sway = still >= farm.tChoir ? 4 * Math.sin(still * 5 + 5) : 0;
   const grey = "#a39e9a";
   const light = "#e8e1d8";
@@ -682,6 +716,270 @@ function Duck({ farm, i, t, still }: { farm: Farm; i: number; t: number; still: 
   );
 }
 
+/* ---------- Turkey, hen, tractor and goose ---------- */
+
+/** The turkey, side on, facing the dog: it jumps with fright, gobbles with its wattle swinging, and fans its tail. */
+function Turkey({ farm, t }: { farm: Farm; t: number }) {
+  const k = farm.turkeyAt(t);
+  const fright = t >= farm.tTurkeyBark && t < farm.tTurkeyBark + 1.6;
+  const swing = 14 * k.mouth * Math.sin(t * 20);
+  return (
+    <g transform={`translate(0 ${-k.lift})`} stroke={INK} strokeWidth="4" strokeLinejoin="round">
+      {Array.from({ length: FEATHERS }, (_, i) => {
+        const a = featherAngle(i, k.fan);
+        const { x, y, r } = TAIL;
+        return (
+          <g key={i} transform={`rotate(${a} ${x} ${y})`}>
+            <path d={`M${x} ${y} Q${x + r * 0.5} ${y - 24} ${x + r} ${y} Q${x + r * 0.5} ${y + 24} ${x} ${y} Z`} fill={i % 2 ? "#8b5a2b" : "#a0682f"} />
+            <path d={`M${x + r * 0.78} ${y - 13} Q${x + r - 4} ${y} ${x + r * 0.78} ${y + 13}`} fill="none" stroke="#f1e3c6" strokeWidth="7" />
+          </g>
+        );
+      })}
+      {[-18, 14].map((dx) => (
+        <path key={dx} d={`M${TURKEY.x + dx} ${FLOOR - 52} V${FLOOR} m-10 0 h20`} fill="none" stroke="#d98c6a" strokeWidth="7" strokeLinecap="round" />
+      ))}
+      <ellipse cx={TURKEY.x} cy={FLOOR - 98} rx="64" ry="52" fill="#5a3a22" />
+      <ellipse cx={TURKEY.x + 8} cy={FLOOR - 98} rx="40" ry="26" fill="#7a5230" />
+      <path
+        d={`M${TURKEY.x - 46} ${FLOOR - 120} Q${TURKEY.x - 70} ${FLOOR - 150} ${TURKEY.x - 74} ${FLOOR - 172}`}
+        fill="none"
+        stroke="#9ecae1"
+        strokeWidth="18"
+        strokeLinecap="round"
+      />
+      <g transform={`translate(${TURKEY.x - 78} ${FLOOR - 182})`}>
+        <circle r="20" fill="#9ecae1" />
+        <path d="M-18 -2 L-36 2 L-18 6 Z" fill="#ffb703" />
+        <path d="M-18 6 L-32 9 L-18 12 Z" fill="#ffb703" transform={`rotate(${-26 * k.mouth} -18 6)`} />
+        <path d="M-14 -8 q-14 18 -6 34" fill="none" stroke="#e63946" strokeWidth="7" strokeLinecap="round" transform={`rotate(${swing} -14 -8)`} />
+        <path d="M-6 10 q-2 18 10 26 q8 -12 2 -26 Z" fill="#e63946" transform={`rotate(${swing} -2 10)`} />
+        <circle cx="-6" cy="-6" r={fright ? 7 : 5} fill={fright ? "#fff" : INK} strokeWidth="2.5" />
+        {fright && <circle cx="-8" cy="-6" r="3" fill={INK} stroke="none" />}
+      </g>
+    </g>
+  );
+}
+
+/** The open sack of grain: it tips over to the right when the turkey's tail sweeps against it. */
+function Sack({ farm, t }: { farm: Farm; t: number }) {
+  const { x0, w, h } = SACK;
+  return (
+    <g transform={`rotate(${farm.sackTilt(t)} ${SACK_PIVOT.x} ${SACK_PIVOT.y})`} stroke={INK} strokeWidth="4" strokeLinejoin="round">
+      <path
+        d={`M${x0 + 6} ${FLOOR} Q${x0 - 6} ${FLOOR - h / 2} ${x0 + 4} ${FLOOR - h} H${x0 + w - 4} Q${x0 + w + 6} ${FLOOR - h / 2} ${x0 + w - 6} ${FLOOR} Z`}
+        fill="#d8b77a"
+      />
+      <ellipse cx={x0 + w / 2} cy={FLOOR - h} rx={w / 2 - 4} ry="10" fill="#f4d35e" />
+      <path d={`M${x0 + 4} ${FLOOR - h + 14} Q${x0 + w / 2} ${FLOOR - h + 26} ${x0 + w - 4} ${FLOOR - h + 14}`} fill="none" />
+      <rect x={x0 + 26} y={FLOOR - 74} width="36" height="30" rx="4" fill="#c49a5a" strokeWidth="3" />
+    </g>
+  );
+}
+
+/** The grains flying out of the sack and lying on the grass until the hen pecks them up. */
+function Grains({ farm, t }: { farm: Farm; t: number }) {
+  return (
+    <g fill="#f4d35e" stroke={INK} strokeWidth="2.5">
+      {GRAINS.map((_, i) => {
+        const pt = farm.grainAt(i, t);
+        return pt && <ellipse key={i} cx={pt.x} cy={pt.y} rx="8" ry="6" />;
+      })}
+    </g>
+  );
+}
+
+/** The straw nest the hen dozes in. */
+function Nest() {
+  return (
+    <g stroke={INK} strokeWidth="4">
+      <ellipse cx={HEN.x - 10} cy={FLOOR - 8} rx="74" ry="18" fill="#e9c46a" />
+      <path
+        d={`M${HEN.x - 70} ${FLOOR - 14} l30 -10 M${HEN.x - 20} ${FLOOR - 4} l34 -12 M${HEN.x + 26} ${FLOOR - 10} l28 6`}
+        fill="none"
+        stroke="#c9a227"
+        strokeWidth="4"
+      />
+    </g>
+  );
+}
+
+/** The brown mother hen, side on, looking right: asleep in her nest, then pecking her way to the tractor and riding on it. */
+function MotherHen({ farm, t }: { farm: Farm; t: number }) {
+  const h = farm.henAt(t);
+  const head = { x: lerp(38, 28, h.peck), y: lerp(-86 - 24 * h.up, -18, h.peck) };
+  const bodyY = -34 - 22 * h.up;
+  const clucks = [farm.tHenWake + 0.1, farm.tOnGuard];
+  const beak = Math.max(...clucks.map((c) => Math.sin(Math.PI * seg(t, c, c + 0.35))));
+  return (
+    <g transform={`translate(${h.pt.x} ${h.pt.y})`} stroke={INK} strokeWidth="3.5" strokeLinejoin="round">
+      {h.up > 0.05 && <path d={`M-8 ${bodyY + 26} V0 M10 ${bodyY + 26} V0`} stroke={BEAK} strokeWidth="5" strokeLinecap="round" />}
+      <path d={`M-36 ${bodyY - 6} L-58 ${bodyY - 40} L-46 ${bodyY - 2} Z`} fill="#6b3e26" />
+      <ellipse cx="0" cy={bodyY} rx="44" ry="32" fill="#b5651d" />
+      <ellipse cx="-6" cy={bodyY - 2} rx="24" ry="14" fill="#8b4513" />
+      <path d={`M20 ${bodyY - 18} L${head.x} ${head.y}`} stroke="#b5651d" strokeWidth="20" strokeLinecap="round" />
+      <g transform={`translate(${head.x} ${head.y})`}>
+        <path d="M-10 -16 q2 -16 8 -4 q4 -14 8 -2 q6 -12 8 4 Z" fill="#e63946" />
+        <circle r="18" fill="#b5651d" />
+        <path d="M16 -4 L32 0 L16 4 Z" fill="#ffb703" />
+        <path d="M16 4 L28 6 L16 8 Z" fill="#ffb703" transform={`rotate(${24 * beak} 16 4)`} />
+        <ellipse cx="12" cy="12" rx="4" ry="7" fill="#e63946" />
+        {h.awake ? (
+          <circle cx="6" cy="-4" r="3.5" fill={INK} stroke="none" />
+        ) : (
+          <path d="M1 -4 q5 4 10 0" fill="none" strokeLinecap="round" strokeWidth="2.5" />
+        )}
+      </g>
+    </g>
+  );
+}
+
+/** The three yellow chicks: asleep beside the nest, then hopping after their mother along the grains. */
+function Chicks({ farm, t }: { farm: Farm; t: number }) {
+  const awake = t >= farm.tHenWake + 0.6;
+  return (
+    <g stroke={INK} strokeWidth="3" strokeLinejoin="round">
+      {Array.from({ length: CHICKS }, (_, j) => {
+        const p = farm.chickAt(j, t);
+        return (
+          <g key={j} transform={`translate(${p.x} ${p.y})`}>
+            <path d="M-4 -4 V0 M4 -4 V0" stroke={BEAK} strokeWidth="3" />
+            <ellipse cx="0" cy="-18" rx="17" ry="15" fill="#ffd60a" />
+            <circle cx="12" cy={awake ? -36 : -28} r="11" fill="#ffd60a" />
+            <path d={`M22 ${awake ? -38 : -30} L30 ${awake ? -35 : -27} L22 ${awake ? -32 : -24} Z`} fill={BEAK} strokeWidth="2" />
+            {awake ? (
+              <circle cx="15" cy="-39" r="2.5" fill={INK} stroke="none" />
+            ) : (
+              <path d="M11 -30 q4 3 8 0" fill="none" strokeLinecap="round" strokeWidth="2.5" />
+            )}
+          </g>
+        );
+      })}
+    </g>
+  );
+}
+
+/** The orange tractor with the fox farmer, his straw hat over his eyes until the horn honks; its wheels turn as it drives. */
+function Tractor({ farm, t }: { farm: Farm; t: number }) {
+  const clip = useId();
+  const { x, spin, shake } = farm.tractorAt(t);
+  const awake = farm.farmerAwake(t);
+  const squash = Math.max(...[farm.tHorn, farm.tHorn2].map((h) => Math.sin(Math.PI * seg(t, h - 0.05, h + 0.25))));
+  const orange = "#e8742c";
+  const wheel = (cx: number, r: number, turn: number) => (
+    <g transform={`rotate(${turn} ${cx} ${-r})`}>
+      <circle cx={cx} cy={-r} r={r} fill="#3a3a3a" />
+      <circle cx={cx} cy={-r} r={r * 0.82} fill="none" stroke="#555" strokeWidth="6" strokeDasharray="10 12" />
+      <circle cx={cx} cy={-r} r={r * 0.45} fill="#f4c430" />
+      <path d={`M${cx - r * 0.45} ${-r} H${cx + r * 0.45} M${cx} ${-r * 1.45} V${-r * 0.55}`} strokeWidth="5" />
+    </g>
+  );
+  return (
+    <g transform={`translate(${x} ${FLOOR + shake})`} stroke={INK} strokeWidth="4" strokeLinejoin="round">
+      <rect x="224" y="-286" width="14" height="86" rx="3" fill="#6b6b6b" />
+      <rect x="-30" y="-122" width="320" height="34" rx="8" fill="#5a4636" />
+      <path d="M90 -96 V-196 Q90 -206 100 -206 H300 Q320 -206 322 -186 V-96 Z" fill={orange} />
+      <path d="M300 -196 V-108" stroke="#5a4636" strokeWidth="8" />
+      <circle cx="306" cy="-176" r="10" fill="#fff3b0" strokeWidth="3" />
+      {wheel(270, 50, (spin * TRACTOR.wheel) / 50)}
+      {/* The farmer on his seat, at the steering wheel. */}
+      <path d="M26 -212 H86 V-200 H26 Z M30 -212 V-262" fill="#5a4636" strokeWidth="4" />
+      <path d="M44 -212 V-282 Q44 -296 62 -296 Q84 -296 86 -280 L92 -212 Z" fill="#3d7ab8" />
+      <path d="M78 -262 Q110 -250 132 -262" fill="none" stroke="#3d7ab8" strokeWidth="14" strokeLinecap="round" />
+      <path d="M150 -206 L132 -258" strokeWidth="6" />
+      <ellipse cx="132" cy="-262" rx="24" ry="7" fill="none" strokeWidth="6" transform="rotate(-20 132 -262)" />
+      {/*
+       * Only the head below its hard hat: his own straw hat is drawn over it, tipped down over his face while he sleeps
+       * and pushed up when he wakes, when it sits on his head.
+       */}
+      <clipPath id={`${clip}-farmer`}>
+        <rect x="0" y="-335" width="128" height="90" />
+      </clipPath>
+      <g clipPath={`url(#${clip}-farmer)`}>
+        <CabDriver cx={64} cy={-322} r={30} kind="fox" hat="#f2d16b" />
+      </g>
+      <g transform={`translate(64 ${lerp(-312, -352, awake)})`}>
+        <ellipse cx="0" cy="8" rx="50" ry="10" fill="#f2d16b" />
+        <path d="M-28 8 Q-28 -22 0 -24 Q28 -22 28 8 Z" fill="#f2d16b" />
+        <path d="M-27 0 H27" stroke="#e63946" strokeWidth="6" />
+      </g>
+      {/* The back wheel under its mudguard, with the bulb horn on top. */}
+      {wheel(0, TRACTOR.wheel, spin)}
+      <path
+        d={`M-104 -80 V-150 Q-104 ${TRACTOR.guard - FLOOR} -64 ${TRACTOR.guard - FLOOR} H64 Q104 ${TRACTOR.guard - FLOOR} 104 -150 V-80 H88 V-150 Q88 -174 64 -174 H-64 Q-88 -174 -88 -150 V-80 Z`}
+        fill={orange}
+      />
+      <path
+        d={`M${HORN_BULB.dx + 10} ${HORN_BULB.y - FLOOR - 4} L46 ${HORN_BULB.y - FLOOR - 14} V${HORN_BULB.y - FLOOR + 10} L${HORN_BULB.dx + 10} ${HORN_BULB.y - FLOOR + 4} Z`}
+        fill="#e9b949"
+      />
+      <rect x={HORN_BULB.dx + 4} y={TRACTOR.guard - FLOOR - 6} width="40" height="6" rx="2" fill="#8a8f96" strokeWidth="3" />
+      <ellipse cx={HORN_BULB.dx} cy={HORN_BULB.y - FLOOR + 3 * squash} rx={HORN_BULB.r + 3 * squash} ry={HORN_BULB.r - 4 * squash} fill="#e63946" />
+    </g>
+  );
+}
+
+/** Little grey clouds puffing out of the tractor's exhaust while its engine runs, rising and fading. */
+function Puffs({ farm, t }: { farm: Farm; t: number }) {
+  return (
+    <g fill="#e3e3e3" stroke={INK} strokeWidth="2.5">
+      {farm.puffs.map((born) => {
+        const age = t - born;
+        if (age < 0 || age >= 1.4) return null;
+        const x = farm.tractorAt(born).x + 231 - 26 * age;
+        return <circle key={born} cx={x} cy={FLOOR - 296 - 90 * age} r={10 + 22 * age} opacity={0.8 * (1 - age / 1.4)} />;
+      })}
+    </g>
+  );
+}
+
+/** The grey goose: asleep on the bank, then flapping, jumping into the pond with a splash and stretching its neck at the ducks. */
+function Goose({ farm, t }: { farm: Farm; t: number }) {
+  const g = farm.gooseAt(t);
+  const head = g.awake ? { x: lerp(40, 66, g.neck), y: lerp(-128, -74, g.neck) } : { x: 30, y: -76 };
+  const sink = g.swimming ? 14 : 0;
+  const splash = t - farm.tGooseSplash;
+  return (
+    <g>
+      <g transform={`translate(${g.pt.x} ${g.pt.y + sink})`} stroke={INK} strokeWidth="4" strokeLinejoin="round">
+        {!g.swimming && <path d="M-8 -20 V0 m-8 0 h14 M12 -20 V0 m-6 0 h14" fill="none" stroke={BEAK} strokeWidth="5" strokeLinecap="round" />}
+        <path d="M-50 -52 L-74 -62 L-54 -36 Z" fill="#7d7d7d" />
+        <ellipse cx="0" cy="-44" rx={GOOSE.half} ry="30" fill="#9a9a9a" />
+        <ellipse cx="6" cy="-30" rx="40" ry="12" fill="#d9d4cc" stroke="none" />
+        <path d="M-30 -52 q30 -14 56 0 q-26 14 -56 0 Z" fill="#7d7d7d" transform={`rotate(${-70 * g.wings} 20 -52)`} />
+        <path d={`M34 -58 Q${head.x - 10} ${(head.y - 58) / 2 - 20} ${head.x} ${head.y}`} fill="none" stroke="#9a9a9a" strokeWidth="18" strokeLinecap="round" />
+        <g transform={`translate(${head.x} ${head.y})`}>
+          <circle r="16" fill="#7d7d7d" />
+          <path d="M12 -6 L36 -2 L12 2 Z" fill={BEAK} />
+          <path d="M12 2 L32 4 L12 8 Z" fill={BEAK} transform={`rotate(${30 * g.beak} 12 2)`} />
+          {g.awake ? (
+            <circle cx="5" cy="-5" r="3.5" fill={INK} stroke="none" />
+          ) : (
+            <path d="M0 -5 q5 4 10 0" fill="none" strokeLinecap="round" strokeWidth="3" />
+          )}
+        </g>
+        {g.swimming && <ellipse cx="0" cy="-16" rx="70" ry="8" fill="#4fb3e8" stroke="#8fd5ff" strokeWidth="3" />}
+      </g>
+      {splash >= 0 &&
+        splash < 0.8 &&
+        Array.from({ length: 8 }, (_, i) => {
+          const a = Math.PI * (0.12 + (0.76 * i) / 7);
+          const r = 30 + 150 * easeOut(splash / 0.8);
+          return (
+            <circle
+              key={i}
+              cx={GOOSE.water - r * Math.cos(a)}
+              cy={POND.y - 10 - r * 0.8 * Math.sin(a) + 260 * splash * splash}
+              r={11 - 8 * splash}
+              fill="#8fd5ff"
+              stroke={INK}
+              strokeWidth="2"
+            />
+          );
+        })}
+    </g>
+  );
+}
+
 /* ---------- The barn and its choir ---------- */
 
 /** The barn: the stable inside with the horse, the sheep and the hen, and two doors that swing open. */
@@ -719,6 +1017,45 @@ function Barn({ farm, t, still }: { farm: Farm; t: number; still: number }) {
           <rect width={half} height={doorH} fill="none" stroke="#fff" strokeWidth="9" />
         </g>
       ))}
+      {/*
+       * The wooden turn button on the left door's free edge, on its nail: lying across both doors it keeps them shut until
+       * the swallow turns it upright, and then it swings away with its door, out of the doorway.
+       */}
+      <g transform={`translate(${BARN.door0 + half * swing - LATCH.x} 0)`}>
+        <g transform={`rotate(${farm.latchTurn(t)} ${LATCH.x} ${LATCH.y})`} strokeWidth="4">
+          <rect x={LATCH.x - LATCH.half} y={LATCH.y - 9} width={2 * LATCH.half} height="18" rx="6" fill="#c68a4f" />
+        </g>
+        <circle cx={LATCH.x} cy={LATCH.y} r="6" fill="#8a8f96" strokeWidth="3" />
+      </g>
+      {/* The swallows' nest of mud under the eaves. */}
+      <path d={`M${NEST.x - 36} ${NEST.y - 2} Q${NEST.x} ${NEST.y + 44} ${NEST.x + 36} ${NEST.y - 2} Z`} fill="#8d6e53" strokeWidth="4" />
+      <path d={`M${NEST.x - 22} ${NEST.y + 10} q8 4 14 0 M${NEST.x + 4} ${NEST.y + 18} q8 4 14 0`} fill="none" stroke="#6b4f3a" strokeWidth="3" />
+    </g>
+  );
+}
+
+/** The swallow: dark blue with a red throat and a forked tail; asleep in her nest, then darting round and onto the turn button, and up onto the roof. */
+function Swallow({ farm, t, still }: { farm: Farm; t: number; still: number }) {
+  const s = farm.swallowAt(t);
+  const dir = Math.cos(s.angle) < 0 ? -1 : 1;
+  const turnBy = dir < 0 ? (s.angle * 180) / Math.PI - 180 : (s.angle * 180) / Math.PI;
+  const flap = s.flying ? 50 * Math.sin(t * 30) : 0;
+  const mouth = farm.singing(5, t);
+  const bob = mouth * 3 * Math.sin(still * 12);
+  return (
+    <g transform={`translate(${s.pt.x} ${s.pt.y - 8 - bob}) rotate(${turnBy}) scale(${dir} 1)`} stroke={INK} strokeWidth="3" strokeLinejoin="round">
+      <path d="M-20 -2 L-46 -12 L-30 0 L-46 8 Z" fill="#1d3557" />
+      <ellipse cx="0" cy="0" rx="24" ry="12" fill="#1d3557" />
+      <ellipse cx="4" cy="5" rx="16" ry="6" fill="#fff" stroke="none" />
+      <path d="M-4 -4 q-22 -4 -34 6 q18 6 34 -2 Z" fill="#274c77" transform={`rotate(${flap} -4 -4)`} />
+      <circle cx="20" cy="-8" r="11" fill="#1d3557" />
+      <ellipse cx="25" cy="-2" rx="6" ry="4" fill="#d62828" stroke="none" />
+      <path d="M30 -10 L40 -7 L30 -4 Z" fill={INK} transform={`rotate(${20 * mouth} 30 -7)`} />
+      {s.out ? (
+        <circle cx="23" cy="-11" r="2.5" fill="#fff" stroke="none" />
+      ) : (
+        <path d="M18 -11 q4 3 8 0" fill="none" strokeLinecap="round" strokeWidth="2.5" />
+      )}
     </g>
   );
 }
@@ -789,6 +1126,7 @@ function ChoirNotes({ farm, t }: { farm: Farm; t: number }) {
     { x: SINGERS[2].x, y: FLOOR - 150 },
     { x: DOG_END + 70, y: FLOOR - 160 },
     { x: BARN_MID, y: BARN.peak - 80 },
+    { x: PERCH.x, y: PERCH.y - 40 },
     { x: DONKEY.x - 200, y: FLOOR - 330 },
   ];
   return (

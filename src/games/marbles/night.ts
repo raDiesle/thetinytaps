@@ -8,19 +8,42 @@
 // minute hand steps up to the full hour, the little door opens and the sleepy
 // cuckoo slides out, calls a soft „kuckuck“ and yawns – leaning into the yawn,
 // its beak pushes the arc lamp's pull chain: click, the light goes out. The
-// cuckoo slides back in, the moon rises in the round window over the cradle, and
-// everything falls asleep while the camera glides slowly back through the room.
+// cuckoo slides back in, and in the dark the hamster in its cage wakes up (a
+// hamster's day begins at night): it trots to its water bottle, drinks and
+// climbs into its wheel. Its running turns the pulley on the wheel's axle, whose
+// rope loop draws a little toy cable car up the wall to the round window, where
+// the car bumps the wooden shutter and it swings open. The moon rises there, its
+// light creeps down over the cradle to the teddy, and everything falls asleep
+// while the camera glides slowly back through the room.
 // Soft sounds, a slow pace and no surprises only. Everything is worked out ahead
 // as a function of the seconds since the tap, so NightLevel.tsx only asks where
-// each thing is at a moment. Coordinates are those of the room, 3650 × 900; the
+// each thing is at a moment. Coordinates are those of the room, 4650 × 900; the
 // screen shows 1600 of it at a time.
 
-import { playChimeNote, playClick, playCreak, playCurtain, playKnock, playMusicbox, playPlop, playTick, playTwinkle, playYawn } from "@/lib/sfx";
+import {
+  playChimeNote,
+  playClick,
+  playCreak,
+  playCurtain,
+  playKnock,
+  playMusicbox,
+  playPlop,
+  playRecorded,
+  playSqueak,
+  playTick,
+  playTwinkle,
+  playWhirr,
+  playYawn,
+} from "@/lib/sfx";
 import { playCuckoo } from "@/lib/realSounds";
 import { along, cameraOn, distAt, easeInOut, easeOut, hop, lerp, pathOf, rad, roll, seg, timeline, timeWhen, turn } from "./machineKit";
 import { arc, line, type Pt } from "./path";
 
-export const WORLD_W = 3650;
+/** The recording the hamster squeaks with, loaded when the level opens. */
+export const NIGHT_SOUNDS = ["hamster"];
+const squeak = () => playRecorded("hamster", playSqueak);
+
+export const WORLD_W = 4650;
 export const FLOOR = 800;
 
 /* ---------- Layout ---------- */
@@ -105,13 +128,80 @@ export const LAMP = { base: BIRD.outX + 310, shade: { x: BIRD.outX + BIRD.beak.d
 /** The lamp's pull chain hangs from the shade's middle; its bead hangs at the cuckoo's beak, just out of reach until it yawns. */
 export const CHAIN = { x: LAMP.shade.x, top: LAMP.shade.y + LAMP.shadeH, len: 70, bead: 11 };
 
+/** How far right the round window, the moon and the cradle moved again when the hamster's nook came in. */
+const NOOK = 1000;
+
+/** The chest of drawers under the hamster's cage, and the cage on it (its tray's floor at `floor`). */
+export const CHEST = { x0: 2830, x1: 3210, top: 650 };
+export const CAGE = { x0: 2860, x1: 3180, top: 470, bottom: 650, floor: 630 };
+/** The middle of the cage, where the camera looks while the hamster is up. */
+const CAGE_MID = (CAGE.x0 + CAGE.x1) / 2;
+/** Where the hamster sleeps on its bedding (its middle), and where its middle is on the cage's floor. */
+export const BED = { x: 2975, y: 604 };
+const GROUND = CAGE.floor - 20;
+/** The hamster wheel on its stand, open towards us: its axle and the rim's radius. */
+export const WHEEL = { x: 3100, y: 568, r: 60 };
+/** Where the hamster's middle is when it runs at the bottom of its wheel. */
+const RUNNER = { x: WHEEL.x, y: WHEEL.y + WHEEL.r - 25 };
+/** Where it stands to drink (facing left), how far it rears up then, and where it stands before it climbs into the wheel. */
+const DRINK_X = 2928;
+const REAR = 0.45;
+const WHEEL_FOOT = 3012;
+
+/**
+ * Where the hamster's nose is: its drawing faces right with the nose at (34, -4) from its middle and rears up round
+ * its hind feet at (-20, 16); `face` -1 mirrors it.
+ */
+export function hamsterNose(h: { x: number; y: number; face: number; rear: number }): Pt {
+  const p = turn({ x: 34, y: -4 }, { x: -20, y: 16 }, -h.rear);
+  return { x: h.x + h.face * p.x, y: h.y + p.y };
+}
+/** The water bottle hanging inside the cage's left wall, its spout's tip right at the drinking hamster's nose. */
+const SPOUT = hamsterNose({ x: DRINK_X, y: GROUND, face: -1, rear: REAR });
+export const BOTTLE = { x0: 2868, x1: 2894, top: 500, bottom: 556, spout: { x: Math.round(SPOUT.x) - 2, y: Math.round(SPOUT.y) - 2 } };
+
 /** The round window over the cradle, where the moon rises. */
-export const ROUND_WINDOW = { x: 2950 + CORNER, y: 260, r: 110 };
+export const ROUND_WINDOW = { x: 2950 + CORNER + NOOK, y: 260, r: 110 };
+/** The wooden shutter over the round window: as big as the window with its frame, hinged at its right side. */
+export const SHUTTER = { r: ROUND_WINDOW.r + 10, hingeX: ROUND_WINDOW.x + ROUND_WINDOW.r + 10, open: rad(78) };
 /** The moon's middle at the bottom of its way (hidden below the window) and at the top. */
-export const MOON = { x: 2975 + CORNER, y0: 430, y1: 235, r: 46 };
+export const MOON = { x: 2975 + CORNER + NOOK, y0: 430, y1: 235, r: 46 };
+/** Where the moonlight falling from the round window starts, across the window's lower part. */
+export const BEAM_TOP = ROUND_WINDOW.y + 80;
 /** The cradle on its rockers, and the teddy's head on its pillow. */
-export const CRADLE = { x0: 2780 + CORNER, x1: 3120 + CORNER, top: 590, bottom: 730 };
-export const TEDDY = { x: 2890 + CORNER, y: 572 };
+export const CRADLE = { x0: 2780 + CORNER + NOOK, x1: 3120 + CORNER + NOOK, top: 590, bottom: 730 };
+export const TEDDY = { x: 2890 + CORNER + NOOK, y: 572 };
+
+/**
+ * The toy cable car's rope loop: round the pulley on the wheel's axle (`drive`, it turns with the wheel) and the
+ * pulley on the wall left of the round window (`turn`). The car hangs from the upper strand by its hanger.
+ */
+export const ROPE = { drive: { x: WHEEL.x, y: WHEEL.y, r: 20 }, turn: { x: 4074, y: 221, r: 10 } };
+/** The car: its hanger's length down from the rope, and its cabin's width and height below that. */
+export const CAR = { hanger: 28, w: 72, h: 54 };
+const ROPE_FROM: Pt = { x: ROPE.drive.x, y: ROPE.drive.y - ROPE.drive.r };
+const ROPE_TO: Pt = { x: ROPE.turn.x, y: ROPE.turn.y - ROPE.turn.r };
+const ROPE_LEN = Math.hypot(ROPE_TO.x - ROPE_FROM.x, ROPE_TO.y - ROPE_FROM.y);
+/** Where the car's grip is on the upper strand, `s` along it from the drive pulley's top. */
+export const gripAt = (s: number): Pt => ({
+  x: ROPE_FROM.x + ((ROPE_TO.x - ROPE_FROM.x) * s) / ROPE_LEN,
+  y: ROPE_FROM.y + ((ROPE_TO.y - ROPE_FROM.y) * s) / ROPE_LEN,
+});
+/** The middle of the cabin's right side, which bumps the shutter. */
+export const carNose = (grip: Pt): Pt => ({ x: grip.x + CAR.w / 2, y: grip.y + CAR.hanger + CAR.h / 2 });
+/** Where the car waits, its cabin just right of the cage, and where its nose touches the shut shutter. */
+const CAR_START = (CAGE.x1 + 8 + CAR.w / 2 - ROPE_FROM.x) / ((ROPE_TO.x - ROPE_FROM.x) / ROPE_LEN);
+const CAR_END = (() => {
+  let lo = CAR_START;
+  let hi = ROPE_LEN;
+  for (let i = 0; i < 40; i++) {
+    const mid = (lo + hi) / 2;
+    const n = carNose(gripAt(mid));
+    if (Math.hypot(n.x - ROUND_WINDOW.x, n.y - ROUND_WINDOW.y) > SHUTTER.r) lo = mid;
+    else hi = mid;
+  }
+  return lo;
+})();
 
 /* ---------- The machine ---------- */
 
@@ -276,8 +366,81 @@ export function buildNight() {
     },
   });
 
-  /* The moon rises in the round window. */
-  const tMoon = tClick + 2;
+  /*
+   * Night has fallen, and the hamster wakes up on its bedding: it trots to its bottle, rears up and drinks (two soft
+   * plops, bubbles rising in the bottle), trots to its wheel and climbs in.
+   */
+  const tHamsterWake = tClick + 1.9;
+  const tToBottle = tHamsterWake + 0.7;
+  const tDrink = tToBottle + 0.7;
+  const tDrinkEnd = tDrink + 1.6;
+  const tToWheel = tDrinkEnd + 0.2;
+  const tAtWheel = tToWheel + 1;
+  const tInWheel = tAtWheel + 0.5;
+  at(tHamsterWake, { sound: squeak });
+  const SIPS = [0.5, 1.1];
+  SIPS.forEach((d) => at(tDrink + d, { sound: playPlop }));
+  at(tInWheel, { sound: () => playKnock(1300) });
+
+  /*
+   * It runs in its wheel, and the pulley on the wheel's axle turns with it: the rope loop draws the cable car up the
+   * wall, slowly, until the car's nose bumps the shutter of the round window. The wheel stops with the car.
+   */
+  const tRun = tInWheel + 0.3;
+  const tArrive = tRun + 5.6;
+  /** How far the rope has moved since the hamster started running. */
+  const ropeRun = (t: number) => (CAR_END - CAR_START) * easeInOut(seg(t, tRun, tArrive));
+  /** Where the cable car's grip is on the rope. */
+  const carAt = (t: number) => gripAt(CAR_START + ropeRun(t));
+  /** How far the wheel (and the pulley on its axle) has turned, in radians, clockwise. */
+  const wheelTurn = (t: number) => ropeRun(t) / ROPE.drive.r;
+  [0.3, 2.5].forEach((d) => at(tRun + d, { sound: playWhirr }));
+  at(tRun + 0.1, { sound: squeak });
+
+  /* The bump sets the shutter swinging open on its hinge, slowly, with a soft creak. */
+  const tOpen = tArrive + 1.8;
+  /** How far the shutter has swung open, in radians (0 shut). */
+  const shutterTurn = (t: number) => SHUTTER.open * easeInOut(seg(t, tArrive + 0.05, tOpen));
+  at(tArrive, { sound: () => playKnock(1100) });
+  at(tArrive + 0.3, { sound: playCreak });
+
+  /** Where the hamster is and what it does: asleep on its bedding, trotting, drinking, climbing in, running in its wheel. */
+  const hamsterAt = (t: number) => {
+    const awake = easeOut(seg(t, tHamsterWake, tHamsterWake + 0.5)) * (1 - easeOut(seg(t, tHamsterSleep, tHamsterSleep + 0.6)));
+    let x = BED.x;
+    let y = BED.y;
+    let face = -1;
+    let rear = 0;
+    let step = 0;
+    if (t >= tToBottle && t < tDrinkEnd + 0.2) {
+      const k = seg(t, tToBottle, tDrink);
+      x = lerp(BED.x, DRINK_X, k);
+      y = lerp(BED.y, GROUND, k);
+      step = k < 1 ? 7 * k : 0;
+      rear = REAR * (easeInOut(seg(t, tDrink, tDrink + 0.3)) - easeInOut(seg(t, tDrinkEnd, tDrinkEnd + 0.2)));
+    } else if (t >= tDrinkEnd + 0.2 && t < tAtWheel) {
+      const k = seg(t, tToWheel, tAtWheel);
+      x = lerp(DRINK_X, WHEEL_FOOT, k);
+      y = GROUND;
+      face = 1;
+      step = 10 * k;
+    } else if (t >= tAtWheel) {
+      const p = hop({ x: WHEEL_FOOT, y: GROUND }, RUNNER, 34, easeInOut(seg(t, tAtWheel, tInWheel)));
+      x = p.x;
+      y = p.y;
+      face = 1;
+      rear = t < tInWheel ? 0.2 : 0.12;
+      step = (wheelTurn(t) * WHEEL.r) / 14;
+    }
+    return { x, y, face, rear, step, awake };
+  };
+  /** How much water is left in the bottle (1 full); each sip takes a little. */
+  const water = (t: number) => 1 - 0.12 * SIPS.reduce((n, d) => n + easeOut(seg(t, tDrink + d, tDrink + d + 0.3)), 0);
+  /** The bubbles rising in the bottle after each sip: how far up each one is (null while there is none). */
+  const bubbles = (t: number) => SIPS.map((d) => (t >= tDrink + d && t < tDrink + d + 0.8 ? seg(t, tDrink + d, tDrink + d + 0.8) : null));
+
+  /* The moon rises in the round window as soon as its shutter is open. */
+  const tMoon = tOpen;
   const tMoonUp = tMoon + 4;
   const moonY = (t: number) => lerp(MOON.y0, MOON.y1, easeOut(seg(t, tMoon, tMoonUp)));
   [0, 1, 2].forEach((i) => at(tMoon + 0.8 + i * 1.1, { sound: () => playChimeNote(3 + i * 2) }));
@@ -293,15 +456,29 @@ export function buildNight() {
     },
   });
 
-  /* Everything falls asleep: first the teddy and the moon, then on the slow way back the cuckoo, the star and the sheep. */
-  const tYawn = tMoonUp + 0.4;
+  /*
+   * The moonlight creeps down from the window over the cradle; when it reaches the teddy's face, the teddy yawns.
+   * Then everything falls asleep: first the teddy and the moon, then on the slow way back the hamster, the cuckoo, the
+   * star and the sheep.
+   */
+  const tBeam = tMoonUp - 0.4;
+  const BEAM_S = 2.8;
+  /** How far down the moonlight has crept, from the window's sill (0) to the cradle's foot (1). */
+  const beamReach = (t: number) => easeInOut(seg(t, tBeam, tBeam + BEAM_S));
+  /** The lowest point the moonlight reaches. */
+  const beamY = (t: number) => lerp(BEAM_TOP, CRADLE.bottom, beamReach(t));
+  let tYawn = tBeam;
+  while (beamY(tYawn) < TEDDY.y) tYawn += 0.01;
   const tTeddy = tYawn + 1.3;
   const tMoonSleep = tTeddy + 1.6;
   const tPan = tMoonSleep + 1.4;
-  const tPanEnd = tPan + 7.4;
+  /** The way back takes as long, per pixel, as it did before the nook came in: 7.4 s for 2050 px. */
+  const tPanEnd = tPan + (7.4 * LAST_CAMERA) / 2050;
   /** The camera's left edge on its way back to the start. */
   const panCamera = (t: number) => LAST_CAMERA * (1 - easeInOut(seg(t, tPan, tPanEnd)));
-  /** The cuckoo and the star fall asleep once the camera has them in the middle of the picture again. */
+  /** The hamster, the cuckoo and the star fall asleep once the camera has them in the middle of the picture again. */
+  let tHamsterSleep = tPan;
+  while (panCamera(tHamsterSleep) > CAGE_MID - 760) tHamsterSleep += 0.05;
   let tCuckoo = tPan;
   while (panCamera(tCuckoo) > CLOCK.x - 760) tCuckoo += 0.05;
   let tStar = tPan;
@@ -333,6 +510,7 @@ export function buildNight() {
       ru: "Спокойной ночи, луна.",
     },
   });
+  at(tHamsterSleep, { sound: () => playChimeNote(4) });
   at(tCuckoo, { sound: () => playChimeNote(3) });
   at(tStar, {
     sound: () => playChimeNote(2),
@@ -368,12 +546,15 @@ export function buildNight() {
     return u <= 0 ? 0 : 3 * Math.exp(-u / 6) * Math.sin(u * 2.2);
   };
 
-  /** Where the camera looks: the music box and the top of the gutter, then the star on its last stretch, the curtain, the reading corner, the moon, and slowly back. */
+  /** Where the camera looks: the music box and the top of the gutter, then the star on its last stretch, the curtain, the reading corner, the hamster and its cable car, the moon, and slowly back. */
   const cameraTarget = (t: number) => {
     if (t < tLeg3) return 0;
     if (t < tEnd) return cameraOn(WORLD_W, starAt(t).pt.x);
     if (t < tShut) return cameraOn(WORLD_W, Math.max(BASKET.x + 300, curtainEdge(t)));
     if (t < tBackEnd + 0.2) return cameraOn(WORLD_W, CLOCK.x + 40);
+    if (t < tRun) return cameraOn(WORLD_W, CAGE_MID);
+    // The whole way of the cable car, from the cage to the round window, fits on the screen at once.
+    if (t < tOpen) return CHEST.x0 - 40;
     if (t < tPan) return LAST_CAMERA;
     return panCamera(t);
   };
@@ -401,10 +582,19 @@ export function buildNight() {
     tClick,
     tBack,
     tBackEnd,
+    tHamsterWake,
+    tDrink,
+    tAtWheel,
+    tInWheel,
+    tRun,
+    tArrive,
+    tOpen,
     tMoon,
+    tBeam,
     tYawn,
     tTeddy,
     tMoonSleep,
+    tHamsterSleep,
     tCuckoo,
     tStar,
     tSheep,
@@ -425,6 +615,13 @@ export function buildNight() {
     lampOn,
     dark,
     moonY,
+    hamsterAt,
+    water,
+    bubbles,
+    carAt,
+    wheelTurn,
+    shutterTurn,
+    beamY,
     asleep,
     rock,
     cameraTarget,

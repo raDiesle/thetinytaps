@@ -5,29 +5,47 @@ import {
   BARN,
   buildFarm,
   CAN,
+  CHICKS,
   DOG_END,
   DONKEY,
   DUCKS,
   donkeyHoof,
+  FEATHERS,
   FLOOR,
+  featherTip,
   GOAT_HORNS,
   GOAT_SPOTS,
+  GOOSE,
+  GRAINS,
+  GUARD_SPOT,
+  HEN,
+  HEN_REACH,
+  HORN_BULB,
+  henHead,
   KENNEL,
+  LATCH,
   MOO_MOUTH,
   MOO_RING_GROW,
   MOO_RING_R0,
+  NEST,
+  PERCH,
   POND,
   ROCKS,
   roofY,
+  SACK,
+  SACK_PIVOT,
+  TRACTOR,
+  TRACTOR_DRIVE,
+  TURKEY,
   WORLD_W,
 } from "./farm";
 
 describe("Bauernhof", () => {
   const farm = buildFarm();
 
-  test("the machine runs 37 to 41 seconds and ends after everything else", () => {
-    expect(farm.duration).toBeGreaterThan(37);
-    expect(farm.duration).toBeLessThan(41);
+  test("the machine runs 56 to 64 seconds and ends after everything else", () => {
+    expect(farm.duration).toBeGreaterThan(56);
+    expect(farm.duration).toBeLessThan(64);
     const last = farm.events[farm.events.length - 1];
     expect(last.at).toBe(farm.duration);
     expect(last.done).toBe(true);
@@ -47,10 +65,29 @@ describe("Bauernhof", () => {
       farm.tButt,
       farm.tKennelHit,
       farm.tDog,
-      farm.tPond,
+      farm.tTurkeyBark,
+      farm.tGobble,
+      farm.tTip,
+      farm.tSackDown,
+      farm.tHenWake,
+      ...GRAINS.map((_, i) => farm.tPeck(i)),
+      farm.tHenHop,
+      farm.tOnGuard,
+      farm.tHorn,
+      farm.tEngine,
+      farm.tDrive,
+      farm.tDriveEnd,
+      farm.tHorn2,
+      farm.tGooseWake,
+      farm.tGooseSplash,
+      farm.tGooseHonk,
+      ...Array.from({ length: DUCKS }, (_, i) => farm.tTakeOff(i)),
       ...Array.from({ length: DUCKS }, (_, i) => farm.tLand(i)),
       farm.tBray,
       farm.tKick,
+      farm.tSwallowOut,
+      farm.tSwallowLand,
+      farm.tTurned,
       farm.tDoors,
       farm.tChoir,
       farm.duration,
@@ -100,6 +137,100 @@ describe("Bauernhof", () => {
     }
     const right = Math.max(...corners(farm.tKennelHit).map((c) => c.x));
     expect(right).toBeGreaterThan(KENNEL.x0 - 6);
+  });
+
+  test("the dog stops barking right in front of the turkey, short of its head", () => {
+    const snout = farm.dogAt(farm.tTurkeyBark).x + 112;
+    const turkeyBeak = TURKEY.x - 114;
+    expect(snout).toBeLessThan(turkeyBeak);
+    expect(turkeyBeak - snout).toBeLessThan(40);
+    expect(farm.dogAt(farm.tTurkeyBark + 3).x).toBe(farm.dogAt(farm.tTurkeyBark).x);
+  });
+
+  test("the turkey's last tail feather reaches the sack just as it starts to tip, and never goes into it", () => {
+    const last = FEATHERS - 1;
+    const fan = (t: number) => farm.turkeyAt(t).fan;
+    expect(featherTip(last, fan(farm.tTip)).x).toBeCloseTo(SACK.x0, 0);
+    expect(farm.sackTilt(farm.tTip)).toBe(0);
+    expect(farm.turkeyAt(farm.tTip).lift).toBeCloseTo(0);
+    // The tip touches the sack's side, not its top.
+    expect(featherTip(last, fan(farm.tTip)).y).toBeGreaterThan(FLOOR - SACK.h);
+    for (let t = farm.tGobble; t < farm.duration; t += 0.01) {
+      const tip = featherTip(last, fan(t));
+      // The sack's left side at the tip's height, turned with the sack.
+      const side = turn({ x: SACK.x0, y: tip.y }, SACK_PIVOT, (farm.sackTilt(t) * Math.PI) / 180);
+      if (tip.y > FLOOR - SACK.h) expect(tip.x).toBeLessThanOrEqual(side.x + 1.5);
+    }
+    expect(farm.sackTilt(farm.tSackDown)).toBe(90);
+  });
+
+  test("the first grain lands on the hen's head, the others in a row she pecks up on her way to the tractor", () => {
+    const head = henHead(HEN.x);
+    const first = farm.grainAt(0, farm.tHenWake - 0.001);
+    expect(first).not.toBeNull();
+    expect(Math.hypot((first?.x ?? 0) - head.x, (first?.y ?? 0) - head.y)).toBeLessThan(30);
+    expect(farm.henAt(farm.tHenWake - 0.01).awake).toBe(false);
+    GRAINS.forEach((g, i) => {
+      // The grain lies on the grass before she pecks it, her beak reaches it, and it is gone afterwards.
+      expect(farm.grainAt(i, farm.tPeck(i) - 0.05)).toEqual({ x: g, y: FLOOR - 6 });
+      expect(farm.henAt(farm.tPeck(i)).pt.x + HEN_REACH).toBeCloseTo(g, 0);
+      expect(farm.henAt(farm.tPeck(i)).peck).toBeGreaterThan(0.8);
+      expect(farm.grainAt(i, farm.tPeck(i) + 0.01)).toBeNull();
+    });
+    // The grains spill out of the sack's mouth, which lies to the right of the sack once it is down, short of the nest.
+    expect(SACK_PIVOT.x + SACK.h).toBeLessThan(HEN.x - 52 - 30 * (CHICKS - 1) - 20);
+    for (let j = 0; j < CHICKS; j++) expect(farm.chickAt(j, farm.duration).x).toBeLessThan(TRACTOR.x - TRACTOR.wheel);
+  });
+
+  test("the hen flutters onto the mudguard, her beak reaches the horn's bulb, and she rides along to the pond", () => {
+    const bulbLeft = (t: number) => farm.tractorAt(t).x + HORN_BULB.dx - HORN_BULB.r;
+    for (const horn of [farm.tHorn, farm.tHorn2]) {
+      const hen = farm.henAt(horn);
+      expect(hen.peck).toBeGreaterThan(0.8);
+      expect(hen.pt.x + HEN_REACH).toBeGreaterThan(bulbLeft(horn));
+      expect(hen.pt.x + HEN_REACH).toBeLessThan(bulbLeft(horn) + 6);
+    }
+    expect(farm.henAt(farm.tOnGuard).pt.y).toBeCloseTo(TRACTOR.guard, 0);
+    expect(farm.tractorAt(farm.tDrive).x).toBe(TRACTOR.x);
+    expect(farm.tractorAt(farm.tDriveEnd).x).toBe(TRACTOR.x + TRACTOR_DRIVE);
+    expect(farm.henAt(farm.tDriveEnd).pt.x).toBe(TRACTOR.x + TRACTOR_DRIVE + GUARD_SPOT.dx);
+    // The farmer is woken by the honk and starts the engine; the first puff comes with it.
+    expect(farm.farmerAwake(farm.tHorn)).toBe(0);
+    expect(farm.farmerAwake(farm.tEngine)).toBe(1);
+    expect(farm.puffs[0]).toBeGreaterThan(farm.tEngine);
+    expect(farm.puffs[farm.puffs.length - 1]).toBeLessThan(farm.tGooseWake);
+  });
+
+  test("the tractor stops short of the goose, which jumps into the pond and stretches towards the ducks", () => {
+    expect(TRACTOR.x + TRACTOR_DRIVE + TRACTOR.front).toBeLessThan(GOOSE.x - 74 - 6);
+    expect(GOOSE.x + GOOSE.half).toBeLessThan(POND.x - POND.rx + 20);
+    expect(GOOSE.water - GOOSE.half).toBeGreaterThan(POND.x - POND.rx - 5);
+    expect(farm.gooseAt(farm.tGooseWake - 0.01).awake).toBe(false);
+    expect(farm.gooseAt(farm.tGooseSplash).pt).toEqual({ x: GOOSE.water, y: POND.y });
+    expect(farm.gooseAt(farm.tGooseHonk).neck).toBeGreaterThan(0.99);
+    // Stretched, its beak comes up to the first duck's tail but not into it.
+    const beak = GOOSE.water + 66 + 36;
+    const duckTail = farm.duckAt(0, farm.tGooseHonk).pt.x - 48 * 1.4;
+    expect(beak).toBeGreaterThan(duckTail - 50);
+    expect(beak).toBeLessThan(duckTail + 10);
+  });
+
+  test("the swallow flies from her nest to the turn button, which only turns under her, and the doors open after it", () => {
+    expect(farm.swallowAt(farm.tSwallowOut - 0.01).pt).toEqual(NEST);
+    const landed = farm.swallowAt(farm.tSwallowLand).pt;
+    expect(Math.hypot(landed.x - (LATCH.x + LATCH.half - 12), landed.y - (LATCH.y - 8))).toBeLessThan(1);
+    expect(farm.latchTurn(farm.tSwallowLand)).toBe(0);
+    expect(farm.latchTurn(farm.tTurned)).toBe(90);
+    expect(farm.doorsOpen(farm.tTurned)).toBe(0);
+    expect(farm.doorsOpen(farm.tDoors + 1)).toBe(1);
+    expect(farm.swallowAt(farm.duration).pt).toEqual(PERCH);
+    for (let t = farm.tSwallowOut; t < farm.duration; t += 0.05) {
+      const { pt } = farm.swallowAt(t);
+      expect(pt.x).toBeGreaterThan(DONKEY.x - 300);
+      expect(pt.x).toBeLessThan(WORLD_W - 40);
+      expect(pt.y).toBeGreaterThan(BARN.peak - 40);
+      expect(pt.y).toBeLessThan(FLOOR - 120);
+    }
   });
 
   test("the ducks land on the donkey's back, and his kick throws them onto the barn roof", () => {

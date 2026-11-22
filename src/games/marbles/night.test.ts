@@ -1,32 +1,44 @@
 import { describe, expect, test } from "bun:test";
 import {
   BASKET,
+  BEAM_TOP,
+  BED,
   BIRD,
+  BOTTLE,
   buildNight,
+  CAGE,
+  CAR,
   CHAIN,
   CHAIR,
+  CHEST,
   CLOCK,
   CRADLE,
   CURTAIN,
+  carNose,
   DOOR,
   FLOOR,
+  hamsterNose,
   KNOB0,
   knobAt,
   LAMP,
   MOON,
   PENDULUM,
+  ROPE,
   ROUND_WINDOW,
   SHELF,
+  SHUTTER,
   STAR_R,
+  TEDDY,
+  WHEEL,
   WORLD_W,
 } from "./night";
 
 describe("Gute-Nacht-Maschine", () => {
   const night = buildNight();
 
-  test("the machine runs 42 to 46 seconds and ends after everything else", () => {
-    expect(night.duration).toBeGreaterThan(42);
-    expect(night.duration).toBeLessThan(46);
+  test("the machine runs 56 to 64 seconds and ends after everything else", () => {
+    expect(night.duration).toBeGreaterThan(56);
+    expect(night.duration).toBeLessThan(64);
     expect(Math.max(...night.events.map((e) => e.at))).toBe(night.duration);
   });
 
@@ -47,7 +59,7 @@ describe("Gute-Nacht-Maschine", () => {
     }
   });
 
-  test("the story comes in order: star, basket, curtain, rocking chair, cuckoo clock, light out, moon", () => {
+  test("the story comes in order: star, basket, curtain, rocking chair, cuckoo clock, light out, hamster, cable car, shutter, moon, moonlight", () => {
     const order = [
       night.tPush,
       night.tIn,
@@ -60,7 +72,15 @@ describe("Gute-Nacht-Maschine", () => {
       night.tBirdYawn,
       night.tClick,
       night.tBack,
-      night.tMoon,
+      night.tHamsterWake,
+      night.tDrink,
+      night.tAtWheel,
+      night.tInWheel,
+      night.tRun,
+      night.tArrive,
+      night.tOpen,
+      night.tBeam,
+      night.tYawn,
       night.tTeddy,
     ];
     order.slice(1).forEach((t, i) => {
@@ -142,6 +162,82 @@ describe("Gute-Nacht-Maschine", () => {
     expect(CRADLE.x0 - 20).toBeGreaterThan(LAMP.base + 70);
   });
 
+  test("the hamster's chest stands between the lamp and the cradle, the cage and its wheel on it", () => {
+    expect(CHEST.x0).toBeGreaterThan(LAMP.base + 70);
+    expect(CHEST.x1).toBeLessThan(CRADLE.x0 - 20);
+    expect(CAGE.x0).toBeGreaterThan(CHEST.x0);
+    expect(CAGE.x1).toBeLessThan(CHEST.x1);
+    expect(CAGE.bottom).toBe(CHEST.top);
+    expect(WHEEL.x - WHEEL.r).toBeGreaterThan(BED.x + 30);
+    expect(WHEEL.x + WHEEL.r).toBeLessThan(CAGE.x1);
+    expect(WHEEL.y + WHEEL.r).toBeLessThanOrEqual(CAGE.floor);
+    expect(BOTTLE.x0).toBeGreaterThan(CAGE.x0);
+  });
+
+  test("the hamster sleeps until the light is out, drinks with its nose at the bottle's spout, and runs in its wheel", () => {
+    expect(night.hamsterAt(night.tClick).awake).toBe(0);
+    expect(night.tHamsterWake).toBeGreaterThan(night.tClick + 1.8);
+    expect(night.hamsterAt(night.tHamsterWake + 0.6).awake).toBe(1);
+    const drinking = night.hamsterAt(night.tDrink + 0.8);
+    const nose = hamsterNose(drinking);
+    expect(Math.hypot(nose.x - BOTTLE.spout.x, nose.y - BOTTLE.spout.y)).toBeLessThan(6);
+    expect(night.water(night.tDrink)).toBe(1);
+    expect(night.water(night.duration)).toBeLessThan(1);
+    // In the wheel it stays inside the rim while it runs.
+    for (let t = night.tInWheel; t <= night.duration; t += 0.1) {
+      const h = night.hamsterAt(t);
+      expect(Math.hypot(h.x - WHEEL.x, h.y - WHEEL.y) + 21).toBeLessThan(WHEEL.r);
+    }
+    // It never leaves the cage.
+    for (let t = 0; t <= night.duration; t += 0.05) {
+      const h = night.hamsterAt(t);
+      expect(h.x - 31).toBeGreaterThan(CAGE.x0);
+      expect(h.x + 31).toBeLessThan(CAGE.x1);
+      expect(h.y + 21).toBeLessThanOrEqual(CAGE.floor + 1);
+    }
+  });
+
+  test("the wheel turns only while the hamster runs, and draws the cable car up until its nose touches the shut shutter", () => {
+    expect(night.wheelTurn(night.tRun)).toBe(0);
+    expect(night.wheelTurn(night.tRun + 1)).toBeGreaterThan(0);
+    expect(night.wheelTurn(night.duration)).toBe(night.wheelTurn(night.tArrive));
+    const start = night.carAt(0);
+    expect(start.x - CAR.w / 2).toBeGreaterThan(CAGE.x1);
+    expect(start.y + CAR.hanger + CAR.h).toBeLessThan(CHEST.top);
+    const nose = carNose(night.carAt(night.tArrive));
+    expect(Math.hypot(nose.x - ROUND_WINDOW.x, nose.y - ROUND_WINDOW.y)).toBeCloseTo(SHUTTER.r, 0);
+    // The car never goes into the shutter, nor past the pulley that turns its rope.
+    for (let t = 0; t <= night.duration; t += 0.05) {
+      const grip = night.carAt(t);
+      const n = carNose(grip);
+      expect(Math.hypot(n.x - ROUND_WINDOW.x, n.y - ROUND_WINDOW.y)).toBeGreaterThan(SHUTTER.r - 1);
+      expect(grip.x + 7).toBeLessThan(ROPE.turn.x - ROPE.turn.r);
+    }
+  });
+
+  test("the shutter stays shut until the car bumps it, and the moon rises only once it is open", () => {
+    expect(night.shutterTurn(night.tArrive)).toBe(0);
+    expect(night.shutterTurn(night.tOpen)).toBeCloseTo(SHUTTER.open);
+    expect(night.moonY(night.tOpen)).toBe(MOON.y0);
+    expect(night.moonY(night.tOpen + 1)).toBeLessThan(MOON.y0);
+    expect(SHUTTER.hingeX + 30).toBeLessThan(WORLD_W);
+  });
+
+  test("the moonlight creeps down from the window and reaches the teddy's face when it yawns", () => {
+    expect(night.beamY(night.tBeam)).toBe(BEAM_TOP);
+    expect(night.tBeam).toBeGreaterThan(night.tMoon + 2);
+    expect(Math.abs(night.beamY(night.tYawn) - TEDDY.y)).toBeLessThan(3);
+    expect(night.beamY(night.duration)).toBe(CRADLE.bottom);
+  });
+
+  test("the camera holds the cage and the whole way of the cable car while it rides", () => {
+    for (let t = night.tRun; t < night.tOpen; t += 0.1) {
+      const left = night.cameraTarget(t);
+      expect(left).toBeLessThan(CAGE.x0);
+      expect(left + 1600).toBeGreaterThan(SHUTTER.hingeX + 20);
+    }
+  });
+
   test("the moon rises from below the round window into it", () => {
     expect(MOON.y0 - MOON.r).toBeGreaterThan(ROUND_WINDOW.y + ROUND_WINDOW.r);
     const top = night.moonY(night.duration);
@@ -149,7 +245,7 @@ describe("Gute-Nacht-Maschine", () => {
   });
 
   test("everyone falls asleep in turn, the last one before the end", () => {
-    const order = [night.tTeddy, night.tMoonSleep, night.tCuckoo, night.tStar, night.tSheep];
+    const order = [night.tTeddy, night.tMoonSleep, night.tHamsterSleep, night.tCuckoo, night.tStar, night.tSheep];
     order.slice(1).forEach((t, i) => {
       expect(t).toBeGreaterThan(order[i]);
     });
