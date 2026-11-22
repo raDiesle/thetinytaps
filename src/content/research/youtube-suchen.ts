@@ -17,7 +17,7 @@ export const youtubeSuchen: Research = {
     "Eltern suchen nach Länge („tooth brushing song 2 minutes“, „5 minute timer for kids“) und nach Zweck („clean up timer“, „aufräum timer mit musik“): Länge und Zweck gehören in den Titel.",
     "Deutsche Zahnputz-Suchen hängen oft eine Figur an (dino, bagger, feuerwehr, krokodil) – ein Hinweis für Shorts mit Kettenreaktion oder Fahrzeugen.",
     "„daycare story“ ist auf YouTube von einem Roblox-Spiel belegt; „first day of daycare story for toddlers“ trifft dagegen nur kleine, neue Kanäle.",
-    "Die Titel unter „Gibt es schon“ übernimmt die Video-Seite als „📝 Text für YouTube“ (`src/video/youtubeTexts.ts`); beim Zähneputzen „Brush Along with Tapsi“ statt „2 Minutes“, weil das Video länger läuft.",
+    "Die Titel unter „Gibt es schon“ übernimmt die Video-Seite als „📝 Text für YouTube“ (`src/video/youtubeTexts.ts`); beim Zähneputzen „Brush Along with Tapsi“. Eine eigene Fassung von genau 2 Minuten gibt es nicht: Das gesungene Putzen dauert gut 2 Minuten, und ungefähr 2 Minuten sind 2 Minuten (Entscheidung des Nutzers, 22. November 2026).",
   ],
   topics: [
     {

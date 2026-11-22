@@ -23,6 +23,7 @@ import { parentPhoneIdeas } from "./e-parent-phone";
 import { everydayHelpersIdeas } from "./h-everyday-helpers";
 import { pottyIdeas } from "./h-potty";
 import { timerIdeas } from "./h-timer";
+import { songHelpersIdeas } from "./h-songs";
 import { allGamesIdeas } from "./a-all-games";
 import { figureIdeas } from "./f-figure";
 import { rewardChartIdeas } from "./t-reward-chart";
@@ -67,6 +68,7 @@ export const IDEA_GROUPS: IdeaGroup[] = [
       timerIdeas,
       pottyIdeas,
       teethIdeas,
+      songHelpersIdeas,
       rewardChartIdeas,
       figureIdeas,
       bookIdeas,
