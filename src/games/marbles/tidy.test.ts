@@ -8,23 +8,35 @@ import {
   BOOKS,
   buildTidy,
   CHEST,
+  CLOWN,
+  CRANK,
   CRAYON,
   CRAYONS,
+  CRUMBS,
   CUSHION,
   FLOOR,
+  HANGER_STOP,
   IN_BED,
   IN_THE_CHEST,
+  JACK,
   LID_FOOT,
+  LINE,
   NOZZLE,
   PIECES,
   PLUG,
   POT,
   PUZZLE,
   PUZZLE_X1,
+  PYJAMAS,
+  ROBOT,
+  RUG,
+  RULER,
   SHELF,
+  SLINKY,
   SOCK_BALL_R,
   SOCK_HALF,
   SOCKS,
+  STEPS,
   slotCentre,
   STOOL,
   TRUCK,
@@ -35,9 +47,9 @@ describe("Aufräum-Maschine", () => {
   const tidy = buildTidy();
   const end = tidy.duration;
 
-  test("the machine runs 32–36 seconds and ends after everything else", () => {
-    expect(end).toBeGreaterThan(32);
-    expect(end).toBeLessThan(36);
+  test("the machine runs 56–64 seconds and ends after everything else", () => {
+    expect(end).toBeGreaterThan(56);
+    expect(end).toBeLessThan(64);
     expect(Math.max(...tidy.events.map((e) => e.at))).toBe(end);
     expect(tidy.events[tidy.events.length - 1].done).toBe(true);
   });
@@ -56,13 +68,20 @@ describe("Aufräum-Maschine", () => {
       expect(s.x + SOCK_HALF).toBeLessThan(BASKET.x0);
       expect(s.y + SOCK_HALF).toBeLessThanOrEqual(FLOOR);
     }
-    // Then the crayons round the stool, then the puzzle pieces, then the cushion and the bed, none overlapping.
+    // Then the crayons round the stool, then the puzzle pieces, the rug, the jack-in-the-box, the step stool, the ruler,
+    // the vacuum with its crumbs, then the cushion and the bed, none overlapping.
     const lastCrayon = CRAYONS[CRAYONS.length - 1];
     expect(CRAYONS[0].x - CRAYON.len / 2).toBeGreaterThan(BASKET.x1);
     expect(STOOL.x).toBeGreaterThan(CRAYONS[0].x);
     expect(STOOL.x).toBeLessThan(lastCrayon.x);
     expect(lastCrayon.x + CRAYON.len / 2).toBeLessThan(PIECES[0].x - PUZZLE.w / 2);
-    expect(PIECES[PIECES.length - 1].x + PUZZLE.w / 2).toBeLessThan(PLUG.x - 2 * SOCK_BALL_R);
+    expect(PIECES[PIECES.length - 1].x + PUZZLE.w / 2).toBeLessThan(RUG.x - RUG.r0 - 2 * SOCK_BALL_R);
+    expect(RUG.end + RUG.r1).toBeLessThan(JACK.x0);
+    expect(JACK.x0 + JACK.w).toBeLessThan(STEPS[0].x0);
+    expect(STEPS[STEPS.length - 1].x1).toBeLessThan(RULER.x - RULER.half);
+    expect(RULER.x + RULER.half).toBeLessThan(ROBOT.x - ROBOT.w / 2);
+    expect(CRUMBS[0].x).toBeGreaterThan(ROBOT.x + ROBOT.w / 2);
+    expect(CRUMBS[CRUMBS.length - 1].x).toBeLessThan(PLUG.x);
     expect(CUSHION.x1).toBeLessThan(BED.x0);
     expect(BED.x1).toBeLessThan(WORLD_W);
     // Every piece has its own slot.
@@ -114,7 +133,7 @@ describe("Aufräum-Maschine", () => {
     expect(IN_THE_CHEST.ball.y - 36).toBeGreaterThan(CHEST.top);
   });
 
-  test("things happen one after the other: chest, lid, books, bellows, socks, sock ball, crayons, puzzle, plug, bunny, glitter", () => {
+  test("things happen one after the other: chest, lid, books, bellows, socks, sock ball, crayons, puzzle, rug, clown, pyjamas, slinky, ruler, plane, vacuum, plug, bunny, glitter", () => {
     const order = [
       tidy.tKick,
       tidy.tTop,
@@ -130,6 +149,18 @@ describe("Aufräum-Maschine", () => {
       tidy.tRoll,
       tidy.tCrayonsIn,
       tidy.tPuzzle,
+      tidy.tRug,
+      tidy.tRugEnd,
+      tidy.tJack,
+      tidy.tNudge,
+      tidy.tSlide,
+      tidy.tArrive,
+      tidy.tFeet,
+      tidy.tOnRuler,
+      tidy.tSnap,
+      tidy.tPlaneDown,
+      tidy.tWake,
+      tidy.tDrive,
       tidy.tPop,
       tidy.tLaunch,
       tidy.tLand,
@@ -164,24 +195,111 @@ describe("Aufräum-Maschine", () => {
     });
   });
 
-  test("the sock ball bounces off the full basket, rolls in front of everything and really reaches the plug", () => {
+  test("the sock ball bounces off the full basket, rolls in front of everything and really reaches the rug", () => {
     const hit = tidy.sockBallAt(tidy.tHit).pt;
     expect(hit.x).toBeGreaterThan(BASKET.x0);
     expect(hit.x).toBeLessThan(BASKET.x1);
     expect(hit.y + SOCK_BALL_R).toBeLessThan(BASKET.top);
-    const atPlug = tidy.sockBallAt(tidy.tPop).pt;
-    expect(atPlug.x + SOCK_BALL_R).toBeCloseTo(PLUG.x, 0);
-    expect(Math.abs(atPlug.y - PLUG.y)).toBeLessThan(SOCK_BALL_R);
+    const atRug = tidy.sockBallAt(tidy.tRug).pt;
+    const roll = tidy.rugAt(tidy.tRug);
+    expect(Math.hypot(atRug.x - roll.pt.x, atRug.y - roll.pt.y)).toBeCloseTo(RUG.r0 + SOCK_BALL_R, 0);
     for (let t = 0; t <= end; t += 0.05) {
       const { pt } = tidy.sockBallAt(t);
       expect(pt.x - SOCK_BALL_R).toBeGreaterThan(0);
       expect(pt.x + SOCK_BALL_R).toBeLessThanOrEqual(WORLD_W);
       expect(pt.y + SOCK_BALL_R).toBeLessThanOrEqual(FLOOR + 0.01);
-      // Once out of the plug's way, it never runs into the cushion or the plug's cap.
-      expect(pt.x + SOCK_BALL_R).toBeLessThanOrEqual(PLUG.x + 0.5);
+      // It never runs into the rug's roll.
+      expect(pt.x).toBeLessThanOrEqual(atRug.x + 0.01);
     }
+    // The plug's cap lands on the floor behind the vacuum, never on it.
     const cap = tidy.capAt(end).pt;
-    expect(cap.x + 10).toBeLessThan(tidy.sockBallAt(end).pt.x - SOCK_BALL_R);
+    expect(cap.x + 10).toBeLessThan(tidy.robotX(end) - ROBOT.w / 2);
+  });
+
+  test("the rug unrolls up to the crank's knob, and the clown, popping out after the crank's turn, nudges the pyjamas' leg", () => {
+    // Before the bump the rug lies rolled up; it unrolls only forward, getting thinner.
+    expect(tidy.rugAt(tidy.tRug).pt.x).toBe(RUG.x);
+    for (let t = tidy.tRug; t < tidy.tRugEnd; t += 0.05) {
+      expect(tidy.rugAt(t + 0.05).pt.x).toBeGreaterThan(tidy.rugAt(t).pt.x);
+      expect(tidy.rugAt(t + 0.05).r).toBeLessThan(tidy.rugAt(t).r);
+    }
+    const roll = tidy.rugAt(tidy.tRugEnd);
+    const knob = { x: CRANK.x, y: CRANK.y + CRANK.arm };
+    expect(Math.abs(Math.hypot(roll.pt.x - knob.x, roll.pt.y - knob.y) - (roll.r + CRANK.knob))).toBeLessThan(5);
+    expect(tidy.crankTurn(tidy.tRugEnd)).toBeCloseTo(0, 6);
+    expect(tidy.crankTurn(tidy.tJack)).toBe(-360);
+    // The clown stays hidden below the box's rim until the pop, the tip of its hat too, and its collar above the floor.
+    const hidden = tidy.clownHead(tidy.tJack - 0.01);
+    expect(hidden.y - CLOWN.head - CLOWN.hat).toBeGreaterThan(FLOOR - JACK.h);
+    expect(hidden.y + CLOWN.head + 6).toBeLessThan(FLOOR);
+    // At the nudge the head touches the pyjamas' near leg from the left, at the leg's height.
+    const head = tidy.clownHead(tidy.tNudge);
+    const { hook, swing } = tidy.hangerAt(tidy.tNudge);
+    expect(swing).toBe(0);
+    const legLeft = hook.x - PYJAMAS.leg - 15;
+    expect(Math.abs(legLeft - (head.x + CLOWN.head))).toBeLessThan(6);
+    expect(head.y).toBeGreaterThan(hook.y + PYJAMAS.top - 10);
+    expect(head.y).toBeLessThan(hook.y + PYJAMAS.feet);
+    // Before the nudge it never reaches into the leg.
+    for (let t = tidy.tJack; t < tidy.tNudge; t += 0.02) expect(tidy.clownHead(t).x + CLOWN.head).toBeLessThan(legLeft + 3);
+  });
+
+  test("the pyjamas zip down the line to its knot, and their foot kicks the slinky on the top step", () => {
+    for (let t = tidy.tNudge; t <= tidy.tArrive; t += 0.05) {
+      const { hook } = tidy.hangerAt(t);
+      expect(hook.x).toBeGreaterThanOrEqual(LINE.x0);
+      expect(hook.x).toBeLessThanOrEqual(HANGER_STOP + 0.01);
+    }
+    expect(tidy.hangerAt(tidy.tArrive).hook.x).toBeCloseTo(HANGER_STOP, 0);
+    // The kick: the foot's outer side touches the slinky's side, below its top.
+    const foot = tidy.footAt(tidy.tFeet);
+    const slinky = tidy.slinkyAt(tidy.tFeet - 0.01);
+    expect(Math.abs(foot.x + 15 - (slinky.a.x - SLINKY.w / 2))).toBeLessThan(1);
+    expect(foot.y).toBeGreaterThan(STEPS[0].top - SLINKY.h);
+    expect(foot.y).toBeLessThan(STEPS[0].top);
+    // Before the kick the foot never gets into the slinky.
+    for (let t = tidy.tArrive; t < tidy.tFeet; t += 0.01) expect(tidy.footAt(t).x + 15).toBeLessThan(slinky.a.x - SLINKY.w / 2 + 0.5);
+  });
+
+  test("the slinky walks down each step, onto the floor and onto the ruler's raised end, which flings the plane onto the vacuum's button", () => {
+    const spots = tidy.slinkySpots;
+    expect(spots.length).toBe(STEPS.length + 2);
+    STEPS.forEach((s, k) => {
+      expect(spots[k].y).toBe(s.top);
+      expect(spots[k].x - SLINKY.w / 2).toBeGreaterThan(s.x0 - 4);
+      expect(spots[k].x + SLINKY.w / 2).toBeLessThan(s.x1 + 4);
+    });
+    const floor = spots[STEPS.length];
+    expect(floor.y).toBe(FLOOR);
+    expect(floor.x - SLINKY.w / 2).toBeGreaterThan(STEPS[STEPS.length - 1].x1);
+    expect(floor.x + SLINKY.w / 2).toBeLessThan(RULER.x - RULER.half);
+    // Standing on the ruler's left end, which is up until it lands there.
+    const onRuler = tidy.slinkyAt(tidy.tOnRuler).a;
+    expect(onRuler.x).toBeGreaterThan(RULER.x - RULER.half);
+    expect(onRuler.x).toBeLessThan(RULER.x);
+    expect(tidy.rulerTilt(tidy.tOnRuler)).toBe(RULER.tilt);
+    expect(tidy.rulerTilt(tidy.tOnRuler + 0.3)).toBeLessThan(0);
+    // The plane waits on the ruler's other end, flies inside the room and lands on the vacuum's button.
+    expect(tidy.planeAt(tidy.tSnap - 0.01).pt.x).toBeGreaterThan(RULER.x);
+    for (let t = tidy.tSnap; t < tidy.tPlaneDown; t += 0.02) {
+      const { pt } = tidy.planeAt(t);
+      expect(pt.y).toBeGreaterThan(40);
+      expect(pt.y).toBeLessThan(FLOOR);
+      expect(pt.x).toBeGreaterThan(0);
+      expect(pt.x).toBeLessThan(WORLD_W);
+    }
+    const down = tidy.planeAt(tidy.tPlaneDown).pt;
+    expect(Math.abs(down.x - ROBOT.x)).toBeLessThan(20);
+    expect(Math.abs(down.y - (FLOOR - ROBOT.h - 9))).toBeLessThan(2);
+  });
+
+  test("the vacuum sweeps up every crumb on its way and knocks the plug out with its front", () => {
+    expect(tidy.robotX(tidy.tDrive)).toBe(ROBOT.x);
+    expect(tidy.robotX(tidy.tPop) + ROBOT.w / 2).toBeCloseTo(PLUG.x, 0);
+    CRUMBS.forEach((_, i) => {
+      expect(tidy.crumbAt(i, tidy.tDrive)).not.toBeNull();
+      expect(tidy.crumbAt(i, tidy.tPop)).toBeNull();
+    });
   });
 
   test("each crayon and puzzle piece hops when the ball gets to it, and stays inside the room", () => {
@@ -220,13 +338,13 @@ describe("Aufräum-Maschine", () => {
     expect(PUZZLE_X1).toBeLessThan(PLUG.x);
   });
 
-  test("the camera stays inside the room and ends on the puzzle, the cushion and the bed", () => {
+  test("the camera stays inside the room and ends on the vacuum, the cushion and the bed", () => {
     for (let t = -1; t <= end; t += 0.1) {
       expect(tidy.cameraTarget(t)).toBeGreaterThanOrEqual(0);
       expect(tidy.cameraTarget(t)).toBeLessThanOrEqual(WORLD_W - 1600);
     }
     const left = tidy.cameraTarget(end);
-    expect(left).toBeLessThan(PUZZLE.x0);
+    expect(left).toBeLessThan(PLUG.x - 300);
     expect(left + 1600).toBeGreaterThan(BED.x1);
   });
 });

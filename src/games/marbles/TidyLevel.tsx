@@ -1,6 +1,6 @@
 import { memo, useId, useMemo } from "react";
 import { VIEW_H, type LevelProps } from "./level";
-import { clamp01, lerp, svgLine } from "./machineKit";
+import { clamp01, deg, lerp, svgLine } from "./machineKit";
 import { MachineStage } from "./MachineStage";
 import { BAR_COLORS, STAR_POINTS } from "./parts";
 import { INK, Picture, Sparkles, WallClock, Window } from "./scenery";
@@ -16,25 +16,40 @@ import {
   BOOKS,
   buildTidy,
   CHEST,
+  CLOWN,
+  CRANK,
   CRAYON,
   CRAYONS,
+  CRUMBS,
   CUSHION,
+  ERASER,
   FLOOR,
   FRONT_WHEEL,
   HORSE,
   IN_BED,
+  JACK,
   LID,
+  LINE,
+  lineY,
+  HANGER_STOP,
   NOZZLE,
   PIECES,
   PILLOW,
+  PLANE,
   PLUG,
   POT,
   PUZZLE,
   PUZZLE_X1,
+  PYJAMAS,
+  ROBOT,
+  RUG,
+  RULER,
   SHELF,
+  SLINKY,
   SOCK_BALL_R,
   SOCKS,
   slotCentre,
+  STEPS,
   STOOL,
   type Tidy,
   TRUCK,
@@ -54,9 +69,13 @@ const BUNNY = "#f3d9e8";
  * in, and then bounces on the bellows: each puff blows a sock into the laundry
  * basket, and the last one throws the sock ball, which bounces off the basket
  * and rolls along the floor – the crayons hop into the pencil pot, the pieces
- * into the jigsaw puzzle – until it knocks the plug out of the air cushion,
- * which jumps and throws the bunny into bed. At the end everything is tidy
- * and glitters.
+ * into the jigsaw puzzle – each its own way – until it bumps the rolled-up rug.
+ * The rug unrolls and turns the crank of the jack-in-the-box, the clown pops
+ * out and nudges the pyjamas, which zip down the clothes line and kick the
+ * slinky down the step stool onto a ruler, which flings the paper plane onto
+ * the robot vacuum's button; the vacuum sweeps up the crumbs and knocks the
+ * plug out of the air cushion, which jumps and throws the bunny into bed. At
+ * the end everything is tidy and glitters.
  */
 export function TidyLevel(props: LevelProps) {
   const tidy = useMemo(buildTidy, []);
@@ -99,6 +118,21 @@ export function TidyLevel(props: LevelProps) {
             <Piece key={i} i={i} ids={ids} tidy={tidy} t={t} />
           ))}
           <Sparkles x={(PUZZLE.x0 + PUZZLE_X1) / 2} y={PUZZLE.top + 90} age={t - tidy.tPuzzle} n={8} spread={170} />
+
+          <Rug tidy={tidy} t={t} />
+          <Clown tidy={tidy} t={t} />
+          <JackBox tidy={tidy} t={t} />
+          <ClothesLine />
+          <Pyjamas tidy={tidy} t={t} />
+          <StepStool />
+          <Slinky tidy={tidy} t={t} />
+          <Eraser />
+          <Ruler tilt={tidy.rulerTilt(t)} />
+          {CRUMBS.map((_, i) => (
+            <Crumb key={i} i={i} tidy={tidy} t={t} />
+          ))}
+          <RobotVacuum tidy={tidy} t={t} />
+          <PaperPlane tidy={tidy} t={t} />
           <Cushion tidy={tidy} t={t} />
           <PlugCap tidy={tidy} t={t} />
 
@@ -112,7 +146,7 @@ export function TidyLevel(props: LevelProps) {
           <Bunny tidy={tidy} t={t} />
           <Blanket k={tidy.blanket(t)} />
 
-          <Sparkles x={(PUZZLE.x0 + PUZZLE_X1) / 2} y={PUZZLE.top - 30} age={t - tidy.tGlitter} n={10} spread={220} />
+          <Sparkles x={PLUG.x - 160} y={FLOOR - 120} age={t - tidy.tGlitter} n={10} spread={220} />
           <Sparkles x={PILLOW.x - 120} y={BED.top - 70} age={t - tidy.tGlitter - 0.25} n={10} spread={240} />
           <Sparkles x={(CUSHION.x0 + CUSHION.x1) / 2} y={FLOOR - 140} age={t - tidy.tGlitter - 0.5} n={8} spread={180} />
           {/* Under the horse's belly, between its legs: the bottom edge of the picture is cut off on a phone on its side. */}
@@ -141,6 +175,9 @@ const Room = memo(function Room({ paper }: { paper: string }) {
       <Picture x={4440} y={250} />
       <Window x={5520} y={110} />
       <Picture x={6280} y={250} />
+      <Window x={7880} y={110} />
+      <WallClock x={9560} y={220} />
+      <Picture x={BED.x0 + 110} y={250} />
       {/* Skirting board and floor */}
       <rect x="-400" y={FLOOR - 14} width={WORLD_W + 800} height="14" fill="#fff" stroke={INK} strokeWidth="3" />
       <rect x="-400" y={FLOOR} width={WORLD_W + 800} height={VIEW_H - FLOOR + 200} fill="#e3b37f" />
@@ -684,6 +721,267 @@ function Piece({ i, ids, tidy, t }: { i: number; ids: string; tidy: Tidy; t: num
         <use href={`#${ids}-pic`} />
       </g>
       <path d={PIECE_PATHS[slot]} fill="none" stroke={INK} strokeWidth="3" strokeLinejoin="round" />
+    </g>
+  );
+}
+
+/* ---------- Rug, jack-in-the-box, pyjamas on the line ---------- */
+
+/** The rug: lying flat behind its roll, which turns and gets thinner as it unrolls. */
+function Rug({ tidy, t }: { tidy: Tidy; t: number }) {
+  const { pt, r, spin } = tidy.rugAt(t);
+  const laid = pt.x - RUG.x;
+  // The rolled-up rug's spiral, from just inside its edge to the middle.
+  const spiral = Array.from({ length: 25 }, (_, i) => {
+    const a = (i / 24) * 4 * Math.PI;
+    const rr = r * (0.82 - 0.62 * (i / 24));
+    return `${rr * Math.cos(a)} ${rr * Math.sin(a)}`;
+  });
+  return (
+    <g>
+      {/* The fringe at its far end */}
+      {[-6, -2, 2].map((dy) => (
+        <line key={dy} x1={RUG.x - 2} y1={FLOOR + dy - RUG.th / 2 + 2} x2={RUG.x - 14} y2={FLOOR + dy - RUG.th / 2 + 2} stroke={INK} strokeWidth="2" />
+      ))}
+      {laid > 1 && (
+        <g>
+          <rect x={RUG.x} y={FLOOR - RUG.th} width={laid} height={RUG.th} fill="#5fb8f0" stroke={INK} strokeWidth="2.5" />
+          <line x1={RUG.x + 6} y1={FLOOR - RUG.th / 2} x2={pt.x} y2={FLOOR - RUG.th / 2} stroke="#ffd23f" strokeWidth="3" strokeDasharray="22 26" />
+        </g>
+      )}
+      <g transform={`translate(${pt.x} ${pt.y}) rotate(${spin})`}>
+        <circle r={r} fill="#5fb8f0" stroke={INK} strokeWidth="3.5" />
+        <path d={`M${spiral.join(" L")}`} fill="none" stroke="#ffd23f" strokeWidth="3" strokeLinecap="round" />
+      </g>
+    </g>
+  );
+}
+
+/** The clown on its spring: hidden in the box until the pop, then out, bobbing and leaning over. */
+function Clown({ tidy, t }: { tidy: Tidy; t: number }) {
+  const { out, lean } = tidy.clownAt(t);
+  const base = { x: JACK.x0 + JACK.w / 2, y: FLOOR - JACK.h + 6 };
+  const h = CLOWN.head;
+  const coils = 7;
+  const spring = out > 0 ? Array.from({ length: coils * 2 + 1 }, (_, i) => `${i % 2 ? (i % 4 === 1 ? 14 : -14) : 0} ${(-out * i) / (coils * 2)}`) : [];
+  return (
+    <g transform={`translate(${base.x} ${base.y}) rotate(${lean})`}>
+      {spring.length > 0 && <path d={`M${spring.join(" L")}`} fill="none" stroke={INK} strokeWidth="5" strokeLinejoin="round" />}
+      <g transform={`translate(0 ${-out - h})`}>
+        {/* Ruffled collar */}
+        <ellipse cy={h - 4} rx={h + 8} ry="10" fill="#ffd23f" stroke={INK} strokeWidth="3" />
+        <circle r={h} fill="#fff6e0" stroke={INK} strokeWidth="3.5" />
+        {/* Pointed hat with a bobble */}
+        <path d={`M${-h + 6} ${-h + 12} L0 ${-h - CLOWN.hat + 9} L${h - 6} ${-h + 12} Z`} fill="#8e7dff" stroke={INK} strokeWidth="3" strokeLinejoin="round" />
+        <circle cy={-h - CLOWN.hat + 7} r="7" fill="#ff5d73" stroke={INK} strokeWidth="2.5" />
+        <circle cx="-10" cy="-6" r="4" fill={INK} />
+        <circle cx="10" cy="-6" r="4" fill={INK} />
+        <circle cy="5" r="7" fill="#ff5d73" stroke={INK} strokeWidth="2" />
+        <path d="M-13 13 Q0 24 13 13" fill="none" stroke={INK} strokeWidth="3" strokeLinecap="round" />
+      </g>
+    </g>
+  );
+}
+
+/** The jack-in-the-box's box, its lid flying open and its crank turning; in front of the clown hidden in it. */
+function JackBox({ tidy, t }: { tidy: Tidy; t: number }) {
+  const { x0, w, h } = JACK;
+  const top = FLOOR - h;
+  return (
+    <g>
+      <rect x={x0} y={top} width={w} height={h} rx="8" fill="#ff5d73" stroke={INK} strokeWidth="4" />
+      <rect x={x0 + 14} y={top + 14} width={w - 28} height={h - 28} rx="6" fill="#ffd23f" stroke={INK} strokeWidth="3" />
+      <polygon points={STAR_POINTS} transform={`translate(${x0 + w / 2} ${top + h / 2 + 2}) scale(1.6)`} fill="#3a86ff" stroke={INK} strokeWidth="2" />
+      <g transform={`translate(${x0} ${top}) rotate(${tidy.jackLid(t)})`}>
+        <rect x="-4" y="-12" width={w + 8} height="12" rx="5" fill="#3ec300" stroke={INK} strokeWidth="3.5" />
+      </g>
+      <g transform={`translate(${CRANK.x} ${CRANK.y}) rotate(${tidy.crankTurn(t)})`}>
+        <line x1="0" y1="0" x2="0" y2={CRANK.arm} stroke={INK} strokeWidth="9" strokeLinecap="round" />
+        <line x1="0" y1="0" x2="0" y2={CRANK.arm} stroke="#c9d1e8" strokeWidth="4" strokeLinecap="round" />
+        <circle cy={CRANK.arm} r={CRANK.knob} fill="#ffb703" stroke={INK} strokeWidth="3" />
+        <circle r="6" fill={INK} />
+      </g>
+    </g>
+  );
+}
+
+/** The clothes line between its two hooks on the wall, with the knot the hanger stops at; drawn once. */
+const ClothesLine = memo(function ClothesLine() {
+  const knot = { x: HANGER_STOP + 12, y: lineY(HANGER_STOP + 12) };
+  return (
+    <g>
+      <line x1={LINE.x0} y1={LINE.y0} x2={LINE.x1} y2={LINE.y1} stroke={INK} strokeWidth="3" />
+      <circle cx={knot.x} cy={knot.y} r="6" fill="#fff" stroke={INK} strokeWidth="2.5" />
+      {[
+        { x: LINE.x0, y: LINE.y0 },
+        { x: LINE.x1, y: LINE.y1 },
+      ].map((p) => (
+        <g key={p.x}>
+          <circle cx={p.x} cy={p.y - 4} r="10" fill="#ff8c42" stroke={INK} strokeWidth="3" />
+          <circle cx={p.x} cy={p.y - 4} r="3" fill={INK} />
+        </g>
+      ))}
+    </g>
+  );
+});
+
+/** The pyjamas on their hanger, hanging from the line; they swing round the hanger's hook (positive swing: legs forward). */
+function Pyjamas({ tidy, t }: { tidy: Tidy; t: number }) {
+  const { hook, swing } = tidy.hangerAt(t);
+  const { bar, top, feet, leg } = PYJAMAS;
+  const blue = "#bfe9ff";
+  return (
+    <g transform={`translate(${hook.x} ${hook.y}) rotate(${-deg(swing)})`}>
+      {/* Hook over the line, and the hanger */}
+      <path d="M0 6 L0 -2 Q0 -10 -7 -10 Q-13 -10 -13 -3" fill="none" stroke={INK} strokeWidth="3.5" strokeLinecap="round" />
+      <path d={`M0 6 L-46 ${bar} L46 ${bar} Z`} fill="none" stroke="#b8763d" strokeWidth="5" strokeLinejoin="round" />
+      {/* Legs */}
+      {[-leg, leg].map((x) => (
+        <g key={x}>
+          <rect x={x - 15} y={top - 10} width="30" height={feet - top + 10} rx="8" fill={blue} stroke={INK} strokeWidth="3" />
+          <rect x={x - 15} y={feet - 12} width="30" height="12" rx="5" fill="#ffd23f" stroke={INK} strokeWidth="2.5" />
+        </g>
+      ))}
+      {/* Top with sleeves */}
+      <path
+        d={`M-30 ${bar} L-58 ${bar + 34} L-44 ${bar + 46} L-34 ${bar + 32} L-34 ${top} L34 ${top} L34 ${bar + 32} L44 ${bar + 46} L58 ${bar + 34} L30 ${bar} Z`}
+        fill={blue}
+        stroke={INK}
+        strokeWidth="3"
+        strokeLinejoin="round"
+      />
+      {[
+        [-14, bar + 20],
+        [12, bar + 34],
+        [-4, bar + 52],
+      ].map(([x, y]) => (
+        <polygon key={y} points={STAR_POINTS} transform={`translate(${x} ${y}) scale(0.45)`} fill="#ffd23f" />
+      ))}
+    </g>
+  );
+}
+
+/* ---------- Step stool, slinky, ruler, paper plane, robot vacuum ---------- */
+
+/** The step stool, its steps going down to the right; drawn once. */
+const StepStool = memo(function StepStool() {
+  return (
+    <g>
+      {STEPS.map((s, k) => (
+        <g key={s.x0}>
+          <rect x={s.x0} y={s.top} width={s.x1 - s.x0} height={FLOOR - s.top} fill={k % 2 ? "#ffb703" : "#3ec300"} stroke={INK} strokeWidth="4" />
+          <rect x={s.x0 - 4} y={s.top - 2} width={s.x1 - s.x0 + 8} height="10" rx="4" fill="#fff6e0" stroke={INK} strokeWidth="3" />
+        </g>
+      ))}
+    </g>
+  );
+});
+
+const SLINKY_COLORS = ["#ff5d73", "#ff8c42", "#ffd23f", "#3ec300", "#00b4d8", "#3a86ff", "#8e7dff"];
+
+/** The slinky: its coils along the curve from one end to the other, arching while it flips. */
+function Slinky({ tidy, t }: { tidy: Tidy; t: number }) {
+  const { a, b, arch } = tidy.slinkyAt(t);
+  const c = { x: (a.x + b.x) / 2, y: (a.y + b.y) / 2 - 2 * arch };
+  const n = SLINKY.coils;
+  return (
+    <g>
+      {Array.from({ length: n }, (_, i) => {
+        const s = 0.04 + (0.92 * i) / (n - 1);
+        const u = 1 - s;
+        const x = u * u * a.x + 2 * u * s * c.x + s * s * b.x;
+        const y = u * u * a.y + 2 * u * s * c.y + s * s * b.y;
+        const tx = 2 * u * (c.x - a.x) + 2 * s * (b.x - c.x);
+        const ty = 2 * u * (c.y - a.y) + 2 * s * (b.y - c.y);
+        const angle = Math.hypot(tx, ty) < 0.01 ? 0 : deg(Math.atan2(ty, tx)) + 90;
+        return (
+          <ellipse
+            key={i}
+            cx={x}
+            cy={y}
+            rx={SLINKY.w / 2}
+            ry="4"
+            transform={`rotate(${angle} ${x} ${y})`}
+            fill="none"
+            stroke={SLINKY_COLORS[i % SLINKY_COLORS.length]}
+            strokeWidth="4"
+          />
+        );
+      })}
+    </g>
+  );
+}
+
+/** The eraser the ruler lies across; drawn once. */
+const Eraser = memo(function Eraser() {
+  return (
+    <g>
+      <rect x={RULER.x - ERASER.w / 2} y={FLOOR - ERASER.h} width={ERASER.w} height={ERASER.h} rx="6" fill="#ff7bd0" stroke={INK} strokeWidth="3" />
+      <rect x={RULER.x - ERASER.w / 2} y={FLOOR - ERASER.h} width={ERASER.w / 2} height={ERASER.h} rx="6" fill="#3a86ff" stroke={INK} strokeWidth="3" />
+    </g>
+  );
+});
+
+/** The ruler, tilted round its middle on the eraser (positive: left end up). */
+function Ruler({ tilt }: { tilt: number }) {
+  const { half, th } = RULER;
+  return (
+    <g transform={`translate(${RULER.x} ${RULER.y}) rotate(${tilt})`}>
+      <rect x={-half} y={-th / 2} width={2 * half} height={th} rx="2" fill="#ffd23f" stroke={INK} strokeWidth="2.5" />
+      {Array.from({ length: 13 }, (_, i) => (
+        <line key={i} x1={-half + 12 + i * 23} y1={-th / 2} x2={-half + 12 + i * 23} y2={-th / 2 + (i % 2 ? 3 : 5)} stroke={INK} strokeWidth="1.5" />
+      ))}
+    </g>
+  );
+}
+
+/** The paper plane, seen from the side, nose along its heading. */
+function PaperPlane({ tidy, t }: { tidy: Tidy; t: number }) {
+  const { pt, angle } = tidy.planeAt(t);
+  const l = PLANE.len / 2;
+  return (
+    <g transform={`translate(${pt.x} ${pt.y}) rotate(${angle})`}>
+      <path d={`M${l} 0 L${-l} -14 L${-l + 10} 0 L${-l} 6 Z`} fill="#fff" stroke={INK} strokeWidth="2.5" strokeLinejoin="round" />
+      <line x1={l} y1="0" x2={-l + 10} y2="0" stroke="#3a86ff" strokeWidth="2" />
+    </g>
+  );
+}
+
+/** A crumb on the floor, shrinking into the vacuum as it is swept up. */
+function Crumb({ i, tidy, t }: { i: number; tidy: Tidy; t: number }) {
+  const crumb = tidy.crumbAt(i, t);
+  if (!crumb) return null;
+  const { r, color } = CRUMBS[i];
+  return <circle cx={crumb.pt.x} cy={crumb.pt.y} r={r * crumb.size} fill={color} stroke={INK} strokeWidth="2" />;
+}
+
+/** The robot vacuum, seen from the side: its button lights up as it wakes, and its side brush spins as it drives. */
+function RobotVacuum({ tidy, t }: { tidy: Tidy; t: number }) {
+  const x = tidy.robotX(t);
+  const { w, h } = ROBOT;
+  const awake = t >= tidy.tWake;
+  return (
+    <g transform={`translate(${x} ${FLOOR})`}>
+      <g transform={`translate(${w / 2 - 14} -6) rotate(${tidy.brushTurn(t)})`}>
+        {[0, 120, 240].map((a) => (
+          <line
+            key={a}
+            x1="0"
+            y1="0"
+            x2={16 * Math.cos((a * Math.PI) / 180)}
+            y2={16 * Math.sin((a * Math.PI) / 180)}
+            stroke={INK}
+            strokeWidth="3"
+            strokeLinecap="round"
+          />
+        ))}
+      </g>
+      <rect x={-w / 2} y={-h} width={w} height={h - 6} rx="16" fill="#c9d1e8" stroke={INK} strokeWidth="4" />
+      <rect x={-w / 2 + 8} y={-h + 6} width={w - 16} height="8" rx="4" fill="#fff" opacity="0.7" />
+      <rect x={w / 2 - 16} y={-h + 4} width="12" height={h - 14} rx="5" fill="#3a4a6b" stroke={INK} strokeWidth="2.5" />
+      <circle cx={-w / 2 + 34} cy="-6" r="8" fill={INK} />
+      <circle cx={w / 2 - 44} cy="-6" r="8" fill={INK} />
+      <ellipse cy={-h - 2} rx="16" ry="6" fill={awake ? "#3ec300" : "#8c93a8"} stroke={INK} strokeWidth="3" />
     </g>
   );
 }

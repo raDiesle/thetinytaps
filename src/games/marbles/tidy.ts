@@ -7,32 +7,47 @@
 // into the shelf one by one; free again, the truck rolls onto the bellows and
 // bounces on it, its wheels still whirring: every bounce sends a puff along the
 // hose to the heap of socks, and the socks fly into the laundry basket one by
-// one (plop, wobble). The last puff throws the rolled-up sock ball onto the full
-// basket; it bounces off and rolls along the floor, and the crayons it gets to
-// hop up into the pencil pot on the stool, each with its own note, then the
-// jigsaw pieces it gets to hop into the puzzle board until the picture is
-// whole. At the end of its way the ball knocks the plug out of the air cushion:
+// one, each its own way (a flip, over the rim, a corkscrew, a flat throw, one
+// teetering on the rim). The last puff throws the rolled-up sock ball onto the
+// full basket; it bounces off and rolls along the floor, and the crayons it gets
+// to go into the pencil pot on the stool (a hop, a cartwheel, a bounce off the
+// stool, straight up like a rocket), then the jigsaw pieces into the puzzle board
+// (a hop, a frisbee spin, a scoot along the floor, a tumble) until the picture is
+// whole. At the end of its way the ball bumps the rolled-up rug, which unrolls
+// across the floor and turns the crank of the jack-in-the-box: pop, the clown
+// springs out, leans over and nudges the pyjamas on their hanger, which zip down
+// the clothes line; their legs swing on and kick the slinky off the step stool,
+// it walks down the steps onto a ruler lying on an eraser, and the ruler flings
+// the paper plane, which loops once and lands on the robot vacuum's button. The
+// vacuum wakes, sweeps up the crumbs and knocks the plug out of the air cushion:
 // pfffft, the cushion jumps like a balloon let go and throws the cuddly bunny
 // into bed, the blanket spreads over it, and everything is tidy and glitters.
 // Everything is worked out ahead as a function of the seconds since the tap,
 // so TidyLevel.tsx only asks where each thing is at a moment. Coordinates are
-// those of the room, 6740 × 900; the screen shows 1600 of it at a time.
+// those of the room, `WORLD_W` × 900; the screen shows 1600 of it at a time.
 
 import {
   playBoing,
   playChime,
+  playClick,
   playClonk,
   playCountNote,
+  playCrackle,
   playCreak,
+  playHop,
   playKnock,
   playPlink,
   playPlop,
   playPop,
   playPuff,
   playRattle,
+  playRobot,
   playRustle,
+  playSlide,
+  playSqueak,
   playThump,
   playTwinkle,
+  playWhirr,
   playWhoosh,
 } from "@/lib/sfx";
 import { playNeigh } from "@/lib/realSounds";
@@ -56,9 +71,8 @@ import {
   timeWhen,
   turn,
 } from "./machineKit";
-import { line, type Pt } from "./path";
+import { arc, line, quad, type Pt } from "./path";
 
-export const WORLD_W = 6740;
 export const FLOOR = 800;
 
 /* ---------- Layout ---------- */
@@ -177,15 +191,70 @@ export const PIECES = [
 export const PIECE_FLAT = 0.45;
 const PIECE_Y = FLOOR - (PUZZLE.h * PIECE_FLAT) / 2 - 4;
 
+/**
+ * The rolled-up rug lying on the floor past the puzzle: the middle of its roll at the start, how thick it is rolled up
+ * and still is at the end, where the roll's middle stops (against the jack-in-the-box's crank), and how thick the rug lies.
+ */
+export const RUG = { x: 5880, r0: 40, r1: 14, end: 6621, th: 8 };
+
+/** The jack-in-the-box: its box's left edge and size. */
+export const JACK = { x0: 6650, w: 120, h: 120 };
+/** The crank on the box's left side: its axle, its arm hanging down at rest, and the knob at the arm's end. */
+export const CRANK = { x: JACK.x0 - 6, y: FLOOR - 76, arm: 50, knob: 9 };
+/** The clown on its spring: how far the spring comes out of the box, its head's radius, how high its hat stands over
+ *  the head's top, and how far it leans right (degrees). */
+export const CLOWN = { spring: 190, head: 30, hat: 43, lean: 26 };
+/** How far the clown's spring is out of the box while it hides: deep enough that the tip of its hat stays below the rim. */
+const CLOWN_HIDDEN = -(2 * CLOWN.head + CLOWN.hat + 3);
+
+/** The clothes line from hook to hook on the wall, sloping down to the right; the pyjamas hang on it on a hanger. */
+export const LINE = { x0: 6840, y0: 330, x1: 7650, y1: 495 };
+/** The clothes line's height at `x`. */
+export const lineY = (x: number) => LINE.y0 + ((x - LINE.x0) * (LINE.y1 - LINE.y0)) / (LINE.x1 - LINE.x0);
+/** Where the hanger's hook stops on the line, at the knot before the right hook. */
+export const HANGER_STOP = 7590;
+/** The pyjamas below the hanger's hook: the hanger's bar, where the top ends and the feet are, how far each leg is from the middle. */
+export const PYJAMAS = { bar: 22, top: 90, feet: 160, leg: 22 };
+
+/** The step stool (Tritthocker): four steps down to the right, each with its left and right edge and its top. */
+export const STEPS = [
+  { x0: 7620, x1: 7745, top: 640 },
+  { x0: 7745, x1: 7837, top: 680 },
+  { x0: 7837, x1: 7929, top: 720 },
+  { x0: 7929, x1: 8021, top: 760 },
+];
+/** The slinky: its width and height standing, and how many coils it has. */
+export const SLINKY = { w: 48, h: 44, coils: 10 };
+/** How far each step of the slinky goes to the right. */
+export const SLINKY_STEP = 92;
+
+/** The ruler lying across an eraser as a seesaw: its middle on the eraser, half its length, its tilt at rest (left end up, degrees), its thickness. */
+export const RULER = { x: 8307, y: 770, half: 150, tilt: 10, th: 8 };
+export const ERASER = { w: 54, h: 26 };
+/** Where the paper plane lies on the ruler's low end, and how long it is. */
+export const PLANE = { x: 8417, len: 76 };
+/** The middle of the paper plane's loop and its radius. */
+export const LOOP = { x: 8690, y: 320, r: 80 };
+
+/** The robot vacuum asleep on the floor: its middle, width and height; its button is on top. */
+export const ROBOT = { x: 9130, w: 170, h: 42 };
+/** The crumbs on the floor between the robot vacuum and the cushion, which it sweeps up on its way. */
+export const CRUMBS = ["#c98d4e", "#ffd23f", "#ff8c42", "#c98d4e", "#ff5d73", "#ffd23f", "#c98d4e"].map((color, i) => ({
+  x: 9330 + i * 86 + (i % 2) * 14,
+  r: 5 + (i % 3) * 2,
+  color,
+}));
+
 /** The air cushion on the floor, blown up from the start, with its plug on the left; the bunny lies on it. */
-export const CUSHION = { x0: 5900, x1: 6040, flat: 14, full: 64 };
-/** The outer end of the plug, where the sock ball knocks it out. */
+export const CUSHION = { x0: 10020, x1: 10160, flat: 14, full: 64 };
+/** The outer end of the plug, where the robot vacuum knocks it out. */
 export const PLUG = { x: CUSHION.x0 - 18, y: FLOOR - 30 };
 /** The bed with its head end on the right; the bunny lands with its head on the pillow. */
-export const BED = { x0: 6170, x1: 6670, top: 600 };
-export const PILLOW = { x: 6540, y: 585 };
+export const BED = { x0: CUSHION.x0 + 270, x1: CUSHION.x0 + 770, top: 600 };
+export const PILLOW = { x: CUSHION.x0 + 640, y: 585 };
 /** Where the bunny lies in bed, head to the right. */
-export const IN_BED = { x: 6450, y: BED.top - 34 };
+export const IN_BED = { x: CUSHION.x0 + 550, y: BED.top - 34 };
+export const WORLD_W = BED.x1 + 70;
 
 /* ---------- The machine ---------- */
 
@@ -210,6 +279,18 @@ const HOSE_TIME = 0.3;
 const SOCK_FLIGHT = 0.75;
 const CRAYON_HOP = 0.6;
 const PIECE_HOP = 0.65;
+/** How each sock, crayon and piece flies in, so that no two in a row go the same way. */
+const SOCK_WAYS = ["flip", "rim", "corkscrew", "flat", "teeter"] as const;
+const CRAYON_WAYS = ["hop", "cartwheel", "stool", "rocket", "hop", "stool", "cartwheel"] as const;
+const PIECE_WAYS = ["hop", "frisbee", "scoot", "hop", "tumble", "scoot"] as const;
+/** Seconds the rug takes to unroll, the crank to turn once, the clown to lean over to the pyjamas, a step of the slinky. */
+const RUG_TIME = 3.8;
+const CRANK_TURN = 0.9;
+const CLOWN_LEAN = 1.6;
+const SLINKY_FLIP = 0.8;
+/** The robot vacuum's top speed, and seconds to get up to it. */
+const ROBOT_SPEED = 115;
+const ROBOT_RAMP = 0.5;
 
 /** Where a thing driving `dist` px at top speed `v` is `u` seconds after it set off, speeding up and slowing down over `ramp` seconds. */
 function drive(dist: number, v: number, ramp: number) {
@@ -404,37 +485,60 @@ export function buildTidy() {
     const inBasket = turn(slot, basketPivot, rad(tilt));
     if (t < tOff(k)) return { pt: { x: s0.x, y: s0.y }, angle: s0.tilt };
     const u = seg(t, tOff(k), tSockIn(k));
-    if (u < 1) return { pt: hop(s0, inBasket, 230 + 20 * k, u), angle: lerp(s0.tilt, slot.angle + 360, easeOut(u)) };
-    return { pt: inBasket, angle: slot.angle + tilt };
+    if (u >= 1) return { pt: inBasket, angle: slot.angle + tilt };
+    // Each sock flies its own way, in the same time.
+    const end = slot.angle + 360;
+    switch (SOCK_WAYS[k]) {
+      case "rim": {
+        // Skims over the near rim and drops in.
+        const rim = { x: BASKET.x0 + 30, y: BASKET.top - SOCK_HALF - 8 };
+        const pt = u < 0.6 ? hop(s0, rim, 150, u / 0.6) : hop(rim, inBasket, 16, easeIn(seg(u, 0.6, 1)));
+        return { pt, angle: lerp(s0.tilt, end - 360, easeOut(u)) };
+      }
+      case "corkscrew":
+        return { pt: hop(s0, inBasket, 320, u), angle: lerp(s0.tilt, end + 360, u) };
+      case "flat":
+        return { pt: hop(s0, inBasket, 140, easeOut(u)), angle: lerp(s0.tilt, end - 360, u) };
+      case "teeter": {
+        // Lands on the far rim, rocks there a moment and slips in.
+        const rim = { x: BASKET.x1 - 18, y: BASKET.top - SOCK_HALF };
+        if (u < 0.5) return { pt: hop(s0, rim, 190, u / 0.5), angle: lerp(s0.tilt, end, easeOut(u / 0.5)) };
+        if (u < 0.8) return { pt: rim, angle: end + 18 * Math.sin((2 * Math.PI * (u - 0.5)) / 0.3) * (1 - (u - 0.5) / 0.3) };
+        return { pt: hop(rim, inBasket, 8, easeIn(seg(u, 0.8, 1))), angle: end };
+      }
+      default:
+        return { pt: hop(s0, inBasket, 230 + 20 * k, u), angle: lerp(s0.tilt, end, easeOut(u)) };
+    }
   };
 
   /* The last puff throws the sock ball onto the full basket; it bounces off over the edge, bounces once more and rolls
-     along the floor past the crayons and the puzzle pieces to the cushion's plug. */
+     along the floor past the crayons and the puzzle pieces to the rolled-up rug. */
   const pileTop = { x: BASKET_MID + 16, y: BASKET.top - 22 - SOCK_BALL_R };
   const bounce = { x: BASKET.x1 + 150, y: FLOOR - SOCK_BALL_R };
   const tBounce = tHit + 0.55;
   const roll0 = { x: bounce.x + 90, y: FLOOR - SOCK_BALL_R };
   const tRoll = tBounce + 0.35;
-  const plugHit = { x: PLUG.x - SOCK_BALL_R, y: FLOOR - SOCK_BALL_R };
-  const rollPath = pathOf(line(roll0, plugHit));
+  // Where the ball touches the rug's roll, which is thicker than the ball.
+  const rugHit = { x: RUG.x - Math.sqrt((RUG.r0 + SOCK_BALL_R) ** 2 - (RUG.r0 - SOCK_BALL_R) ** 2), y: FLOOR - SOCK_BALL_R };
+  const rollPath = pathOf(line(roll0, rugHit));
   const rollRun = roll(rollPath, 250, 145, 400, 0.2);
-  const tPop = tRoll + rollRun.duration;
+  const tRug = tRoll + rollRun.duration;
   at(tHit, { sound: playBoing });
   at(tBounce, { sound: playThump });
   const toDeg = 180 / Math.PI;
   const spinRolled = (rollPath.total / SOCK_BALL_R) * toDeg;
-  /** Where the sock ball is and how far it has turned (degrees); once the plug is out, the air blows it back a little. */
+  /** Where the sock ball is and how far it has turned (degrees); after bumping the rug it rolls back a little and lies still. */
   const sockBallAt = (t: number): { pt: Pt; spin: number } => {
     if (t < tBallOff) return { pt: SOCK_BALL0, spin: 0 };
     if (t < tHit) return { pt: hop(SOCK_BALL0, pileTop, 200, seg(t, tBallOff, tHit)), spin: 300 * seg(t, tBallOff, tHit) };
     if (t < tBounce) return { pt: hop(pileTop, bounce, 120, seg(t, tHit, tBounce)), spin: 300 + 220 * seg(t, tHit, tBounce) };
     if (t < tRoll) return { pt: hop(bounce, roll0, 36, seg(t, tBounce, tRoll)), spin: 520 + 200 * seg(t, tBounce, tRoll) };
-    if (t < tPop) {
+    if (t < tRug) {
       const d = distAt(rollRun, t - tRoll);
       return { pt: along(rollPath, d).pt, spin: 720 + (d / SOCK_BALL_R) * toDeg };
     }
-    const back = 150 * easeOut(seg(t, tPop + 0.05, tPop + 1.1));
-    return { pt: { x: plugHit.x - back, y: plugHit.y }, spin: 720 + spinRolled - (back / SOCK_BALL_R) * toDeg };
+    const back = 40 * easeOut(seg(t, tRug, tRug + 0.7));
+    return { pt: { x: rugHit.x - back, y: rugHit.y }, spin: 720 + spinRolled - (back / SOCK_BALL_R) * toDeg };
   };
   /** Seconds after the tap when the rolling sock ball gets to `x` with its front. */
   const ballGetsTo = (x: number) => tRoll + timeWhen(rollRun, (pt) => pt.x + SOCK_BALL_R >= x);
@@ -457,8 +561,30 @@ export function buildTidy() {
     const inPot = turn(slot, potPivot, rad(tilt));
     const u = seg(t, tCrayon[k], tCrayonIn[k]);
     if (u <= 0) return { pt: rest, angle: c.tilt };
-    if (u < 1) return { pt: hop(rest, inPot, 150, u), angle: lerp(c.tilt, slot.angle - 360, easeOut(u)) };
-    return { pt: inPot, angle: slot.angle + tilt };
+    if (u >= 1) return { pt: inPot, angle: slot.angle + tilt };
+    // Each crayon goes in its own way, in the same time.
+    switch (CRAYON_WAYS[k]) {
+      case "cartwheel":
+        return { pt: hop(rest, inPot, 230, u), angle: lerp(c.tilt, slot.angle - 720, u) };
+      case "stool": {
+        // A bounce on the stool's edge, then into the pot.
+        const edge = { x: STOOL.x + (rest.x < STOOL.x ? -1 : 1) * (STOOL.w / 2 - 12), y: STOOL.top - CRAYON.th / 2 };
+        if (u < 0.55) return { pt: hop(rest, edge, 90, u / 0.55), angle: lerp(c.tilt, 0, u / 0.55) };
+        return { pt: hop(edge, inPot, 80, seg(u, 0.55, 1)), angle: lerp(0, slot.angle - 360, easeOut(seg(u, 0.55, 1))) };
+      }
+      case "rocket": {
+        // Stands up on the floor and shoots straight up over the pot, then drops in.
+        const high = { x: inPot.x, y: STOOL.top - POT.h - 150 };
+        if (u < 0.5)
+          return {
+            pt: { x: lerp(rest.x, high.x, easeInOut(u / 0.5)), y: lerp(rest.y, high.y, easeOut(u / 0.5)) },
+            angle: lerp(c.tilt, -90, easeOut(seg(u, 0, 0.2))),
+          };
+        return { pt: { x: inPot.x, y: lerp(high.y, inPot.y, easeIn(seg(u, 0.5, 1))) }, angle: lerp(-90, slot.angle, seg(u, 0.5, 1)) };
+      }
+      default:
+        return { pt: hop(rest, inPot, 150, u), angle: lerp(c.tilt, slot.angle - 360, easeOut(u)) };
+    }
   };
 
   /* Each puzzle piece the ball gets to hops up into its place in the board, klack; with the last one the picture is whole. */
@@ -473,16 +599,213 @@ export function buildTidy() {
   const pieceAt = (i: number, t: number): { pt: Pt; angle: number; flat: number } => {
     const p = PIECES[i];
     const rest = { x: p.x, y: PIECE_Y };
+    const slot = slotCentre(p.slot);
     const u = seg(t, tPiece[i], tPieceIn[i]);
     if (u <= 0) return { pt: rest, angle: p.tilt, flat: PIECE_FLAT };
-    return {
-      pt: hop(rest, slotCentre(p.slot), 140, easeInOut(u)),
-      angle: lerp(p.tilt, 360 * (i % 2 ? -1 : 1), easeOut(u)),
-      flat: lerp(PIECE_FLAT, 1, easeOut(u)),
-    };
+    if (u >= 1) return { pt: slot, angle: 0, flat: 1 };
+    // Each piece goes in its own way, in the same time.
+    switch (PIECE_WAYS[i]) {
+      case "frisbee":
+        // Spins lying flat, like a frisbee, and stands up only at the end.
+        return { pt: hop(rest, slot, 220, u), angle: lerp(p.tilt, 720, easeOut(u)), flat: lerp(PIECE_FLAT, 1, easeInOut(seg(u, 0.55, 1))) };
+      case "scoot": {
+        // Slides along the floor to below its hole, then pops up into it.
+        const below = { x: slot.x, y: PIECE_Y };
+        if (u < 0.45) return { pt: { x: lerp(rest.x, below.x, easeInOut(u / 0.45)), y: PIECE_Y }, angle: lerp(p.tilt, 0, u / 0.45), flat: PIECE_FLAT };
+        const k = easeOut(seg(u, 0.45, 1));
+        return { pt: { x: slot.x, y: lerp(PIECE_Y, slot.y, k) - 40 * Math.sin(Math.PI * k) }, angle: 0, flat: lerp(PIECE_FLAT, 1, k) };
+      }
+      case "tumble":
+        return { pt: hop(rest, slot, 260, easeInOut(u)), angle: lerp(p.tilt, -1080, easeOut(u)), flat: lerp(PIECE_FLAT, 1, u) };
+      default:
+        return { pt: hop(rest, slot, 140, easeInOut(u)), angle: lerp(p.tilt, 360 * (i % 2 ? -1 : 1), easeOut(u)), flat: lerp(PIECE_FLAT, 1, easeOut(u)) };
+    }
   };
 
-  /* The ball knocks the plug out: pfffft, the air rushes out, the cushion jumps like a balloon let go and throws the
+  /* The ball bumps the rolled-up rug: it unrolls across the floor, its roll getting thinner and turning faster, until
+     it bumps the knob of the jack-in-the-box's crank. */
+  const rugLen = RUG.end - RUG.x;
+  const tRugEnd = tRug + RUG_TIME;
+  at(tRug, { sound: playThump });
+  at(tRug + 0.1, { sound: playRustle });
+  /** How far the roll has come: quick at first, slower as it gets thin. */
+  const rugGone = (t: number) => {
+    const k = seg(t, tRug, tRugEnd);
+    return rugLen * k * (1.4 - 0.4 * k);
+  };
+  /** The roll at a moment: its middle, its radius, and how far it has turned (degrees); the rug lies flat behind it. */
+  const rugAt = (t: number) => {
+    const d = rugGone(t);
+    // Unrolling `d` of the rug takes away that much of the roll's area: r² falls in a straight line, and the turn is ∫ dd / r.
+    const c = (RUG.r0 ** 2 - RUG.r1 ** 2) / rugLen;
+    const r = Math.sqrt(RUG.r0 ** 2 - c * d);
+    return { pt: { x: RUG.x + d, y: FLOOR - r }, r, spin: (2 / c) * (RUG.r0 - r) * toDeg };
+  };
+
+  /* The roll turns the crank once round, and at the end of the turn – pop – the lid flies open and the clown springs
+     out on its spring, bobs, and leans over to the right until its head nudges the pyjamas on the line. */
+  const tJack = tRugEnd + CRANK_TURN;
+  at(tRugEnd, { sound: playClick });
+  at(tJack, { sound: playPop });
+  at(tJack + 0.06, { sound: playBoing });
+  /** The crank's turn in degrees (one turn back over the top, as the roll pushes its knob). */
+  const crankTurn = (t: number) => -360 * easeOut(seg(t, tRugEnd, tJack));
+  /** How far the lid is open (degrees, swinging up and over to the left). */
+  const jackLid = (t: number) => -120 * easeOut(seg(t, tJack, tJack + 0.18)) + wobble(t - tJack - 0.18, 10, 18, 5);
+  const tNudge = tJack + CLOWN_LEAN;
+  /** Where the clown's spring stands in the box, round which it leans. */
+  const clownBase = { x: JACK.x0 + JACK.w / 2, y: FLOOR - JACK.h + 6 };
+  /** How far the spring is out of the box (hidden below its rim before the pop), and how far it leans right (degrees). */
+  const clownAt = (t: number) => {
+    const u = t - tJack;
+    const out = u < 0 ? CLOWN_HIDDEN : CLOWN_HIDDEN + (CLOWN.spring - CLOWN_HIDDEN) * (1 - Math.exp(-6 * u) * Math.cos(14 * u));
+    // Leans over slowly, nudges the pyjamas and springs back half way.
+    const lean =
+      CLOWN.lean * easeInOut(seg(u, 0.55, CLOWN_LEAN)) -
+      CLOWN.lean * 0.4 * easeOut(seg(u, CLOWN_LEAN, CLOWN_LEAN + 0.5)) +
+      wobble(u - CLOWN_LEAN - 0.5, 5, 9, 2.5);
+    return { out, lean };
+  };
+  /** The middle of the clown's head. */
+  const clownHead = (t: number): Pt => {
+    const { out, lean } = clownAt(t);
+    return turn({ x: clownBase.x, y: clownBase.y - out - CLOWN.head }, clownBase, rad(lean));
+  };
+  at(tNudge, { sound: playSqueak });
+
+  /* Nudged off their peg, the pyjamas zip down the clothes line on their hanger to the knot at its end; there the legs
+     swing on and kick the slinky off the step stool's top step. */
+  const nudgeHead = clownHead(tNudge);
+  // The hanger hangs where the left leg just touches the clown's head at the nudge.
+  const hanger0 = { x: nudgeHead.x + CLOWN.head + PYJAMAS.leg + 18, y: 0 };
+  hanger0.y = lineY(hanger0.x);
+  const hangerEnd = { x: HANGER_STOP, y: lineY(HANGER_STOP) };
+  const zipPath = pathOf(line(hanger0, hangerEnd));
+  const zipRun = roll(zipPath, 60, 60, 240, 0.6);
+  const tSlide = tNudge + 0.1;
+  const tArrive = tSlide + zipRun.duration;
+  at(tSlide, { sound: playSlide });
+  at(tArrive, { sound: () => playKnock(760) });
+  /** The pyjamas' swing (radians; positive: the legs swing forward, to the right). */
+  const SWING = 0.5;
+  const swingAt = (t: number) => {
+    if (t < tSlide) return 0;
+    // Trailing a little behind while they zip, then swinging forward at the knot and dying away.
+    if (t < tArrive) return -0.12 * easeOut(seg(t, tSlide, tSlide + 0.6));
+    const u = t - tArrive;
+    if (u < 0.32) return lerp(-0.12, SWING, Math.sin((Math.PI / 2) * (u / 0.32)));
+    return SWING * Math.exp(-1.4 * (u - 0.32)) * Math.cos((2 * Math.PI * (u - 0.32)) / 1.1);
+  };
+  /** Where the hanger's hook is on the line, and the pyjamas' swing. */
+  const hangerAt = (t: number) => ({
+    hook: t < tSlide ? hanger0 : along(zipPath, distAt(zipRun, t - tSlide)).pt,
+    swing: swingAt(t),
+  });
+  /** The front foot of the pyjamas, which kicks the slinky. */
+  const footAt = (t: number) => {
+    const { hook, swing } = hangerAt(t);
+    return {
+      x: hook.x + PYJAMAS.leg * Math.cos(swing) + PYJAMAS.feet * Math.sin(swing),
+      y: hook.y - PYJAMAS.leg * Math.sin(swing) + PYJAMAS.feet * Math.cos(swing),
+    };
+  };
+  // The kick: the swing reaches the slinky on its way forward.
+  const KICK_SWING = 0.38;
+  const tFeet = tArrive + (0.32 * Math.asin((KICK_SWING + 0.12) / (SWING + 0.12))) / (Math.PI / 2);
+
+  /* The slinky walks down the step stool, one step at a time – the top end flips over onto the next step and the rest
+     follows – and on to the floor and onto the ruler's raised end. */
+  const kickFoot = footAt(tFeet);
+  // The front leg is about 30 wide: its outer side touches the slinky.
+  const slinky0 = { x: kickFoot.x + 15 + SLINKY.w / 2, y: STEPS[0].top };
+  /** Where the slinky stands after each step: on the steps, on the floor, and on the ruler's raised end. */
+  const rulerTop = (x: number, tilt: number) => RULER.y + (x - RULER.x) * Math.tan(rad(tilt)) - RULER.th / 2;
+  const onRuler = { x: RULER.x - RULER.half + 18, y: 0 };
+  onRuler.y = rulerTop(onRuler.x, RULER.tilt);
+  const slinkySpots: Pt[] = [
+    slinky0,
+    ...STEPS.slice(1).map((s, k) => ({ x: slinky0.x + SLINKY_STEP * (k + 1), y: s.top })),
+    { x: slinky0.x + SLINKY_STEP * STEPS.length, y: FLOOR },
+    onRuler,
+  ];
+  const FLIPS = slinkySpots.length - 1;
+  const tFlip = (k: number) => tFeet + SLINKY_FLIP * k;
+  const tOnRuler = tFlip(FLIPS);
+  for (let k = 0; k < FLIPS; k++) at(tFlip(k), { sound: () => playHop(SLINKY_FLIP - 0.06) });
+
+  /* The slinky lands on the ruler's raised end: it snaps down, the other end flies up and flings the paper plane. */
+  const tSnap = tOnRuler + 0.08;
+  at(tOnRuler, { sound: () => playKnock(420) });
+  at(tSnap, { sound: playWhoosh });
+  /** The ruler's tilt in degrees (positive: left end up). */
+  const rulerTilt = (t: number) => lerp(RULER.tilt, -RULER.tilt, easeIn(seg(t, tOnRuler, tOnRuler + 0.12))) + wobble(t - tOnRuler - 0.12, 2.5, 30, 6);
+  /** The slinky's two ends and how high it arches between them: standing, it is a stack from its foot straight up. */
+  const slinkyAt = (t: number): { a: Pt; b: Pt; arch: number } => {
+    const up = (p: Pt): Pt => ({ x: p.x, y: p.y - SLINKY.h });
+    if (t < tFeet) return { a: slinky0, b: up(slinky0), arch: 0 };
+    if (t >= tOnRuler) {
+      // Riding the ruler down as it snaps.
+      const pivot = { x: RULER.x, y: RULER.y };
+      const da = rad(rulerTilt(t) - RULER.tilt);
+      return { a: turn(onRuler, pivot, da), b: turn(up(onRuler), pivot, da), arch: 0 };
+    }
+    const k = Math.min(FLIPS - 1, Math.floor((t - tFeet) / SLINKY_FLIP));
+    const u = seg(t, tFlip(k), tFlip(k + 1));
+    const from = slinkySpots[k];
+    const to = slinkySpots[k + 1];
+    // The top end flips over onto the next spot, then the other end comes up and over to stand on it.
+    const arch = SLINKY.h * 1.5 * Math.sin(Math.PI * u);
+    if (u < 0.55) return { a: from, b: hop(up(from), to, 30, easeInOut(u / 0.55)), arch };
+    return { a: hop(from, up(to), 30, easeInOut(seg(u, 0.55, 1))), b: to, arch };
+  };
+
+  /* The paper plane flies up, loops once and glides down onto the robot vacuum's button. */
+  const plane0 = { x: PLANE.x, y: rulerTop(PLANE.x, RULER.tilt) - 7 };
+  const loopIn = { x: LOOP.x, y: LOOP.y + LOOP.r };
+  const planeDown = { x: ROBOT.x, y: FLOOR - ROBOT.h - 9 };
+  const planePath = pathOf(
+    quad(plane0, { x: plane0.x + 70, y: loopIn.y + 30 }, loopIn),
+    arc(LOOP.x, LOOP.y, LOOP.r, 90, -270),
+    quad(loopIn, { x: loopIn.x + 260, y: loopIn.y }, planeDown),
+  );
+  const planeRun = roll(planePath, 640, 250, 640, 0.25);
+  const tPlaneDown = tSnap + planeRun.duration;
+  at(tPlaneDown, { sound: playClick });
+
+  /* The robot vacuum wakes with a little tune, drives off sweeping up the crumbs and knocks the plug out of the cushion. */
+  const tWake = tPlaneDown + 0.15;
+  const tDrive = tWake + 0.7;
+  const robotFront0 = ROBOT.x + ROBOT.w / 2;
+  const robotRun = drive(PLUG.x - robotFront0, ROBOT_SPEED, ROBOT_RAMP);
+  const tPop = tDrive + robotRun.duration;
+  at(tWake, { sound: playRobot });
+  at(tDrive, { sound: playWhirr });
+  /** When the vacuum's front gets to each crumb, which it then sweeps in. */
+  const tCrumb = CRUMBS.map((c) => tDrive + robotRun.when(c.x - 4 - robotFront0));
+  at(tCrumb[0], { sound: playCrackle });
+  at(tCrumb[4], { sound: playCrackle });
+  /** The vacuum's middle; once the plug is out, the air pushes it back a little. */
+  const robotX = (t: number) => ROBOT.x + robotRun.at(t - tDrive) - 70 * easeOut(seg(t, tPop + 0.05, tPop + 1.1));
+  /** How far its side brush has turned (degrees): it spins while the vacuum is awake and driving. */
+  const brushTurn = (t: number) => 600 * Math.max(0, Math.min(t, tPop + 0.4) - tWake);
+  /** Crumb `i`: where it is and how big (1 lying, 0 swept in), or null once it is gone. */
+  const crumbAt = (i: number, t: number): { pt: Pt; size: number } | null => {
+    const c = CRUMBS[i];
+    const k = seg(t, tCrumb[i], tCrumb[i] + 0.2);
+    if (k >= 1) return null;
+    return { pt: { x: c.x + 14 * k, y: FLOOR - c.r }, size: 1 - k };
+  };
+  /** Where the paper plane is and its heading (degrees): on the ruler, flying, and riding on the vacuum once it is down. */
+  const planeAt = (t: number): { pt: Pt; angle: number } => {
+    if (t < tSnap) return { pt: plane0, angle: RULER.tilt };
+    if (t < tPlaneDown) {
+      const { pt, angle } = along(planePath, distAt(planeRun, t - tSnap));
+      return { pt, angle: angle * toDeg };
+    }
+    return { pt: { x: robotX(t), y: planeDown.y }, angle: 0 };
+  };
+
+  /* The vacuum knocks the plug out: pfffft, the air rushes out, the cushion jumps like a balloon let go and throws the
      bunny into bed, then lies flat. */
   const tLaunch = tPop + 0.2;
   const tLand = tLaunch + FLIGHT;
@@ -497,8 +820,8 @@ export function buildTidy() {
   const cushionHop = (t: number) => 70 * Math.sin(Math.PI * seg(t, tPop, tPop + 0.5));
   /** Seconds since the plug came out, while the air rushes out of the hole (-1 otherwise). */
   const jet = (t: number) => (t < tPop || t > tPop + 1.6 ? -1 : t - tPop);
-  /** Where the plug's cap is and its turn: on the plug, then flying off high over the ball and lying on the floor. */
-  const capRest = { x: PLUG.x - 280, y: FLOOR - 7 };
+  /** Where the plug's cap is and its turn: on the plug, then flying off high over the vacuum and lying on the floor behind it. */
+  const capRest = { x: PLUG.x - 340, y: FLOOR - 7 };
   const capAt = (t: number): { pt: Pt; angle: number } => {
     const u = seg(t, tPop, tPop + 0.8);
     return { pt: hop({ x: PLUG.x, y: PLUG.y }, capRest, 230, u), angle: -630 * easeOut(u) };
@@ -544,31 +867,51 @@ export function buildTidy() {
   /** The wind-up key turns while the truck drives and bounces. */
   const keyTurn = (t: number) => (t < tGo ? 0 : 140 * (Math.min(t, tLastPress + 0.3) - tGo));
 
-  /** Where the camera looks: the horse, the ball, the chest while the lid shuts, the truck, the shelf, the socks, the sock ball, and the bed. */
-  // The camera's left edge is 0.42 of the screen left of what it looks at, so the finale shows the puzzle, the cushion and the whole bed.
+  /** Where the camera looks: the horse, the ball, the chest while the lid shuts, the truck, the shelf, the socks, the sock ball, the rug, the jack-in-the-box and the pyjamas, the slinky, the plane, the robot vacuum, and the bed. */
+  // The camera's left edge is 0.42 of the screen left of what it looks at, so the finale shows the vacuum, the cushion and the whole bed.
   const finale = BED.x1 + 10 - VIEW_W * 0.58;
   const shelfFocus = (SHELF.x0 + SHELF.x1) / 2;
   // Shows the bellows, the heap of socks, the basket and where the sock ball comes down.
   const sockFocus = 3900;
+  /** From each moment on, what the camera follows; at each change it glides over from the one before within `GLIDE` seconds. */
+  const GLIDE = 1;
+  const shots: [number, (t: number) => number][] = [
+    [
+      -Infinity,
+      (t) => {
+        if (t < tKick) return 0;
+        if (t < tTop) return Math.max(0, ballAt(t).pt.x - 150);
+        if (t < tGo) return CHEST.x0 + 160;
+        if (t < tStop) return Math.max(CHEST.x0 + 160, truckFront(t) - 60);
+        if (t < tPump) return lerp(frontStop - 60, shelfFocus, clamp01((t - tStop) / 1.5));
+        if (t < tBallOff) return lerp(shelfFocus, sockFocus, clamp01((t - tPump) / 1.2));
+        // Then the sock ball, a little ahead of it while it bounces, and soon a little behind it as it rolls.
+        return Math.max(sockFocus, sockBallAt(t).pt.x - lerp(380, 80, seg(t, tHit, tRoll + 1.5)));
+      },
+    ],
+    [tRug, (t) => rugAt(t).pt.x - 40],
+    [tJack, (t) => Math.max(JACK.x0 + 200, hangerAt(t).hook.x + 60)],
+    [tArrive, (t) => Math.max(HANGER_STOP + 60, slinkyAt(t).a.x + 60)],
+    [tSnap, (t) => lerp(PLANE.x, ROBOT.x, easeInOut(seg(t, tSnap, tPlaneDown))) + 160],
+    [tPlaneDown, (t) => robotX(t) + 40],
+    [tPop, () => finale],
+  ];
   const focusX = (t: number) => {
-    if (t < tKick) return 0;
-    if (t < tTop) return Math.max(0, ballAt(t).pt.x - 150);
-    if (t < tGo) return CHEST.x0 + 160;
-    if (t < tStop) return Math.max(CHEST.x0 + 160, truckFront(t) - 60);
-    if (t < tPump) return lerp(frontStop - 60, shelfFocus, clamp01((t - tStop) / 1.5));
-    if (t < tBallOff) return lerp(shelfFocus, sockFocus, clamp01((t - tPump) / 1.2));
-    // Then the sock ball, a little ahead of it while it bounces, and soon a little behind it as it rolls.
-    if (t < tPop) return Math.min(finale, Math.max(sockFocus, sockBallAt(t).pt.x - lerp(380, 80, seg(t, tHit, tRoll + 1.5))));
-    return finale;
+    let i = shots.length - 1;
+    while (t < shots[i][0]) i--;
+    const [from, follow] = shots[i];
+    const x = follow(t);
+    if (i === 0 || t >= from + GLIDE) return x;
+    return lerp(shots[i - 1][1](from), x, easeInOut(seg(t, from, from + GLIDE)));
   };
   const cameraTarget = (t: number) => cameraOn(WORLD_W, focusX(t));
 
-  /** Where it could wait for the child's tap (R-03): the open lid with the ball in the chest, the truck before the full shelf, the sock ball come down on the floor, the sock ball at the cushion's plug. Only the truck before the full shelf waits; the machine runs through the others. */
+  /** Where it could wait for the child's tap (R-03): the open lid with the ball in the chest, the truck before the full shelf, the sock ball come down on the floor, the pyjamas at the end of the line before they kick the slinky. Only the truck before the full shelf waits; the machine runs through the others. */
   const stops = [
     { at: tBallIn, x: (CHEST.x0 + LID_FOOT.x) / 2, y: (CHEST.top + FLOOR) / 2 },
     { at: tRollOn, x: frontStop - TRUCK.len / 2, y: FLOOR - 60, active: true },
     { at: tBounce, x: bounce.x, y: bounce.y },
-    { at: tPop, x: (PLUG.x + CUSHION.x1) / 2, y: FLOOR - 50 },
+    { at: tArrive, x: slinky0.x - 20, y: STEPS[0].top - 60 },
   ];
 
   return {
@@ -591,6 +934,19 @@ export function buildTidy() {
     /** When the last crayon lands in the pot. */
     tCrayonsIn: Math.max(...tCrayonIn),
     tPuzzle,
+    tRug,
+    tRugEnd,
+    tJack,
+    tNudge,
+    tSlide,
+    tArrive,
+    /** When the pyjamas' feet kick the slinky. */
+    tFeet,
+    tOnRuler,
+    tSnap,
+    tPlaneDown,
+    tWake,
+    tDrive,
     tPop,
     tLaunch,
     tLand,
@@ -615,6 +971,20 @@ export function buildTidy() {
     potTilt,
     crayonAt,
     pieceAt,
+    rugAt,
+    crankTurn,
+    jackLid,
+    clownAt,
+    clownHead,
+    hangerAt,
+    footAt,
+    slinkyAt,
+    slinkySpots,
+    rulerTilt,
+    planeAt,
+    robotX,
+    brushTurn,
+    crumbAt,
     cushion,
     cushionHop,
     jet,

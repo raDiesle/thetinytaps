@@ -346,14 +346,14 @@ const MIDDLE = [juice, bottle, cereal, umbrella, vase, thermos];
 /**
  * A new row of things, in `groups` runs from small to tall, so each one can
  * reach the next: two small ones, two books, and two or three of the bigger
- * things. The tall end of one run falls onto the small start of the next,
- * and the very last run ends with the broom, the tallest of all, which falls
- * onto the drum.
+ * things. A link carries the fall from the tall end of one run to the small
+ * start of the next, and the very last run ends with the broom, the tallest
+ * of all, which falls onto the drum.
  */
-export function pickThings(groups = 1): Thing[] {
+export function pickRuns(groups = 1): Thing[][] {
   return Array.from({ length: groups }, (_, g) => {
     const makers = [...shuffle(SMALL).slice(0, 2), book, book, ...shuffle(MIDDLE).slice(0, pick([2, 3]))];
     if (g === groups - 1) makers.push(broom);
     return makers.map((make) => make()).sort((a, b) => a.h - b.h);
-  }).flat();
+  });
 }
