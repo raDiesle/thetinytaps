@@ -1,10 +1,12 @@
 import type { TargetLanguageId } from "../targetLanguages";
 
 // Which game speaks which of the wanted languages (targetLanguages.ts), shown on
-// the ideas page. Translations and recordings are made only when the grown-up asks
-// for them (they cost tokens and credits), so this is the list of what is there and
-// what is still missing. Kept by hand: when a game gains a language, or a new part
-// comes in German only, mark it here in the same commit. content.test.ts checks the
+// the ideas page. New and changed texts are translated into every app language at
+// once (user decision, 22 November 2026), while recordings cost credits and are made
+// only when the grown-up asks, so a translated but unrecorded part is "text"; older
+// parts may still miss a language. This is the list of what is there and what is
+// still missing. Kept by hand: when a game gains a language or a recording, or a new
+// part comes, mark it here in the same commit. content.test.ts checks the
 // rows against the home menu, the language packs of the letters and words games,
 // the translations and recordings of the Bewegungsabenteuer stories and the sung
 // brushing songs.

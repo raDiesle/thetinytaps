@@ -104,7 +104,8 @@ taken out (user request, November 2026). The pictures:
   share of the time and the last landing as it is up (`tidyTimes`, `CYCLE`). Trolley, rope, claw, its two fingers and
   each toy move on keyframes written for the run from that one plan (`TidyKeyframes`), so they stay in step; the claw
   sways a little every second. A tap makes the motor whirr and lights the toys still on the floor. Its name and lines
-  are English only (`tidyNames.ts`, their own part in `languageStatus.ts`) until translations are asked for. The
+  are still English only (`tidyNames.ts`, their own part in `languageStatus.ts`), made before new texts were translated
+  at once (user decision, 22 November 2026). The
   Aufräumlied (H-119, a fixed five minutes with a Suno song) is an idea of its own, not built.
 - „Abwechseln“ 🔁 (H-52): two children take turns with a toy. The time set is one turn. Its hourglass is the
   Sanduhr's own (`Hourglass` in `scenes.tsx`, user request, November 2026: one drawing, never a second one built
@@ -140,8 +141,8 @@ taken out (user request, November 2026). The pictures:
   still while the clock runs on – the sinking seat was then the waiting child's). Before the first turn the plank already
   stands tipped for the fox child with the chick still beside the bear's seat; at the end it lies level, the chick in the
   middle. Whose turn it is: warm sun over that half (`SeesawSun`), the other half in shade (`SwapShade` with `edge` at
-  the pivot). A tap lights the tyre the falling seat goes to (`SeesawGoal`). Its name is English only („Seesaw“) until
-  translations are asked for.
+  the pivot). A tap lights the tyre the falling seat goes to (`SeesawGoal`). Its name is still English only („Seesaw“),
+  made before new texts were translated at once (user decision, 22 November 2026).
   At the end the picture's own sound, then children cheer (the `cheer` recording) while a warm light spreads over the
   picture (`.tm-done-light`), a friendly tune after it, then `GameEnd` with the picture's trophy (nothing rises, the trophy replaced it, user decision, November 2026) with „Nochmal“ and „Weiter“ (the next picture,
   the same minutes, `nextPicture`). Every tap or key during the run answers (steam and a whistle, twinkling, the flame
@@ -323,13 +324,14 @@ and the shared `Layer`, `Draw`, `LeftGlow`), `timer.css`, `content.ts`
   `Localized` in all app languages (November 2026) and said in the app language through `timerSay` (its English
   recording standing in where the language has none); `timerSaid(language)` lists them for the recordings. Only
   recordings play (`timerVoice`, ./stimme/, `bun run voice make --only timer`), never the browser's voice: a line without its recording stays
-  silent (every app language but Russian recorded, November 2026). A new picture gets its two lines in `PICTURE_LINES` (the type asks for them), English only
-  until translations are asked for, German included (root `CLAUDE.md`, Language): `PICTURE_LINES` takes `Texts`, the
-  older lines German first and a new picture's English first in a file of its own (`tidyNames.ts`) that its own part
-  in `languageStatus.ts` names in `files`, so the inline texts' check reads it as English only. `timerSaid` and the 🎙️
+  silent (every app language but Russian recorded, November 2026). A new picture gets its two lines in `PICTURE_LINES` (the type asks for them), written
+  English first and translated into every app language, German included, in the same commit (root `CLAUDE.md`, user
+  decision, 22 November 2026): `PICTURE_LINES` takes `Texts`, the older lines German first and a new picture's English
+  first; Tidy Up's, still English only, stand in a file of its own (`tidyNames.ts`) that its own part in
+  `languageStatus.ts` names in `files`, so the inline texts' check reads it as English only. `timerSaid` and the 🎙️
   list leave a line out of a language it is not translated into (its English recording stands in), and
   `timer.test.ts` keeps every German-first line in every language; a changed line of the older ones is changed in its
-  German.
+  German and in its translations.
 - Its ideas are the area „Timer“ on `/management/` (`src/content/ideas/h-timer.ts`, H numbers shared with the
   Alltagshelfer): any time to set (H-59 to H-62), pictures that visibly change every second and show where they go,
   also over long times (H-45, H-63 to H-69), and new pictures. A new timer idea goes there, not into the Alltagshelfer.

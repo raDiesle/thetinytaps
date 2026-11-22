@@ -106,10 +106,11 @@ are not kept offline by every phone, only once the story has started in that lan
   quiet after, encode like the others (22,050 Hz mono, 32 kbit/s MP3), save it under the shortened line's name
   (`recordingName`), delete the old file and let Whisper hear the cut file once. Shorten the line in every
   `lines.<language>.ts` alike; `voice.test.ts` checks that names and lines match.
-- A new story or new lines come in English only (root `CLAUDE.md`, user decision, 11 November 2026): its `lines.ts`
+- A new story or new lines are written English first (root `CLAUDE.md`, user decision, 11 November 2026): its `lines.ts`
   says `LANGUAGE = "en"`, its recordings go to `stimme/en/`, and German is one of the translations. A changed line of an
-  older, German-first story is changed in its German. Translate (`lines.<language>.ts`) and record (`bun run voice make`)
-  only when the user asks for it, and keep the story's row in `src/content/ideas/languageStatus.ts` true
+  older, German-first story is changed in its German. Translate (`lines.<language>.ts`) into every app language in the
+  same commit (user decision, 22 November 2026), record (`bun run voice make`) only when the user asks for it, and keep
+  the story's row in `src/content/ideas/languageStatus.ts` true, `"text"` where a recording still waits
   (`content.test.ts` checks it against the files).
 - ElevenLabs always with the turbo model (`eleven_v4_turbo`, in `stimme.json`): it costs half the credits, and
   the 10,000 credits a month have to reach for every language. `bun run voice make --dry [--lang en]` shows what
@@ -126,8 +127,9 @@ The game has no settings of its own: its own music and the language follow the s
 
 - The start screen, buttons, tooltips and notes follow the app language of the home page (`src/lib/language.ts`), as
   Tapsi does. A text that has a translation is written as `t({ de: "…", en: "…", zh: "…", hi: "…", es: "…", ar: "…", ru: "…" })` (`useT()`); new texts
-  come in English only (`t({ en: "…" })`), like Tapsi's new lines, until the user asks for a language, German included
-  (root `CLAUDE.md`, Language); a changed line of an older German-first text is changed in its German.
+  are written English first and come with all seven languages at once, German included, like Tapsi's new lines (root
+  `CLAUDE.md`, user decision, 22 November 2026); a changed line of an older German-first text is changed in its German
+  and its translations with it.
 - A story's title and its step names on the route come from its translations (`title`, `name` per step in
   `lines.<language>.ts`), shown in the app language (`storyTitle`, `stepName` in `AdventurePlay.tsx`), German where a
   translation has none; the movement library itself stays German (notes for building stories, shown only as a fallback name).

@@ -412,9 +412,9 @@ with load quietly (`nextLines`, given by `DayPlay` and `PassPlay`). With the voi
 „Was brauche ich?“ are on that list in every language they are translated into (C-73, `MOOD_SAID`, `NEEDS_SAID`): a
 child picking a feeling hears it in its own language; a new line said there goes into those lists with all its languages.
 A feeling's card, tapped, says its name („Traurig“) before „Wie doll ist es?“. Rules:
-- New stories, feelings and kind things come in English only (root `CLAUDE.md`, Language); their translations,
-  German included, are written only when the user asks, and a changed line of an older German-first story is changed
-  in its German. The stories so far are written in German with the other languages laid over them, so the first
+- New stories, feelings and kind things are written English first (root `CLAUDE.md`, Language); their translations,
+  German included, are written in the same commit (user decision, 22 November 2026), and a changed line of an older
+  German-first story is changed in its German and in its translations. The stories so far are written in German with the other languages laid over them, so the first
   English-first one teaches the game a story's first language, with a test – never by writing it German first after
   all. Of the German-first ones, a missing entry in `bear.<lang>.ts`/`kita.<lang>.ts` is told in German. A not-so-good idea at home
   without its translation is `null` and told in German; `useVoice` plays a line that is still German from its German

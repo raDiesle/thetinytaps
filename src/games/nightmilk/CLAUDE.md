@@ -27,9 +27,10 @@ wakes, sees the moon, hugs the teddy and sleeps on. Milk in the day, sleep at ni
 
 ## Rules
 
-- **English first, nothing translated yet** (root CLAUDE.md, Language): pages, titles and names are English; German and
-  the others come only when the user asks, then as `<language>.ts` here loaded with `texts-<language>.ts`, like „Hair
-  Washing“ (and `ChapterBook`'s `translations`, `voiceLines.ts`' `chapterBook(…)`, the row's part in
+- **English first, nothing translated yet** (root CLAUDE.md, Language): pages, titles and names are English, written
+  before the user decision of 22 November 2026 that translates every new or changed text at once. Its translations,
+  German included, are still owed and come as `<language>.ts` here loaded with
+  `texts-<language>.ts`, like „Hair Washing“ (and `ChapterBook`'s `translations`, `voiceLines.ts`' `chapterBook(…)`, the row's part in
   `languageStatus.ts`). Its search texts are in all seven languages and say the story is so far in English: drop that
   sentence in every language when it is translated.
 - **Published since its pictures were made** (21 November 2026, a Claude cloud session's `/paid-queue`): the volume has

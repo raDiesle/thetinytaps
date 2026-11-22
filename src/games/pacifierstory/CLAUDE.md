@@ -39,11 +39,12 @@ Tapsi misses the pacifier, is comforted, and Mama and Papa love Tapsi with and w
   ever gives. The foxes are the family: Tapsi, Mama and Papa Fuchs, never a fox or bear only standing by.
 - Tapsi is an animal, not the child's figure, so it does not follow „Junge / Mädchen“, and the German text names Tapsi
   instead of „er“ or „sie“, as „Abstillen“ does.
-- Every language has every chapter and page (`pacifierstory.test.ts`): a new page or chapter comes in English only
-  (root `CLAUDE.md`, Language) – the story is German first and `ChapterBook`'s `first` is the whole book's, so the first
+- Every language has every chapter and page (`pacifierstory.test.ts`): a new page or chapter is written English first
+  and comes with every other language, German included, in the same commit (root `CLAUDE.md`, user decision, 22 November
+  2026) – the story is German first and `ChapterBook`'s `first` is the whole book's, so the first
   English-first page teaches the book a page's first language, with a test, never by writing it German first after all –
-  and the row in `languageStatus.ts` says what is missing until the user asks for translations, German included; a
-  German line whose meaning changes is changed in its German and loses its translations (they fall back to German). The child's languages' rules hold: Tapsi in each script
+  and the row in `languageStatus.ts` says what is missing (`"text"` until recorded); a German line whose meaning changes
+  is changed in its German and translated again with it. The child's languages' rules hold: Tapsi in each script
   (Тапси, 塔普西, टैप्सी, تابسي), the pacifier named the same way throughout (pacifier, 奶嘴, चुसनी, chupete, لهاية,
   пустышка), Arabic with „let's“ instead of an imperative, Spanish without adjectives about Tapsi that change with
   gender; Tapsi's grammar follows „Abstillen“'s (masculine in Russian, Hindi and Arabic).

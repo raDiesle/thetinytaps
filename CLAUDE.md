@@ -210,23 +210,24 @@ In a fresh worktree run `bun install` first.
   in its German (see below), never rewritten English first. Other languages come game by game: the app aims at
   German, the five most spoken languages (English, Chinese, Hindi, Spanish, Arabic), Russian and Italian
   (`src/content/targetLanguages.ts`).
-  Translations and recordings (ElevenLabs voice, Suno songs) are made **only when the user asks** for
-  them, since they cost tokens and credits – German now is such a translation too: new features, stories, modes and
-  lines come in English only, never translated (also not into German) or recorded on your own, also in a game that
-  already speaks other languages. Until German is asked for, a German player sees and hears those in English.
-  This rule wins over the games' own `CLAUDE.md` files written before it: where one says a new line, story or mode
-  „comes in German only“, it now comes in English only, German being one of the translations made on request; where
-  that game's data is built on German sentences, its first English-first part teaches it a part's first language (see
-  below). Rewrite such a sentence in a game's file when you work there anyway.
-  Instead keep `src/content/ideas/languageStatus.ts` (shown on `/management/`) true in the same commit: what is
-  there and what is missing, per game, as `parts` where a part (a story, a mode, the song) differs, and
-  `"text"` where it is translated but not yet recorded – a new part marks `en` and leaves `de` out until it is
-  translated. `content.test.ts` checks it where files tell, and
-  `inlineTexts.test.ts` checks that every inline `t({ en: … })` (or older `t({ de: … })`) of a game has each language
-  its row marks as there, German included (so an English-only line in a translated game fails until its row says what
-  is missing). A new game that comes English-only
-  into the translated menus keeps its card's title and blurb in its own folder (`names.ts`, imported by `games.ts`, like
-  `/zusammen/`), so its own row says they are missing, not the home page's.
+  **Every new or changed text is translated at once into all seven app languages** (`APP_LANGUAGES`: German, English,
+  Chinese, Hindi, Spanish, Arabic, Russian; user decision, 22 November 2026 – before, new texts stayed English only
+  until the user asked): a new game, feature, story, mode, picture's name, menu text or line, and a line whose meaning
+  changed, gets its translations in the same commit, unasked, in every game, German included. Written English first,
+  then translated, following the rules for each language below. Recordings (ElevenLabs voice, Suno songs) still cost
+  credits and are made **only when the user asks**: a translated line waiting for its recording is `"text"` in
+  `src/content/ideas/languageStatus.ts`. This wins over any game's `CLAUDE.md` or skill still saying a new text „comes
+  in English only“ until asked; where a game's data is built on German sentences, its first English-first part
+  teaches it a part's first language (see below). Italian, a target language not yet in `APP_LANGUAGES`, waits until
+  it joins them.
+  Keep `src/content/ideas/languageStatus.ts` (shown on `/management/`) true in the same commit: what is there and what
+  is missing, per game, as `parts` where a part (a story, a mode, the song) differs, and `"text"` where it is
+  translated but not yet recorded. `content.test.ts` checks it where files tell, `inlineTexts.test.ts` checks that every
+  inline `t({ en: … })` (or older `t({ de: … })`) of a game has each language its row marks as there, German included,
+  and `languageGaps.test.ts` fails on any part missing an app language that is not on its list of gaps left from before
+  22 November 2026 (`OLD_GAPS`) – so a new text can't be marked missing instead of translated, and a gap translated
+  later leaves that list in the same commit. A new game keeps its card's title and blurb in its own folder (`names.ts`,
+  imported by `games.ts`, like `/zusammen/`).
   **One language for everything, never mixed**: menus, letters and keys, words and voice all follow the app language
   (🌐 on the home page, `useAppLanguage()`); no game, menu or option adds a language choice of its own (a „Spielsprache“ once
   put Russian letters under German menus, and the offline copy's choice of languages was taken out again, user feedback,
@@ -240,11 +241,10 @@ In a fresh worktree run `bun install` first.
   Code, comments, docs and commit messages are English, except
   the German names of the older games, modes and content.
 - **The whole app speaks German, English, Chinese, Hindi, Spanish, Arabic and Russian** (🌐 on the home page,
-  `APP_LANGUAGES` in `src/lib/language.ts`): grown-ups' screens and what the child hears and sees, translated once on
-  request (Russian, then the other five, October 2026). Write every user-facing text so it can be translated: short
+  `APP_LANGUAGES` in `src/lib/language.ts`): grown-ups' screens and what the child hears and sees (Russian, then the
+  other five, October 2026; since 22 November 2026 every new text in all of them at once, see above). Write every user-facing text so it can be translated: short
   texts inline as `t({ en: "…" })` (a text several components share stands once in `src/lib/sharedTexts.ts`; `useT()`; typed `EnglishFirst`, the older German-first ones `Localized`, and a
-  field taking either is `Texts`, all in `src/lib/language.ts`), adding the other languages only when translations
-  are asked for; larger content gets a `<lang>.ts` / `*.<lang>.ts` file next to its first language's data (English
+  field taking either is `Texts`, all in `src/lib/language.ts`), with the other languages beside it; larger content gets a `<lang>.ts` / `*.<lang>.ts` file next to its first language's data (English
   for what is new), keyed by id, and a table by language. German has a chunk of its own
   for that (`texts-de.ts`, since „Haare waschen“, November 2026): the older German-first games need nothing there, and
   German English-first content is listed in it like any other language's. Games whose data is built on German sentences (Lebendige Bilder's items and
@@ -268,8 +268,8 @@ In a fresh worktree run `bun install` first.
   never the German one** (user decision, November 2026: a child hearing Russian or Spanish can't follow German;
   `recordingUrl` in `src/lib/voice.ts`, `voice.test.ts`): a line with several languages passes its English text as
   `say(…, { english })` (`spokenIn` and the elevator's phrasebook do), and only the games told by their voice fall
-  back to the browser's voice after that. When the meaning of a line changes in its first language, delete its translations (they fall back to
-  it) rather than leaving wrong ones. For the child: present tense, informal (ты, tú, तुम, 你), and nothing that changes for boy or
+  back to the browser's voice after that. When the meaning of a line changes in its first language, translate it again in every language in the same commit,
+  never leaving wrong ones. For the child: present tense, informal (ты, tú, तुम, 你), and nothing that changes for boy or
   girl – Spanish without adjectives about the child, Hindi with requests or „let's“ instead of gendered verbs, Arabic
   with „let's“ (هيّا ن…) instead of an imperative. Grown-ups: вы, usted, आप, Arabic plural. Names the voice says
   (Tapsi → „Тапси“, „塔普西“, „टैप्सी“, „تابسي“) are written in the language's own script, never in Latin letters inside a
@@ -1091,9 +1091,13 @@ src/lib/                 speech, sfx (synthesized + recorded sounds), storage, d
   sign's earlier size the foxes were a few pixels and nobody saw them (user feedback, October 2026).
 - Search engines: every game, category and scene has a title, description and text in `src/content/seo.ts`
   and in every other language of the app in `seo.<lang>.ts` (`SEO_LANGUAGES` = `APP_LANGUAGES`: the pages are part
-  of being found, A-22 – English since October, the other five since November 2026, user request). So, unlike other
-  translations, a new entry or a changed meaning gets its lines in all seven in the same commit: search texts are
-  short, and a page missing a language would leave a hole in the hreflang set (`content.test.ts` checks every
+  of being found, A-22 – English since October, the other five since November 2026, user request). A new entry or a
+  changed meaning gets its lines in all seven in the same commit, like every text: a page missing a language would
+  leave a hole in the hreflang set. **Every new feature updates the search texts in the same commit, unasked** (user
+  decision, 22 November 2026): not only the page's text but its `title` and `description` too – they become the
+  page's `<title>`, meta description and the Open Graph tags – where the feature is something parents would search
+  for or would want to know from a search result (a new mode, story, picture, kind of round, option), in all seven
+  languages, and the book's and the home page's entries where they sum up what is there (`content.test.ts` checks every
   language has every page, lengths – Chinese half, Hindi more, since Google cuts by width – and no Latin letters in
   Russian, Chinese, Hindi and Arabic but the site's name). The build writes an own `index.html` per entry and
   language – German at `/zaehne/`, the others at `/en/zaehne/`, `/zh/zaehne/` …, joined by hreflang (GitHub

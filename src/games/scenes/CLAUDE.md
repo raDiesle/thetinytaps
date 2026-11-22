@@ -117,9 +117,10 @@ trophy and the end's buttons (`curtainEndAt`). The bedtime picture goes dark ins
 - `scenes.test.ts` checks every picture's data (unique ids, articles, tap sizes, chains, keys,
   plural grammar in questions, roads). `bun test` after every change to items.
 - The mode labels for the row on `/bilder/` are `SCENE_MODES` in `settings.ts`, so their languages count for this game in
-  `languageStatus.ts`; a new mode comes with its label in English only (root `CLAUDE.md`, Language; `label` is a
-  `Texts`, as „🔊 Sounds“, kept in the mode's own file so its part of the language status covers it) and a part
-  marking the gap there, German included. Keep labels
+  `languageStatus.ts`; a new mode comes with its label written English first and translated into every app
+  language at once, German included (root `CLAUDE.md`, user decision, 22 November 2026; `label` is a `Texts`, as
+  „🔊 Sounds“, kept in the mode's own file so its part of the language status covers it), and a part there saying
+  what it has. Keep labels
   short: all modes must fit in one row on a phone on its side (844 × 390), or the row wraps and pushes the pictures down
   („Straße malen“ is „🛣️ Straßen“ there for this). Check the row there after adding a mode.
 - `ScenePlay.tsx` is the engine and is shared by every picture (sounds in `sounds.ts`, the marks drawn over a picture in `marks.tsx`): keep scene-specific things in the
@@ -134,11 +135,11 @@ The pictures speak the app language (chosen on the home page, `src/lib/language.
 - An item's words live in two places: German in the scene's item (`name`, `sentences`, chains), every other
   language in the scene folder's `ru.ts`, `en.ts`, `zh.ts`, `hi.ts`, `es.ts`, `ar.ts` (`SceneTranslation`: title,
   description, items by id with name, sentences, `gender`/`plural`, chain sentences in order), listed in
-  `src/content/texts/texts-<lang>.ts` (loaded with the app language, `translations.ts` fills `SCENE_TRANSLATIONS`). New items and sentences come in English only until the user asks for a language, German included (root `CLAUDE.md`,
-  Language): the pictures so far are German first, so the first English-first one teaches the scene data and
+  `src/content/texts/texts-<lang>.ts` (loaded with the app language, `translations.ts` fills `SCENE_TRANSLATIONS`). New items and sentences are written English first and translated into every app language, German included, in the
+  same commit (root `CLAUDE.md`, user decision, 22 November 2026): the pictures so far are German first, so the first English-first one teaches the scene data and
   `sceneLanguage` a scene's first language, with a test (`/neue-szene`) – never by writing it German first after all.
   A changed line of a German-first picture is changed in its German; when a German
-  line's meaning changes, delete its translations. A picture plays in a language only when its translation covers
+  line's meaning changes, translate it again in the same commit. A picture plays in a language only when its translation covers
   every item and chain step, otherwise entirely in German, voice and keys included (`sceneLanguage` in
   `localize.ts`), never mixed; mark such a gap in `src/content/ideas/languageStatus.ts`.
 - The grammar contract of a translated name (`scenes.test.ts` checks it, and that ru/zh/hi/ar lines have no Latin letters):

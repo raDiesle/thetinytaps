@@ -32,15 +32,15 @@ the cup everywhere now, sometimes still thinks of the bottle and gets a cuddle, 
 
 ## Rules
 
-- **Written English first, translated on request** (root CLAUDE.md, Language): pages, title, book name and blurb were
+- **Written English first, translated at once** (root CLAUDE.md, Language): pages, title, book name and blurb were
   written in English and translated the same day (21 November 2026, „übersetze alles in alle Sprachen“) into every app
   language, German as one of them: `<language>.ts` here, loaded by `texts-<language>.ts` into `texts.bottleStory`, and
-  `names.ts`. A changed page is changed in English first and its translations deleted until made again (they fall back
-  to English, never German); `bottlestory.test.ts` checks every language has every chapter and page, Tapsi in its own
+  `names.ts`. A changed page is changed in English first and translated again in the same commit (user decision, 22 November
+  2026; a page missing a translation falls back to English, never German); `bottlestory.test.ts` checks every language has every chapter and page, Tapsi in its own
   script (Тапси, 塔普西, टैप्सी, تابسي) and no Latin letters in Russian, Chinese, Hindi and Arabic. The rules for the
   child's languages hold: Spanish without adjectives about Tapsi that change with gender („Tapsi es grande“, „tú y
   yo“ rather than „juntos“), Russian without past-tense forms that show a gender, Arabic with „let's“ (هيّا) instead
-  of an imperative to the child. A new page needs its six translations again, when the user asks.
+  of an imperative to the child. A new page comes with its six translations in the same commit.
 - **The chapters follow the guides' steps in their order** (`BOTTLE_STEPS`, checked): tell beforehand, choose an open
   cup and practise, then one bottle after the other – the daytime bottle first, the morning's next, the bedtime bottle
   last (`BOTTLE_ORDER`, checked) –, the night, the goodbye. The last chapter only tells the story. The sources differ on

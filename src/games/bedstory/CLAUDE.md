@@ -31,9 +31,9 @@ close and love Tapsi in the little bed and the big one.
 
 ## Rules
 
-- **English first** (root CLAUDE.md, Language): pages, title, book name and blurb are English; other languages, German
-  too, come only when the user asks (`languageStatus.ts` says what is missing). The search texts (`seo.ts`,
-  `seo.<lang>.ts`) are the exception and stand in all seven languages.
+- **English first** (root CLAUDE.md, Language): pages, title, book name and blurb are written in English; a new or
+  changed one gets the other languages, German too, in the same commit (user decision, 22 November 2026;
+  `languageStatus.ts` says what is missing). The search texts (`seo.ts`, `seo.<lang>.ts`) stand in all seven languages.
 - **The chapters follow the guides' steps in their order** (`BED_STEPS`, checked): the signs that it is time (climbing
   out, too small), telling and reading about it beforehand, choosing and helping, the bed where the cot stood with the
   old blanket, the cuddly toy, a rail and a night light and naps first, the same evening ritual with a promise to look in

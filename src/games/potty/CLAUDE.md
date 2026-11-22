@@ -118,10 +118,10 @@ nothing to choose). `potty.test.ts` fails when a picture of the story is missing
 thought's picture lacks its second frame, or `bilder/` holds a picture of anybody else.
 
 German, English, Chinese, Hindi, Spanish, Arabic and Russian (`POTTY_TEXTS` is `Localized`; start screen and week chart
-inline `t({ … })`): another language goes next to them when asked for; a new line comes in English only
-(root `CLAUDE.md`, Language: inline `t({ en: "…" })`, and the first English-first line of `POTTY_TEXTS`, German first so
-far, teaches it a line's first language, with a test), and a changed German line is changed in its German and loses its
-translations until then. Everything Tapsi's story says is played from its ElevenLabs recording (`voice.ts`, files in `stimme/`),
+inline `t({ … })`): a new line is written English first and gets the other six languages in the same commit
+(root `CLAUDE.md`, user decision, 22 November 2026: inline `t({ en: "…", de: "…", … })`, and the first English-first
+line of `POTTY_TEXTS`, German first so far, teaches it a line's first language, with a test), and a changed German line
+is changed in its German and in its translations. Everything Tapsi's story says is played from its ElevenLabs recording (`voice.ts`, files in `stimme/`),
 recorded in every app language (November 2026). Two sentences in a row (what the child said, then the
 next step; „nichts“, then washing hands) go one after the other (`queue`), never as one joined sentence, which
 would have no recording. A new or changed line is listed by `src/content/recordedLines.ts` (`toepfchen`) and recorded
