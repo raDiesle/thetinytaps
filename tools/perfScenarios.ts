@@ -96,18 +96,36 @@ const key = (k: string, times = 1): Step[] => Array.from({ length: times }, () =
 
 export const SCENARIOS: Scenario[] = [
   {
+    // One stretch after the other, with no waits between them: collecting a trace already leaves seconds unmeasured
+    // between two stretches, and a stretch started after a wait of its own missed the story's monsters growing, which
+    // painted the whole screen 60 times a second until November 2026 (the sky's colour and the monsters swaying inside
+    // svgs). The jumps glide the mirror to the next step every two seconds, far more often than a child sees it.
     name: "zaehne",
     path: "/zaehne/",
     parts: [
-      { label: "Geschichte: Süßes", before: [START, { wait: 300 }], ms: 9000 },
-      { label: "Geschichte: Monster wachsen", before: [{ wait: 600 }], ms: 5500 },
-      { label: "Waschbecken", ms: 12000 },
-      { label: "Spiegel, Countdown", before: [{ wait: 3000 }], ms: 4500 },
-      { label: "Putzen: Kauflächen", before: [{ wait: 1000 }], ms: 6000 },
-      { label: "Putzen: Kopf dreht sich", before: key("ArrowRight"), ms: 5000 },
-      { label: "Putzen: Mund geht zu", before: key("ArrowRight"), ms: 5000 },
-      { label: "Putzen: innen", before: key("ArrowRight", 3), ms: 5000 },
-      { label: "Ende", before: key("ArrowRight", 2), ms: 6000 },
+      { label: "Geschichte: Süßes", before: [START], ms: 9500 },
+      { label: "Geschichte: Monster wachsen", ms: 5500 },
+      { label: "Hinunter zum Waschbecken", ms: 6000 },
+      { label: "Waschbecken", ms: 8000 },
+      { label: "Hinauf in den Spiegel, Countdown", ms: 5000 },
+      { label: "Putzen: Los!", ms: 6000 },
+      { label: "Putzen: Monster antippen", ms: 6000, tap: { selector: ".monster-body", every: 700 } },
+      { label: "Putzen: springen", ms: 12000, type: { keys: ["ArrowRight"], every: 2000 } },
+      { label: "Ende und Aufräumen", ms: 14000 },
+    ],
+  },
+  {
+    // The book on the shelf starts the brushing at once: its flight, then the story beginning as the book lies open.
+    name: "zaehne-vom-regal",
+    path: "/",
+    parts: [
+      {
+        label: "Buch aus dem Regal nehmen",
+        before: [{ tap: '[data-book="zaehne"]' }],
+        startWhen: { holds: 'document.querySelector(".bt-book")?.getAnimations({ subtree: true }).length > 0', lead: "tap to lift", within: 600 },
+        ms: 3000,
+      },
+      { label: "Geschichte beginnt", ms: 5000 },
     ],
   },
   {

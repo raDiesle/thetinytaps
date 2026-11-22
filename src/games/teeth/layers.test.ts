@@ -31,13 +31,41 @@ function onlyOnPieces(classes: Set<string>, code: string) {
 }
 
 /**
- * The sky is the one picture that changes as a whole (its colour as the day goes by): it lies alone in the svg behind
- * the child. The camera is the HTML layer that zooms in.
+ * The sky is the one picture that changes as a whole (its colour as the day goes by): two more skies lie alone in svgs
+ * of their own over the first and fade in by their opacity. The camera is the HTML layer that zooms in.
  */
-const WHOLE = new Set(["origin-sky", "origin-camera"]);
+const WHOLE = new Set(["origin-sky-1", "origin-sky-2", "origin-camera"]);
+
+/** The body of a `@keyframes` rule in teeth.css. */
+const keyframes = (name: string) => css.match(new RegExp(`@keyframes ${name} \\{([\\s\\S]*?)\\n\\}`))?.[1] ?? "";
 
 test("the story animates only HTML layers of their own, never something inside its picture", () => {
   onlyOnPieces(new Set(animatedClasses("origin").filter((c) => !WHOLE.has(c))), origin);
+});
+
+// The sky's colour once changed by an animation of its rect's fill, and the story's monsters swayed and blinked inside
+// their svgs: while the monsters grew, the story painted the whole screen 60 times a second on the old Android
+// (November 2026). A phone moves a layer by its transform, opacity or filter without painting it again.
+test("every keyframe of the game animates only transform, opacity or filter", () => {
+  const names = [...css.matchAll(/@keyframes ([\w-]+)/g)].map((m) => m[1]);
+  expect(names.length).toBeGreaterThan(20);
+  for (const name of names) {
+    const properties = [...keyframes(name).matchAll(/([\w-]+)\s*:/g)].map((m) => m[1]);
+    for (const property of properties) {
+      const fine = ["transform", "opacity", "filter", "animation-timing-function", "visibility"].includes(property);
+      expect({ name, property, fine }).toEqual({ name, property, fine: true });
+    }
+  }
+});
+
+test("the story's sky changes by fading skies of its own in, and its monsters sway as HTML", () => {
+  for (const name of ["teeth-origin-sky-noon", "teeth-origin-sky-dusk", "teeth-origin-sky-night", "teeth-origin-sky-dawn"]) {
+    expect(keyframes(name)).toContain("opacity");
+  }
+  expect(origin).toMatch(/className=\{`origin-picture origin-sky-\$\{i\}`\}/);
+  // The monsters' Piece moves its svg as a whole; the Monster drawn inside stands still (no blink, no sway).
+  expect(css).toMatch(/\.origin-monster > svg \{[^}]*animation: teeth-origin-monster-sway/);
+  expect(origin).toMatch(/<Monster\b[^>]*\bstill\b/);
 });
 
 test("the sink animates only HTML layers of their own, never something inside its picture", () => {
@@ -57,7 +85,6 @@ test("the story's animations per sweet are set on HTML layers too", () => {
 test("the end's shine breathes as a layer of its own, and the dazzled monster moves its HTML, not inside an svg", () => {
   // The shine is an svg of its own over the mirror whose animation changes only its opacity.
   expect(mouth).toMatch(/<svg className="mouth mouth-moving teeth-shine"/);
-  const keyframes = (name: string) => css.match(new RegExp(`@keyframes ${name} \\{([\\s\\S]*?)\\n\\}`))?.[1] ?? "";
   for (const name of ["teeth-shine-in", "teeth-shine-breathe"]) {
     expect(keyframes(name)).toContain("opacity");
     expect(keyframes(name)).not.toMatch(/transform|fill|stroke|filter/);

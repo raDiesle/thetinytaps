@@ -391,6 +391,17 @@ export const ORIGIN_CUES: Cue[] = [
 /** The recordings the story plays, to load before it starts. */
 export const ORIGIN_RECORDINGS = ["yay", "wrapper", "lolly", "munch", "chew", "yum"];
 
+/**
+ * The sky's colours as the day goes by while the monsters grow: before the evening brushing a whole day ending at dusk
+ * (blue, the afternoon's warm light, dusk), before the morning one a night (dusk, night, the sun coming up). Each is a
+ * picture of its own over the one before, fading in as a whole (`.origin-sky-1`, `-2`): the sky's own colour changing
+ * had the phone paint the whole screen again in every frame, 60 times a second on the old Android (November 2026).
+ */
+const SKY: Record<Daytime, [string, string, string]> = {
+  evening: ["#c4f1ff", "#ffd9a8", "#a49be6"],
+  morning: ["#a49be6", "#2d2a6e", "#ffe0b0"],
+};
+
 /** Where the sun or the moon stands at the top of its arc, which turns round the point below it (`.origin-sky-body`). */
 const SKY_BODY_AREA: Box = { x: W / 2 - 40, y: -30, width: 100, height: 72 };
 
@@ -528,14 +539,11 @@ export function Origin({
   return (
     <div ref={scene} className={`origin at-${part} ${daytime}`}>
       <div className="origin-camera" style={camera}>
-        <svg className="origin-picture" viewBox={viewBox} aria-hidden>
-          <defs>
-            <clipPath id="origin-frame-back">
-              <rect {...frame} />
-            </clipPath>
-          </defs>
-          <rect className="origin-sky" {...box} clipPath="url(#origin-frame-back)" />
-        </svg>
+        {SKY[daytime].map((fill, i) => (
+          <svg key={i} className={`origin-picture origin-sky-${i}`} viewBox={viewBox} aria-hidden>
+            <rect {...frame} fill={fill} />
+          </svg>
+        ))}
         <div className="teeth-space" style={space}>
           {/* In the morning the night ends with the sun coming up beside the head. */}
           {daytime === "morning" && part === "grow" && (
@@ -688,7 +696,7 @@ export function Origin({
                         key={i}
                         area={{ x: x - 11, y: y - 18, width: 22, height: 27.5 }}
                         within={MOUTH_AREA}
-                        className="origin-monster"
+                        className={`origin-monster${tickled === FIRST_ID + i ? " tickled" : ""}`}
                         style={{ "--grow": `${600 + i * 700}ms` } as CSSProperties}
                       >
                         <g transform={`translate(${x.toFixed(1)} ${y.toFixed(1)}) scale(0.63)`}>
@@ -696,6 +704,7 @@ export function Origin({
                             color={c.color}
                             variant={i % 3}
                             active={false}
+                            still
                             gone={false}
                             scared={false}
                             tickled={tickled === FIRST_ID + i}
