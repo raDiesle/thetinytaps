@@ -14,6 +14,7 @@ import { type Cdp, evaluate, launchChrome, open, siteUrl, sleep } from "./chrome
 //   bun run previews --url http://…    picture a server that already runs (the dev server shows its DevTag: avoid it)
 //   bun run previews --no-build        picture the out/ that is there
 //   bun run previews --shots <dir>     also keep each whole window there, to see why a cut lies where it does
+//   bun run previews --video           the big pictures of the games the videos' outro shows (`VIDEO_GAMES`)
 //
 // Look at every new picture before committing it: a card whose game starts with a dark screen, a loading slip or a
 // story's first words gets a cut of its own in CUTS, or a later moment in WAIT.
@@ -29,6 +30,8 @@ const option = (name: string) => {
   return i >= 0 ? args[i + 1] : undefined;
 };
 const filters = args.filter((a, i) => !a.startsWith("--") && !["--url", "--shots"].includes(args[i - 1]));
+/** Only the videos' big pictures (`VIDEO_GAMES`), not the menus'. */
+const video = flag("video");
 /** Where to keep each whole window pictured too, to see why a cut lies where it does. */
 const shots = option("shots");
 
@@ -92,6 +95,28 @@ const BOOK_DIR = "src/components/vorschau";
 /** The tables of contents' lines whose game draws the child, pictured again as a girl into `GIRL_BOOK_DIR`. */
 const GIRL_LINES = ["/kleine-abenteuer/"];
 const GIRL_BOOK_DIR = "src/components/vorschau-maedchen";
+
+/**
+ * The games the YouTube videos' outro shows big in the middle (`src/video/outro/content.ts`, `GALLERY`), by address,
+ * pictured as their table of contents' line is (the same `keyOf`, so CUTS, PLAYS and WHOLE apply) but at
+ * `VIDEO_SIZE` into `VIDEO_DIR`, named by their key („zaehne.webp“): a menu's 480 × 320 picture, a third of the
+ * screen in the video, was blurred. A game with painted pictures of its own (the stories, Gefühle) shows one of those
+ * there instead. No picture may hold words: one picture serves the video in every language.
+ */
+const VIDEO_GAMES: Record<string, { href: string; hide?: string }> = {
+  // Its face big, without the song's bar and buttons at its side.
+  zaehne: { href: "/zaehne/", hide: ".teeth-controls, .teeth-progress" },
+  // The train, a picture to wait with, rather than the first card's bare red disc, without the minutes in its corner.
+  timer: { href: "/timer/train/", hide: ".tm-shown" },
+  bilder: { href: "/bilder/" },
+  // The animal and its choices without their names and the round's question.
+  tiere: { href: "/tiere/", hide: ".ap-name, .ap-topic" },
+  kettenreaktion: { href: "/kettenreaktion/" },
+  "kleine-abenteuer": { href: "/kleine-abenteuer/" },
+};
+const VIDEO_DIR = "src/video/outro/bilder";
+/** The videos' pictures: 3 : 2 like the menus', as big as the outro shows them on its 1920 × 1080 canvas. */
+const VIDEO_SIZE = { width: 1200, height: 800 };
 
 /** Where the tables of contents' pictures go: smaller in the line than on a card, so they are cut closer (`ZOOMED`). */
 const isBook = (file: string) => file.startsWith(BOOK_DIR);
@@ -376,9 +401,13 @@ async function press(cdp: Cdp, key: string) {
 /** The webp's quality: low enough to stay under the size `previews.test.ts` allows a picture. */
 const QUALITY = 70;
 
-/** Pictures what the window shows now into `file`: the cut CUTS says, or the busiest part of `area` (by default the window). */
-async function picture(cdp: Cdp, file: string, area?: Area | null) {
-  const key = keyOf(file);
+/**
+ * Pictures what the window shows now into `file`: the cut CUTS says, or the busiest part of `area` (by default the
+ * window), `size` big; `key` names the cut where the file's own name doesn't (the videos' pictures).
+ */
+async function picture(cdp: Cdp, file: string, area?: Area | null, { key = keyOf(file), size = SIZE } = {}) {
+  // A video's picture fills much of a television: no blocks of the encoding may show there.
+  const quality = size === SIZE ? QUALITY : 85;
   await PLAYS[key]?.(cdp);
   await evaluate(cdp, HIDE_OVERLAYS);
   if (HIDE_ALSO[key.split("/")[0]]) await evaluate(cdp, hideAlso(HIDE_ALSO[key.split("/")[0]]));
@@ -409,14 +438,14 @@ async function picture(cdp: Cdp, file: string, area?: Area | null) {
       .composite([{ input: faded, left: Math.round((wide - width) / 2), top: 0 }])
       .png()
       .toBuffer();
-    await sharp(whole).resize(SIZE.width, SIZE.height).webp({ quality: QUALITY }).toFile(file);
+    await sharp(whole).resize(size.width, size.height).webp({ quality }).toFile(file);
   } else if (!cut) {
     area ??= { x: 0, y: 0, width: SCREEN.width, height: SCREEN.height };
     const shot = await cdp.send<{ data: string }>("Page.captureScreenshot", { format: "png", clip: { ...area, scale: 1 } });
     const png = Buffer.from(shot.data, "base64");
     if (shots) await Bun.write(join(shots, `${key.replace("/", "-")}.png`), png);
     const rect = await bestCut(png, WHOLE.has(key) ? { smallest: ZOOMED.smallest, biggest: 1 } : isBook(file) ? ZOOMED : WIDE);
-    await sharp(png).extract(rect).resize(SIZE.width, SIZE.height).webp({ quality: QUALITY }).toFile(file);
+    await sharp(png).extract(rect).resize(size.width, size.height).webp({ quality }).toFile(file);
   } else {
     const height = cut.size * SCREEN.height;
     const width = height * ASPECT;
@@ -426,7 +455,7 @@ async function picture(cdp: Cdp, file: string, area?: Area | null) {
     const clip = { x, y, width, height, scale: 1 };
     const shot = await cdp.send<{ data: string }>("Page.captureScreenshot", { format: "png", clip });
     if (shots) await Bun.write(join(shots, `${key.replace("/", "-")}.png`), Buffer.from(shot.data, "base64"));
-    await sharp(Buffer.from(shot.data, "base64")).resize(SIZE.width, SIZE.height).webp({ quality: QUALITY }).toFile(file);
+    await sharp(Buffer.from(shot.data, "base64")).resize(size.width, size.height).webp({ quality }).toFile(file);
   }
   console.log(`  ${file}`);
 }
@@ -471,17 +500,27 @@ async function pictureBook(cdp: Cdp, base: string, book: string, dir = BOOK_DIR,
   await sleep(1500);
   const hrefs = await evaluate<string[]>(cdp, `[...document.querySelectorAll(".toc-line")].map((e) => e.getAttribute("href"))`);
   for (const href of hrefs.filter((h) => !only || only.includes(h))) {
-    await open(cdp, `${base}${href}`);
-    await sleep(2000);
-    const first = (await cardIds(cdp))[0];
-    if (first) await evaluate(cdp, `document.querySelector('[data-mode="${first}"]')?.click()`);
     const file = join(dir, `${href.replaceAll("/", "")}.webp`);
-    await sleep(WAITS[keyOf(file)] ?? WAIT);
-    const prepare = MENUS.find((menu) => menu.path === href)?.prepare;
-    await picture(cdp, file, prepare && !CUTS[keyOf(file)] ? await evaluate<Area | null>(cdp, prepare) : null);
+    await pictureGame(cdp, base, href, file);
     written.push(file);
   }
   return written;
+}
+
+/**
+ * One game as it plays, or, where its page is a menu of cards, as its first card plays, into `file` – cut as its table of
+ * contents' line (`key`, „components/<id>“) and `size` big.
+ */
+async function pictureGame(cdp: Cdp, base: string, href: string, file: string, size = SIZE, hide?: string) {
+  const key = keyOf(join(BOOK_DIR, `${href.replaceAll("/", "")}.webp`));
+  await open(cdp, `${base}${href}`);
+  await sleep(2000);
+  const first = (await cardIds(cdp))[0];
+  if (first) await evaluate(cdp, `document.querySelector('[data-mode="${first}"]')?.click()`);
+  await sleep(WAITS[key] ?? WAIT);
+  if (hide) await evaluate(cdp, hideAlso(hide));
+  const prepare = MENUS.find((menu) => menu.path === href)?.prepare;
+  await picture(cdp, file, prepare && !CUTS[key] ? await evaluate<Area | null>(cdp, prepare) : null, { key, size });
 }
 
 /**
@@ -540,15 +579,21 @@ try {
   await open(cdp, `${site.url}/`);
   await evaluate(cdp, `localStorage.clear(); localStorage.setItem("tinytaps.applanguage.v1", "de"); true`);
   const wanted = (text: string) => !filters.length || filters.some((f) => text.includes(f));
-  for (const book of BOOKS.filter((b) => wanted(`${b} ${BOOK_DIR}`))) {
+  if (video) {
+    for (const [name, { href, hide }] of Object.entries(VIDEO_GAMES).filter(([name, { href }]) => wanted(`${name} ${href}`))) {
+      console.log(`${href} (video)`);
+      await pictureGame(cdp, site.url, href, join(VIDEO_DIR, `${name}.webp`), VIDEO_SIZE, hide);
+    }
+  }
+  for (const book of BOOKS.filter((b) => !video && wanted(`${b} ${BOOK_DIR}`))) {
     console.log(`/spiele/${book}/`);
     await pictureBook(cdp, site.url, book);
   }
-  for (const menu of MENUS.filter((m) => wanted(`${m.path} ${m.dir}`))) {
+  for (const menu of MENUS.filter((m) => !video && wanted(`${m.path} ${m.dir}`))) {
     console.log(menu.path);
     await pictureMenu(cdp, site.url, menu);
   }
-  await pictureGirls(cdp, site.url, wanted);
+  if (!video) await pictureGirls(cdp, site.url, wanted);
 } finally {
   stop();
   site.stop();

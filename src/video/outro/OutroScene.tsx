@@ -1,12 +1,10 @@
-import type { CSSProperties } from "react";
-import { Logo } from "@/components/Logo";
 import type { SeoLanguage } from "@/content/seo";
-import { pick } from "@/lib/language";
 import previews from "../../components/vorschau/*.webp?glob";
 import { CANVAS } from "../canvas";
 import { COVER_BOXES, COVERS, INTRO_PICTURES, PrintedTitle, ShelfAndBook } from "../intro/IntroScene";
-import { addressFor, type CodeTarget, SCAN, SIGNS, shortAddress } from "./content";
-import { QrCode } from "./QrCode";
+import type { CodeTarget } from "./content";
+import { SIGNS } from "./content";
+import { EndCard } from "./EndCard";
 import { cardPose, glows, outroBookPose, outroFadeIn, outroShelfPose, titleLeft } from "./timeline";
 
 /**
@@ -22,9 +20,6 @@ const PHOTO = { width: 300, height: 200, lift: 26 };
 /** The printed name as the intro left it, so the cut from the video into the outro lands on the same page. */
 const FULL_TITLE = { letters: 1, tracks: 1, foxes: 1, address: 1 };
 
-/** How big the code is on the canvas: big enough for a phone across a living room to read it off a television. */
-const CODE_SIZE = 360;
-
 /**
  * One frame of the outro at second `t` (idea Y-04 and Y-05): the first page with the name, the book closing and going
  * back into the shelf, the other picture books lighting up in turn with a picture of their games, then a card with the
@@ -34,7 +29,6 @@ export function OutroScene({ t, language, target }: { t: number; language: SeoLa
   const lit = glows(t);
   const card = cardPose(t, SIGNS.length);
   const title = titleLeft(t);
-  const address = addressFor(target, language);
   return (
     <div className="vi-scene vo-scene" style={{ width: CANVAS.width, height: CANVAS.height }}>
       <ShelfAndBook shelf={outroShelfPose(t)} book={outroBookPose(t)} glows={lit} />
@@ -57,29 +51,7 @@ export function OutroScene({ t, language, target }: { t: number; language: SeoLa
         ) : null,
       )}
       {title > 0 && <PrintedTitle title={FULL_TITLE} opacity={title} />}
-      {card.card > 0 && (
-        <div className="vo-card" style={{ opacity: Math.min(1, card.card * 1.6), translate: `0 ${(1 - card.card) * 640}px` }}>
-          <div className="vo-card-main">
-            <Logo />
-            <p className="vo-address">funforboth.com</p>
-            <ul className="vo-signs">
-              {SIGNS.map((sign, k) => (
-                <li key={sign.icon} style={{ opacity: card.signs[k], translate: `0 ${(1 - card.signs[k]!) * 18}px` } as CSSProperties}>
-                  <span className="vo-sign-icon" aria-hidden>
-                    {sign.icon}
-                  </span>
-                  {pick(sign.text, language)}
-                </li>
-              ))}
-            </ul>
-          </div>
-          <div className="vo-card-code" style={{ opacity: card.code }}>
-            <p className="vo-scan">{pick(SCAN, language)}</p>
-            <QrCode text={address} size={CODE_SIZE} />
-            <p className="vo-code-address">{shortAddress(address)}</p>
-          </div>
-        </div>
-      )}
+      <EndCard pose={card} language={language} target={target} />
       <div className="vi-paper-fade" style={{ opacity: 1 - outroFadeIn(t) }} />
     </div>
   );

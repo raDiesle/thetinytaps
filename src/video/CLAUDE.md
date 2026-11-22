@@ -24,6 +24,21 @@ the management page's contents by `TOOL_GROUPS`), never a link from the shelf or
   limit) and a QR code to the video's game in the video's language (`CODE_TARGETS`, `addressFor`; `uqr` draws it). 12 s.
   YouTube shows no end screen links on videos made for children, so all of it is in the picture.
   `bun run video outro --ziel /zaehne/ --sprache en` makes it for one game and language.
+  It comes in two variants (choice „Variante“ on the page, `--variante regal` for the tool): „Bilder aus den Spielen“,
+  the default (user request, November 2026: show the games' pictures big, not the books), and the shelf one above.
+  „Bilder aus den Spielen“ (`gallery.ts`, `GalleryScene`, `scheduleGallerySound`, about 17 s) opens on the two
+  categories side by side, „Alltagshelfer“ and „Lernspiele“, each with a picture of its games and its name under it;
+  then six helpers and six games (`GALLERY` in `content.ts`) come one after another out of the depth into the middle,
+  big, the game's name on a slip under it and its category over it, each with a rising note, the one before flying on
+  past the camera; then the same card (`EndCard`). Motion, pictures and sound are the same in every video; only the
+  words follow the video's language and the code its game.
+- Pictures shown big in a video are at least 1100 px wide (`gallery.test.ts`): a menu's 480 × 320 preview shown
+  1140 wide was blurred. The games' painted pictures (1200 wide) serve as they are; a game drawn in code gets a cut of
+  1200 × 800 by `bun run previews --video` (`VIDEO_GAMES` in `tools/previews.ts`, into `outro/bilder/`), with what it
+  lays over its picture (minutes, names, a question, buttons) hidden there – a new one adds its line.
+- In a run of pictures flying past, the one passing fades within a few frames (slowly, it lay over the next as a pale
+  double picture), a heading changes by crossfading in place (moving, it crossed the growing picture), and the card
+  comes only once the last picture is gone (over it, it looked muddy) – `gallery.test.ts` checks the last two.
 - `youtubeTexts.ts` (Y-18): title and description of each video for YouTube Studio, shown to copy under „📝 Text für
   YouTube“ on its page (`VideoRecorder youtube`): the title from the YouTube searches looked up (research „youtube-suchen“,
   at most `TITLE_LIMIT` letters, English, German for a German video), the description from the game's texts for search

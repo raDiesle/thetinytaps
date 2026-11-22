@@ -8,6 +8,7 @@ import { type WorldId, WorldCardScene } from "@/components/Worlds";
 import { bookIdOf, CATEGORIES, hasPage, SHELF, shelfVolumes } from "@/content/games";
 import { takeOutBook } from "@/lib/bookTravel";
 import { type Localized, type Texts, useAppLanguage, useT } from "@/lib/language";
+import { LEARNING_GAMES } from "@/lib/sharedTexts";
 import { preloadPage } from "@/lib/preloadPages";
 import { playKnock } from "@/lib/sfx";
 import {
@@ -510,17 +511,6 @@ function groupWidth(cell: ShelfCell, bh: number, spans: number[]): CSSProperties
   return { left: (cell.w - width) / 2, width };
 }
 
-/** The name of the picture books' group (the everyday helpers' is their category's, `DailyGroup`). */
-const LEARNING: Localized = {
-  de: "Lernspiele",
-  ru: "Развивающие игры",
-  en: "Learning Games",
-  zh: "益智游戏",
-  hi: "सीखने के खेल",
-  es: "Juegos para aprender",
-  ar: "ألعاب تعليمية",
-};
-
 /**
  * The name on a wooden sign under a compartment's books: „Lernspiele“ where all the picture books stand together on
  * one board and nothing else does (user feedback, November 2026) – split over several boards there is no group to name.
@@ -529,7 +519,7 @@ function labelOf(cell: ShelfCell, layout: ShelfLayout): Localized | undefined {
   const pictureBooks = (c: ShelfCell) => (c.books ?? []).filter((b) => !PLACES[b][0].colour).length;
   const all = layout.cells.reduce((sum, c) => sum + pictureBooks(c), 0);
   const own = pictureBooks(cell);
-  return own > 0 && own === cell.books?.length && own === all ? LEARNING : undefined;
+  return own > 0 && own === cell.books?.length && own === all ? LEARNING_GAMES : undefined;
 }
 
 /**

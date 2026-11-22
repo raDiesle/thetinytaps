@@ -131,3 +131,75 @@
   font-size: 30px;
   letter-spacing: 0.02em;
 }
+
+/* ----- The outro „Bilder aus den Spielen“ (GalleryScene): pictures of the games coming out of the depth ----- */
+
+/* Warm paper with light in its middle, where the pictures come from; the games' part turns it a soft blue. */
+.vg-scene {
+  background: radial-gradient(ellipse at 50% 42%, #fffdf6 0 30%, #fff1d4 70%, #f3dcb4);
+}
+
+.vg-light {
+  position: absolute;
+  inset: 0;
+}
+
+.vg-light-games {
+  background: radial-gradient(ellipse at 50% 42%, #fbfdff 0 30%, #e3f0fb 70%, #c9dff2);
+}
+
+/* A picture of a game, framed like a photo pasted in, as the menus show them. */
+.vg-photo {
+  position: absolute;
+  box-sizing: border-box;
+  padding: 16px;
+  background: #fffaf0;
+  border-radius: 8px;
+  box-shadow: 0 26px 60px #3a261459;
+  transform-origin: 50% 50%;
+}
+
+.vg-photo img {
+  display: block;
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  border-radius: 4px;
+}
+
+/* The category's name: a paper label like the shelf's signs, big enough to read across a room. */
+.vg-heading {
+  position: absolute;
+  z-index: 300;
+  margin: 0;
+  padding: 10px 40px 14px;
+  border-radius: 8px;
+  background: #fffaf0;
+  box-shadow: 0 6px 16px #3a261440;
+  color: #c0392b;
+  font-size: 76px;
+  font-weight: 700;
+  white-space: nowrap;
+  transform-origin: 50% 50%;
+}
+
+/* The game's name, on a slip of paper over the picture's bottom edge. */
+.vg-name {
+  position: absolute;
+  z-index: 300;
+  margin: 0;
+  padding: 8px 34px 12px;
+  border-radius: 6px;
+  background: #fffaf0;
+  box-shadow: 0 4px 12px #3a261440;
+  color: #3d3045;
+  font-size: 58px;
+  white-space: nowrap;
+  translate: -50% -50%;
+  rotate: -1.5deg;
+}
+
+/* The card comes up over the last picture flying past. */
+.vg-scene .vo-card {
+  z-index: 400;
+}
