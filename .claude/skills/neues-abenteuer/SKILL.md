@@ -27,15 +27,16 @@ Read first, every time:
 ```
 src/games/elevator/trail/
   types.ts        // the level format: TrailLevel, Pickup, Obstacle, Climb, SceneryProps – read it
-  levels.ts       // TRAIL_LEVELS: each level's data (stations, ground, start, away, finale)
+  levels.ts       // TRAIL_LEVELS: the list of every level, for tests and tools only – never imported by the game
   levels.test.ts  // checks every level in TRAIL_LEVELS (see "Checks")
-  drachen.tsx     // the world drawing of „Der Drachen“: DrachenScenery, DrachenBackdrop, ground constants
-  <level>.tsx     // the world drawing of the new level, same shape
+  drachen.tsx     // „Der Drachen“: its world drawing (DrachenScenery, DrachenBackdrop, ground constants) and its data DRACHEN_LEVEL
+  <level>.tsx     // the new level, same shape: drawing and `<LEVEL>_LEVEL` in one module, a chunk of its own
+  sounds.ts       // TRAIL_SOUNDS: the real recordings every level may play
   items.tsx       // ItemId, the bag's things (ITEMS) and the goals (GOALS), drawn standing on (0, 0)
   TrailPlay.tsx   // the script: walking, bag, choosing, nudges, the end – usually no change needed
   trail.css       // all classes and @keyframes, prefixed `tl-`
-src/games/elevator/ElevatorGame.tsx  // modes on the start screen
-src/games/elevator/cards.tsx         // the picture cards at the end; picks up TRAIL_LEVELS by itself
+src/games/elevator/catalog.ts        // CARDS: every card's id, emoji, title and kind, and how its code loads
+src/games/elevator/cards.tsx         // „Weiter“ at the end: the next card of CARDS
 ```
 
 The child (`Kid` from `../kid`), the thought bubble and the action button (`../house`)
@@ -44,10 +45,10 @@ come from `elevator.css`, which the game always loads. Shared drawing helpers (`
 
 ## The level format, with „Der Drachen“
 
-`levels.ts` holds one `TrailLevel` per level:
+Each level's module (`drachen.tsx`) holds its `TrailLevel` below its drawing:
 
 ```ts
-const drachen: TrailLevel = {
+export const DRACHEN_LEVEL: TrailLevel = {
   id: "drachen",                  // also the mode id on the start screen and the card id
   title: "Der Drachen",           // parents' start screen only – the child never sees text
   goal: "kite",                   // a key of GOALS: the card and the thought bubble show it
@@ -169,10 +170,11 @@ points with their times, then `to`; `sway` swings them (120 for the kite, 0 for 
    - A level that needs something new from `TrailPlay.tsx` (a new kind of station, a
      new way to carry the goal) adds it there generically and checks that the other
      levels still play.
-4. **Add the data** to `levels.ts`: the `TrailLevel` with stations, sounds from
+4. **Add the data** to the level's own module (`<level>.tsx`, below its drawing, as `<LEVEL>_LEVEL`) – never to another
+   level's module, which would load both levels together: the `TrailLevel` with stations, sounds from
    `@/lib/sfx` (add a new sound to the fitting topic file there, built on `note()`),
    short sentences in the present tense, **English first** (root `CLAUDE.md`: everything new since November 2026).
-   Append it to `TRAIL_LEVELS`. The levels so far are German first, their phrasebooks (`src/games/elevator/en.ts`,
+   Append it to `TRAIL_LEVELS` in `levels.ts` (the list for tests and tools). The levels so far are German first, their phrasebooks (`src/games/elevator/en.ts`,
    `ru.ts`, …) keyed by the German sentence: the first English-first level teaches `levels.ts` and the phrasebooks a
    level's first language (its own sentences English, German a translation like the others, the level said in English
    where one is missing), with a test – never by writing it German first after all. Its lines in the other six
@@ -180,10 +182,10 @@ points with their times, then `to`; `sway` swings them (120 for the kite, 0 for 
    `src/content/ideas/languageStatus.ts`, `"text"` where the recordings still wait (made only when the user asks).
    When you change a sentence in its first language that already has translations, delete or update them
    (`phrases.test.ts` fails on a left-over one).
-5. **Add a mode** in `ElevatorGame.tsx`: `{ id: "<level id>", emoji, title: title("…"), kind: t(TRAIL) }` after the
-   other trail levels. If the start-screen note mentions the levels or keys, keep it true.
-6. **The cards pick it up**: `cards.tsx` builds the end cards from `TRAIL_LEVELS` and
-   `GOALS[level.goal]` – nothing to add, but check the new card shows the goal.
+5. **Add its card** to `CARDS` in `catalog.ts` after the other trail levels: `{ id, emoji, title, kind: "trail", level:
+   () => import("./trail/<level>").then((m) => m.<LEVEL>_LEVEL) }` – the start screen shows it from there, and the level's
+   code loads only when its card is pressed (`catalog.test.ts` checks it against `TRAIL_LEVELS`). If the start-screen note mentions the levels or keys, keep it true.
+6. **„Weiter“ picks it up**: `cards.tsx` goes on in `CARDS` order – nothing to add.
 7. **Mark the idea done**: `done: true` (what is left becomes a new idea, see CLAUDE.md) in
    `g-little-adventures.ts`, and add the level to „Levels so far“ in
    `src/games/elevator/trail/CLAUDE.md` with its stations in one line.

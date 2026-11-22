@@ -2,7 +2,6 @@ import voiceFiles from "./stimme/**/*.mp3?glob-by-language";
 import type { TargetLanguage } from "@/content/targetLanguages";
 import { waitingFor } from "@/lib/soundWait";
 import { recordedVoice, type VoiceLine } from "@/lib/voice";
-import { texts, type Story } from "./content";
 import type { Film } from "./film/types";
 import { type FirstLanguage, spokenIn } from "./phrases";
 import type { Station, TrailLevel } from "./trail/types";
@@ -10,7 +9,7 @@ import type { Station, TrailLevel } from "./trail/types";
 // What the stories, levels and films say, from their ElevenLabs recordings (`bun run voice make`,
 // src/content/recordedLines.ts): one file per sentence in stimme/ (German) or stimme/<language>/. The voice tells
 // the story, so a sentence not recorded yet is said by the browser's voice meanwhile.
-// A story, level or film loads only its own lines as it starts (the game has hundreds per language), and its first
+// A story, level or film loads only its own lines (`storyLines` in content.ts, `trailLines`, `filmLines`) as it starts (the game has hundreds per language), and its first
 // line holds the start until it is there (`linesReady`), so it comes with the picture.
 
 const voice = recordedVoice(voiceFiles, { browser: true });
@@ -44,13 +43,6 @@ export function linesReady(germans: (string | undefined)[], language: TargetLang
   const loaded = voice.ready(lines, language.id);
   return () => (voice.isReady(lines, language.id) ? loaded : waitingFor(loaded));
 }
-
-/** Everything a lift story says (and the lines every story may say). */
-export const storyLines = (story: Story): (string | undefined)[] => [
-  story.need.say,
-  ...story.steps.flatMap((step) => [step.ask, step.done, ...(step.tasks ?? []).flatMap((task) => [task.wish?.ask, task.done])]),
-  ...Object.values(texts),
-];
 
 /** Everything a trail level says, along every way. */
 export function trailLines(level: TrailLevel): (string | undefined)[] {

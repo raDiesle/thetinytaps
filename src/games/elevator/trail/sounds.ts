@@ -1,0 +1,38 @@
+import {
+  playBark,
+  playBuzz,
+  playChatter,
+  playCluck,
+  playCoo,
+  playGiggle,
+  playMeow,
+  playMunch,
+  playNeigh,
+  playQuack,
+  playRoar,
+  playSaw,
+  playSplash,
+  playSquawk,
+  playTweet,
+  playWhistle,
+} from "@/lib/realSounds";
+
+/** The real recordings the levels play, loaded when one starts so even the first sound is real. */
+export const TRAIL_SOUNDS = [
+  playBark,
+  playBuzz,
+  playChatter,
+  playCluck,
+  playCoo,
+  playGiggle,
+  playMeow,
+  playMunch,
+  playNeigh,
+  playSaw,
+  playQuack,
+  playRoar,
+  playSplash,
+  playSquawk,
+  playTweet,
+  playWhistle,
+];

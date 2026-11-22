@@ -19,8 +19,8 @@ import {
 import { Kid, KidHead, type Look, type Pose, useHero } from "../kid";
 import type { Picture } from "../trail/items";
 import type { Cue, Point } from "../trail/types";
-import { Wheel } from "./korn";
 import { Go, route } from "./move";
+import { Wheel } from "./parts";
 import { Grownup } from "./people";
 import { Outdoors, RoundTree } from "./places";
 import { type Film, GROUND, type Scene, type SceneProps } from "./types";
