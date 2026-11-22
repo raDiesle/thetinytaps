@@ -55,7 +55,7 @@ import { DAY_PARTS_CHOICES, DAY_SIGN_SETS, DaySign, type DayParts, type DaySignS
 import { RITUALS } from "./rituals";
 import { emptyHistory, type History, record, redo, undo } from "./history";
 import { Pick } from "./pageParts";
-import { ItemPic, MarkPic, NightPic, Pic, picture } from "./pictures";
+import { ItemPic, LazyPictures, MarkPic, NightPic, Pic, picture } from "./pictures";
 import {
   allStars,
   bigDayOf,
@@ -808,7 +808,8 @@ export function ChartEditor({
               ru: "Другие настройки",
             })}
           </summary>
-          {more}
+          {/* Folded, its picture chips load nothing until it is opened. */}
+          <LazyPictures value={true}>{more}</LazyPictures>
         </details>
       )}
 

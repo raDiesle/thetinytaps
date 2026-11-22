@@ -6,7 +6,7 @@ import { putBookBack } from "@/lib/bookTravel";
 import { goBack } from "@/lib/goBack";
 import { pageMoves } from "@/lib/pageMotion";
 import { picturesReady } from "@/lib/picturesReady";
-import { holdPreloads } from "@/lib/preloadPages";
+import { pageCodeSoon } from "@/lib/preloadPages";
 import { playPageTurn } from "@/lib/sfx";
 
 /**
@@ -39,6 +39,9 @@ export type TurnDirection = "forward" | "back";
 /** The most pages drawn turning together: a thicker bundle would tell no more. */
 const MOST_PAGES = 6;
 
+/** Whether a tap's forward turn waits for the next page's code (`useTurnPage`). */
+let waitingToTurn = false;
+
 /** The turn running now, so that a turn cut short by the next one doesn't clear what the next one set. */
 let turning = 0;
 
@@ -58,7 +61,6 @@ export function turnPageWith(direction: TurnDirection, update: () => void, pages
     return;
   }
   playPageTurn(TURN_SECONDS);
-  holdPreloads(TURN_SECONDS * 1000 + 200);
   // The page it turns to waits with its voice, songs and animations until it lies still (pageMotion.ts).
   const still = pageMoves();
   const html = document.documentElement;
@@ -116,6 +118,16 @@ export function useTurnPage(to: string, direction: TurnDirection) {
     const go = direction === "back" ? () => goBack(navigate, to) : () => navigate(to);
     e.preventDefault();
     if (to === "/") putBookBack(pathname, go);
-    else turnPageWith(direction, go, pagesBetween(pathname, to));
+    // Forward the page turns once the next page's code is there (or a moment has passed): menus load it only as the
+    // finger lands, so it is drawn before the turn instead of coming in mid-turn (preloadPages.ts).
+    // A second tap meanwhile (a child's hand often lands twice) turns nothing more.
+    else if (direction === "forward") {
+      if (waitingToTurn) return;
+      waitingToTurn = true;
+      void pageCodeSoon(to).then(() => {
+        waitingToTurn = false;
+        turnPageWith(direction, go, pagesBetween(pathname, to));
+      });
+    } else turnPageWith(direction, go, pagesBetween(pathname, to));
   };
 }

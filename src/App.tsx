@@ -12,7 +12,7 @@ import { Home } from "@/pages/Home";
 /**
  * A page loaded only when it is opened, so the first visit doesn't download every
  * game (three.js, all pictures). Offline the service worker has them all anyway.
- * `paths` are the addresses it opens at, so a menu can load it before its card is tapped (`usePreloadPages`).
+ * `paths` are the addresses it opens at, so a card can load it as the finger lands on it (`loadOnIntent`).
  * A load that fails is tried once more, then shows `PageErrorBoundary`, whose „Nochmal“ loads it anew (`lazyPage`).
  */
 function page<K extends string>(load: () => Promise<Record<K, ComponentType>>, name: K, ...paths: string[]) {

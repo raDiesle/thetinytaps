@@ -1,8 +1,12 @@
-import { useEffect } from "react";
-import { savesData } from "@/lib/pwa";
+import type { PointerEvent } from "react";
+import { codeSoon } from "@/lib/lazyPart";
 
-// Every game page is lazy-loaded (App.tsx), so tapping its card used to download and run its whole chunk first, while
-// the menu stood still. A menu loads the pages behind its cards while it waits for the tap instead.
+// Every game page is lazy-loaded (App.tsx), and a page's code is loaded only once the visitor shows they want it: as a
+// finger lands on its card or book, as a mouse comes over it, or with the tap itself. Menus loaded the pages behind
+// all their cards while they waited once – the shelf every everyday helper's game (about 320 KB gzip), the pictures'
+// menu all 23 pictures (about 580 KB) – for every visitor, though most open one or two (user request, November 2026:
+// load only what the child picks). The tap waits a moment for the code instead (`pageCodeSoon`), so the page turns to
+// the game drawn, not to the loading paper.
 
 /** The loaders of the lazy-loaded pages, by the address they open at (`/zaehne/`); filled by App.tsx. */
 const loaders = new Map<string, () => Promise<unknown>>();
@@ -15,66 +19,37 @@ export function registerPage(paths: string[], load: () => Promise<unknown>) {
 /** The addresses that have a lazy-loaded page. */
 export const pagePaths = () => [...loaders.keys()];
 
+/** The address without its query or hash, as pages are registered. */
+const pathOf = (href: string) => href.replace(/[?#].*$/, "");
+
 /** Starts loading the page at `href` (a card's link); a page loaded already, or none of ours, costs nothing. */
-export function preloadPage(href: string) {
-  void loaders
-    .get(href)?.()
-    .catch(() => {
-      // Offline before the worker is there: the tap will show it.
-    });
-}
-
-/** Until when nothing is preloaded (`performance.now()` ms): while a book flies or a page turns. */
-let quietUntil = 0;
-
-/**
- * Holds preloading back for `ms` while something moves across the screen: running a page's code takes the main thread
- * for a long frame (a game's chunk took 50–60 ms on a slow phone), which stuttered a book taken out of the shelf.
- */
-export function holdPreloads(ms: number) {
-  quietUntil = Math.max(quietUntil, performance.now() + ms);
+export function preloadPage(href: string): Promise<unknown> | undefined {
+  const loading = loaders.get(pathOf(href))?.();
+  loading?.catch(() => {
+    // Offline before the worker is there: the tap will show it.
+  });
+  return loading;
 }
 
 /**
- * For menus: once the menu is shown and the browser has nothing else to do, loads the pages behind its cards one
- * by one, each in an idle moment of its own, so a tap shows the next screen at once and never waits long for one.
+ * Resolves once the page at `href` has its code, or after `CODE_WAIT_MS` (lazyPart.ts) – whichever comes first. A tap
+ * that turns the page to it waits for this, so the new page is drawn before the turn, and a slow network still gets its
+ * turn soon, to the loading paper.
  */
-export function usePreloadPages(hrefs: string[]) {
-  const key = hrefs.join(" ");
-  useEffect(() => {
-    let handle = 0;
-    let timer = 0;
-    const queue = key.split(" ").filter((href) => loaders.has(href));
-    const idle = (task: () => void) =>
-      typeof requestIdleCallback === "function" ? requestIdleCallback(task, { timeout: 2000 }) : window.setTimeout(task, 200);
-    const cancel = (id: number) => (typeof cancelIdleCallback === "function" ? cancelIdleCallback(id) : clearTimeout(id));
-    const next = () => {
-      const wait = quietUntil - performance.now();
-      if (wait > 0) {
-        timer = window.setTimeout(() => (handle = idle(next)), wait);
-        return;
-      }
-      const href = queue.shift();
-      if (!href) return;
-      void loaders
-        .get(href)?.()
-        .catch(() => {})
-        .finally(() => {
-          handle = idle(next);
-        });
-    };
-    const start = () => {
-      // Saving data, only the card tapped loads its page (preloadPage, as the finger lands).
-      if (!savesData()) handle = idle(next);
-    };
-    // Not before the page has loaded: on a first visit the menu itself comes first.
-    if (document.readyState === "complete") start();
-    else addEventListener("load", start, { once: true });
-    return () => {
-      removeEventListener("load", start);
-      cancel(handle);
-      clearTimeout(timer);
-      queue.length = 0;
-    };
-  }, [key]);
+export const pageCodeSoon = (href: string): Promise<unknown> => {
+  const loading = preloadPage(href);
+  return loading ? codeSoon(loading) : Promise.resolve();
+};
+
+/**
+ * The handlers that load a card's page as the visitor shows they want it: a finger landing on it, or a mouse coming
+ * over it (a touch's own pointerenter comes with the press). Spread onto the card's link.
+ */
+export function loadOnIntent(href: string) {
+  return {
+    onPointerDown: () => void preloadPage(href),
+    onPointerEnter: (e: PointerEvent) => {
+      if (e.pointerType === "mouse") void preloadPage(href);
+    },
+  };
 }

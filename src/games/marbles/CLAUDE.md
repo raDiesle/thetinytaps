@@ -75,9 +75,10 @@ are the shared `TapHint`, still until the child has waited a few seconds.
 - **Every level is a chunk of its own** (R-P12, November 2026: all 21 levels in the start screen's chunk were 454 KB):
   the cards' data (id, emoji) lives in `catalog.ts` with one `import()` per level (the six marble runs share
   `TrackLevel`'s), names in `content.ts`; `MarblePlay` waits for a level's code behind a `Suspense` showing
-  `PageLoading` (`PlayedLevel`, which also says the level's first line once its picture is there). The start screen
-  fetches the level picked last once the page lies still and the browser is idle, and a level's end fetches the next
-  one during its party – never while a level runs, nor when `savesData()`. A new level gets its entry in `LEVELS`,
+  `PageLoading` (`PlayedLevel`, which also says the level's first line once its picture is there). A level's code
+  loads only once its card is pressed (`prepare`, as the finger lands) – the start screen fetches no level ahead in idle
+  moments (user request, November 2026: load only what the child picks) –, and a level's end fetches the next one
+  during its party, since „Weiter“ asks for it – never while a level runs, nor when `savesData()`. A new level gets its entry in `LEVELS`,
   never a static import in `MarbleGame.tsx` or `MarblePlay.tsx`, and imports its own CSS (`track.css` in
   `TrackLevel.tsx`) (`catalog.test.ts`).
 - **A level draws only while something moves** (R-G7, November 2026: every level rendered 60 times a second also while

@@ -1,3 +1,4 @@
+import { createContext, useContext } from "react";
 import pictureFiles from "./bilder/*.webp?glob";
 import { type CatalogMark, type NightLook, REWARD_BY_ID, STEP_BY_ID, TASK_BY_ID, type Theme } from "./catalog";
 
@@ -31,9 +32,22 @@ export function itemPicture(item: Item, kind: "task" | "reward", lines = false):
 /** The sticker of a mark (star, heart …). */
 export const markPicture = (mark: CatalogMark) => PICTURES.get(`zeichen-${mark.id}`);
 
+/**
+ * True where pictures load only once they come near the screen: the small pictures of the Vorlagen (`Thumb`,
+ * `PlanThumb`) and the picture chips under the folded „Weitere Einstellungen“ (`ChartEditor`), which alone fetched 45
+ * files on every first visit while folded (user request, November 2026: load only what is seen). A chart itself, and
+ * every print, loads its pictures at once, so a print never misses one.
+ */
+export const LazyPictures = createContext(false);
+
 /** A picture where there is one, else the emoji; as big as the emoji was (1em of where it sits, a little more). */
 export function Pic({ src, emoji }: { src: string | undefined; emoji: string }) {
-  return src ? <img className="rw-pic" src={src} alt="" draggable={false} /> : emoji;
+  const thumb = useContext(LazyPictures);
+  return src ? (
+    <img className="rw-pic" src={src} alt="" draggable={false} loading={thumb ? "lazy" : undefined} decoding={thumb ? "async" : undefined} />
+  ) : (
+    emoji
+  );
 }
 
 /** A task's, step's or reward's picture, or its emoji. */
@@ -44,7 +58,8 @@ export function ItemPic({ item, kind = "task", lines = false }: { item: Item; ki
 /** A colour print's strip of pictures along the top, in the board's or plan's theme. */
 export function SheetStrip({ theme }: { theme: Theme }) {
   const src = PICTURES.get(`streifen-${theme.id}`);
-  return src ? <img className="rw-strip" src={src} alt="" /> : null;
+  const thumb = useContext(LazyPictures);
+  return src ? <img className="rw-strip" src={src} alt="" loading={thumb ? "lazy" : undefined} /> : null;
 }
 
 /** A mark's sticker, or its emoji. */

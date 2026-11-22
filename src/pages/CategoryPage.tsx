@@ -4,7 +4,6 @@ import { MenuHead } from "@/components/MenuTop";
 import { Sky } from "@/components/Sky";
 import { CATEGORIES, categoryHref, hasPage, listedGames } from "@/content/games";
 import { useT } from "@/lib/language";
-import { usePreloadPages } from "@/lib/preloadPages";
 import { useUpdateBetweenGames } from "@/lib/pwa";
 import { useTitle } from "@/lib/title";
 import { SeoText } from "@/components/SeoText";
@@ -19,7 +18,6 @@ export function CategoryPage() {
   const t = useT();
   useTitle(category && t(category.title));
   useUpdateBetweenGames();
-  usePreloadPages(category ? listedGames(category).map((g) => g.href) : []);
   if (!category) return <Navigate to="/" replace />;
   // An old address of a category that has only one game now.
   if (!hasPage(category)) return <Navigate to={categoryHref(category)} replace />;

@@ -1,7 +1,7 @@
 import { Link } from "react-router";
 import { type Localized, useT } from "@/lib/language";
 import { useTurnPage } from "@/lib/look";
-import { preloadPage } from "@/lib/preloadPages";
+import { loadOnIntent } from "@/lib/preloadPages";
 
 /** The page marker on a card or a table of contents' line still being built (`GameMode.unfinished`, `Game.unfinished`). */
 export const UNFINISHED_LABEL: Localized = {
@@ -69,8 +69,8 @@ export function GameCard({ href, emoji, picture, title, id }: GameCardProps) {
   );
   if (href) {
     return (
-      // The page starts loading as the finger lands, not only once it is lifted.
-      <Link to={href} className="game-card" data-mode={id} onPointerDown={() => preloadPage(href)} onClick={turnPage}>
+      // The page starts loading as the finger lands or a mouse comes over it, not only once the tap is done.
+      <Link to={href} className="game-card" data-mode={id} {...loadOnIntent(href)} onClick={turnPage}>
         {content}
       </Link>
     );

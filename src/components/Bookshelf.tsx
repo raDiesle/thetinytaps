@@ -9,7 +9,7 @@ import { bookIdOf, CATEGORIES, hasPage, SHELF, shelfVolumes } from "@/content/ga
 import { takeOutBook } from "@/lib/bookTravel";
 import { type Localized, type Texts, useAppLanguage, useT } from "@/lib/language";
 import { LEARNING_GAMES } from "@/lib/sharedTexts";
-import { preloadPage } from "@/lib/preloadPages";
+import { loadOnIntent } from "@/lib/preloadPages";
 import { playKnock } from "@/lib/sfx";
 import {
   BOOK_ASPECT,
@@ -726,8 +726,8 @@ function Book({ book, onClick }: { book: ShelfBook; onClick: (e: MouseEvent<HTML
       data-tap
       aria-label={t(book.title)}
       title={t(book.blurb)}
-      // The page starts loading as the finger lands, not only once it is lifted.
-      onPointerDown={() => preloadPage(book.href)}
+      // The page starts loading as the finger lands or a mouse comes over it, not only once the tap is done.
+      {...loadOnIntent(book.href)}
       onClick={onClick}
     >
       <span className="shelf-book-shadow" />
@@ -755,7 +755,7 @@ function SpineBook({ book, onClick }: { book: ShelfBook; onClick: (e: MouseEvent
       data-tap
       aria-label={t(book.title)}
       title={t(book.blurb)}
-      onPointerDown={() => preloadPage(book.href)}
+      {...loadOnIntent(book.href)}
       onClick={onClick}
     >
       <span className="box-front">

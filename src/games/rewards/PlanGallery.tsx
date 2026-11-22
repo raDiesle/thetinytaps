@@ -3,6 +3,7 @@ import { NO_LINKED } from "./board";
 import { PLAN_TEMPLATES, PLAN_VIEWS, type PlanTemplate } from "./catalog";
 import { exampleTicks, type Plan, planFromTemplate } from "./plan";
 import { PLAN_SCREEN, PlanSheet } from "./PlanSheet";
+import { LazyPictures } from "./pictures";
 
 /** Width / height of a small picture of a plan, as for boards. */
 const THUMB_ASPECT = 1.45;
@@ -11,7 +12,9 @@ const THUMB_ASPECT = 1.45;
 export function PlanThumb({ plan, today = new Date() }: { plan: Plan; today?: Date }) {
   return (
     <span className="rw-thumb" aria-hidden>
-      <PlanSheet plan={plan} ticks={exampleTicks(plan, today)} linked={NO_LINKED} today={today} look={PLAN_SCREEN} aspect={THUMB_ASPECT} />
+      <LazyPictures value={true}>
+        <PlanSheet plan={plan} ticks={exampleTicks(plan, today)} linked={NO_LINKED} today={today} look={PLAN_SCREEN} aspect={THUMB_ASPECT} />
+      </LazyPictures>
     </span>
   );
 }
