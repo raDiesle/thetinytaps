@@ -8,9 +8,14 @@ const CREDITS_PER_CHARACTER = 0.11;
 /** The credits of the plan, each month. */
 const CREDITS_PER_MONTH = 10_000;
 
-/** Every game and every volume of a game (a book's second story, like Abstillen's night story) by its address. */
+/**
+ * Every game, every volume of a game and every other address of a game (a book's second story, like Abstillen's night
+ * story at `/abstillen/nachts/`) by its address.
+ */
 const GAME_BY_HREF = new Map<string, { emoji: string; title: Parameters<typeof pick>[0] }>(
-  CATEGORIES.flatMap((c) => c.games.flatMap((g) => [...(g.volumes ?? []).map((v) => [v.href, v] as const), [g.href, g] as const])),
+  CATEGORIES.flatMap((c) =>
+    c.games.flatMap((g) => [...(g.also ?? []).map((href) => [href, g] as const), ...(g.volumes ?? []).map((v) => [v.href, v] as const), [g.href, g] as const]),
+  ),
 );
 const nameOf = (href: string) => {
   const game = GAME_BY_HREF.get(href);

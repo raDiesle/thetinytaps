@@ -25,13 +25,27 @@ export const MILK_CHAIN_BOOK: Localized = {
   ar: "الفطام",
 };
 
-/** Its line for grown-ups. */
+/** Its line for grown-ups: the book's two stories. */
 export const MILK_CHAIN_BLURB: Localized = {
-  de: "Tapsis Milchkette, in Kapiteln",
-  en: "Tapsi's Milk Chain, in chapters",
-  zh: "塔普西的奶滴链，分章节",
-  hi: "टैप्सी की दूध-माला, अध्यायों में",
-  es: "La cadena de leche de Tapsi, por capítulos",
-  ar: "سلسلة حليب تابسي، في فصول",
-  ru: "Молочная цепочка Тапси, по главам",
+  de: "Ganz oder nur nachts, in Kapiteln",
+  en: "Completely or only at night, in chapters",
+  zh: "完全断奶或只在夜里，分章节",
+  hi: "पूरी तरह या सिर्फ़ रात में, अध्यायों में",
+  es: "Del todo o solo de noche, por capítulos",
+  ar: "كليًا أو في الليل فقط، في فصول",
+  ru: "Полностью или только ночью, по главам",
+};
+
+/**
+ * Its name in the book's choice of stories (`WeaningBook`), over its title: what it is for, beside the night story's
+ * „Nachts abstillen“ – weaning by day and at night, the long story.
+ */
+export const MILK_CHAIN_KIND: Localized = {
+  de: "Ganz abstillen",
+  en: "Weaning completely",
+  zh: "完全断奶",
+  hi: "पूरी तरह दूध छुड़ाना",
+  es: "Destete completo",
+  ar: "الفطام الكامل",
+  ru: "Полное отлучение",
 };

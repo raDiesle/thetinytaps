@@ -71,8 +71,8 @@ const TogetherPage = page(
   "/zusammen/",
 );
 const TimerPage = page(() => import("@/pages/TimerPage"), "TimerPage", "/timer/");
-const MilkChainPage = page(() => import("@/pages/MilkChainPage"), "MilkChainPage", "/abstillen/");
-const NightMilkPage = page(() => import("@/pages/NightMilkPage"), "NightMilkPage", "/abstillen/nachts/");
+// The book „Abstillen“ and its stories: the long one at its own address, the night one at `/abstillen/nachts/`.
+const MilkChainPage = page(() => import("@/pages/MilkChainPage"), "MilkChainPage", "/abstillen/", "/abstillen/nachts/");
 const TrophyRoomPage = page(() => import("@/pages/TrophyRoomPage"), "TrophyRoomPage", "/pokale/");
 
 export function App() {
@@ -100,8 +100,9 @@ export function App() {
           <Route path="bilder/:scene" element={<ScenePage />} />
           <Route path="zaehne" element={<TeethPage />} />
           <Route path="toepfchen" element={<PottyPage />} />
+          {/* One book of two stories, opening on their choice: the same page at both addresses, so it stays between them. */}
           <Route path="abstillen" element={<MilkChainPage />} />
-          <Route path="abstillen/nachts" element={<NightMilkPage />} />
+          <Route path="abstillen/nachts" element={<MilkChainPage />} />
           <Route path="schnullerfee" element={<PacifierStoryPage />} />
           <Route path="kita" element={<KitaStoryPage />} />
           <Route path="haare-waschen" element={<HairStoryPage />} />

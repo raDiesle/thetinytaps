@@ -44,7 +44,7 @@ export interface StoryTranslation {
 }
 
 /** „Kapitel 4“ in each language, before the chapter's title. */
-const CHAPTER = {
+export const CHAPTER = {
   de: "Kapitel {n}",
   en: "Chapter {n}",
   zh: "第{n}章",
@@ -90,6 +90,8 @@ export function ChapterBook({
   voice,
   first = "de",
   level,
+  opensAt,
+  onContents,
 }: {
   /** The story, in reading order. */
   chapters: StoryChapter[];
@@ -114,6 +116,14 @@ export function ChapterBook({
    * („/abstillen/nachts/“ in the game „/abstillen/“): without it both would give the game's one trophy.
    */
   level?: string;
+  /** The page to open on (its place in the story, from 0), for a book opened at a chapter from outside (`onContents`). */
+  opensAt?: number;
+  /**
+   * Where the table of contents is kept outside the book: a book of several stories opens on a choice of them with their
+   * chapters (Abstillen's `WeaningBook`). The book then shows no contents of its own, and every way to them (the corner,
+   * ◀ on the first page, „Nochmal“) calls this instead.
+   */
+  onContents?: () => void;
 }) {
   const t = useT();
   const { id: language } = useAppLanguage();
@@ -131,7 +141,7 @@ export function ChapterBook({
   }, [chapters, code]);
   const LAST = pages.length - 1;
   // A link to one of its pages (`?seite=7`) opens the book there, else at its table of contents.
-  const [opened] = useState(() => stepIndexInAddress(pages.length) ?? CONTENTS);
+  const [opened] = useState(() => opensAt ?? stepIndexInAddress(pages.length) ?? CONTENTS);
   const [index, setIndex] = useState(opened);
   const indexRef = useRef(opened);
   // The page on screen is in the address: its number in the whole story, from 1 (stepAddress.ts).
@@ -187,8 +197,11 @@ export function ChapterBook({
     show(starts[chapter]);
   };
 
+  /** Back to the table of contents: the book's own, or the choice of stories it stands in (`onContents`). */
+  const toContents = () => (onContents ? onContents() : show(CONTENTS));
+
   // While a page is open, the corner goes back to the table of contents; there it leaves the book as always.
-  useInnerBack(index === CONTENTS ? undefined : () => show(CONTENTS));
+  useInnerBack(index === CONTENTS ? undefined : toContents);
 
   /** The next page, or ripples and a soft note where it comes too soon, and on the last page. */
   const forward = (x?: number, y?: number) => {
@@ -206,7 +219,8 @@ export function ChapterBook({
     if (indexRef.current === CONTENTS) return;
     if (!screenTap()) return ripple();
     playPageTurn(0.6);
-    show(indexRef.current - 1);
+    if (indexRef.current === 0) toContents();
+    else show(indexRef.current - 1);
   };
 
   useEffect(() => {
@@ -345,7 +359,7 @@ export function ChapterBook({
         </div>
       )}
       {/* One story, so only „Nochmal“; small in the corners, so the last picture stays free. */}
-      {last && <GameEnd delayMs={600} onAgain={() => show(CONTENTS)} corners level={level} />}
+      {last && <GameEnd delayMs={600} onAgain={toContents} corners level={level} />}
       <DevTag code={here.code} id={page.id} />
       <FeedbackLayer effects={effects} />
     </div>

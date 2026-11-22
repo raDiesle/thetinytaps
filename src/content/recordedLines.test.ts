@@ -25,7 +25,7 @@ const PLAYERS: Record<string, string> = {
   "src/games/pacifierstory/stimme": "src/games/pacifierstory/PacifierStoryGame.tsx",
   "src/games/kitastory/stimme": "src/games/kitastory/KitaStoryGame.tsx",
   "src/games/hairstory/stimme": "src/games/hairstory/HairStoryGame.tsx",
-  "src/games/nightmilk/stimme": "src/games/nightmilk/NightMilkGame.tsx",
+  "src/games/nightmilk/stimme": "src/games/nightmilk/story.ts",
   "src/games/bottlestory/stimme": "src/games/bottlestory/BottleStoryGame.tsx",
   "src/games/bedstory/stimme": "src/games/bedstory/BedStoryGame.tsx",
 };
