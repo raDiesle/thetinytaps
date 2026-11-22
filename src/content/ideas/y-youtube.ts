@@ -331,7 +331,7 @@ export const youtubeIdeas: IdeaArea = {
       id: "Y-36",
       emoji: "🎶",
       title: "Reihe „Sing along with Tapsi“ aus den Mitsing-Helfern",
-      text: "Die Mitsing-Helfer (H-134 bis H-138) als eigene Reihe auf dem Kanal: die Countdown-Timer mit Lied in jeder Länge und unter jedem Timer-Bild („5 Minute Timer with Music – Clean Up with Tapsi“), Hände waschen als Video und als Short, Aufräumen, Anziehen und der ruhige Gute-Nacht-Ablauf. Weil die 3D-Bühne (H-139) Bild für Bild rendert, entsteht jedes Video samt Sprache und Länge mit einem Befehl, und das Vorschaubild ist ein Standbild aus derselben Szene in hoher Auflösung, mit den Wörtern der Reihe darauf (fester Aufbau aus Y-16) – ohne ein Gemini-Bild zu bezahlen.",
+      text: "Die Mitsing-Helfer (H-134 bis H-138) als eigene Reihe auf dem Kanal: die Countdown-Timer mit Lied in jeder Länge und unter jedem Timer-Bild („5 Minute Timer with Music – Clean Up with Tapsi“), Hände waschen als Video und als Short, Aufräumen, Anziehen und der ruhige Gute-Nacht-Ablauf. Aufgenommen im geteilten `VideoRecorder` wie Zähne putzen und Aufs Töpfchen, so entsteht jedes Video samt Sprache und Länge ohne Schnitt, und das Vorschaubild ist ein gemaltes Bild aus dem Helfer selbst (H-141) mit den Wörtern der Reihe darauf (fester Aufbau aus Y-16) – ohne ein weiteres Gemini-Bild zu bezahlen.",
       why: "Jedes Lied wird so mehrfach zum Video: Sieben Countdown-Lieder unter zwanzig Timer-Bildern in fünf Längen sind Hunderte mögliche Videos, von denen man die besten auswählt. Qualität statt Masse heißt dabei: wenige hochladen, die gut aussehen, und die Titel nach dem, was Eltern suchen (Länge und Zweck, Recherche „youtube-suchen“).",
       effort: "M",
     },
