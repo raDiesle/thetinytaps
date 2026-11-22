@@ -179,6 +179,27 @@ and the shared `Layer`, `Draw`, `LeftGlow`), `timer.css`, `content.ts`
   nearly to the top), and a goal shows from the start (the flag, the ribbon). What is cut into pieces
   over the time gets enough of them (24 slices, three candles one after the other, petals opening after the stalk has
   grown). Many pieces mean many moments: their sounds are spaced (`PIECE_SOUND_GAP_MS`), never a din.
+- **A bar along the bottom** (user request, 22 November 2026, H-124; `bar.tsx`): under every picture a paper track
+  over nearly the whole width fills from its start at the left to a little flag at the right, in the picture's own
+  colour (`.tm-play[data-picture=…] .tm-bar`, a new picture adds its colours there; Abwechseln the colour of the child
+  whose turn it is, `tone`), a round marker at the fill's front. On by default, „Leiste unten“ behind ⚙️ switches it
+  off (`settings.bar`). Fill, way still to go and marker each move by one CSS animation of `transform` as long as the
+  run, started from the clock (`--tm-bar-delay`) and started again after a page turn or when the page comes back –
+  never React per frame (`timer.test.ts`). With it the stage's middle moves up into the room above it
+  (`.tm-with-bar .tm-stage`), so it lies under what matters instead of over the picture's foot, while the stage still
+  reaches the screen's bottom edge (a dark strip showed under it on a tablet); the time note stands above its right
+  end, and at the end it fades for the end's light, trophy and buttons. A tap lights its way still to go too (H-51).
+- **The last moments are felt, never hurried** (H-124): `finalMs` (ten seconds, a quarter of a short run) before the
+  end a warm light gathers from the screen's edges (`FinalLight`, one layer by `opacity`), the bar's marker and the
+  flag's light swell softly once a second, and the last `FINAL_NOTES` seconds each sound one soft rising note, the
+  last a second before the end's own sound. Never a blink, a flash, a faster pace or anything over the picture's
+  middle: the picture itself runs on as always.
+- **Detail lives in what runs and its own place** (user request, 22 November 2026: „interessanter und detaillierter“):
+  a richer picture gets it in the thing itself and where it stands – the hourglass's turned posts and grained plates,
+  the red disc's case on its feet, each candle's own wax colour (`WAX`, its top, drop and puddle alike) and brass
+  dish, the pizza's mixed toppings lying across the cuts (`TOPPINGS`, drawn by every slice near them and cut by its
+  wedge) – and in quiet texture of the backdrop (wallpaper, floorboards, a table's grain, all in `.tm-back`), never a
+  new thing standing beside it (see „A picture makes sense as it is“). Still drawings stay `memo`, painted once.
 - **The end is plain to see and hear**: the picture's own last step, then children cheering, a warm light over the
   picture and the trophy at the end – for every picture, Abwechseln's clock time too. Never a storm of confetti.
 - **A picture makes sense as it is**: where something comes from and why it happens is plain (the water from a tap and a

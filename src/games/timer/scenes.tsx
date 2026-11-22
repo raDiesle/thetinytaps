@@ -356,10 +356,34 @@ export const SandBackdrop = memo(function SandBackdrop() {
   return (
     <Layer x={0} y={0} w={STAGE_W} h={STAGE_H} className="tm-back">
       <Draw w={STAGE_W} h={STAGE_H}>
-        <rect width={STAGE_W} height={STAGE_H} fill="#fde8c8" />
+        <defs>
+          {/* A soft striped wallpaper with little flowers between the stripes. */}
+          <pattern id="tm-sand-wall" width="120" height="120" patternUnits="userSpaceOnUse">
+            <rect width="120" height="120" fill="#fde8c8" />
+            <rect x="0" width="44" height="120" fill="#fbdfb8" />
+            <circle cx="82" cy="30" r="5" fill="#f7c99a" />
+            <circle cx="82" cy="90" r="5" fill="#f7c99a" />
+          </pattern>
+        </defs>
+        <rect width={STAGE_W} height={STAGE_H} fill="url(#tm-sand-wall)" />
+        {/* The skirting board, then the floorboards. */}
+        <rect y={SAND_FLOOR - 44} width={STAGE_W} height="30" fill="#f4d3a6" stroke="#9c6334" strokeWidth="5" />
         <rect y={SAND_FLOOR - 16} width={STAGE_W} height={STAGE_H} fill="#c98b52" />
         <path d={`M0 ${SAND_FLOOR - 16} H1600`} stroke="#9c6334" strokeWidth="6" />
-        <ellipse cx="900" cy={SAND_FLOOR + 6} rx="520" ry="40" fill="#ff8787" opacity="0.7" />
+        <path
+          d={`M0 ${SAND_FLOOR + 30} H1600 M0 ${SAND_FLOOR + 80} H1600 M220 ${SAND_FLOOR - 16} V${SAND_FLOOR + 30} M1380 ${SAND_FLOOR + 30} V${SAND_FLOOR + 80}`}
+          stroke="#b07440"
+          strokeWidth="4"
+        />
+        {/* The rug under the hourglass: a border round its middle and a fringe at both ends. */}
+        <ellipse cx="900" cy={SAND_FLOOR + 6} rx="520" ry="40" fill="#ff8787" />
+        <ellipse cx="900" cy={SAND_FLOOR + 6} rx="470" ry="30" fill="none" stroke="#ffc9c9" strokeWidth="6" strokeDasharray="22 14" />
+        <path
+          d={`M372 ${SAND_FLOOR - 4} l-26 -4 M368 ${SAND_FLOOR + 8} l-28 0 M372 ${SAND_FLOOR + 20} l-26 4 M1428 ${SAND_FLOOR - 4} l26 -4 M1432 ${SAND_FLOOR + 8} l28 0 M1428 ${SAND_FLOOR + 20} l26 4`}
+          stroke="#e8686a"
+          strokeWidth="5"
+          strokeLinecap="round"
+        />
         {/* A picture on the wall: a sun over a hill. */}
         <rect x="260" y="200" width="220" height="170" rx="10" fill="#e7f5ff" stroke="#9c6334" strokeWidth="12" />
         <path d="M266 330 Q370 270 474 330 V364 H266 Z" fill="#8ce99a" />
@@ -412,11 +436,36 @@ const GlassFrame = memo(function GlassFrame() {
         <path d={bulbPath(top, neck, false)} />
         <path d={bulbPath(neck, bottom, true)} />
       </g>
-      {[left + 10, right - 30].map((x) => (
-        <rect key={x} x={x} y={top - 10} width="20" height={bottom - top + 20} rx="8" fill="#b5651d" stroke={INK} strokeWidth="5" />
+      {/* Turned wooden posts: a slim shaft with a light edge, and round beads near its ends and at the neck. */}
+      {[left + 20, right - 20].map((x) => (
+        <g key={x}>
+          <rect x={x - 10} y={top - 10} width="20" height={bottom - top + 20} rx="8" fill="#b5651d" stroke={INK} strokeWidth="5" />
+          <path d={`M${x - 3} ${top + 4} V${bottom - 4}`} stroke="#d98c45" strokeWidth="4" strokeLinecap="round" />
+          {[top + 26, neck, bottom - 26].map((y) => (
+            <g key={y}>
+              <ellipse cx={x} cy={y} rx="19" ry="14" fill="#b5651d" stroke={INK} strokeWidth="5" />
+              <ellipse cx={x - 5} cy={y - 4} rx="6" ry="4" fill="#d98c45" />
+            </g>
+          ))}
+        </g>
       ))}
-      <rect x={left - 10} y={top - 4 - PLATE} width={right - left + 20} height={PLATE} rx="12" fill="#c97d3a" stroke={INK} strokeWidth="6" />
-      <rect x={left - 10} y={bottom + 4} width={right - left + 20} height={PLATE} rx="12" fill="#c97d3a" stroke={INK} strokeWidth="6" />
+      {/* The plates: a light top edge, a darker underside and the wood's grain. */}
+      {[top - 4 - PLATE, bottom + 4].map((y) => (
+        <g key={y}>
+          <rect x={left - 10} y={y} width={right - left + 20} height={PLATE} rx="12" fill="#c97d3a" />
+          <rect x={left - 4} y={y + 4} width={right - left + 8} height="7" rx="3.5" fill="#e3a062" />
+          <rect x={left - 4} y={y + PLATE - 9} width={right - left + 8} height="6" rx="3" fill="#a8622a" />
+          <path
+            d={`M${left + 20} ${y + 17} C${left + 90} ${y + 12} ${left + 150} ${y + 22} ${left + 230} ${y + 16} M${right - 170} ${y + 19} C${right - 110} ${y + 14} ${right - 60} ${y + 22} ${right - 10} ${y + 17}`}
+            fill="none"
+            stroke="#9c5a22"
+            strokeWidth="3"
+            strokeLinecap="round"
+            opacity="0.6"
+          />
+          <rect x={left - 10} y={y} width={right - left + 20} height={PLATE} rx="12" fill="none" stroke={INK} strokeWidth="6" />
+        </g>
+      ))}
     </svg>
   );
 });
@@ -522,10 +571,25 @@ export const CandleBackdrop = memo(function CandleBackdrop() {
         ].map(([cx, cy]) => (
           <circle key={cx} cx={cx} cy={cy} r="5" fill="#fff3bf" />
         ))}
+        {/* The window's sill. */}
+        <rect x="1094" y="388" width="252" height="22" rx="6" fill="#c9a46b" />
         <rect x="0" y={CANDLE.base + 10} width={STAGE_W} height={STAGE_H} fill="#8a5a2b" />
         <rect x="0" y={CANDLE.base + 10} width={STAGE_W} height="16" fill="#a8743f" />
+        <path
+          d={`M0 ${CANDLE.base + 52} C300 ${CANDLE.base + 44} 600 ${CANDLE.base + 60} 900 ${CANDLE.base + 50} S1400 ${CANDLE.base + 46} 1600 ${CANDLE.base + 54} M120 ${CANDLE.base + 82} C420 ${CANDLE.base + 74} 760 ${CANDLE.base + 90} 1500 ${CANDLE.base + 80}`}
+          fill="none"
+          stroke="#74491f"
+          strokeWidth="4"
+        />
+        {/* Each holder a brass dish with a rim and a little handle ring at its side. */}
         {CANDLE.xs.map((cx) => (
-          <ellipse key={cx} cx={cx} cy={CANDLE.base + 8} rx="92" ry="18" fill="#e6b44c" stroke={INK} strokeWidth="5" />
+          <g key={cx}>
+            <ellipse cx={cx + 70} cy={CANDLE.base + 36} rx="18" ry="11" fill="none" stroke={INK} strokeWidth="11" />
+            <ellipse cx={cx + 70} cy={CANDLE.base + 36} rx="18" ry="11" fill="none" stroke="#e6b44c" strokeWidth="5" />
+            <ellipse cx={cx} cy={CANDLE.base + 16} rx="92" ry="18" fill="#b8862a" stroke={INK} strokeWidth="5" />
+            <ellipse cx={cx} cy={CANDLE.base + 8} rx="92" ry="18" fill="#e6b44c" stroke={INK} strokeWidth="5" />
+            <ellipse cx={cx} cy={CANDLE.base + 8} rx="74" ry="12" fill="none" stroke="#f7d779" strokeWidth="4" />
+          </g>
         ))}
       </Draw>
     </Layer>
@@ -534,8 +598,23 @@ export const CandleBackdrop = memo(function CandleBackdrop() {
 
 /** The animation timing of candle `i` for the CSS: its turn (`--tm-i`) among `--tm-of` candles. */
 function turn(i: number): CSSProperties {
-  return { "--tm-i": i, "--tm-of": CANDLE.xs.length } as CSSProperties;
+  const wax = WAX[i % WAX.length];
+  return {
+    "--tm-i": i,
+    "--tm-of": CANDLE.xs.length,
+    "--tm-wax-side": wax.side,
+    "--tm-wax-light": wax.light,
+    "--tm-wax-top": wax.top,
+    "--tm-wax-run": wax.run,
+  } as CSSProperties;
 }
+
+/** Each candle's wax: its shaded sides, its lit middle, its top and what runs down (drop and puddle) – pink, blue, yellow. */
+const WAX = [
+  { side: "#ffc9c9", light: "#fff0f0", top: "#ffe3e3", run: "#ffb3c1" },
+  { side: "#a5d8ff", light: "#eef7ff", top: "#d0ebff", run: "#8cc8f5" },
+  { side: "#ffe066", light: "#fffbe0", top: "#fff3bf", run: "#ffd43b" },
+] as const;
 
 /**
  * One candle: the wax that has run down, a puddle on the holder that grows as it burns (H-64), behind it; the wax,
@@ -561,7 +640,7 @@ function Candle({ i, out, flare, glow }: { i: number; out: boolean; flare: numbe
       </Layer>
       <Layer x={cx - w / 2} y={CANDLE.top} w={w} h={h} className="tm-flame-box tm-move" style={turn(i)}>
         <svg viewBox={`0 0 ${w} ${h}`} preserveAspectRatio="none">
-          <ellipse cx={w / 2} cy="0" rx={w / 2 - 2} ry="13" fill="#ffe3e3" stroke={INK} strokeWidth="4" />
+          <ellipse cx={w / 2} cy="0" rx={w / 2 - 2} ry="13" style={{ fill: "var(--tm-wax-top)" }} stroke={INK} strokeWidth="4" />
           <path d={`M${w / 2} 0 V-22`} stroke={INK} strokeWidth="5" strokeLinecap="round" />
         </svg>
         <div className={`tm-lit${last ? "" : " tm-goes-out"}`}>

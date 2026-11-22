@@ -282,6 +282,20 @@ export const SCENARIOS: Scenario[] = [
     path: "/timer/?sekunden=5",
     parts: [{ label: "Wechsel", before: [{ tap: `.mode-card[title^="Seesaw"]` }, { wait: 500 }], ms: 10000, tap: { selector: ".tm-play", every: 1500 } }],
   },
+  // A timer's last moments and its end, with the shortest length (10 s, the first slip): the bar along the bottom
+  // filling, the warm light gathering from the edges, the bar's marker and flag beating, then the end's light and trophy.
+  {
+    name: "timer-letzte-sekunden",
+    path: "/timer/",
+    parts: [
+      {
+        label: "Letzte Sekunden",
+        before: [{ tap: ".tm-lengths button" }, { wait: 300 }, { tap: `.mode-card[title^="Rote Scheibe"]` }, { wait: 4000 }],
+        ms: 7000,
+        tap: { selector: ".tm-play", every: 1500 },
+      },
+    ],
+  },
   // The Apfelbaum's harvest, sped up: bees buzzing, apples ripening and falling into the cart the bear child pushes.
   {
     name: "timer-apfelbaum-ernte",

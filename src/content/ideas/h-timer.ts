@@ -441,5 +441,16 @@ export const timerIdeas: IdeaArea = {
       why: "Wagen für Wagen zeigt, wie weit es ist, und der Zug, der am Ende verschwindet, sagt: fertig, alles weg.",
       effort: "M",
     },
+    {
+      id: "H-124",
+      emoji: "📏",
+      title: "Leiste unten, letzte Sekunden und mehr Einzelheiten in den Bildern",
+      text: "Unter jedem Timer-Bild läuft ganz unten über fast die ganze Breite eine Leiste vom Start bis zu einem Fähnchen, als zweite, gleichbleibende Hilfe. Kurz vor dem Ende wird es spürbar: ein warmes Licht, ein sanfter Herzschlag, leise steigende Töne. Die schlichtesten Bilder bekommen mehr Einzelheiten.",
+      why: "Gewünscht am 22. November 2026: die Timer interessanter und detaillierter machen. Eine Leiste lesen Kinder in jedem Bild gleich, und das nahe Ende kündigt sich an, statt plötzlich da zu sein.",
+      effort: "M",
+      done: true,
+      partial:
+        "Gebaut (22. November 2026, bar.tsx): eine Papierleiste in der Farbe des Bildes füllt sich vom Start bis zum Fähnchen, eine runde Marke an ihrer Spitze; bei „Gleich ist es so weit“ wird der Rest warm, in den letzten zehn Sekunden (bei kurzen Läufen einem Viertel) schlagen Marke und Fähnchen-Licht sanft einmal pro Sekunde, ein warmes Licht sammelt sich vom Bildrand her, und die letzten fünf Sekunden steigt je ein leiser Ton. Beim Abwechseln die Farbe des Kindes, das dran ist. Abschaltbar hinter ⚙️ („Leiste unten“), das Bild rückt über die Leiste. Mehr Einzelheiten: Sanduhr mit gedrechselten Pfosten, Maserung, Tapete, Dielen und Teppich mit Fransen; Rote Scheibe in einem Gehäuse auf Füßen, auf einem Tisch; Kerzen in Rosa, Hellblau und Gelb auf Messingschalen; Pizza mit Salami, Pilzen, Oliven, Basilikum und Paprika, die über die Schnitte gehen, Tomatenrand und feinen Schnitten.",
+    },
   ],
 };

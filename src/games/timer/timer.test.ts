@@ -7,7 +7,8 @@ import { BITE_R, BUTTERFLY, biteSpot, bodyFront, frontAfter, LEAF, LEAF_FLOOR, l
 import { DISC, DOTS, dotAt } from "./disc";
 import { PICTURE_LINES, SOON_LINE, TURN_LINES, timerSaid } from "./voice";
 import { BLOOM, FLOWER_FLOOR, GROWN_AT, HOLDER, SPOUT, SPROUT, SPROUT_SIZE, STAKE, STALK, TAP } from "./flower";
-import { PIZZA, PIZZA_FLOOR, slice, SLICES, SLICE_SECONDS } from "./pizza";
+import { PIZZA, PIZZA_FLOOR, slice, SLICES, SLICE_SECONDS, TOPPINGS } from "./pizza";
+import { FINAL_MS, FINAL_NOTES, finalMs } from "./bar";
 import { FLOWERS, MOON, MOON_SET_AT, ridgeAt, SKY_CUT, STARS, SUN, SUN_FROM } from "./sunset";
 import {
   appleCount,
@@ -709,4 +710,31 @@ test("every line the Timer says is in every app language, a new picture's Englis
       if (["ru", "zh", "hi", "ar"].includes(language)) expect(line, language).not.toMatch(/[A-Za-zäöüß]/);
     }
   }
+});
+
+describe("the bar along the bottom and the last moments", () => {
+  test("the last moments are ten seconds, a quarter of a short run, and the bar is on by default", () => {
+    expect(finalMs(5 * 60_000)).toBe(FINAL_MS);
+    expect(finalMs(10_000)).toBe(2500);
+    expect(FINAL_NOTES * 1000).toBeLessThanOrEqual(FINAL_MS);
+    expect(DEFAULT_TIMER_SETTINGS.bar).toBe(true);
+  });
+
+  test("the bar and the last moments' light move only by transform and opacity, and the stage still covers the screen", async () => {
+    const css = await Bun.file(new URL("./timer.css", import.meta.url)).text();
+    const frames = [...css.matchAll(/@keyframes (tm-bar-[\w-]+|tm-final-light) \{([\s\S]*?)\n\}/g)];
+    expect(frames.length).toBeGreaterThanOrEqual(6);
+    for (const [, name, body] of frames) {
+      const props = [...body.matchAll(/([a-z-]+):/g)].map((m) => m[1]);
+      for (const prop of props) expect(["transform", "opacity"], `${name}: ${prop}`).toContain(prop);
+    }
+    // Moved up into the room above the bar, the stage must still reach the screen's bottom edge (a dark strip showed).
+    const stage = css.slice(css.indexOf(".tm-with-bar .tm-stage {"), css.indexOf("}", css.indexOf(".tm-with-bar .tm-stage {")));
+    expect(stage).toContain("100cqh + var(--tm-bar-room)");
+  });
+
+  test("the pizza's toppings lie on the cheese, inside the tomato ring and the crust", () => {
+    expect(new Set(TOPPINGS.map((t) => t.kind)).size).toBe(5);
+    for (const t of TOPPINGS) expect(t.radius + 22).toBeLessThanOrEqual(PIZZA.r - 26);
+  });
 });

@@ -108,6 +108,7 @@ export function TimerGame() {
         onPicture={(picture) => update({ picture })}
         onToy={(toy) => update({ toy })}
         onShown={(timeNote) => update({ timeNote })}
+        onBar={(bar) => update({ bar })}
       />
     </GameShell>
   );

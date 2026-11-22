@@ -206,7 +206,13 @@
 .tm-wax {
   position: absolute;
   inset: 0;
-  background: linear-gradient(90deg, #ffc9c9, #ffe3e3 40%, #fff0f0 55%, #ffc9c9);
+  background: linear-gradient(
+    90deg,
+    var(--tm-wax-side, #ffc9c9),
+    var(--tm-wax-top, #ffe3e3) 40%,
+    var(--tm-wax-light, #fff0f0) 55%,
+    var(--tm-wax-side, #ffc9c9)
+  );
   border: 0.35cqw solid #3b2a20;
   border-top: none;
   border-radius: 0 0 8% 8% / 0 0 2% 2%;
@@ -488,7 +494,7 @@
   aspect-ratio: 3 / 4;
   border: 0.2cqw solid #3b2a20;
   border-radius: 50% 50% 50% 50% / 62% 62% 38% 38%;
-  background: #ffb3c1;
+  background: var(--tm-wax-run, #ffb3c1);
   animation: tm-drip 6s ease-in-out infinite;
 }
 
@@ -553,7 +559,7 @@
   inset: 0;
   border: 0.2cqw solid #3b2a20;
   border-radius: 50%;
-  background: #ffb3c1;
+  background: var(--tm-wax-run, #ffb3c1);
   transform: scale(0.62, 0.55);
   animation: tm-spread var(--tm-turn) linear var(--tm-from) both;
 }
@@ -2338,4 +2344,322 @@
 
 .tm-done .tm-tidy-finger {
   transform: rotate(calc(var(--tm-side) * 24deg));
+}
+
+/* The bar along the bottom (`TimeBar`, user request, 22 November 2026): a paper track over nearly the whole width,
+   filling from the start at the left to the flag at the right in the picture's own colour, a round marker at its
+   front. Fill, way still to go and marker each move by one animation of `transform` as long as the run. Its sizes are
+   set here and used by its children, so `cqh` measures the play area (`.tm-play`), never the bar. */
+.tm-play {
+  --tm-bar-h: clamp(14px, 4cqh, 30px);
+  --tm-bar-bottom: calc(max(6px, 1.8cqh) + env(safe-area-inset-bottom));
+  --tm-bar-room: calc(var(--tm-bar-bottom) + var(--tm-bar-h) + 6px);
+}
+
+/* With the bar, the stage's middle moves up into the room above it, so the bar lies under what matters instead of over
+   its foot (it hid the candles' holders on a phone): only on a phone wider than 16:9 a strip is cut off at top and
+   bottom alike. The stage still reaches the screen's bottom edge (a dark strip showed under the bar on a tablet), so
+   it is that much taller there, and a 4:3 tablet still shows x 200–1400 whole. */
+.tm-with-bar .tm-stage {
+  top: calc(50% - var(--tm-bar-room) / 2);
+  width: max(100cqw, calc((100cqh + var(--tm-bar-room)) * 16 / 9));
+}
+
+.tm-bar {
+  --tm-bar-a: #b2f2bb;
+  --tm-bar-b: #40c057;
+  --tm-bar-flag: #ff6b6b;
+  --tm-knob: calc(var(--tm-bar-h) * 1.7);
+  position: absolute;
+  left: calc(6cqw + env(safe-area-inset-left));
+  right: calc(7cqw + env(safe-area-inset-right));
+  bottom: var(--tm-bar-bottom);
+  z-index: 2;
+  height: var(--tm-bar-h);
+  container-type: inline-size;
+  pointer-events: none;
+  transition: opacity 0.8s ease-out;
+}
+
+/* Each picture's own colour, so the bar belongs to it. */
+.tm-play[data-picture="disc"] .tm-bar {
+  --tm-bar-a: #ffa8a8;
+  --tm-bar-b: #f03e3e;
+  --tm-bar-flag: #fcc419;
+}
+
+.tm-play[data-picture="sand"] .tm-bar {
+  --tm-bar-a: #ffe0b8;
+  --tm-bar-b: #f08c3c;
+}
+
+.tm-play[data-picture="candle"] .tm-bar {
+  --tm-bar-a: #ffec99;
+  --tm-bar-b: #ff922b;
+}
+
+.tm-play[data-picture="apple"] .tm-bar {
+  --tm-bar-a: #c0eb75;
+  --tm-bar-b: #74b816;
+}
+
+.tm-play[data-picture="flower"] .tm-bar {
+  --tm-bar-a: #fcc2d7;
+  --tm-bar-b: #e64980;
+  --tm-bar-flag: #fcc419;
+}
+
+.tm-play[data-picture="pizza"] .tm-bar {
+  --tm-bar-a: #ffe066;
+  --tm-bar-b: #f59f00;
+}
+
+.tm-play[data-picture="clock"] .tm-bar {
+  --tm-bar-a: #99e9f2;
+  --tm-bar-b: #15aabf;
+}
+
+.tm-play[data-picture="tidy"] .tm-bar,
+.tm-play[data-picture="train"] .tm-bar {
+  --tm-bar-a: #a5d8ff;
+  --tm-bar-b: #339af0;
+}
+
+.tm-play[data-picture="caterpillar"] .tm-bar {
+  --tm-bar-a: #d8f5a2;
+  --tm-bar-b: #82c91e;
+}
+
+.tm-play[data-picture="sunset"] .tm-bar {
+  --tm-bar-a: #ffd8a8;
+  --tm-bar-b: #fd7e14;
+}
+
+/* Abwechseln: the turn's bar in the colour of the child whose turn it is. */
+.tm-bar[data-tone="fox"] {
+  --tm-bar-a: #ffc078;
+  --tm-bar-b: #f76707;
+}
+
+.tm-bar[data-tone="bear"] {
+  --tm-bar-a: #d8b48c;
+  --tm-bar-b: #9c6334;
+}
+
+/* The track: plain paper with a dotted way along it, the way still to go. */
+.tm-bar-track {
+  position: absolute;
+  inset: 0;
+  overflow: hidden;
+  border: 2px solid #3b2a20;
+  border-radius: 999px;
+  background:
+    radial-gradient(circle, #d9c7a4 0 16%, transparent 20%) 0 50% / var(--tm-bar-h) 100% repeat-x,
+    linear-gradient(#fffdf6, #f4ead6);
+  box-shadow:
+    inset 0 2px 4px rgb(59 42 32 / 0.18),
+    0 6px 12px -8px rgb(0 0 0 / 0.6);
+}
+
+/* What is done: the picture's colour with soft stripes and a light top. */
+.tm-bar-fill {
+  position: absolute;
+  inset: 0;
+  border-radius: 999px;
+  background:
+    linear-gradient(rgb(255 255 255 / 0.45), transparent 45%), repeating-linear-gradient(-45deg, transparent 0 9px, rgb(255 255 255 / 0.2) 9px 18px),
+    linear-gradient(var(--tm-bar-a), var(--tm-bar-b));
+  transform: translateX(-100%);
+  animation: tm-bar-fill var(--tm-bar-ms) linear var(--tm-bar-delay) both;
+}
+
+@keyframes tm-bar-fill {
+  from {
+    transform: translateX(-100%);
+  }
+  to {
+    transform: none;
+  }
+}
+
+/* The way still to go, shrinking towards the flag: a tap lights it (H-51), and „gleich“ warms it. */
+.tm-bar-left {
+  position: absolute;
+  inset: 0;
+  transform-origin: 100% 50%;
+  animation: tm-bar-left var(--tm-bar-ms) linear var(--tm-bar-delay) both;
+}
+
+@keyframes tm-bar-left {
+  from {
+    transform: none;
+  }
+  to {
+    transform: scaleX(0);
+  }
+}
+
+.tm-bar-left .tm-left-glow {
+  inset: 0;
+  border-radius: 999px;
+}
+
+.tm-bar-warm {
+  position: absolute;
+  inset: 0;
+  background: linear-gradient(90deg, rgb(255 200 90 / 0.15), rgb(255 160 60 / 0.6));
+  opacity: 0;
+  transition: opacity 2s ease-out;
+}
+
+.tm-bar-soon .tm-bar-warm {
+  opacity: 1;
+}
+
+/* Where it starts: a little round stop, which the marker leaves behind. */
+.tm-bar-start {
+  position: absolute;
+  left: 0;
+  top: 50%;
+  width: calc(var(--tm-bar-h) * 1.05);
+  aspect-ratio: 1;
+  border: 2px solid #3b2a20;
+  border-radius: 50%;
+  background: var(--tm-bar-a);
+  transform: translate(-50%, -50%);
+}
+
+/* The goal: a little flag standing at the bar's right end. */
+.tm-bar-goal {
+  position: absolute;
+  right: calc(var(--tm-bar-h) * -0.55);
+  bottom: 15%;
+  width: calc(var(--tm-bar-h) * 1.6);
+  aspect-ratio: 60 / 80;
+}
+
+.tm-bar-goal svg {
+  position: relative;
+  display: block;
+  width: 100%;
+  height: 100%;
+  overflow: visible;
+}
+
+.tm-bar-goal-light {
+  position: absolute;
+  inset: -45%;
+  border-radius: 50%;
+  background: radial-gradient(closest-side, rgb(255 236 150 / 0.95), rgb(255 210 90 / 0.4) 60%, transparent);
+  opacity: 0;
+  transition: opacity 2s ease-out;
+  will-change: transform, opacity;
+}
+
+.tm-bar-soon .tm-bar-goal-light {
+  opacity: 0.55;
+}
+
+/* The marker at the fill's front, riding the bar's width as a small layer of its own. */
+.tm-bar-knob {
+  position: absolute;
+  left: 0;
+  top: 50%;
+  width: var(--tm-knob);
+  height: var(--tm-knob);
+  margin: calc(var(--tm-knob) / -2) 0 0 calc(var(--tm-knob) / -2);
+  filter: drop-shadow(0 3px 3px rgb(0 0 0 / 0.25));
+  animation: tm-bar-knob var(--tm-bar-ms) linear var(--tm-bar-delay) both;
+}
+
+.tm-bar-knob svg {
+  display: block;
+  width: 100%;
+  height: 100%;
+}
+
+@keyframes tm-bar-knob {
+  from {
+    transform: none;
+  }
+  to {
+    transform: translateX(100cqw);
+  }
+}
+
+/* The last moments: the marker and the flag's light beat softly once a second – a small swell, never a blink. */
+.tm-bar-final .tm-bar-knob svg {
+  animation: tm-bar-beat 1s ease-in-out infinite;
+}
+
+.tm-bar-final .tm-bar-goal-light {
+  opacity: 1;
+  animation: tm-bar-goal-beat 1s ease-in-out infinite;
+}
+
+@keyframes tm-bar-beat {
+  50% {
+    transform: scale(1.22);
+  }
+}
+
+@keyframes tm-bar-goal-beat {
+  0%,
+  100% {
+    transform: scale(0.85);
+    opacity: 0.7;
+  }
+  50% {
+    transform: scale(1.15);
+    opacity: 1;
+  }
+}
+
+/* At the end it stands full and fades, leaving the end's light, trophy and buttons alone. */
+.tm-bar-done {
+  opacity: 0;
+}
+
+.tm-bar-done .tm-bar-fill,
+.tm-bar-done .tm-bar-left,
+.tm-bar-done .tm-bar-knob,
+.tm-bar-done .tm-bar-knob svg,
+.tm-bar-done .tm-bar-goal-light {
+  animation: none;
+}
+
+.tm-bar-done .tm-bar-fill {
+  transform: none;
+}
+
+.tm-bar-done .tm-bar-left {
+  transform: scaleX(0);
+}
+
+.tm-bar-done .tm-bar-knob {
+  transform: translateX(100cqw);
+}
+
+/* With the bar shown, the time note stands above its right end. */
+.tm-with-bar .tm-shown {
+  bottom: calc(var(--tm-bar-bottom) + var(--tm-bar-h) * 2.6);
+}
+
+/* The last moments over the whole picture (`FinalLight`): a warm light gathering from the screen's edges until the
+   end – one layer fading in by opacity, staying for the end's own light to join. */
+.tm-final-light {
+  position: absolute;
+  inset: 0;
+  z-index: 1;
+  background: radial-gradient(ellipse 75% 70% at 50% 50%, transparent 55%, rgb(255 205 100 / 0.32) 82%, rgb(255 170 60 / 0.55));
+  opacity: 0;
+  pointer-events: none;
+  will-change: opacity;
+  animation: tm-final-light var(--tm-final-ms) ease-in forwards;
+}
+
+@keyframes tm-final-light {
+  to {
+    opacity: 1;
+  }
 }

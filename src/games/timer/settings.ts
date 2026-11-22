@@ -43,6 +43,8 @@ export interface TimerSettings {
    * (`shown`, then `showTime` held the old default for everyone who had played before), so the new one reaches them too.
    */
   timeNote: TimeShown;
+  /** The bar along the bottom (`TimeBar`), a second way to see the time beside the picture; on by default, off behind ⚙️. */
+  bar: boolean;
 }
 
 export const DEFAULT_TIMER_SETTINGS: TimerSettings = {
@@ -52,6 +54,7 @@ export const DEFAULT_TIMER_SETTINGS: TimerSettings = {
   useOwn: false,
   toy: "bobbycar",
   timeNote: "digits",
+  bar: true,
 };
 
 export const TIMER_SETTINGS_KEY = "tinytaps.timer.v1";

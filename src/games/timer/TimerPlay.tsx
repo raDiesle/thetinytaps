@@ -29,8 +29,10 @@ import {
   recorded,
 } from "@/lib/sfx";
 import { hush } from "@/lib/voice";
+import { useTimers } from "@/lib/timers";
 import { useWakeLock } from "@/lib/wakeLock";
 import { AppleScene } from "./apples";
+import { FINAL_NOTES, FinalLight, finalMs, TimeBar, TimeBarChoice } from "./bar";
 import { CaterpillarScene } from "./caterpillar";
 import { ClockScene } from "./clock";
 import { isTurns, nextPicture, OTHER_TIME, PICTURES, tomorrowAt } from "./content";
@@ -89,6 +91,7 @@ export function TimerPlay({
   onPicture,
   onToy,
   onShown,
+  onBar,
 }: {
   settings: TimerSettings;
   onPicture: (picture: TimerPicture) => void;
@@ -96,6 +99,8 @@ export function TimerPlay({
   onToy: (toy: SwapToy) => void;
   /** A grown-up has the time left shown in the picture, or not, behind ⚙️. */
   onShown: (shown: TimeShown) => void;
+  /** A grown-up has the bar along the bottom shown, or not, behind ⚙️. */
+  onBar: (bar: boolean) => void;
 }) {
   const [run, setRun] = useState(0);
   const again = () => setRun((n) => n + 1);
@@ -103,7 +108,7 @@ export function TimerPlay({
     onPicture(picture);
     again();
   };
-  return <TimerStart key={run} settings={settings} onAgain={again} onPicture={pick} onToy={onToy} onShown={onShown} />;
+  return <TimerStart key={run} settings={settings} onAgain={again} onPicture={pick} onToy={onToy} onShown={onShown} onBar={onBar} />;
 }
 
 /**
@@ -116,12 +121,14 @@ function TimerStart({
   onPicture,
   onToy,
   onShown,
+  onBar,
 }: {
   settings: TimerSettings;
   onAgain: () => void;
   onPicture: (picture: TimerPicture) => void;
   onToy: (toy: SwapToy) => void;
   onShown: (shown: TimeShown) => void;
+  onBar: (bar: boolean) => void;
 }) {
   const t = useT();
   const leave = useLeaveGame();
@@ -172,6 +179,8 @@ function TimerStart({
         onToy={onToy}
         timeShown={settings.timeNote}
         onShown={onShown}
+        bar={settings.bar}
+        onBar={onBar}
         onAgain={onAgain}
         onPicture={onPicture}
       />
@@ -187,6 +196,8 @@ function TimerStart({
       until={until}
       shown={settings.timeNote}
       onShown={onShown}
+      bar={settings.bar}
+      onBar={onBar}
       onAgain={onAgain}
       onPicture={onPicture}
     />
@@ -258,6 +269,8 @@ function TimerRun({
   until,
   shown,
   onShown,
+  bar,
+  onBar,
   onAgain,
   onPicture,
 }: {
@@ -271,6 +284,9 @@ function TimerRun({
   /** The time left in the picture's corner too, or not. */
   shown: TimeShown;
   onShown: (shown: TimeShown) => void;
+  /** The bar along the bottom too, or not. */
+  bar: boolean;
+  onBar: (bar: boolean) => void;
   onAgain: () => void;
   onPicture: (picture: TimerPicture) => void;
 }) {
@@ -283,6 +299,12 @@ function TimerRun({
   // Gleich ist es so weit (H-49): a while before the end the bell rings once, and a picture stepped back from afar comes bright again.
   const [soon, setSoon] = useState(false);
   const soonAt = endsAt - soonMs(total);
+  // The last moments (user request, 22 November 2026): a warm light gathers from the edges, the bar's marker and flag
+  // beat once a second, and the last seconds rise note by note to the end.
+  const lastMs = finalMs(total);
+  const finalAt = endsAt - lastMs;
+  const [final, setFinal] = useState(false);
+  const { later } = useTimers();
   const { effects, ripple, glow } = useTapFeedback();
   useWakeLock(phase === "running");
   useEffect(() => loadRecordings(["cheer"]), []);
@@ -320,6 +342,7 @@ function TimerRun({
   }, [picture, total, set, apples, stops]);
   const nextMoment = useRef(0);
   const soonRang = useRef(false);
+  const finalOn = useRef(false);
   const lastPieceSound = useRef(Number.NEGATIVE_INFINITY);
 
   // Seen from afar (H-48): a while after the last tap the small things step back, and a tap brings them back.
@@ -345,6 +368,10 @@ function TimerRun({
         playDing();
         say(SOON_LINE, true);
       }
+      if (now >= finalAt && !finalOn.current) {
+        finalOn.current = true;
+        setFinal(true);
+      }
       // A piece done: one sound, also when several passed while the page was away.
       if (nextMoment.current < moments.length && now >= startedAt + moments[nextMoment.current]) {
         while (nextMoment.current < moments.length && now >= startedAt + moments[nextMoment.current]) nextMoment.current++;
@@ -360,7 +387,8 @@ function TimerRun({
       }
       const toMoment = nextMoment.current < moments.length ? startedAt + moments[nextMoment.current] - now : Number.POSITIVE_INFINITY;
       const toSoon = soonRang.current ? Number.POSITIVE_INFINITY : soonAt - now;
-      timer = setTimeout(check, Math.max(10, Math.min(left, 1000, toMoment, toSoon)));
+      const toFinal = finalOn.current ? Number.POSITIVE_INFINITY : finalAt - now;
+      timer = setTimeout(check, Math.max(10, Math.min(left, 1000, toMoment, toSoon, toFinal)));
     };
     const onVisible = () => {
       clearTimeout(timer);
@@ -372,7 +400,17 @@ function TimerRun({
       clearTimeout(timer);
       document.removeEventListener("visibilitychange", onVisible);
     };
-  }, [phase, endsAt, total, picture, moments, soonAt, say]);
+  }, [phase, endsAt, total, picture, moments, soonAt, finalAt, say]);
+
+  // The last seconds rise note by note, softly, the last one a second before the end, so the end's own sound follows.
+  useEffect(() => {
+    if (!final) return;
+    const notes = Math.min(FINAL_NOTES, Math.floor(lastMs / 1000));
+    for (let k = notes; k >= 1; k--) {
+      const wait = endsAt - k * 1000 - Date.now();
+      if (wait >= 0) later(() => playChimeNote(notes - k + 2), wait);
+    }
+  }, [final, endsAt, lastMs, later]);
 
   useEffect(() => {
     if (phase === "blow") {
@@ -448,11 +486,13 @@ function TimerRun({
   const clock = picture === "clock";
   return (
     <>
-      <div className="tm-play" data-picture={picture} onPointerDown={down} role="img" aria-label={name ? t(name) : undefined}>
+      <div className={`tm-play${bar ? " tm-with-bar" : ""}`} data-picture={picture} onPointerDown={down} role="img" aria-label={name ? t(name) : undefined}>
         <div className={`tm-stage tm-${phase}${far ? " tm-far" : ""}`} style={stageStyle(picture, total, stops)}>
           <SceneParts picture={picture} phase={phase} total={total} set={set} poke={poke} startedAt={endsAt - total} />
           {phase === "done" && <div className="tm-done-light" />}
         </div>
+        {final && <FinalLight endsAt={endsAt} />}
+        {bar && <TimeBar startedAt={endsAt - total} total={total} soon={soon} final={final && phase === "running"} glow={poke} done={phase !== "running"} />}
         {/* The alarm clock shows the time left on its own screen, so it needs no note in the corner. */}
         <TimeShownNote shown={phase === "running" && !clock ? shown : "off"} endsAt={endsAt} total={total} />
         <FeedbackLayer effects={effects} />
@@ -468,6 +508,7 @@ function TimerRun({
       <PlayOptions>
         <TimeLeft endsAt={endsAt} until={until} />
         {!clock && <TimeShownChoice value={shown} onChange={onShown} />}
+        <TimeBarChoice value={bar} onChange={onBar} />
       </PlayOptions>
     </>
   );

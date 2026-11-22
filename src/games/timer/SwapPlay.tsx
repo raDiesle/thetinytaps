@@ -8,6 +8,7 @@ import { afterPageMotion } from "@/lib/pageMotion";
 import { loadRecordings, playChime, playKnock, playMelody, playTusch, playTwinkle, playWhoosh, recorded } from "@/lib/sfx";
 import { hush } from "@/lib/voice";
 import { useWakeLock } from "@/lib/wakeLock";
+import { TimeBar, TimeBarChoice } from "./bar";
 import { nextPicture, PICTURES, SWAP_NAME } from "./content";
 import type { SwapToy, TimeShown, TimerPicture, TurnPicture } from "./settings";
 import { TimeShownChoice, TimeShownNote } from "./shown";
@@ -60,6 +61,8 @@ export function SwapRun({
   onToy,
   timeShown,
   onShown,
+  bar,
+  onBar,
   onAgain,
   onPicture,
 }: {
@@ -75,6 +78,9 @@ export function SwapRun({
   /** The time to the change in the picture's corner too, or not (behind ⚙️). */
   timeShown: TimeShown;
   onShown: (shown: TimeShown) => void;
+  /** The bar along the bottom, filling once a turn in the colour of the child whose turn it is (behind ⚙️). */
+  bar: boolean;
+  onBar: (bar: boolean) => void;
   onAgain: () => void;
   onPicture: (picture: TimerPicture) => void;
 }) {
@@ -226,7 +232,7 @@ export function SwapRun({
 
   return (
     <>
-      <div className="tm-play" data-picture={picture} onPointerDown={down} role="img" aria-label={name ? t(name) : undefined}>
+      <div className={`tm-play${bar ? " tm-with-bar" : ""}`} data-picture={picture} onPointerDown={down} role="img" aria-label={name ? t(name) : undefined}>
         {seesaw ? (
           <div className={`tm-stage ${done ? "tm-done" : "tm-running"}`}>
             <SeesawBackdrop />
@@ -269,6 +275,7 @@ export function SwapRun({
             {done && <div className="tm-done-light" />}
           </div>
         )}
+        {bar && ticking && holder && <TimeBar key={`${turnStart}-${turn}`} startedAt={turnStart} total={turnMs} tone={holder} glow={poke} />}
         {ticking && <TimeShownNote shown={timeShown} endsAt={turnStart + turnMs} total={turnMs} />}
         <FeedbackLayer effects={effects} />
         {done && <GameEnd delayMs={4200} level={picture} onAgain={onAgain} next={nextInfo && { name: t(nextInfo.name), onNext: () => onPicture(next) }} />}
@@ -343,6 +350,7 @@ export function SwapRun({
         )}
         {endsAt !== undefined && <TimeLeft endsAt={endsAt} until={until} />}
         <TimeShownChoice value={timeShown} onChange={onShown} />
+        <TimeBarChoice value={bar} onChange={onBar} />
       </PlayOptions>
     </>
   );
