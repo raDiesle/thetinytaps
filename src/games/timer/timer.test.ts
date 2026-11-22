@@ -25,18 +25,25 @@ import {
   roadY,
 } from "./road";
 import {
+  BEAM_L,
   BLOCK,
-  BLOCK_HOP_MS,
+  beamFrames,
+  beamShades,
+  beamTransform,
   blockCount,
+  blockPose,
   blocksPlan,
   cursorFrames,
   DOOR,
   FACE,
+  GEM,
   HOUSE as BLOCK_HOUSE,
   JUMBLE,
   MAX_BLOCKS,
   MIN_BLOCKS,
   SLOTS,
+  SLIP,
+  SLIP_FALL_MS,
   slotFoot,
   WINDOWS,
 } from "./blocks";
@@ -731,7 +738,7 @@ describe("Timer", () => {
     expect(code).toContain('className="tm-hop tm-road-car"');
   });
 
-  test("Block House: all twenty blocks at five minutes, one hop at a time, the house built from the bottom up, the last block landing as the time is up (H-125)", () => {
+  test("Block House: all twenty blocks at five minutes, carried one at a time, the house built from the bottom up, the last block landing as the time is up (H-125)", () => {
     expect(blockCount(5 * 60_000)).toBe(MAX_BLOCKS);
     expect(blockCount(10_000)).toBe(MIN_BLOCKS);
     expect(blockCount(3 * 3600_000)).toBe(MAX_BLOCKS);
@@ -742,17 +749,16 @@ describe("Timer", () => {
       let before = 0;
       for (const [i, b] of blocks.entries()) {
         expect(b.k).toBe(built + i);
-        expect(b.hop.start).toBeGreaterThanOrEqual(before);
-        expect(b.hop.land - b.hop.start).toBeLessThanOrEqual(BLOCK_HOP_MS);
-        expect(b.hop.land).toBeGreaterThan(b.hop.start);
-        if (b.hop.waitFrom !== undefined) expect(b.hop.waitFrom).toBeGreaterThanOrEqual(before);
-        before = b.hop.land;
+        // Each block is on its way its whole share: the beam turns onto it as the one before lands.
+        expect(b.start).toBeCloseTo(before);
+        expect(b.land).toBeGreaterThan(b.start);
+        before = b.land;
       }
-      expect(blocks.at(-1)?.hop.land).toBeCloseTo(total);
+      expect(blocks.at(-1)?.land).toBeCloseTo(total);
       // The cursor stands on each block's place until the one before has landed, never on a place already built.
       const frames = cursorFrames(blocks);
       expect(frames).toHaveLength(blocks.length);
-      for (const [i, f] of frames.entries()) expect(f.at).toBe(i ? blocks[i - 1].hop.land : 0);
+      for (const [i, f] of frames.entries()) expect(f.at).toBe(i ? blocks[i - 1].land : 0);
     }
   });
 
@@ -781,16 +787,72 @@ describe("Timer", () => {
     }
     // Every place of the jumble is taken by exactly one block of the house.
     const { blocks } = blocksPlan(5 * 60_000, MAX_BLOCKS);
-    expect(new Set(blocks.map((b) => `${b.hop.from.x},${b.hop.from.y}`)).size).toBe(MAX_BLOCKS);
-    for (const b of blocks) expect(b.hop.peak - BLOCK).toBeGreaterThanOrEqual(80);
+    expect(new Set(blocks.map((b) => `${b.from.x},${b.from.y}`)).size).toBe(MAX_BLOCKS);
     expect(FACE + 20).toBe(BLOCK);
   });
 
-  test("Block House: blocks, cursor and crumbs are layers on CSS animations that snap to their place at the end, with no clip path (H-125)", async () => {
+  test("Block House: the beam carries each block all its share – it moves every second, floats clear of the jumble, the house built and the crystal, and slips now and then (H-125)", () => {
+    const overlap = (a: { x: number; y: number }, b: { x: number; y: number }) => Math.abs(a.x - b.x) < FACE - 4 && Math.abs(a.y - b.y) < FACE - 4;
+    for (const total of [60_000, 5 * 60_000, 3600_000]) {
+      const { built, blocks } = blocksPlan(total, blockCount(total));
+      for (const [i, b] of blocks.entries()) {
+        // Lying still before its turn, resting on its place after it.
+        expect(blockPose(b, b.start - 1)).toMatchObject({ ...b.from, rot: b.tilt });
+        expect(blockPose(b, b.land)).toMatchObject({ ...b.to, rot: 0 });
+        const share = b.land - b.start;
+        // From the beam's grip to the landing it never stands still for a second (on a long run its bob, a second
+        // at a time, shows the move where the way itself is slow).
+        const lift = b.start + share * 0.07;
+        if (total <= 5 * 60_000)
+          for (let t = lift; t + 1000 <= b.land; t += 1000) {
+            const a = blockPose(b, t);
+            const c = blockPose(b, t + 1000);
+            expect(Math.hypot(c.x - a.x, c.y - a.y), `${total} ${b.k} ${t}`).toBeGreaterThan(2);
+          }
+        // Floating across (and slipping), it never passes through a block still lying, a block of the house or the crystal.
+        const lying = blocks.slice(i + 1).map((o) => o.from);
+        const house = [...SLOTS.slice(0, built), ...blocks.slice(0, i).map((o) => SLOTS[o.k])].map((s) => slotFoot(s.c, s.r));
+        for (let t = b.start + share * 0.3; t < b.land; t += share / 200) {
+          const pose = blockPose(b, t);
+          for (const o of [...lying, ...house]) expect(overlap(pose, o), `${b.k} over ${o.x},${o.y} at ${t}`).toBe(false);
+          expect(pose.x + BLOCK / 2 < GEM.x || pose.x - BLOCK / 2 > GEM.x + GEM.w || pose.y - BLOCK > GEM.y + GEM.h).toBe(true);
+          expect(pose.y - BLOCK).toBeGreaterThanOrEqual(80);
+        }
+      }
+      // Every third block slips once on a long share, and the beam's light is off while it falls.
+      const slipping = blocks.filter((b) => b.drop !== undefined);
+      expect(slipping.length).toBe(Math.floor((blocks.length + 1) / 3));
+      const shades = beamShades(blocks);
+      for (const b of slipping) {
+        const at = b.drop ?? 0;
+        expect(blockPose(b, at + SLIP_FALL_MS).y - blockPose(b, at).y).toBeCloseTo(SLIP);
+        expect(blockPose(b, at + SLIP_FALL_MS / 2).held).toBe(false);
+        expect(shades.some((s) => s.at > at && s.at <= at + SLIP_FALL_MS && s.o === 0)).toBe(true);
+      }
+    }
+    // A short run has no time to slip.
+    expect(blocksPlan(10_000, blockCount(10_000)).blocks.every((b) => b.drop === undefined)).toBe(true);
+  });
+
+  test("Block House: the beam's tip lies on the carried block at every keyframe, reaching from the crystal's tip (H-125)", () => {
+    expect(beamTransform({ x: GEM.tip.x, y: GEM.tip.y + BEAM_L })).toBe("rotate(0.00deg) scaleY(1.000)");
+    const total = 5 * 60_000;
+    const { blocks } = blocksPlan(total, blockCount(total));
+    const frames = beamFrames(blocks);
+    for (const b of blocks)
+      for (const f of frames.filter((f) => f.at >= b.start + (b.land - b.start) * 0.07 && f.at <= b.land)) {
+        const pose = blockPose(b, f.at);
+        expect(f.transform).toBe(beamTransform({ x: pose.x, y: pose.y - BLOCK / 2 }));
+      }
+    for (let i = 1; i < frames.length; i++) expect(frames[i].at).toBeGreaterThanOrEqual(frames[i - 1].at);
+  });
+
+  test("Block House: blocks, beam, crystal, cursor and crumbs are layers on CSS animations that snap to their place at the end, with no clip path (H-125)", async () => {
     const code = await Bun.file(new URL("./blocks.tsx", import.meta.url)).text();
     expect(code).not.toMatch(/clip-?[pP]ath/);
     const css = await Bun.file(new URL("./timer.css", import.meta.url)).text();
-    for (const part of ["blocks-z", "blocks-cursor", "blocks-crumbs", "blocks-light"]) expect(css, part).toMatch(new RegExp(`\\.tm-done \\.tm-${part}[,\\s{]`));
+    for (const part of ["blocks-z", "blocks-cursor", "blocks-crumbs", "blocks-light", "blocks-block", "blocks-aura", "blocks-beam", "blocks-halo"])
+      expect(css, part).toMatch(new RegExp(`\\.tm-done \\.tm-${part}[,\\s{]`));
     // Their stacking stays inside the picture, never above the end's light and trophy.
     expect(css).toMatch(/\.tm-blocks \{\s*isolation: isolate;/);
   });

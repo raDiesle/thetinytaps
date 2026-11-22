@@ -17,9 +17,9 @@ const MIDDLE = 0.5;
 /**
  * Pictures whose middle shows little take another moment, as a share of the run: the Sonnenaufgang's moon has set at
  * the middle and its sun not yet risen, and the Wippe lies nearly level there, so its card shows the fox child's seat
- * still well up.
+ * still well up; the Block House's middle has a block just landed, so its card shows the next one carried by the beam.
  */
-const LATER: Partial<Record<TimerPicture, number>> = { sunset: 0.68, seesaw: 0.25 };
+const LATER: Partial<Record<TimerPicture, number>> = { sunset: 0.68, seesaw: 0.25, blocks: 0.53 };
 
 /**
  * Stops a card's drawing `at` ms into its run: every animation in it is put at that moment, its look there written into

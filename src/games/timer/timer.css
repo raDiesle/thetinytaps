@@ -2172,10 +2172,26 @@
   pointer-events: none;
 }
 
+/* Each digit and colon in a cell of its own, the cells as many as at the run's start (`--tm-note-em`, `digitsEm`):
+   the note keeps one width the whole run, whatever the font's digits (user feedback, 22 November 2026). */
 .tm-shown b {
-  font-size: clamp(1.4rem, 5cqh, 2.6rem);
+  display: block;
+  width: calc(var(--tm-note-em) * 1em);
+  font-size: var(--tm-note-font);
   font-variant-numeric: tabular-nums;
   line-height: 1.2;
+  text-align: center;
+  white-space: nowrap;
+}
+
+.tm-shown b > span {
+  display: inline-block;
+  width: 0.64em;
+  text-align: center;
+}
+
+.tm-shown b > .tm-colon {
+  width: 0.34em;
 }
 
 .tm-tally {
@@ -2434,8 +2450,8 @@
 }
 
 /* The block house (H-125, blocks.tsx): its blocks stack in a box of their own (`isolation`), so their z-indices never
-   reach past the picture to the end's light. Each moving block lies in a full-size box whose z-index steps from its
-   row in the jumble to its place in the house as it hops (keyframes written for the run). */
+   reach past the picture to the end's light. Each carried block lies in a full-size box whose z-index steps from its
+   row in the jumble to its place in the house as the beam lifts it (keyframes written for the run). */
 .tm-blocks,
 .tm-blocks-z {
   position: absolute;
@@ -2453,6 +2469,131 @@
 .tm-done .tm-blocks-z {
   animation: none;
   z-index: var(--tm-z-end);
+}
+
+/* A carried block: its layer follows its way (keyframes written for the run, turned from its foot), it bobs gently a
+   second at a time while it floats, and a cool glow lies round it while the beam holds it. */
+.tm-blocks-block {
+  transform-origin: 50% 100%;
+  will-change: transform;
+  animation: var(--tm-anim) var(--tm-ms) linear both;
+}
+
+.tm-blocks-bob {
+  position: absolute;
+  inset: 0;
+}
+
+.tm-blocks-bob[data-bobs] {
+  animation: tm-blocks-bob 2s ease-in-out var(--tm-at) var(--tm-bobs);
+}
+
+@keyframes tm-blocks-bob {
+  50% {
+    transform: translateY(-7%) rotate(-2deg);
+  }
+}
+
+.tm-blocks-bob > svg {
+  position: absolute;
+  inset: 0;
+  display: block;
+  width: 100%;
+  height: 100%;
+  overflow: visible;
+}
+
+.tm-blocks-aura {
+  position: absolute;
+  inset: -42%;
+  border-radius: 50%;
+  background: radial-gradient(closest-side, rgb(132 94 247 / 0.9) 50%, rgb(177 151 252 / 0.6) 72%, transparent);
+  opacity: 0;
+  will-change: opacity;
+  animation: var(--tm-anim) var(--tm-ms) linear both;
+}
+
+.tm-done .tm-blocks-block,
+.tm-done .tm-blocks-bob,
+.tm-done .tm-blocks-aura {
+  animation: none;
+}
+
+.tm-done .tm-blocks-block {
+  transform: var(--tm-end);
+}
+
+/* The crystal's halo pulses softly once a second while it works; at the end it rests lit. */
+.tm-blocks-halo {
+  opacity: 0.55;
+  will-change: opacity;
+  animation: tm-blocks-halo 1s ease-in-out infinite alternate;
+}
+
+@keyframes tm-blocks-halo {
+  to {
+    opacity: 1;
+  }
+}
+
+.tm-done .tm-blocks-halo {
+  animation: none;
+}
+
+/* The beam: a layer pointing down from the crystal's tip, turned and stretched onto its block (keyframes written for
+   the run), its light on keyframes of its own, sparks running along it to the block. Gone at the end. */
+.tm-blocks-beam {
+  transform-origin: 50% 0;
+  will-change: transform;
+  animation: var(--tm-anim) var(--tm-ms) linear both;
+}
+
+.tm-blocks-beam-on {
+  position: absolute;
+  inset: 0;
+  will-change: opacity;
+  animation: var(--tm-light) var(--tm-ms) linear both;
+}
+
+.tm-blocks-beam-on > svg {
+  position: absolute;
+  inset: 0;
+  display: block;
+  width: 100%;
+  height: 100%;
+}
+
+.tm-blocks-sparks {
+  position: absolute;
+  inset: 0 40%;
+  overflow: hidden;
+}
+
+.tm-blocks-sparks > svg {
+  display: block;
+  width: 100%;
+  height: 200%;
+  will-change: transform;
+  animation: tm-blocks-sparks 1s linear infinite;
+}
+
+@keyframes tm-blocks-sparks {
+  from {
+    transform: translateY(-50%);
+  }
+  to {
+    transform: translateY(0);
+  }
+}
+
+.tm-done .tm-blocks-beam,
+.tm-done .tm-blocks-beam-on,
+.tm-done .tm-blocks-sparks > svg {
+  animation: none;
+}
+
+.tm-done .tm-blocks-beam {
+  visibility: hidden;
 }
 
 /* The cursor round the next block's place jumps on as each block lands, and is gone at the end. */
@@ -2718,6 +2859,9 @@
   --tm-bar-h: clamp(14px, 4cqh, 30px);
   --tm-bar-bottom: calc(max(6px, 1.8cqh) + env(safe-area-inset-bottom));
   --tm-bar-room: calc(var(--tm-bar-bottom) + var(--tm-bar-h) + 6px);
+  /* The digits' note: its font, and its whole width (padding and border round its cells). */
+  --tm-note-font: clamp(1.4rem, 5cqh, 2.6rem);
+  --tm-note-w: calc(var(--tm-note-font) * var(--tm-note-em, 2.3) + 32px);
 }
 
 /* With the bar, the stage's middle moves up into the room above it, so the bar lies under what matters instead of over
@@ -3034,9 +3178,19 @@
   transform: translateX(100cqw);
 }
 
-/* With the bar shown, the time note stands above its right end. */
+/* With the bar shown, the digits' note stays in the very bottom right corner, beside the bar's end, and the bar ends
+   left of it (user request, 22 November 2026: above the bar it floated somewhere over the picture). Tally marks, which
+   can run over several rows and half the width, stand above the bar's right end. */
 .tm-with-bar .tm-shown {
   bottom: calc(var(--tm-bar-bottom) + var(--tm-bar-h) * 2.6);
+}
+
+.tm-with-bar .tm-shown-digits {
+  bottom: calc(14px + env(safe-area-inset-bottom));
+}
+
+.tm-with-bar.tm-note-digits .tm-bar {
+  right: calc(14px + env(safe-area-inset-right) + var(--tm-note-w) + 2.5cqw);
 }
 
 /* The last moments over the whole picture (`FinalLight`): a warm light gathering from the screen's edges until the

@@ -5,7 +5,7 @@ import { MILK_CHAIN_AR } from "./ar";
 import { MILK_CHAIN_EN } from "./en";
 import { MILK_CHAIN_ES } from "./es";
 import { MILK_CHAIN_HI } from "./hi";
-import { GENTLE_STEPS, goneOn, MILK_CHAIN, MILK_CHAIN_PAGES, MILK_ORDER } from "./milkChain";
+import { GENTLE_STEPS, goneOn, MILK_CHAIN, MILK_CHAIN_PAGES, MILK_CHAIN_SHORT, MILK_ORDER, minutesOf, SHORT_PAGES } from "./milkChain";
 import { MILK_CHAIN_RU } from "./ru";
 import { MILK_CHAIN_ZH } from "./zh";
 
@@ -64,18 +64,67 @@ test("the book opens on its table of contents, and the corner leads back to it",
   expect(play).toMatch(/useInnerBack\(index === CONTENTS \? undefined : toContents\)/);
 });
 
-// User request, 22 November 2026: „Abstillen“ is one book whose first page chooses its story – the long one or night
-// weaning – with each story's chapters left out or shown only very small.
-test("the book Abstillen opens on the choice of its two stories, their chapters only as small numbers", () => {
+// User request, 22 November 2026: „Abstillen“ is one book whose first page chooses its story, and that choice shows
+// only how many pictures each story has, about how long it takes and where it starts – no chapter numbers any more.
+test("the book Abstillen opens on the choice of its stories, each with its pictures, minutes and start slips", () => {
   const book = readFileSync("src/games/milkchain/MilkChainGame.tsx", "utf8");
-  expect([...book.matchAll(/^ {4}href: "([^"]+)",$/gm)].map((m) => m[1])).toEqual(["/abstillen/", "/abstillen/nachts/"]);
+  expect([...book.matchAll(/^ {2,6}href: "([^"]+)",$/gm)].map((m) => m[1])).toEqual([
+    "/abstillen/",
+    "/abstillen/kurz/",
+    "/abstillen/abschied/",
+    "/abstillen/nachts/",
+  ]);
   // Without a link to a page, nothing is open: the choice.
   expect(book).toContain('return typeof opened?.page === "number" ? { story: here, page: opened.page, from } : undefined;');
-  // Each story's way back to its contents leads to the choice, and a chapter's line is its number alone.
+  // Each story's way back to its contents leads to the choice; every version has a slip with its size to start it.
   expect(book).toContain("onContents={toChoice}");
-  expect(book).toMatch(/className="cb-story-chapter"[\s\S]*?>\s*\{c \+ 1\}\s*<\/button>/);
+  expect(book).toMatch(/className="cb-story-start"[\s\S]*?className="cb-story-start-label"[\s\S]*?className="cb-story-start-size"/);
+  expect(book).not.toContain("cb-story-chapter");
   // One book on the shelf, no longer two tied together.
   expect(CATEGORIES.flatMap((c) => c.games).find((g) => g.href === "/abstillen/")?.volumes).toBeUndefined();
+});
+
+test("a story's minutes grow with its pages and words, and every story takes at least one", () => {
+  expect(minutesOf([])).toBe(1);
+  const long = minutesOf(MILK_CHAIN_PAGES);
+  const short = minutesOf(MILK_CHAIN_SHORT.flatMap((c) => c.pages));
+  expect(short).toBeLessThan(long);
+  expect(long).toBeGreaterThanOrEqual(8);
+});
+
+// User request, 22 November 2026: „zusätzlich von der ersten Geschichte eine Kurzfassung“.
+describe("the short version of Tapsis Milchkette", () => {
+  const short = MILK_CHAIN_SHORT.flatMap((c) => c.pages);
+  const ids = MILK_CHAIN_PAGES.map((p) => p.id);
+
+  test("is made of the long story's own pages, in their order, about a third of them", () => {
+    expect(short.every((p) => ids.includes(p.id))).toBe(true);
+    const at = short.map((p) => ids.indexOf(p.id));
+    expect(at).toEqual([...at].sort((a, b) => a - b));
+    expect(short.length).toBeGreaterThanOrEqual(12);
+    expect(short.length).toBeLessThanOrEqual(MILK_CHAIN_PAGES.length / 2);
+    // Every id in SHORT_PAGES is a page of the long story, so a renamed page can't drop out unseen.
+    expect(SHORT_PAGES.filter((id) => !ids.includes(id))).toEqual([]);
+  });
+
+  test("tells the whole way: from the baby to the farewell and the love that stays", () => {
+    expect(short[0].id).toBe(MILK_CHAIN_PAGES[0].id);
+    expect(short.at(-1)?.id).toBe(MILK_CHAIN_PAGES.at(-1)?.id);
+    // Every milk time goes in it, in MILK_ORDER, and it keeps a page where Tapsi drinks at the breast.
+    for (const steps of ["tag", "abend", "nacht", "abschied"])
+      expect(
+        short.some((p) => p.id.startsWith(steps)),
+        steps,
+      ).toBe(true);
+    expect(short.some((p) => /Brust/.test(p.text))).toBe(true);
+  });
+
+  test("never leaves Tapsi crying: a page where Tapsi cries is followed by one where a grown-up holds or comforts", () => {
+    short.forEach((page, i) => {
+      if (!/weint/.test(page.text)) return;
+      expect(/Papa|Mama/.test(page.text) || /hält|tröst|Arm|kuschelt/.test(short[i + 1]?.text ?? ""), page.id).toBe(true);
+    });
+  });
 });
 
 describe("Tapsis Milchkette in every language", () => {
