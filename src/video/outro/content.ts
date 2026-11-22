@@ -13,10 +13,10 @@ import { APP_LANGUAGES, type EnglishFirst, type Texts } from "@/lib/language";
 export const SITE = "https://www.funforboth.com";
 
 /**
- * Where the code on the card can lead: the home page or the game the video shows (idea Y-05), each with its name on
- * the recording page (German, like the rest of /management/). A new video of a game adds its address here.
+ * The pages a video's YouTube description links to: the home page or the game the video shows, each with its German
+ * name. A new video of a game adds its address here.
  */
-export const CODE_TARGETS = [
+export const VIDEO_PAGES = [
   ["/", "Startseite"],
   ["/zaehne/", "Zähne putzen"],
   ["/toepfchen/", "Aufs Töpfchen"],
@@ -26,11 +26,17 @@ export const CODE_TARGETS = [
   ["/kita/", "Kita-Start"],
 ] as const;
 
-/** One of the addresses the code can lead to. */
-export type CodeTarget = (typeof CODE_TARGETS)[number][0];
+/** One of the pages a video links to. */
+export type VideoPage = (typeof VIDEO_PAGES)[number][0];
 
 /** The page `path` in `language` on the site: German at the root, every other language under its prefix (/en/zaehne/). */
-export const addressFor = (path: CodeTarget, language: SeoLanguage) => `${SITE}${languagePrefix(language)}${path}`;
+export const addressFor = (path: VideoPage, language: SeoLanguage) => `${SITE}${languagePrefix(language)}${path}`;
+
+/**
+ * Where the code on the card leads: always the home page in the video's language (user decision, November 2026), so
+ * one outro per language serves every video, rendered once and put after each.
+ */
+export const codeAddress = (language: SeoLanguage) => addressFor("/", language);
 
 /** The address as people say and type it: no https, no www, no slash at the end („funforboth.com/en/zaehne“). */
 export const shortAddress = (url: string) => url.replace(/^https:\/\/(www\.)?/, "").replace(/\/$/, "");

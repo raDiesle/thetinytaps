@@ -600,7 +600,7 @@ export const LANGUAGE_STATUS: LanguageStatusRow[] = [
         label: "📚 Abspann der YouTube-Videos",
         languages: { en: "done" },
         files: ["src/video/outro/content.ts"],
-        note: "Die Wörter auf der Karte am Ende jedes Videos (/management/video-outro/, Y-04 und Y-05, 21. November 2026), englisch zuerst: die fünf Zeichen „Free“, „No ads“, „Plays offline“, „7 languages“, „Play-time limit“ und „Scan to play“ über dem QR-Code. In den anderen Sprachen zeigt der Abspann sie bis zur Übersetzung auf Englisch; die Adresse des Codes folgt schon der Sprache (/en/zaehne/). Name und Adresse brauchen keine. Tapsi sagt die Adresse noch nicht (bezahlte Aufnahme).",
+        note: "Die Wörter auf der Karte am Ende jedes Videos (/management/video-outro/, Y-04 und Y-05, 21. November 2026), englisch zuerst: die fünf Zeichen „Free“, „No ads“, „Plays offline“, „7 languages“, „Play-time limit“ und „Scan to play“ über dem QR-Code. In den anderen Sprachen zeigt der Abspann sie bis zur Übersetzung auf Englisch; die Adresse des Codes folgt schon der Sprache (/en/). Name und Adresse brauchen keine. Tapsi sagt die Adresse noch nicht (bezahlte Aufnahme).",
       },
     ],
   },

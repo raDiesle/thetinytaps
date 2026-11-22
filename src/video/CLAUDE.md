@@ -21,9 +21,12 @@ the management page's contents by `TOOL_GROUPS`), never a link from the shelf or
   the intro ends on, the name fades, the book closes and goes back into its gap – `introSecond` maps its time onto the
   intro's, so both stay one motion), the four picture books lighting up one after another with a menu picture of one of
   their games, then a card with the `Logo`, „funforboth.com“, five signs (free, no ads, offline, languages, play-time
-  limit) and a QR code to the video's game in the video's language (`CODE_TARGETS`, `addressFor`; `uqr` draws it). 12 s.
+  limit) and a QR code to the home page in the video's language (`codeAddress`; `uqr` draws it). 12 s.
   YouTube shows no end screen links on videos made for children, so all of it is in the picture.
-  `bun run video outro --ziel /zaehne/ --sprache en` makes it for one game and language.
+  `bun run video outro --sprache en` makes it for one language.
+  **The outro is the same in every video** (user decision, November 2026): its code leads to the home page, never to
+  the video's game, so one outro per language is rendered once and put after each video; the link to the game stands
+  in the video's description (`VIDEO_PAGES`, `youtubeTexts.ts`). Nothing in it may depend on the video it follows.
   It comes in two variants (choice „Variante“ on the page, `--variante regal` for the tool): „Bilder aus den Spielen“,
   the default (user request, November 2026: show the games' pictures big, not the books), and the shelf one above.
   „Bilder aus den Spielen“ (`gallery.ts`, `GalleryScene`, `scheduleGallerySound`, about 17 s) opens on the two
@@ -31,7 +34,7 @@ the management page's contents by `TOOL_GROUPS`), never a link from the shelf or
   then six helpers and six games (`GALLERY` in `content.ts`) come one after another out of the depth into the middle,
   big, the game's name on a slip under it and its category over it, each with a rising note, the one before flying on
   past the camera; then the same card (`EndCard`). Motion, pictures and sound are the same in every video; only the
-  words follow the video's language and the code its game.
+  words and the code's address follow the video's language.
 - Pictures shown big in a video are at least 1100 px wide (`gallery.test.ts`): a menu's 480 × 320 preview shown
   1140 wide was blurred. The games' painted pictures (1200 wide) serve as they are; a game drawn in code gets a cut of
   1200 × 800 by `bun run previews --video` (`VIDEO_GAMES` in `tools/previews.ts`, into `outro/bilder/`), with what it

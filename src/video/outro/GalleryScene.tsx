@@ -4,7 +4,7 @@ import { pick } from "@/lib/language";
 import { LEARNING_GAMES } from "@/lib/sharedTexts";
 import pictures from "../../components/bilder/*.webp?glob";
 import { CANVAS } from "../canvas";
-import { type CodeTarget, GALLERY, gameTitle, HELPERS_TITLE, SIGNS } from "./content";
+import { GALLERY, gameTitle, HELPERS_TITLE, SIGNS } from "./content";
 import { EndCard } from "./EndCard";
 import { backgroundGames, GALLERY_BEATS, galleryFadeIn, headingPose, nameShown, type PicturePose, picturePose } from "./gallery";
 import { cardPose } from "./timeline";
@@ -36,9 +36,9 @@ function photoStyle(pose: PicturePose): CSSProperties {
  * One frame of the outro „Bilder aus den Spielen“ at second `t` (user request, November 2026): the two categories side
  * by side, „Alltagshelfer“ and „Lernspiele“, each with a picture of its games; then picture after picture of the games
  * coming out of the depth into the middle, big, with its name under it and its category over it, flying on past the
- * camera as the next comes; then the card with the address, five signs and a code leading to `target` in `language`.
+ * camera as the next comes; then the card with the address, five signs and a code leading to the home page in `language`.
  */
-export function GalleryScene({ t, language, target }: { t: number; language: SeoLanguage; target: CodeTarget }) {
+export function GalleryScene({ t, language }: { t: number; language: SeoLanguage }) {
   const headings = [HELPERS_TITLE, LEARNING_GAMES] as const;
   return (
     <div className="vi-scene vg-scene" style={{ width: CANVAS.width, height: CANVAS.height }}>
@@ -71,7 +71,7 @@ export function GalleryScene({ t, language, target }: { t: number; language: Seo
           </p>
         ) : null;
       })}
-      <EndCard pose={cardPose(t, SIGNS.length, GALLERY_BEATS)} language={language} target={target} />
+      <EndCard pose={cardPose(t, SIGNS.length, GALLERY_BEATS)} language={language} />
       <div className="vi-paper-fade" style={{ opacity: 1 - galleryFadeIn(t) }} />
     </div>
   );

@@ -2,7 +2,7 @@ import type { CSSProperties } from "react";
 import { Logo } from "@/components/Logo";
 import type { SeoLanguage } from "@/content/seo";
 import { pick } from "@/lib/language";
-import { addressFor, type CodeTarget, SCAN, SIGNS, shortAddress } from "./content";
+import { codeAddress, SCAN, SIGNS, shortAddress } from "./content";
 import { QrCode } from "./QrCode";
 import type { CardPose } from "./timeline";
 
@@ -11,11 +11,11 @@ const CODE_SIZE = 360;
 
 /**
  * The card every outro ends on (ideas Y-04 and Y-05): the `Logo`, „funforboth.com“, what the site is in five small
- * signs, and a code leading to `target` in `language`, coming up from below as `pose` says.
+ * signs, and a code leading to the home page in `language`, coming up from below as `pose` says.
  */
-export function EndCard({ pose, language, target }: { pose: CardPose; language: SeoLanguage; target: CodeTarget }) {
+export function EndCard({ pose, language }: { pose: CardPose; language: SeoLanguage }) {
   if (pose.card <= 0) return null;
-  const address = addressFor(target, language);
+  const address = codeAddress(language);
   return (
     <div className="vo-card" style={{ opacity: Math.min(1, pose.card * 1.6), translate: `0 ${(1 - pose.card) * 640}px` }}>
       <div className="vo-card-main">
