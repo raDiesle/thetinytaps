@@ -480,6 +480,9 @@ export const timerIdeas: IdeaArea = {
       text: "Eine Wand aus Klötzen im Berg, dahinter (durch einen Spalt schon zu sehen) eine Schatzkiste. Klotz für Klotz wird ein Gang hineingegraben: Ein Klotz bekommt Risse, zerfällt in kleine Würfelkrümel, und der Gang wird länger. Am Ende ist der Weg frei, die Kiste geht auf und funkelt.",
       why: "Das Graben ist das, was Kinder in Klötzchenspielen am meisten fasziniert. Der Gang, der wächst, ist die vergangene Zeit, die Wand davor der Rest – und das Ziel ist von Anfang an zu sehen.",
       effort: "M",
+      done: true,
+      partial:
+        "Gebaut als Bild „Schatztunnel“ (Treasure Tunnel) im Timer (22. November 2026, tunnel.tsx): ein Klötzchenberg von der Seite aufgeschnitten, wie Klötzchenspiele in 2D ihre Welt zeigen – Gras, Erde und Stein, links davor eine Wiese. Am Fuß des Bergs liegt der Weg des Tunnels noch voller Klötze (zehn Spalten, zwei hoch, Erde, Stein und zwei Klötze mit Goldkörnern), an seinem Ende eine kleine Kammer mit der Schatzkiste, in die durch einen Spalt von oben Licht fällt. Eine Spitzhacke schlägt jede Sekunde an den nächsten Klotz, ein Rahmen wie im Spiel zeigt ihn, er bekommt in drei Stufen Risse und zerfällt dann in kleine Würfelkrümel; Spalte für Spalte, erst oben, dann unten. Ist der letzte Klotz weg, geht die Kiste auf, Gold darin und ein warmes Licht. Bei 5 Minuten alle 20 Klötze, bei kurzen Zeiten ist der Anfang des Tunnels schon gegraben (mindestens 8 Klötze). Ein Tippen klingt hell wie die Hacke auf Stein und lässt die Klötze aufleuchten, die noch stehen. Name und Sätze Englisch zuerst und in alle sieben Sprachen übersetzt, Aufnahmen folgen auf Wunsch.",
     },
     {
       id: "H-127",

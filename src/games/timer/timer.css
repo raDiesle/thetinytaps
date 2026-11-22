@@ -2495,6 +2495,145 @@
   opacity: 1;
 }
 
+/* The treasure tunnel (H-126, tunnel.tsx): each block still to dig crumbles away at its moment (`--tm-at`, for
+   `--tm-crumble`, ending as its share does), shrinking a little and fading – one small layer by `transform` and `opacity`. */
+.tm-tunnel-block {
+  position: absolute;
+  inset: 0;
+  transform-origin: 50% 100%;
+  animation: tm-tunnel-crumble var(--tm-crumble) ease-in var(--tm-at) both;
+}
+
+.tm-tunnel-block > svg,
+.tm-tunnel-swing > svg {
+  display: block;
+  width: 100%;
+  height: 100%;
+  overflow: visible;
+}
+
+@keyframes tm-tunnel-crumble {
+  0% {
+    opacity: 1;
+    transform: scale(1);
+  }
+  100% {
+    opacity: 0;
+    transform: scale(0.75);
+  }
+}
+
+/* The block being dug gets its cracks a stage at each quarter of its share, again for every block (`--tm-unit`): the
+   frame round it jumps on with the pickaxe (keyframes written for the run). */
+.tm-tunnel-crack {
+  position: absolute;
+  inset: 0;
+  opacity: 0;
+  animation: var(--tm-crack) var(--tm-unit) step-end infinite;
+}
+
+.tm-tunnel-crack-1 {
+  --tm-crack: tm-tunnel-crack-1;
+}
+
+.tm-tunnel-crack-2 {
+  --tm-crack: tm-tunnel-crack-2;
+}
+
+.tm-tunnel-crack-3 {
+  --tm-crack: tm-tunnel-crack-3;
+}
+
+@keyframes tm-tunnel-crack-1 {
+  0% {
+    opacity: 0;
+  }
+  25%,
+  100% {
+    opacity: 1;
+  }
+}
+
+@keyframes tm-tunnel-crack-2 {
+  0% {
+    opacity: 0;
+  }
+  50%,
+  100% {
+    opacity: 1;
+  }
+}
+
+@keyframes tm-tunnel-crack-3 {
+  0% {
+    opacity: 0;
+  }
+  75%,
+  100% {
+    opacity: 1;
+  }
+}
+
+/* The pickaxe swings at the block once a second, from the hand on its handle: raised, a quick strike, back up. */
+.tm-tunnel-swing {
+  position: absolute;
+  inset: 0;
+  will-change: transform;
+  animation: tm-tunnel-swing 1s infinite;
+}
+
+@keyframes tm-tunnel-swing {
+  0% {
+    transform: rotate(-38deg);
+    animation-timing-function: ease-in;
+  }
+  45% {
+    transform: rotate(3deg);
+    animation-timing-function: ease-out;
+  }
+  58% {
+    transform: rotate(0deg);
+    animation-timing-function: ease-in-out;
+  }
+  100% {
+    transform: rotate(-38deg);
+  }
+}
+
+/* At the end every block is gone, the pickaxe and the cracks are put away, and the chest opens on its hinge at the back
+   with a warm light round it. */
+.tm-done .tm-tunnel-block,
+.tm-done .tm-tunnel-crack,
+.tm-done .tm-tunnel-swing {
+  animation: none;
+}
+
+.tm-done .tm-tunnel-block,
+.tm-done .tm-tunnel-pick,
+.tm-done .tm-tunnel-cracks {
+  visibility: hidden;
+}
+
+.tm-tunnel-lid {
+  transform-origin: 97% 94%;
+  transition: transform 1s ease-out;
+}
+
+.tm-done .tm-tunnel-lid {
+  transform: rotate(-40deg);
+}
+
+.tm-tunnel-light {
+  border-radius: 50%;
+  background: radial-gradient(closest-side, rgb(255 230 120 / 0.9), rgb(255 212 59 / 0.45) 55%, transparent);
+  opacity: 0;
+  transition: opacity 1.2s ease-out;
+}
+
+.tm-done .tm-tunnel-light {
+  opacity: 1;
+}
+
 /* The bar along the bottom (`TimeBar`, user request, 22 November 2026): a paper track over nearly the whole width,
    filling from the start at the left to the flag at the right in the picture's own colour, a round marker at its
    front. Fill, way still to go and marker each move by one animation of `transform` as long as the run. Its sizes are
@@ -2590,6 +2729,12 @@
   --tm-bar-a: #b2f2bb;
   --tm-bar-b: #5aa84a;
   --tm-bar-flag: #e2574c;
+}
+
+.tm-play[data-picture="tunnel"] .tm-bar {
+  --tm-bar-a: #e9d8c4;
+  --tm-bar-b: #a8703c;
+  --tm-bar-flag: #fab005;
 }
 
 .tm-play[data-picture="caterpillar"] .tm-bar {

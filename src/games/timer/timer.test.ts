@@ -40,6 +40,24 @@ import {
   slotFoot,
   WINDOWS,
 } from "./blocks";
+import {
+  CHEST,
+  CRUMBLE_MS,
+  digCount,
+  HILL,
+  MAX_DIG,
+  MIN_DIG,
+  PICK,
+  pickCorner,
+  ROOM,
+  S as DIG,
+  SPOTS,
+  spotCorner,
+  spotKind,
+  toolFrames,
+  TUNNEL,
+  tunnelPlan,
+} from "./tunnel";
 import { BOX_COUNT, BOXES, boxesPlan, boxLeft, boxSlot, floorPlaces, IN_BOX, LID_H, MAX_PER_BOX, MIN_PER_BOX, OPENING, perBox, TOY as BOX_TOY } from "./boxes";
 import { BITE_R, BUTTERFLY, biteSpot, bodyFront, frontAfter, LEAF, LEAF_FLOOR, leafLeft, leafShape, leafSpan, planBites, REACH } from "./caterpillar";
 import { DISC, DOTS, dotAt } from "./disc";
@@ -758,6 +776,61 @@ describe("Timer", () => {
     for (const part of ["blocks-z", "blocks-cursor", "blocks-crumbs", "blocks-light"]) expect(css, part).toMatch(new RegExp(`\\.tm-done \\.tm-${part}[,\\s{]`));
     // Their stacking stays inside the picture, never above the end's light and trophy.
     expect(css).toMatch(/\.tm-blocks \{\s*isolation: isolate;/);
+  });
+
+  test("Treasure Tunnel: all twenty blocks at five minutes, dug one after the other from the entrance, the last gone as the time is up (H-126)", () => {
+    expect(digCount(5 * 60_000)).toBe(MAX_DIG);
+    expect(digCount(10_000)).toBe(MIN_DIG);
+    expect(digCount(3 * 3600_000)).toBe(MAX_DIG);
+    for (const total of [10_000, 60_000, 5 * 60_000, 3 * 3600_000]) {
+      const { dug, unit, blocks } = tunnelPlan(total, digCount(total));
+      expect(dug + blocks.length).toBe(MAX_DIG);
+      for (const [i, b] of blocks.entries()) {
+        expect(b.k).toBe(dug + i);
+        expect(b.gone).toBeCloseTo((i + 1) * unit);
+        // It crumbles within its own share, after its last crack (three quarters in), never longer than CRUMBLE_MS.
+        expect(b.crumble).toBeGreaterThan(i * unit + unit * 0.75);
+        expect(b.gone - b.crumble).toBeLessThanOrEqual(CRUMBLE_MS);
+      }
+      expect(blocks.at(-1)?.gone).toBeCloseTo(total);
+      // The pickaxe and the frame stand at each block from the moment the one before is gone.
+      const frames = toolFrames(blocks, pickCorner, PICK.size);
+      for (const [i, f] of frames.entries()) expect(f.at).toBe(i ? blocks[i - 1].gone : 0);
+    }
+  });
+
+  test("Treasure Tunnel: dug column by column from the entrance, the top first; the tunnel lies inside the hill, and tunnel, chest and pickaxe stay on the screen (H-126)", () => {
+    expect(SPOTS).toHaveLength(TUNNEL.cols * TUNNEL.rows);
+    expect(new Set(SPOTS.map((p) => `${p.c},${p.r}`)).size).toBe(SPOTS.length);
+    SPOTS.forEach((p, k) => {
+      if (k) expect(p.c * 2 + (1 - p.r)).toBe(SPOTS[k - 1].c * 2 + (1 - SPOTS[k - 1].r) + 1);
+      // Every block of the tunnel has the hill above it, at least a block of dirt under its grass.
+      expect(HILL[p.c]).toBeGreaterThanOrEqual(TUNNEL.rows + 1);
+      const corner = spotCorner(k);
+      expect(corner.y).toBeGreaterThanOrEqual(80);
+      // Each block's pickaxe stands within the picture, its tip at the block.
+      const pick = pickCorner(k);
+      expect(pick.x + PICK.hand.x).toBeGreaterThanOrEqual(200);
+      expect(pick.y).toBeGreaterThanOrEqual(80);
+      expect(pick.x + PICK.tip.x).toBeCloseTo(corner.x + 4);
+    });
+    expect(new Set(SPOTS.map((_, k) => spotKind(k)))).toEqual(new Set(["dirt", "stone", "gold"]));
+    // The room and its chest come right after the tunnel, inside the room, left of the paper margin.
+    expect(ROOM.x).toBe(TUNNEL.x + TUNNEL.cols * DIG);
+    expect(CHEST.cx - CHEST.w / 2).toBeGreaterThanOrEqual(ROOM.x);
+    expect(CHEST.cx + CHEST.w / 2).toBeLessThanOrEqual(Math.min(ROOM.x + ROOM.cols * DIG, RIGHT_EDGE));
+    expect(CHEST.body + CHEST.lid).toBeLessThan(TUNNEL.rows * DIG);
+    // The hill reaches the stage's right edge, and its top stays below the top of what every screen shows.
+    expect(TUNNEL.x + HILL.length * DIG).toBeGreaterThanOrEqual(1600);
+    for (const n of HILL) expect(TUNNEL.floor - n * DIG).toBeGreaterThanOrEqual(80);
+  });
+
+  test("Treasure Tunnel: blocks, cracks and pickaxe are layers on CSS animations that are put away at the end, with no clip path (H-126)", async () => {
+    const code = await Bun.file(new URL("./tunnel.tsx", import.meta.url)).text();
+    expect(code).not.toMatch(/clip-?[pP]ath/);
+    const css = await Bun.file(new URL("./timer.css", import.meta.url)).text();
+    for (const part of ["tunnel-block", "tunnel-crack", "tunnel-swing", "tunnel-pick", "tunnel-cracks", "tunnel-lid", "tunnel-light"])
+      expect(css, part).toMatch(new RegExp(`\\.tm-done \\.tm-${part}[,\\s{]`));
   });
 
   // User feedback, November 2026: the drawn fox and bear children in the timer's pictures (holding the basket and the

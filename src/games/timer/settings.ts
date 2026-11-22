@@ -21,6 +21,7 @@ export type TimerPicture =
   | "boxes"
   | "road"
   | "blocks"
+  | "tunnel"
   | TurnPicture;
 
 /**

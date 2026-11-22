@@ -2,6 +2,7 @@ import type { Localized, Texts } from "@/lib/language";
 import type { TimerPicture, TurnPicture } from "./settings";
 import { BLOCKS_NAME } from "./blocksNames";
 import { BOXES_NAME } from "./boxesNames";
+import { TUNNEL_NAME } from "./tunnelNames";
 import { ROAD_NAME } from "./roadNames";
 import { TIDY_NAME } from "./tidyNames";
 
@@ -61,6 +62,8 @@ export const PICTURES: { id: TimerPicture; emoji: string; name: Texts }[] = [
   { id: "road", emoji: "🛣️", name: ROAD_NAME },
   // The block house (H-125, 22 November 2026), the first timer like a game played by itself: blocks hop out of a jumble into a house.
   { id: "blocks", emoji: "🧱", name: BLOCKS_NAME },
+  // The treasure tunnel (H-126, 22 November 2026), the second like a block world played by itself: a tunnel dug block by block to a chest.
+  { id: "tunnel", emoji: "⛏️", name: TUNNEL_NAME },
   {
     id: "train",
     emoji: "🚂",

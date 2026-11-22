@@ -20,7 +20,7 @@ request, November 2026; the middle rather than the end, user feedback, November 
 `GameMode.art`): the very drawing of a run (`SceneParts`), cut as for 5 minutes and started half of it ago, every
 animation in it put at that moment and then stopped (`holdAt`, `.tm-card-art.tm-still`), so the menu stands still. The cards come as wide as
 the picture (`ART_ASPECT`). Names are only read out and their tooltip. They stand in the order the user chose (November
-2026, `PICTURES`): Rote Scheibe, Sanduhr, Kerze, Apfelbaum, Blume, Pizza, Wecker, then Tidy Up, Five Boxes, Road Rug, Block House and the others, on one frame with
+2026, `PICTURES`): Rote Scheibe, Sanduhr, Kerze, Apfelbaum, Blume, Pizza, Wecker, then Tidy Up, Five Boxes, Road Rug, Block House, Treasure Tunnel and the others, on one frame with
 no name; after all of them Abwechseln is a category of its own, named on its frame (`GameMode.kind`): its two children
 with the toy, the lamps and the hourglass, then the Wippe, and that they run on without end is said in their tooltip (`SWAP_NOTE`). Where there is
 room, its frame stands beside the pictures' rather than in a row of its own below (`packGroups`' `reserve`), so all
@@ -150,6 +150,20 @@ taken out (user request, November 2026). The pictures:
   look is a genre of our own** (user request with H-125): blocks, a cursor, a meadow of squares – never another
   game's name, figures, textures or a picture that copies one game (no Minecraft, no Steve, no creeper); the ideas for
   more of them (H-126 to H-133) say the same.
+- „Treasure Tunnel“ ⛏️ (`tunnel.tsx`, H-126, 22 November 2026, the second block world): a hill of blocks cut open from
+  the side, as 2D block games show their worlds (`HILL`: grass on top, a block of dirt, then stone, a little darker than
+  the blocks to dig), a meadow before it. At its foot the tunnel's way is still blocks (`TUNNEL`, ten columns two high,
+  `spotKind`: dirt under the grass, else stone, two with gold), and after it a little room (`ROOM`) with the treasure
+  chest, lit through a crack from above – the goal, seen from the start. A pickaxe (`PICK`, a layer of its own) swings at
+  the next block once a second from the hand on its handle, a frame round that block as a block game marks it; the
+  block cracks a stage at each quarter of its share (`CRACKS`, three opacity steps repeating every `--tm-unit`) and
+  crumbles away into square crumbs as its share ends (`CRUMBLE_MS`, the Block House's crumbs). Column by column from
+  the entrance, the top block first (`SPOTS`); the pickaxe and the frame jump on together (`toolFrames`, keyframes
+  written for the run). The last block goes as the time is up, then the chest's lid turns open on its hinge at the back
+  over the gold, with a warm light round it. Five minutes dig all twenty blocks; a shorter run starts with the tunnel's
+  first part dug (`digCount`, at least `MIN_DIG`). A block going cracks, a tap gives the pickaxe's bright tink and
+  lights the blocks still standing. Its name and lines (`tunnelNames.ts`) were written English first and translated
+  into every app language at once.
 - „Abwechseln“ 🔁 (H-52): two children take turns with a toy. The time set is one turn. Its hourglass is the
   Sanduhr's own (`Hourglass` in `scenes.tsx`, user request, November 2026: one drawing, never a second one built
   beside it), standing between two floor cushions (`SWAP_SEATS`, the same way left and right of it): the fox child's
@@ -207,7 +221,7 @@ Files: `TimerGame.tsx` (start screen: cards, minutes and the own time's slip), `
 run: working out its length, the question when a clock time is past, the clock, the phases `running` →
 `blow` (candle only) → `done`, taps, the end, the sounds of the pieces), `pieces.ts` (how a run is cut into pieces, the
 train's halts, where the apples hang; tested), `SwapPlay.tsx` and `swap.tsx` („Abwechseln“: its turns, and its room,
-lamps, cushions and toys), `seesaw.tsx` (the Wippe's playground, plank, stand and chick), `apples.tsx`, `caterpillar.tsx`, `clock.tsx`, `disc.tsx`, `flower.tsx`, `sunset.tsx`, `pizza.tsx`, `tidy.tsx`, `boxes.tsx`, `road.tsx`, `blocks.tsx` (one picture each; `tidyNames.ts`, `boxesNames.ts`, `roadNames.ts` and `blocksNames.ts` their texts), `hop.tsx` (a toy hopping
+lamps, cushions and toys), `seesaw.tsx` (the Wippe's playground, plank, stand and chick), `apples.tsx`, `caterpillar.tsx`, `clock.tsx`, `disc.tsx`, `flower.tsx`, `sunset.tsx`, `pizza.tsx`, `tidy.tsx`, `boxes.tsx`, `road.tsx`, `blocks.tsx`, `tunnel.tsx` (one picture each; `tidyNames.ts`, `boxesNames.ts`, `roadNames.ts`, `blocksNames.ts` and `tunnelNames.ts` their texts), `hop.tsx` (a toy hopping
 into its box, shared), `keyframes.ts` (keyframes written for a run), `shown.tsx`
 („Zeit im Bild“: its choice, the note with digits or tally marks), `scenes.tsx` (the other drawings
 and the shared `Layer`, `Draw`, `LeftGlow`), `timer.css`, `content.ts`
@@ -288,7 +302,7 @@ and the shared `Layer`, `Draw`, `LeftGlow`), `timer.css`, `content.ts`
 - **One drawing for one thing**: a thing two pictures show (the hourglass) is one component both use, never copied and
   drawn again with its own sizes (user request, November 2026; `timer.test.ts` checks the hourglass).
 - **The cards' order is the user's** (November 2026: Rote Scheibe, Sanduhr, Kerze, Apfelbaum, Blume, Pizza, then the
-  Wecker, then Tidy Up, Five Boxes, Road Rug and Block House; Abwechseln last): keep it when adding a picture (a new one goes after these, before Abwechseln, unless the
+  Wecker, then Tidy Up, Five Boxes, Road Rug, Block House and Treasure Tunnel; Abwechseln last): keep it when adding a picture (a new one goes after these, before Abwechseln, unless the
   user says otherwise), and add it to the perf scenarios' list in `tools/perfScenarios.ts`, which taps each card by its
   name (`timer.test.ts` checks the order). Abwechseln is another thing to do than the pictures that run until the time
   is up – taking turns without end – so it stands in a group of its own after them (`GameMode.kind`, user request,

@@ -20,6 +20,7 @@ import {
   playEngine,
   playHonk,
   playHop,
+  playCrack,
   playKnock,
   playLeaves,
   playMelody,
@@ -39,6 +40,7 @@ import { AppleScene } from "./apples";
 import { BlocksScene, blockCount, blocksPlan } from "./blocks";
 import { BoxesScene, boxesPlan, perBox } from "./boxes";
 import { RoadScene, roadPlan, roadToyCount } from "./road";
+import { TunnelScene, digCount, tunnelPlan } from "./tunnel";
 import { FINAL_NOTES, FinalLight, finalMs, TimeBar, TimeBarChoice } from "./bar";
 import { CaterpillarScene } from "./caterpillar";
 import { ClockScene } from "./clock";
@@ -352,6 +354,11 @@ function TimerRun({
       return blocksPlan(total, blockCount(set))
         .blocks.slice(0, -1)
         .map((b) => b.hop.land);
+    // The treasure tunnel (H-126): each block crumbling away, the last one being the end's.
+    if (picture === "tunnel")
+      return tunnelPlan(total, digCount(set))
+        .blocks.slice(0, -1)
+        .map((b) => b.gone);
     // The ladybug leaves a dot as it is back at the top (H-67).
     if (picture === "disc") return pieceMoments(total, ladybugLaps(set).dots);
     return [];
@@ -400,6 +407,7 @@ function TimerRun({
           else if (picture === "boxes") (boxMoments(total, perBox(set))[nextMoment.current - 1]?.lid ? playKnock : playClonk)();
           else if (picture === "road") (roadMoments(total, roadToyCount(set))[nextMoment.current - 1]?.honk ? playHonk : playClonk)();
           else if (picture === "blocks") playKnock(520);
+          else if (picture === "tunnel") playCrack();
           else if (picture === "disc") playPlink(nextMoment.current);
           else playDing();
         }
@@ -452,6 +460,7 @@ function TimerRun({
       else if (picture === "boxes") playKnock();
       else if (picture === "road") playHonk();
       else if (picture === "blocks") playChime();
+      else if (picture === "tunnel") playTwinkle();
       say(lines.end, true);
       // The time is up, plain to see and hear (user feedback, November 2026): children cheer, the picture
       // lights up warmly, then the friendly tune – and the trophy with the end's buttons, nothing rising (user decision).
@@ -493,6 +502,8 @@ function TimerRun({
       else if (picture === "road") playEngine();
       // The blocks still in the jumble give a soft knock.
       else if (picture === "blocks") playKnock(880);
+      // The pickaxe gives a bright tink on the stone.
+      else if (picture === "tunnel") playKnock(1200);
       else playChimeNote(Math.floor(Math.random() * 8));
     },
     [phase, picture, ripple, glow, endsAt, total, apples],
@@ -617,6 +628,7 @@ export function SceneParts({
       {picture === "boxes" && <BoxesScene count={perBox(set)} total={total} glow={poke} />}
       {picture === "road" && <RoadScene count={roadToyCount(set)} total={total} glow={poke} />}
       {picture === "blocks" && <BlocksScene count={blockCount(set)} total={total} glow={poke} />}
+      {picture === "tunnel" && <TunnelScene count={digCount(set)} total={total} glow={poke} />}
       {picture === "clock" && <ClockScene glow={poke} endsAt={startedAt + total} total={total} running={phase === "running"} still={still} />}
       {picture === "flower" && <FlowerScene glow={poke} total={total} />}
       {picture === "sunset" && <SunsetScene glow={poke} />}
