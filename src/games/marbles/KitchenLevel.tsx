@@ -2,22 +2,34 @@ import { memo, useId, useMemo } from "react";
 import { wobble, VIEW_H, type LevelProps } from "./level";
 import {
   BOARD,
+  BOTTLE,
+  BREADBOX,
   BREAKFAST,
   buildKitchen,
   BUNNY,
+  COFFEE,
   COOKTOP,
+  CORK,
   COUNTER,
   CRANK,
+  CUP,
   DIAL_MAX,
+  DRIP_Y,
+  EGG,
+  EGG_CUP,
   FLOOR,
+  HONEY,
+  HONEY_MOUTH_X,
   HOPPER,
   JAR,
+  JELLY,
   KETTLE,
   type Kitchen,
   KNOB_X,
   LADLE,
   LEVER,
   MEATBALL,
+  MILL,
   MUG,
   mugTop,
   PAN,
@@ -34,9 +46,11 @@ import {
   SPINNER,
   SPOON,
   spoonY,
+  SPOUT_Y,
   TOAST,
   TIMER,
   TOASTER,
+  TRAY,
   WEDGE,
   WORLD_W,
 } from "./kitchen";
@@ -53,15 +67,19 @@ const POPCORN = "#fff4cf";
 
 /**
  * Level 5: the crazy kitchen. One tap lets the marble out of the spice jar,
- * and then one thing sets off the next for about forty seconds: the wooden
+ * and then one thing sets off the next for about a minute: the wooden
  * spoon, the paper towel roll, the rolling pin down the cutting board, the
  * swinging ladle that throws a meatball, a plate rolling along the counter
  * into the salad spinner's crank, the whirling spinner popping its lid and
  * flinging lettuce, a leaf winding up the egg timer, which ticks, rings and
  * rattles off the cookie jar onto the pancake pan's handle, the pancake's
- * double somersault onto the cooktop, popcorn popping into a mug that pulls
- * down the toaster lever, and the toast flying onto the bunny's plate. The
- * camera travels along with whatever moves.
+ * double somersault onto the wobbling jelly, which tips the pepper mill
+ * against the coffee machine's button, the machine grinding, pouring and
+ * puffing the cork out of the apple fizz onto the egg, the egg wobbling down
+ * the baking tray into the honey jar, the honey oozing onto the cooktop's
+ * touch field, popcorn popping into a mug that pulls down the toaster lever,
+ * and the toast flying onto the bunny's plate. The camera travels along with
+ * whatever moves.
  */
 export function KitchenLevel(props: LevelProps) {
   const kitchen = useMemo(buildKitchen, []);
@@ -120,7 +138,16 @@ function MovingThings({ kitchen, t }: { kitchen: Kitchen; t: number }) {
       <RollingPin at={pin.pt} turned={pin.turned} />
       <Plate at={plate.pt} turned={plate.turned} tilt={plate.tilt} flat={plate.flat} />
       <SaladSpinner kitchen={kitchen} t={t} />
+      <Jelly kitchen={kitchen} t={t} />
       <PancakePan kitchen={kitchen} t={t} />
+      <CoffeeMachine kitchen={kitchen} t={t} />
+      <PepperMill kitchen={kitchen} t={t} />
+      <BreadBox />
+      <Egg kitchen={kitchen} t={t} />
+      <EggCup />
+      <Cork kitchen={kitchen} t={t} />
+      <Honey kitchen={kitchen} t={t} />
+      <HoneyJar kitchen={kitchen} t={t} />
       <EggTimer kitchen={kitchen} t={t} />
       <Leaves kitchen={kitchen} t={t} />
       <Kernels kitchen={kitchen} t={t} />
@@ -147,6 +174,7 @@ function Room({ tiles }: { tiles: string }) {
       <WallClock x={2420} y={150} />
       <Window x={3420} />
       <Window x={4560} />
+      <Window x={6300} />
       <SpiceRack />
       <Bunting x0={BREAKFAST.cx - 140} x1={WORLD_W + 20} y={30} />
       {/* Worktop and the cupboards under it */}
@@ -817,6 +845,289 @@ function PancakePan({ kitchen, t }: { kitchen: Kitchen; t: number }) {
           strokeLinejoin="round"
         />
         <path d={`M${left + 24} ${-rimH + 14} Q${mid} ${-rimH + 20} ${-24} ${-rimH + 14}`} fill="none" stroke="#8d93a8" strokeWidth="4" strokeLinecap="round" />
+      </g>
+    </g>
+  );
+}
+
+/* ---------- Jelly, pepper mill, coffee machine ---------- */
+
+/** The raspberry jelly on its plate: it sways and squashes under the pancake, sheared over its foot. */
+function Jelly({ kitchen, t }: { kitchen: Kitchen; t: number }) {
+  const { sway, squash } = kitchen.jellyAt(t);
+  const { cx, h, foot, top, plate, plateH } = JELLY;
+  const skew = -deg(Math.atan(sway / (h * squash)));
+  const shape = `M${-foot / 2} 0 L${-top / 2} ${-h + 16} Q${-top / 2} ${-h} ${-top / 2 + 16} ${-h} L${top / 2 - 16} ${-h} Q${top / 2} ${-h} ${top / 2} ${-h + 16} L${foot / 2} 0 Z`;
+  return (
+    <g>
+      <ellipse cx={cx} cy={COUNTER - plateH / 2} rx={plate / 2} ry={plateH / 2 + 3} fill="#fff" stroke={INK} strokeWidth="3" />
+      <g transform={`translate(${cx} ${COUNTER - plateH}) skewX(${skew}) scale(1 ${squash})`}>
+        <path d={shape} fill="#ff4d6d" stroke={INK} strokeWidth="4" strokeLinejoin="round" />
+        {[-1, 0, 1].map((k) => (
+          <path key={k} d={`M${(k * foot) / 3} -4 L${(k * top) / 3} ${-h + 8}`} stroke="#d62850" strokeWidth="5" strokeLinecap="round" />
+        ))}
+        <path d={`M${-foot / 2 + 16} -14 L${-top / 2 + 10} ${-h + 22}`} stroke="#fff" strokeWidth="6" strokeLinecap="round" opacity="0.75" />
+      </g>
+    </g>
+  );
+}
+
+/** The wooden pepper mill: it rocks and falls over its bottom right corner. */
+function PepperMill({ kitchen, t }: { kitchen: Kitchen; t: number }) {
+  const { x0, w, h } = MILL;
+  return (
+    <g transform={`translate(${x0 + w} ${COUNTER}) rotate(${kitchen.millTilt(t)})`}>
+      <rect x={-w + 9} y={-h + 50} width={w - 18} height={h - 110} fill={MID_WOOD} stroke={INK} strokeWidth="3.5" />
+      <rect x={-w} y="-64" width={w} height="64" rx="6" fill={DARK_WOOD} stroke={INK} strokeWidth="3.5" />
+      <rect x={-w} y={-h} width={w} height="54" rx="6" fill={DARK_WOOD} stroke={INK} strokeWidth="3.5" />
+      <rect x={-w} y="-58" width={w} height="8" fill="#ffd23f" stroke={INK} strokeWidth="2.5" />
+      <rect x={-w} y={-h + 44} width={w} height="8" fill="#ffd23f" stroke={INK} strokeWidth="2.5" />
+      <circle cx={-w / 2} cy={-h - 8} r="10" fill={DARK_WOOD} stroke={INK} strokeWidth="3" />
+      <path d={`M${-w + 12} -76 L${-w + 12} ${-h + 64}`} stroke="#fff" strokeWidth="5" strokeLinecap="round" opacity="0.5" />
+    </g>
+  );
+}
+
+/** The coffee machine's body, which stays as it is: hopper, front, spout and drip tray. */
+const CoffeeBody = memo(function CoffeeBody() {
+  const { x0, w, top } = COFFEE;
+  const x1 = x0 + w;
+  return (
+    <g>
+      {/* The bean hopper on top */}
+      <path
+        d={`M${x0 + 22} ${top} L${x0 + 30} ${top - 46} L${x0 + 96} ${top - 46} L${x0 + 104} ${top} Z`}
+        fill="#e8f6ffcc"
+        stroke={INK}
+        strokeWidth="3"
+        strokeLinejoin="round"
+      />
+      {[
+        [40, -12],
+        [58, -10],
+        [76, -13],
+        [92, -9],
+        [48, -26],
+        [68, -28],
+        [86, -24],
+      ].map(([dx, dy]) => (
+        <ellipse key={`${dx}${dy}`} cx={x0 + dx} cy={top + dy} rx="7" ry="5" fill="#6b4423" stroke={INK} strokeWidth="1.5" />
+      ))}
+      <rect x={x0 + 24} y={top - 54} width="78" height="10" rx="4" fill="#4a4e69" stroke={INK} strokeWidth="2.5" />
+      <rect x={x0} y={top} width={w} height={COUNTER - top} rx="18" fill="#9b5de5" stroke={INK} strokeWidth="4" />
+      {/* The recess the cup stands in */}
+      <rect x={CUP.cx - 62} y={SPOUT_Y - 30} width="124" height={DRIP_Y - SPOUT_Y + 30} rx="12" fill="#3d405b" stroke={INK} strokeWidth="3" />
+      <rect x={CUP.cx - 34} y={SPOUT_Y - 30} width="68" height="20" rx="6" fill={STEEL} stroke={INK} strokeWidth="2.5" />
+      <rect x={CUP.cx - 7} y={SPOUT_Y - 12} width="14" height="12" rx="3" fill={STEEL} stroke={INK} strokeWidth="2.5" />
+      <rect x={CUP.cx - 70} y={DRIP_Y} width="140" height={COUNTER - DRIP_Y} rx="4" fill={STEEL} stroke={INK} strokeWidth="3" />
+      {/* The vent under the bottle */}
+      {[-14, 0, 14].map((dx) => (
+        <line key={dx} x1={BOTTLE.cx + dx} y1={top + 8} x2={BOTTLE.cx + dx} y2={top + 22} stroke="#5a2d91" strokeWidth="4" strokeLinecap="round" />
+      ))}
+      <path d={`M${x1 - 18} ${top + 40} L${x1 - 18} ${top + 100}`} stroke="#fff" strokeWidth="7" strokeLinecap="round" opacity="0.5" />
+    </g>
+  );
+});
+
+/** The coffee machine: it shakes while it grinds, pours into the cup and puffs steam; the leaning mill pushes its button in. */
+function CoffeeMachine({ kitchen, t }: { kitchen: Kitchen; t: number }) {
+  const { x0, w, top, button, buttonY, buttonR } = COFFEE;
+  const out = button - kitchen.buttonIn(t);
+  const full = kitchen.cupFull(t);
+  const brewing = t >= kitchen.tPress && t < kitchen.tBrewed;
+  const level = DRIP_Y - 8 - (CUP.h - 16) * full;
+  const puff = t - kitchen.tBrewed;
+  return (
+    <g>
+      <g transform={`translate(${kitchen.coffeeShake(t)} 0)`}>
+        <rect x={x0 - out} y={buttonY - buttonR} width={out + 6} height={2 * buttonR} rx="6" fill="#ff3b3b" stroke={INK} strokeWidth="3" />
+        <CoffeeBody />
+        <circle cx={x0 + w - 40} cy={top + 46} r="11" fill={brewing ? "#7ed957" : "#2b2d42"} stroke={INK} strokeWidth="3" />
+        <Bottle kitchen={kitchen} t={t} />
+      </g>
+      {kitchen.pouring(t) && <rect x={CUP.cx - 3} y={SPOUT_Y} width="6" height={level - SPOUT_Y} rx="3" fill="#6b3a1e" />}
+      {/* The cup on the drip tray, filling up */}
+      <path d={`M${CUP.cx + CUP.w / 2 - 4} ${DRIP_Y - CUP.h + 12} q26 2 22 18 q-4 14 -24 10`} fill="none" stroke={INK} strokeWidth="9" strokeLinecap="round" />
+      <path d={`M${CUP.cx + CUP.w / 2 - 4} ${DRIP_Y - CUP.h + 12} q26 2 22 18 q-4 14 -24 10`} fill="none" stroke="#fff" strokeWidth="4" strokeLinecap="round" />
+      <path
+        d={`M${CUP.cx - CUP.w / 2} ${DRIP_Y - CUP.h} L${CUP.cx + CUP.w / 2} ${DRIP_Y - CUP.h} L${CUP.cx + CUP.w / 2 - 6} ${DRIP_Y - 4} Q${CUP.cx + CUP.w / 2 - 8} ${DRIP_Y} ${CUP.cx + CUP.w / 2 - 14} ${DRIP_Y} L${CUP.cx - CUP.w / 2 + 14} ${DRIP_Y} Q${CUP.cx - CUP.w / 2 + 8} ${DRIP_Y} ${CUP.cx - CUP.w / 2 + 6} ${DRIP_Y - 4} Z`}
+        fill="#fff"
+        stroke={INK}
+        strokeWidth="3.5"
+        strokeLinejoin="round"
+      />
+      {full > 0 && <rect x={CUP.cx - CUP.w / 2 + 8} y={level} width={CUP.w - 16} height={DRIP_Y - 8 - level} rx="3" fill="#6b3a1e" />}
+      <path d={`M${CUP.cx - 18} ${DRIP_Y - 30} L${CUP.cx + 18} ${DRIP_Y - 30}`} stroke="#ff5d73" strokeWidth="5" strokeLinecap="round" />
+      {/* The puff of steam round the bottle's foot when the coffee is ready */}
+      {puff > 0 &&
+        puff < 1.2 &&
+        [-1, 1].map((side) => (
+          <circle
+            key={side}
+            cx={BOTTLE.cx + side * (26 + 30 * puff)}
+            cy={top - 8 - 40 * puff}
+            r={10 + 22 * puff}
+            fill="#f4f5fb"
+            stroke="#b9bdd6"
+            strokeWidth="3"
+            opacity={0.9 * (1 - puff / 1.2)}
+          />
+        ))}
+    </g>
+  );
+}
+
+/** The bottle of apple fizz on the machine: bubbles rise as it is shaken, and it hops at the puff of steam. */
+function Bottle({ kitchen, t }: { kitchen: Kitchen; t: number }) {
+  const { cx, w, h } = BOTTLE;
+  const top = COFFEE.top;
+  const fizz = kitchen.fizz(t);
+  const bubbles = Math.round(fizz * 9);
+  const body = top - h + 44;
+  return (
+    <g transform={`translate(0 ${-kitchen.bottleHop(t)})`}>
+      <path
+        d={`M${cx - w / 2} ${top - 4} L${cx - w / 2} ${body + 10} Q${cx - w / 2} ${body - 8} ${cx - 13} ${body - 22} L${cx - 13} ${top - h} L${cx + 13} ${top - h} L${cx + 13} ${body - 22} Q${cx + w / 2} ${body - 8} ${cx + w / 2} ${body + 10} L${cx + w / 2} ${top - 4} Q${cx + w / 2} ${top} ${cx + w / 2 - 6} ${top} L${cx - w / 2 + 6} ${top} Q${cx - w / 2} ${top} ${cx - w / 2} ${top - 4} Z`}
+        fill="#ffe066"
+        stroke={INK}
+        strokeWidth="3.5"
+        strokeLinejoin="round"
+      />
+      {Array.from({ length: bubbles }, (_, i) => {
+        const rise = (t * 70 + i * 23) % (h - 40);
+        return <circle key={i} cx={cx + ((i * 7) % 3) * 9 - 9} cy={top - 8 - rise} r={2.5 + (i % 3)} fill="#fff" opacity="0.85" />;
+      })}
+      {/* The label: an apple, no words */}
+      <rect x={cx - w / 2} y={body + 18} width={w} height="38" fill="#fff8e7" stroke={INK} strokeWidth="2.5" />
+      <circle cx={cx} cy={body + 39} r="11" fill="#ff3b3b" stroke={INK} strokeWidth="2" />
+      <path d={`M${cx} ${body + 28} q4 -6 9 -4 q-3 6 -9 4`} fill="#3ec300" stroke={INK} strokeWidth="1.5" />
+      <path
+        d={`M${cx - w / 2 + 8} ${body + 4} L${cx - w / 2 + 8} ${body + 14} M${cx - w / 2 + 8} ${top - 30} L${cx - w / 2 + 8} ${top - 12}`}
+        stroke="#fff"
+        strokeWidth="5"
+        strokeLinecap="round"
+        opacity="0.7"
+      />
+    </g>
+  );
+}
+
+/** The cork: in the neck, then flying in somersaults, then lying on the bread box. */
+function Cork({ kitchen, t }: { kitchen: Kitchen; t: number }) {
+  const { pt, angle } = kitchen.corkAt(t);
+  const { w, h } = CORK;
+  return (
+    <g transform={`translate(${pt.x} ${pt.y}) rotate(${angle})`}>
+      <path
+        d={`M${-w / 2} ${-h / 2} L${w / 2} ${-h / 2} L${w / 2 - 3} ${h / 2} L${-w / 2 + 3} ${h / 2} Z`}
+        fill="#d9a35b"
+        stroke={INK}
+        strokeWidth="3"
+        strokeLinejoin="round"
+      />
+      <circle cx="-4" cy="-4" r="2" fill="#a86f2f" />
+      <circle cx="4" cy="5" r="2" fill="#a86f2f" />
+    </g>
+  );
+}
+
+/* ---------- Bread box, egg, honey ---------- */
+
+/** The bread box with its roll-top front, and the baking tray leaning against it. */
+const BreadBox = memo(function BreadBox() {
+  const { x0, x1, top } = BREADBOX;
+  const { from, to, h } = TRAY;
+  const len = Math.hypot(to.x - from.x, to.y - from.y);
+  const n = { x: (-(to.y - from.y) * h) / len, y: ((to.x - from.x) * h) / len };
+  return (
+    <g>
+      <rect x={x0} y={top} width={x1 - x0} height={COUNTER - top} rx="16" fill={MID_WOOD} stroke={INK} strokeWidth="4" />
+      {[22, 36, 50, 64].map((dy) => (
+        <line key={dy} x1={x0 + 14} y1={top + dy} x2={x1 - 14} y2={top + dy} stroke={DARK_WOOD} strokeWidth="3" strokeLinecap="round" />
+      ))}
+      <rect x={(x0 + x1) / 2 - 24} y={top + 72} width="48" height="12" rx="6" fill="#ffd23f" stroke={INK} strokeWidth="2.5" />
+      <path
+        d={`M${from.x} ${from.y} L${to.x} ${to.y} L${to.x + n.x} ${to.y + n.y} L${from.x + n.x} ${from.y + n.y} Z`}
+        fill="#6c757d"
+        stroke={INK}
+        strokeWidth="3"
+        strokeLinejoin="round"
+      />
+      <path d={`M${from.x + 14} ${from.y + 3} L${to.x - 14} ${to.y - 1}`} stroke="#c9cfd6" strokeWidth="2.5" strokeLinecap="round" />
+    </g>
+  );
+});
+
+/** The egg cup on the bread box, drawn over the egg so the egg sits in it. */
+const EggCup = memo(function EggCup() {
+  const { cx, w, h } = EGG_CUP;
+  const y = BREADBOX.top;
+  return (
+    <g>
+      <ellipse cx={cx} cy={y - 4} rx={w / 2 - 2} ry="5" fill="#ffd23f" stroke={INK} strokeWidth="3" />
+      <rect x={cx - 6} y={y - 16} width="12" height="12" fill="#ffd23f" stroke={INK} strokeWidth="3" />
+      <path
+        d={`M${cx - w / 2} ${y - h} L${cx + w / 2} ${y - h} Q${cx + w / 2} ${y - 14} ${cx} ${y - 14} Q${cx - w / 2} ${y - 14} ${cx - w / 2} ${y - h} Z`}
+        fill="#ffd23f"
+        stroke={INK}
+        strokeWidth="3"
+        strokeLinejoin="round"
+      />
+      <circle cx={cx - 8} cy={y - h + 7} r="2.5" fill="#ff5d73" />
+      <circle cx={cx + 6} cy={y - h + 9} r="2.5" fill="#ff5d73" />
+    </g>
+  );
+});
+
+/** The egg: it tips out of its cup and rolls end over end, so it wobbles as it goes. */
+function Egg({ kitchen, t }: { kitchen: Kitchen; t: number }) {
+  const { pt, angle } = kitchen.eggAt(t);
+  const { rx, ry } = EGG;
+  const shape = `M0 ${-ry} C${rx * 0.75} ${-ry} ${rx} ${-ry * 0.2} ${rx} ${ry * 0.2} C${rx} ${ry * 0.75} ${rx * 0.55} ${ry} 0 ${ry} C${-rx * 0.55} ${ry} ${-rx} ${ry * 0.75} ${-rx} ${ry * 0.2} C${-rx} ${-ry * 0.2} ${-rx * 0.75} ${-ry} 0 ${-ry} Z`;
+  return (
+    <g transform={`translate(${pt.x} ${pt.y}) rotate(${angle})`}>
+      <path d={shape} fill="#f6dcb5" stroke={INK} strokeWidth="3.5" strokeLinejoin="round" />
+      <path d={`M${-rx + 7} -4 Q${-rx + 6} ${-ry + 12} -4 ${-ry + 6}`} fill="none" stroke="#fff" strokeWidth="4" strokeLinecap="round" opacity="0.8" />
+    </g>
+  );
+}
+
+/** The honey running out of the fallen jar along the worktop to the touch field. */
+function Honey({ kitchen, t }: { kitchen: Kitchen; t: number }) {
+  if (t < kitchen.tJarDown + 0.1) return null;
+  const mouth = HONEY_MOUTH_X;
+  const front = kitchen.honeyFront(t);
+  const lip = Math.min(1, (t - kitchen.tJarDown - 0.1) / 0.4);
+  return (
+    <path
+      d={`M${mouth - 8} ${COUNTER - 34} Q${mouth + 6 + 10 * lip} ${COUNTER - 32} ${mouth + 10 + 6 * lip} ${COUNTER - 13} L${front - 8} ${COUNTER - 13} Q${front + 6} ${COUNTER - 13} ${front + 6} ${COUNTER} L${mouth - 8} ${COUNTER} Z`}
+      fill="#f4a300"
+      stroke="#b86e00"
+      strokeWidth="3"
+      strokeLinejoin="round"
+    />
+  );
+}
+
+/** The honey jar: a glass jar full of honey with a honeycomb label; it teeters and falls over its bottom right corner. */
+function HoneyJar({ kitchen, t }: { kitchen: Kitchen; t: number }) {
+  const { x0, w, h } = HONEY;
+  const left = kitchen.honeyLeft(t);
+  const lid = kitchen.honeyLidAt(t);
+  return (
+    <g>
+      <g transform={`translate(${x0 + w} ${COUNTER}) rotate(${kitchen.jarTilt(t)})`}>
+        <rect x={-w} y={-h} width={w} height={h} rx="16" fill="#e8f6ff" stroke={INK} strokeWidth="4" />
+        <rect x={-w + 6} y={-(h - 14) * left - 6} width={w - 12} height={(h - 14) * left} rx="10" fill="#f4a300" />
+        <path d={`M${-w / 2 - 10} ${-h / 2 - 9} l10 -6 l10 6 l0 12 l-10 6 l-10 -6 Z`} fill="#ffd23f" stroke={INK} strokeWidth="2.5" strokeLinejoin="round" />
+        <path d={`M${-w + 12} ${-h + 22} L${-w + 12} -18`} stroke="#fff" strokeWidth="6" strokeLinecap="round" opacity="0.7" />
+        <rect x={-w + 6} y={-h - 4} width={w - 12} height="8" fill="#e8f6ff" stroke={INK} strokeWidth="3" />
+      </g>
+      <g transform={`translate(${lid.pt.x} ${lid.pt.y}) rotate(${lid.angle})`}>
+        <rect x={-w / 2 - 4} y={-HONEY.lid / 2} width={w + 8} height={HONEY.lid} rx="5" fill="#ff8c42" stroke={INK} strokeWidth="3" />
+        {[-24, -8, 8, 24].map((dx) => (
+          <line key={dx} x1={dx} y1={-HONEY.lid / 2 + 4} x2={dx} y2={HONEY.lid / 2 - 4} stroke="#c95f1a" strokeWidth="3" strokeLinecap="round" />
+        ))}
       </g>
     </g>
   );

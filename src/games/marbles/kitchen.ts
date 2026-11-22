@@ -1,39 +1,50 @@
 // The crazy kitchen ("Verrückte Küche"), a Rube Goldberg machine along a long
 // kitchen counter: one tap lets a marble out of the spice jar, and one thing
-// sets off the next for about forty seconds while the camera travels along:
+// sets off the next for about a minute while the camera travels along:
 // spoon, paper towel roll, rolling pin down the cutting board, the ladle that
 // throws a meatball against a plate, the plate rolling into the salad
 // spinner's crank – the spinner whirls, its lid pops off and lettuce flies,
 // one leaf slaps the egg timer on the cookie jar, which turns, ticks, rings
 // and rattles off onto the pancake pan's handle – the pancake somersaults
-// high onto the cooktop's touch field, popcorn pops into the mug on the
-// toaster lever, and the toast flies onto the bunny's plate.
+// high onto the jelly, whose wobble tips the pepper mill against the coffee
+// machine's button; the machine grinds, pours a cup and puffs steam under a
+// bottle of apple fizz, whose cork pops onto the egg in its egg cup; the egg
+// tips out, wobbles down the baking tray into the honey jar, the jar falls
+// over and its honey oozes onto the cooktop's touch field, popcorn pops into
+// the mug on the toaster lever, and the toast flies onto the bunny's plate.
 // Everything is worked out ahead as a function of the seconds since the tap,
 // so KitchenLevel.tsx only asks where each thing is at a moment. Coordinates
-// are those of the kitchen, 6800 × 900; the screen shows 1600 of it at a time.
+// are those of the kitchen, 8654 × 900; the screen shows 1600 of it at a time.
 
 import {
   playAlarm,
   playBeeps,
   playBoing,
+  playClick,
   playClonk,
+  playCreak,
   playDing,
+  playGlug,
   playHum,
   playKnock,
   playPlop,
   playPop,
+  playPuff,
+  playRattle,
   playRing,
   playRumble,
   playRustle,
+  playSlide,
   playSwirl,
   playThump,
   playTick,
+  playTrickle,
   playTwinkle,
   playWhirr,
   playWhistle,
   playWhoosh,
 } from "@/lib/sfx";
-import { wobble } from "./level";
+import { SETTLE_S, wobble } from "./level";
 import {
   along,
   beside,
@@ -57,7 +68,7 @@ import {
 } from "./machineKit";
 import { arc, BALL_R, line, quad, type Pt } from "./path";
 
-export const WORLD_W = 6800;
+export const WORLD_W = 8654;
 export const FLOOR = 800;
 /** The top of the worktop: everything on the counter stands at this height. */
 export const COUNTER = 640;
@@ -134,18 +145,62 @@ export const TIMER = { rx: 36, ry: 44, foot: 48, onHandle: 172 };
 /** How far the egg timer's dial turns when it is wound up, in degrees. */
 export const DIAL_MAX = 300;
 
-/** The cooktop set into the worktop, with its touch field at the left end. */
-export const COOKTOP = { x0: 5120, x1: 5700, touchX: 5180 };
-export const KETTLE = { cx: 5400, h: 120 };
-export const POT = { cx: 5580, w: 150, h: 84 };
+/**
+ * The raspberry jelly on its little plate, which catches the pancake: `foot` and
+ * `top` are its widths at the bottom and the top, `h` its height on the plate.
+ */
+export const JELLY = { cx: 5260, h: 96, foot: 120, top: 90, plate: 140, plateH: 8 };
+export const JELLY_TOP = COUNTER - JELLY.plateH - JELLY.h;
+/** How far the jelly's top sways to either side while it wobbles, and how long one sway there and back takes. */
+export const SWAY = { amp: 30, period: 0.62 };
+
+/** The tall pepper mill beside the jelly, just where the jelly's top reaches as it sways; it tips over its bottom right corner. */
+export const MILL = { x0: JELLY.cx + JELLY.top / 2 + SWAY.amp, w: 54, h: 210 };
+/** How far the mill leans, in degrees, once it lies against the coffee machine's button. */
+export const MILL_LEAN = 28;
+/** The mill's top right corner when it leans: it rests there on the button. */
+const MILL_TIP = { x: MILL.x0 + MILL.w + MILL.h * Math.sin(rad(MILL_LEAN)), y: COUNTER - MILL.h * Math.cos(rad(MILL_LEAN)) };
+
+/**
+ * The coffee machine: its button sticks out of the left side `button` far (pushed in, `pressed`) just where the
+ * leaning mill's corner comes to rest; the cup stands under the spout, the bottle of apple fizz on top.
+ */
+export const COFFEE = { x0: MILL_TIP.x + 4, w: 200, top: 380, buttonY: MILL_TIP.y, button: 12, pressed: 4, buttonR: 13 };
+export const CUP = { cx: COFFEE.x0 + 104, w: 56, h: 48 };
+/** The drip tray the cup stands on, and the spout above it. */
+export const DRIP_Y = COUNTER - 12;
+export const SPOUT_Y = 512;
+export const BOTTLE = { cx: COFFEE.x0 + COFFEE.w - 46, w: 50, h: 128 };
+export const CORK = { w: 28, h: 34, sunk: 12 };
+/** The cork's middle while it sits in the bottle's neck. */
+export const CORK0 = { x: BOTTLE.cx, y: COFFEE.top - BOTTLE.h - CORK.h / 2 + CORK.sunk };
+
+/** The bread box; an egg stands in its egg cup on the lid, near the right end. */
+export const BREADBOX = { x0: 5800, x1: 6020, top: 530 };
+export const EGG_CUP = { cx: BREADBOX.x1 - 50, w: 36, h: 30 };
+/** The egg: half its width and half its length; it sits `sunk` deep in the cup. */
+export const EGG = { rx: 22, ry: 30, sunk: 16 };
+export const EGG0 = { x: EGG_CUP.cx, y: BREADBOX.top - EGG_CUP.h + EGG.sunk - EGG.ry };
+
+/** The baking tray leans from the bread box's top right corner down onto the counter: `from` and `to` are the ends of its top, `h` thick. */
+export const TRAY = { from: { x: BREADBOX.x1, y: BREADBOX.top }, to: { x: 6330, y: COUNTER - 8 }, h: 8 };
+
+/** The honey jar the egg rolls against; once it lies on its side its mouth is at `mouthX`. */
+export const HONEY = { x0: 6680, w: 84, h: 100, lid: 16 };
+export const HONEY_MOUTH_X = HONEY.x0 + HONEY.w + HONEY.h;
+
+/** The cooktop set into the worktop, with its touch field at the left end, where the honey runs to. */
+export const COOKTOP = { x0: 6974, x1: 7554, touchX: 7034 };
+export const KETTLE = { cx: 7254, h: 120 };
+export const POT = { cx: 7434, w: 150, h: 84 };
 export const POT_RIM = COUNTER - POT.h;
 
 /** The toaster; its lever knob sticks out of the left side and goes down from `up` to `down`. */
-export const TOASTER = { x0: 5790, x1: 6010, top: 470, slotX: 5900 };
+export const TOASTER = { x0: 7644, x1: 7864, top: 470, slotX: 7754 };
 export const LEVER = { knobW: 28, up: 500, down: 576 };
 export const KNOB_X = TOASTER.x0 - LEVER.knobW;
 /** The mug hangs by its handle from the lever knob; `x` is its middle. */
-export const MUG = { x: 5718, w: 60, h: 58 };
+export const MUG = { x: 7572, w: 60, h: 58 };
 export const mugTop = (knobY: number) => knobY - 4;
 /** Popcorn in the mug that makes it heavy enough to pull the lever down. */
 export const MUG_FULL = 9;
@@ -156,8 +211,8 @@ const TOAST_UP = TOASTER.top - 30 + TOAST.h / 2;
 const TOAST_SINK = 46;
 
 /** The breakfast plate (lying flat) and the toy bunny waiting for the toast. */
-export const BREAKFAST = { cx: 6380, top: 622 };
-export const BUNNY = { x: 6570 };
+export const BREAKFAST = { cx: 8234, top: 622 };
+export const BUNNY = { x: 8424 };
 
 /* ---------- Helpers ---------- */
 
@@ -505,14 +560,13 @@ export function buildKitchen() {
     return { pt: onPan(onHandle, angle), tilt: -angle, dial: 0, ringing: false };
   };
 
-  /* The pancake: the pan tips, and it flies high with two somersaults onto the cooktop's touch field. */
+  /* The pancake: the pan tips, and it flies high with two somersaults onto the jelly. */
   // It lies in the pan's opening, so its top shows over the rim.
   const inPan = { x: PANCAKE.inPan, y: -PAN.rimH };
   const tToss = tHandle + TIP;
-  const onTouch = { x: COOKTOP.touchX, y: COUNTER - PANCAKE.h / 2 };
-  const cakeFly: Flight = { t0: tToss, t1: tToss + Math.sqrt((8 * 420) / 1500), a: onPan(inPan, PAN_DOWN), b: onTouch, h: 420 };
+  const onJelly = { x: JELLY.cx, y: JELLY_TOP - PANCAKE.h / 2 };
+  const cakeFly: Flight = { t0: tToss, t1: tToss + Math.sqrt((8 * 420) / 1500), a: onPan(inPan, PAN_DOWN), b: onJelly, h: 420 };
   const tCake = cakeFly.t1;
-  const tBeep = tCake + 0.3;
   at(tToss, { sound: () => playKnock(500) });
   at(tToss + 0.02, { sound: playWhoosh });
   at(tToss + 0.1, {
@@ -527,9 +581,20 @@ export function buildKitchen() {
     },
   });
   at(tCake, { sound: playPlop });
-  at(tBeep, { sound: playBeeps });
-  at(tBeep + 0.9, { sound: playHum });
+  at(tCake + 0.04, { sound: playBoing });
 
+  /* The jelly: it wobbles to and fro under the pancake, and each sway to the right nudges the pepper mill. */
+  /** The three moments the jelly's top reaches furthest right, against the mill: the third one tips it over. */
+  const nudges = [0, 1, 2].map((k) => tCake + SWAY.period / 4 + k * SWAY.period);
+  const tNudge = nudges[0];
+  const tTopple = nudges[2];
+  /** How far the jelly's top is pushed sideways (to the right is positive), and how much it is squashed down. */
+  const jellyAt = (t: number): { sway: number; squash: number } => {
+    if (t < tCake) return { sway: 0, squash: 1 };
+    const fade = t < tTopple ? 1 : Math.exp(-2.4 * (t - tTopple));
+    const sway = t - tTopple > SETTLE_S ? 0 : SWAY.amp * fade * Math.sin((2 * Math.PI * (t - tCake)) / SWAY.period);
+    return { sway, squash: 1 - Math.abs(wobble(t - tCake, 0.14, 16, 5)) };
+  };
   const pancakeAt = (t: number): { pt: Pt; angle: number; squash: number } => {
     if (t < tToss) {
       const angle = panAngle(t);
@@ -539,9 +604,171 @@ export function buildKitchen() {
       const k = seg(t, cakeFly.t0, cakeFly.t1);
       return { pt: hop(cakeFly.a, cakeFly.b, cakeFly.h, k), angle: lerp(-PAN_DOWN, 720, easeInOut(k)), squash: 1 };
     }
-    // Flatsch: it squashes flat and wobbles back.
-    return { pt: onTouch, angle: 0, squash: 1 - Math.abs(wobble(t - tCake, 0.45, 14, 4)) };
+    // Flatsch: it squashes flat on the jelly and rides its wobble.
+    const { sway, squash } = jellyAt(t);
+    return {
+      pt: { x: JELLY.cx + sway, y: COUNTER - JELLY.plateH - JELLY.h * squash - PANCAKE.h / 2 },
+      angle: 0,
+      squash: 1 - Math.abs(wobble(t - tCake, 0.45, 14, 4)),
+    };
   };
+
+  const ROCKS = [5, 9];
+  const FALL = 0.55;
+  const tPress = tTopple + FALL;
+  nudges.forEach((tn, k) => at(tn, { sound: () => playKnock(1000 - 120 * k) }));
+  at(tTopple + 0.08, { sound: playCreak });
+  at(tPress, { sound: playClick });
+  at(tPress + 0.04, { sound: () => playKnock(600) });
+
+  /** The pepper mill's tilt in degrees, to the right over its bottom right corner: it rocks at two nudges and falls at the third. */
+  const millTilt = (t: number) => {
+    if (t < tNudge) return 0;
+    if (t < tTopple) {
+      const k = Math.min(ROCKS.length - 1, Math.floor((t - tNudge) / SWAY.period));
+      return ROCKS[k] * Math.sin((Math.PI * (t - nudges[k])) / SWAY.period);
+    }
+    return MILL_LEAN * easeIn(seg(t, tTopple, tPress));
+  };
+  /** How far the coffee machine's button is pushed in by the mill's corner. */
+  const buttonIn = (t: number) => {
+    const a = rad(millTilt(t));
+    const corner = MILL.x0 + MILL.w + MILL.h * Math.sin(a);
+    return Math.min(COFFEE.button - COFFEE.pressed, Math.max(0, corner - (COFFEE.x0 - COFFEE.button)));
+  };
+
+  /* The coffee machine: it grinds and shakes, pours a cup, and lets off a puff of steam under the bottle of apple fizz. */
+  const GRIND = 3.2;
+  const POUR = 3.2;
+  const tGrind = tPress + 0.25;
+  const tPour = tGrind + GRIND;
+  const tBrewed = tPour + POUR;
+  at(tGrind, { sound: playWhirr });
+  at(tGrind + 1.0, { sound: playRattle });
+  at(tGrind + 2.0, { sound: playWhirr });
+  at(tPour, { sound: playTrickle });
+  at(tPour + 1.5, { sound: playTrickle });
+  at(tBrewed, { sound: playPuff });
+  /** The machine's shake while it grinds, sideways in px. */
+  const coffeeShake = (t: number) => (t > tGrind && t < tPour ? 1.6 * Math.sin(t * 90) : 0);
+  /** How full the cup is, from 0 to 1, and whether coffee runs from the spout. */
+  const cupFull = (t: number) => easeInOut(seg(t, tPour + 0.2, tBrewed));
+  const pouring = (t: number) => t >= tPour && t < tBrewed + 0.1;
+  /** How fizzy the bottle is (its bubbles), from 0 to 1, and how high it hops at the puff of steam. */
+  const fizz = (t: number) => seg(t, tGrind, tBrewed);
+  const bottleHop = (t: number) => 8 * Math.sin(Math.PI * seg(t, tBrewed, tBrewed + 0.3));
+
+  /* The cork: it creeps up out of the shaken bottle, pops at the puff and flies onto the egg. */
+  const tCork = tBrewed + 0.45;
+  const CREEP = 7;
+  const corkStart = { x: CORK0.x, y: CORK0.y - CREEP };
+  const corkHit = { x: EGG0.x - EGG.rx - CORK.h / 2 + 2, y: EGG0.y - 14 };
+  const corkRest = { x: EGG_CUP.cx - 74, y: BREADBOX.top - CORK.w / 2 };
+  const corkFly: Flight = { t0: tCork, t1: tCork + 1.0, a: corkStart, b: corkHit, h: 150 };
+  const tEggHit = corkFly.t1;
+  const BOUNCE = 0.45;
+  at(tCork, { sound: playPop });
+  at(tCork + 0.03, { sound: playWhoosh });
+  at(tCork + 0.08, {
+    say: {
+      de: "Plopp! Da fliegt der Korken!",
+      en: "Pop! There goes the cork!",
+      zh: "砰！瓶塞飞出去啦！",
+      hi: "पॉप! कॉर्क उड़ गया!",
+      es: "¡Pop! ¡Sale volando el corcho!",
+      ar: "بوب! السدادة تطير!",
+      ru: "Чпок! Пробка летит!",
+    },
+  });
+  at(tEggHit, { sound: () => playKnock(1400) });
+  at(tEggHit + BOUNCE, { sound: () => playKnock(1800) });
+
+  const corkAt = (t: number): { pt: Pt; angle: number } => {
+    if (t < tCork) {
+      const creep = CREEP * easeIn(seg(t, tPour, tCork));
+      return { pt: { x: CORK0.x + coffeeShake(t), y: CORK0.y - creep - bottleHop(t) }, angle: 0 };
+    }
+    if (t < tEggHit) return { pt: hop(corkFly.a, corkFly.b, corkFly.h, seg(t, corkFly.t0, corkFly.t1)), angle: 540 * seg(t, corkFly.t0, corkFly.t1) };
+    // It bounces back off the egg and lies down on the bread box.
+    const k = seg(t, tEggHit, tEggHit + BOUNCE);
+    return { pt: hop(corkHit, corkRest, 36, k), angle: lerp(540, 630, k) };
+  };
+
+  /* The egg: knocked, it tips out of its cup onto the baking tray and wobbles down it and along the counter into the honey jar. */
+  const TIP_OUT = 0.45;
+  const TIP_TO = 75;
+  const tEggOut = tEggHit + TIP_OUT;
+  const tTray = tEggOut + 0.35;
+  const cupRim = { x: EGG_CUP.cx + EGG_CUP.w / 2, y: BREADBOX.top - EGG_CUP.h };
+  const tippedEgg = turn(EGG0, cupRim, rad(TIP_TO));
+  const onTray = (x: number): Pt => ({ x, y: TRAY.from.y + ((x - TRAY.from.x) * (TRAY.to.y - TRAY.from.y)) / (TRAY.to.x - TRAY.from.x) });
+  const eggPath = pathOf(
+    beside(line(onTray(TRAY.from.x + 60), TRAY.to), -EGG.rx),
+    line({ x: TRAY.to.x + 10, y: COUNTER - EGG.rx }, { x: HONEY.x0 - EGG.ry, y: COUNTER - EGG.rx }),
+  );
+  const eggRun = roll(eggPath, 40, 90, 420, 1.1);
+  const tJar = tTray + eggRun.duration;
+  /** The egg's rolling radius, chosen so it comes to rest lying flat, its long side along the counter. */
+  const eggTurns = Math.max(1, Math.round(eggPath.total / (26 * Math.PI)));
+  const eggR = eggPath.total / (eggTurns * Math.PI);
+  /** How far the egg's middle rises above lying flat when it is turned by `angle` degrees (0: standing on its tip). */
+  const eggBob = (angle: number) => Math.hypot(EGG.ry * Math.cos(rad(angle)), EGG.rx * Math.sin(rad(angle))) - EGG.rx;
+  at(tEggHit + 0.1, { sound: playCreak });
+  at(tTray, { sound: () => playKnock(1500) });
+  at(tTray + 0.05, { sound: playSlide });
+  at(tJar, { sound: playThump });
+
+  const eggAt = (t: number): { pt: Pt; angle: number } => {
+    if (t < tEggHit) return { pt: EGG0, angle: 0 };
+    if (t < tEggOut) {
+      const a = TIP_TO * easeIn(seg(t, tEggHit, tEggOut));
+      return { pt: turn(EGG0, cupRim, rad(a)), angle: a };
+    }
+    if (t < tTray) {
+      const k = seg(t, tEggOut, tTray);
+      return { pt: hop(tippedEgg, eggPath.pts[0], 24, k), angle: lerp(TIP_TO, 90, k) };
+    }
+    const d = distAt(eggRun, t - tTray);
+    const angle = 90 + deg(d / eggR) + (t > tJar ? wobble(t - tJar, 8, 14, 4) : 0);
+    const pt = along(eggPath, d).pt;
+    return { pt: { x: pt.x, y: pt.y - eggBob(angle) }, angle };
+  };
+
+  /* The honey jar: bumped, it teeters, tips onto its side, its lid pops off and the honey oozes slowly to the touch field. */
+  const TEETER = 0.5;
+  const tJarDown = tJar + TEETER + 0.55;
+  const tOoze = tJarDown + 0.3;
+  const OOZE = 4.0;
+  const tBeep = tOoze + OOZE;
+  const lidRest = { x: HONEY.x0 - 120, y: COUNTER - HONEY.lid / 2 };
+  const LID_FLY = 0.65;
+  at(tJar + TEETER, { sound: playCreak });
+  at(tJarDown, { sound: playClonk });
+  at(tJarDown + 0.05, { sound: () => playKnock(1300) });
+  at(tJarDown + LID_FLY, { sound: () => playKnock(800) });
+  at(tOoze, { sound: playGlug });
+  at(tOoze + 1.8, { sound: playGlug });
+  at(tBeep, { sound: playBeeps });
+  at(tBeep + 0.9, { sound: playHum });
+
+  const jarPivot = { x: HONEY.x0 + HONEY.w, y: COUNTER };
+  /** The honey jar's tilt in degrees, to the right over its bottom right corner. */
+  const jarTilt = (t: number) => {
+    if (t < tJar) return 0;
+    if (t < tJar + TEETER) return 12 * Math.sin(Math.PI * seg(t, tJar, tJar + TEETER));
+    if (t < tJarDown) return 90 * easeIn(seg(t, tJar + TEETER, tJarDown));
+    return 90 - Math.abs(wobble(t - tJarDown, 4, 18, 6));
+  };
+  /** The jar's lid: on the jar until it lands, then it pops off backwards over the jar and lies down on the counter. */
+  const honeyLidAt = (t: number): { pt: Pt; angle: number } => {
+    const onJar = (a: number) => turn({ x: HONEY.x0 + HONEY.w / 2, y: COUNTER - HONEY.h - HONEY.lid / 2 }, jarPivot, rad(a));
+    if (t < tJarDown) return { pt: onJar(jarTilt(t)), angle: jarTilt(t) };
+    const k = seg(t, tJarDown, tJarDown + LID_FLY);
+    return { pt: hop(onJar(90), lidRest, 130, k), angle: lerp(90, 360, k) };
+  };
+  /** How far right the honey has run out of the jar's mouth, and how much is left in the jar (1 full). */
+  const honeyFront = (t: number) => lerp(HONEY_MOUTH_X, COOKTOP.touchX, easeInOut(seg(t, tOoze, tBeep)));
+  const honeyLeft = (t: number) => 1 - 0.35 * seg(t, tJarDown, tBeep);
 
   /** How hot the cooktop is, from 0 to 1. */
   const heat = (t: number) => easeOut(seg(t, tBeep + 0.2, tBeep + 1.6));
@@ -630,6 +857,10 @@ export function buildKitchen() {
     if (t < tLeafHit) return SPINNER.cx + 80;
     if (t < tToss) return TIMER0.x - 250;
     if (t < tCake) return Math.max(TIMER0.x - 250, pancakeAt(t).pt.x);
+    if (t < tGrind) return JELLY.cx + 100;
+    if (t < tCork) return COFFEE.x0 + 120;
+    if (t < tJar) return Math.max(COFFEE.x0 + 120, corkAt(t).pt.x, eggAt(t).pt.x);
+    if (t < tBeep) return HONEY.x0 + 120;
     if (t < tLever) return POT.cx;
     return BREAKFAST.cx - 230;
   };
@@ -663,6 +894,19 @@ export function buildKitchen() {
     tHandle,
     tToss,
     tCake,
+    nudges,
+    tTopple,
+    tPress,
+    tGrind,
+    tPour,
+    tBrewed,
+    tCork,
+    tEggHit,
+    tEggOut,
+    tTray,
+    tJar,
+    tJarDown,
+    tOoze,
     tBeep,
     tLever,
     tPop,
@@ -684,6 +928,20 @@ export function buildKitchen() {
     timerAt,
     panAngle,
     pancakeAt,
+    jellyAt,
+    millTilt,
+    buttonIn,
+    coffeeShake,
+    cupFull,
+    pouring,
+    fizz,
+    bottleHop,
+    corkAt,
+    eggAt,
+    jarTilt,
+    honeyLidAt,
+    honeyFront,
+    honeyLeft,
     heat,
     popped,
     heapY,

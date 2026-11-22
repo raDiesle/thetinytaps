@@ -10,29 +10,39 @@ import {
   CABLE,
   CAR,
   CROSSING_X,
+  CRADLE,
+  CRADLE_TOP,
+  cradleX,
   CUPS,
-  DOMINO,
-  dominoLeft,
+  DRAWER,
   FLOOR,
   FUNNEL,
   GATE,
   GIFT,
+  HOOP,
   HOPPER,
   JUMP,
+  JUMPER,
+  KEY_Y,
+  KNOB_TOP,
   KREISEL,
   LOOP,
+  PENGUIN,
+  penguinParts,
   PULLEYS,
   RAMP,
   rampY,
+  REGISTER,
   SEESAW,
   STAIRS,
   TABLE,
   TRAIN,
   TRAIN_STOP,
+  WHEEL,
   WORLD_W,
   type Machine,
 } from "./machine";
-import { beside, deg, seg } from "./machineKit";
+import { beside, deg, rad, seg } from "./machineKit";
 import { MachineStage } from "./MachineStage";
 import { DARK_WOOD, Hopper, INK, MARBLE_COLOR, Picture, WallClock, Window, WOOD } from "./scenery";
 import { BALL_R, type Pt } from "./path";
@@ -40,13 +50,16 @@ import { BAR_COLORS, Ball, Rail } from "./parts";
 
 /**
  * Level 3: the big machine. One tap lets the marble go, and then one thing
- * sets off the next for about 42 seconds: xylophone, bell, funnel, ten
- * dominoes, a toy car through a loop onto a seesaw that flings a ball down the
- * stairs into a bucket, which pulls up a gate for the train. The train bumps a
- * humming top, which wanders across the floor into a tower of stacking cups;
- * the cups tumble down plinking their notes, and the top one flicks off a
- * paper plane, which loops the loop and glides onto the button for the
- * jack-in-the-box. The camera travels along with whatever moves.
+ * sets off the next for about a minute: xylophone, bell, funnel, a Newton's
+ * cradle tapping a roly-poly penguin into a toy car, the car through a loop
+ * onto a seesaw that flings a ball down the stairs into a bucket, which pulls
+ * up a gate for the train. The train bumps a humming top, which wanders across
+ * the floor into a tower of stacking cups; the cups tumble down plinking their
+ * notes, and the top one flicks off a paper plane, which loops the loop and
+ * glides onto the key of a toy cash register. The drawer sends a hula hoop
+ * rolling into a toy Ferris wheel, which lifts a little parachutist to the top;
+ * he floats down onto the button for the jack-in-the-box. The camera travels
+ * along with whatever moves.
  */
 export function MachineLevel(props: LevelProps) {
   const machine = useMemo(buildMachine, []);
@@ -60,9 +73,8 @@ export function MachineLevel(props: LevelProps) {
           <Table />
           <XylophoneRamp machine={machine} t={t} />
           <FunnelBack />
-          {Array.from({ length: DOMINO.n }, (_, i) => (
-            <Domino key={i} i={i} angle={machine.dominoAngle(i, t)} />
-          ))}
+          <CradleFrame />
+          <Penguin tilt={machine.penguinTilt(t)} />
           <CarTrack machine={machine} />
           <Seesaw tilt={machine.tiltAt(t)} />
           <Stairs />
@@ -70,12 +82,15 @@ export function MachineLevel(props: LevelProps) {
           <BucketBack drop={machine.bucketDrop(t)} />
           <Rails />
           <Crossing machine={machine} t={t} />
+          <Register machine={machine} t={t} />
+          <WheelStand />
           <ButtonBox machine={machine} t={t} />
           <Jack age={t - machine.tPop} />
           <GiftBox age={t - machine.tPop} />
 
           <MovingThings machine={machine} t={t} />
 
+          <CradleBalls machine={machine} t={t} />
           <Hopper x={HOPPER.x} y={HOPPER.y} />
           <Bell age={t - machine.tBell} />
           <FunnelFront />
@@ -107,6 +122,8 @@ function MovingThings({ machine, t }: { machine: Machine; t: number }) {
       <Kreisel {...machine.kreiselAt(t)} />
       <PlaneTrail machine={machine} t={t} />
       <PaperPlane {...machine.planeAt(t)} />
+      <FerrisWheel machine={machine} t={t} />
+      <Hoop {...machine.hoopAt(t)} />
     </g>
   );
 }
@@ -115,7 +132,8 @@ function MovingThings({ machine, t }: { machine: Machine; t: number }) {
 
 /** The wall, the floor and what hangs on the wall: never changes, so it is drawn once. */
 const Room = memo(function Room({ stripes }: { stripes: string }) {
-  const bunting = GIFT.x - 400;
+  const bunting = GIFT.x - 220;
+  const flags = 11;
   return (
     <g>
       <defs>
@@ -134,7 +152,10 @@ const Room = memo(function Room({ stripes }: { stripes: string }) {
       <Picture x={6600} y={110} />
       <Window x={7720} />
       <WallClock x={8330} y={200} />
-      {Array.from({ length: 13 }, (_, i) => {
+      <Picture x={9420} y={110} />
+      <Window x={10150} />
+      <WallClock x={10880} y={220} />
+      {Array.from({ length: flags }, (_, i) => {
         const x = bunting + i * 64;
         return (
           <path
@@ -147,7 +168,7 @@ const Room = memo(function Room({ stripes }: { stripes: string }) {
           />
         );
       })}
-      <path d={`M${bunting - 20} 36 Q${bunting + 420} 60 ${bunting + 860} 36`} stroke={INK} strokeWidth="4" fill="none" />
+      <path d={`M${bunting - 20} 36 Q${bunting + (flags * 64) / 2} 60 ${bunting + flags * 64 + 20} 36`} stroke={INK} strokeWidth="4" fill="none" />
       <rect x="-400" y={FLOOR - 26} width={WORLD_W + 800} height="26" fill="#fff" stroke={INK} strokeWidth="3" />
       <rect x="-400" y={FLOOR} width={WORLD_W + 800} height={VIEW_H - FLOOR + 200} fill="#d9a066" />
       {Array.from({ length: 5 }, (_, i) => (
@@ -261,14 +282,79 @@ function Table() {
   );
 }
 
-function Domino({ i, angle }: { i: number; angle: number }) {
-  const { w, h } = DOMINO;
+/** The Newton's cradle's wooden frame, standing on the table at the back, so the marble rolls in front of its leg. */
+function CradleFrame() {
+  const x0 = cradleX(0) - 74;
+  const x1 = cradleX(CRADLE.n - 1) + 62;
+  const bar = CRADLE_TOP - 14;
   return (
-    <g transform={`translate(${dominoLeft(i) + w} ${TABLE.y}) rotate(${deg(angle)}) translate(${-w} 0)`}>
-      <rect x="0" y={-h} width={w} height={h} rx="5" fill={BAR_COLORS[i % BAR_COLORS.length]} stroke={INK} strokeWidth="3" />
-      <line x1="4" y1={-h / 2} x2={w - 4} y2={-h / 2} stroke={INK} strokeWidth="2.5" />
-      <circle cx={w / 2} cy={-h * 0.76} r="4" fill="#fff" />
-      <circle cx={w / 2} cy={-h * 0.24} r="4" fill="#fff" />
+    <g>
+      {[x0, x1].map((x) => (
+        <rect key={x} x={x} y={bar} width="12" height={TABLE.y - bar} rx="4" fill={DARK_WOOD} stroke={INK} strokeWidth="3" />
+      ))}
+      <rect x={x0 - 8} y={bar - 6} width={x1 - x0 + 28} height="18" rx="7" fill={WOOD} stroke={INK} strokeWidth="3.5" />
+    </g>
+  );
+}
+
+/** The cradle's five shiny balls, each on its V of strings from the bar. */
+function CradleBalls({ machine, t }: { machine: Machine; t: number }) {
+  const r = CRADLE.r;
+  return (
+    <g>
+      {Array.from({ length: CRADLE.n }, (_, i) => {
+        const ball = machine.cradleBall(i, t);
+        const top = cradleX(i);
+        return (
+          <g key={i}>
+            <path d={`M${top - 16} ${CRADLE_TOP} L${ball.x} ${ball.y} L${top + 16} ${CRADLE_TOP}`} fill="none" stroke="#7d7d96" strokeWidth="2.5" />
+            <circle cx={ball.x} cy={ball.y} r={r} fill="#c9cde0" stroke={INK} strokeWidth="3" />
+            <circle cx={ball.x - 7} cy={ball.y - 8} r="6" fill="#fff" opacity="0.85" />
+          </g>
+        );
+      })}
+    </g>
+  );
+}
+
+/**
+ * The roly-poly penguin, rocking `tilt` degrees on the bottom of its round belly: a toy with a weight inside, so it
+ * always stands up again, painted with a white tummy, little flippers on its sides, an orange beak and a red bow tie.
+ */
+function Penguin({ tilt }: { tilt: number }) {
+  const { body, head, headUp } = PENGUIN;
+  const belly = penguinParts(tilt).body;
+  return (
+    <g transform={`translate(${belly.x} ${belly.y}) rotate(${tilt}) translate(0 ${body})`}>
+      <circle cy={-body} r={body} fill="#2b2d42" stroke={INK} strokeWidth="3.5" />
+      <ellipse cy={-body + 4} rx={body - 12} ry={body - 6} fill="#fff" />
+      {[-1, 1].map((side) => (
+        <ellipse
+          key={side}
+          cx={side * 38}
+          cy={-56}
+          rx="8"
+          ry="17"
+          transform={`rotate(${side * -20} ${side * 38} -56)`}
+          fill="#2b2d42"
+          stroke={INK}
+          strokeWidth="3"
+        />
+      ))}
+      <circle cy={-headUp} r={head} fill="#2b2d42" stroke={INK} strokeWidth="3.5" />
+      <ellipse cy={-headUp + 4} rx={head - 7} ry={head - 9} fill="#fff" />
+      <circle cx="-8" cy={-headUp} r="4" fill={INK} />
+      <circle cx="8" cy={-headUp} r="4" fill={INK} />
+      <circle cx="-7" cy={-headUp - 1.5} r="1.5" fill="#fff" />
+      <circle cx="9" cy={-headUp - 1.5} r="1.5" fill="#fff" />
+      <path d={`M-7 ${-headUp + 7} L7 ${-headUp + 7} L0 ${-headUp + 17} Z`} fill="#ffb703" stroke={INK} strokeWidth="2" strokeLinejoin="round" />
+      <path
+        d={`M0 ${-headUp + head + 2} L-14 ${-headUp + head - 6} L-14 ${-headUp + head + 10} Z M0 ${-headUp + head + 2} L14 ${-headUp + head - 6} L14 ${-headUp + head + 10} Z`}
+        fill="#ff3b3b"
+        stroke={INK}
+        strokeWidth="2"
+        strokeLinejoin="round"
+      />
     </g>
   );
 }
@@ -653,20 +739,209 @@ function PlaneTrail({ machine, t }: { machine: Machine; t: number }) {
   return <g>{puffs}</g>;
 }
 
+/* ---------- Cash register, hula hoop, Ferris wheel and parachutist ---------- */
+
+/**
+ * The toy cash register: its big red key sticks out on the left, where the plane comes from, and its drawer slides
+ * out on the right, low above the floor, with two coins in it. Key and drawer are drawn behind the body, so only
+ * what sticks out shows. A round tab pops up on its top when it rings – no numbers, nothing to read.
+ */
+function Register({ machine, t }: { machine: Machine; t: number }) {
+  const { x, w, h } = REGISTER;
+  const top = FLOOR - h;
+  const keyX = x - REGISTER.key + machine.keyPress(t);
+  const out = machine.drawerOut(t);
+  const tab = 46 * seg(t, machine.tKey, machine.tKey + 0.2);
+  return (
+    <g>
+      <g transform={`translate(${x + w - 58} ${top + 20 - tab})`}>
+        <rect x="-3" y="0" width="6" height="40" fill="#7d7d96" />
+        <circle r="17" fill="#3ec300" stroke={INK} strokeWidth="3" />
+      </g>
+      <rect x={keyX} y={KEY_Y - 18} width={x - keyX + 30} height="36" rx="9" fill="#ff3b3b" stroke={INK} strokeWidth="3.5" />
+      <g transform={`translate(${out} 0)`}>
+        <rect x={x + w - 90} y={DRAWER.y - DRAWER.h / 2} width="94" height={DRAWER.h} rx="5" fill="#ffd23f" stroke={INK} strokeWidth="3.5" />
+        <circle cx={x + w - 8} cy={DRAWER.y} r="6" fill={INK} />
+        {[x + w - 40, x + w - 66].map((cx) => (
+          <ellipse key={cx} cx={cx} cy={DRAWER.y - DRAWER.h / 2} rx="12" ry="5" fill="#ffd23f" stroke={INK} strokeWidth="2.5" />
+        ))}
+      </g>
+      <path
+        d={`M${x} ${FLOOR} L${x} ${top + 60} L${x + 30} ${top} L${x + w - 20} ${top} L${x + w} ${top + 60} L${x + w} ${FLOOR} Z`}
+        fill="#4cc9f0"
+        stroke={INK}
+        strokeWidth="4"
+        strokeLinejoin="round"
+      />
+      <rect x={x + 44} y={top + 14} width={w - 100} height="34" rx="6" fill="#2b2d42" stroke={INK} strokeWidth="3" />
+      {[0, 1, 2].map((row) =>
+        [0, 1, 2, 3].map((col) => (
+          <rect
+            key={`${row}-${col}`}
+            x={x + 30 + col * 42}
+            y={top + 70 + row * 22}
+            width="32"
+            height="14"
+            rx="4"
+            fill={BAR_COLORS[(row * 4 + col) % BAR_COLORS.length]}
+            stroke={INK}
+            strokeWidth="2"
+          />
+        )),
+      )}
+    </g>
+  );
+}
+
+/** The Ferris wheel's two legs, from its hub down to the floor, behind everything round it. */
+function WheelStand() {
+  const { cx, cy } = WHEEL;
+  return (
+    <g>
+      {[-1, 1].map((side) => (
+        <path key={side} d={`M${cx} ${cy} L${cx + side * 170} ${FLOOR}`} stroke={DARK_WOOD} strokeWidth="16" strokeLinecap="round" />
+      ))}
+      <rect x={cx - 200} y={FLOOR - 12} width="400" height="12" rx="5" fill={WOOD} stroke={INK} strokeWidth="3" />
+    </g>
+  );
+}
+
+/** One gondola hanging from its pin, swinging `sway` degrees; `part` draws its hanger (behind) or its box (in front). */
+function Gondola({ i, pin, sway, part }: { i: number; pin: Pt; sway: number; part: "back" | "front" }) {
+  const { w, h, hang } = WHEEL;
+  const color = ["#ff5d73", "#8e7dff", "#3ec300"][i % 3];
+  return (
+    <g transform={`translate(${pin.x} ${pin.y}) rotate(${sway})`}>
+      {part === "back" ? (
+        <path d={`M${-w / 2 + 6} ${hang} L0 0 L${w / 2 - 6} ${hang}`} fill="none" stroke={INK} strokeWidth="3.5" strokeLinejoin="round" />
+      ) : (
+        <>
+          <rect x={-w / 2} y={hang} width={w} height={h} rx="10" fill={color} stroke={INK} strokeWidth="3.5" />
+          <rect x={-w / 2 + 8} y={hang + 8} width={w - 16} height="8" rx="4" fill="#fff8" />
+          <circle r="7" fill="#ffd23f" stroke={INK} strokeWidth="2.5" />
+        </>
+      )}
+    </g>
+  );
+}
+
+/**
+ * The toy Ferris wheel: its rim and spokes turn round the hub, the gondolas hang straight down from their pins, and
+ * the parachutist sits in the first one, his head over its side, until he jumps.
+ */
+function FerrisWheel({ machine, t }: { machine: Machine; t: number }) {
+  const { cx, cy, r, n } = WHEEL;
+  const turn = machine.wheelTurn(t);
+  const gondolas = Array.from({ length: n }, (_, i) => ({ i, ...machine.gondolaAt(i, t) }));
+  return (
+    <g>
+      <g transform={`rotate(${turn} ${cx} ${cy})`}>
+        {Array.from({ length: n * 2 }, (_, k) => {
+          const a = rad(90 + (k * 180) / n);
+          return <line key={k} x1={cx} y1={cy} x2={cx + r * Math.cos(a)} y2={cy + r * Math.sin(a)} stroke={WOOD} strokeWidth="9" />;
+        })}
+        <circle cx={cx} cy={cy} r={r} fill="none" stroke={INK} strokeWidth="18" />
+        <circle cx={cx} cy={cy} r={r} fill="none" stroke="#ff8c42" strokeWidth="11" />
+        <circle cx={cx} cy={cy} r={r * 0.55} fill="none" stroke="#ffd23f" strokeWidth="7" />
+      </g>
+      <circle cx={cx} cy={cy} r="24" fill="#ff5d73" stroke={INK} strokeWidth="4" />
+      <circle cx={cx} cy={cy} r="8" fill={INK} />
+      {gondolas.map((g) => (
+        <Gondola key={g.i} {...g} part="back" />
+      ))}
+      <Jumper {...machine.jumperAt(t)} />
+      {gondolas.map((g) => (
+        <Gondola key={g.i} {...g} part="front" />
+      ))}
+    </g>
+  );
+}
+
+/** The peg figure is drawn 54 high and scaled up to the parachutist's height. */
+const PEG = JUMPER.h / 54;
+
+/**
+ * The little parachutist, a wooden peg toy with a red helmet and a pack on his back, his feet at `feet`, leaning `tilt`
+ * degrees. `open` spreads his parachute above him, `fold` lets it sink down over the button's right side.
+ */
+function Jumper({ feet, tilt, open, fold }: { feet: Pt; tilt: number; open: number; fold: number }) {
+  const rx = 80 * open;
+  const canopy = { x: 95 * fold, y: -175 + 165 * fold };
+  return (
+    <g transform={`translate(${feet.x} ${feet.y}) rotate(${tilt})`}>
+      {open > 0 && fold < 1 && (
+        <g>
+          {[-1, -0.35, 0.35, 1].map((f) => (
+            <line key={f} x1={canopy.x + f * rx * (1 - fold)} y1={canopy.y} x2="0" y2={-34 * PEG} stroke="#7d7d96" strokeWidth="2" />
+          ))}
+        </g>
+      )}
+      {open > 0 && (
+        <g transform={`translate(${canopy.x} ${canopy.y}) rotate(${75 * fold}) scale(1 ${1 - 0.55 * fold})`}>
+          <path
+            d={`M${-rx} 0 Q${-rx} ${-56 * open} 0 ${-56 * open} Q${rx} ${-56 * open} ${rx} 0 Q${rx / 2} -12 0 0 Q${-rx / 2} -12 ${-rx} 0 Z`}
+            fill="#ff5d73"
+            stroke={INK}
+            strokeWidth="3"
+            strokeLinejoin="round"
+          />
+          <path d={`M0 ${-56 * open} Q${-rx / 3} -20 0 0 Q${rx / 3} -20 0 ${-56 * open} Z`} fill="#fff" stroke={INK} strokeWidth="2.5" strokeLinejoin="round" />
+        </g>
+      )}
+      <g transform={`scale(${PEG})`}>
+        <rect x="-9" y="-20" width="7" height="20" rx="3.5" fill="#2b6cb0" stroke={INK} strokeWidth="2" />
+        <rect x="2" y="-20" width="7" height="20" rx="3.5" fill="#2b6cb0" stroke={INK} strokeWidth="2" />
+        <rect x="-18" y="-36" width="10" height="18" rx="3" fill="#3ec300" stroke={INK} strokeWidth="2" />
+        <rect x="-11" y="-38" width="22" height="22" rx="7" fill="#ffd23f" stroke={INK} strokeWidth="2.5" />
+        <circle cy="-45" r="9" fill="#f3c69b" stroke={INK} strokeWidth="2.5" />
+        <path d="M-9.5 -46 A9.5 9.5 0 0 1 9.5 -46 Z" fill="#ff3b3b" stroke={INK} strokeWidth="2.5" strokeLinejoin="round" />
+        <circle cx="3.5" cy="-43" r="1.6" fill={INK} />
+      </g>
+    </g>
+  );
+}
+
+/** The hula hoop, seen as an ellipse `round` times as tall as wide, its stripes turned on by `turned` radians as it rolls. */
+function Hoop({ pt, turned, round }: { pt: Pt; turned: number; round: number }) {
+  const { r } = HOOP;
+  const ry = r * round;
+  return (
+    <g>
+      <ellipse cx={pt.x} cy={pt.y} rx={r + 7} ry={ry + 7} fill="none" stroke={INK} strokeWidth="3" />
+      <ellipse cx={pt.x} cy={pt.y} rx={r - 7} ry={Math.max(1, ry - 7)} fill="none" stroke={INK} strokeWidth="3" />
+      <ellipse cx={pt.x} cy={pt.y} rx={r} ry={ry} fill="none" stroke="#ff5d73" strokeWidth="11" />
+      <ellipse
+        cx={pt.x}
+        cy={pt.y}
+        rx={r}
+        ry={ry}
+        fill="none"
+        stroke="#fff"
+        strokeWidth="11"
+        pathLength="100"
+        strokeDasharray="6.25 6.25"
+        strokeDashoffset={(-turned / (2 * Math.PI)) * 100}
+      />
+    </g>
+  );
+}
+
 /* ---------- Finale ---------- */
 
+/** The box with the red push button on top; pressed, a spark runs along the cable to the gift box. */
 function ButtonBox({ machine, t }: { machine: Machine; t: number }) {
-  const knobX = BUTTON.x - BUTTON.knob;
   const press = machine.buttonPress(t);
   const top = FLOOR - BUTTON.h;
+  const mid = BUTTON.x + BUTTON.w / 2;
   const k = seg(t, machine.tButton, machine.tPop);
   const spark = CABLE[Math.round(k * (CABLE.length - 1))];
   return (
     <g>
       <path d={`M${CABLE.map((p) => `${p.x} ${p.y}`).join(" L")}`} fill="none" stroke={INK} strokeWidth="5" strokeLinecap="round" />
-      <rect x={knobX + press} y={top + 28} width={BUTTON.knob + 6} height="36" rx="8" fill="#ff3b3b" stroke={INK} strokeWidth="3" />
+      <rect x={mid - 24} y={KNOB_TOP + press} width="48" height={top - KNOB_TOP + 8} rx="12" fill="#ff3b3b" stroke={INK} strokeWidth="3.5" />
+      <rect x={mid - 34} y={top - 6} width="68" height="10" rx="4" fill="#d9d9e6" stroke={INK} strokeWidth="3" />
       <rect x={BUTTON.x} y={top} width={BUTTON.w} height={BUTTON.h} rx="8" fill="#8e7dff" stroke={INK} strokeWidth="4" />
-      <circle cx={BUTTON.x + BUTTON.w / 2} cy={top + 30} r="9" fill={press >= BUTTON.press ? "#3ec300" : "#5a4ab0"} stroke={INK} strokeWidth="2" />
+      <circle cx={mid} cy={top + 38} r="9" fill={press >= BUTTON.press ? "#3ec300" : "#5a4ab0"} stroke={INK} strokeWidth="2" />
       {k > 0 && k < 1 && (
         <g transform={`translate(${spark.x} ${spark.y}) rotate(${t * 500})`}>
           <path d="M0 -16 L4 -4 L16 0 L4 4 L0 16 L-4 4 L-16 0 L-4 -4 Z" fill="#ffd23f" stroke="#ff8c42" strokeWidth="2" />
