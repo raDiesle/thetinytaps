@@ -1,6 +1,7 @@
 import { memo, useId, useMemo } from "react";
 import { VIEW_H, type LevelProps } from "./level";
 import {
+  BEAM,
   BED,
   BLOBS,
   BULB_DROP,
@@ -14,26 +15,33 @@ import {
   DRESSER,
   FIREFLIES,
   FLOOR,
+  FLOWER,
   GLOBE,
   GLOBE_BUTTON,
   JAR,
   LAMP,
+  LANTERN,
   LAVA,
   lavaHalf,
+  LIGHTHOUSE,
   type Light,
   MIRROR,
   NAILS,
   NIGHTSTAND,
   OWL,
+  PRISM,
   SHADOW,
   SIDE_TABLE,
+  STICK,
+  STICKERS,
   STOOL,
   SWITCH,
   TORCH,
+  WINDOW,
   WORLD_W,
   wireY,
 } from "./light";
-import { easeOut, seg } from "./machineKit";
+import { deg, easeOut, lerp, seg } from "./machineKit";
 import { MachineStage } from "./MachineStage";
 import { BAR_COLORS, STAR_POINTS } from "./parts";
 import type { Pt } from "./path";
@@ -67,8 +75,12 @@ interface Hole {
  * rise, the warm air turns the paper carousel on its cap, and the rabbit and
  * bird cut-outs throw big shadows that hop and fly over the wall. The paper bird
  * comes loose, flutters onto the globe's button, the globe lights up and turns,
- * and its glow calls the fireflies over it to the star lamp, which throws stars
- * all over the room. Then the toy owl on the bed wakes up. The camera travels
+ * and its glow calls the fireflies over it into the toy lighthouse's lantern.
+ * The lighthouse turns, its spot sweeps over the wall and wakes the
+ * glow-in-the-dark stickers, and rests on the prism in the window; a rainbow
+ * falls onto the solar flower, which dances, bows and snaps the glow stick.
+ * Its green glow calls the fireflies to the star lamp, which throws stars all
+ * over the room. Then the toy owl on the bed wakes up. The camera travels
  * along with the light.
  */
 export function LightLevel(props: LevelProps) {
@@ -96,8 +108,12 @@ export function LightLevel(props: LevelProps) {
           <WarmAir light={light} t={t} />
           <Desk />
           <Globe light={light} t={t} />
+          <Stickers />
+          <Lighthouse />
           <Dresser />
           <Lamp light={light} t={t} />
+          <GlowStick light={light} t={t} />
+          <Flower light={light} t={t} />
           <Bed />
           <Owl light={light} t={t} />
 
@@ -109,9 +125,15 @@ export function LightLevel(props: LevelProps) {
           <LitBulbs light={light} t={t} glow={`${ids}-glow`} />
           <Halo x={LAVA.x} y={490} r={170} k={0.3 * light.lavaGlow(t)} glow={`${ids}-glow`} />
           <Halo x={GLOBE.x} y={GLOBE.y} r={170} k={0.35 * light.globeGlow(t)} glow={`${ids}-glow`} />
+          <LighthouseBeam light={light} t={t} />
+          <StickerGlow light={light} t={t} green={`${ids}-green`} />
+          <Rainbow light={light} t={t} />
+          <StickLight light={light} t={t} green={`${ids}-green`} />
+          <LanternLight light={light} t={t} glow={`${ids}-glow`} />
           <LampLight light={light} t={t} glow={`${ids}-glow`} />
           <PaperBird light={light} t={t} />
           <Fireflies light={light} t={t} glow={`${ids}-glow`} />
+          <LanternBars />
           <Sparkles x={LAMP.x} y={DOME_Y - 140} age={t - light.tLamp - 0.6} n={12} spread={300} />
           <Sparkles x={OWL.x} y={OWL.y - 40} age={t - light.tOwl} n={8} spread={140} />
         </>
@@ -134,6 +156,7 @@ function Room({ paper }: { paper: string }) {
       </defs>
       <rect x="-400" y="-200" width={WORLD_W + 800} height={FLOOR + 200} fill={`url(#${paper})`} />
       <NightWindow x={2560} />
+      <StarWindow />
       <Picture x={1180} y={420} />
       <Picture x={3380} y={330} />
       {/* Floor boards */}
@@ -175,6 +198,51 @@ function NightWindow({ x }: { x: number }) {
         />
       ))}
       <rect x="-40" y="-24" width="360" height="12" rx="6" fill="#8e7dff" stroke={INK} strokeWidth="3" />
+    </g>
+  );
+}
+
+/** The arched window by the star lamp: stars only, and the prism hanging in it on a thread. */
+function StarWindow() {
+  const { x0, x1, top, bottom } = WINDOW;
+  const r = (x1 - x0) / 2;
+  const mid = (x0 + x1) / 2;
+  const glass = `M${x0} ${bottom} L${x0} ${top + r} A${r} ${r} 0 0 1 ${x1} ${top + r} L${x1} ${bottom} Z`;
+  return (
+    <g>
+      <path d={glass} fill="#1b2266" stroke={INK} strokeWidth="5" strokeLinejoin="round" />
+      {[
+        [mid - 70, top + 140],
+        [mid - 20, top + 60],
+        [mid + 66, top + 120],
+        [mid + 40, top + 230],
+        [mid - 80, top + 250],
+      ].map(([sx, sy]) => (
+        <polygon key={sx} points={STAR_POINTS} transform={`translate(${sx} ${sy}) scale(0.5)`} fill="#fff3b0" />
+      ))}
+      <line x1={mid} y1={top} x2={mid} y2={bottom} stroke={INK} strokeWidth="5" />
+      <line x1={x0} y1={top + r + 40} x2={x1} y2={top + r + 40} stroke={INK} strokeWidth="5" />
+      <rect x={x0 - 18} y={bottom} width={x1 - x0 + 36} height="14" rx="5" fill="#8e7dff" stroke={INK} strokeWidth="3" />
+      {/* The prism: a glass drop on its thread from the top of the arch. */}
+      <line x1={PRISM.x} y1={top} x2={PRISM.x} y2={PRISM.y - PRISM.r} stroke="#e8f6ff" strokeWidth="2" />
+      <PrismShape />
+    </g>
+  );
+}
+
+/** The glass prism: a cut crystal drop with its facets. */
+function PrismShape({ fill = "#cfe8ff", opacity = 0.85 }: { fill?: string; opacity?: number }) {
+  const { x, y, r } = PRISM;
+  return (
+    <g opacity={opacity}>
+      <path
+        d={`M${x} ${y - r} L${x + r * 0.8} ${y + r * 0.2} L${x} ${y + r} L${x - r * 0.8} ${y + r * 0.2} Z`}
+        fill={fill}
+        stroke={INK}
+        strokeWidth="3"
+        strokeLinejoin="round"
+      />
+      <path d={`M${x} ${y - r} L${x} ${y + r} M${x - r * 0.8} ${y + r * 0.2} L${x + r * 0.8} ${y + r * 0.2}`} stroke="#fff" strokeWidth="2" opacity="0.8" />
     </g>
   );
 }
@@ -632,6 +700,161 @@ function PaperBird({ light, t }: { light: Light; t: number }) {
   );
 }
 
+/* ---------- Lighthouse, stickers, prism, flower, glow stick ---------- */
+
+/** Half the lighthouse tower's width at height `y`. */
+const towerHalf = (y: number) => LIGHTHOUSE.neck + ((LIGHTHOUSE.foot - LIGHTHOUSE.neck) * (y - LIGHTHOUSE.gallery)) / (FLOOR - LIGHTHOUSE.gallery);
+
+/** The toy lighthouse: a striped tower, a gallery with a railing, the glass lantern with its little hatch open, and a red roof. */
+const Lighthouse = memo(function Lighthouse() {
+  const { x, gallery } = LIGHTHOUSE;
+  const band = (y0: number, y1: number) => `M${x - towerHalf(y0)} ${y0} L${x + towerHalf(y0)} ${y0} L${x + towerHalf(y1)} ${y1} L${x - towerHalf(y1)} ${y1} Z`;
+  const { rx, ry, y } = LANTERN;
+  return (
+    <g>
+      <path d={band(gallery, FLOOR)} fill="#fff" stroke={INK} strokeWidth="4" strokeLinejoin="round" />
+      {[
+        [450, 520],
+        [590, 660],
+        [730, FLOOR],
+      ].map(([y0, y1]) => (
+        <path key={y0} d={band(y0, y1)} fill="#ff5d73" />
+      ))}
+      <path d={band(gallery, FLOOR)} fill="none" stroke={INK} strokeWidth="4" strokeLinejoin="round" />
+      <path
+        d={`M${x - 20} ${FLOOR} L${x - 20} ${FLOOR - 44} A20 20 0 0 1 ${x + 20} ${FLOOR - 44} L${x + 20} ${FLOOR} Z`}
+        fill="#3a86ff"
+        stroke={INK}
+        strokeWidth="3"
+      />
+      <circle cx={x} cy="555" r="13" fill="#bfe9ff" stroke={INK} strokeWidth="3" />
+      {/* The lantern's glass, its open hatch on the left, the railing in front and the roof. */}
+      <rect x={x - rx} y={y - ry} width={rx * 2} height={ry * 2} rx="8" fill="#cfe8ff" opacity="0.7" stroke={INK} strokeWidth="4" />
+      <path
+        d={`M${x - rx} ${y - 22} L${x - rx - 30} ${y - 28} L${x - rx - 30} ${y + 26} L${x - rx} ${y + 30} Z`}
+        fill="#cfe8ff"
+        stroke={INK}
+        strokeWidth="3"
+        strokeLinejoin="round"
+      />
+      <rect x={x - 74} y={gallery - 8} width="148" height="16" rx="5" fill="#ff5d73" stroke={INK} strokeWidth="3" />
+      <path
+        d={`M${x - 66} ${gallery - 8} L${x - 66} ${gallery - 36} L${x + 66} ${gallery - 36} L${x + 66} ${gallery - 8}`}
+        fill="none"
+        stroke={INK}
+        strokeWidth="3"
+      />
+      {[-44, -22, 0, 22, 44].map((dx) => (
+        <line key={dx} x1={x + dx} y1={gallery - 36} x2={x + dx} y2={gallery - 8} stroke={INK} strokeWidth="2.5" />
+      ))}
+      <path
+        d={`M${x - rx - 12} ${y - ry + 2} L${x} ${y - ry - 52} L${x + rx + 12} ${y - ry + 2} Z`}
+        fill="#ff5d73"
+        stroke={INK}
+        strokeWidth="4"
+        strokeLinejoin="round"
+      />
+      <circle cx={x} cy={y - ry - 58} r="8" fill="#ffd23f" stroke={INK} strokeWidth="3" />
+    </g>
+  );
+});
+
+/** The thin bars of the lantern's glass, in front of the fireflies flying round inside. */
+const LanternBars = memo(function LanternBars() {
+  const { x, y, rx, ry } = LANTERN;
+  return (
+    <g stroke={INK} strokeWidth="3">
+      {[-rx / 2, 0, rx / 2].map((dx) => (
+        <line key={dx} x1={x + dx} y1={y - ry} x2={x + dx} y2={y + ry} />
+      ))}
+    </g>
+  );
+});
+
+/** One sticker's shape round (0, 0), about 70 wide. */
+function StickerShape({ kind }: { kind: (typeof STICKERS)[number]["kind"] }) {
+  switch (kind) {
+    case "moon":
+      return <path d="M10 -32 A32 32 0 1 0 10 32 A24 24 0 1 1 10 -32 Z" />;
+    case "fish":
+      return <path d="M-30 0 Q-8 -22 16 -8 L34 -22 L30 0 L34 22 L16 8 Q-8 22 -30 0 Z" />;
+    case "boat":
+      return <path d="M-34 8 L34 8 L22 28 L-22 28 Z M-2 4 L-2 -34 L28 2 Z M-8 4 L-8 -24 L-30 2 Z" />;
+    case "shell":
+      return <path d="M0 26 L-32 -4 Q-22 -32 0 -32 Q22 -32 32 -4 Z M-6 26 L-10 34 L10 34 L6 26 Z" />;
+  }
+}
+
+/** The glow-in-the-dark stickers, pale and dull while they have drunk no light yet. */
+const Stickers = memo(function Stickers() {
+  return (
+    <g fill="#e3ecd2" stroke={INK} strokeWidth="2.5" strokeLinejoin="round">
+      {STICKERS.map((s) => (
+        <g key={s.x} transform={`translate(${s.x} ${s.y})`}>
+          <StickerShape kind={s.kind} />
+        </g>
+      ))}
+    </g>
+  );
+});
+
+/** The solar flower in its pot: leaves of little solar panels, a face with sunglasses that smiles in the light. It dances in the rainbow and bows to the glow stick. */
+function Flower({ light, t }: { light: Light; t: number }) {
+  const { x, rim, stem, head } = FLOWER;
+  const lit = light.rainbow(t);
+  const lean = deg(light.flowerLean(t));
+  const top = rim - stem;
+  return (
+    <g>
+      <path
+        d={`M${x - 32} ${rim - 4} L${x + 32} ${rim - 4} L${x + 24} ${DRESSER.top} L${x - 24} ${DRESSER.top} Z`}
+        fill="#e07a3f"
+        stroke={INK}
+        strokeWidth="4"
+        strokeLinejoin="round"
+      />
+      <rect x={x - 36} y={rim - 10} width="72" height="14" rx="5" fill="#f08c4f" stroke={INK} strokeWidth="3" />
+      <g transform={`rotate(${lean} ${x} ${rim})`}>
+        <path d={`M${x} ${rim} Q${x - 8} ${rim - stem / 2} ${x} ${top}`} fill="none" stroke="#3ec300" strokeWidth="8" strokeLinecap="round" />
+        {[-1, 1].map((side) => (
+          <g key={side} transform={`translate(${x} ${rim - stem * 0.42 + side * 10}) rotate(${side * -28}) scale(${side * 1.2} 1.2)`}>
+            <rect x="4" y="-12" width="40" height="24" rx="3" fill="#1d3fa6" stroke={INK} strokeWidth="3" />
+            <path d="M17 -12 V12 M31 -12 V12 M4 0 H44" stroke="#7fdcff" strokeWidth="1.5" />
+          </g>
+        ))}
+        {/* The face, drawn for petals 28 round and scaled to the flower's size. */}
+        <g transform={`translate(${x} ${top}) scale(${head / 28})`}>
+          {Array.from({ length: 10 }, (_, i) => {
+            const a = (i * 360) / 10;
+            return <ellipse key={i} cx="19" rx="10" ry="6" transform={`rotate(${a})`} fill={i % 2 ? "#ff8c42" : "#ffb703"} stroke={INK} strokeWidth="2" />;
+          })}
+          <circle r="19" fill="#ffd23f" stroke={INK} strokeWidth="3" />
+          <path d="M-15 -7 h12 v7 a6 6 0 0 1 -12 0 Z M3 -7 h12 v7 a6 6 0 0 1 -12 0 Z M-3 -5 h6" fill={INK} stroke={INK} strokeWidth="2" />
+          <path d={`M-8 8 Q0 ${9 + 6 * lit} 8 8`} fill="none" stroke={INK} strokeWidth="2.5" strokeLinecap="round" />
+        </g>
+      </g>
+    </g>
+  );
+}
+
+/** The points of the glow stick: from the pot's rim over to the lamp's base, snapped into a little V where the flower pressed it. */
+function stickPoints(bent: number) {
+  const { a, b } = STICK;
+  const mid = { x: lerp(a.x, b.x, 0.55), y: lerp(a.y, b.y, 0.55) + 6 * bent };
+  return `${a.x},${a.y} ${mid.x},${mid.y} ${b.x},${b.y}`;
+}
+
+/** The glow stick, dull and grey until it is snapped. */
+function GlowStick({ light, t }: { light: Light; t: number }) {
+  const points = stickPoints(light.stickBent(t));
+  return (
+    <g fill="none" strokeLinecap="round" strokeLinejoin="round">
+      <polyline points={points} stroke={INK} strokeWidth={STICK.r * 2 + 4} />
+      <polyline points={points} stroke="#a9b8ae" strokeWidth={STICK.r * 2 - 2} />
+    </g>
+  );
+}
+
 function Dresser() {
   const { x0, x1, top } = DRESSER;
   return (
@@ -769,6 +992,27 @@ function Night({ light, t, ids }: { light: Light; t: number; ids: string }) {
   const globe = light.globeGlow(t);
   if (bird) holes.push({ x: bird.pt.x, y: bird.pt.y, r: 130, k: 0.6 * (1 - globe) });
   if (globe > 0) holes.push({ x: GLOBE.x, y: GLOBE.y, r: 200 + 120 * globe, k: globe });
+  // Starlight at the arched window, so the prism in it can be found in the dark.
+  holes.push({ x: PRISM.x, y: WINDOW.top + 140, r: 200, k: 0.45 });
+  const lantern = light.lanternGlow(t);
+  if (lantern > 0) holes.push({ x: LANTERN.x, y: LANTERN.y, r: 160 + 200 * lantern, k: lantern });
+  const spot = light.beamSpot(t);
+  if (spot.show > 0) {
+    holes.push({ x: spot.x, y: spot.y, r: 190, k: spot.show });
+    for (const k of [0.3, 0.55, 0.8]) holes.push({ x: lerp(LANTERN.x, spot.x, k), y: spot.y, r: 90, k: 0.7 * spot.show });
+  }
+  STICKERS.forEach((s, k) => {
+    const g = light.stickerGlow(k, t);
+    if (g > 0) holes.push({ x: s.x, y: s.y, r: 90, k: 0.8 * g });
+  });
+  const rainbow = light.rainbow(t);
+  if (rainbow > 0) {
+    const reach = light.rainbowReach(t);
+    for (const k of [0.2, 0.5, 0.8, 1])
+      holes.push({ x: lerp(PRISM.x, FLOWER.x, k * reach), y: lerp(PRISM.y, FLOWER.rim - FLOWER.stem, k * reach), r: 110, k: rainbow });
+  }
+  const stick = light.stickGlow(t);
+  if (stick > 0) holes.push({ x: (STICK.a.x + STICK.b.x) / 2, y: STICK.a.y + 10, r: 130 + 90 * stick, k: stick });
   const lamp = light.lampGlow(t);
   if (lamp > 0) holes.push({ x: LAMP.x, y: DOME_Y - 40, r: 260 + 400 * easeOut(seg(t, light.tLamp, light.tLamp + 2)), k: lamp });
 
@@ -939,8 +1183,9 @@ function Fireflies({ light, t, glow }: { light: Light; t: number; glow: string }
         const awake = f.glow > 0.2;
         // Wings beat while awake, and stop when the level is over.
         const flap = awake ? 18 * Math.sin(Math.min(t, light.duration) * 38 + i) : 0;
-        // Small enough to fit six in the jar, big enough to follow on a phone once the lid is open, and a bit smaller again round the lamp.
-        const size = 1.2 + 0.5 * seg(t, light.tLid, light.tLid + 1) - 0.3 * seg(t, light.tLamp - 2, light.tLamp);
+        // Small enough to fit six in the jar, big enough to follow on a phone once the lid is open, small again in the
+        // lighthouse's lantern, and a bit smaller round the lamp.
+        const size = 1.2 + 0.5 * seg(t, light.tLid, light.tLid + 1) - 0.75 * f.inside - 0.3 * seg(t, light.tLamp - 2, light.tLamp);
         return (
           <g key={i} transform={`translate(${f.pt.x} ${f.pt.y}) scale(${size})`}>
             <circle r="40" fill={`url(#${glow})`} opacity={f.glow} />
@@ -952,6 +1197,117 @@ function Fireflies({ light, t, glow }: { light: Light; t: number; glow: string }
           </g>
         );
       })}
+    </g>
+  );
+}
+
+/** The lighthouse's beam: a band of light from the lantern to its spot on the wall, and a soft glare while it shines at the child. */
+function LighthouseBeam({ light, t }: { light: Light; t: number }) {
+  const s = light.beamSpot(t);
+  if (s.show <= 0 && s.facing <= 0) return null;
+  const { x, y } = LANTERN;
+  return (
+    <g>
+      {s.show > 0 && (
+        <g opacity={s.show}>
+          <path d={`M${x} ${y - 16} L${s.x} ${s.y - BEAM.ry * 0.8} L${s.x} ${s.y + BEAM.ry * 0.8} L${x} ${y + 16} Z`} fill={LIGHT} opacity="0.22" />
+          <ellipse cx={s.x} cy={s.y} rx={BEAM.rx} ry={BEAM.ry} fill={LIGHT} opacity="0.35" />
+          <ellipse cx={s.x} cy={s.y} rx={BEAM.rx * 0.6} ry={BEAM.ry * 0.6} fill={LIGHT} opacity="0.45" />
+        </g>
+      )}
+      {s.facing > 0 && <circle cx={x} cy={y} r={50 + 60 * s.facing} fill="#fff" opacity={0.45 * s.facing ** 3} />}
+    </g>
+  );
+}
+
+/** The lantern shining with the fireflies' light, and the lens inside turning with the lighthouse. */
+function LanternLight({ light, t, glow }: { light: Light; t: number; glow: string }) {
+  const k = light.lanternGlow(t);
+  if (k <= 0) return null;
+  const { x, y, rx, ry } = LANTERN;
+  const a = light.lighthouseAngle(t);
+  return (
+    <g>
+      <circle cx={x} cy={y} r="170" fill={`url(#${glow})`} opacity={k} />
+      <rect x={x - rx} y={y - ry} width={rx * 2} height={ry * 2} rx="8" fill={LIGHT} opacity={0.55 * k} />
+      <ellipse cx={x + 30 * Math.sin(a)} cy={y} rx={4 + 12 * Math.abs(Math.cos(a))} ry={ry - 10} fill="#fff" opacity={0.7 * k} />
+    </g>
+  );
+}
+
+/** The stickers glowing green once the beam has passed over them, and on in the dark. */
+function StickerGlow({ light, t, green }: { light: Light; t: number; green: string }) {
+  return (
+    <g>
+      <defs>
+        <radialGradient id={green}>
+          <stop offset="0" stopColor="#b8ff9a" stopOpacity="0.85" />
+          <stop offset="1" stopColor="#b8ff9a" stopOpacity="0" />
+        </radialGradient>
+      </defs>
+      {STICKERS.map((s, k) => {
+        const g = light.stickerGlow(k, t);
+        if (g <= 0) return null;
+        return (
+          <g key={s.x} transform={`translate(${s.x} ${s.y})`} opacity={g}>
+            <circle r="64" fill={`url(#${green})`} opacity="0.6" />
+            <g fill="#c9ffb0" stroke="#5fd35a" strokeWidth="2.5" strokeLinejoin="round">
+              <StickerShape kind={s.kind} />
+            </g>
+          </g>
+        );
+      })}
+    </g>
+  );
+}
+
+/** The colours of the rainbow, from its top to its bottom. */
+const RAINBOW = ["#ff5d73", "#ff8c42", "#ffd23f", "#3ec300", "#3a86ff", "#8e7dff"];
+
+/** The rainbow fanning out from the prism down onto the flower, and the prism shining while the beam rests on it. */
+function Rainbow({ light, t }: { light: Light; t: number }) {
+  const k = light.rainbow(t);
+  const lit = t >= light.tPrism ? light.beamSpot(t).show : 0;
+  if (lit <= 0 && k <= 0) return null;
+  const reach = light.rainbowReach(t);
+  // From the prism towards the flower's face, as far as it has grown, fanning out across that way.
+  const from = { x: PRISM.x + 8, y: PRISM.y + 8 };
+  const to = { x: lerp(from.x, FLOWER.x + 30, reach), y: lerp(from.y, FLOWER.rim - FLOWER.stem + 30, reach) };
+  const len = Math.hypot(to.x - from.x, to.y - from.y) || 1;
+  const n = { x: -(to.y - from.y) / len, y: (to.x - from.x) / len };
+  const w = 16 * reach;
+  return (
+    <g>
+      {k > 0 &&
+        RAINBOW.map((color, i) => {
+          const a = (i - 3) * 3 * reach;
+          const b = (i - 2) * 3 * reach;
+          const c = (i - 3) * w;
+          const d = (i - 2) * w;
+          return (
+            <path
+              key={color}
+              d={`M${from.x + n.x * a} ${from.y + n.y * a} L${to.x + n.x * c} ${to.y + n.y * c} L${to.x + n.x * d} ${to.y + n.y * d} L${from.x + n.x * b} ${from.y + n.y * b} Z`}
+              fill={color}
+              opacity={0.6 * k}
+            />
+          );
+        })}
+      {lit > 0 && <PrismShape fill="#fff" opacity={0.8 * lit} />}
+    </g>
+  );
+}
+
+/** The snapped glow stick shining green. */
+function StickLight({ light, t, green }: { light: Light; t: number; green: string }) {
+  const g = light.stickGlow(t);
+  if (g <= 0) return null;
+  const points = stickPoints(light.stickBent(t));
+  return (
+    <g opacity={g}>
+      <ellipse cx={(STICK.a.x + STICK.b.x) / 2} cy={STICK.a.y + 8} rx="130" ry="70" fill={`url(#${green})`} />
+      <polyline points={points} fill="none" stroke="#7dff6a" strokeWidth={STICK.r * 2 - 2} strokeLinecap="round" strokeLinejoin="round" />
+      <polyline points={points} fill="none" stroke="#eaffd9" strokeWidth="4" strokeLinecap="round" strokeLinejoin="round" />
     </g>
   );
 }
