@@ -1,4 +1,4 @@
-import type { StoryChapter, StoryTranslation } from "@/components/ChapterBook";
+import type { StoryChapter, StoryPage, StoryTranslation } from "@/components/ChapterBook";
 
 // „Tapsis Milchkette“, the second Abstillen story (user request, 9 November 2026): told in chapters that follow the
 // steps weaning guides advise for gentle weaning (`GENTLE_STEPS`, research „abstillen-kapitel“) – tell the child first,
@@ -606,3 +606,53 @@ export function goneOn(pageId: string): MilkTime[] {
   }
   return gone;
 }
+
+/**
+ * The pages of the short version (user request, 22 November 2026: „von der ersten Geschichte eine Kurzversion“), read in
+ * one evening: the same story told with a third of its pages – Tapsi big and still drinking, the chain, Mama telling why,
+ * the day's milk going with tears held in Mama's arm, the evening's, Papa comforting at night, the last morning's milk
+ * with a farewell, and love as before. Only pages of the whole story, in its order, so its pictures, translations and
+ * recordings serve both; every page where Tapsi cries is followed by the one where a grown-up holds Tapsi until it is
+ * done (checked in `milkchain.test.ts`).
+ */
+export const SHORT_PAGES = [
+  "baby",
+  "essen",
+  "noch",
+  "kette",
+  "schoss",
+  "babys",
+  "schwer",
+  "tag-ab",
+  "tag-nicht",
+  "tag-halten",
+  "abend-ab",
+  "nacht-wach",
+  "nacht-papa",
+  "nacht-lied",
+  "abschied-sagen",
+  "abschied-trinken",
+  "abschied-danke",
+  "bleibt-lieb",
+];
+
+/** The short version's chapters: each chapter of the whole story with only its pages on `SHORT_PAGES`, the empty ones left out. */
+export const MILK_CHAIN_SHORT: Chapter[] = MILK_CHAIN.map((chapter) => ({
+  ...chapter,
+  pages: chapter.pages.filter((page) => SHORT_PAGES.includes(page.id)),
+})).filter((chapter) => chapter.pages.length > 0);
+
+/**
+ * About how many minutes a story takes read aloud to a small child: a few seconds per page to look at its picture, and
+ * a slow reader's pace for its sentence (the first language's words). Shown in the choice, so a grown-up sees what fits
+ * the evening (user request, 22 November 2026: „die Dauer ca. … je Geschichte“).
+ */
+export function minutesOf(pages: StoryPage[]): number {
+  const seconds = pages.reduce((sum, page) => sum + LOOK_SECONDS + page.text.split(/\s+/).length * SECONDS_PER_WORD, 0);
+  return Math.max(1, Math.round(seconds / 60));
+}
+
+/** Seconds a page's picture is looked at and its page turned, beside its sentence. */
+const LOOK_SECONDS = 8;
+/** Seconds a word takes read slowly to a small child. */
+const SECONDS_PER_WORD = 0.45;

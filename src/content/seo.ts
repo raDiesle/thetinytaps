@@ -311,14 +311,27 @@ export const SEO_TEXTS: PageSeo[] = [
     title: "Abstillen mit Geschichte – Tapsis Milchkette",
     description:
       "Eine Vorlesegeschichte in Kapiteln zum sanften Abstillen: erst die Milch am Tag, dann am Abend, in der Nacht und zuletzt am Morgen – mit Tapsi dem Fuchs.",
-    text: "Eine längere Geschichte zum Vorlesen, Kapitel für Kapitel, wenn das Stillen langsam zu Ende gehen soll. Tapsi der Fuchs hat als Baby an Mamas Brust getrunken und ist jetzt groß. Mama erzählt, warum die Milch nun gehen darf: Ihre Brust hat so lange Milch gemacht und möchte ausruhen. Über Tapsis Bett hängt eine Kette mit einem Milchtropfen für jede Stillzeit, und Kapitel für Kapitel geht einer: zuerst die Milch am Tag, wenn Spielen, Essen und der Becher helfen, dann die am Abend, wenn Tapsi mit Buch und Lied einschläft, dann die in der Nacht, wenn Papa tröstet, und zuletzt die am Morgen, mit einem Abschied. Tapsi darf wütend und traurig sein, Mama und Papa bleiben ganz nah. Unter jedem Bild steht der Satz zum Vorlesen. Das Buch „Abstillen“ beginnt mit einer Wahl: diese lange Geschichte oder eine kurze für Familien, die nur nachts abstillen. Unter jeder stehen ihre Kapitel als kleine Nummern, so schlägt man jedes der elf Kapitel direkt auf und liest am nächsten Abend weiter, wo man aufgehört hat. Jedes Tippen blättert eine Seite weiter. Für sanftes Abstillen von Kleinkindern, ohne Druck und ohne Schimpfen.",
+    text: "Eine längere Geschichte zum Vorlesen, Kapitel für Kapitel, wenn das Stillen langsam zu Ende gehen soll. Tapsi der Fuchs hat als Baby an Mamas Brust getrunken und ist jetzt groß. Mama erzählt, warum die Milch nun gehen darf: Ihre Brust hat so lange Milch gemacht und möchte ausruhen. Über Tapsis Bett hängt eine Kette mit einem Milchtropfen für jede Stillzeit, und Kapitel für Kapitel geht einer: zuerst die Milch am Tag, wenn Spielen, Essen und der Becher helfen, dann die am Abend, wenn Tapsi mit Buch und Lied einschläft, dann die in der Nacht, wenn Papa tröstet, und zuletzt die am Morgen, mit einem Abschied. Tapsi darf wütend und traurig sein, Mama und Papa bleiben ganz nah. Unter jedem Bild steht der Satz zum Vorlesen. Das Buch „Abstillen“ beginnt mit einer Wahl: diese lange Geschichte als Ganzes oder in einer Kurzfassung mit den wichtigsten Bildern, oder eine Geschichte für Familien, die nur nachts abstillen. Bei jeder steht, wie viele Bilder sie hat und wie viele Minuten sie ungefähr dauert, und ein Tippen auf „Lesen“ schlägt sie auf. Jedes Tippen blättert eine Seite weiter. Für sanftes Abstillen von Kleinkindern, ohne Druck und ohne Schimpfen.",
   },
   {
     path: "/abstillen/nachts/",
     title: "Nachts abstillen: Die Milch schläft",
     description:
       "Eine Vorlesegeschichte in Kapiteln fürs nächtliche Abstillen: Wenn der Mond scheint, schläft die Milch – nachts tröstet Papa, am Tag trinkt Tapsi weiter.",
-    text: "Eine kurze Geschichte zum Vorlesen, Kapitel für Kapitel, für Familien, die nachts abstillen und am Tag weiter stillen. Tapsi der Fuchs trinkt an Mamas Brust, am Tag und auch in der Nacht. Mama erzählt mit einem kleinen Bilderbuch von Mond und Sonne: Wenn der Mond scheint, schläft die Milch, und wenn die Sonne aufgeht, wacht sie wieder auf. Am Tag gibt es Milch und Kuscheln, so viel Tapsi mag, und Papa verspricht, nachts zu kommen. Am Abend trinkt Tapsi noch einmal, winkt dem Mond „Gute Nacht, Milch!“ zu, und Papa liest vor. Wacht Tapsi nachts auf, ist Papa sofort da: Tapsi darf wütend sein und weinen, Papa hält Tapsi fest, gibt einen Schluck Wasser aus dem blauen Becher, trägt Tapsi hin und her und summt, bis Tapsi in seinem Arm einschläft. Am Morgen ist die Milch wieder wach. Nacht für Nacht kommt Papa wieder, und ein paar Nächte später sieht Tapsi den Mond, nimmt den Teddy in den Arm und schläft weiter. Unter jedem Bild steht der Satz zum Vorlesen, das Buch „Abstillen“ beginnt mit der Wahl zwischen ihr und der langen Geschichte, ihre Kapitel als kleine Nummern zum Aufschlagen, und jedes Tippen blättert weiter. Ohne Druck, ohne Schimpfen und ohne Uhrzeit – jede Familie hat ihre eigene Nacht.",
+    text: "Eine kurze Geschichte zum Vorlesen, Kapitel für Kapitel, für Familien, die nachts abstillen und am Tag weiter stillen. Tapsi der Fuchs trinkt an Mamas Brust, am Tag und auch in der Nacht. Mama erzählt mit einem kleinen Bilderbuch von Mond und Sonne: Wenn der Mond scheint, schläft die Milch, und wenn die Sonne aufgeht, wacht sie wieder auf. Am Tag gibt es Milch und Kuscheln, so viel Tapsi mag, und Papa verspricht, nachts zu kommen. Am Abend trinkt Tapsi noch einmal, winkt dem Mond „Gute Nacht, Milch!“ zu, und Papa liest vor. Wacht Tapsi nachts auf, ist Papa sofort da: Tapsi darf wütend sein und weinen, Papa hält Tapsi fest, gibt einen Schluck Wasser aus dem blauen Becher, trägt Tapsi hin und her und summt, bis Tapsi in seinem Arm einschläft. Am Morgen ist die Milch wieder wach. Nacht für Nacht kommt Papa wieder, und ein paar Nächte später sieht Tapsi den Mond, nimmt den Teddy in den Arm und schläft weiter. Unter jedem Bild steht der Satz zum Vorlesen, das Buch „Abstillen“ beginnt mit der Wahl zwischen ihr und der langen Geschichte, jede mit der Zahl ihrer Bilder und ihrer ungefähren Dauer, und jedes Tippen blättert weiter. Ohne Druck, ohne Schimpfen und ohne Uhrzeit – jede Familie hat ihre eigene Nacht.",
+  },
+  {
+    path: "/abstillen/kurz/",
+    title: "Abstillen kurz erzählt – Tapsis Milchkette als Kurzfassung",
+    description: "Die Kurzfassung der Abstillgeschichte zum Vorlesen: dieselben Bilder von Tapsi dem Fuchs, nur das Wichtigste – in wenigen Minuten gelesen.",
+    text: "Die Kurzfassung von „Tapsis Milchkette“, für Abende, an denen die lange Geschichte zu lang ist, oder für ein Kind, das sie schon kennt. Sie erzählt dieselbe Geschichte mit denselben Bildern, nur das Wichtigste: Tapsi der Fuchs hat als Baby an Mamas Brust getrunken und ist jetzt groß, Mama erzählt, dass die Milch gehen darf, und über Tapsis Bett hängt eine Kette mit einem Milchtropfen für jede Stillzeit. Erst geht die Milch am Tag, dann die am Abend, wenn Tapsi mit einem Buch einschläft, dann die in der Nacht, wenn Papa tröstet und summt, und an einem Morgen trinkt Tapsi ein letztes Mal und sagt der Milch danke und Tschüss. Tapsi darf traurig und wütend sein, Mama und Papa halten Tapsi fest, und lieb haben sie Tapsi wie immer. Unter jedem Bild steht ein kurzer Satz zum Vorlesen, jedes Tippen blättert weiter, und in wenigen Minuten ist sie gelesen. Im Buch „Abstillen“ steht sie neben der ganzen Geschichte, und bei jeder steht, wie viele Bilder sie hat und wie lange sie ungefähr dauert.",
+  },
+  {
+    path: "/abstillen/abschied/",
+    title: "Abstillen mit Abschiedsfest – Noch dreimal schlafen",
+    description:
+      "Eine kurze Vorlesegeschichte zum Abstillen an einem festen Tag: Drei Papierherzen zählen die Nächte, dann sagt Tapsi der Milch danke und feiert.",
+    text: "Eine kurze Geschichte zum Vorlesen, in vier Kapiteln, für Familien, die an einem festen Tag ganz abstillen möchten statt eine Stillzeit nach der anderen über Wochen. Tapsi der Fuchs ist groß und trinkt noch an Mamas Brust. Mama erzählt: Ihre Brust hat so lange Milch gemacht, und noch dreimal schlafen, dann sagen sie der Milch Tschüss. Tapsi will das nicht, und Mama nimmt Tapsi in den Arm: Traurigsein darf sein. Auf Tapsis Regal stehen drei rote Papierherzen, jeden Morgen nimmt Tapsi eines weg, und bis dahin gibt es noch Milch und langes Kuscheln. Mit Papa backt Tapsi einen Kuchen für das Abschiedsfest. Als das letzte Herz weg ist, trinkt Tapsi ein letztes Mal, ganz langsam, winkt „Danke, Mama-Brust! Tschüss, Milch!“, und dann gibt es Kuchen für alle und einen neuen Becher nur für Tapsi. Am Abend will Tapsi doch Milch, ist wütend und weint, und Mama und Papa halten Tapsi fest, bis die Tränen fertig sind. Jeden Tag wird es ein bisschen leichter: Die Milch ist weg, aber Kuscheln bleibt. Unter jedem Bild steht der Satz zum Vorlesen, und jedes Tippen blättert weiter. Ohne Druck und ohne Schimpfen.",
   },
   scene(
     "baustelle",
@@ -460,8 +473,17 @@ export const SEO_TEXTS: PageSeo[] = [
   ),
 ];
 
+/**
+ * Another address of a published game whose content players can't see yet – a story of a book whose pictures are still
+ * in the queue: its texts wait here like an unfinished game's, out of the search pages and `noindex` until it shows.
+ */
+const WAITING_PATHS = [
+  // „Three More Sleeps“ (`src/games/milkgoodbye`), until its pictures are made (`goodbyeMilkPictures.ts`, its `after`).
+  "/abstillen/abschied/",
+];
+
 /** Every page that should be found: all but the games still being built (`Game.unfinished`), which no one is to find yet. */
-export const SEO_PAGES: PageSeo[] = SEO_TEXTS.filter((page) => !isUnfinished(page.path));
+export const SEO_PAGES: PageSeo[] = SEO_TEXTS.filter((page) => !isUnfinished(page.path) && !WAITING_PATHS.includes(page.path));
 
 /**
  * Pages that had an entry here, and so stood in the sitemap, and moved: their old address and where it leads now. The
@@ -491,6 +513,7 @@ export const NO_INDEX_PATHS = [
   "/ideen/",
   "/impressum/",
   "/datenschutz/",
+  ...WAITING_PATHS,
   ...SEO_TEXTS.filter((page) => isUnfinished(page.path)).map((page) => page.path),
 ];
 

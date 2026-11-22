@@ -49,7 +49,7 @@ const FOLDERS: Record<string, string[]> = {
   "/grosses-bett/": ["src/games/bedstory"],
   "/flaeschchen/": ["src/games/bottlestory"],
   // The night story is a volume of the book Abstillen, a part of its row with its own files.
-  "/abstillen/": ["src/games/milkchain", "src/games/nightmilk"],
+  "/abstillen/": ["src/games/milkchain", "src/games/nightmilk", "src/games/milkgoodbye"],
   "/": ["src/components", "src/pages", "src/lib", "src/content/games.ts"],
 };
 

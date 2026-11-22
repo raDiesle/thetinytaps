@@ -6,7 +6,7 @@ A second story in the book „Abstillen“, for families who wean only at night 
 „Tapsis Milchkette“ (`src/games/milkchain`, weaning altogether) can't tell. Its own address, so a video or a search for
 „night weaning“ lands right on it. The book opens on the choice between the two stories (`MilkChainGame.tsx` in
 `src/games/milkchain`, user request, 22 November 2026), where this one is „Night weaning“ / „Nachts abstillen“
-(`NIGHT_MILK_KIND`) with its chapters as small numbers; the address `/abstillen/nachts/` shows the same book and names
+(`NIGHT_MILK_KIND`) with a slip „Lesen“ showing its pictures and minutes; the address `/abstillen/nachts/` shows the same book and names
 this story. It is no longer a volume tied to the other on the shelf.
 
 Tapsi the fox (the same family and home as in the other chapter books) drinks at Mama's breast by day and at night. With a

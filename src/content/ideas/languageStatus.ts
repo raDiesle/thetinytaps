@@ -92,7 +92,7 @@ export const LANGUAGE_STATUS: LanguageStatusRow[] = [
   },
   {
     href: "/abstillen/",
-    note: "Das Buch „Abstillen“ mit zwei Geschichten in Kapiteln, die Tapsis Stimme vorliest (ChapterBook, 13. November 2026); unten rechts über ▶ schaltet ein Lautsprecher sie für Erwachsene aus, die selbst vorlesen. Die Wörter des Buchs selbst (Kapitel, Weiter) kommen aus ChapterBook.",
+    note: "Das Buch „Abstillen“ mit drei Geschichten in Kapiteln, die Tapsis Stimme vorliest (ChapterBook, 13. November 2026); unten rechts über ▶ schaltet ein Lautsprecher sie für Erwachsene aus, die selbst vorlesen. Die Wörter des Buchs selbst (Kapitel, Weiter) kommen aus ChapterBook, die der Wahl am Anfang („Ganze Geschichte“, „Kurzfassung“, „Lesen“, „N Bilder · ca. M Min.“) stehen in allen sieben Sprachen in MilkChainGame.tsx (22. November 2026).",
     parts: [
       {
         label: "🤱 Tapsis Milchkette",
@@ -106,6 +106,18 @@ export const LANGUAGE_STATUS: LanguageStatusRow[] = [
         languages: { de: "text", en: "text", zh: "text", hi: "text", es: "text", ar: "text", ru: "text" },
         note: 'Die Geschichte fürs nächtliche Abstillen (H-104, nightMilk.ts, /abstillen/nachts/, 21. November 2026), Englisch zuerst geschrieben (ChapterBook first="en"): Titel, Name in der Auswahl des Buchs (names.ts), Kapitel und Sätze. Am 22. November 2026 in alle sechs anderen Sprachen übersetzt, Deutsch eingeschlossen: Kapitel und Sätze in <Sprache>.ts im Ordner, geladen über texts-<Sprache>.ts, wie bei „Haare waschen“. Aufnahmen gibt es noch keine (bun run voice make --only abstillen-nachts, nur auf Wunsch), bis dahin bleibt es still. Die Texte für Suchmaschinen sind in allen sieben Sprachen da. Seit dem 21. November 2026 mit allen Bildern veröffentlicht; seit dem 22. November 2026 ist „Abstillen“ wieder ein Buch, das auf der Wahl zwischen „Ganz abstillen“ und „Nachts abstillen“ aufgeht.',
         files: ["src/games/nightmilk/names.ts", "src/games/nightmilk/story.ts", "src/games/nightmilk/nightMilk.ts", "src/games/nightmilk/nightMilkPictures.ts"],
+      },
+      {
+        label: "🎂 Three More Sleeps",
+        recorded: true,
+        languages: { de: "text", en: "text", zh: "text", hi: "text", es: "text", ar: "text", ru: "text" },
+        note: 'Ganz abstillen an einem festen Tag mit Abschiedsfest (H-143, goodbyeMilk.ts, /abstillen/abschied/, 22. November 2026), Englisch zuerst geschrieben (ChapterBook first="en") und am selben Tag in alle sechs anderen Sprachen übersetzt, Deutsch eingeschlossen: Titel und Name in der Wahl (names.ts), Kapitel und Sätze in <Sprache>.ts im Ordner, geladen über texts-<Sprache>.ts. Aufnahmen gibt es noch keine (bun run voice make --only abstillen-abschied, nur auf Wunsch). Die Texte für Suchmaschinen sind in allen sieben Sprachen da, die Seite bleibt noindex, bis die zwölf Bilder gemacht sind; bis dahin sehen Spielende die Geschichte nicht. Die Kurzfassung der Milchkette (/abstillen/kurz/) braucht nichts Eigenes: dieselben Seiten, Texte und Aufnahmen.',
+        files: [
+          "src/games/milkgoodbye/names.ts",
+          "src/games/milkgoodbye/story.ts",
+          "src/games/milkgoodbye/goodbyeMilk.ts",
+          "src/games/milkgoodbye/goodbyeMilkPictures.ts",
+        ],
       },
     ],
   },
