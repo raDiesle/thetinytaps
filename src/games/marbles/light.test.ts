@@ -1,20 +1,30 @@
 import { describe, expect, test } from "bun:test";
 import {
+  BEAM,
   BLOBS,
+  BOW,
   BULBS,
   buildLight,
   CAROUSEL,
   DOME_Y,
   FIREFLIES,
   FLOOR,
+  FLOWER,
+  flowerHead,
+  fromStick,
   GLOBE,
   GLOBE_BUTTON,
   LAMP,
+  LANTERN,
   LAVA,
   lavaHalf,
   NAILS,
+  PRISM,
   SIDE_TABLE,
+  STICK,
+  STICKERS,
   SWITCH,
+  WINDOW,
   WIRE,
   WORLD_W,
   wireY,
@@ -31,9 +41,9 @@ describe("Licht-Kette", () => {
     }
   });
 
-  test("the machine runs about forty seconds and ends after everything else", () => {
-    expect(light.duration).toBeGreaterThan(38);
-    expect(light.duration).toBeLessThan(42);
+  test("the machine runs about a minute and ends after everything else", () => {
+    expect(light.duration).toBeGreaterThan(56);
+    expect(light.duration).toBeLessThan(64);
     expect(Math.max(...light.events.map((e) => e.at))).toBe(light.duration);
     expect(light.events.filter((e) => e.done)).toHaveLength(1);
   });
@@ -53,6 +63,12 @@ describe("Licht-Kette", () => {
       light.tLoose,
       light.tGlobe,
       light.tCall(FIREFLIES - 1),
+      light.tFull,
+      light.tSweep,
+      light.tPrism,
+      light.tSway,
+      light.tBow,
+      light.tOut(0),
       light.tLamp,
       light.tOwl,
       light.duration,
@@ -139,6 +155,61 @@ describe("Licht-Kette", () => {
       expect(pt?.y).toBeLessThan(FLOOR);
       expect(pt?.y).toBeGreaterThan(200);
     }
+  });
+
+  test("the globe's glow calls the fireflies into the lighthouse's lantern, where they fly round until the glow stick calls them", () => {
+    for (let i = 0; i < FIREFLIES; i++) {
+      expect(light.tIn(i)).toBeLessThanOrEqual(light.tFull);
+      for (const t of times(light.tIn(i) + 0.6, light.tOut(i), 0.1)) {
+        const { pt, inside } = light.fireflyAt(i, t);
+        expect(inside).toBe(1);
+        expect(Math.abs(pt.x - LANTERN.x)).toBeLessThan(LANTERN.rx - 10);
+        expect(Math.abs(pt.y - LANTERN.y)).toBeLessThan(LANTERN.ry - 10);
+      }
+      expect(light.fireflyAt(i, light.tOut(i) + 1).inside).toBe(0);
+    }
+    expect(light.lanternGlow(light.tCall(0))).toBe(0);
+    expect(light.lanternGlow(light.tSweep)).toBe(1);
+  });
+
+  test("the lighthouse's spot stays on the wall, passes every sticker twice before it rests on the prism, and they glow", () => {
+    for (const t of times(-1, light.duration)) {
+      const s = light.beamSpot(t);
+      if (t < light.tCall(0)) expect(s.show + s.facing).toBe(0);
+      if (s.show <= 0) continue;
+      expect(s.x - BEAM.rx).toBeGreaterThan(4600);
+      expect(s.x + BEAM.rx).toBeLessThan(WINDOW.x1 + 100);
+    }
+    STICKERS.forEach((sticker, k) => {
+      const hits = light.stickerHits[k];
+      expect({ sticker: sticker.x, passes: hits.length }).toEqual({ sticker: sticker.x, passes: 2 });
+      for (const h of hits) expect(Math.abs(light.beamSpot(h).x - sticker.x)).toBeLessThan(20);
+      expect(light.stickerGlow(k, light.tSweep)).toBe(0);
+      expect(light.stickerGlow(k, hits[0] + 1)).toBeLessThan(0.7);
+      expect(light.stickerGlow(k, light.tPrism + 0.5)).toBe(1);
+    });
+    const rest = light.beamSpot(light.tPrism);
+    expect(Math.abs(rest.x - PRISM.x)).toBeLessThan(1);
+    expect(rest.show).toBe(1);
+    expect(light.beamSpot(light.tBow).x).toBeCloseTo(PRISM.x, 3);
+  });
+
+  test("the rainbow reaches the flower, which bows until its face presses the glow stick, and only then the stick snaps and glows", () => {
+    expect(light.rainbow(light.tPrism)).toBe(0);
+    expect(light.rainbow(light.tSway)).toBeGreaterThan(0.9);
+    expect(light.flowerLean(light.tSway)).toBe(0);
+    const touch = FLOWER.head + STICK.r;
+    for (const t of times(-1, light.tBow - 0.15)) expect(fromStick(flowerHead(light.flowerLean(t)))).toBeGreaterThan(touch + 5);
+    expect(light.flowerLean(light.tBow)).toBeCloseTo(BOW, 5);
+    expect(fromStick(flowerHead(BOW))).toBeLessThanOrEqual(touch);
+    // Never through the stick, and up again once it has pressed.
+    for (const t of times(-1, light.duration)) expect(light.flowerLean(t)).toBeLessThanOrEqual(BOW + 1e-9);
+    expect(light.flowerLean(light.tBow + 1.6)).toBeLessThan(0.2);
+    expect(light.stickBent(light.tBow - 0.06)).toBe(0);
+    expect(light.stickGlow(light.tBow)).toBe(0);
+    expect(light.stickGlow(light.tOut(0))).toBeGreaterThan(0.9);
+    // The rainbow fades as the fireflies leave the lantern.
+    expect(light.rainbow(light.duration)).toBe(0);
   });
 
   test("the fireflies stay in the room, and every one ends up on the star lamp", () => {

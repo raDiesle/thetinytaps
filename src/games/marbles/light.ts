@@ -7,11 +7,16 @@
 // air turns the paper carousel on its cap, and its rabbit and bird cut-outs
 // throw big shadows that hop and fly over the wall. The paper bird comes
 // loose, flutters onto the globe's button, the globe lights up and turns, and
-// its glow calls the fireflies over it to the star lamp, which throws stars
-// all over the room. Soft sounds only: light, not noise. Everything is worked
-// out ahead as a function of the seconds since the tap, so LightLevel.tsx
-// only asks where each thing is at a moment. Coordinates are those of the
-// room, 6200 × 900; the screen shows 1600 of it at a time.
+// its glow calls the fireflies over it into the lantern of a toy lighthouse.
+// Their light becomes its beam: the lighthouse turns, its spot sweeps twice
+// over the wall, waking glow-in-the-dark stickers, and stops on a prism in the
+// window, which throws a rainbow onto a solar flower. The flower dances, bows
+// and snaps a glow stick with its face; the green glow calls the fireflies
+// out to the star lamp, which throws stars all over the room. Soft sounds
+// only: light, not noise. Everything is worked out ahead as a function of the
+// seconds since the tap, so LightLevel.tsx only asks where each thing is at a
+// moment. Coordinates are those of the room, 7100 × 900; the screen shows 1600
+// of it at a time.
 
 import {
   playBeam,
@@ -19,6 +24,7 @@ import {
   playChime,
   playChimeNote,
   playClick,
+  playCrack,
   playDing,
   playHum,
   playMusicbox,
@@ -32,10 +38,10 @@ import {
   playWhoosh,
 } from "@/lib/sfx";
 import { playHoot, playTweet } from "@/lib/realSounds";
-import { along, cameraOn, deg, easeInOut, easeOut, lerp, pathOf, rad, seg, timeline } from "./machineKit";
+import { along, cameraOn, clamp01, deg, easeInOut, easeOut, lerp, pathOf, rad, seg, timeline } from "./machineKit";
 import { arc, line, quad, type Pt } from "./path";
 
-export const WORLD_W = 6200;
+export const WORLD_W = 7100;
 export const FLOOR = 800;
 
 /* ---------- Layout ---------- */
@@ -126,15 +132,60 @@ export const DESK = { x0: 4720, x1: 5000, top: 650 };
 export const GLOBE = { x: 4860, y: 510, r: 78 };
 export const GLOBE_BUTTON = { x: 4904, y: DESK.top - 24 };
 
-/** The chest of drawers the star lamp stands on. */
-export const DRESSER = { x0: 5310, x1: 5610, top: 600 };
+/**
+ * The toy lighthouse standing on the floor: its tower narrows from `foot` (half its width at the floor) to `neck`
+ * under the gallery at `gallery`. The fireflies gather in its glass lantern, fly in through the little open hatch on
+ * its left, and their light turns into the lighthouse's beam.
+ */
+export const LIGHTHOUSE = { x: 5420, foot: 90, neck: 52, gallery: 372 };
+export const LANTERN = { x: LIGHTHOUSE.x, y: 322, rx: 46, ry: 44 };
+/** The lighthouse's spot of light on the wall: how far either side of the tower it sweeps, its height and its size. */
+export const BEAM = { sweep: 680, y: 322, rx: 74, ry: 120 };
+
+/** The glow-in-the-dark stickers on the wall: dull by day, they drink the beam's light and glow on in the dark. */
+export const STICKERS = [
+  { x: 4810, y: 262, kind: "moon" },
+  { x: 5030, y: 368, kind: "fish" },
+  { x: 5215, y: 230, kind: "boat" },
+  { x: 5640, y: 248, kind: "shell" },
+  { x: 5785, y: 378, kind: "fish" },
+] as const;
+
+/** The second window, arched, with stars outside; the sun catcher (a glass prism) hangs in it on a thread. */
+export const WINDOW = { x0: 5860, x1: 6100, top: 170, bottom: 450 };
+export const PRISM = { x: 5980, y: 330, r: 30 };
+
+/** The chest of drawers with the dancing solar flower, the glow stick and the star lamp on it. */
+export const DRESSER = { x0: 6080, x1: 6470, top: 600 };
+/** The solar flower in its pot: the stem stands on the pot's rim (`rim`), `stem` long, with a round face `head` big. */
+export const FLOWER = { x: 6168, rim: 552, stem: 140, head: 36 };
+/** The glow stick lying from the flower pot's rim over to the star lamp's base, `r` thick. */
+export const STICK = { a: { x: 6198, y: 552 }, b: { x: 6330, y: 566 }, r: 8 };
 /** The star lamp: its base on the dresser and the dome on top (`domeY` is the middle of the dome's flat bottom). */
-export const LAMP = { x: 5460, baseH: 34, r: 66 };
+export const LAMP = { x: 6386, baseH: 34, r: 66 };
 export const DOME_Y = DRESSER.top - LAMP.baseH;
 
 /** The bed with the sleeping toy owl. */
-export const BED = { x0: 5700, x1: 6180, top: 640 };
-export const OWL = { x: 5990, y: 572 };
+export const BED = { x0: 6580, x1: 7060, top: 640 };
+export const OWL = { x: 6870, y: 572 };
+
+/** Where the flower's face is when it leans `angle` radians to the right. */
+export function flowerHead(angle: number): Pt {
+  return { x: FLOWER.x + FLOWER.stem * Math.sin(angle), y: FLOWER.rim - FLOWER.stem * Math.cos(angle) };
+}
+/** How far the point `p` is from the glow stick's middle line. */
+export function fromStick(p: Pt) {
+  const { a, b } = STICK;
+  const len2 = (b.x - a.x) ** 2 + (b.y - a.y) ** 2;
+  const k = Math.min(1, Math.max(0, ((p.x - a.x) * (b.x - a.x) + (p.y - a.y) * (b.y - a.y)) / len2));
+  return Math.hypot(p.x - (a.x + k * (b.x - a.x)), p.y - (a.y + k * (b.y - a.y)));
+}
+/** How far the flower bows (radians) to press the glow stick with its face: until face and stick touch, a little more. */
+export const BOW = (() => {
+  let a = 0;
+  while (fromStick(flowerHead(a)) > FLOWER.head + STICK.r - 3) a += 0.002;
+  return a;
+})();
 
 /* ---------- The machine ---------- */
 
@@ -375,13 +426,15 @@ export function buildLight() {
     return u <= 0 ? 0 : 7 * Math.sin(u * 14) * Math.exp(-3 * u);
   };
 
-  /* The glowing globe calls the fireflies: they fly over the top of it and on to the star lamp, the one furthest left first. */
+  /* The glowing globe calls the fireflies: they fly over the top of it and on into the lighthouse's lantern, the one furthest left first. */
   const tCall = (i: number) => tGlobe + 0.9 + FLY_GAP * (FIREFLIES - 1 - i);
   const FIRST = FIREFLIES - 1;
   for (let i = 0; i < FIREFLIES; i++) at(tCall(i), { sound: () => playChimeNote(i + 2) });
   at(tCall(FIRST) + 0.2, { sound: playWhoosh });
-  const overLamp = { x: LAMP.x, y: DOME_Y - LAMP.r - 70 };
-  const toLamp = Array.from({ length: FIREFLIES }, (_, i) => {
+  /** The little open hatch on the lantern's left, and the lantern's middle. */
+  const hatch = { x: LANTERN.x - LANTERN.rx - 30, y: LANTERN.y + 6 };
+  const lanternMiddle = { x: LANTERN.x, y: LANTERN.y + 4 };
+  const toLantern = Array.from({ length: FIREFLIES }, (_, i) => {
     const s = tableSeat(i);
     const left = { x: GLOBE.x - ROUND_GLOBE, y: GLOBE.y };
     const right = { x: GLOBE.x + ROUND_GLOBE, y: GLOBE.y };
@@ -389,18 +442,135 @@ export function buildLight() {
       quad(s, { x: s.x + 120, y: 420 }, left),
       // Round over the top of the globe.
       arc(GLOBE.x, GLOBE.y, ROUND_GLOBE, 180, 360),
-      quad(right, { x: 5200, y: 330 }, overLamp),
+      quad(right, { x: 5180, y: 300 }, hatch),
+      line(hatch, lanternMiddle),
     );
   });
-  const tArrive = (i: number) => tCall(i) + toLamp[i].total / FLY_SPEED;
+  const tIn = (i: number) => tCall(i) + toLantern[i].total / FLY_SPEED;
+  for (let i = 0; i < FIREFLIES; i++) at(tIn(i), { sound: () => playPlink(i + 3) });
+
+  /* With all of them inside, the lantern shines and the lighthouse turns: its spot sweeps over the wall twice, waking the stickers, and stops on the prism. */
+  const tFull = Math.max(...Array.from({ length: FIREFLIES }, (_, i) => tIn(i)));
+  const tSweep = tFull + 0.5;
+  /** The lighthouse's angle before it turns (0: shining at the child, π: at the wall), and where it stops: its spot on the prism. */
+  const A0 = 4 * Math.PI;
+  const A_STOP = Math.PI - Math.asin((PRISM.x - LIGHTHOUSE.x) / BEAM.sweep);
+  /** Its speed once going (radians per second), and the seconds it speeds up and slows down. */
+  const SPEED = (2 * Math.PI) / 3;
+  const ACC = 1;
+  const DEC = 2;
+  const EVEN = (A0 - A_STOP - (SPEED * (ACC + DEC)) / 2) / SPEED;
+  const tPrism = tSweep + ACC + EVEN + DEC;
+  at(tSweep, { sound: playTick });
+  at(tSweep + 0.2, { sound: playSwirl });
+  /** The lighthouse's angle: it goes down, so that on the wall the spot moves to the right. */
+  const lighthouseAngle = (t: number) => {
+    const u = Math.max(0, t - tSweep);
+    if (u < ACC) return A0 - (SPEED * u * u) / (2 * ACC);
+    if (u < ACC + EVEN) return A0 - (SPEED * ACC) / 2 - SPEED * (u - ACC);
+    const v = Math.min(DEC, u - ACC - EVEN);
+    return A0 - (SPEED * ACC) / 2 - SPEED * EVEN - SPEED * v + (SPEED * v * v) / (2 * DEC);
+  };
+  /** How far firefly `i` is inside the lantern (0 to 1). */
+  const inside = (i: number, t: number) => seg(t, tIn(i) - 0.2, tIn(i) + 0.3) * (1 - seg(t, tOut(i), tOut(i) + 0.4));
+  /** How brightly the lantern shines: as many fireflies as are in it. */
+  const lanternGlow = (t: number) => Array.from({ length: FIREFLIES }, (_, i) => inside(i, t)).reduce((a, b) => a + b, 0) / FIREFLIES;
+  /** The beam's spot on the wall: where it is, how much it shows (only while it points at the wall), and how much it shines at the child. */
+  const beamSpot = (t: number) => {
+    const a = lighthouseAngle(t);
+    const glow = lanternGlow(t);
+    return { ...onWall(a), facing: Math.max(0, Math.cos(a)) * glow, show: onWall(a).show * glow };
+  };
+  /** Where the spot falls on the wall at the lighthouse's angle `a`, and how much of it is there (none while it points at the child). */
+  const onWall = (a: number) => ({ x: LIGHTHOUSE.x + BEAM.sweep * Math.sin(a), y: BEAM.y, show: clamp01(-2.5 * Math.cos(a)) });
+  /** When the spot passes over each sticker. */
+  const stickerHits = STICKERS.map((s) => {
+    const hits: number[] = [];
+    let before = onWall(lighthouseAngle(tSweep)).x - s.x;
+    for (let t = tSweep; t <= tPrism + 0.01; t += 1 / 120) {
+      const b = onWall(lighthouseAngle(t));
+      const now = b.x - s.x;
+      if (Math.sign(now) !== Math.sign(before) && b.show > 0.5) hits.push(t);
+      before = now;
+    }
+    return hits;
+  });
+  stickerHits.forEach((hits, k) => hits.forEach((h, n) => at(h, { sound: () => playChimeNote(k + 3 * n) })));
+  /** How brightly sticker `k` glows: half after the spot's first pass, fully after the second. */
+  const stickerGlow = (k: number, t: number) =>
+    Math.min(
+      1,
+      stickerHits[k].reduce((sum, h) => sum + 0.55 * easeOut(seg(t, h, h + 0.4)), 0),
+    );
+
+  /* The beam rests on the prism, and a rainbow falls from it onto the solar flower. */
+  at(tPrism, { sound: playPing });
+  at(tPrism + 0.3, { sound: playTwinkle });
+  at(tPrism + 0.9, {
+    say: {
+      de: "Schau, ein Regenbogen!",
+      en: "Look, a rainbow!",
+      zh: "看，一道彩虹！",
+      hi: "देखो, इंद्रधनुष!",
+      es: "¡Mira, un arcoíris!",
+      ar: "واو، قوس قزح!",
+      ru: "Смотри, радуга!",
+    },
+  });
+  /** How far the rainbow has grown from the prism down to the flower (0 to 1). */
+  const rainbowReach = (t: number) => easeOut(seg(t, tPrism + 0.1, tPrism + 0.9));
+  /** How strong the rainbow is: it grows from the prism down onto the flower, and fades as the fireflies leave the lantern. */
+  const rainbow = (t: number) => rainbowReach(t) * lanternGlow(t);
+
+  /* The flower drinks the light and dances, wider and wider, then bows deep and snaps the glow stick with its face: knack. */
+  const tSway = tPrism + 1.1;
+  const SWAY_T = 1;
+  const SWINGS = 3;
+  const tBend = tSway + SWINGS * SWAY_T;
+  const tBow = tBend + 0.45;
+  for (let n = 0; n < 2 * SWINGS; n++) at(tSway + SWAY_T * (0.25 + 0.5 * n), { sound: () => playPlink(n + 1) });
+  at(tBow, { sound: playCrack });
+  at(tBow + 0.35, { sound: playChime });
+  /** How far the flower leans to the right, in radians. */
+  const flowerLean = (t: number) => {
+    if (t < tSway) return 0;
+    if (t < tBend) return rad(6 + 18 * seg(t, tSway, tBend)) * Math.sin((2 * Math.PI * (t - tSway)) / SWAY_T);
+    if (t < tBow) return BOW * Math.sin((Math.PI / 2) * seg(t, tBend, tBow));
+    if (t < tBow + 0.5) return BOW;
+    if (t < tBow + 1.5) return BOW * (1 - easeInOut(seg(t, tBow + 0.5, tBow + 1.5)));
+    // A gentle sway on while the rainbow lasts, still when the level is over.
+    const u = Math.min(t, tDone) - tBow - 1.5;
+    return rad(8) * rainbow(t) * seg(u, 0, 0.8) * Math.sin((2 * Math.PI * u) / 1.2);
+  };
+  /** How far the glow stick is snapped into a little V (0 to 1), and how brightly it glows. */
+  const stickBent = (t: number) => easeOut(seg(t, tBow - 0.05, tBow + 0.05));
+  const stickGlow = (t: number) => easeOut(seg(t, tBow + 0.1, tBow + 0.8));
+
+  /* The glow stick's green light calls the fireflies out of the lantern, over the lighthouse to the star lamp. */
+  const tOut = (i: number) => tBow + 0.9 + FLY_GAP * i;
+  for (let i = 0; i < FIREFLIES; i++) at(tOut(i), { sound: () => playChimeNote(7 - i) });
+  at(tOut(0) + 0.2, { sound: playWhoosh });
+  const overLamp = { x: LAMP.x, y: DOME_Y - LAMP.r - 70 };
+  const overRoof = { x: LIGHTHOUSE.x + 120, y: 190 };
+  const toLamp = pathOf(line(lanternMiddle, hatch), quad(hatch, { x: LIGHTHOUSE.x - 70, y: 140 }, overRoof), quad(overRoof, { x: 6250, y: 150 }, overLamp));
+  const tArrive = (i: number) => tOut(i) + toLamp.total / FLY_SPEED;
+  /** Where firefly `i` flies round inside the lantern, going round with the turning lighthouse. */
+  const inLantern = (i: number, t: number): Pt => {
+    const a = lighthouseAngle(t) + (2 * Math.PI * i) / FIREFLIES;
+    return { x: LANTERN.x + 22 * Math.sin(a), y: lanternMiddle.y + 8 * Math.cos(a) + 3 * Math.sin(Math.min(t, tDone) * 5 + i) };
+  };
   /** Where each firefly sits on the dome of the star lamp at the end. */
   const seat = (i: number): Pt => {
     const a = rad(-170 + (160 * i) / (FIREFLIES - 1));
     return { x: LAMP.x + (LAMP.r + 34) * Math.cos(a), y: DOME_Y + (LAMP.r + 34) * Math.sin(a) };
   };
 
-  /** Where firefly `i` is, and how brightly it glows (0 asleep to 1). */
-  const fireflyAt = (i: number, t: number): { pt: Pt; glow: number } => {
+  /** Where firefly `i` is, how brightly it glows (0 asleep to 1), and how far it is inside the lantern (it is smaller there). */
+  const fireflyAt = (i: number, t: number): { pt: Pt; glow: number; inside: number } => {
+    const where = flightAt(i, t);
+    return { ...where, inside: inside(i, t) };
+  };
+  const flightAt = (i: number, t: number): { pt: Pt; glow: number } => {
     const glow = 0.15 + 0.85 * easeOut(seg(t, tWake(i), tWake(i) + 0.4));
     const home = SLEEP[i];
     if (t < tGo(i)) {
@@ -419,11 +589,25 @@ export function buildLight() {
       return { pt: { x: lerp(home.x, p.x, k), y: lerp(home.y, p.y + bob * calm, k) }, glow };
     }
     if (t < tCall(i)) return { pt: tableSeat(i), glow };
-    const second = toLamp[i];
+    const second = toLantern[i];
     const d2 = (t - tCall(i)) * FLY_SPEED;
     if (d2 < second.total) {
       const p = along(second, d2).pt;
-      return { pt: { x: p.x, y: p.y + bob * seg(d2, 0, 120) * (1 - seg(d2, second.total - 120, second.total)) }, glow };
+      return { pt: { x: p.x, y: p.y + bob * seg(d2, 0, 120) * (1 - seg(d2, second.total - 160, second.total - 80)) }, glow };
+    }
+    if (t < tOut(i)) {
+      // Into its place in the ring, then round and round with the lighthouse.
+      const k = easeInOut(seg(t, tIn(i), tIn(i) + 0.5));
+      const p = inLantern(i, t);
+      return { pt: { x: lerp(lanternMiddle.x, p.x, k), y: lerp(lanternMiddle.y, p.y, k) }, glow };
+    }
+    const d3 = (t - tOut(i)) * FLY_SPEED;
+    if (d3 < toLamp.total) {
+      const p = along(toLamp, d3).pt;
+      const from = inLantern(i, tOut(i));
+      const k = easeOut(seg(t, tOut(i), tOut(i) + 0.35));
+      const calm = seg(d3, 160, 280) * (1 - seg(d3, toLamp.total - 120, toLamp.total));
+      return { pt: { x: lerp(from.x, p.x, k), y: lerp(from.y, p.y + bob * calm, k) }, glow };
     }
     const k = easeInOut(seg(t, tArrive(i), tArrive(i) + 0.5));
     const s = seat(i);
@@ -474,9 +658,16 @@ export function buildLight() {
 
   /** Where the lava lamp, its shadows and the globe are all in the picture. */
   const LAVA_VIEW = 4450;
+  /** Where the stickers, the lighthouse and the prism are all in the picture (the view's left edge at 4740). */
+  const SWEEP_VIEW = 5412;
+  /** Where the lantern, the prism, the flower and the star lamp are all in the picture. */
+  const BOW_VIEW = 5872;
+  /** The star lamp and the bed: the view's left edge at the end of the room. */
+  const END_VIEW = WORLD_W - 1600 + 672;
   /**
    * Where the camera looks: the light on its way, the jar while the fireflies wake, the first firefly along the
-   * fairy lights, the lava lamp with the shadows on the wall and the globe, then over to the star lamp and the bed.
+   * fairy lights, the lava lamp with the shadows on the wall and the globe, the lighthouse sweeping over the wall,
+   * the rainbow and the flower, then over to the star lamp and the bed.
    */
   const focusX = (t: number) => {
     if (t < 0) return 0;
@@ -485,7 +676,9 @@ export function buildLight() {
     if (t < tJar) return spotAt(t).x;
     if (t < tGo(0) + 0.6) return JAR.x;
     if (t < tSwitch) return Math.min(LAVA_VIEW, Math.max(JAR.x, fireflyAt(0, t).pt.x - 120));
-    return lerp(LAVA_VIEW, 5680, easeInOut(seg(t, tCall(FIRST) + 1.2, tArrive(FIRST) + 0.4)));
+    if (t < tPrism) return lerp(LAVA_VIEW, SWEEP_VIEW, easeInOut(seg(t, tCall(FIRST) + 1, tFull)));
+    if (t < tOut(FIREFLIES - 1)) return lerp(SWEEP_VIEW, BOW_VIEW, easeInOut(seg(t, tPrism, tPrism + 1.6)));
+    return lerp(BOW_VIEW, END_VIEW, easeInOut(seg(t, tOut(FIREFLIES - 1), tArrive(FIREFLIES - 1) + 0.4)));
   };
   const cameraTarget = (t: number) => cameraOn(WORLD_W, focusX(t));
 
@@ -515,6 +708,13 @@ export function buildLight() {
     tLoose,
     tGlobe,
     tCall,
+    tIn,
+    tFull,
+    tSweep,
+    tPrism,
+    tSway,
+    tBow,
+    tOut,
     tArrive,
     tLamp,
     tOwl,
@@ -541,6 +741,16 @@ export function buildLight() {
     globeGlow,
     globeTurn,
     globeWobble,
+    lighthouseAngle,
+    lanternGlow,
+    beamSpot,
+    stickerHits,
+    stickerGlow,
+    rainbow,
+    rainbowReach,
+    flowerLean,
+    stickBent,
+    stickGlow,
     lampGlow,
     lampTurn,
     dark,

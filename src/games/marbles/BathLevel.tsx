@@ -9,8 +9,11 @@ import {
   BUBBLES,
   BUTTON,
   buildBath,
+  CISTERN,
   COUNTER,
+  DOOR,
   DRYER,
+  DRYER_SWITCH,
   FLOOR,
   HANDLE,
   HOLDER,
@@ -20,13 +23,20 @@ import {
   leverKnob,
   MUG,
   NOZZLE,
+  PIPE_X,
+  PLUNGER,
+  PULL,
   ROLL,
   SHELF,
+  SOAP,
+  START,
   TAP,
   TEAR,
+  TOILET,
   TUB,
   TUBE,
   WAND,
+  WASHER,
   WHALE,
   WORLD_W,
 } from "./bath";
@@ -55,9 +65,14 @@ const TILES_TOP = 380;
  * toothpaste tube, the blob tips the toothbrush off the glass shelf into the
  * tooth mug, the mug topples and knocks the squeaky duck onto the bath tap's
  * lever, the tub fills with foam and overflows, the wave carries the duck over
- * the rim against the toilet roll, which rolls off its holder and away over the
+ * the rim onto a bar of soap, and duck and soap slide over the wet tiles into the
+ * plunger stuck to the floor. It rocks, comes loose and topples onto the pull
+ * handle of the toilet's chain: the high cistern flushes, the lid bursts open
+ * and knocks the toilet roll off its holder, and the roll rolls away over the
  * floor in a long paper ribbon until it winds up the wind-up whale. The whale
- * waddles to the hair dryer and spouts a fountain onto its switch; the dryer
+ * waddles up to the washing machine and spouts a fountain in an arc onto its
+ * start button; the machine fills, tumbles its washing and spins so hard that
+ * it walks off on its feet until it presses the hair dryer's switch; the dryer
  * blows the shower cap onto the ceiling lamp and soap bubbles out of the
  * bubble wand, which pop at the lamp one by one. The camera travels along.
  */
@@ -77,14 +92,21 @@ export function BathLevel(props: LevelProps) {
           <Brush bath={bath} t={t} />
           <Tap bath={bath} t={t} />
           <Water bath={bath} t={t} inside={`${ids}-inside`} />
+          <Soap bath={bath} t={t} />
           <Duck bath={bath} t={t} />
           <Tub />
           <Overflow bath={bath} t={t} />
+          <Cistern bath={bath} t={t} />
+          <Toilet />
+          <Lid bath={bath} t={t} />
+          <Spray bath={bath} t={t} />
+          <Plunger bath={bath} t={t} />
           <Holder />
           <Roll bath={bath} t={t} />
           <Whale bath={bath} t={t} belly={`${ids}-belly`} />
           <Fountain bath={bath} t={t} />
           <DryerRing />
+          <Washer bath={bath} t={t} glass={`${ids}-glass`} />
           <Dryer bath={bath} t={t} />
           <BathShelf />
           <Wand bath={bath} t={t} />
@@ -116,10 +138,11 @@ const Room = memo(function Room({ tiles }: { tiles: string }) {
       {/* The ceiling */}
       <rect x="-400" y="-200" width={WORLD_W + 800} height="214" fill="#fff" stroke={INK} strokeWidth="4" />
       <Porthole x={2400} y={190} />
-      <Porthole x={3500} y={190} />
-      <TowelRail x={2860} />
-      <Basket x={5320} />
-      <Plant x={5600} />
+      <Porthole x={3560} y={190} />
+      <Porthole x={4800} y={190} />
+      <TowelRail x={3950} />
+      <Basket x={DRYER.x + 1110} />
+      <Plant x={DRYER.x + 1390} />
       {/* The floor: big black and white tiles */}
       <rect x="-400" y={FLOOR} width={WORLD_W + 800} height={VIEW_H - FLOOR + 200} fill="#f4f1ea" />
       {Array.from({ length: Math.ceil((WORLD_W + 800) / 100) }, (_, i) =>
@@ -346,8 +369,8 @@ function Mug({ bath, t }: { bath: Bath; t: number }) {
 /** The squeaky duck, in a little blue sailor's hat; it turns as it flies. */
 function Duck({ bath, t }: { bath: Bath; t: number }) {
   const { pt, spin } = bath.duckAt(t);
-  // It squeaks happily (beak open) when it is hit, when it lands on the lever and when it bonks the toilet roll.
-  const open = [bath.tHit, bath.tLever, bath.tBonk].some((at) => t > at && t < at + 0.35);
+  // It squeaks happily (beak open) when it is hit, when it lands on the lever, when it lands on the soap and when the soap bumps the plunger.
+  const open = [bath.tHit, bath.tLever, bath.tOnSoap, bath.tKnock].some((at) => t > at && t < at + 0.35);
   return (
     <g transform={`translate(${pt.x} ${pt.y}) rotate(${spin})`}>
       <path
@@ -474,7 +497,7 @@ function Overflow({ bath, t }: { bath: Bath; t: number }) {
   const still = Math.min(t, bath.duration);
   return (
     <g>
-      <ellipse cx={TUB.x1 + 40 + 120 * k} cy={FLOOR + 14} rx={60 + 260 * k} ry={10 + 12 * k} fill={WATER} opacity="0.7" />
+      <ellipse cx={TUB.x1 + 40 + 200 * k} cy={FLOOR + 14} rx={60 + 420 * k} ry={10 + 12 * k} fill={WATER} opacity="0.7" />
       {Array.from({ length: 6 }, (_, i) => {
         const fall = (still * 0.6 + i / 6) % 1;
         const y = TUB.rim + fall * (FLOOR - TUB.rim) * k;
@@ -487,6 +510,116 @@ function Overflow({ bath, t }: { bath: Bath; t: number }) {
         strokeWidth="3"
         opacity={k}
       />
+    </g>
+  );
+}
+
+/* ---------- Soap, plunger and toilet ---------- */
+
+/** The bar of soap on the floor; once the duck sits on it, it slides off over the wet tiles with a little foam behind it. */
+function Soap({ bath, t }: { bath: Bath; t: number }) {
+  const x = bath.soapX(t);
+  const sliding = t > bath.tOnSoap && t < bath.tKnock + 0.3;
+  return (
+    <g>
+      {sliding &&
+        [0, 1, 2].map((i) => (
+          <circle key={i} cx={x - SOAP.w / 2 - 12 - 20 * i} cy={FLOOR - 7 - 3 * (i % 2)} r={8 - 2 * i} fill={FOAM} stroke="#cbe9f7" strokeWidth="2" />
+        ))}
+      <rect x={x - SOAP.w / 2} y={FLOOR - SOAP.h} width={SOAP.w} height={SOAP.h} rx="13" fill="#9fe6c8" stroke={INK} strokeWidth="4" />
+      <rect x={x - SOAP.w / 2 + 14} y={FLOOR - SOAP.h + 7} width="34" height="6" rx="3" fill="#fff" opacity="0.7" />
+    </g>
+  );
+}
+
+/** The plunger: a red rubber cup on the floor with a long wooden handle; it rocks on its cup's corners, then topples right. */
+function Plunger({ bath, t }: { bath: Bath; t: number }) {
+  const tilt = bath.plungerTilt(t);
+  const { x, cupW, cupH, stick } = PLUNGER;
+  const pivot = x + (tilt >= 0 ? 1 : -1) * (cupW / 2);
+  const top = FLOOR - cupH - stick;
+  return (
+    <g transform={`rotate(${tilt} ${pivot} ${FLOOR})`}>
+      <rect x={x - 7} y={top} width="14" height={stick + 8} rx="6" fill="#d9a066" stroke={INK} strokeWidth="3" />
+      <circle cx={x} cy={top} r="11" fill="#a0612d" stroke={INK} strokeWidth="3" />
+      <path
+        d={`M${x - cupW / 2} ${FLOOR} Q${x - cupW / 2 + 4} ${FLOOR - cupH} ${x} ${FLOOR - cupH} Q${x + cupW / 2 - 4} ${FLOOR - cupH} ${x + cupW / 2} ${FLOOR} Z`}
+        fill="#e63946"
+        stroke={INK}
+        strokeWidth="4"
+        strokeLinejoin="round"
+      />
+      <path d={`M${x - 22} ${FLOOR - 12} q4 -20 18 -26`} fill="none" stroke="#ff9aa5" strokeWidth="5" strokeLinecap="round" />
+    </g>
+  );
+}
+
+/** The high cistern on the wall with its little water window, the lever and chain down to the pull handle, and the pipe
+    down behind the toilet, where the flush water rushes down. */
+function Cistern({ bath, t }: { bath: Bath; t: number }) {
+  const { x0, x1, top, bottom, lever } = CISTERN;
+  const pull = bath.pullAt(t);
+  const drop = pull.y - PULL.y;
+  const { front, tail } = bath.pipeWater(t);
+  const pipeTop = bottom;
+  const pipeLen = TOILET.hinge.y - 6 - pipeTop;
+  const full = bath.cisternFull(t);
+  const win = { x: x0 + 80, y: top + 22, w: x1 - x0 - 130, h: bottom - top - 44 };
+  return (
+    <g>
+      <rect x={PIPE_X - 12} y={pipeTop - 4} width="24" height={pipeLen + 4} fill={CHROME} stroke={INK} strokeWidth="3" />
+      {front > tail && <rect x={PIPE_X - 7} y={pipeTop + pipeLen * tail} width="14" height={pipeLen * (front - tail)} fill={WATER} />}
+      <rect x={x0} y={top} width={x1 - x0} height={bottom - top} rx="12" fill={ENAMEL} stroke={INK} strokeWidth="4" />
+      <rect x={win.x} y={win.y} width={win.w} height={win.h} rx="6" fill="#e9f3fb" stroke={INK} strokeWidth="3" />
+      <rect x={win.x + 3} y={win.y + win.h * (1 - 0.85 * full) - 3} width={win.w - 6} height={win.h * 0.85 * full} fill={WATER} opacity="0.8" />
+      {/* The lever out of the cistern's side, its end pulled down with the chain */}
+      <line x1={x0 + 10} y1={lever} x2={PULL.x} y2={lever + drop} stroke={INK} strokeWidth="11" strokeLinecap="round" />
+      <line x1={x0 + 10} y1={lever} x2={PULL.x} y2={lever + drop} stroke={CHROME} strokeWidth="5" strokeLinecap="round" />
+      <line x1={PULL.x} y1={lever + drop} x2={PULL.x} y2={pull.y - 7} stroke={INK} strokeWidth="5" strokeDasharray="7 5" />
+      <circle cx={x0 + 10} cy={lever} r="8" fill={CHROME} stroke={INK} strokeWidth="3" />
+      <rect x={PULL.x - PULL.half} y={pull.y - 7} width={2 * PULL.half} height="14" rx="7" fill="#c8893f" stroke={INK} strokeWidth="3" />
+    </g>
+  );
+}
+
+/** The toilet, facing left: the bowl on its foot and the seat ring, drawn once; the lid is drawn on its own. */
+const Toilet = memo(function Toilet() {
+  const { x: hx, y: hy } = TOILET.hinge;
+  const front = hx - TOILET.bowl;
+  return (
+    <g>
+      <path
+        d={`M${front} ${hy + 8} Q${front - 4} ${hy + 104} ${hx - 120} ${hy + 128} L${hx - 112} ${FLOOR} H${hx + 14} V${hy + 8} Z`}
+        fill={ENAMEL}
+        stroke={INK}
+        strokeWidth="5"
+        strokeLinejoin="round"
+      />
+      <path d={`M${front + 24} ${hy + 30} q10 60 70 76`} fill="none" stroke="#dde6f0" strokeWidth="8" strokeLinecap="round" />
+      <rect x={front - 4} y={hy} width={TOILET.bowl + 18} height="10" rx="5" fill="#8ecae6" stroke={INK} strokeWidth="3" />
+    </g>
+  );
+});
+
+/** The toilet's lid on its hinge: shut, until the flush bursts it open. */
+function Lid({ bath, t }: { bath: Bath; t: number }) {
+  const { x: hx, y: hy } = TOILET.hinge;
+  return (
+    <g transform={`rotate(${bath.lidAngle(t)} ${hx} ${hy})`}>
+      <rect x={hx - TOILET.lid} y={hy - 12} width={TOILET.lid} height="13" rx="6" fill="#8ecae6" stroke={INK} strokeWidth="4" />
+      <circle cx={hx - 6} cy={hy - 6} r="6" fill={CHROME} stroke={INK} strokeWidth="2" />
+    </g>
+  );
+}
+
+/** The water drops the flush throws up out of the bowl as the lid bursts open. */
+function Spray({ bath, t }: { bath: Bath; t: number }) {
+  return (
+    <g>
+      {Array.from({ length: 6 }, (_, i) => {
+        const p = bath.spray(i, t);
+        return p && <circle key={i} cx={p.x} cy={p.y} r={8 - (i % 3)} fill={WATER} stroke="#4fb6e8" strokeWidth="2" />;
+      })}
     </g>
   );
 }
@@ -610,36 +743,114 @@ function Whale({ bath, t, belly }: { bath: Bath; t: number; belly: string }) {
   );
 }
 
-/** The whale's water: a little spurt, then a big jet up to the dryer's switch, splashing there and dripping down. */
+/** The whale's water: a little spurt straight up, then a big fountain in an arc onto the washing machine's start button. */
 function Fountain({ bath, t }: { bath: Bath; t: number }) {
+  const spurt = bath.spurtAt(t);
   const f = bath.fountainAt(t);
-  if (!f) return null;
   const x = WHALE.stop + BLOWHOLE.dx;
   const base = FLOOR + BLOWHOLE.dy + 4;
-  const w = 8 + 10 * f.k;
-  const top = f.top;
-  const atSwitch = top <= HANDLE.y + 2;
+  const arc = f && Array.from({ length: 15 }, (_, i) => bath.arcAt((f.reach * i) / 14));
+  const end = arc?.[arc.length - 1];
   return (
-    <g opacity={Math.min(1, 0.4 + f.k)}>
-      <path
-        d={`M${x - w / 2} ${base} Q${x - w / 4} ${(base + top) / 2} ${x - w} ${top} H${x + w} Q${x + w / 4} ${(base + top) / 2} ${x + w / 2} ${base} Z`}
-        fill={WATER}
-        stroke="#4fb6e8"
-        strokeWidth="3"
-      />
-      <line x1={x - 2} y1={base - 6} x2={x - 2} y2={top + 10} stroke="#fff" strokeWidth="3" strokeDasharray="14 16" />
-      {/* The crown of drops at the top, flying out wider at the switch */}
-      {[-1, -0.5, 0.5, 1].map((s, i) => (
-        <circle
-          key={s}
-          cx={x + s * (atSwitch ? 42 : 18 + 10 * f.k)}
-          cy={top + 8 + Math.abs(s) * (atSwitch ? 18 : 8) + (i % 2) * 4}
-          r={4 + 4 * f.k}
+    <g>
+      {spurt && (
+        <path
+          d={`M${x - 5} ${base} Q${x - 3} ${(base + spurt.top) / 2} ${x - 8} ${spurt.top} H${x + 8} Q${x + 3} ${(base + spurt.top) / 2} ${x + 5} ${base} Z`}
           fill={WATER}
           stroke="#4fb6e8"
-          strokeWidth="2"
+          strokeWidth="3"
+          opacity={0.4 + spurt.k}
         />
+      )}
+      {f && arc && end && (
+        <g opacity={Math.min(1, 0.3 + f.k)} fill="none" strokeLinecap="round" strokeLinejoin="round">
+          <path d={svgLine(arc)} stroke="#4fb6e8" strokeWidth={8 + 14 * f.k} />
+          <path d={svgLine(arc)} stroke={WATER} strokeWidth={3 + 14 * f.k} />
+          <path d={svgLine(arc)} stroke="#fff" strokeWidth="3" strokeDasharray="14 16" />
+          {/* Where it lands on the button, the drops fly out to both sides */}
+          {f.reach > 0.98 &&
+            [-1, -0.5, 0.5, 1].map((s, i) => (
+              <circle
+                key={s}
+                cx={end.x + s * 34}
+                cy={end.y - 6 + Math.abs(s) * 10 + (i % 2) * 4}
+                r={3 + 4 * f.k}
+                fill={WATER}
+                stroke="#4fb6e8"
+                strokeWidth="2"
+              />
+            ))}
+        </g>
+      )}
+    </g>
+  );
+}
+
+/* ---------- Washing machine ---------- */
+
+/** The front-loading washing machine: its start button lights up green when the fountain hits it, water fills the drum,
+    the washing turns over and over behind the round glass, and spinning it hops along on its little feet. */
+function Washer({ bath, t, glass }: { bath: Bath; t: number; glass: string }) {
+  const { x, lift, tilt, on } = bath.washerAt(t);
+  const { w, h } = WASHER;
+  const cx = x + DOOR.dx;
+  const cy = DOOR.y;
+  const r = DOOR.r;
+  const water = bath.washWater(t);
+  const surface = cy + r - 2 * r * 0.75 * water;
+  const turnBy = bath.drumTurn(t);
+  const top = FLOOR - h;
+  const buttonX = x + START.x - WASHER.x0;
+  return (
+    <g transform={`translate(0 ${-lift}) rotate(${tilt} ${x + w / 2} ${FLOOR})`}>
+      {[30, w - 60].map((fx) => (
+        <rect key={fx} x={x + fx} y={FLOOR - 16} width="30" height="16" rx="5" fill="#5a6b8c" stroke={INK} strokeWidth="3" />
       ))}
+      <rect x={x} y={top} width={w} height={h - 12} rx="20" fill="#fbfbff" stroke={INK} strokeWidth="5" />
+      {/* The panel along the top: start button, three little lights and the dial */}
+      <rect x={x + 10} y={top + 10} width={w - 20} height="46" rx="10" fill="#e3ecf5" stroke={INK} strokeWidth="3" />
+      <circle cx={buttonX} cy={START.y} r={START.r} fill={on ? "#3ec300" : "#ff5d73"} stroke={INK} strokeWidth="4" />
+      <circle cx={buttonX - 5} cy={START.y - 6} r="5" fill="#fff" opacity="0.7" />
+      {[0, 1, 2].map((i) => (
+        <circle key={i} cx={x + 112 + 26 * i} cy={START.y} r="7" fill={on ? BAR_COLORS[(i * 2) % BAR_COLORS.length] : "#c9d3de"} stroke={INK} strokeWidth="2" />
+      ))}
+      <g transform={`rotate(${on ? 120 : 0} ${x + w - 52} ${START.y})`}>
+        <circle cx={x + w - 52} cy={START.y} r="17" fill="#fff" stroke={INK} strokeWidth="3" />
+        <line x1={x + w - 52} y1={START.y} x2={x + w - 52} y2={START.y - 13} stroke={INK} strokeWidth="4" strokeLinecap="round" />
+      </g>
+      {/* The round door with its glass: the water and the washing behind it */}
+      <circle cx={cx} cy={cy} r={r + 18} fill={CHROME} stroke={INK} strokeWidth="4" />
+      <defs>
+        <clipPath id={glass}>
+          <circle cx={cx} cy={cy} r={r} />
+        </clipPath>
+      </defs>
+      <circle cx={cx} cy={cy} r={r} fill="#dff4ff" />
+      <g clipPath={`url(#${glass})`}>
+        {water > 0 && <rect x={cx - r} y={surface} width={2 * r} height={cy + r - surface} fill={WATER} opacity="0.75" />}
+        <g transform={`rotate(${turnBy} ${cx} ${cy})`}>
+          {/* A red sock, a yellow shirt and a blue sock going round */}
+          <path d={`M${cx - 14} ${cy - 62} h22 v30 q0 14 16 14 v16 h-24 q-14 0 -14 -16 z`} fill="#ff5d73" stroke={INK} strokeWidth="3" strokeLinejoin="round" />
+          <path
+            d={`M${cx + 24} ${cy + 14} l18 -10 l14 10 l18 -10 l18 10 l-8 14 h-8 v26 h-36 v-26 h-8 z`}
+            fill="#ffd23f"
+            stroke={INK}
+            strokeWidth="3"
+            strokeLinejoin="round"
+          />
+          <path d={`M${cx - 70} ${cy + 6} h28 v20 q16 0 16 14 v12 h-30 q-14 0 -14 -14 z`} fill="#3a86ff" stroke={INK} strokeWidth="3" strokeLinejoin="round" />
+        </g>
+      </g>
+      <circle cx={cx} cy={cy} r={r} fill="none" stroke={INK} strokeWidth="4" />
+      <path
+        d={`M${cx - r * 0.55} ${cy - r * 0.5} q${r * 0.3} ${-r * 0.3} ${r * 0.65} ${-r * 0.25}`}
+        fill="none"
+        stroke="#fff"
+        strokeWidth="8"
+        strokeLinecap="round"
+        opacity="0.7"
+      />
+      <rect x={cx + r + 6} y={cy - 22} width="12" height="44" rx="5" fill="#9aa7b6" stroke={INK} strokeWidth="2" />
     </g>
   );
 }
@@ -652,19 +863,19 @@ const DryerRing = memo(function DryerRing() {
     <g>
       <rect x={DRYER.x - 40} y={DRYER.y - 84} width="80" height="18" rx="6" fill={CHROME} stroke={INK} strokeWidth="3" />
       <rect x={DRYER.x - 12} y={DRYER.y - 68} width="24" height="34" fill={CHROME} stroke={INK} strokeWidth="3" />
-      <rect x={DRYER.x - 150} y={DRYER.y + 150} width="40" height="54" rx="8" fill="#fff" stroke={INK} strokeWidth="3" />
-      <circle cx={DRYER.x - 136} cy={DRYER.y + 177} r="4" fill={INK} />
-      <circle cx={DRYER.x - 124} cy={DRYER.y + 177} r="4" fill={INK} />
+      <rect x={DRYER.x + 6} y={DRYER.y + 170} width="40" height="54" rx="8" fill="#fff" stroke={INK} strokeWidth="3" />
+      <circle cx={DRYER.x + 20} cy={DRYER.y + 197} r="4" fill={INK} />
+      <circle cx={DRYER.x + 32} cy={DRYER.y + 197} r="4" fill={INK} />
     </g>
   );
 });
 
-/** The hair dryer: it jolts in its ring when the jet hits its switch, the switch slides on, and air streams out of it. */
+/** The hair dryer: it jolts in its ring when the washer presses the switch on its handle, and air streams out of it. */
 function Dryer({ bath, t }: { bath: Bath; t: number }) {
   const { x, y } = DRYER;
   const on = bath.blowing(t);
   const still = Math.min(t, bath.duration);
-  const knob = t >= bath.tHitDryer && t < bath.tDryerOff + 0.15 ? -16 : 0;
+  const pressed = t >= bath.tHitDryer && t < bath.tDryerOff + 0.15;
   return (
     <g>
       {on > 0 && (
@@ -676,7 +887,7 @@ function Dryer({ bath, t }: { bath: Bath; t: number }) {
       )}
       <g transform={`rotate(${bath.dryerAngle(t)} ${x} ${y})`}>
         {/* The cord, curling down to the socket */}
-        <path d={`M${HANDLE.x} ${HANDLE.y} q-8 40 -40 34 q-24 -6 -20 24 q4 30 -40 44`} fill="none" stroke={INK} strokeWidth="5" strokeLinecap="round" />
+        <path d={`M${HANDLE.x} ${HANDLE.y} q4 40 34 46 q22 4 26 12`} fill="none" stroke={INK} strokeWidth="5" strokeLinecap="round" />
         {/* The handle, with its switch */}
         <path
           d={`M${x - 56} ${y + 20} L${x - 16} ${y + 20} L${HANDLE.x + 16} ${HANDLE.y} L${HANDLE.x - 16} ${HANDLE.y} Z`}
@@ -685,8 +896,16 @@ function Dryer({ bath, t }: { bath: Bath; t: number }) {
           strokeWidth="4"
           strokeLinejoin="round"
         />
-        <rect x={HANDLE.x - 6} y={y + 52} width="12" height="40" rx="5" fill="#7c5bd6" stroke={INK} strokeWidth="2" />
-        <rect x={HANDLE.x - 9} y={y + 74 + knob} width="18" height="14" rx="4" fill={knob ? "#3ec300" : "#ff5d73"} stroke={INK} strokeWidth="2" />
+        <rect
+          x={DRYER_SWITCH.x - DRYER_SWITCH.r + (pressed ? 6 : 0)}
+          y={DRYER_SWITCH.y - DRYER_SWITCH.r}
+          width={2 * DRYER_SWITCH.r + 6}
+          height={2 * DRYER_SWITCH.r}
+          rx="5"
+          fill={pressed ? "#3ec300" : "#ff5d73"}
+          stroke={INK}
+          strokeWidth="3"
+        />
         {/* The barrel with its nozzle and the grille at the back */}
         <path
           d={`M${x + 70} ${y - 26} L${NOZZLE.x} ${y - 18} V${y + 18} L${x + 70} ${y + 26} Z`}

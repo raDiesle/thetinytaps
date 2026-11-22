@@ -3,17 +3,23 @@
 // brush off the glass shelf, it turns a somersault and lands in the tooth
 // mug, the mug topples and its brush knocks the squeaky duck off the counter,
 // the duck bonks the bath tap's lever and the water rushes, the tub fills up
-// with foam and overflows. The wave carries the duck over the rim against the
-// toilet roll, which jumps off its holder and rolls away over the floor,
+// with foam and overflows. The wave carries the duck over the rim onto the bar
+// of soap in the puddle, and duck and soap slide off over the wet tiles into the
+// plunger stuck to the floor. The plunger rocks, comes loose with a plop and
+// topples onto the pull handle of the toilet's chain: the high cistern flushes,
+// the water rushes down the pipe and bursts the toilet's lid open, and the lid
+// knocks the toilet roll off its holder. It rolls away over the floor,
 // unrolling a long paper ribbon and getting thinner, until it bumps the key of
 // the wind-up whale and winds it up. The whale wakes, waddles off on its
-// little feet and spouts a fountain from its blowhole right onto the switch of
-// the hair dryer above it; the dryer blows the shower cap off the shelf onto
-// the ceiling lamp and blows a stream of soap bubbles out of the bubble wand,
-// each popping at the lamp with a note. Everything is worked out ahead as a
-// function of the seconds since the tap, so BathLevel.tsx only asks where each
-// thing is at a moment. Coordinates are those of the bathroom, 5700 × 900; the
-// screen shows 1600 of it at a time.
+// little feet and spouts a fountain in an arc onto the start button of the
+// washing machine: it fills, tumbles its washing and spins so hard that it
+// walks off on its feet, until it bumps the switch on the hair dryer's
+// handle; the dryer blows the shower cap off the shelf onto the ceiling lamp
+// and blows a stream of soap bubbles out of the bubble wand, each popping at
+// the lamp with a note. Everything is worked out ahead as a function of the
+// seconds since the tap, so BathLevel.tsx only asks where each thing is at a
+// moment. Coordinates are those of the bathroom, about 7700 × 900; the screen
+// shows 1600 of it at a time.
 
 import {
   playBlub,
@@ -22,6 +28,7 @@ import {
   playClonk,
   playCreak,
   playDing,
+  playGlug,
   playHum,
   playKnock,
   playPlink,
@@ -33,16 +40,16 @@ import {
   playRustle,
   playSlide,
   playSqueak,
+  playThump,
   playTwinkle,
   playWhirr,
   playWhoosh,
 } from "@/lib/sfx";
-import { playBlow, playSplash, playWhale } from "@/lib/realSounds";
+import { playBlow, playFlush, playSplash, playWash, playWhale } from "@/lib/realSounds";
 import { wobble } from "./level";
 import { cameraOn, clamp01, easeIn, easeInOut, easeOut, hop, lerp, rad, seg, timeline, turn } from "./machineKit";
 import type { Pt } from "./path";
 
-export const WORLD_W = 5700;
 export const FLOOR = 800;
 
 /* ---------- Layout ---------- */
@@ -73,36 +80,84 @@ export const TAP = { x: 1330, y: 440 };
 /** The lever's turning point, and its knob before and after the duck bonks it. */
 export const LEVER = { pivot: { x: TAP.x, y: TAP.y - 26 }, len: 76, up: -125, down: -60 };
 
-/** The toilet roll holder on the wall right of the tub: the middle of the roll on it. */
-export const HOLDER = { x: 2290, y: 590 };
+/** The bar of soap lying on the floor right of the tub: its middle, length and height (its bottom on the floor). */
+export const SOAP = { x: TUB.x1 + 100, w: 90, h: 30 };
+/** How high the duck's middle is while it rides on the soap. */
+export const DUCK_ON_SOAP = FLOOR - SOAP.h - 38;
+/** The plunger stuck to the floor by its rubber cup: the cup's middle, its width and height, and the handle's length above it. */
+export const PLUNGER = { x: 2860, cupW: 84, cupH: 46, stick: 290 };
+/** How far the plunger has toppled (degrees) when its knob comes down on the pull handle, and how far the handle goes down. */
+export const PLUNGER_HIT = 24;
+export const PULL_DOWN = 12;
+const PLUNGER_TOP = { x: PLUNGER.x, y: FLOOR - PLUNGER.cupH - PLUNGER.stick };
+/** The plunger's knob when it leans `deg` degrees: to the right it tips over its cup's right corner, to the left over the left one. */
+export const plungerTop = (deg: number): Pt => turn(PLUNGER_TOP, { x: PLUNGER.x + (deg >= 0 ? 1 : -1) * (PLUNGER.cupW / 2), y: FLOOR }, rad(deg));
+/** The wooden pull handle at the end of the toilet's chain, a short bar hanging crosswise right where the toppling plunger's knob comes down on its left part: its middle, and half its length. */
+export const PULL = { x: plungerTop(PLUNGER_HIT).x + 12, y: plungerTop(PLUNGER_HIT).y + 17, half: 30 };
+/** How far the plunger leans once it has pulled the handle down. */
+export const PLUNGER_PRESSED = (() => {
+  let deg = PLUNGER_HIT;
+  while (plungerTop(deg).y < plungerTop(PLUNGER_HIT).y + PULL_DOWN) deg += 0.05;
+  return deg;
+})();
+
+/** The toilet faces left: its lid turns on the hinge at the back (right), the bowl's rim reaches `bowl` forward of it. */
+export const TOILET = { hinge: { x: PULL.x + PULL.half + 237, y: 552 }, lid: 215, bowl: 228 };
+/** The high cistern on the wall above it; its lever reaches out over the bowl to the chain with the pull handle. */
+export const CISTERN = { x0: PULL.x + 70, x1: PULL.x + 300, top: 150, bottom: 240, lever: 186 };
+/** The flush pipe from the cistern down behind the toilet. */
+export const PIPE_X = TOILET.hinge.x - 26;
+/** How far the lid flies open, and where it comes to rest leaning back. */
+export const LID_OPEN = 110;
+export const LID_REST = 100;
+
+/** The toilet roll holder on the wall right of the toilet, where the flying lid hits the roll: the middle of the roll on it. */
+export const HOLDER = { x: TOILET.hinge.x + 90, y: TOILET.hinge.y - 120 };
 /** The toilet roll: full, and its cardboard core (what is left once all paper is off). */
 export const ROLL = { r: 44, core: 16 };
 /** The holder's tear bar under the roll: the paper runs over it, and its end stays caught there when the roll falls. */
 export const TEAR = { x: HOLDER.x + 40, y: HOLDER.y + 54 };
 
 /** The wind-up whale stands on the floor on two little feet; `x` is its middle before and after its walk. */
-export const WHALE = { x: 3600, stop: 4130, half: 115, h: 116, feet: 24 };
+export const WHALE = { x: HOLDER.x + 1310, stop: HOLDER.x + 1840, half: 115, h: 116, feet: 24 };
 /** The whale's wind-up key sticks out of its left side, low down: the tip's offset from the whale's middle and its height. */
 export const KEY = { dx: -110, y: FLOOR - 36 };
 /** The whale's blowhole, on top of its head: offset from its middle. */
 export const BLOWHOLE = { dx: 46, dy: -WHALE.feet - WHALE.h / 2 - Math.sqrt(1 - (46 / WHALE.half) ** 2) * (WHALE.h / 2) };
 
-/** The hair dryer rests in a ring on the wall, nozzle to the right; this is its barrel's middle, where it turns. */
-export const DRYER = { x: 4210, y: 400 };
-/** The bottom of the dryer's handle, where its switch is: the whale's fountain hits it there. */
+/** The front-loading washing machine on the floor right of where the whale stops: its left edge, width and height. */
+export const WASHER = { x0: WHALE.stop + BLOWHOLE.dx + 140, w: 300, h: 330 };
+/** Its start button on the panel along its top, as it stands before it walks. */
+export const START = { x: WASHER.x0 + 60, y: FLOOR - WASHER.h + 32, r: 18 };
+/** The round door on its front: its middle's offset from the washer's left edge, its height, and the glass's radius. */
+export const DOOR = { dx: WASHER.w / 2, y: FLOOR - 170, r: 82 };
+/** How high the whale's fountain arcs over the straight line from the blowhole to the start button. */
+export const ARC_H = 150;
+/** How far the spinning washer walks to the right, in steps. */
+export const WALK = 520;
+export const WALK_STEPS = 14;
+
+/** The hair dryer rests in a ring on the wall, nozzle to the right; this is its barrel's middle, where it turns. The washer
+    walks until its right side presses the switch on the handle's left edge. */
+export const DRYER = { x: WASHER.x0 + WASHER.w + WALK + 68, y: 400 };
+/** The bottom of the dryer's handle. */
 export const HANDLE = { x: DRYER.x - 34, y: DRYER.y + 112 };
+/** The dryer's switch, a button on the handle's left edge, where the walking washer's corner presses it. */
+export const DRYER_SWITCH = { x: DRYER.x - 59, y: DRYER.y + 92, r: 9 };
 /** Where the air comes out. */
 export const NOZZLE = { x: DRYER.x + 100, y: DRYER.y };
 /** The little glass shelf in front of the dryer, with the shower cap and the jar of bubble soap on it. */
-export const BATH_SHELF = { x0: 4350, x1: 4640, y: 470 };
+export const BATH_SHELF = { x0: DRYER.x + 140, x1: DRYER.x + 430, y: 470 };
 /** The shower cap's bottom middle as it sits on the shelf. */
-export const CAP = { x: 4410, y: BATH_SHELF.y };
+export const CAP = { x: DRYER.x + 200, y: BATH_SHELF.y };
 /** The ring of the bubble wand, standing in its jar in the dryer's air. */
-export const WAND = { x: 4545, y: 404, r: 24 };
+export const WAND = { x: DRYER.x + 335, y: 404, r: 24 };
 
 /** The ceiling lamp, a round glass globe on a cord; the bubbles go to the bottom of it. */
-export const LAMP = { x: 5150, y: 170, r: 58 };
+export const LAMP = { x: DRYER.x + 940, y: 170, r: 58 };
 export const BUBBLES = 9;
+
+export const WORLD_W = DRYER.x + 1490;
 
 /* ---------- The machine ---------- */
 
@@ -208,18 +263,98 @@ export function buildBath() {
   /** How far the overflow has got: 0 to 1. */
   const spill = (t: number) => easeOut(seg(t, tFull, tFull + 1.6));
 
-  /* The overflowing wave carries the duck over the rim; it bonks the toilet roll off its holder and lands in the puddle. */
+  /* The overflowing wave carries the duck over the rim onto the bar of soap in the puddle, and duck and soap slide off
+     over the wet tiles, slower and slower, until the soap bumps the plunger's rubber cup. */
   const tSurf = tFull + 0.35;
-  const tBonk = tSurf + 0.8;
-  const tDuckDown = tBonk + 0.5;
+  const tOnSoap = tSurf + 0.8;
+  const tGlide = tOnSoap + 0.15;
   const afloatEnd = { x: TUB.x1 - 150, y: waterY(tFull) - 30 };
-  /** Where the duck touches the roll on its holder. */
-  const bonkAt = { x: HOLDER.x - 84, y: HOLDER.y - 8 };
-  const duckFloor = { x: TUB.x1 + 45, y: FLOOR - 40 };
+  const onSoap = { x: SOAP.x, y: DUCK_ON_SOAP };
+  const slideEnd = PLUNGER.x - PLUNGER.cupW / 2 - SOAP.w / 2 - 2;
+  // Sliding from 300 px/s down to 140 px/s: still going when it bumps the cup.
+  const SLIDE_V0 = 300;
+  const SLIDE_V1 = 140;
+  const tKnock = tGlide + (2 * (slideEnd - SOAP.x)) / (SLIDE_V0 + SLIDE_V1);
+  /** The soap's middle: lying still until the duck lands on it, then sliding to the plunger. */
+  const soapX = (t: number) => {
+    const T = tKnock - tGlide;
+    const s = clamp01((t - tGlide) / T) * T;
+    return SOAP.x + SLIDE_V0 * s + ((SLIDE_V1 - SLIDE_V0) * s * s) / (2 * T);
+  };
   at(tSurf, { sound: playWhoosh });
-  at(tBonk, { sound: playSqueak });
-  at(tBonk + 0.03, { sound: () => playKnock(500) });
-  at(tDuckDown, { sound: playSplash });
+  at(tOnSoap, { sound: playSqueak });
+  at(tOnSoap + 0.03, { sound: playSplash });
+  at(tGlide, { sound: playSlide });
+  at(tGlide + 1.2, { sound: playSlide });
+  at(tKnock, { sound: () => playKnock(700) });
+  at(tKnock + 0.05, { sound: playSqueak });
+
+  /* The plunger is stuck by its cup: it rocks to and fro, further each time, until it comes loose with a plop on a rock to
+     the right and topples over onto the pull handle, pulling the chain down. */
+  const ROCK_T = 0.5;
+  const ROCKS = 3.25;
+  const tLoose = tKnock + ROCK_T * ROCKS;
+  const tPress = tLoose + 0.35;
+  const tPressed = tPress + 0.25;
+  at(tKnock + 0.1, { sound: playBoing });
+  at(tLoose, { sound: playPop });
+  at(tPress, { sound: () => playKnock(1000) });
+  at(tPress + 0.1, { sound: playRattle });
+  /** How far the plunger leans to the right (degrees; to the left when negative). */
+  const plungerTilt = (t: number) => {
+    if (t < tKnock) return 0;
+    if (t < tLoose) {
+      const k = (t - tKnock) / ROCK_T;
+      return lerp(4, 12, (t - tKnock) / (tLoose - tKnock)) * Math.sin(2 * Math.PI * k);
+    }
+    if (t < tPress) return lerp(12, PLUNGER_HIT, easeIn(seg(t, tLoose, tPress)));
+    return lerp(PLUNGER_HIT, PLUNGER_PRESSED, easeOut(seg(t, tPress, tPressed)));
+  };
+  /** The pull handle's middle: hanging still until the plunger's knob comes down on it, then pressed down under it as the knob slides along it. */
+  const pullAt = (t: number): Pt => {
+    if (t < tPress) return PULL;
+    const top = plungerTop(plungerTilt(t));
+    return { x: PULL.x, y: PULL.y + top.y - plungerTop(PLUNGER_HIT).y };
+  };
+
+  /* The cistern flushes: the water rushes down the pipe into the toilet and bursts the lid open, which flies up and back
+     and knocks the toilet roll off its holder. */
+  const tFlush = tPressed + 0.05;
+  const tLidPop = tFlush + 0.75;
+  const LID_FLY = 0.4;
+  at(tFlush, { sound: playFlush });
+  at(tLidPop, { sound: playWhoosh });
+  /** The water drops the burst throws up out of the bowl: each one's middle, or null before and once it has fallen back. */
+  const spray = (i: number, t: number): Pt | null => {
+    const age = t - tLidPop;
+    const v = 520 + 90 * (i % 3);
+    const y = TOILET.hinge.y + 4 - v * age + 700 * age * age;
+    if (age < 0 || y > TOILET.hinge.y + 6) return null;
+    return { x: TOILET.hinge.x - 190 + 30 * i + 40 * age * ((i % 2) * 2 - 1), y };
+  };
+  /** How far the flush water has got down the pipe (0 to 1), and how far its end has (the pipe is empty again at 1). */
+  const pipeWater = (t: number) => ({ front: easeIn(seg(t, tFlush, tFlush + 0.7)), tail: easeIn(seg(t, tFlush + 1.4, tFlush + 2.1)) });
+  /** How full the cistern is: it empties with the flush and fills again slowly. */
+  const cisternFull = (t: number) => 1 - easeInOut(seg(t, tFlush, tFlush + 1.2)) + easeInOut(seg(t, tFlush + 3, tFlush + 7));
+  /** The lid's angle (degrees, 0 shut and lying to the left, 90 standing up): it flies open, then settles leaning back. */
+  const lidAngle = (t: number) => {
+    if (t < tLidPop) return 0;
+    if (t < tLidPop + LID_FLY) return LID_OPEN * easeOut(seg(t, tLidPop, tLidPop + LID_FLY));
+    const age = Math.min(t, tLidPop + LID_FLY + 3) - tLidPop - LID_FLY;
+    return LID_REST + (LID_OPEN - LID_REST) * Math.exp(-age * 4) * Math.cos(age * 9);
+  };
+  /** How close the lid at angle `a` comes to the roll on its holder, beyond the roll's and the lid's half thickness. */
+  const lidGap = (a: number) => {
+    let near = Number.POSITIVE_INFINITY;
+    for (let s = 0; s <= TOILET.lid; s += 2) {
+      const p = turn({ x: TOILET.hinge.x - s, y: TOILET.hinge.y - 6 }, TOILET.hinge, rad(a));
+      near = Math.min(near, Math.hypot(p.x - HOLDER.x, p.y - HOLDER.y));
+    }
+    return near - ROLL.r - 6;
+  };
+  // The moment the flying lid touches the roll.
+  let tBonk = tLidPop;
+  while (lidGap(lidAngle(tBonk)) > 0) tBonk += 0.002;
 
   const duckAt = (t: number): { pt: Pt; spin: number } => {
     const start = { x: DUCK.x, y: DUCK.y };
@@ -237,10 +372,10 @@ export function buildBath() {
       return { pt: { x, y: Math.min(duckLand.y, water) + (water < duckLand.y ? bob : 0) }, spin: 200 * (1 - easeOut(seg(t, tInTub, tInTub + 0.4))) };
     }
     const from = { x: afloatEnd.x, y: waterY(tSurf) - 30 + 5 * Math.sin(tSurf * 3) };
-    if (t < tBonk) return { pt: hop(from, bonkAt, 110, seg(t, tSurf, tBonk)), spin: 30 * Math.sin(seg(t, tSurf, tBonk) * Math.PI) };
-    // Bonked back off the roll: a tumble down into the puddle, landing upright.
-    const k = seg(t, tBonk, tDuckDown);
-    return { pt: hop(bonkAt, duckFloor, 20, easeIn(k)), spin: -360 * easeOut(k) };
+    if (t < tOnSoap) return { pt: hop(from, onSoap, 110, seg(t, tSurf, tOnSoap)), spin: -360 * easeInOut(seg(t, tSurf, tOnSoap)) };
+    // Riding the soap: swaying a little while it slides, nodding forward when it bumps the plunger.
+    const sway = t < tKnock ? 5 * Math.sin((t - tOnSoap) * 10) * seg(t, tOnSoap, tOnSoap + 0.3) : wobble(t - tKnock, 22, 12, 3);
+    return { pt: { x: soapX(t), y: DUCK_ON_SOAP }, spin: sway };
   };
 
   /* The roll jumps off its holder, lands, hops once and rolls off over the floor. Its paper stays caught on the tear bar,
@@ -275,6 +410,7 @@ export function buildBath() {
     const s = clamp01((t - tRollBounce) / T) * T;
     return bounceX + V0 * s + ((V1 - V0) * s * s) / (2 * T);
   };
+  at(tBonk, { sound: () => playKnock(500) });
   at(tBonk + 0.08, { sound: playRip });
   at(tRollLand, { sound: playPlop });
   at(tRollBounce, { sound: playPlop });
@@ -330,11 +466,13 @@ export function buildBath() {
   at(tWalk, { sound: playWhirr });
   for (let i = 0; i < STEPS; i++) at(tWalk + (i + 0.5) * STEP_T, { sound: () => playKnock(i % 2 ? 1300 : 1600) });
 
-  /* At the stop it swells up, gives a little spurt, then a big fountain right up onto the dryer's switch. */
+  /* At the stop it swells up, gives a little spurt, then a big fountain in an arc onto the washing machine's start button. */
   const tSpurt = tStop + 0.7;
   const tFountain = tStop + 1.4;
   const blowholeY = FLOOR + BLOWHOLE.dy;
-  const tHitDryer = tFountain + 0.3;
+  const tHitStart = tFountain + 0.45;
+  at(tHitStart, { sound: playClick });
+  at(tHitStart + 0.15, { sound: playDing });
   at(tStop + 0.1, { sound: playWhale });
   at(tSpurt, { sound: playPuff });
   at(tFountain, { sound: playSplash });
@@ -366,20 +504,76 @@ export function buildBath() {
   };
   /** The tip of the whale's key at a moment. */
   const keyTip = (t: number) => keyAt(whaleAt(t).x);
-  /** How high the whale's water goes: the top of the jet (null when there is none) and how strong it is (0 to 1). */
-  const fountainAt = (t: number): { top: number; k: number } | null => {
-    if (t >= tSpurt && t < tSpurt + 0.5) {
-      const k = Math.sin(Math.PI * seg(t, tSpurt, tSpurt + 0.5));
-      return { top: blowholeY - 50 * k, k: 0.5 * k };
-    }
+  /** The whale's little spurt straight up: the top of the water and how strong it is (0 to 1), or null. */
+  const spurtAt = (t: number): { top: number; k: number } | null => {
+    if (t < tSpurt || t >= tSpurt + 0.5) return null;
+    const k = Math.sin(Math.PI * seg(t, tSpurt, tSpurt + 0.5));
+    return { top: blowholeY - 50 * k, k: 0.5 * k };
+  };
+  const blowhole = { x: WHALE.stop + BLOWHOLE.dx, y: blowholeY };
+  /** A point on the fountain's arc, `k` of the way from the blowhole (0) to the start button (1). */
+  const arcAt = (k: number): Pt => hop(blowhole, START, ARC_H, k);
+  /** The big fountain: how far along its arc the water has got (0 to 1) and how strong it is (0 to 1), or null. */
+  const fountainAt = (t: number): { reach: number; k: number } | null => {
     if (t < tFountain || t > tFountain + 2.2) return null;
-    const up = easeOut(seg(t, tFountain, tHitDryer));
-    const down = easeIn(seg(t, tFountain + 1.5, tFountain + 2.2));
-    return { top: lerp(blowholeY, HANDLE.y, up * (1 - down)), k: 1 - down };
+    return { reach: easeOut(seg(t, tFountain, tHitStart)), k: 1 - easeIn(seg(t, tFountain + 1.5, tFountain + 2.2)) };
   };
 
-  /* The jet pushes the switch: click, the dryer jolts in its ring and blows. Its air lifts the shower cap off the shelf and
-     carries it, fluttering, onto the lamp like a hat, and blows soap bubbles out of the wand. */
+  /* The washing machine starts: water runs into its drum, the drum turns the washing over and over, then spins faster and
+     faster until the machine shakes and walks off to the right on its little feet, step by step, and its right side presses
+     the switch on the dryer's handle. */
+  const tFill = tHitStart + 0.4;
+  const tTumble = tFill + 2.6;
+  const tSpin = tTumble + 5;
+  const tWalkOff = tSpin + 0.4;
+  const WALK_T = 0.45;
+  const tHitDryer = tWalkOff + WALK_STEPS * WALK_T;
+  at(tFill, { sound: playGlug });
+  at(tFill + 1.3, { sound: playGlug });
+  at(tTumble, { sound: playWash });
+  at(tTumble + 2.5, { sound: playWash });
+  for (let s = tTumble + 0.8; s < tSpin; s += 1) at(s, { sound: playThump });
+  at(tSpin, { sound: playWhirr });
+  for (let i = 0; i < WALK_STEPS; i++) at(tWalkOff + (i + 0.5) * WALK_T, { sound: () => playKnock(i % 2 ? 450 : 560) });
+  at(tWalkOff + 0.3, {
+    say: {
+      de: "Die Waschmaschine läuft los!",
+      en: "The washing machine walks off!",
+      zh: "洗衣机自己走起来啦！",
+      hi: "देखो, वॉशिंग मशीन चल पड़ी!",
+      es: "¡La lavadora se va andando!",
+      ar: "واو، الغسّالة تمشي!",
+      ru: "Стиральная машина пошла!",
+    },
+  });
+  /** How full the drum is (0 to 1). */
+  const washWater = (t: number) => easeInOut(seg(t, tFill, tTumble)) * (1 - 0.6 * easeInOut(seg(t, tSpin, tSpin + 1.5)));
+  /** The time a speed that rises evenly from `t0` to `t1` (and stays) has run, counted at full speed. */
+  const ramp = (t: number, t0: number, t1: number) => (t < t0 ? 0 : t < t1 ? (t - t0) ** 2 / (2 * (t1 - t0)) : (t1 - t0) / 2 + (t - t1));
+  /** How far the drum has turned (degrees): slowly while it tumbles, fast while it spins, slowing to a stop after the switch. */
+  const drumTurn = (t: number) => {
+    const still = Math.min(t, tHitDryer + 4);
+    return 140 * ramp(still, tTumble, tTumble + 0.5) + 760 * ramp(still, tSpin, tSpin + 0.4) - 900 * ramp(still, tHitDryer, tHitDryer + 1.6);
+  };
+  /** The washing machine: its left edge, how high it is lifted, its tilt (degrees) and whether it is on. */
+  const washerAt = (t: number) => {
+    const step = WALK / WALK_STEPS;
+    const on = t >= tHitStart;
+    if (t < tWalkOff) {
+      const shake = t >= tSpin ? 1.5 * Math.sin(t * 50) * seg(t, tSpin, tWalkOff) : 0;
+      return { x: WASHER.x0, lift: 0, tilt: shake, on };
+    }
+    if (t < tHitDryer) {
+      const phase = (t - tWalkOff) / WALK_T;
+      const i = Math.floor(phase);
+      const f = phase - i;
+      return { x: WASHER.x0 + step * (i + easeInOut(f)), lift: 10 * Math.sin(Math.PI * f), tilt: (i % 2 ? -3 : 3) * Math.sin(Math.PI * f), on };
+    }
+    return { x: WASHER.x0 + WALK, lift: 0, tilt: wobble(t - tHitDryer, 3, 14, 3), on };
+  };
+
+  /* The washer presses the switch: click, the dryer jolts in its ring and blows. Its air lifts the shower cap off the shelf
+     and carries it, fluttering, onto the lamp like a hat, and blows soap bubbles out of the wand. */
   const tDryer = tHitDryer + 0.05;
   const tCapLift = tDryer + 0.35;
   const tCapOff = tCapLift + 0.45;
@@ -390,7 +584,7 @@ export function buildBath() {
   /** The dryer's turn in its ring after the jolt (degrees). */
   const dryerAngle = (t: number) => wobble(t - tHitDryer, 12, 16, 3);
   const capOn = { x: LAMP.x, y: LAMP.y - LAMP.r + 22 };
-  const capMid = { x: 4820, y: 90 };
+  const capMid = { x: DRYER.x + 610, y: 90 };
   /** The shower cap: its bottom middle and turn while it flies, or null once it sits on the lamp. */
   const capAt = (t: number): { pt: Pt; angle: number } | null => {
     if (t >= tCapLand) return null;
@@ -511,23 +705,28 @@ export function buildBath() {
     return null;
   };
 
-  /** Where the camera looks: tube, brush and mug, the duck, the tub filling, the roll, the whale, then dryer and lamp. */
-  const FINALE = 4760;
+  /** Where the camera looks: tube, brush and mug, the duck, the tub filling, the soap's slide, plunger and toilet, the roll,
+      the whale, the washing machine walking, then dryer and lamp. */
+  const TOILET_VIEW = PULL.x;
+  const WASHER_VIEW = WASHER.x0 + 74;
+  const FINALE = DRYER.x + 550;
   const focusX = (t: number) => {
     if (t < 0) return 0;
     if (t < tHit) return 760;
     if (t < tInTub) return Math.max(760, duckAt(t).pt.x);
     if (t < tSurf) return 1700;
-    if (t < tBonk) return Math.max(1700, duckAt(t).pt.x);
-    if (t < tKey) return Math.max(2100, rollAt(t).pt.x);
+    if (t < tKnock) return Math.min(TOILET_VIEW, Math.max(1700, duckAt(t).pt.x + 230));
+    if (t < tBonk + 0.3) return TOILET_VIEW;
+    if (t < tKey) return Math.max(TOILET_VIEW, rollAt(t).pt.x);
     if (t < tWalk) return rollEndX + 120;
     if (t < tStop) return whaleAt(t).x + 120;
-    if (t < tDryer + 0.4) return WHALE.stop + 200;
+    if (t < tHitDryer) return Math.max(WASHER_VIEW, washerAt(t).x + 74);
+    if (t < tDryer + 0.4) return WASHER.x0 + WALK + 74;
     return FINALE;
   };
   const cameraTarget = (t: number) => cameraOn(WORLD_W, focusX(t));
 
-  /** Where it could wait for the child's tap (R-03): the mug with the brush in it, the duck on the brimful tub, the wound-up whale, the whale under the dryer. Only the wound-up whale waits; the machine runs through the others. */
+  /** Where it could wait for the child's tap (R-03): the mug with the brush in it, the duck on the brimful tub, the wound-up whale, the whale before the washing machine. Only the wound-up whale waits; the machine runs through the others. */
   const whaleY = FLOOR - WHALE.feet - WHALE.h / 2;
   const stops = [
     { at: tTopple, x: MUG.x, y: MUG.bottom - MUG.h / 2 },
@@ -549,8 +748,14 @@ export function buildBath() {
     tWater,
     tFull,
     tSurf,
+    tOnSoap,
+    tGlide,
+    tKnock,
+    tLoose,
+    tPress,
+    tFlush,
+    tLidPop,
     tBonk,
-    tDuckDown,
     tRollLand,
     tKey,
     tWound,
@@ -558,6 +763,11 @@ export function buildBath() {
     tWalk,
     tStop,
     tFountain,
+    tHitStart,
+    tFill,
+    tTumble,
+    tSpin,
+    tWalkOff,
     tHitDryer,
     tDryer,
     tCapLand,
@@ -577,11 +787,24 @@ export function buildBath() {
     pour,
     foam,
     spill,
+    soapX,
+    plungerTilt,
+    pullAt,
+    pipeWater,
+    cisternFull,
+    lidAngle,
+    lidGap,
+    spray,
     rollAt,
     ribbon,
     whaleAt,
     keyTip,
+    spurtAt,
     fountainAt,
+    arcAt,
+    washWater,
+    drumTurn,
+    washerAt,
     dryerAngle,
     blowing,
     capAt,
