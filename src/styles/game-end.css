@@ -40,7 +40,7 @@
   font-size: clamp(1.4rem, 8vh, 2.8rem);
 }
 
-/* No emoji (user feedback, November 2026): words, or where the game hands over the next picture that and the drawn round arrow. */
+/* No emoji and no words but „Menü“ (children don't read): the drawn round arrow, and the next picture or the drawn play sign. */
 .game-end-button {
   position: relative;
   padding: 0.35em 0.9em 0.4em;
@@ -342,4 +342,31 @@
 /* „Menü“ alone in the corner is the only way on: a little bigger than „Nochmal“ there, its shelf still clear. */
 .game-end.corners .game-end-button.menu {
   font-size: clamp(1.1rem, 3vw, 1.6rem);
+}
+
+/* „Weiter“ without a picture of what comes (a game whose levels have none): the drawn ▶ on its painted label. */
+.game-end-button.next.arrow {
+  padding: 0.12em 0.5em;
+}
+
+.game-end-next-arrow {
+  display: block;
+  width: clamp(64px, 18vh, 130px);
+  height: clamp(64px, 18vh, 130px);
+  margin: 0 auto;
+}
+
+/* The next one's name for grown-ups (`showNext`) under its picture, on the photo's white frame. */
+.game-end-button.next.pictured .game-end-next-name {
+  margin-top: 0.3em;
+  color: var(--ink);
+  font-size: clamp(0.8rem, 3.4vh, 1.2rem);
+  -webkit-text-stroke: 0;
+  text-align: center;
+}
+
+/* In a game's own narrow column (`inline`, Gefühle) the picture, the arrow and the trophy stand one over the other:
+   the picture smaller, so the trophy stays on the screen at 844×390. */
+.game-end.inline .game-end-next-picture {
+  height: clamp(56px, 19vh, 170px);
 }

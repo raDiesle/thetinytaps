@@ -32,6 +32,7 @@ import { playSound } from "./sounds";
 import { gust, poke, SPOTS, SpotEffectArt, spotAt, type SpotEffect } from "./spots";
 import { litItems, TORCH_RADIUS, TORCH_STEP, TorchNight } from "./torch";
 import { placeBox, type Scene, type SceneItem } from "./types";
+import previews from "./vorschau/*.webp?glob";
 
 /** Key presses closer together than this only make ripples. */
 const MIN_KEY_MS = 600;
@@ -981,7 +982,7 @@ export function ScenePlay({ scene, settings, onKeys }: { scene: Scene; settings:
           delayMs={bedtime ? NIGHT_END_MS : curtainEndAt(items.length)}
           level={scene.id}
           onAgain={startOver}
-          next={{ name: sceneTitle(nextId, appLanguage.id), onNext: goToNextScene }}
+          next={{ name: sceneTitle(nextId, appLanguage.id), onNext: goToNextScene, picture: previews[`${nextId}.webp`] }}
         />
       )}
       {/* Colour mode with the key badges on: the space bar, small at the bottom, paints where nothing happens. */}

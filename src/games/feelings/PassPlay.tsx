@@ -1,5 +1,5 @@
 import { type ReactNode, useEffect, useRef, useState } from "react";
-import { GameEnd } from "@/components/GameEnd";
+import { GameEnd, type NextLevel } from "@/components/GameEnd";
 import { useAppLanguage } from "@/lib/language";
 import { stepInAddress, useStepAddress } from "@/lib/stepAddress";
 import { groupStories, type StoryGroup } from "./groups";
@@ -32,7 +32,7 @@ export function PassPlay({
   remember?: boolean;
   onAgain: () => void;
   /** The next group; left out where there is none to go on to. */
-  next?: { name?: string; onNext: () => void };
+  next?: NextLevel;
   /** The loudspeaker for grown-ups in the bottom right corner („Alltagssituationen“ only, `VoiceSwitch`). */
   voiceSwitch?: ReactNode;
 }) {

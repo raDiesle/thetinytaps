@@ -1,5 +1,5 @@
 import { useEffect, useRef, useState } from "react";
-import { GameEnd } from "@/components/GameEnd";
+import { GameEnd, type NextLevel } from "@/components/GameEnd";
 import type { TargetLanguage, TargetLanguageId } from "@/content/targetLanguages";
 import { useNoBackgroundMusic } from "@/lib/backgroundMusic";
 import type { CommonSettings } from "@/lib/common";
@@ -80,7 +80,7 @@ export function AdventurePlay({
   language: TargetLanguage;
   settings: CommonSettings;
   /** The story „Weiter“ starts at the end; none where only one story can be played. */
-  next?: { name: string; onNext: () => void };
+  next?: NextLevel;
 }) {
   const canvasRef = useRef<HTMLCanvasElement>(null);
   const playerRef = useRef<StoryPlayer | null>(null);

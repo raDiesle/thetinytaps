@@ -6,6 +6,7 @@ import { groupAfter, groupById } from "./groups";
 import { PassPlay } from "./PassPlay";
 import type { FeelingsSettings } from "./settings";
 import { VoiceSwitch } from "@/components/VoiceSwitch";
+import previews from "./vorschau/*.webp?glob";
 
 /**
  * „Alltagssituationen“: the picked day (`byDay`) or feeling, going on where the child stopped last time; „Nochmal“
@@ -44,7 +45,11 @@ function Days({ settings, update, voiceSwitch }: PlayProps) {
       settings={settings}
       update={update}
       onAgain={() => setNow({ day: now.day, startAt: 0, key: now.key + 1 })}
-      next={{ name: t(dayTitle(following)), onNext: () => setNow({ day: following, startAt: 0, key: now.key + 1 }) }}
+      next={{
+        name: t(dayTitle(following)),
+        onNext: () => setNow({ day: following, startAt: 0, key: now.key + 1 }),
+        picture: previews[`${following.id}.webp`],
+      }}
       voiceSwitch={voiceSwitch}
     />
   );
@@ -64,7 +69,11 @@ function Groups({ settings, update, voiceSwitch }: PlayProps) {
       settings={settings}
       update={update}
       onAgain={() => setNow({ group: now.group, startAt: 0, key: now.key + 1 })}
-      next={{ name: t(following.title), onNext: () => setNow({ group: following, startAt: 0, key: now.key + 1 }) }}
+      next={{
+        name: t(following.title),
+        onNext: () => setNow({ group: following, startAt: 0, key: now.key + 1 }),
+        picture: previews[`${following.id}.webp`],
+      }}
       voiceSwitch={voiceSwitch}
     />
   );

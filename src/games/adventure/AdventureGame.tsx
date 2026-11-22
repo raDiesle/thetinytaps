@@ -1,4 +1,5 @@
 import { Suspense, use, useMemo } from "react";
+import type { NextLevel } from "@/components/GameEnd";
 import { GameShell } from "@/components/GameShell";
 import { PageLoading } from "@/components/PageLoading";
 import { type TargetLanguage, targetLanguageFor } from "@/content/targetLanguages";
@@ -63,7 +64,7 @@ export function AdventureGame() {
           entry={chosen}
           language={language}
           settings={common}
-          next={next && { name: entryTitle(next, app.id), onNext: () => update({ story: next.id }) }}
+          next={next && { name: entryTitle(next, app.id), onNext: () => update({ story: next.id }), picture: previews[`${next.id}.webp`] }}
         />
       </Suspense>
     </GameShell>
@@ -71,17 +72,7 @@ export function AdventureGame() {
 }
 
 /** One story played: waits (suspends) for its code, then hands it to the player in its language. */
-function StoryPlay({
-  entry,
-  language,
-  settings,
-  next,
-}: {
-  entry: StoryEntry;
-  language: TargetLanguage;
-  settings: CommonSettings;
-  next?: { name: string; onNext: () => void };
-}) {
+function StoryPlay({ entry, language, settings, next }: { entry: StoryEntry; language: TargetLanguage; settings: CommonSettings; next?: NextLevel }) {
   // Read at once where they were fetched ahead, so the story's first picture is drawn before the page turns to it.
   const loaded = use(loadStory(entry));
   const { AdventurePlay } = use(loadPlay());

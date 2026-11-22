@@ -1149,9 +1149,36 @@
     padding: var(--corner-top) var(--pad) calc(var(--next-w) + var(--pad)) 0;
   }
 
-  /* The text's column is narrow: „Weiter“, the big label, above „Nochmal“, never past the page's edge. */
+  /* The text's column is narrow: „Weiter“, the next day's picture, with „Nochmal“'s arrow beside it, and the trophy
+     under them, never past the page's edge (one over the other, the trophy left the screen at 844×390). At the day's
+     end the column reaches down between ◀ and ▶, which the trophy in its middle stays clear of. */
+  .fg-day-end .fg-day-words {
+    padding-bottom: var(--pad);
+  }
+
   .fg-day .game-end {
-    flex-direction: column-reverse;
+    --trophy-h: clamp(90px, 28vh, 240px);
+    display: grid;
+    grid-template-areas: "next again" "prize prize";
+    gap: clamp(6px, 2vh, 16px) clamp(10px, 2vw, 20px);
+    align-items: end;
+    justify-items: center;
+  }
+
+  .fg-day .game-end-button.next {
+    grid-area: next;
+  }
+
+  .fg-day .game-end.inline .game-end-next-picture {
+    height: clamp(56px, 16vh, 150px);
+  }
+
+  .fg-day .game-end-small {
+    grid-area: again;
+  }
+
+  .fg-day .game-end-prize {
+    grid-area: prize;
   }
 
   .fg-day-text {

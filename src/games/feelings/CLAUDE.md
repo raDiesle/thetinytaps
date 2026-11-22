@@ -115,8 +115,9 @@ story** (`DayPage.tsx`) tells in one or two sentences how the day goes on to it;
   once all its pages' pictures and scenes are made (`playableDays`); with none, it shows no row and only the groups. When
   the days go live in the built site, the search texts (`seo.ts`, `seo.en.ts`, which say „nach Gefühlen geordnet“) are
   changed to tell of the days in the same commit.
-- Wide screens put the picture left and the words right like a book's spread; at a day's end „Weiter“ stands above
-  „Nochmal“ in the narrow column of words, never past the page's edge. Look at 844×390, 1024×768 and 1280×720.
+- Wide screens put the picture left and the words right like a book's spread; at a day's end „Weiter“ (the next
+  day's picture) and „Nochmal“ (the round arrow) stand side by side in the narrow column of words, the trophy under
+  them, never past the page's edge (one over the other the trophy left the screen at 844×390; measure the boxes). Look at 844×390, 1024×768 and 1280×720.
 
 **The voice can be switched off in „Alltagssituationen“ (user decision, November 2026):** a grown-up may want to
 tell the scenes to the child in their own words. So while a scene plays (never on a page of a day's story), a wooden
@@ -364,7 +365,7 @@ the built site leaves it off the start screen until all its pictures are made (`
 with only the first one made, seven of eight cards were still placeholders – and the dev server shows it to look at. `feelings.test.ts` allows a missing picture only while it is listed there,
 and fails when a listed one has been made (move its row into its table). Choices are picture cards (`ChoiceCard` in `storyParts.tsx`)
 with a green tick or red cross, so children can choose without reading; „Nochmal“ and „Weiter“ at a pass's
-end are the shared `GameEnd` (`inline`), words only like in every game. Timing of a story's beats and its sounds in
+end are the shared `GameEnd` (`inline`), drawn like in every game: the round arrow and the next day's or group's picture (its menu card's cut, `vorschau/`), its name small under it; in the narrow column of a day's end the picture and the arrow stand side by side and the trophy under them, reaching down between ◀ and ▶. Timing of a story's beats and its sounds in
 `story.ts`.
 
 Nothing grows or shrinks in an animation: the cards change between big on top and small behind the picture at once,

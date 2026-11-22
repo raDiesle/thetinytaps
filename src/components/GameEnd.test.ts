@@ -1,17 +1,32 @@
 import { expect, test } from "bun:test";
 
-// The end buttons once showed 🔁, the next level's emoji and ▶, which the user found ugly (November 2026): „Menü“,
-// „Nochmal“ and „Weiter“ are words, told apart by size and colour – or, where a game hands over the next level's
-// picture (Kettenreaktion, user request, November 2026: children don't read), that picture and the drawn round arrow.
-test("the end of a level shows words or the next level's picture, never an emoji", async () => {
+// The end buttons once showed 🔁, the next level's emoji and ▶ as text, which the user found ugly (November 2026), then
+// words – which children don't read (user request, 22 November 2026, first for Kettenreaktion, then every game): „Nochmal“
+// is the drawn round arrow, „Weiter“ the next level's picture where the game has one (its menu card's cut), else the
+// drawn ▶; only „Menü“ keeps its word beside the shelf label.
+test("the end of a level shows the drawn arrow and the next level's picture, never a word or an emoji", async () => {
   const source = await Bun.file("src/components/GameEnd.tsx").text();
   expect(source).not.toMatch(/\p{Extended_Pictographic}|[▶►→]/u);
   // The one picture there is the ribbon's shelf label on „Menü“, the way back drawn as in the corner (ShelfLabelArt).
   expect(source).not.toMatch(/<svg|<MenuIcon|\bemoji[:?}]/);
-  // The picture and the arrow come together, only where `next.picture` is given.
-  expect(source).toContain("const pictured = Boolean(next?.picture);");
-  expect(source).toContain('{pictured ? <ControlIcon kind="again"');
+  expect(source).toContain('<ControlIcon kind="again" className="game-end-again-arrow" />');
+  expect(source).not.toMatch(/: t\(AGAIN\)\}/);
   expect(source).toMatch(/<img className="game-end-next-picture" src=\{next\.picture\}/);
+  expect(source).toContain('<ControlIcon kind="play" className="game-end-next-arrow" />');
+});
+
+// A game whose levels have menu pictures (`vorschau/`) hands the next one's to „Weiter“.
+test("every game with pictures of its levels shows the next one at the end", async () => {
+  const handing = [
+    "src/games/marbles/MarblePlay.tsx",
+    "src/games/scenes/ScenePlay.tsx",
+    "src/games/elevator/cards.tsx",
+    "src/games/feelings/FeelingsPlay.tsx",
+    "src/games/adventure/AdventureGame.tsx",
+    // The next pass's first feeling, the painted picture it starts with.
+    "src/games/cause/CausePlay.tsx",
+  ];
+  for (const file of handing) expect(`${file}: ${/picture: /.test(await Bun.file(file).text())}`).toBe(`${file}: true`);
 });
 
 // Zähne putzen and Gefühle had end buttons of their own (🔁, round symbols without words): every end is `GameEnd`, and

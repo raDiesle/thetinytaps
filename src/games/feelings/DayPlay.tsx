@@ -1,5 +1,5 @@
 import { type ReactNode, useEffect, useRef, useState } from "react";
-import { GameEnd } from "@/components/GameEnd";
+import { GameEnd, type NextLevel } from "@/components/GameEnd";
 import { useAppLanguage } from "@/lib/language";
 import { stepInAddress, useStepAddress } from "@/lib/stepAddress";
 import { DayPage } from "./DayPage";
@@ -34,7 +34,7 @@ export function DayPlay({
   settings: FeelingsSettings;
   update: (patch: Partial<FeelingsSettings>) => void;
   onAgain: () => void;
-  next?: { name?: string; onNext: () => void };
+  next?: NextLevel;
   /**
    * The loudspeaker for grown-ups – in the scenes only: on the pages of the story it would change nothing (user
    * feedback, November 2026: there it only lay over ▶).
