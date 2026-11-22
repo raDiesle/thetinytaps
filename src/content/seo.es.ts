@@ -76,10 +76,10 @@ export const SEO_ES: SeoTranslation = {
       text: "Treinta pequeñas escenas con el osito: está triste, enojado, tiene miedo, está feliz, orgulloso o algo le da asco. Dos imágenes muestran lo que pudo pasar justo antes –se le cae el helado, el mapache le quita la pala, papá le hace cosquillas– y el niño toca la que encaja. Debajo, los adultos leen qué preguntarle y por qué el osito se siente así. Así se ve que las emociones tienen un motivo: un comienzo para hablar con los pequeños sobre el porqué.",
     },
     "/kettenreaktion/": {
-      title: "Reacción en cadena y circuito de canicas",
+      title: "Máquinas de reacción en cadena y canicas para niños",
       description:
-        "Una canica echa a rodar y pone en marcha una máquina: circuitos de canicas y reacciones en cadena para tocar y asombrarse. Para niños pequeños.",
-      text: "Veintiún circuitos y máquinas: las canicas ruedan sobre madera, nieve, toboganes de agua y cintas transportadoras, las fichas de dominó y las cosas de casa caen, una empuja a la siguiente. En el circuito de colores el niño elige rojo, amarillo o azul para cada canica, y abajo cae en el tubo de su color y se cuenta. Un toque pone en marcha la reacción en cadena, y en un punto la máquina espera hasta que el niño la deja seguir con otro toque: para asombrarse y volver a empezar.",
+        "Un toque y durante un minuto una cosa empuja a la siguiente: circuitos de canicas y reacciones en cadena para asombrarse, con pausa. Sin anuncios.",
+      text: "Veintiún circuitos y máquinas, cada uno de alrededor de un minuto: las canicas ruedan sobre madera, nieve, toboganes de agua y cintas transportadoras, bajan girando por una torre en espiral, saltan desde un trampolín de esquí, suben en telesilla o dan vueltas en un remolino, y las cosas de casa caen como fichas de dominó. En las máquinas una cosa empuja a la siguiente: en la cocina sale volando un corcho, en el baño la lavadora se va andando, en el jardín arranca un robot cortacésped, en el circo suena el martillo de fuerza y en el lanzamiento del cohete un canguro espacial salta hasta una antena de radio. En el circuito de colores el niño elige rojo, amarillo o azul para cada canica, y abajo cae en el tubo de su color y se cuenta. Un toque pone en marcha la reacción en cadena, y en un punto la máquina espera hasta que el niño la deja seguir con otro toque. Con el botón de pausa todo se detiene en cualquier momento, y desde ahí se puede saltar directamente al siguiente circuito. Al final solo hay una imagen del siguiente circuito y una flecha redonda para repetir: no hace falta leer para seguir jugando.",
     },
     "/kleine-abenteuer/": {
       title: "Pequeñas aventuras: historias para niños pequeños",

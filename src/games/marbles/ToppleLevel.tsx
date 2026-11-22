@@ -1,7 +1,20 @@
 import { useEffect, useMemo, useRef, type CSSProperties } from "react";
 import { playDrum, playKnock, playTwinkle } from "@/lib/sfx";
-import { useTimers } from "@/lib/timers";
-import { cameraLayer, cameraPoint, gliding, SETTLE_S, useAnyKey, useFrames, useLevelName, VIEW_H, VIEW_W, worldHint, type LevelProps } from "./level";
+import {
+  cameraLayer,
+  cameraPoint,
+  gliding,
+  SETTLE_S,
+  useAnyKey,
+  useFrames,
+  useLevelName,
+  levelNow,
+  useLevelTimers,
+  VIEW_H,
+  VIEW_W,
+  worldHint,
+  type LevelProps,
+} from "./level";
 import { TapHint } from "@/components/TapHint";
 import { cameraOn } from "./machineKit";
 import { Sparkles } from "./scenery";
@@ -41,11 +54,11 @@ export function ToppleLevel({ sound, say, onDone }: LevelProps) {
   const phase = useRef<Phase>("dropping");
   const fallStart = useRef(0);
   const drumAt = useRef(-Infinity);
-  const now = useRef(performance.now());
+  const now = useRef(levelNow());
   const camera = useRef(0);
   const box = useRef<HTMLDivElement>(null);
   // The knocks, the twinkle after the drum and the end are dropped when the level is left before them.
-  const { later } = useTimers();
+  const { later } = useLevelTimers();
   // The room is as wide as the whole row: drawn once, not again in every frame.
   const room = useMemo(() => <Room width={worldW} />, [worldW]);
 
@@ -60,7 +73,7 @@ export function ToppleLevel({ sound, say, onDone }: LevelProps) {
         onFirstScreen * DROP_STAGGER_MS + DROP_MS,
       ),
     );
-    return () => timers.forEach(clearTimeout);
+    return () => timers.forEach((timer) => timer.cancel());
   }, [things, onFirstScreen, sound, later]);
 
   const finish = () => {
@@ -100,7 +113,7 @@ export function ToppleLevel({ sound, say, onDone }: LevelProps) {
   const push = () => {
     if (phase.current !== "ready") return;
     phase.current = "falling";
-    fallStart.current = performance.now();
+    fallStart.current = levelNow();
     pushFirst(sim);
     sound(() => playKnock(1400));
   };

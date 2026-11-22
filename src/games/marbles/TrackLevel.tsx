@@ -1,6 +1,20 @@
 import { useEffect, useMemo, useRef, useState, type PointerEvent } from "react";
 import { BRIGHT_COLORS } from "@/components/TapFeedback";
-import { cameraLayer, cameraPoint, gliding, type LevelProps, useAnyKey, useFrames, useLevelName, VIEW_H, VIEW_W, wobble, worldHint } from "./level";
+import {
+  cameraLayer,
+  cameraPoint,
+  gliding,
+  type LevelProps,
+  useAnyKey,
+  useFrames,
+  useLevelName,
+  levelNow,
+  useLevelTimers,
+  VIEW_H,
+  VIEW_W,
+  wobble,
+  worldHint,
+} from "./level";
 import { TapHint } from "@/components/TapHint";
 import type { BallLook } from "./parts";
 import { SITE_TRACK } from "./siteTrack";
@@ -13,7 +27,6 @@ import { BALL_R, type Pt } from "./path";
 import { useDevice } from "@/lib/device";
 import { useT } from "@/lib/language";
 import { shuffle } from "@/lib/random";
-import { useTimers } from "@/lib/timers";
 import {
   playBoing,
   playChime,
@@ -282,7 +295,7 @@ function Run({ sound, say, onDone, onGoal, watch = false, look }: LevelProps & {
   // `t` is the time everywhere here, so the translation helper gets another name.
   const tr = useT();
   // What comes a moment after a landing (its note, the end) is dropped when the run is left before it.
-  const { later } = useTimers();
+  const { later } = useLevelTimers();
   const routes = useMemo(() => buildRoutes(look.stretch), [look]);
   useEffect(() => loadRealSounds([...Object.values(look.release), look.landSound, look.fullSound]), [look]);
   /** How long the whole run is with the parts it starts with, for how much of it lies behind a thing. */
@@ -325,7 +338,7 @@ function Run({ sound, say, onDone, onGoal, watch = false, look }: LevelProps & {
   const [magicStart] = useState(() => Math.floor(Math.random() * MAGIC.length));
   const svg = useRef<SVGSVGElement>(null);
   const done = useRef(false);
-  const now = useRef(performance.now());
+  const now = useRef(levelNow());
   /** The top of the view and its height, in the wall's coordinates. */
   const camera = useRef({ y: -TOP_ROOM, h: VIEW_H });
   /**
@@ -535,7 +548,7 @@ function Run({ sound, say, onDone, onGoal, watch = false, look }: LevelProps & {
     const spot = spots.current[i];
     const next = (PIECES.indexOf(spot.pending ?? build.current[i]) + 1) % PIECES.length;
     if (busy(i)) spot.pending = PIECES[next];
-    else put(i, PIECES[next], performance.now());
+    else put(i, PIECES[next], levelNow());
     return next === 0;
   };
 
@@ -581,7 +594,7 @@ function Run({ sound, say, onDone, onGoal, watch = false, look }: LevelProps & {
   /** The switch flips to the other way, „klack“ (K-01); a marble that hasn't got there yet takes the new way. */
   const flip = (to: Way = way.current === "left" ? "right" : "left") => {
     if (to === way.current) {
-      flapHit.current = performance.now();
+      flapHit.current = levelNow();
       sound(playClick);
       return;
     }
@@ -620,7 +633,7 @@ function Run({ sound, say, onDone, onGoal, watch = false, look }: LevelProps & {
   /** A tap on the basket makes the things in it jump, one after the other. */
   const tapBasket = (e: PointerEvent) => {
     tapped(e);
-    basketTapped.current = performance.now();
+    basketTapped.current = levelNow();
     sound(playPlop);
   };
 
@@ -823,7 +836,7 @@ function Run({ sound, say, onDone, onGoal, watch = false, look }: LevelProps & {
       color: color ?? BRIGHT_COLORS[id % BRIGHT_COLORS.length],
       look: "plain",
       nudged: -Infinity,
-      fly: from ? { from, at: performance.now() } : null,
+      fly: from ? { from, at: levelNow() } : null,
       dist: 0,
       hop: 0,
       section: 0,
@@ -845,14 +858,14 @@ function Run({ sound, say, onDone, onGoal, watch = false, look }: LevelProps & {
     if (done.current) return;
     if (look.sort) {
       release("marble", shelfSpot(i, "marble"), look.sort.colors[i]);
-      filled.current[i] = performance.now();
+      filled.current[i] = levelNow();
       return;
     }
     release(shelf.current[i], shelfSpot(i, shelf.current[i]));
     const others = shelf.current.filter((_, j) => j !== i);
     const choices = ROLLERS.filter((r) => r !== shelf.current[i] && !others.includes(r));
     shelf.current[i] = choices[Math.floor(Math.random() * choices.length)];
-    filled.current[i] = performance.now();
+    filled.current[i] = levelNow();
   };
 
   /** A key or a tap on the wall: the next thing on the shelf goes, in turn. */
@@ -863,7 +876,7 @@ function Run({ sound, say, onDone, onGoal, watch = false, look }: LevelProps & {
    * thing in turn; the space bar rebuilds the run, the up arrow looks up to the shelf.
    */
   useAnyKey((e) => {
-    stirred.current = performance.now();
+    stirred.current = levelNow();
     held.current = e.key;
     const place = SHELF.things.findIndex((_, i) => e.key === `${i + 1}`);
     if (e.key === " ") {
@@ -877,14 +890,14 @@ function Run({ sound, say, onDone, onGoal, watch = false, look }: LevelProps & {
       flip(e.key === "ArrowLeft" ? "left" : "right");
     } else if (e.key === "Enter" || e.key === "ArrowDown") {
       e.preventDefault();
-      openGate(performance.now());
+      openGate(levelNow());
     } else if (place >= 0) take(place);
     else open();
   });
 
   useEffect(() => {
     const onKeyUp = () => {
-      stirred.current = performance.now();
+      stirred.current = levelNow();
       held.current = null;
     };
     window.addEventListener("keyup", onKeyUp);
@@ -897,7 +910,7 @@ function Run({ sound, say, onDone, onGoal, watch = false, look }: LevelProps & {
     const ctm = svg.current?.getScreenCTM();
     if (!ctm) return;
     const p = new DOMPoint(e.clientX, e.clientY).matrixTransform(ctm.inverse());
-    sparkle(p.x, p.y, performance.now());
+    sparkle(p.x, p.y, levelNow());
     sound(playTwinkle);
   };
 
@@ -929,7 +942,7 @@ function Run({ sound, say, onDone, onGoal, watch = false, look }: LevelProps & {
   const basketAge = age(basketTapped.current);
   const tapBar = (i: number, e: PointerEvent) => {
     tapped(e);
-    playBar(i, performance.now());
+    playBar(i, levelNow());
   };
 
   const layerBox = `0 ${-TOP_ROOM} ${VIEW_W} ${TRACK_H + TOP_ROOM}`;
@@ -943,7 +956,7 @@ function Run({ sound, say, onDone, onGoal, watch = false, look }: LevelProps & {
       onPointerDown={tapWall}
       // Every tap – also on a part, which stops its event there – draws the run again until its wobble is over.
       onPointerDownCapture={() => {
-        stirred.current = performance.now();
+        stirred.current = levelNow();
       }}
     >
       <TrackLook.Provider value={look}>
@@ -974,7 +987,7 @@ function Run({ sound, say, onDone, onGoal, watch = false, look }: LevelProps & {
             data-tap
             onPointerDown={(e) => {
               tapped(e);
-              looped.current = performance.now();
+              looped.current = levelNow();
               sound(playWhoosh);
             }}
           >
@@ -986,7 +999,7 @@ function Run({ sound, say, onDone, onGoal, watch = false, look }: LevelProps & {
               data-tap
               onPointerDown={(e) => {
                 tapped(e);
-                playDrum(i, performance.now());
+                playDrum(i, levelNow());
               }}
             >
               <Drum i={i} age={age(drums.current[i])} />
@@ -996,7 +1009,7 @@ function Run({ sound, say, onDone, onGoal, watch = false, look }: LevelProps & {
             ages={chimes.current.map(age)}
             onTap={(i, e) => {
               tapped(e);
-              playChimeAt(i, performance.now());
+              playChimeAt(i, levelNow());
             }}
           />
           <Xylophone row={ROW9} ages={barAges} onTap={tapBar} />
@@ -1014,7 +1027,7 @@ function Run({ sound, say, onDone, onGoal, watch = false, look }: LevelProps & {
             data-tap
             onPointerDown={(e) => {
               tapped(e);
-              seesawTapped.current = performance.now();
+              seesawTapped.current = levelNow();
               sound(playBoing);
             }}
           >
@@ -1038,7 +1051,7 @@ function Run({ sound, say, onDone, onGoal, watch = false, look }: LevelProps & {
             data-tap
             onPointerDown={(e) => {
               tapped(e);
-              openGate(performance.now());
+              openGate(levelNow());
             }}
           >
             <Gate
@@ -1110,7 +1123,7 @@ function Run({ sound, say, onDone, onGoal, watch = false, look }: LevelProps & {
                 aria-hidden
                 onPointerDown={(e) => {
                   tapped(e);
-                  nudge(m, performance.now());
+                  nudge(m, levelNow());
                 }}
               >
                 <circle r="56" fill="transparent" />
@@ -1145,7 +1158,7 @@ function Run({ sound, say, onDone, onGoal, watch = false, look }: LevelProps & {
             data-tap
             onPointerDown={(e) => {
               tapped(e);
-              peekOut(performance.now());
+              peekOut(levelNow());
             }}
           >
             <Tunnel />

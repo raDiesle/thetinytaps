@@ -153,9 +153,10 @@ export const SEO_TEXTS: PageSeo[] = [
   },
   {
     path: "/kettenreaktion/",
-    title: "Kettenreaktion und Kugelbahn für Kinder",
-    description: "Eine Kugel rollt los und stößt eine Maschine an: Kugelbahn und Kettenreaktionen zum Antippen und Staunen, für Kleinkinder, ohne Werbung.",
-    text: "Einundzwanzig Bahnen und Maschinen: Kugeln rollen über Holz, Schnee, Wasserrutschen und Förderbänder, Dominosteine und Alltagsdinge fallen um, eins stößt das nächste an. Auf der Farbenbahn sucht das Kind für jede Kugel Rot, Gelb oder Blau aus, und unten fällt sie in die Röhre ihrer Farbe und wird mitgezählt. Ein Tippen startet die Kettenreaktion, und an einer Stelle wartet die Maschine, bis das Kind sie mit einem Tippen weiterlaufen lässt – zum Staunen und Nochmal-Machen.",
+    title: "Kettenreaktion-Maschinen und Kugelbahn für Kinder",
+    description:
+      "Ein Tippen, und eine Minute lang stößt ein Ding das nächste an: Kugelbahnen und Kettenreaktionen zum Staunen, mit Pause jederzeit. Ohne Werbung.",
+    text: "Einundzwanzig Bahnen und Maschinen, jede etwa eine Minute lang: Kugeln rollen über Holz, Schnee, Wasserrutschen und Förderbänder, kreiseln einen Wendelturm hinunter, fliegen über eine Sprungschanze, fahren mit dem Sessellift hinauf oder drehen sich im Strudel, und Alltagsdinge fallen um wie Dominosteine. In den Maschinen stößt ein Ding das nächste an: In der Küche knallt ein Korken aus der Flasche, im Badezimmer läuft die Waschmaschine davon, im Garten fährt ein Mähroboter los, im Zirkus klingelt der Hau-den-Lukas, und beim Raketenstart hüpft ein Weltraum-Känguru zum Funkmast. Auf der Farbenbahn sucht das Kind für jede Kugel Rot, Gelb oder Blau aus, und unten fällt sie in die Röhre ihrer Farbe und wird mitgezählt. Ein Tippen startet die Kettenreaktion, und an einer Stelle wartet die Maschine, bis das Kind sie mit einem Tippen weiterlaufen lässt. Mit dem Pausenknopf hält alles jederzeit an, und von dort geht es auch gleich zur nächsten Bahn. Am Ende zeigt ein Bild die nächste Bahn und ein runder Pfeil das Nochmal – so muss niemand lesen können, um weiterzuspielen.",
   },
   {
     path: "/kleine-abenteuer/",

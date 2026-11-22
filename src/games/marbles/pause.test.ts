@@ -54,3 +54,15 @@ test("the pause button and its veil are mounted while a level plays, and skip go
   const level = readFileSync("src/games/marbles/level.ts", "utf8");
   expect(level).toMatch(/if \(!paused\.get\(\)\) tick\(levelNow\(\)\);/);
 });
+
+test("no level times itself past the level clock", () => {
+  // A level reading the wall's clock or waiting with a bare timeout would move, sound or end behind the pause veil.
+  const files = Array.from(new Bun.Glob("*.{ts,tsx}").scanSync(import.meta.dir)).filter(
+    (file) => !file.endsWith(".test.ts") && !["level.ts", "MarblePlay.tsx", "PauseVeil.tsx"].includes(file),
+  );
+  expect(files.length).toBeGreaterThan(20);
+  const offenders = files.filter((file) =>
+    /performance\.now\(|Date\.now\(|setTimeout\(|setInterval\(|useTimers\(/.test(readFileSync(`${import.meta.dir}/${file}`, "utf8")),
+  );
+  expect(offenders).toEqual([]);
+});

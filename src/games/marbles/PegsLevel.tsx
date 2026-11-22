@@ -1,8 +1,21 @@
 import { useEffect, useMemo, useRef, type PointerEvent, type ReactNode } from "react";
 import { playBoing, playKnock, playPlink, playPop, playTrill } from "@/lib/sfx";
 import { loadRealSounds, playBark, playBuzz, playCroak, playMeow, playMoo, playOink, playQuack } from "@/lib/realSounds";
-import { useTimers } from "@/lib/timers";
-import { cameraPoint, gliding, SETTLE_S, useAnyKey, useFrames, useLevelName, VIEW_H, VIEW_W, wobble, worldHint, type LevelProps } from "./level";
+import {
+  cameraPoint,
+  gliding,
+  SETTLE_S,
+  useAnyKey,
+  useFrames,
+  useLevelName,
+  levelNow,
+  useLevelTimers,
+  VIEW_H,
+  VIEW_W,
+  wobble,
+  worldHint,
+  type LevelProps,
+} from "./level";
 import { TapHint } from "@/components/TapHint";
 import { BAR_COLORS, Ball } from "./parts";
 import { BALL_R } from "./path";
@@ -130,7 +143,7 @@ export function PegsLevel({ sound, onDone, onGoal }: LevelProps) {
   const animals = useMemo(() => pickAnimals(BINS), []);
   const svg = useRef<SVGSVGElement>(null);
   const box = useRef<HTMLDivElement>(null);
-  const now = useRef(performance.now());
+  const now = useRef(levelNow());
   const started = useRef(false);
   const nextId = useRef(0);
   const falling = useRef<Drop[]>([]);
@@ -157,7 +170,7 @@ export function PegsLevel({ sound, onDone, onGoal }: LevelProps) {
   const trickAt = useRef(animals.map(() => -Infinity));
   const climbAt = useRef(animals.map(() => Infinity));
   // The end is dropped when the level is left before it.
-  const { later } = useTimers();
+  const { later } = useLevelTimers();
 
   useEffect(() => loadRealSounds([playBark, playBuzz, playCroak, playMeow, playMoo, playOink, playQuack]), []);
 

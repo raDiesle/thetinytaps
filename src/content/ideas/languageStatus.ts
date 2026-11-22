@@ -313,6 +313,12 @@ export const LANGUAGE_STATUS: LanguageStatusRow[] = [
         languages: { de: "done", en: "text", zh: "text", hi: "text", es: "text", ar: "text", ru: "text" },
         note: "Neu seit K-10 (11. November 2026): Name, erster Satz, „Eine rote!“ bis „Fünf blaue!“ und „Die Röhre ist voll!“. Deutsch am 12. November 2026 von ElevenLabs gesprochen mit dem Klon von Tapsis Stimme aus ihren deutschen Aufnahmen („Tapsi Coach (Klon de)“, zweites Konto). Auf Wunsch übersetzt am 19. November 2026 (die Zählsätze je Sprache mit Zahl und Farbe passend, COUNTS in colors.ts); in den anderen Sprachen fehlen die Aufnahmen noch, bis dahin zählen dort nur die Töne.",
       },
+      {
+        label: "⏱️ Die Level werden eine Minute lang",
+        recorded: true,
+        languages: { de: "text", en: "text", zh: "text", hi: "text", es: "text", ar: "text", ru: "text" },
+        note: "Vier neue Sätze der längeren Maschinen (22. November 2026), englisch zuerst und am selben Tag in alle sieben Sprachen übersetzt, noch in keiner aufgenommen (bis dahin bleiben sie stumm): Licht-Kette „Look, a rainbow!“ (light.ts), Badezimmer „The washing machine walks off!“ (bath.ts), Große Maschine „Oh, a parachute!“ (machine.ts), Verrückte Küche „Pop! There goes the cork!“ (kitchen.ts). Das „Überspringen“ der Pause (nur vorgelesen, kein Satz der Stimme) steht in allen sieben Sprachen in PauseVeil.tsx.",
+      },
     ],
   },
   {

@@ -73,9 +73,9 @@ export const SEO_EN: SeoTranslation = {
       text: "Thirty small scenes with the little bear: he is sad, angry, scared, happy, proud or finds something yucky. Two pictures show what might have happened just before – his ice cream falls down, the raccoon takes his spade, Papa tickles him – and the child taps the one that fits. Below them, grown-ups read what to ask the child and why the bear feels this way. So the child sees that feelings have a reason – a start for talking with toddlers about why.",
     },
     "/kettenreaktion/": {
-      title: "Chain Reaction and Marble Run for Kids",
-      description: "A marble rolls off and sets a machine going: marble runs and chain reactions to tap and marvel at, for toddlers, without ads.",
-      text: "Twenty-one runs and machines: marbles roll over wood, snow, water slides and conveyor belts, dominoes and everyday things topple, one thing pushes the next. On the colour run the child picks red, yellow or blue for each marble, and at the bottom it drops into the tube of its colour and is counted. One tap starts the chain reaction, and at one point the machine waits until the child lets it run on with a tap – to marvel at and play again.",
+      title: "Chain Reaction Machines and Marble Runs for Kids",
+      description: "One tap, and for a minute one thing sets off the next: marble runs and chain reactions to marvel at, with a pause at any time. No ads.",
+      text: "Twenty-one runs and machines, each about a minute long: marbles roll over wood, snow, water slides and conveyor belts, spiral down a helix tower, fly off a ski jump, ride up a chair lift or swirl round a whirlpool, and everyday things topple like dominoes. In the machines one thing pushes the next: in the kitchen a cork pops out of a bottle, in the bathroom the washing machine walks off, in the garden a robot mower sets off, in the circus the high striker rings, and at the rocket launch a space kangaroo hops over to a radio mast. On the colour run the child picks red, yellow or blue for each marble, and at the bottom it drops into the tube of its colour and is counted. One tap starts the chain reaction, and at one point the machine waits until the child lets it run on with a tap. The pause button stops everything at any moment, and from there the child can skip straight to the next run. At the end a picture of the next run and a round arrow to play again are all there is – nobody needs to read to play on.",
     },
     "/kleine-abenteuer/": {
       title: "Little Adventures – Picture Stories for Toddlers",
