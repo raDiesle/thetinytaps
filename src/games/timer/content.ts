@@ -50,7 +50,7 @@ export const PICTURES: { id: TimerPicture; emoji: string; name: Texts }[] = [
   { id: "flower", emoji: "🌸", name: { de: "Blume", en: "Flower", zh: "小花", hi: "फूल", es: "Flor", ar: "الزهرة", ru: "Цветок" } },
   { id: "pizza", emoji: "🍕", name: { de: "Pizza", en: "Pizza", zh: "披萨", hi: "पिज़्ज़ा", es: "Pizza", ar: "البيتزا", ru: "Пицца" } },
   { id: "clock", emoji: "⏰", name: { de: "Wecker", en: "Alarm Clock", zh: "闹钟", hi: "अलार्म घड़ी", es: "Despertador", ar: "المنبّه", ru: "Будильник" } },
-  // Tidy Up (H-118): a toy crane puts the toys into the box, best at five minutes; English only so far.
+  // Tidy Up (H-118): a toy crane puts the toys into the box, best at five minutes; written English first, translated on 22 November 2026.
   { id: "tidy", emoji: "🧸", name: TIDY_NAME },
   {
     id: "train",
@@ -75,8 +75,8 @@ export const PICTURES: { id: TimerPicture; emoji: string; name: Texts }[] = [
   },
   { id: "swap", emoji: "🔁", name: SWAP_NAME },
   // Tennis (H-71) stood here and was taken out again (user request, 21 November 2026: poorly done). In its place the
-  // seesaw (H-109), the best of the better ideas H-108 to H-117: written English first, its other languages on request.
-  { id: "seesaw", emoji: "⚖️", name: { en: "Seesaw" } },
+  // seesaw (H-109), the best of the better ideas H-108 to H-117: written English first, translated on 22 November 2026.
+  { id: "seesaw", emoji: "⚖️", name: { en: "Seesaw", de: "Wippe", zh: "跷跷板", hi: "सी-सॉ", es: "Balancín", ar: "أرجوحة التوازن", ru: "Качели-балансир" } },
 ];
 
 /**

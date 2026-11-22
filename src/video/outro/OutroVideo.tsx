@@ -79,7 +79,7 @@ export function OutroVideo() {
       }
       facts={[
         ["Länge", `${seconds} Sekunden`],
-        ["Sprache", `${OWN_NAMES[language]} (wie im Regal; neue Wörter erst auf Englisch)`],
+        ["Sprache", `${OWN_NAMES[language]} (wie im Regal)`],
         ["Code führt zu", shortAddress(codeAddress(language))],
         [
           "Ton",

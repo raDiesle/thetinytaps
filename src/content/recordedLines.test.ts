@@ -2,7 +2,6 @@ import { readFileSync } from "node:fs";
 import { dirname } from "node:path";
 import { expect, test } from "bun:test";
 import { recordingName } from "@/lib/voiceName";
-import { LANGUAGE_STATUS } from "./ideas/languageStatus";
 import { RECORDED_GAMES, RECORDED_LANGUAGES } from "./recordedLines";
 
 // The games recorded with `bun run voice make` from src/content/recordedLines.ts and played by src/lib/voice.ts.
@@ -30,22 +29,6 @@ const PLAYERS: Record<string, string> = {
   "src/games/bedstory/stimme": "src/games/bedstory/BedStoryGame.tsx",
 };
 
-/**
- * Recorded games whose texts are not translated yet (translations come only when the user asks), by name: the address
- * of their row in languageStatus.ts, which must say so by leaving the other languages out.
- */
-const GERMAN_ONLY: Record<string, string> = {};
-
-/**
- * Recorded games written English first (root CLAUDE.md, November 2026) and not translated yet, German included: they say
- * everything in English, so only the English voice records them, and their row in languageStatus.ts says so – or, for a
- * story that is a part of a book's row (the night story of Abstillen), that part.
- */
-const ENGLISH_ONLY: Record<string, { href: string; part?: string }> = {
-  "grosses-bett": { href: "/grosses-bett/" },
-  "abstillen-nachts": { href: "/abstillen/", part: "🌙 The Milk Sleeps at Night" },
-};
-
 test("no two lines of a game share a recording", () => {
   for (const game of RECORDED_GAMES) {
     for (const language of RECORDED_LANGUAGES) {
@@ -64,29 +47,12 @@ test("every recorded game's folder is played, with its languages below it", () =
   }
 });
 
-test("every recorded game says something in German, or in English where it is written English first", () => {
-  for (const game of RECORDED_GAMES) expect(game.lines(game.name in ENGLISH_ONLY ? "en" : "de").length, game.name).toBeGreaterThan(0);
-});
-
-// The user asked for every game's voice in every app language (November 2026): a game that says something only in
-// German would stay silent in the others, so each recorded game lists lines in each language.
+// The user asked for every game's voice in every app language (November 2026), and since 22 November 2026 every new text
+// comes translated into all of them at once: a game saying something in one language only would stay silent in the
+// others, so each recorded game lists lines in each language – a story written English first as well as the older ones.
 test("every recorded game says something in every app language", () => {
   for (const game of RECORDED_GAMES)
-    for (const language of RECORDED_LANGUAGES) {
-      if (game.name in GERMAN_ONLY && language !== "de") continue;
-      // English, untranslated, is said in every language, and recorded only once, by the English voice.
-      if (game.name in ENGLISH_ONLY) {
-        expect(game.lines(language).length, `${game.name} ${language}`)[language === "en" ? "toBeGreaterThan" : "toBe"](0);
-        continue;
-      }
-      expect(game.lines(language).length, `${game.name} ${language}`).toBeGreaterThan(0);
-    }
-  for (const href of Object.values(GERMAN_ONLY)) expect(Object.keys(LANGUAGE_STATUS.find((row) => row.href === href)?.languages ?? {}), href).toEqual(["de"]);
-  for (const { href, part } of Object.values(ENGLISH_ONLY)) {
-    const row = LANGUAGE_STATUS.find((r) => r.href === href);
-    const languages = part ? row?.parts?.find((p) => p.label === part)?.languages : row?.languages;
-    expect(Object.keys(languages ?? {}), `${href} ${part ?? ""}`).toEqual(["en"]);
-  }
+    for (const language of RECORDED_LANGUAGES) expect(game.lines(language).length, `${game.name} ${language}`).toBeGreaterThan(0);
 });
 
 // A line a language hasn't translated is said in German there, and has no recording in that language: it must never be

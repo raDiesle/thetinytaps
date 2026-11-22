@@ -1,5 +1,6 @@
 import { ChapterBook } from "@/components/ChapterBook";
 import { GameShell } from "@/components/GameShell";
+import { byLanguage } from "@/content/texts";
 import { useT } from "@/lib/language";
 import { recordedVoice } from "@/lib/voice";
 import pictureFiles from "./bilder/*.webp?glob";
@@ -9,6 +10,9 @@ import { NIGHT_MILK_TITLE } from "./names";
 
 /** Tapsi's voice reading the pages, from `stimme/en/` (English first) and `stimme/<language>/`; a page not recorded yet stays silent. */
 const VOICE = recordedVoice(voiceFiles);
+
+/** The story in the other languages, German too, by language, as each language's texts load (`texts-<id>.ts`). */
+const TRANSLATIONS = byLanguage((texts) => texts.nightMilk);
 
 /** Each page's picture by its file name without extension (`nacht-<page id>`). */
 const PICTURES = new Map(Object.entries(pictureFiles).map(([file, url]) => [file.replace(/\.webp$/, ""), url]));
@@ -26,7 +30,16 @@ export function NightMilkGame() {
       // One story with nothing to choose before it: it starts at once, and ✕ goes back to the page before it.
       startMode="story"
     >
-      <ChapterBook chapters={NIGHT_MILK} voice={VOICE} title={NIGHT_MILK_TITLE} pictureOf={pictureOf} code="N" first="en" level="nachts" />
+      <ChapterBook
+        chapters={NIGHT_MILK}
+        voice={VOICE}
+        title={NIGHT_MILK_TITLE}
+        pictureOf={pictureOf}
+        code="N"
+        first="en"
+        level="nachts"
+        translations={TRANSLATIONS}
+      />
     </GameShell>
   );
 }

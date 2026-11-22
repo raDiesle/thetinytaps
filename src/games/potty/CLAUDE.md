@@ -149,7 +149,7 @@ stays `VIDEO_TAIL_MS` more, then the recording ends. The page fetches the pictur
 Tapsi plays and Mama and Papa ask at the door. „Nur Sitzen“ (Y-23, `PottyVideoRun.sittingOnly`) is a potty song to leave
 running while the child sits on the real potty: the video starts as Tapsi sits down, shows the thoughts for what was
 chosen (pipi, kaka or both) and ends with the last pass of the song (3 or 5 passes, about 5 and 10 minutes). Every step
-that begins a chapter (`STEP_CHAPTERS`, `NOTHING_CHAPTERS` in `videoChapters.ts`, English first) – sitting only, every
+that begins a chapter (`STEP_CHAPTERS`, `NOTHING_CHAPTERS` in `videoChapters.ts`, English first, in every app language) – sitting only, every
 thought, named by its line – is a chapter mark for YouTube's description (Y-26, `VideoRecorder`'s `chapter`).
 A new thing shown beside the picture (a button, a chart) stays out of the video (`potty.test.ts`).
 
@@ -158,7 +158,8 @@ The video for parents (idea Y-29, November 2026): `/management/video-toepfchen-e
 drawn hand in a jumper sleeve (`ParentHand`) comes up from below and taps it through after a fixed script
 (`PARENTS_SCRIPT` in `parentsScript.ts`): the story starting at once, ▶, the 💧 of what the child said, sitting with the
 song and the thoughts, ⏸ and ▶ again, the ✓💧, the steps after it, the week's stars – about a minute and a half, a short
-line for grown-ups on a sheet beside the tablet at each part (English first, `languageStatus.ts`), then 15 s of the name
+line for grown-ups on a sheet beside the tablet at each part (English first, in every app language, grown-ups addressed
+formally), then 15 s of the name
 and the game's address (`END_SLATE_MS`) for YouTube's end screen, since this video is „not made for kids“. Each beat waits
 for its step (`pt-at-<step>`), and the hand presses the button (`pt-pressed`, its look under a finger) and sends it a
 pointer event, so the game answers as to a finger. `PottyPlay demo` keeps nothing: the week shown is made up
