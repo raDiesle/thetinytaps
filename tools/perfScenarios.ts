@@ -96,18 +96,49 @@ const key = (k: string, times = 1): Step[] => Array.from({ length: times }, () =
 
 export const SCENARIOS: Scenario[] = [
   {
+    // One stretch after the other, with no waits between them: collecting a trace already leaves seconds unmeasured
+    // between two stretches, and a stretch started after a wait of its own missed the story's monsters growing, which
+    // painted the whole screen 60 times a second until November 2026 (the sky's colour and the monsters swaying inside
+    // svgs). The jumps glide the mirror to the next step every two seconds, far more often than a child sees it.
     name: "zaehne",
     path: "/zaehne/",
     parts: [
-      { label: "Geschichte: Süßes", before: [START, { wait: 300 }], ms: 9000 },
-      { label: "Geschichte: Monster wachsen", before: [{ wait: 600 }], ms: 5500 },
-      { label: "Waschbecken", ms: 12000 },
-      { label: "Spiegel, Countdown", before: [{ wait: 3000 }], ms: 4500 },
-      { label: "Putzen: Kauflächen", before: [{ wait: 1000 }], ms: 6000 },
-      { label: "Putzen: Kopf dreht sich", before: key("ArrowRight"), ms: 5000 },
-      { label: "Putzen: Mund geht zu", before: key("ArrowRight"), ms: 5000 },
-      { label: "Putzen: innen", before: key("ArrowRight", 3), ms: 5000 },
-      { label: "Ende", before: key("ArrowRight", 2), ms: 6000 },
+      { label: "Geschichte: Süßes", before: [START], ms: 9500 },
+      { label: "Geschichte: Monster wachsen", ms: 5500 },
+      { label: "Hinunter zum Waschbecken", ms: 6000 },
+      { label: "Waschbecken", ms: 8000 },
+      { label: "Hinauf in den Spiegel, Countdown", ms: 5000 },
+      { label: "Putzen: Los!", ms: 6000 },
+      { label: "Putzen: Monster antippen", ms: 6000, tap: { selector: ".monster-body", every: 700 } },
+      { label: "Putzen: springen", ms: 12000, type: { keys: ["ArrowRight"], every: 2000 } },
+      { label: "Ende und Aufräumen", ms: 14000 },
+    ],
+  },
+  {
+    // The book on the shelf starts the brushing at once: its flight, then the story beginning as the book lies open.
+    name: "zaehne-vom-regal",
+    path: "/",
+    parts: [
+      {
+        label: "Buch aus dem Regal nehmen",
+        before: [{ tap: '[data-book="zaehne"]' }],
+        startWhen: { holds: 'document.querySelector(".bt-book")?.getAnimations({ subtree: true }).length > 0', lead: "tap to lift", within: 600 },
+        ms: 3000,
+      },
+      { label: "Geschichte beginnt", ms: 5000 },
+    ],
+  },
+  {
+    // Hände waschen plays at once: sleeves, water and soap, then the rubbing with the foam and the monsters dissolving,
+    // and the rinse with the stream and the towel. The stretches follow the clock with no waits between them.
+    name: "haende-waschen",
+    path: "/haende-waschen/",
+    parts: [
+      { label: "Ärmel, Wasser, Seife", ms: 8500 },
+      { label: "Reiben: Handflächen und Handrücken", ms: 8500 },
+      { label: "Reiben: Monster antippen", ms: 8500, tap: { selector: ".hw-monster", every: 700 } },
+      { label: "Reiben: springen", ms: 6000, type: { keys: ["ArrowRight"], every: 2000 } },
+      { label: "Abspülen, Handtuch, Glanz", ms: 12000 },
     ],
   },
   {
@@ -218,7 +249,7 @@ export const SCENARIOS: Scenario[] = [
   // The timer's pictures in their order on its start screen, each running for a while with a tap now and then (the
   // steam, the twinkling, the flame, what is left lighting up), the moon setting and the sun rising, the pizza's slices
   // lifted off, the ladybug crawling round the red disc, the alarm clock's digits ticking, the toy crane carrying toys
-  // into the box, in „Abwechseln“ the toy hopping onto the first cushion and the hourglass running, and on the Wippe the
+  // into the box, the toys hopping into their five boxes, the toy car driving on as the toys hop off the road rug, the blocks hopping out of their jumble into the block house, the pickaxe digging the treasure tunnel block by block, the hopper hopping to the flag catching its stars, in „Abwechseln“ the toy hopping onto the first cushion and the hourglass running, and on the Wippe the
   // chick stepping along the plank as the seesaw tips slowly. Each card is tapped by its name (its
   // tooltip), so the cards' order and groups may change.
   ...(
@@ -230,13 +261,18 @@ export const SCENARIOS: Scenario[] = [
       ["blume", "Blume"],
       ["pizza", "Pizza"],
       ["wecker", "Wecker"],
-      // Tidy Up is English only so far, so its card is named so in the German app too.
-      ["aufraeumen", "Tidy Up"],
+      // Tidy Up, Five Boxes and the road rug were written English first; the German app names their cards in German since they were translated.
+      ["aufraeumen", "Aufräumen"],
+      ["kisten", "Fünf Kisten"],
+      ["strassenteppich", "Straßenteppich"],
+      ["kloetzchen", "Klötzchenhaus"],
+      ["schatztunnel", "Schatztunnel"],
+      ["huepfen", "Hüpf zur Fahne"],
       ["zug", "Zug zum Bahnhof"],
       ["raupe", "Raupe"],
       ["sonne", "Sonnenaufgang"],
       ["abwechseln", "Abwechseln"],
-      ["wippe", "Seesaw"],
+      ["wippe", "Wippe"],
     ] as const
   ).map(([name, title]) => ({
     name: `timer-${name}`,
@@ -262,7 +298,21 @@ export const SCENARIOS: Scenario[] = [
   {
     name: "timer-wippe-wechsel",
     path: "/timer/?sekunden=5",
-    parts: [{ label: "Wechsel", before: [{ tap: `.mode-card[title^="Seesaw"]` }, { wait: 500 }], ms: 10000, tap: { selector: ".tm-play", every: 1500 } }],
+    parts: [{ label: "Wechsel", before: [{ tap: `.mode-card[title^="Wippe"]` }, { wait: 500 }], ms: 10000, tap: { selector: ".tm-play", every: 1500 } }],
+  },
+  // A timer's last moments and its end, with the shortest length (10 s, the first slip): the bar along the bottom
+  // filling, the warm light gathering from the edges, the bar's marker and flag beating, then the end's light and trophy.
+  {
+    name: "timer-letzte-sekunden",
+    path: "/timer/",
+    parts: [
+      {
+        label: "Letzte Sekunden",
+        before: [{ tap: ".tm-lengths button" }, { wait: 300 }, { tap: `.mode-card[title^="Rote Scheibe"]` }, { wait: 4000 }],
+        ms: 7000,
+        tap: { selector: ".tm-play", every: 1500 },
+      },
+    ],
   },
   // The Apfelbaum's harvest, sped up: bees buzzing, apples ripening and falling into the cart the bear child pushes.
   {

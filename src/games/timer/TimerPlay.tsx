@@ -10,6 +10,7 @@ import { playBlow, playMunch, playWhistle } from "@/lib/realSounds";
 import {
   loadRecordings,
   playBeeps,
+  playBoing,
   playBuzz,
   playChime,
   playChimeNote,
@@ -17,6 +18,11 @@ import {
   playClonk,
   playDing,
   playDrops,
+  playEngine,
+  playHonk,
+  playHop,
+  playCrack,
+  playKnock,
   playLeaves,
   playMelody,
   playPlink,
@@ -29,8 +35,15 @@ import {
   recorded,
 } from "@/lib/sfx";
 import { hush } from "@/lib/voice";
+import { useTimers } from "@/lib/timers";
 import { useWakeLock } from "@/lib/wakeLock";
 import { AppleScene } from "./apples";
+import { BlocksScene, blockCount, blocksPlan } from "./blocks";
+import { BoxesScene, boxesPlan, perBox } from "./boxes";
+import { RoadScene, roadPlan, roadToyCount } from "./road";
+import { TunnelScene, digCount, tunnelPlan } from "./tunnel";
+import { JumpScene, hopCount, jumpPlan } from "./jump";
+import { FINAL_NOTES, FinalLight, finalMs, TimeBar, TimeBarChoice } from "./bar";
 import { CaterpillarScene } from "./caterpillar";
 import { ClockScene } from "./clock";
 import { isTurns, nextPicture, OTHER_TIME, PICTURES, tomorrowAt } from "./content";
@@ -89,6 +102,7 @@ export function TimerPlay({
   onPicture,
   onToy,
   onShown,
+  onBar,
 }: {
   settings: TimerSettings;
   onPicture: (picture: TimerPicture) => void;
@@ -96,6 +110,8 @@ export function TimerPlay({
   onToy: (toy: SwapToy) => void;
   /** A grown-up has the time left shown in the picture, or not, behind ⚙️. */
   onShown: (shown: TimeShown) => void;
+  /** A grown-up has the bar along the bottom shown, or not, behind ⚙️. */
+  onBar: (bar: boolean) => void;
 }) {
   const [run, setRun] = useState(0);
   const again = () => setRun((n) => n + 1);
@@ -103,7 +119,7 @@ export function TimerPlay({
     onPicture(picture);
     again();
   };
-  return <TimerStart key={run} settings={settings} onAgain={again} onPicture={pick} onToy={onToy} onShown={onShown} />;
+  return <TimerStart key={run} settings={settings} onAgain={again} onPicture={pick} onToy={onToy} onShown={onShown} onBar={onBar} />;
 }
 
 /**
@@ -116,12 +132,14 @@ function TimerStart({
   onPicture,
   onToy,
   onShown,
+  onBar,
 }: {
   settings: TimerSettings;
   onAgain: () => void;
   onPicture: (picture: TimerPicture) => void;
   onToy: (toy: SwapToy) => void;
   onShown: (shown: TimeShown) => void;
+  onBar: (bar: boolean) => void;
 }) {
   const t = useT();
   const leave = useLeaveGame();
@@ -172,6 +190,8 @@ function TimerStart({
         onToy={onToy}
         timeShown={settings.timeNote}
         onShown={onShown}
+        bar={settings.bar}
+        onBar={onBar}
         onAgain={onAgain}
         onPicture={onPicture}
       />
@@ -187,6 +207,8 @@ function TimerStart({
       until={until}
       shown={settings.timeNote}
       onShown={onShown}
+      bar={settings.bar}
+      onBar={onBar}
       onAgain={onAgain}
       onPicture={onPicture}
     />
@@ -258,6 +280,8 @@ function TimerRun({
   until,
   shown,
   onShown,
+  bar,
+  onBar,
   onAgain,
   onPicture,
 }: {
@@ -271,6 +295,9 @@ function TimerRun({
   /** The time left in the picture's corner too, or not. */
   shown: TimeShown;
   onShown: (shown: TimeShown) => void;
+  /** The bar along the bottom too, or not. */
+  bar: boolean;
+  onBar: (bar: boolean) => void;
   onAgain: () => void;
   onPicture: (picture: TimerPicture) => void;
 }) {
@@ -283,6 +310,12 @@ function TimerRun({
   // Gleich ist es so weit (H-49): a while before the end the bell rings once, and a picture stepped back from afar comes bright again.
   const [soon, setSoon] = useState(false);
   const soonAt = endsAt - soonMs(total);
+  // The last moments (user request, 22 November 2026): a warm light gathers from the edges, the bar's marker and flag
+  // beat once a second, and the last seconds rise note by note to the end.
+  const lastMs = finalMs(total);
+  const finalAt = endsAt - lastMs;
+  const [final, setFinal] = useState(false);
+  const { later } = useTimers();
   const { effects, ripple, glow } = useTapFeedback();
   useWakeLock(phase === "running");
   useEffect(() => loadRecordings(["cheer"]), []);
@@ -314,12 +347,32 @@ function TimerRun({
       return tidyTimes(total, toyCount(set))
         .slice(0, -1)
         .map((t) => t.land);
+    // Five Boxes (H-120): each toy landing in its box, and each lid shutting but the last, whose shutting is the end.
+    if (picture === "boxes") return boxMoments(total, perBox(set)).map((m) => m.at);
+    // The road rug (H-122): each toy landing in the box, and the car arriving behind the next toy, but home at the end.
+    if (picture === "road") return roadMoments(total, roadToyCount(set)).map((m) => m.at);
+    // The block house (H-125): each block landing on its place, the last one being the end's.
+    if (picture === "blocks")
+      return blocksPlan(total, blockCount(set))
+        .blocks.slice(0, -1)
+        .map((b) => b.hop.land);
+    // The treasure tunnel (H-126): each block crumbling away, the last one being the end's.
+    if (picture === "tunnel")
+      return tunnelPlan(total, digCount(set))
+        .blocks.slice(0, -1)
+        .map((b) => b.gone);
+    // Hop to the Flag (H-127): each star caught at the top of its hop, the last hop's landing being the end's.
+    if (picture === "jump")
+      return jumpPlan(total, hopCount(set))
+        .hops.slice(0, -1)
+        .map((h) => h.star);
     // The ladybug leaves a dot as it is back at the top (H-67).
     if (picture === "disc") return pieceMoments(total, ladybugLaps(set).dots);
     return [];
   }, [picture, total, set, apples, stops]);
   const nextMoment = useRef(0);
   const soonRang = useRef(false);
+  const finalOn = useRef(false);
   const lastPieceSound = useRef(Number.NEGATIVE_INFINITY);
 
   // Seen from afar (H-48): a while after the last tap the small things step back, and a tap brings them back.
@@ -345,6 +398,10 @@ function TimerRun({
         playDing();
         say(SOON_LINE, true);
       }
+      if (now >= finalAt && !finalOn.current) {
+        finalOn.current = true;
+        setFinal(true);
+      }
       // A piece done: one sound, also when several passed while the page was away.
       if (nextMoment.current < moments.length && now >= startedAt + moments[nextMoment.current]) {
         while (nextMoment.current < moments.length && now >= startedAt + moments[nextMoment.current]) nextMoment.current++;
@@ -354,13 +411,20 @@ function TimerRun({
           if (picture === "apple") playPlop();
           else if (picture === "pizza") playMunch();
           else if (picture === "tidy") playClonk();
+          else if (picture === "boxes") (boxMoments(total, perBox(set))[nextMoment.current - 1]?.lid ? playKnock : playClonk)();
+          else if (picture === "road") (roadMoments(total, roadToyCount(set))[nextMoment.current - 1]?.honk ? playHonk : playClonk)();
+          else if (picture === "blocks") playKnock(520);
+          else if (picture === "tunnel") playCrack();
+          // A star caught: a bright note climbing the scale star by star.
+          else if (picture === "jump") playPlink(nextMoment.current + 3);
           else if (picture === "disc") playPlink(nextMoment.current);
           else playDing();
         }
       }
       const toMoment = nextMoment.current < moments.length ? startedAt + moments[nextMoment.current] - now : Number.POSITIVE_INFINITY;
       const toSoon = soonRang.current ? Number.POSITIVE_INFINITY : soonAt - now;
-      timer = setTimeout(check, Math.max(10, Math.min(left, 1000, toMoment, toSoon)));
+      const toFinal = finalOn.current ? Number.POSITIVE_INFINITY : finalAt - now;
+      timer = setTimeout(check, Math.max(10, Math.min(left, 1000, toMoment, toSoon, toFinal)));
     };
     const onVisible = () => {
       clearTimeout(timer);
@@ -372,7 +436,17 @@ function TimerRun({
       clearTimeout(timer);
       document.removeEventListener("visibilitychange", onVisible);
     };
-  }, [phase, endsAt, total, picture, moments, soonAt, say]);
+  }, [phase, endsAt, total, picture, moments, soonAt, finalAt, say, set]);
+
+  // The last seconds rise note by note, softly, the last one a second before the end, so the end's own sound follows.
+  useEffect(() => {
+    if (!final) return;
+    const notes = Math.min(FINAL_NOTES, Math.floor(lastMs / 1000));
+    for (let k = notes; k >= 1; k--) {
+      const wait = endsAt - k * 1000 - Date.now();
+      if (wait >= 0) later(() => playChimeNote(notes - k + 2), wait);
+    }
+  }, [final, endsAt, lastMs, later]);
 
   useEffect(() => {
     if (phase === "blow") {
@@ -392,6 +466,11 @@ function TimerRun({
       else if (picture === "pizza") playYum();
       else if (picture === "clock") playBeeps();
       else if (picture === "tidy") playClonk();
+      else if (picture === "boxes") playKnock();
+      else if (picture === "road") playHonk();
+      else if (picture === "blocks") playChime();
+      else if (picture === "tunnel") playTwinkle();
+      else if (picture === "jump") playHop(0.3);
       say(lines.end, true);
       // The time is up, plain to see and hear (user feedback, November 2026): children cheer, the picture
       // lights up warmly, then the friendly tune – and the trophy with the end's buttons, nothing rising (user decision).
@@ -427,6 +506,16 @@ function TimerRun({
       else if (picture === "clock") playClick();
       // The crane's motor whirrs.
       else if (picture === "tidy") playWhirr();
+      // The toys still on the floor giggle with a little hop.
+      else if (picture === "boxes") playHop();
+      // The little car's engine hums.
+      else if (picture === "road") playEngine();
+      // The blocks still in the jumble give a soft knock.
+      else if (picture === "blocks") playKnock(880);
+      // The pickaxe gives a bright tink on the stone.
+      else if (picture === "tunnel") playKnock(1200);
+      // The hopper's springy boing.
+      else if (picture === "jump") playBoing();
       else playChimeNote(Math.floor(Math.random() * 8));
     },
     [phase, picture, ripple, glow, endsAt, total, apples],
@@ -448,11 +537,13 @@ function TimerRun({
   const clock = picture === "clock";
   return (
     <>
-      <div className="tm-play" data-picture={picture} onPointerDown={down} role="img" aria-label={name ? t(name) : undefined}>
+      <div className={`tm-play${bar ? " tm-with-bar" : ""}`} data-picture={picture} onPointerDown={down} role="img" aria-label={name ? t(name) : undefined}>
         <div className={`tm-stage tm-${phase}${far ? " tm-far" : ""}`} style={stageStyle(picture, total, stops)}>
           <SceneParts picture={picture} phase={phase} total={total} set={set} poke={poke} startedAt={endsAt - total} />
           {phase === "done" && <div className="tm-done-light" />}
         </div>
+        {final && <FinalLight endsAt={endsAt} />}
+        {bar && <TimeBar startedAt={endsAt - total} total={total} soon={soon} final={final && phase === "running"} glow={poke} done={phase !== "running"} />}
         {/* The alarm clock shows the time left on its own screen, so it needs no note in the corner. */}
         <TimeShownNote shown={phase === "running" && !clock ? shown : "off"} endsAt={endsAt} total={total} />
         <FeedbackLayer effects={effects} />
@@ -468,9 +559,28 @@ function TimerRun({
       <PlayOptions>
         <TimeLeft endsAt={endsAt} until={until} />
         {!clock && <TimeShownChoice value={shown} onChange={onShown} />}
+        <TimeBarChoice value={bar} onChange={onBar} />
       </PlayOptions>
     </>
   );
+}
+
+/**
+ * Five Boxes' moments with a sound, in time order: each toy landing in its box (a clonk) and each lid shutting (a knock),
+ * but the last lid's, which is the end's own sound.
+ */
+function boxMoments(total: number, count: number): { at: number; lid: boolean }[] {
+  const { toys, lids } = boxesPlan(total, count);
+  return [...toys.map((t) => ({ at: t.hop.land, lid: false })), ...lids.slice(0, -1).map((l) => ({ at: l.shut, lid: true }))].sort((a, b) => a.at - b.at);
+}
+
+/**
+ * The road rug's moments with a sound, in time order: each toy landing in the box (a clonk) and the car arriving behind
+ * the next toy (a little honk), but its arrival home, which is the end's own sound.
+ */
+function roadMoments(total: number, count: number): { at: number; honk: boolean }[] {
+  const { toys, drives } = roadPlan(total, count);
+  return [...toys.map((t) => ({ at: t.hop.land, honk: false })), ...drives.slice(0, -1).map((d) => ({ at: d.arrive, honk: true }))].sort((a, b) => a.at - b.at);
 }
 
 /** The stage's lengths for the CSS: the run's, its seconds, the train's way, and the train's own keyframes when it halts. */
@@ -527,6 +637,11 @@ export function SceneParts({
       {picture === "disc" && <DiscScene glow={poke} total={total} set={set} />}
       {picture === "pizza" && <PizzaScene glow={poke} />}
       {picture === "tidy" && <TidyScene count={toyCount(set)} total={total} glow={poke} />}
+      {picture === "boxes" && <BoxesScene count={perBox(set)} total={total} glow={poke} />}
+      {picture === "road" && <RoadScene count={roadToyCount(set)} total={total} glow={poke} />}
+      {picture === "blocks" && <BlocksScene count={blockCount(set)} total={total} glow={poke} />}
+      {picture === "tunnel" && <TunnelScene count={digCount(set)} total={total} glow={poke} />}
+      {picture === "jump" && <JumpScene count={hopCount(set)} total={total} glow={poke} />}
       {picture === "clock" && <ClockScene glow={poke} endsAt={startedAt + total} total={total} running={phase === "running"} still={still} />}
       {picture === "flower" && <FlowerScene glow={poke} total={total} />}
       {picture === "sunset" && <SunsetScene glow={poke} />}

@@ -100,6 +100,6 @@ export function sceneTitle(id: string, languageId: TargetLanguageId) {
   return (languageId === "de" ? undefined : SCENE_TRANSLATIONS[id]?.[languageId]?.title) ?? entry?.title ?? id;
 }
 
-// A menu loads the pictures behind its cards while it waits for a tap, and a card loads its picture as the finger
-// lands (usePreloadPages, preloadPage), as it does the lazy pages of App.tsx: the picture with the page that plays it.
+// A card loads its picture as the finger lands on it (loadOnIntent, preloadPage), as it does the lazy pages of App.tsx:
+// the picture with the page that plays it – never the pictures behind every card while the menu waits.
 for (const entry of SCENE_ENTRIES) registerPage([scenePath(entry.id)], () => Promise.all([import("@/pages/ScenePage"), loadScene(entry.id)]));

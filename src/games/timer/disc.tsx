@@ -3,8 +3,8 @@ import { ladybugLaps } from "./pieces";
 import { Draw, INK, Layer, LeftGlow, STAGE_H, STAGE_W } from "./scenes";
 
 // Rote Scheibe (H-47): the plainest picture, as many Kitas know it from the „Time Timer“ – a big red disc on a white
-// face that gets smaller like a clock's hand going round, until nothing red is left. Bright colour on plain paper, to be
-// seen across the room. The red is covered by two white half discs turning in two halves of the face, each clipped by
+// face that gets smaller like a clock's hand going round, until nothing red is left. Bright colour on a quiet wall, the
+// face in its case on a table (H-124), to be seen across the room. The red is covered by two white half discs turning in two halves of the face, each clipped by
 // its half (`overflow: hidden`), so only `transform` moves; a hand turns with the edge, and the knob in the middle turns
 // a little every second (H-63). A ladybug crawls round the face's rim about once a minute, like a second hand, and
 // leaves a dot outside the rim after each round, so one sees how many minutes are over (H-67): two speeds as on a real
@@ -25,13 +25,25 @@ const BUG_BOX = BUG * 1.3;
 /** The overlays reach a little past the red, so no red hairline shows at its rim. */
 const COVER = DISC.r + 3;
 
-/** The plain paper behind the face; drawn once. */
+/** The case round the face, the timer's own body, standing on its two feet. */
+const CASE = DISC.face + 56;
+
+/** A quiet wall with soft stripes and the table the timer stands on; drawn once. */
 const DiscBackdrop = memo(function DiscBackdrop() {
   return (
     <Layer x={0} y={0} w={STAGE_W} h={STAGE_H} className="tm-back">
       <Draw w={STAGE_W} h={STAGE_H}>
-        <rect width={STAGE_W} height={STAGE_H} fill="#fff4e0" />
-        <rect y="800" width={STAGE_W} height="100" fill="#f1dcb8" />
+        <defs>
+          <pattern id="tm-disc-wall" width="90" height="90" patternUnits="userSpaceOnUse">
+            <rect width="90" height="90" fill="#fff4e0" />
+            <rect width="30" height="90" fill="#fdecd2" />
+          </pattern>
+        </defs>
+        <rect width={STAGE_W} height={STAGE_H} fill="url(#tm-disc-wall)" />
+        <rect y="790" width={STAGE_W} height="110" fill="#e9c999" />
+        <rect y="790" width={STAGE_W} height="14" fill="#f4dcb4" />
+        <path d="M0 790 H1600" stroke="#b98a52" strokeWidth="5" />
+        <path d="M0 846 C400 838 800 854 1600 842 M200 876 C600 868 1000 884 1500 872" fill="none" stroke="#d4ad78" strokeWidth="4" />
       </Draw>
     </Layer>
   );
@@ -43,6 +55,20 @@ const DiscFace = memo(function DiscFace() {
   return (
     <Layer x={0} y={0} w={STAGE_W} h={STAGE_H}>
       <Draw w={STAGE_W} h={STAGE_H}>
+        {/* The timer's case: its shadow on the wall, two feet on the table, the round body with a rim. */}
+        <circle cx={cx + 14} cy={cy + 18} r={CASE} fill="#3b2a20" opacity="0.12" />
+        {[-1, 1].map((side) => (
+          <rect key={side} x={cx + side * 200 - 34} y={cy + CASE - 90} width="68" height="110" rx="16" fill="#ced4da" stroke={INK} strokeWidth="7" />
+        ))}
+        <circle cx={cx} cy={cy} r={CASE} fill="#f1f3f5" stroke={INK} strokeWidth="8" />
+        <circle cx={cx} cy={cy} r={CASE - 14} fill="none" stroke="#dee2e6" strokeWidth="6" />
+        <path
+          d={`M${cx - CASE + 22} ${cy + 60} A${CASE - 22} ${CASE - 22} 0 0 0 ${cx + CASE - 22} ${cy + 60}`}
+          fill="none"
+          stroke="#ced4da"
+          strokeWidth="10"
+          strokeLinecap="round"
+        />
         <circle cx={cx} cy={cy} r={face} fill="#fff" stroke={INK} strokeWidth="9" />
         {Array.from({ length: 60 }, (_, i) => {
           const a = (i / 60) * 2 * Math.PI;

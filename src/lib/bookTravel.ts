@@ -2,7 +2,6 @@ import { bookIdOf, shelfEntryOf, shelfVolumes } from "@/content/games";
 import { playPageTurn } from "@/lib/sfx";
 import { pageMoves } from "@/lib/pageMotion";
 import { picturesReady } from "@/lib/picturesReady";
-import { holdPreloads } from "@/lib/preloadPages";
 import { BOOK_ASPECT } from "@/lib/shelfLayout";
 
 /*
@@ -263,8 +262,8 @@ function whenGone(gone: Element | null) {
  * the room's copy is drawn in the very frame the new page replaces the room (one long frame on an old phone, which no
  * one sees, since nothing changes), then the new page is copied onto the left page, and only then the book lifts – and
  * with it the sound. While it moves the main thread has nothing left to do: drawing and copying during the motion
- * stuttered on phones (4 frames over 50 ms in its first 0.4 s, November 2026), and no other page's code is loaded until
- * the book is open.
+ * stuttered on phones (4 frames over 50 ms in its first 0.4 s, November 2026), and no other page's code is loaded then
+ * (a page loads only when it is asked for, preloadPages.ts).
  */
 export function takeOutBook(book: HTMLElement, go: () => void) {
   if (travelling || still()) {
@@ -272,7 +271,6 @@ export function takeOutBook(book: HTMLElement, go: () => void) {
     return;
   }
   travelling = true;
-  holdPreloads(READY_WAIT);
   // The game or menu the book opens on waits with its voice, songs and animations until the book lies open and the
   // layer is gone (pageMotion.ts): the child sees it start, never while the book still flies.
   const lies = pageMoves();
@@ -311,7 +309,6 @@ export function takeOutBook(book: HTMLElement, go: () => void) {
       await frames(2);
       // The cover lands on the left with the sound's last thud.
       playPageTurn((LIFT + FLY + OPEN) / 1000 / 0.85);
-      holdPreloads(TOTAL + 300);
       await moving();
     } catch {
       // A move cut short (the page hidden meanwhile): the layer goes all the same.
@@ -337,7 +334,6 @@ export function putBookBack(from: string, go: () => void) {
     return;
   }
   travelling = true;
-  holdPreloads(TOTAL + 1800);
   const lies = pageMoves();
   // The screen as it is, still on top while the shelf comes in under it.
   const root = layer();

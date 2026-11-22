@@ -1,5 +1,10 @@
 import type { Localized, Texts } from "@/lib/language";
 import type { TimerPicture, TurnPicture } from "./settings";
+import { BLOCKS_NAME } from "./blocksNames";
+import { BOXES_NAME } from "./boxesNames";
+import { TUNNEL_NAME } from "./tunnelNames";
+import { JUMP_NAME } from "./jumpNames";
+import { ROAD_NAME } from "./roadNames";
 import { TIDY_NAME } from "./tidyNames";
 
 /** The game's name, on its start screen, its spine on the shelf and in the browser tab. */
@@ -52,6 +57,16 @@ export const PICTURES: { id: TimerPicture; emoji: string; name: Texts }[] = [
   { id: "clock", emoji: "⏰", name: { de: "Wecker", en: "Alarm Clock", zh: "闹钟", hi: "अलार्म घड़ी", es: "Despertador", ar: "المنبّه", ru: "Будильник" } },
   // Tidy Up (H-118): a toy crane puts the toys into the box, best at five minutes; written English first, translated on 22 November 2026.
   { id: "tidy", emoji: "🧸", name: TIDY_NAME },
+  // Five Boxes (H-120, 22 November 2026): a box for each sort, its toys hopping in and its lid shutting, one a minute at five minutes.
+  { id: "boxes", emoji: "📦", name: BOXES_NAME },
+  // The road rug (H-122, 22 November 2026): toys hop off a play rug's road into the box, and the toy car drives on to the next one.
+  { id: "road", emoji: "🛣️", name: ROAD_NAME },
+  // The block house (H-125, 22 November 2026), the first timer like a game played by itself: blocks hop out of a jumble into a house.
+  { id: "blocks", emoji: "🧱", name: BLOCKS_NAME },
+  // The treasure tunnel (H-126, 22 November 2026), the second like a block world played by itself: a tunnel dug block by block to a chest.
+  { id: "tunnel", emoji: "⛏️", name: TUNNEL_NAME },
+  // Hop to the Flag (H-127, 22 November 2026), the first game look that is no block world: a jump-and-run, a hopper catching a trail of stars on its way to the flag.
+  { id: "jump", emoji: "🏃", name: JUMP_NAME },
   {
     id: "train",
     emoji: "🚂",

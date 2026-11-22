@@ -34,6 +34,13 @@ export const TOOL_GROUPS: { title: string; pages: ToolPage[] }[] = [
       { to: "/management/video-outro/", emoji: "📚", label: "Abspann", about: "das Buch geht zurück, Adresse und QR-Code, 12 s", ideas: ["Y-04", "Y-05"] },
       { to: "/management/video-zaehne/", emoji: "🪥", label: "Zähne putzen", about: "das ganze Zähneputzen zum Mitputzen aufnehmen", ideas: ["Y-06"] },
       {
+        to: "/management/video-haende/",
+        emoji: "🧼",
+        label: "Hände waschen",
+        about: "das ganze Händewaschen zum Mitwaschen aufnehmen – noch mit Platzhalter-Melodie statt Lied",
+        ideas: ["H-136", "Y-36"],
+      },
+      {
         to: "/management/video-toepfchen/",
         emoji: "🚽",
         label: "Aufs Töpfchen",

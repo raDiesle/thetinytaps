@@ -3,7 +3,9 @@ import { Cloud } from "@/components/drawing";
 import { INK } from "@/components/drawing";
 import { groundY } from "./ground";
 import { Balloon, Bread, Fish, Plank, Sunflower, Umbrella } from "./items";
-import type { Point, SceneryProps } from "./types";
+import type { Point, SceneryProps, TrailLevel } from "./types";
+import { playBlub, playBoing, playClonk, playCreak, playCrunch, playDrops, playLeaves, playPeck, playPoof, playSneeze, playThump, playWhoosh } from "@/lib/sfx";
+import { playCoo, playGiggle, playMeow, playMunch, playQuack, playSplash } from "@/lib/realSounds";
 
 // "Der Luftballon": from home along the street past the bakery, the fish stall and the flower
 // stall, through the park with the duck pond, the bench and the sprinkler, over the hanging bridge,
@@ -572,3 +574,126 @@ export function BallonBackdrop() {
     </g>
   );
 }
+
+export const BALLON_LEVEL: TrailLevel = {
+  id: "ballon",
+  title: "Der Luftballon",
+  goal: "balloon",
+  Scenery: BallonScenery,
+  Backdrop: BallonBackdrop,
+  ground: BALLON_GROUND,
+  start: 300,
+  away: {
+    to: DOVE_HOLDS,
+    ms: 4200,
+    sway: 120,
+    pose: "reach",
+    sounds: [
+      [0, playWhoosh],
+      [1600, playWhoosh],
+    ],
+    say: "Huch! Der Wind nimmt den Luftballon mit. Hinterher!",
+  },
+  stations: [
+    { kind: "pickup", id: "bread", x: 560, item: "bread", at: [640, 660], sound: playCrunch, ask: "Ein Brot!", done: "Ab in den Rucksack!" },
+    { kind: "pickup", id: "fish", x: 860, item: "fish", at: [940, 630], sound: playBlub, ask: "Ein Fisch.", done: "Den nehmen wir mit." },
+    { kind: "pickup", id: "sunflower", x: 1120, item: "sunflower", at: [1210, 600], sound: playLeaves, ask: "Eine Sonnenblume!", done: "Die nehmen wir mit." },
+    {
+      kind: "obstacle",
+      id: "ducks",
+      x: 1400,
+      need: "bread",
+      why: { wants: [1520, 596] },
+      at: [1476, 721],
+      meet: [[100, playQuack]],
+      sounds: [
+        [200, playQuack],
+        [500, playPeck],
+        [1100, playPeck],
+        [1700, playPeck],
+        [2700, playSplash],
+        [3200, playQuack],
+      ],
+      ms: 3600,
+      nope: playSneeze,
+      ask: "Die Enten stehen im Weg. Sie haben Hunger. Was geben wir ihnen?",
+      done: "Das Brot! Quak, quak, lecker.",
+    },
+    { kind: "pickup", id: "umbrella", x: 1780, item: "umbrella", at: [1906, 640], sound: playPoof, ask: "Ein Regenschirm.", done: "Den nehmen wir mit." },
+    {
+      kind: "obstacle",
+      id: "sprinkler",
+      x: 2060,
+      need: "umbrella",
+      why: { worry: "wet" },
+      at: [2300, 640],
+      meet: [[100, playDrops]],
+      sounds: [
+        [0, playPoof],
+        [500, playDrops],
+        [1100, playGiggle],
+      ],
+      ms: 1800,
+      nope: playSplash,
+      ask: "Hier spritzt das Wasser. Was hilft?",
+      done: "Der Regenschirm! Jetzt bleiben wir trocken.",
+    },
+    { kind: "pickup", id: "plank", x: 2330, item: "plank", at: [2440, 690], sound: playClonk, ask: "Ein Brett.", done: "Das nehmen wir mit." },
+    {
+      kind: "obstacle",
+      id: "bridge",
+      x: 2600,
+      need: "plank",
+      why: { worry: "splash" },
+      at: [BRIDGE_DIP[0], BRIDGE_DIP[1] + 10],
+      meet: [[100, playCreak]],
+      sounds: [
+        [0, playThump],
+        [600, playCreak],
+      ],
+      ms: 1600,
+      nope: playBoing,
+      ask: "Die Brücke hat ein Loch. Was hilft?",
+      done: "Das Brett! Jetzt kommen wir rüber.",
+    },
+    {
+      kind: "obstacle",
+      id: "cat",
+      x: 3260,
+      need: "fish",
+      why: { wants: [3350, 640] },
+      at: [3330, 710],
+      meet: [[100, playMeow]],
+      sounds: [
+        [300, playMeow],
+        [1300, playMunch],
+        [2000, playMunch],
+      ],
+      ms: 2400,
+      nope: playSneeze,
+      ask: "Die Katze liegt im Weg. Sie hat Hunger. Was geben wir ihr?",
+      done: "Den Fisch! Miau, danke.",
+    },
+    { kind: "climb", id: "stairs", x: 3480, steps: STAIRS, ask: "Eine lange Treppe! Hoch geht's.", done: "Oben!" },
+    {
+      kind: "obstacle",
+      id: "dove",
+      x: 4380,
+      need: "sunflower",
+      why: { wants: [4595, 124] },
+      at: [4630, 180],
+      meet: [[100, playCoo]],
+      sounds: [
+        [200, playCoo],
+        [1400, playPeck],
+        [2000, playPeck],
+      ],
+      ms: 2200,
+      nope: playCoo,
+      frees: true,
+      ask: "Die Taube hat den Luftballon. Was geben wir ihr?",
+      done: "Die Sonnenblume! Danke, Taube.",
+    },
+  ],
+  finale: { to: [4540, -170], ms: 2600, sway: 60, say: "Der Luftballon ist wieder da! Hurra!" },
+};

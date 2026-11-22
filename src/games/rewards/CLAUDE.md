@@ -346,6 +346,10 @@ card), safety. The Tagesplan shows it first, before A4; the board after its A4 p
 - A rule that changes `.rw-page` (its `display`, padding) for one kind of page goes after `.rw-page` in `rewards.css`,
   never into `planner.css`: the two stylesheets load in another order on the dev server than in the build, so a page's
   grid in `planner.css` lost to `.rw-page`'s flex and the cut-out cards stood as tall strips in the preview.
+- A picture loads when it is seen (user request, November 2026): the Vorlagen's small pictures and the chips under the
+  folded „Weitere Einstellungen“ stand inside `LazyPictures` (`loading="lazy"`; the folded chips alone were 45 files,
+  2 MB, on every first visit). A new place showing many pictures out of sight (a list below the screen, something
+  folded) does the same; a chart itself and every print never, so a print misses no picture (`loading.test.tsx`).
 - On paper a picture never takes more room than the emoji it replaces where words stand beside it (a week row): the
   bigger pictures cut „Zähne putzen“ to „Zähne putze“ in the A4 preview. Look at the print preview after changing sizes.
 

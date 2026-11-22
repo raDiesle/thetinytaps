@@ -2,7 +2,25 @@ import type { ReactNode } from "react";
 import { Cloud } from "@/components/drawing";
 import { INK } from "@/components/drawing";
 import { Bone, WateringCan } from "./items";
-import type { Point, SceneryProps } from "./types";
+import type { Point, SceneryProps, TrailLevel } from "./types";
+import {
+  playBoing,
+  playClonk,
+  playCrunch,
+  playDing,
+  playDrops,
+  playGlug,
+  playPing,
+  playPlop,
+  playPop,
+  playRustle,
+  playSneeze,
+  playSniff,
+  playTick,
+  playTwinkle,
+  playWhoosh,
+} from "@/lib/sfx";
+import { playBark, playMunch } from "@/lib/realSounds";
 
 // "Der Ball rollt weg": down the own street – the front garden, the traffic light with its button
 // and the zebra crossing, the pet shop, the dog at its door, who comes along once it has its bone – into the park,
@@ -540,3 +558,114 @@ export function BallBackdrop() {
     </g>
   );
 }
+
+export const BALL_LEVEL: TrailLevel = {
+  id: "ball",
+  title: "Der Ball rollt weg",
+  goal: "football",
+  Scenery: BallScenery,
+  Front: BallFront,
+  Backdrop: BallBackdrop,
+  ground: [[-3000, GROUND_Y], [3400, GROUND_Y], ...LADDER, ...SLIDE, [9000, GROUND_Y]],
+  start: 300,
+  away: {
+    via: [
+      [[450, 744], 450],
+      [[560, 680], 300],
+      [[660, 744], 300],
+    ],
+    to: BALL_AT,
+    ms: 3400,
+    sway: 0,
+    pose: "reach",
+    sounds: [
+      [400, playBoing],
+      [1000, playBoing],
+      [1400, playWhoosh],
+    ],
+    say: "Oh nein! Der Ball rollt weg. Hinterher!",
+  },
+  stations: [
+    { kind: "pickup", id: "can", x: 540, item: "can", at: [640, 700], sound: playClonk, ask: "Eine Gießkanne.", done: "Die nehmen wir mit." },
+    {
+      kind: "moment",
+      id: "light",
+      x: 960,
+      pose: "reach",
+      sounds: [
+        [100, playPing],
+        [600, playTick],
+        [1900, playTick],
+        [3000, playDing],
+      ],
+      ms: 3200,
+      ask: "Die Ampel ist rot. Wir drücken den Knopf.",
+      done: "Grün! Jetzt gehen wir rüber.",
+    },
+    { kind: "pickup", id: "bone", x: 1600, item: "bone", at: [1690, 676], sound: playPop, ask: "Ein Knochen!", done: "Ab in den Rucksack!" },
+    {
+      kind: "obstacle",
+      id: "dog",
+      x: 2300,
+      need: "bone",
+      why: { wants: [2462, 560] },
+      at: [2420, 636],
+      meet: [[100, playBark]],
+      sounds: [
+        [100, playMunch],
+        [800, playMunch],
+        [1500, playMunch],
+      ],
+      ms: 2800,
+      nope: playSneeze,
+      // G-10: the dog comes along, and at the sandbox it digs the ball out.
+      befriends: { friend: "dog", from: DOG_AT, say: "Den nehmen wir mit." },
+      ask: "Der Hund sitzt im Weg. Er hat Hunger. Was geben wir ihm?",
+      done: "Der Knochen! Mmh, lecker.",
+    },
+    {
+      kind: "obstacle",
+      id: "flowers",
+      x: 2760,
+      need: "can",
+      why: { wants: [2930, 600] },
+      at: [2880, 560],
+      meet: [[100, playRustle]],
+      sounds: [
+        [0, playGlug],
+        [300, playDrops],
+        [1400, playTwinkle],
+      ],
+      ms: 2600,
+      nope: playBoing,
+      ask: "Die Blumen lassen die Köpfe hängen. Sie haben Durst. Was hilft?",
+      done: "Wasser! Die Blumen stehen auf.",
+    },
+    { kind: "climb", id: "slide", x: 3360, steps: LADDER, slide: SLIDE, ask: "Die Rutsche! Hoch geht's.", done: "Hui!" },
+    {
+      kind: "obstacle",
+      id: "sandbox",
+      x: 4200,
+      need: "dog",
+      why: { worry: "dig" },
+      // The dog stands on the sand left of the ball and digs with its front paws.
+      at: [4350, 700],
+      meet: [[100, playBoing]],
+      sounds: [
+        [0, playSniff],
+        [500, playCrunch],
+        [1000, playCrunch],
+        [1500, playCrunch],
+        [2300, playPop],
+        [2700, playBark],
+      ],
+      ms: 3000,
+      nope: playPlop,
+      frees: true,
+      ask: "Da ist der Ball! Er steckt im Sand. Was hilft?",
+      done: "Da bist du ja!",
+    },
+  ],
+  // Up into the air and back into the hands (they reach out at x 4266, y 662).
+  finale: { via: [[[4320, 300], 1000]], to: [4266, 662], ms: 1000, sway: 0, say: "Der Ball ist wieder da! Hurra!" },
+};

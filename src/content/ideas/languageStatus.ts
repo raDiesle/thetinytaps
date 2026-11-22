@@ -88,6 +88,41 @@ export const LANGUAGE_STATUS: LanguageStatusRow[] = [
         note: "Das Bild fürs Aufräumen mit dem Spielzeugkran (H-118, tidy.tsx, 21. November 2026), Englisch zuerst geschrieben: sein Name „Tidy Up“ und seine zwei Sätze am Anfang und am Ende (tidyNames.ts). Am 22. November 2026 in alle anderen Sprachen übersetzt („Aufräumen“). Aufgenommen ist noch nichts (bun run voice make --only timer, nur auf Wunsch), bis dahin bleibt es still. Die Texte für Suchmaschinen nennen es in allen sieben Sprachen.",
         files: ["src/games/timer/tidyNames.ts"],
       },
+      {
+        label: "📦 Five Boxes",
+        languages: { de: "text", en: "text", zh: "text", hi: "text", es: "text", ar: "text", ru: "text" },
+        recorded: true,
+        note: "Das Bild mit den fünf Kisten, in die die Spielsachen Sorte für Sorte hüpfen (H-120, boxes.tsx, 22. November 2026), Englisch zuerst geschrieben und gleich in alle Sprachen übersetzt: sein Name „Five Boxes“ („Fünf Kisten“) und seine zwei Sätze am Anfang und am Ende (boxesNames.ts). Aufgenommen ist noch nichts (bun run voice make --only timer, nur auf Wunsch), bis dahin bleibt es still. Die Texte für Suchmaschinen nennen es in allen sieben Sprachen.",
+        files: ["src/games/timer/boxesNames.ts"],
+      },
+      {
+        label: "🛣️ Road Rug",
+        languages: { de: "text", en: "text", zh: "text", hi: "text", es: "text", ar: "text", ru: "text" },
+        recorded: true,
+        note: "Das Bild mit dem Straßenteppich, von dessen Straße die Spielsachen in die Kiste hüpfen, während das Spielzeugauto nachrückt (H-122, road.tsx, 22. November 2026), Englisch zuerst geschrieben und gleich in alle Sprachen übersetzt: sein Name „Road Rug“ („Straßenteppich“) und seine zwei Sätze am Anfang und am Ende (roadNames.ts). Aufgenommen ist noch nichts (bun run voice make --only timer, nur auf Wunsch), bis dahin bleibt es still. Die Texte für Suchmaschinen nennen es in allen sieben Sprachen.",
+        files: ["src/games/timer/roadNames.ts"],
+      },
+      {
+        label: "🧱 Block House",
+        languages: { de: "text", en: "text", zh: "text", hi: "text", es: "text", ar: "text", ru: "text" },
+        recorded: true,
+        note: "Das Bild im Stil eines Klötzchen-Bauspiels, in dem Klötze aus einem Durcheinander an ihren Platz in einem Haus hüpfen (H-125, blocks.tsx, 22. November 2026), Englisch zuerst geschrieben und gleich in alle Sprachen übersetzt: sein Name „Block House“ („Klötzchenhaus“) und seine zwei Sätze am Anfang und am Ende (blocksNames.ts). Aufgenommen ist noch nichts (bun run voice make --only timer, nur auf Wunsch), bis dahin bleibt es still. Die Texte für Suchmaschinen nennen es in allen sieben Sprachen.",
+        files: ["src/games/timer/blocksNames.ts"],
+      },
+      {
+        label: "⛏️ Treasure Tunnel",
+        languages: { de: "text", en: "text", zh: "text", hi: "text", es: "text", ar: "text", ru: "text" },
+        recorded: true,
+        note: "Das zweite Bild im Stil einer Klötzchenwelt, in dem eine Spitzhacke Klotz für Klotz einen Tunnel zur Schatzkiste gräbt (H-126, tunnel.tsx, 22. November 2026), Englisch zuerst geschrieben und gleich in alle Sprachen übersetzt: sein Name „Treasure Tunnel“ („Schatztunnel“) und seine zwei Sätze am Anfang und am Ende (tunnelNames.ts). Aufgenommen ist noch nichts (bun run voice make --only timer, nur auf Wunsch), bis dahin bleibt es still. Die Texte für Suchmaschinen nennen es in allen sieben Sprachen.",
+        files: ["src/games/timer/tunnelNames.ts"],
+      },
+      {
+        label: "🏃 Hop to the Flag",
+        languages: { de: "text", en: "text", zh: "text", hi: "text", es: "text", ar: "text", ru: "text" },
+        recorded: true,
+        note: "Das dritte Spiel-Video-Bild und das erste, das keine Klötzchenwelt ist: ein Jump'n'Run, in dem ein kleiner Hüpfer Stern für Stern bis zur Fahne auf dem Hügel springt (H-127, jump.tsx, 22. November 2026), Englisch zuerst geschrieben und gleich in alle Sprachen übersetzt: sein Name „Hop to the Flag“ („Hüpf zur Fahne“) und seine zwei Sätze am Anfang und am Ende (jumpNames.ts). Aufgenommen ist noch nichts (bun run voice make --only timer, nur auf Wunsch), bis dahin bleibt es still. Die Texte für Suchmaschinen nennen es in allen sieben Sprachen.",
+        files: ["src/games/timer/jumpNames.ts"],
+      },
     ],
   },
   {
@@ -167,6 +202,11 @@ export const LANGUAGE_STATUS: LanguageStatusRow[] = [
         note: "Text und Lied von Suno, eine neue Sprache: /zahnputzlied.",
       },
     ],
+  },
+  {
+    href: "/haende-waschen/",
+    note: "Hände waschen (H-136, 22. November 2026), Englisch zuerst und gleich in allen sieben Sprachen: Name, Satz fürs Regal (names.ts), die Namen der Schritte in der Leiste (steps.ts) und die Beschreibung des Bilds. Auf dem Bild steht nichts, und gesprochen wird nichts. Das gesungene Lied fehlt noch in allen Sprachen (H-142, mit Suno wie das Zahnputzlied); bis dahin spielt eine Platzhalter-Melodie.",
+    languages: { de: "done", en: "done", zh: "done", hi: "done", es: "done", ar: "done", ru: "done" },
   },
   {
     href: "/toepfchen/",

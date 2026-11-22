@@ -6,7 +6,7 @@ import { useT } from "@/lib/language";
 import { useTurnPage } from "@/lib/look";
 import { useFigurePictures } from "@/lib/figurePictures";
 import { canTestUnfinished } from "@/lib/localTest";
-import { preloadPage } from "@/lib/preloadPages";
+import { loadOnIntent } from "@/lib/preloadPages";
 import previews from "./vorschau/*.webp?glob";
 import girlPreviews from "./vorschau-maedchen/*.webp?glob";
 
@@ -60,8 +60,8 @@ function ContentsLine({ game, page }: { game: Game; page: number }) {
       className="toc-line"
       data-tap
       aria-label={title}
-      // The page starts loading as the finger lands, not only once it is lifted.
-      onPointerDown={() => preloadPage(game.href)}
+      // The page starts loading as the finger lands or a mouse comes over it, not only once the tap is done.
+      {...loadOnIntent(game.href)}
       onClick={turnPage}
     >
       {picture}

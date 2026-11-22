@@ -167,14 +167,25 @@ late in the video. A new thing shown beside the picture (a control, a chart, a b
   painted whole in each of those frames, so as few as possible are drawn then: the glow on the teeth waits until the
   head holds still, and the lips with the waiting monsters join the still picture meanwhile (one screen per frame
   instead of four, November 2026). Nothing that stays put on the screen (the mirror's frame and glass) takes the
-  picture's viewBox.
+  picture's viewBox. Where a device can't draw such a frame well within its time (an old phone), the glide
+  draws every other frame only (`useGlidingView`: after two frames missed or drawn slowly – it renders inside the frame
+  with `flushSync`, so it can time the drawing – it paces itself to about 30 a second), so the picture keeps moving
+  evenly instead of stuttering; a fast device draws every frame. `bun run perf zaehne` plays the whole routine in
+  stretches one after the other, with no waits between them: a stretch started after a wait missed the monsters
+  growing, which painted far over budget (November 2026) – a new part of the routine gets its stretch there in its
+  place, never after a wait of its own.
 - The story (`origin.tsx`) is still pictures – the sky behind, the child – with every moving thing between and on them
   an HTML layer of its own (`Piece` in `piece.tsx`, `.teeth-piece` inside `.teeth-space`, which is picture units on the screen, `pictureSpace`): the
   sun or the moon, the brows, pupils, happy eyes, cheeks, the chewing mouth with its crumbs and monsters, the sweets and
   the bits they break into. A piece draws in picture units and its keyframes stay those of the one picture; its `area` is where it
   lies, and a transform origin is the middle of that area or set on it. All of them once moved inside the one picture
   the size of the screen, and „Süßes“ painted 36–38 screens a second (budget 30). A new moving thing in the story is a
-  `Piece` too; only the sky, alone in the svg behind, changes as a whole. `layers.test.ts` checks.
+  `Piece` too, and what moves is its HTML, never something inside its svg: the growing monsters sway as their piece's
+  svg (`.origin-monster > svg`) and the `Monster` drawn inside is `still` (it once swayed and blinked inside, and the
+  monsters had the camera's whole layer painted 60 times a second). The sky changes colour by two more skies, each an
+  svg of its own over the first, fading in by their opacity (`SKY`, `.origin-sky-1`, `-2`) – never an animation of a
+  fill or colour, which also painted the whole screen in every frame while the monsters grew (November 2026). Every
+  keyframe of `teeth.css` animates only transform, opacity or filter; `layers.test.ts` checks.
 - The sink (`prep.tsx`) is built the same way: one still picture (wall, tiles, window sky, basin, tap) and every
   moving thing a `Piece` over it – the sun rising in the window (inside a clip the size of the glass), the tube and its
   squeeze, the brush with its paste and foam, the water and its drops, the hand and the twinkles. The brush and the

@@ -566,3 +566,10 @@ export const texts = {
   sleep: "Schlaf gut!",
   party: "Hurra!",
 };
+
+/** Everything a lift story says (and the lines every story may say). */
+export const storyLines = (story: Story): (string | undefined)[] => [
+  story.need.say,
+  ...story.steps.flatMap((step) => [step.ask, step.done, ...(step.tasks ?? []).flatMap((task) => [task.wish?.ask, task.done])]),
+  ...Object.values(texts),
+];

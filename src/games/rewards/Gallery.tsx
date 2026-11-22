@@ -2,6 +2,7 @@ import { useT } from "@/lib/language";
 import { type Board, boardFromTemplate, exampleStars, NO_LINKED } from "./board";
 import { BoardSheet, SCREEN_LOOK } from "./BoardSheet";
 import { KINDS, type Template, TEMPLATES } from "./catalog";
+import { LazyPictures } from "./pictures";
 
 /** Width / height of a small picture of a board. */
 const THUMB_ASPECT = 1.45;
@@ -13,15 +14,17 @@ export const PRESETS = [...TEMPLATES].sort((a, b) => KINDS.findIndex((k) => k.id
 export function Thumb({ board, today = new Date() }: { board: Board; today?: Date }) {
   return (
     <span className="rw-thumb" aria-hidden>
-      <BoardSheet
-        board={board}
-        stars={undefined}
-        examples={exampleStars(board, today)}
-        linked={NO_LINKED}
-        today={today}
-        look={SCREEN_LOOK}
-        aspect={THUMB_ASPECT}
-      />
+      <LazyPictures value={true}>
+        <BoardSheet
+          board={board}
+          stars={undefined}
+          examples={exampleStars(board, today)}
+          linked={NO_LINKED}
+          today={today}
+          look={SCREEN_LOOK}
+          aspect={THUMB_ASPECT}
+        />
+      </LazyPictures>
     </span>
   );
 }

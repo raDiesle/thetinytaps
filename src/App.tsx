@@ -12,7 +12,7 @@ import { Home } from "@/pages/Home";
 /**
  * A page loaded only when it is opened, so the first visit doesn't download every
  * game (three.js, all pictures). Offline the service worker has them all anyway.
- * `paths` are the addresses it opens at, so a menu can load it before its card is tapped (`usePreloadPages`).
+ * `paths` are the addresses it opens at, so a card can load it as the finger lands on it (`loadOnIntent`).
  * A load that fails is tried once more, then shows `PageErrorBoundary`, whose „Nochmal“ loads it anew (`lazyPage`).
  */
 function page<K extends string>(load: () => Promise<Record<K, ComponentType>>, name: K, ...paths: string[]) {
@@ -43,6 +43,7 @@ const ManagementPage = page(() => import("@/pages/ManagementPage"), "ManagementP
 const PicturesPage = page(() => import("@/pages/PicturesPage"), "PicturesPage");
 const ResearchPage = page(() => import("@/pages/ResearchPage"), "ResearchPage");
 const TeethVideoPage = page(() => import("@/pages/TeethVideoPage"), "TeethVideoPage");
+const HandwashVideoPage = page(() => import("@/pages/HandwashVideoPage"), "HandwashVideoPage");
 const IntroVideoPage = page(() => import("@/pages/IntroVideoPage"), "IntroVideoPage");
 const OutroVideoPage = page(() => import("@/pages/OutroVideoPage"), "OutroVideoPage");
 const PottyVideoPage = page(() => import("@/pages/PottyVideoPage"), "PottyVideoPage");
@@ -65,6 +66,7 @@ const ScenesMenu = page(() => import("@/pages/ScenesMenu"), "ScenesMenu", "/bild
 const ShadowsPage = page(() => import("@/pages/ShadowsPage"), "ShadowsPage", "/schatten/");
 const SocksPage = page(() => import("@/pages/SocksPage"), "SocksPage", "/socken/");
 const TeethPage = page(() => import("@/pages/TeethPage"), "TeethPage", "/zaehne/");
+const HandwashPage = page(() => import("@/pages/HandwashPage"), "HandwashPage", "/haende-waschen/");
 const TogetherPage = page(
   withTexts("together", () => import("@/pages/TogetherPage")),
   "TogetherPage",
@@ -107,6 +109,7 @@ export function App() {
           <Route path="bilder" element={<ScenesMenu />} />
           <Route path="bilder/:scene" element={<ScenePage />} />
           <Route path="zaehne" element={<TeethPage />} />
+          <Route path="haende-waschen" element={<HandwashPage />} />
           <Route path="toepfchen" element={<PottyPage />} />
           {/* One book of two stories, opening on their choice: the same page at both addresses, so it stays between them. */}
           <Route path="abstillen" element={<MilkChainPage />} />
@@ -145,6 +148,7 @@ export function App() {
           <Route path="management/bilder" element={<PicturesPage />} />
           <Route path="management/recherchen" element={<ResearchPage />} />
           <Route path="management/video-zaehne" element={<TeethVideoPage />} />
+          <Route path="management/video-haende" element={<HandwashVideoPage />} />
           <Route path="management/video-intro" element={<IntroVideoPage />} />
           <Route path="management/video-outro" element={<OutroVideoPage />} />
           <Route path="management/video-toepfchen" element={<PottyVideoPage />} />

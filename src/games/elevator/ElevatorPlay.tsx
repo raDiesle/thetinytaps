@@ -4,11 +4,11 @@ import { loadRecordings, playDing, playKnock, playLift, playLullaby, playMelody,
 import { playGiggle } from "@/lib/realSounds";
 import type { TargetLanguage } from "@/content/targetLanguages";
 import { StoryEnd, nextCard } from "./cards";
-import { STORIES, RECORDINGS, texts, type Step, type Story, type Task, type Who } from "./content";
+import { STORIES, RECORDINGS, storyLines, texts, type Step, type Story, type Task, type Who } from "./content";
 import { Backdrop, Buttons, CabinBack, CabinFront, Hint, Shaft, Shell, Slabs } from "./house";
 import { BROTHER, Bubble, KID_H, Kid, type Holding, type Outfit, type PicId, type Pose, useHero } from "./kid";
 import { CABIN_L, FLOORS, IN_CABIN, ROOM_H, ROOM_L, ROOM_R, VIEW_H, VIEW_L, VIEW_W, floorLine } from "./layout";
-import { linesReady, loadLines, sayIn, storyLines } from "./voice";
+import { linesReady, loadLines, sayIn } from "./voice";
 import { WeatherContext } from "./rooms";
 import { useStepAddress } from "@/lib/stepAddress";
 

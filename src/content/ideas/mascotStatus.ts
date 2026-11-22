@@ -132,6 +132,19 @@ export const MASCOT_STATUS: MascotStatusRow[] = [
     ],
   },
   {
+    href: "/haende-waschen/",
+    note: "SVG. Die Hände sind die eigenen Hände des Kinds, von oben gesehen; ein Fuchs oder Bär gehört nicht ins Bild (nur, wo er etwas tut).",
+    tasks: [
+      {
+        label: "Fuchs oder Bär neben dem Becken, der mitwäscht oder zuschaut",
+        work: "drawing",
+        effort: "S",
+        state: "removed",
+        note: "Nicht bauen: nur Deko neben den Händen, die das Kind selbst sind (Regel November 2026, wie bei Zähne putzen).",
+      },
+    ],
+  },
+  {
     href: "/toepfchen/",
     note: "Hier kommt Tapsi her: Gemini-Bilder mit Tapsi, Mama und Papa Fuchs – die Vorlage für alle anderen Füchse (für Bären: buch-baeren.webp).",
     tasks: [{ label: "Tapsi und Familie in allen Bildern", work: "picture", pictures: 126, effort: "L", state: "done" }],

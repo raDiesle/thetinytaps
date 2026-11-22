@@ -200,6 +200,7 @@ October 2026: 2,186 objects, 79 % busy, budget 60 %). So:
 - three.js is only imported below this folder, so the rest of the app stays small.
 - The start screen loads neither three.js nor a story (R-P11, November 2026: its chunk was 1.17 MB, now 3 KB): a
   story's card data (id, emoji, title, first language, translations) lives in `catalog.ts`, each story and
-  `AdventurePlay` come by `import()` behind a `Suspense` showing `PageLoading`, and the player is fetched in an idle
-  moment once the page lies still – a new story gets its entry there, never a static import in `AdventureGame.tsx`
+  `AdventurePlay` come by `import()` behind a `Suspense` showing `PageLoading`, and the player and a story load only
+  once its card is pressed (`prepare`, as the finger lands), never ahead in an idle moment (it was 280 KB gzip of
+  three.js and a story for every visitor of the start screen; user request, November 2026) – a new story gets its entry there, never a static import in `AdventureGame.tsx`
   (`catalog.test.ts`).

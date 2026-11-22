@@ -2,7 +2,9 @@ import type { ReactNode } from "react";
 import { Cloud } from "@/components/drawing";
 import { INK } from "@/components/drawing";
 import { Apple, Ball, Carrot, Lantern, Plank } from "./items";
-import type { SceneryProps } from "./types";
+import type { SceneryProps, TrailLevel } from "./types";
+import { playBoing, playClonk, playDrops, playLeaves, playPlop, playPop, playSneeze, playThump, playTwinkle, playWhoosh } from "@/lib/sfx";
+import { playBark, playChatter, playGiggle, playMunch, playNeigh, playSplash } from "@/lib/realSounds";
 
 // "Der Drachen": from the garden over the meadow, past the dog, the horse and the apple tree,
 // over the stream, through the dark tunnel in the hill and up the stairs to the big tree on the
@@ -430,3 +432,118 @@ export function DrachenBackdrop() {
     </g>
   );
 }
+
+export const DRACHEN_LEVEL: TrailLevel = {
+  id: "drachen",
+  title: "Der Drachen",
+  goal: "kite",
+  Scenery: DrachenScenery,
+  Backdrop: DrachenBackdrop,
+  ground: [[-3000, GROUND_Y], [4420, GROUND_Y], ...STAIRS, [9000, TOP_Y]],
+  start: 300,
+  away: {
+    to: [5420, 150],
+    ms: 3600,
+    sway: 120,
+    pose: "reach",
+    sounds: [
+      [0, playWhoosh],
+      [1400, playWhoosh],
+    ],
+    say: "Huch! Der Wind nimmt den Drachen mit. Hinterher!",
+  },
+  stations: [
+    { kind: "pickup", id: "ball", x: 540, item: "ball", at: [620, 712], sound: playBoing, ask: "Da liegt ein Ball.", done: "Ab in den Rucksack!" },
+    { kind: "pickup", id: "carrot", x: 740, item: "carrot", at: [830, 690], sound: playPop, ask: "Eine Karotte!", done: "Rausgezogen!" },
+    { kind: "pickup", id: "plank", x: 840, item: "plank", at: [930, 640], sound: playClonk, ask: "Ein Brett.", done: "Das nehmen wir mit." },
+    {
+      kind: "obstacle",
+      id: "dog",
+      x: 1400,
+      need: "ball",
+      why: { wants: [1540, 600] },
+      at: [1486, 680],
+      meet: [[100, playBark]],
+      sounds: [
+        [200, playBark],
+        [900, playGiggle],
+      ],
+      ms: 1800,
+      nope: playSneeze,
+      ask: "Bello liegt im Weg. Er will spielen. Was geben wir ihm?",
+      done: "Den Ball! Bello ist froh.",
+    },
+    { kind: "pickup", id: "lantern", x: 1760, item: "lantern", at: [1834, 640], sound: playClonk, ask: "Eine Laterne.", done: "Die nehmen wir mit." },
+    {
+      kind: "obstacle",
+      id: "horse",
+      x: 2200,
+      need: "carrot",
+      why: { wants: [2400, 440] },
+      at: [2310, 545],
+      meet: [[100, playNeigh]],
+      sounds: [
+        [100, playMunch],
+        [900, playMunch],
+        [1700, playNeigh],
+      ],
+      ms: 2400,
+      nope: playBoing,
+      ask: "Das Pferd steht im Weg. Es hat Hunger. Was geben wir ihm?",
+      done: "Die Karotte! Mmh, lecker.",
+    },
+    { kind: "pickup", id: "apple", x: 2800, item: "apple", at: [2930, 590], sound: playLeaves, ask: "Ein Apfel!", done: "Plopp, in den Rucksack." },
+    {
+      kind: "obstacle",
+      id: "stream",
+      x: 2990,
+      need: "plank",
+      why: { worry: "splash" },
+      at: [3150, 735],
+      meet: [[100, playSplash]],
+      sounds: [
+        [0, playThump],
+        [700, playSplash],
+      ],
+      ms: 1600,
+      nope: playPlop,
+      ask: "Ein Bach! Wie kommen wir rüber?",
+      done: "Mit dem Brett! Eine Brücke.",
+    },
+    {
+      kind: "obstacle",
+      id: "cave",
+      x: 3350,
+      need: "lantern",
+      why: { worry: "dark" },
+      at: [3520, 620],
+      meet: [[100, playDrops]],
+      sounds: [[0, playTwinkle]],
+      ms: 1500,
+      nope: playBoing,
+      ask: "Da ist es ganz dunkel. Was hilft?",
+      done: "Die Laterne! Jetzt ist es hell.",
+    },
+    { kind: "climb", id: "stairs", x: 4420, steps: STAIRS, ask: "Eine Treppe! Hoch geht's.", done: "Oben!" },
+    {
+      kind: "obstacle",
+      id: "squirrel",
+      x: 5300,
+      need: "apple",
+      why: { wants: [5490, 110] },
+      at: [5490, 150],
+      meet: [[100, playChatter]],
+      sounds: [
+        [100, playMunch],
+        [800, playChatter],
+        [1400, playWhoosh],
+      ],
+      ms: 1800,
+      nope: playChatter,
+      frees: true,
+      ask: "Das Eichhörnchen hat den Drachen. Was geben wir ihm?",
+      done: "Den Apfel! Danke, Eichhörnchen.",
+    },
+  ],
+  finale: { to: [5820, -200], ms: 2600, sway: 60, say: "Der Drachen fliegt! Hurra!" },
+};

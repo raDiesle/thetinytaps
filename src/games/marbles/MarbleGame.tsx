@@ -1,11 +1,8 @@
-import { useEffect } from "react";
 import { GameShell } from "@/components/GameShell";
 import { Choice } from "@/components/SettingControls";
 import { useGameSettings } from "@/lib/common";
 import { useT } from "@/lib/language";
-import { afterPageMotion } from "@/lib/pageMotion";
-import { afterLoad, savesData } from "@/lib/pwa";
-import { LEVELS, loadLevel, prefetchLevel } from "./catalog";
+import { LEVELS, loadLevel } from "./catalog";
 import { GAME_TITLE, LEVEL_TEXTS } from "./content";
 import { MarblePlay } from "./MarblePlay";
 import { DEFAULT_MARBLE_SETTINGS, MARBLE_SETTINGS_KEY, type MarbleLevel, type MarbleSettings } from "./settings";
@@ -17,22 +14,6 @@ export function MarbleGame() {
   // Older saves may hold a choice that is gone ("all", "both", "machines"): those begin with the first level.
   const mode = LEVELS.some((m) => m.id === settings.levels) ? settings.levels : LEVELS[0].id;
   const modes = LEVELS.map((m) => ({ id: m.id, emoji: m.emoji, title: t(LEVEL_TEXTS[m.id].name) }));
-
-  // The first tap should not wait for the level's code: the level picked last is fetched once the page lies still and
-  // the browser is idle – never while a book flies or a page turns, nor when the visitor saves data.
-  useEffect(() => {
-    if (savesData()) return;
-    let live = true;
-    const cancel = afterPageMotion(() =>
-      afterLoad(() => {
-        if (live) prefetchLevel(LEVELS.find((l) => l.id === mode));
-      }),
-    );
-    return () => {
-      live = false;
-      cancel();
-    };
-  }, [mode]);
 
   return (
     <GameShell

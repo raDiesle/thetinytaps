@@ -416,6 +416,9 @@ export const timerIdeas: IdeaArea = {
       text: "Fünf bunte Kisten nebeneinander, jede für eine Sorte (Bausteine, Autos, Bälle, Kuscheltiere, Bücher). In jeder Minute füllt sich eine Kiste mit ihrer Sorte, Stück für Stück, und am Ende der Minute klappt ihr Deckel zu. Nach fünf Minuten sind alle Deckel zu.",
       why: "Fünf Minuten werden zu fünf sichtbaren Stücken: „Noch zwei Kisten“ versteht ein Kind ohne Uhr. Und Große können sagen: „Jetzt die Autos“, während die Autokiste dran ist.",
       effort: "M",
+      done: true,
+      partial:
+        "Gebaut als Bild „Fünf Kisten“ (Five Boxes) im Timer (22. November 2026, boxes.tsx): fünf offene Kisten in Rot, Grün, Blau, Gelb und Lila an der Wand, vorne auf jeder ein rundes Schild mit ihrer Sorte (Bauklotz, Auto, Ball, Ente, Buch – die Spielsachen von „Aufräumen“), davor liegen auf dem Teppich die Sachen jeder Sorte in verschiedenen Farben. Kiste für Kiste von links hüpft ein Spielzeug nach dem anderen in hohem Bogen in seine Kiste (hop.tsx, ohne Figur, die es wirft), und ist das letzte drin, klappt der Deckel zu – der letzte, wenn die Zeit um ist. Bei 5 Minuten drei Sachen je Kiste, sonst zwei bis vier. Das Spielzeug, das als Nächstes dran ist, wackelt jede Sekunde. Name und Sätze Englisch zuerst und in alle sieben Sprachen übersetzt, Aufnahmen folgen auf Wunsch.",
     },
     {
       id: "H-121",
@@ -432,6 +435,9 @@ export const timerIdeas: IdeaArea = {
       text: "Von oben gesehen liegt ein Spielteppich mit Straßen voller Spielsachen. Mit jedem Stück, das in die Kiste kommt, wird ein Stück Straße frei. Ist alles weg, fährt ein kleines Auto einmal die ganze freie Straße entlang.",
       why: "Das Freiwerden ist die Belohnung, die Kinder vom echten Aufräumen kennen: Jetzt ist Platz zum Spielen.",
       effort: "M",
+      done: true,
+      partial:
+        "Gebaut als Bild „Straßenteppich“ (Road Rug) im Timer (22. November 2026, road.tsx): ein grüner Spielteppich mit einer kurvigen Straße, vorne an der Startlinie das Spielzeugauto von „Aufräumen“, am Ende ein Spielzeughaus mit Zielflagge auf dem Dach (von Anfang an zu sehen), an der Wand die Spielzeugkiste. Die Spielsachen liegen dem Auto im Weg; eins nach dem anderen hüpft von der Straße in die Kiste, und sobald es drin ist, fährt das Auto bis zum nächsten vor (statt erst am Ende die ganze Straße entlang – so sieht man den Fortschritt bei jedem Stück) und hupt leise. Nach dem letzten fährt es nach Hause, wenn die Zeit um ist. Bei 5 Minuten acht Spielsachen, sonst vier bis acht. Das Spielzeug, das als Nächstes dran ist, wackelt jede Sekunde. Name und Sätze Englisch zuerst und in alle sieben Sprachen übersetzt, Aufnahmen folgen auf Wunsch.",
     },
     {
       id: "H-123",
@@ -440,6 +446,102 @@ export const timerIdeas: IdeaArea = {
       text: "Ein Spielzeugzug mit fünf Wagen hält im Kinderzimmer. In jeder Minute wird ein Wagen mit Spielsachen beladen, dann rückt der Zug ein Stück weiter. Am Ende fährt der volle Zug in den Spielzeugschrank wie in einen Bahnhof, und die Tür geht zu.",
       why: "Wagen für Wagen zeigt, wie weit es ist, und der Zug, der am Ende verschwindet, sagt: fertig, alles weg.",
       effort: "M",
+    },
+    {
+      id: "H-124",
+      emoji: "📏",
+      title: "Leiste unten, letzte Sekunden und mehr Einzelheiten in den Bildern",
+      text: "Unter jedem Timer-Bild läuft ganz unten über fast die ganze Breite eine Leiste vom Start bis zu einem Fähnchen, als zweite, gleichbleibende Hilfe. Kurz vor dem Ende wird es spürbar: ein warmes Licht, ein sanfter Herzschlag, leise steigende Töne. Die schlichtesten Bilder bekommen mehr Einzelheiten.",
+      why: "Gewünscht am 22. November 2026: die Timer interessanter und detaillierter machen. Eine Leiste lesen Kinder in jedem Bild gleich, und das nahe Ende kündigt sich an, statt plötzlich da zu sein.",
+      effort: "M",
+      done: true,
+      partial:
+        "Gebaut (22. November 2026, bar.tsx): eine Papierleiste in der Farbe des Bildes füllt sich vom Start bis zum Fähnchen, eine runde Marke an ihrer Spitze; bei „Gleich ist es so weit“ wird der Rest warm, in den letzten zehn Sekunden (bei kurzen Läufen einem Viertel) schlagen Marke und Fähnchen-Licht sanft einmal pro Sekunde, ein warmes Licht sammelt sich vom Bildrand her, und die letzten fünf Sekunden steigt je ein leiser Ton. Beim Abwechseln die Farbe des Kindes, das dran ist. Abschaltbar hinter ⚙️ („Leiste unten“), das Bild rückt über die Leiste. Mehr Einzelheiten: Sanduhr mit gedrechselten Pfosten, Maserung, Tapete, Dielen und Teppich mit Fransen; Rote Scheibe in einem Gehäuse auf Füßen, auf einem Tisch; Kerzen in Rosa, Hellblau und Gelb auf Messingschalen; Pizza mit Salami, Pilzen, Oliven, Basilikum und Paprika, die über die Schnitte gehen, Tomatenrand und feinen Schnitten.",
+    },
+    // Wie ein Spiel-Video (user request, 22 November 2026): timer pictures that look like watching someone play a game
+    // of a well-known kind – a block world, a jump-and-run, an adventure –, running by themselves like a video. Each is a
+    // genre, never a copy of one game (its name, figures, textures, music or levels), calm, with nothing to fight, and
+    // what runs down is the game's own progress. The block house (H-125) was built first, as a timer for tidying up.
+    {
+      id: "H-125",
+      emoji: "🧱",
+      title: "Wie ein Spiel-Video: Klötzchenwelt – aus dem Durcheinander wird ein Haus",
+      text: "Ein Timer-Bild im Stil der Klötzchen-Bauspiele (wie Minecraft, aber mit eigenen Klötzen und ohne seine Figuren): Auf einer Wiese aus Würfeln liegen Klötze kreuz und quer – Stein, Holz und rote Dachziegel. Daneben steht der Umriss eines Hauses, gestrichelt wie ein Bauplan. Ein Klotz nach dem anderen hüpft aus dem Durcheinander an seinen Platz im Haus, von unten nach oben, und ein Auswahlrahmen wie im Spiel zeigt schon vorher, wohin der nächste kommt. Ist das Dach zu, geht drinnen das Licht an. Fürs Aufräumen: Bei 5 Minuten 20 Klötze, alle 15 Sekunden einer.",
+      why: "Viele Kinder kennen Klötzchenwelten von großen Geschwistern und finden es spannend, dabei zuzusehen. Aufräumen wird zu Bauen: Das Durcheinander, das kleiner wird, ist die Zeit, die bleibt, und das fertige Haus ist das Ziel, das man von Anfang an sieht.",
+      effort: "M",
+      done: true,
+      partial:
+        "Gebaut als Bild „Klötzchenhaus“ (Block House) im Timer (22. November 2026, blocks.tsx): eine Klötzchenwiese unter blauem Himmel mit eckigen Wolken und Hügeln aus Würfeln, links das Durcheinander aus Stein-, Holz- und Dachklötzen, rechts der gestrichelte Bauplan eines Hauses (fünf Klötze breit, Tür, zwei Fenster, ein Stufendach). Ein Klotz nach dem anderen hüpft in hohem Bogen an seinen Platz, erst die Steinreihe, dann die Holzwände, zuletzt das Dach; beim Landen springen kleine Würfelkrümel ab. Ein schwarz-weißer Auswahlrahmen steht auf dem Platz des nächsten Klotzes, und der Klotz, der dran ist, wackelt jede Sekunde. Am Ende geht hinter Fenstern und Tür ein warmes Licht an. Bei 5 Minuten alle 20 Klötze, bei kurzen Zeiten steht ein Teil des Hauses schon (mindestens 8 Klötze). Ein Tippen lässt die Klötze im Durcheinander aufleuchten. Name und Sätze Englisch zuerst und in alle sieben Sprachen übersetzt, Aufnahmen folgen auf Wunsch.",
+    },
+    {
+      id: "H-126",
+      emoji: "⛏️",
+      title: "Wie ein Spiel-Video: Klötzchenwelt – ein Tunnel zur Schatzkiste",
+      text: "Eine Wand aus Klötzen im Berg, dahinter (durch einen Spalt schon zu sehen) eine Schatzkiste. Klotz für Klotz wird ein Gang hineingegraben: Ein Klotz bekommt Risse, zerfällt in kleine Würfelkrümel, und der Gang wird länger. Am Ende ist der Weg frei, die Kiste geht auf und funkelt.",
+      why: "Das Graben ist das, was Kinder in Klötzchenspielen am meisten fasziniert. Der Gang, der wächst, ist die vergangene Zeit, die Wand davor der Rest – und das Ziel ist von Anfang an zu sehen.",
+      effort: "M",
+      done: true,
+      partial:
+        "Gebaut als Bild „Schatztunnel“ (Treasure Tunnel) im Timer (22. November 2026, tunnel.tsx): ein Klötzchenberg von der Seite aufgeschnitten, wie Klötzchenspiele in 2D ihre Welt zeigen – Gras, Erde und Stein, links davor eine Wiese. Am Fuß des Bergs liegt der Weg des Tunnels noch voller Klötze (zehn Spalten, zwei hoch, Erde, Stein und zwei Klötze mit Goldkörnern), an seinem Ende eine kleine Kammer mit der Schatzkiste, in die durch einen Spalt von oben Licht fällt. Eine Spitzhacke schlägt jede Sekunde an den nächsten Klotz, ein Rahmen wie im Spiel zeigt ihn, er bekommt in drei Stufen Risse und zerfällt dann in kleine Würfelkrümel; Spalte für Spalte, erst oben, dann unten. Ist der letzte Klotz weg, geht die Kiste auf, Gold darin und ein warmes Licht. Bei 5 Minuten alle 20 Klötze, bei kurzen Zeiten ist der Anfang des Tunnels schon gegraben (mindestens 8 Klötze). Ein Tippen klingt hell wie die Hacke auf Stein und lässt die Klötze aufleuchten, die noch stehen. Name und Sätze Englisch zuerst und in alle sieben Sprachen übersetzt, Aufnahmen folgen auf Wunsch.",
+    },
+    {
+      id: "H-127",
+      emoji: "🏃",
+      title: "Wie ein Spiel-Video: Jump'n'Run zur Zielfahne",
+      text: "Ein Hüpfspiel von der Seite: Eine kleine Spielfigur ohne Gesicht eines Tiers (ein hüpfender runder Ball mit Augen – die Timer-Bilder zeigen keine Fuchs- oder Bärenfigur) läuft von links nach rechts über Wiesen, hüpft über Steine und Lücken, springt auf Plattformen und sammelt dabei Sterne ein. Die Welt rollt mit (eine eigene Ebene, die als Ganzes verschoben wird), oben zeigt eine kleine Karte, wie weit es bis zur Zielfahne ist. Am Ende springt sie an die Fahnenstange, und die Fahne geht hoch.",
+      why: "Das ist das bekannteste Spiel-Video überhaupt, und die Richtung ist klar: nach rechts zur Fahne. Jeder Sprung ist ein Schritt, den man von Weitem sieht. Ohne Gegner und ohne Hinfallen, denn nichts soll schiefgehen.",
+      effort: "L",
+      done: true,
+      partial:
+        "Gebaut als Bild „Hüpf zur Fahne“ (Hop to the Flag) im Timer (22. November 2026, jump.tsx), das erste Spiel-Video-Bild, das keine Klötzchenwelt ist – zur Abwechslung nach Klötzchenhaus und Schatztunnel: ein Jump'n'Run auf einem Bildschirm, ohne mitrollende Welt, damit das Ziel von Anfang an zu sehen ist. Ein kleiner runder orangefarbener Hüpfer mit großen Augen und zwei Füßen (keine Tierfigur) steht links auf einer Wiese; der Weg führt über einen Stein, drei schwebende Inseln über einem Teich, einen Baumstamm und Stufen auf einen Hügel, wo eine Fahnenstange mit noch gesenkter roter Fahne steht. Über jedem Sprung hängt ein Stern, zusammen eine Sternenspur bis zum Hügel. Ein Sprung nach dem anderen hüpft der Hüpfer weiter und fängt oben im Bogen seinen Stern (ein heller Ton, der Stern für Stern höher klingt, mit Abstand); dazwischen federt er einmal pro Sekunde auf der Stelle. Die Sterne, die noch hängen, sind die Zeit, die bleibt. Landet er auf dem Hügel, geht die Fahne hoch. Bei 5 Minuten alle 13 Sprünge, bei kurzen Zeiten fängt er weiter vorn an (mindestens 8 Sprünge). Ohne Gegner, ohne Hinfallen, ohne Sternzähler. Ein Tippen macht „boing“ und lässt die Sterne aufleuchten, die noch hängen. Name und Sätze Englisch zuerst und in alle sieben Sprachen übersetzt, Aufnahmen folgen auf Wunsch.",
+    },
+    {
+      id: "H-128",
+      emoji: "🗺️",
+      title: "Wie ein Spiel-Video: Abenteuer auf der Schatzkarte",
+      text: "Eine Abenteuerkarte von oben, wie in Rollenspielen: Inseln, Wald, Brücke, Höhle und am Ende ein großes X. Eine kleine Spielfigur (ein Boot oder eine Laterne, keine Tierfigur) geht einen gepunkteten Weg entlang, hält an jeder Station, findet dort etwas (einen Schlüssel, eine Fackel, ein Seil) und legt es in die Taschen-Leiste unten. Mit allem zusammen geht am X die Schatzkiste auf.",
+      why: "Ein Abenteuer in Etappen: „Noch zwei Stationen“ versteht ein Kind ohne Uhr, und was es unterwegs findet, zeigt, wie viel schon geschafft ist.",
+      effort: "L",
+    },
+    {
+      id: "H-129",
+      emoji: "🧩",
+      title: "Wie ein Spiel-Video: Fallende Klötze füllen Reihe um Reihe",
+      text: "Wie in Spielen mit fallenden Klötzen: Bunte Teile aus vier Würfeln fallen langsam herunter, drehen sich einmal und landen passend, bis eine Reihe nach der anderen voll ist – Reihen verschwinden hier aber nicht, damit man sieht, wie weit es ist. Eine Linie oben ist das Ziel; ist der Kasten bis dorthin voll, leuchtet er auf.",
+      why: "Kinder sehen gern zu, wie Teile genau in ihre Lücke passen. Der Kasten, der sich füllt, ist ein ruhiges Maß für die Zeit, wie eine Sanduhr aus Klötzen.",
+      effort: "M",
+    },
+    {
+      id: "H-130",
+      emoji: "🏎️",
+      title: "Wie ein Spiel-Video: Rennen ohne Gegner",
+      text: "Ein Rennspiel von oben: Ein kleines Spielzeugrennauto fährt Runden auf einer bunten Strecke mit Kurven, Brücke und Tunnel. Neben der Strecke steht eine Tafel mit einem Licht für jede Runde, das angeht, wenn eine Runde geschafft ist. Nach der letzten Runde fährt es durch das Ziel, die karierte Flagge schwenkt, und das Auto hält in der Box – kein Konfetti.",
+      why: "Runden sind wie Steine in einem Glas: Kinder zählen sie mit. Ohne Gegner, denn ein Timer ist kein Wettrennen.",
+      effort: "M",
+    },
+    {
+      id: "H-131",
+      emoji: "🚜",
+      title: "Wie ein Spiel-Video: Bauernhof-Spiel – säen, wachsen, ernten",
+      text: "Wie in Bauernhof-Spielen von oben gesehen: Ein Feld aus Kästchen, ein kleiner Traktor fährt Reihe für Reihe und sät; dann sprießen die Pflanzen Kästchen für Kästchen, werden groß und reif, und zum Schluss erntet der Traktor alles in seinen Anhänger, der zur Scheune fährt.",
+      why: "Kästchenfelder sind leicht zu lesen: leer, gesät, gewachsen, geerntet. Die Geschichte kennen Kinder aus Bilderbüchern, und sie hat immer etwas Neues zu zeigen.",
+      effort: "M",
+    },
+    {
+      id: "H-132",
+      emoji: "🚀",
+      title: "Wie ein Spiel-Video: Raumflug von Planet zu Planet",
+      text: "Wie in Weltraum-Spielen von der Seite: Eine kleine Rakete fliegt durch die Sterne, die Welt rollt mit, sie sammelt leuchtende Sterne ein und fliegt an bunten Planeten vorbei, von denen jeder eine Station ist. Am Ende landet sie sanft auf dem Mond, und eine Fahne geht hoch. Kein Schießen, keine Gegner.",
+      why: "Weltraum begeistert viele Kinder, und Stationen auf dem Weg machen die Zeit greifbar. Das Gegenstück zum Jump'n'Run (H-127) für Kinder, die lieber fliegen.",
+      effort: "M",
+    },
+    {
+      id: "H-133",
+      emoji: "🎮",
+      title: "Wie ein Spiel-Video: eine eigene Gruppe im Timer",
+      text: "Sind mehrere Spiel-Video-Bilder da (Klötzchenhaus H-125, Tunnel H-126, Jump'n'Run H-127, Schatzkarte H-128 …), stehen sie auf dem Startbildschirm des Timers in einer eigenen Gruppe „Wie im Spiel“, so wie Abwechseln eine eigene Gruppe hat.",
+      why: "Große Geschwister und Eltern finden die Spiel-Bilder so auf einen Blick, und sie unterscheiden sich von den ruhigen Bildern wie Sanduhr und Kerze.",
+      effort: "S",
     },
   ],
 };

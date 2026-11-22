@@ -898,12 +898,18 @@ src/lib/                 speech, sfx (synthesized + recorded sounds), storage, d
   content, and a list of all files (`static/built.<hash>.txt`, the offline manifest) is fetched only when it is needed.
   What is fetched ahead (other pages' code, the song) waits when the visitor
   saves data (`savesData()` in `src/lib/pwa.ts`).
-- A tap in a menu shows the next screen at once: the home page and the category pages load the lazy pages behind their
-  cards while they wait (`usePreloadPages`, `src/lib/preloadPages.ts`, each lazy page registers its addresses in
-  `App.tsx` – checked in `preloadPages.test.ts`), and a card starts loading its page as the finger lands. A new menu
-  whose cards open lazy pages does the same. A game made of many big parts (pictures, levels drawn in code) loads each
+- **Only what the visitor picks is loaded** (user request, 22 November 2026): a page's code, a level's code and a
+  picture load when the visitor shows they want it, never ahead for everyone. A card, book or line starts loading its
+  page as the finger lands or a mouse comes over it (`loadOnIntent`, `src/lib/preloadPages.ts`; each lazy page registers
+  its addresses in `App.tsx`, checked in `preloadPages.test.ts`), and the tap waits up to `CODE_WAIT_MS` for it before
+  the page turns (`pageCodeSoon` in `useTurnPage`, `codeSoon`), so the page turns to the game drawn, not to the loading
+  paper. Menus once loaded every card's page while they waited – the shelf about 320 KB gzip of everyday helpers, the
+  pictures' menu all 23 pictures, about 580 KB – and start screens a level in idle moments: never again
+  (`loading.test.tsx`). The next level may be fetched where it is the likely next step (an end's „Weiter“), and pictures
+  that stand below the screen or in something folded load lazily (`loading="lazy"`, the Belohnungstafel's
+  `LazyPictures`: 45 chips in a folded „Weitere Einstellungen“ were 2 MB on every first visit). A game made of many big parts (pictures, levels drawn in code) loads each
   part's code only when it is played, through an `import()` per part – wrapped in `lazyPart` (`src/lib/lazyPart.ts`),
-  read as `part.loaded() ?? use(part.load())`, with the start screen passing `GameShell prepare`, so a level fetched
+  read as `use(part.load())` (it marks its promise fulfilled, so `use()` draws a part fetched ahead at once), with the start screen passing `GameShell prepare`, so a level fetched
   ahead is drawn before the page turns to it: `use()` alone showed the loading paper first and drew the level in the
   turn's middle, a 450 ms frame on an old phone (`bun run perf`, November 2026; `lazyPart.test.ts`) – and keeps what its menu needs before that (id,
   emoji, title) in a small catalog: Lebendige Bilder's 23 pictures in one chunk were 1.6 MB that its menu and every
@@ -918,8 +924,9 @@ src/lib/                 speech, sfx (synthesized + recorded sounds), storage, d
   search engines finds its code. A part loaded by its own `import()` that a built page opens with (a picture's scene)
   gets its modulepreload too (`sceneModules` in `tools/pageStart.ts`). A page's code is only ever loaded through
   `lazyPage` (`src/lib/lazyPage.ts`), which tries a failed download once more, under `PageErrorBoundary`, which shows
-  a paper page with the way back and „Again“ instead of an empty screen (code review, November 2026). Fetching ahead stays as it is: after the page has loaded, in idle moments, never the
-  songs or every game for every visitor.
+  a paper page with the way back and „Again“ instead of an empty screen (code review, November 2026). Ahead of a tap only the service worker's start
+  (`shellFiles`) and the background song are fetched, after the page has loaded (`afterLoad`), the song only while music
+  is on and the visitor doesn't save data.
 - **The app looks like a picture book a grown-up and a child read together** (A-20, area D on `/management/`,
   `src/lib/look.ts`). **It is the only look** (user decision, November 2026): the old toy-block look (cards on a sky,
   buttons on top, its switch `?buch=aus` and its stored choice) was removed, since keeping it only kept code no one

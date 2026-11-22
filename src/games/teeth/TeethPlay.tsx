@@ -1,5 +1,6 @@
 import { sectionStart } from "./seekBar";
 import { type CSSProperties, useCallback, useEffect, useLayoutEffect, useMemo, useRef, useState, type PointerEvent } from "react";
+import { flushSync } from "react-dom";
 import { ControlIcon } from "@/components/ControlIcon";
 import { GameEnd } from "@/components/GameEnd";
 import { GO_ON, PAUSE, SPACE_OR_TAP_TO_GO_ON, TAP_TO_GO_ON } from "@/lib/sharedTexts";
@@ -125,7 +126,22 @@ const formatTime = (ms: number) => {
 
 const ease = (k: number) => (k < 0.5 ? 2 * k * k : 1 - (-2 * k + 2) ** 2 / 2);
 
-/** Glides from one view to the next, so the child sees the head turn and the mouth open; `gliding` while it does, `k` how far (eased). */
+/** A frame that came this much later than the one before missed the screen's beat. */
+const MISSED_FRAME_MS = 24;
+/** Drawing an in-between picture of the mirror (React's render and commit) that takes longer leaves a frame too little for the rest. */
+const SLOW_PICTURE_MS = 5;
+/** After this many missed frames or slow pictures a glide draws every other frame only, at least this far apart. */
+const SLOW_TO_PACE = 2;
+const PACED_GAP_MS = 28;
+
+/**
+ * Glides from one view to the next, so the child sees the head turn and the mouth open; `gliding` while it does, `k`
+ * how far (eased). Each in-between picture redraws the whole mirror: where a device can't do that well within a frame
+ * (an old phone), the glide draws every other frame only, so it moves at an even 30 frames a second instead of
+ * stumbling between one, two and three frames per picture, and leaves the main thread time for taps (`bun run perf
+ * zaehne`, „Putzen: springen“, November 2026). A device that keeps up draws every frame. Each picture is drawn inside
+ * its animation frame (`flushSync`), so it shows in that frame and its cost can be measured.
+ */
 function useGlidingView(target: View, ms: number): { view: View; gliding: boolean; k: number } {
   const [glide, setGlide] = useState({ view: target, k: 1, to: target });
   const current = useRef(target);
@@ -133,10 +149,23 @@ function useGlidingView(target: View, ms: number): { view: View; gliding: boolea
     const from = current.current;
     const start = performance.now();
     let frame = 0;
+    // The first frame comes after the commit that changed the target, which is no measure of the glide's own frames.
+    let last = Number.NaN;
+    let drawn = -Infinity;
+    let slow = 0;
     const step = (t: number) => {
       const k = ms <= 0 ? 1 : Math.min(1, (t - start) / ms);
+      if (t - last > MISSED_FRAME_MS) slow++;
+      last = t;
+      if (k < 1 && slow >= SLOW_TO_PACE && t - drawn < PACED_GAP_MS) {
+        frame = requestAnimationFrame(step);
+        return;
+      }
+      drawn = t;
       current.current = k >= 1 ? target : lerpView(from, target, ease(k));
-      setGlide({ view: current.current, k: ease(k), to: target });
+      const before = performance.now();
+      flushSync(() => setGlide({ view: current.current, k: ease(k), to: target }));
+      if (performance.now() - before > SLOW_PICTURE_MS) slow++;
       if (k < 1) frame = requestAnimationFrame(step);
     };
     frame = requestAnimationFrame(step);

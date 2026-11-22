@@ -10,7 +10,26 @@
  * address, in the order of its cards. A new game with levels, or a new level, is added here.
  */
 export const LEVEL_IDS: Record<string, readonly string[]> = {
-  "/timer/": ["disc", "sand", "candle", "apple", "flower", "pizza", "clock", "tidy", "train", "caterpillar", "sunset", "swap", "seesaw"],
+  "/timer/": [
+    "disc",
+    "sand",
+    "candle",
+    "apple",
+    "flower",
+    "pizza",
+    "clock",
+    "tidy",
+    "boxes",
+    "road",
+    "blocks",
+    "tunnel",
+    "jump",
+    "train",
+    "caterpillar",
+    "sunset",
+    "swap",
+    "seesaw",
+  ],
   // Its cards are the days of the little bear or, by the row above them, the feelings.
   "/gefuehle/": [
     ...Array.from({ length: 15 }, (_, i) => `tag-${i + 1}`),

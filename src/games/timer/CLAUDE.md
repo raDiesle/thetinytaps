@@ -20,7 +20,7 @@ request, November 2026; the middle rather than the end, user feedback, November 
 `GameMode.art`): the very drawing of a run (`SceneParts`), cut as for 5 minutes and started half of it ago, every
 animation in it put at that moment and then stopped (`holdAt`, `.tm-card-art.tm-still`), so the menu stands still. The cards come as wide as
 the picture (`ART_ASPECT`). Names are only read out and their tooltip. They stand in the order the user chose (November
-2026, `PICTURES`): Rote Scheibe, Sanduhr, Kerze, Apfelbaum, Blume, Pizza, Wecker, then Tidy Up and the others, on one frame with
+2026, `PICTURES`): Rote Scheibe, Sanduhr, Kerze, Apfelbaum, Blume, Pizza, Wecker, then Tidy Up, Five Boxes, Road Rug, Block House, Treasure Tunnel, Hop to the Flag and the others, on one frame with
 no name; after all of them Abwechseln is a category of its own, named on its frame (`GameMode.kind`): its two children
 with the toy, the lamps and the hourglass, then the Wippe, and that they run on without end is said in their tooltip (`SWAP_NOTE`). Where there is
 room, its frame stands beside the pictures' rather than in a row of its own below (`packGroups`' `reserve`), so all
@@ -107,6 +107,79 @@ taken out (user request, November 2026). The pictures:
   were written English first and translated into every app language on 22 November 2026 (`tidyNames.ts`, their own
   part in `languageStatus.ts`); its lines wait for their recordings. The
   Aufräumlied (H-119, a fixed five minutes with a Suno song) is an idea of its own, not built.
+- „Five Boxes“ 📦 (`boxes.tsx`, H-120, user request, 22 November 2026: more timers for tidying up): five open boxes
+  stand against the wall side by side, red, green, blue, yellow and purple, each with its sort's picture on a round
+  label (block, car, ball, duck, book – the Tidy Up's own `ToyArt`), and in front of each its sort's toys lie on the rug
+  in different colours (`hue-rotate`). Box after box from the left, its toys hop into it one at a time in a high arc,
+  landing smaller side by side with their tops over the rim (`boxSlot`), and once its last is in, its lid folds shut
+  over its hinge – two layers, the half standing behind the toys shrinking to its edge and the half lying over them
+  growing from there (`Lid`, `LID_SHUT`). Each box is a fifth of the time, the last lid shuts as it is up
+  (`boxesPlan`): five minutes are five boxes, three toys each (`perBox`, `MIN_PER_BOX` to `MAX_PER_BOX`). No figure
+  throws them (see the rules): the toys hop by themselves, as Abwechseln's toy does. The toy whose turn comes wiggles
+  once a second while it waits (`Hopper`'s `waitFrom`). A hop is three small layers inside each other on keyframes
+  written for the run (`hop.tsx`: across at an even pace, up and down slower at the top and faster falling, smaller
+  from its foot), shared with the Road Rug; `keyframes.ts` writes them, as for the crane. A landing
+  clonks, a lid shutting knocks (both spaced); a tap makes a toy hop sound and lights the toys still on the floor.
+  Its name and lines (`boxesNames.ts`) were written English first and translated into every app language at once.
+- „Road Rug“ 🛣️ (`road.tsx`, H-122, user request, 22 November 2026): a green play rug lies on the floor with a winding
+  grey road (`ROAD`, `roadY`, swinging gently so nothing on it tilts more than a little, `roadTilt`), the Tidy Up's toy
+  car (`ToyArt`, bigger, `CAR`) at its chequered start line and a toy house with a chequered flag on its roof at its
+  end, the goal seen from the start (`HOUSE`); the toy box stands at the wall behind the rug (`ROAD_BOX`). Toys lie on
+  the road in the car's way (`roadToyX`, never a car among them). One after the other, from the nearest, a toy hops
+  into the box (`Hopper`, landing on its own place, `roadBoxSlot`), and as it lies there the car drives on along the
+  road to just behind the next (`carStop`), setting off gently and braking, tilting with the road (`carFrames`, one
+  keyframe every `ROAD_STEP` of road), with a little honk; after the last it drives home, arriving as the time is up
+  (`roadPlan`, each toy the same share of the time). The idea had the car drive the whole road only at the end; it
+  drives on with every toy instead, so the road coming free shows at every piece. Five minutes take eight toys
+  (`roadToyCount`, `MIN_ROAD_TOYS` to `MAX_ROAD_TOYS`: more would stand on each other on the road). The toy whose turn
+  comes wiggles once a second. The road and the house stay bright from afar (the way the time goes); a tap makes the
+  car's engine hum and lights the toys still on the road. Its name and lines (`roadNames.ts`) were written English
+  first and translated into every app language at once.
+- „Block House“ 🧱 (`blocks.tsx`, H-125, user request, 22 November 2026: timers that look like a well-known kind of game
+  played by itself, like a video, the first a block-building game for tidying up): on a meadow of square grass a
+  jumble of blocks lies in three rows (`JUMBLE`, each a little tilted), beside a house's plan drawn in dashed outlines
+  (`HOUSE`, `SLOTS`: stone at the foot, wood walls with a door and two windows, a stepped roof). A cursor's cube
+  outline stands on the next place (`cursorFrames`), and one block after the other hops from the jumble onto it
+  (`Hopper`, `FROM` says which), from the bottom up, with a little puff of crumbs as it lands; the last lands as the
+  time is up, and then the windows and the door light up. Five minutes are all twenty blocks; a shorter run starts
+  with the lower places already built (`blockCount`, at least `MIN_BLOCKS` moving), so blocks never hop too fast.
+  Each block is a layer of its own; that a block further right or higher covers its neighbour comes from an animated
+  z-index per block (`stackKeyframes`, stepping at its hop) inside `.tm-blocks`, which isolates it so none reaches over
+  the end's light or trophy. A landing knocks, a tap knocks higher and lights the blocks still lying. Its name and
+  lines (`blocksNames.ts`) were written English first and translated into every app language at once. **Such a game
+  look is a genre of our own** (user request with H-125): blocks, a cursor, a meadow of squares – never another
+  game's name, figures, textures or a picture that copies one game (no Minecraft, no Steve, no creeper); the ideas for
+  more of them (H-126 to H-133) say the same.
+- „Treasure Tunnel“ ⛏️ (`tunnel.tsx`, H-126, 22 November 2026, the second block world): a hill of blocks cut open from
+  the side, as 2D block games show their worlds (`HILL`: grass on top, a block of dirt, then stone, a little darker than
+  the blocks to dig), a meadow before it. At its foot the tunnel's way is still blocks (`TUNNEL`, ten columns two high,
+  `spotKind`: dirt under the grass, else stone, two with gold), and after it a little room (`ROOM`) with the treasure
+  chest, lit through a crack from above – the goal, seen from the start. A pickaxe (`PICK`, a layer of its own) swings at
+  the next block once a second from the hand on its handle, a frame round that block as a block game marks it; the
+  block cracks a stage at each quarter of its share (`CRACKS`, three opacity steps repeating every `--tm-unit`) and
+  crumbles away into square crumbs as its share ends (`CRUMBLE_MS`, the Block House's crumbs). Column by column from
+  the entrance, the top block first (`SPOTS`); the pickaxe and the frame jump on together (`toolFrames`, keyframes
+  written for the run). The last block goes as the time is up, then the chest's lid turns open on its hinge at the back
+  over the gold, with a warm light round it. Five minutes dig all twenty blocks; a shorter run starts with the tunnel's
+  first part dug (`digCount`, at least `MIN_DIG`). A block going cracks, a tap gives the pickaxe's bright tink and
+  lights the blocks still standing. Its name and lines (`tunnelNames.ts`) were written English first and translated
+  into every app language at once.
+- „Hop to the Flag“ 🏃 (`jump.tsx`, H-127, 22 November 2026, chosen for variety after two block worlds: the first game
+  look that is no block world, a jump-and-run): one sunny level seen from the side on one screen, never a world
+  scrolling past, so the goal shows from the start – meadow, a stone, three floating islands over a pond (`ISLANDS`,
+  `POND`), a log, three steps up a hill (`STEPS`), and on the hilltop a flagpole (`POLE`) with its red flag still down
+  at its foot (`FLAG.low`), flying to the left so it stays in the picture and right of the hopper's last spot, never
+  behind it. A little round hopper (orange, big eyes looking ahead, two feet – no animal, see the rules) stands on the
+  first spot (`SPOTS`); over every hop hangs a star at the top of its arc (`starAt`), together a trail of stars up to the
+  hill. One hop after the other it jumps on (`jumpPlan`: each hop the same share of the time, landing at its end, the
+  last as the time is up; `HOP_MS` long, never more than half a share), catching its star at the top of the arc, where
+  the star grows a little and fades; between hops it bounces once a second on its spot (`.tm-jump-bob`). Its way is two
+  layers on keyframes written for the run (`runnerFrames`: across at an even pace, up and down with the curves of
+  `hop.tsx`). The stars still hanging are the time left. Five minutes are all 13 hops, a short time starts further
+  along (`hopCount`, at least `MIN_HOPS`). No enemies, no falling, no count of stars. A star caught plays a bright note
+  climbing the scale (spaced), the landing on the hilltop a hop, and the flag goes up; a tap boings and lights the stars
+  still hanging. Its name and lines (`jumpNames.ts`) were written English first and translated into every app language
+  at once. The level stays within x 235–1340 (a tablet's 4:3 cut with the paper's margin; `timer.test.ts` checks).
 - „Abwechseln“ 🔁 (H-52): two children take turns with a toy. The time set is one turn. Its hourglass is the
   Sanduhr's own (`Hourglass` in `scenes.tsx`, user request, November 2026: one drawing, never a second one built
   beside it), standing between two floor cushions (`SWAP_SEATS`, the same way left and right of it): the fox child's
@@ -164,7 +237,8 @@ Files: `TimerGame.tsx` (start screen: cards, minutes and the own time's slip), `
 run: working out its length, the question when a clock time is past, the clock, the phases `running` →
 `blow` (candle only) → `done`, taps, the end, the sounds of the pieces), `pieces.ts` (how a run is cut into pieces, the
 train's halts, where the apples hang; tested), `SwapPlay.tsx` and `swap.tsx` („Abwechseln“: its turns, and its room,
-lamps, cushions and toys), `seesaw.tsx` (the Wippe's playground, plank, stand and chick), `apples.tsx`, `caterpillar.tsx`, `clock.tsx`, `disc.tsx`, `flower.tsx`, `sunset.tsx`, `pizza.tsx`, `tidy.tsx` (one picture each; `tidyNames.ts` Tidy Up's texts), `shown.tsx`
+lamps, cushions and toys), `seesaw.tsx` (the Wippe's playground, plank, stand and chick), `apples.tsx`, `caterpillar.tsx`, `clock.tsx`, `disc.tsx`, `flower.tsx`, `sunset.tsx`, `pizza.tsx`, `tidy.tsx`, `boxes.tsx`, `road.tsx`, `blocks.tsx`, `tunnel.tsx`, `jump.tsx` (one picture each; `tidyNames.ts`, `boxesNames.ts`, `roadNames.ts`, `blocksNames.ts`, `tunnelNames.ts` and `jumpNames.ts` their texts), `hop.tsx` (a toy hopping
+into its box, shared), `keyframes.ts` (keyframes written for a run), `shown.tsx`
 („Zeit im Bild“: its choice, the note with digits or tally marks), `scenes.tsx` (the other drawings
 and the shared `Layer`, `Draw`, `LeftGlow`), `timer.css`, `content.ts`
 (names, order), `settings.ts`.
@@ -179,6 +253,27 @@ and the shared `Layer`, `Draw`, `LeftGlow`), `timer.css`, `content.ts`
   nearly to the top), and a goal shows from the start (the flag, the ribbon). What is cut into pieces
   over the time gets enough of them (24 slices, three candles one after the other, petals opening after the stalk has
   grown). Many pieces mean many moments: their sounds are spaced (`PIECE_SOUND_GAP_MS`), never a din.
+- **A bar along the bottom** (user request, 22 November 2026, H-124; `bar.tsx`): under every picture a paper track
+  over nearly the whole width fills from its start at the left to a little flag at the right, in the picture's own
+  colour (`.tm-play[data-picture=…] .tm-bar`, a new picture adds its colours there; Abwechseln the colour of the child
+  whose turn it is, `tone`), a round marker at the fill's front. On by default, „Leiste unten“ behind ⚙️ switches it
+  off (`settings.bar`). Fill, way still to go and marker each move by one CSS animation of `transform` as long as the
+  run, started from the clock (`--tm-bar-delay`) and started again after a page turn or when the page comes back –
+  never React per frame (`timer.test.ts`). With it the stage's middle moves up into the room above it
+  (`.tm-with-bar .tm-stage`), so it lies under what matters instead of over the picture's foot, while the stage still
+  reaches the screen's bottom edge (a dark strip showed under it on a tablet); the time note stands above its right
+  end, and at the end it fades for the end's light, trophy and buttons. A tap lights its way still to go too (H-51).
+- **The last moments are felt, never hurried** (H-124): `finalMs` (ten seconds, a quarter of a short run) before the
+  end a warm light gathers from the screen's edges (`FinalLight`, one layer by `opacity`), the bar's marker and the
+  flag's light swell softly once a second, and the last `FINAL_NOTES` seconds each sound one soft rising note, the
+  last a second before the end's own sound. Never a blink, a flash, a faster pace or anything over the picture's
+  middle: the picture itself runs on as always.
+- **Detail lives in what runs and its own place** (user request, 22 November 2026: „interessanter und detaillierter“):
+  a richer picture gets it in the thing itself and where it stands – the hourglass's turned posts and grained plates,
+  the red disc's case on its feet, each candle's own wax colour (`WAX`, its top, drop and puddle alike) and brass
+  dish, the pizza's mixed toppings lying across the cuts (`TOPPINGS`, drawn by every slice near them and cut by its
+  wedge) – and in quiet texture of the backdrop (wallpaper, floorboards, a table's grain, all in `.tm-back`), never a
+  new thing standing beside it (see „A picture makes sense as it is“). Still drawings stay `memo`, painted once.
 - **The end is plain to see and hear**: the picture's own last step, then children cheering, a warm light over the
   picture and the trophy at the end – for every picture, Abwechseln's clock time too. Never a storm of confetti.
 - **A picture makes sense as it is**: where something comes from and why it happens is plain (the water from a tap and a
@@ -223,7 +318,7 @@ and the shared `Layer`, `Draw`, `LeftGlow`), `timer.css`, `content.ts`
 - **One drawing for one thing**: a thing two pictures show (the hourglass) is one component both use, never copied and
   drawn again with its own sizes (user request, November 2026; `timer.test.ts` checks the hourglass).
 - **The cards' order is the user's** (November 2026: Rote Scheibe, Sanduhr, Kerze, Apfelbaum, Blume, Pizza, then the
-  Wecker, then Tidy Up; Abwechseln last): keep it when adding a picture (a new one goes after these, before Abwechseln, unless the
+  Wecker, then Tidy Up, Five Boxes, Road Rug, Block House, Treasure Tunnel and Hop to the Flag; Abwechseln last): keep it when adding a picture (a new one goes after these, before Abwechseln, unless the
   user says otherwise), and add it to the perf scenarios' list in `tools/perfScenarios.ts`, which taps each card by its
   name (`timer.test.ts` checks the order). Abwechseln is another thing to do than the pictures that run until the time
   is up – taking turns without end – so it stands in a group of its own after them (`GameMode.kind`, user request,
@@ -333,4 +428,4 @@ and the shared `Layer`, `Draw`, `LeftGlow`), `timer.css`, `content.ts`
   German and in its translations.
 - Its ideas are the area „Timer“ on `/management/` (`src/content/ideas/h-timer.ts`, H numbers shared with the
   Alltagshelfer): any time to set (H-59 to H-62), pictures that visibly change every second and show where they go,
-  also over long times (H-45, H-63 to H-69), and new pictures. A new timer idea goes there, not into the Alltagshelfer.
+  also over long times (H-45, H-63 to H-69), timers like a game played by itself (H-125 to H-133; built so far: blocks, tunnel, jump-and-run – a new one takes a genre the others are not, for variety), and new pictures. A new timer idea goes there, not into the Alltagshelfer.

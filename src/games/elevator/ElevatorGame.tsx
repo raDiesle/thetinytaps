@@ -1,15 +1,12 @@
-import { useState } from "react";
+import { Suspense, use, useState } from "react";
 import { GameShell, useLevelOnScreen } from "@/components/GameShell";
+import { PageLoading } from "@/components/PageLoading";
 import { useGameSettings } from "@/lib/common";
 import { useFigurePictures } from "@/lib/figurePictures";
 import { useAppLanguage, useT } from "@/lib/language";
-import { ElevatorPlay } from "./ElevatorPlay";
-import { FilmPlay } from "./film/FilmPlay";
-import { FILMS } from "./film/films";
+import { CARDS, type CardEntry, cardOf, loadCard, type PlayProps } from "./catalog";
 import { titleIn } from "./phrases";
 import { DEFAULT_ELEVATOR_SETTINGS, ELEVATOR_SETTINGS_KEY, type ElevatorSettings } from "./settings";
-import { TRAIL_LEVELS } from "./trail/levels";
-import { TrailPlay } from "./trail/TrailPlay";
 import "./elevator.css";
 import previews from "./vorschau/*.webp?glob";
 import girlPreviews from "./vorschau-maedchen/*.webp?glob";
@@ -18,14 +15,13 @@ import girlPreviews from "./vorschau-maedchen/*.webp?glob";
 const LIFT = { de: "🛗 Aufzug", ru: "🛗 Лифт", en: "🛗 Elevator", zh: "🛗 电梯", hi: "🛗 लिफ़्ट", es: "🛗 Ascensor", ar: "🛗 المصعد" };
 const TRAIL = { de: "🚶 Laufen", ru: "🚶 Пешком", en: "🚶 Walking", zh: "🚶 走路", hi: "🚶 पैदल", es: "🚶 A pie", ar: "🚶 مشيا" };
 const FILM = { de: "🎬 Filme", ru: "🎬 Фильмы", en: "🎬 Films", zh: "🎬 电影", hi: "🎬 फ़िल्में", es: "🎬 Películas", ar: "🎬 أفلام" };
+const KINDS = { lift: LIFT, trail: TRAIL, film: FILM };
 
 /** "Kleine Abenteuer": the lift stories in the house and the trail levels through the world. */
 export function ElevatorGame() {
   const [settings, update] = useGameSettings(ELEVATOR_SETTINGS_KEY, DEFAULT_ELEVATOR_SETTINGS);
   const t = useT();
   const { id: language } = useAppLanguage();
-  // The story titles are German in the data and come in the app language from its phrasebook (`phrases.ts`).
-  const title = (german: string) => titleIn(german, language);
   // The cards show the child as a boy or a girl, as chosen on the home page.
   const pictures = useFigurePictures(previews, girlPreviews);
 
@@ -41,30 +37,11 @@ export function ElevatorGame() {
         es: "Pequeñas aventuras",
         ar: "مغامرات صغيرة",
       })}
-      modes={[
-        { id: "hunger", emoji: "🥞", title: title("Pfannkuchen"), kind: t(LIFT) },
-        { id: "gutenacht", emoji: "🌙", title: title("Gute Nacht"), kind: t(LIFT) },
-        { id: "pfuetzen", emoji: "🌧️", title: title("Pfützen"), kind: t(LIFT) },
-        { id: "drachen", emoji: "🪁", title: title("Der Drachen"), kind: t(TRAIL) },
-        { id: "ball", emoji: "⚽", title: title("Der Ball rollt weg"), kind: t(TRAIL) },
-        { id: "ballon", emoji: "🎈", title: title("Der Luftballon"), kind: t(TRAIL) },
-        { id: "lok", emoji: "🚂", title: title("Die kleine Lok"), kind: t(TRAIL) },
-        { id: "floss", emoji: "⛵", title: title("Das Floß"), kind: t(TRAIL) },
-        { id: "sandburg", emoji: "🏖️", title: title("Die Sandburg"), kind: t(TRAIL) },
-        { id: "picknick", emoji: "🧺", title: title("Picknick im Wald"), kind: t(TRAIL) },
-        { id: "katze", emoji: "🐈", title: title("Wo ist die Katze?"), kind: t(TRAIL) },
-        { id: "schneemann", emoji: "⛄", title: title("Der Schneemann"), kind: t(TRAIL) },
-        { id: "feuerwehr", emoji: "🚒", title: title("Die Feuerwehr"), kind: t(FILM) },
-        { id: "brief", emoji: "✉️", title: title("Ein Brief für Oma"), kind: t(FILM) },
-        { id: "baecker", emoji: "🥨", title: title("Beim Bäcker"), kind: t(FILM) },
-        { id: "garten", emoji: "🌻", title: title("Unser Garten wächst"), kind: t(FILM) },
-        { id: "krankenwagen", emoji: "🚑", title: titleIn("The ambulance", language, "en"), kind: t(FILM) },
-        { id: "korn", emoji: "🌾", title: titleIn("From grain to bread", language, "en"), kind: t(FILM) },
-        { id: "haus", emoji: "🏡", title: titleIn("We build a house", language, "en"), kind: t(FILM) },
-        { id: "muell", emoji: "🚛", title: titleIn("The rubbish truck", language, "en"), kind: t(FILM) },
-      ]}
+      modes={CARDS.map((card) => ({ id: card.id, emoji: card.emoji, title: titleIn(card.title, language, card.first), kind: t(KINDS[card.kind]) }))}
       mode={settings.story}
       onMode={(story) => update({ story })}
+      // A tap on a card waits a moment for its code, so the level is drawn before the page turns to it; nothing is fetched before a card is pressed.
+      prepare={(id) => loadCard(cardOf(id ?? settings.story))}
     >
       <Stories settings={settings} />
     </GameShell>
@@ -78,12 +55,16 @@ function Stories({ settings }: { settings: ElevatorSettings }) {
   // „Weiter“ plays the next story without changing the card picked: the address names the one on screen.
   useLevelOnScreen(run.story);
   const pick = (story: string) => setRun((r) => ({ story, n: r.n + 1 }));
-  const level = TRAIL_LEVELS.find((l) => l.id === run.story);
-  const film = FILMS.find((f) => f.id === run.story);
-  if (film) return <FilmPlay key={run.n} language={language} film={film} onPick={pick} />;
-  return level ? (
-    <TrailPlay key={run.n} language={language} level={level} onPick={pick} />
-  ) : (
-    <ElevatorPlay key={run.n} language={language} story={run.story} onPick={pick} />
+  return (
+    // The paper with the paw track while the level's code still loads – never a dark screen.
+    <Suspense fallback={<PageLoading />}>
+      <Played key={run.n} card={cardOf(run.story)} language={language} onPick={pick} />
+    </Suspense>
   );
+}
+
+/** One story, level or film played: waits (suspends) for its code, then plays it. */
+function Played({ card, ...props }: PlayProps & { card: CardEntry }) {
+  const Play = use(loadCard(card));
+  return <Play {...props} />;
 }

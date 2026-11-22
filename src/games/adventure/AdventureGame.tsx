@@ -1,14 +1,12 @@
-import { Suspense, use, useEffect, useMemo } from "react";
+import { Suspense, use, useMemo } from "react";
 import { GameShell } from "@/components/GameShell";
 import { PageLoading } from "@/components/PageLoading";
 import { type TargetLanguage, targetLanguageFor } from "@/content/targetLanguages";
 import { type CommonSettings, useCommonSettings } from "@/lib/common";
 import { canPlayUnfinished } from "@/lib/localTest";
 import { useAppLanguage, useT } from "@/lib/language";
-import { afterPageMotion } from "@/lib/pageMotion";
-import { afterLoad, savesData } from "@/lib/pwa";
 import { useStoredSettings } from "@/lib/storage";
-import { entryTitle, entryToldIn, loadedPlay, loadedStory, loadPlay, loadStory, STORIES, type StoryEntry } from "./catalog";
+import { entryTitle, entryToldIn, loadPlay, loadStory, STORIES, type StoryEntry } from "./catalog";
 import { ADVENTURE_SETTINGS_KEY, type AdventureStoryId, DEFAULT_ADVENTURE_SETTINGS } from "./settings";
 import { storyIn } from "./stories/story";
 import previews from "./vorschau/*.webp?glob";
@@ -40,29 +38,6 @@ export function AdventureGame() {
   // The app language, like every game. A story not told in it yet is said in English, or else in the language it was
   // written in – never German words with a Russian voice.
   const language = targetLanguageFor(entryToldIn(chosen, app.id) ? app.id : entryToldIn(chosen, "en") ? "en" : chosen.language);
-
-  // The first tap should not wait for the player's code: fetched once the page lies still and the browser is idle,
-  // then the story picked last – never while a book flies or a page turns, nor when the visitor saves data.
-  const chosenId = chosen.id;
-  useEffect(() => {
-    if (savesData()) return;
-    let live = true;
-    const cancel = afterPageMotion(() =>
-      afterLoad(() => {
-        if (!live) return;
-        const entry = STORIES.find((s) => s.id === chosenId);
-        void loadPlay()
-          .then(() => (entry && live ? loadStory(entry) : undefined))
-          .catch(() => {
-            // Offline: the tap will show the loading paper and try again.
-          });
-      }),
-    );
-    return () => {
-      live = false;
-      cancel();
-    };
-  }, [chosenId]);
 
   return (
     <GameShell
@@ -108,8 +83,8 @@ function StoryPlay({
   next?: { name: string; onNext: () => void };
 }) {
   // Read at once where they were fetched ahead, so the story's first picture is drawn before the page turns to it.
-  const loaded = loadedStory(entry) ?? use(loadStory(entry));
-  const { AdventurePlay } = loadedPlay() ?? use(loadPlay());
+  const loaded = use(loadStory(entry));
+  const { AdventurePlay } = use(loadPlay());
   // Built once per story and language: the game starts anew when the story changes.
   const story = useMemo(() => storyIn(loaded, language.id), [loaded, language.id]);
   // Its own music, which plays while music is on for all games.

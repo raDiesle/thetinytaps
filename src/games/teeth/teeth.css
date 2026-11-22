@@ -869,6 +869,7 @@
   }
 
   .monster-body,
+  .origin-monster > svg,
   .zone-glow,
   .teeth-shine,
   .monster-glow {
@@ -1189,6 +1190,32 @@
   }
 }
 
+/* Grown, the monsters sway on their feet, and a tapped one wiggles: their piece's svg turns as a whole, an HTML layer
+   (inside the svg the drawing stands still, `still`): a monster swaying and blinking inside its svg had the phone paint
+   the story's mouth again in every frame, 57 screens a second on the old Android (November 2026). */
+.origin-monster > svg {
+  transform-origin: 50% 100%;
+  animation: teeth-origin-monster-sway 2.14s ease-in-out infinite;
+}
+
+.origin-monster:nth-child(odd) > svg {
+  animation-delay: -1.07s;
+}
+
+.origin-monster.tickled > svg {
+  animation: wiggle 0.4s ease-in-out infinite;
+}
+
+@keyframes teeth-origin-monster-sway {
+  0%,
+  100% {
+    transform: rotate(-5deg);
+  }
+  50% {
+    transform: rotate(5deg) translateY(-1px);
+  }
+}
+
 /* The child gets worried as the monsters grow: brows up in the middle, eyes on the teeth. */
 .origin-brow {
   transform-origin: center;
@@ -1252,40 +1279,68 @@
   }
 }
 
-/* Before the evening brushing a whole day goes by and ends at dusk; before the morning one a night, and the sun comes up. */
-.origin.evening .origin-sky {
-  fill: #c4f1ff;
+/* Before the evening brushing a whole day goes by and ends at dusk; before the morning one a night, and the sun comes up
+   (`SKY` in origin.tsx). The sky's colours are pictures on top of each other, each fading in as a whole: only their
+   layers' opacity changes, which a phone does without painting. Never animate the sky's fill: that painted the whole
+   screen again in every frame. */
+.origin-sky-1,
+.origin-sky-2 {
+  opacity: 0;
 }
 
-.origin.morning .origin-sky {
-  fill: #a49be6;
+.origin.at-grow .origin-sky-1,
+.origin.at-grow .origin-sky-2 {
+  will-change: opacity;
 }
 
-.origin.evening.at-grow .origin-sky {
-  animation: teeth-origin-day 5.6s ease-in-out forwards;
+.origin.evening.at-grow .origin-sky-1 {
+  animation: teeth-origin-sky-noon 5.6s ease-in-out forwards;
 }
 
-@keyframes teeth-origin-day {
+.origin.evening.at-grow .origin-sky-2 {
+  animation: teeth-origin-sky-dusk 5.6s ease-in-out forwards;
+}
+
+@keyframes teeth-origin-sky-noon {
+  60%,
+  to {
+    opacity: 1;
+  }
+}
+
+@keyframes teeth-origin-sky-dusk {
+  0%,
   60% {
-    fill: #ffd9a8;
+    opacity: 0;
   }
   to {
-    fill: #a49be6;
+    opacity: 1;
   }
 }
 
-.origin.morning.at-grow .origin-sky {
-  animation: teeth-origin-night 5.6s ease-in-out forwards;
+.origin.morning.at-grow .origin-sky-1 {
+  animation: teeth-origin-sky-night 5.6s ease-in-out forwards;
 }
 
-@keyframes teeth-origin-night {
+.origin.morning.at-grow .origin-sky-2 {
+  animation: teeth-origin-sky-dawn 5.6s ease-in-out forwards;
+}
+
+@keyframes teeth-origin-sky-night {
   30%,
+  to {
+    opacity: 1;
+  }
+}
+
+@keyframes teeth-origin-sky-dawn {
+  0%,
   55% {
-    fill: #2d2a6e;
+    opacity: 0;
   }
   85%,
   to {
-    fill: #ffe0b0;
+    opacity: 1;
   }
 }
 

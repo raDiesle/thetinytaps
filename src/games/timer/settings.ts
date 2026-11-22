@@ -6,7 +6,24 @@ import type { OwnTime } from "./time";
  * digital alarm clock counting down (H-70) – or „Abwechseln“ (H-52), two children taking
  * turns with a toy, turn after turn, or the same on a seesaw (H-109).
  */
-export type TimerPicture = "train" | "apple" | "sand" | "caterpillar" | "flower" | "candle" | "sunset" | "disc" | "pizza" | "clock" | "tidy" | TurnPicture;
+export type TimerPicture =
+  | "train"
+  | "apple"
+  | "sand"
+  | "caterpillar"
+  | "flower"
+  | "candle"
+  | "sunset"
+  | "disc"
+  | "pizza"
+  | "clock"
+  | "tidy"
+  | "boxes"
+  | "road"
+  | "blocks"
+  | "tunnel"
+  | "jump"
+  | TurnPicture;
 
 /**
  * The pictures of taking turns, which run on without end: the toy between two cushions, and the seesaw carrying it
@@ -43,6 +60,8 @@ export interface TimerSettings {
    * (`shown`, then `showTime` held the old default for everyone who had played before), so the new one reaches them too.
    */
   timeNote: TimeShown;
+  /** The bar along the bottom (`TimeBar`), a second way to see the time beside the picture; on by default, off behind ⚙️. */
+  bar: boolean;
 }
 
 export const DEFAULT_TIMER_SETTINGS: TimerSettings = {
@@ -52,6 +71,7 @@ export const DEFAULT_TIMER_SETTINGS: TimerSettings = {
   useOwn: false,
   toy: "bobbycar",
   timeNote: "digits",
+  bar: true,
 };
 
 export const TIMER_SETTINGS_KEY = "tinytaps.timer.v1";

@@ -106,8 +106,9 @@ const GIRL_BOOK_DIR = "src/components/vorschau-maedchen";
 const VIDEO_GAMES: Record<string, { href: string; hide?: string }> = {
   // Its face big, without the song's bar and buttons at its side.
   zaehne: { href: "/zaehne/", hide: ".teeth-controls, .teeth-progress" },
-  // The train, a picture to wait with, rather than the first card's bare red disc, without the minutes in its corner.
-  timer: { href: "/timer/train/", hide: ".tm-shown" },
+  // The train, a picture to wait with, rather than the first card's bare red disc, without the minutes in its corner
+  // nor the bar along the bottom.
+  timer: { href: "/timer/train/", hide: ".tm-shown, .tm-bar" },
   bilder: { href: "/bilder/" },
   // The animal and its choices without their names and the round's question.
   tiere: { href: "/tiere/", hide: ".ap-name, .ap-topic" },

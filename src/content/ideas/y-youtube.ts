@@ -6,7 +6,7 @@ export const youtubeIdeas: IdeaArea = {
   emoji: "📺",
   title: "YouTube-Videos",
   intro:
-    "Videos aus den echten Spielen, die für funforboth.com werben: am besten die Alltagshelfer, nach denen Eltern ohnehin auf YouTube suchen (Zähne putzen, Aufs Töpfchen, Schnullerfee, Timer). Jedes Video beginnt mit demselben kurzen Intro und endet mit einem kurzen Hinweis auf die Seite und was sie kann. Zwei Dinge gelten für alle: Ein Video für Kinder ist ein Mitmach-Video (putzen, aufs Klo gehen, warten), nie eines zum bloßen Zuschauen – „Ein paar Worte von uns“ nennt reines Zuschauen als das Letzte. Und ein Video für Kinder muss bei YouTube „speziell für Kinder“ heißen: Dann zeigt YouTube keine Infokarten und keinen Abspann mit Links (Endcards), keine Kommentare – die Werbung für die Seite muss also im Bild und in der Stimme selbst stecken. Neue Texte und Sprecherzeilen kommen wie alles Neue zuerst auf Englisch, andere Sprachen und Aufnahmen nur auf Anfrage.",
+    "Videos aus den echten Spielen, die für funforboth.com werben: am besten die Alltagshelfer, nach denen Eltern ohnehin auf YouTube suchen (Zähne putzen, Aufs Töpfchen, Schnullerfee, Timer). Jedes Video beginnt mit demselben kurzen Intro und endet mit einem kurzen Hinweis auf die Seite und was sie kann. Zwei Dinge gelten für alle: Ein Video für Kinder ist ein Mitmach-Video (putzen, aufs Klo gehen, warten), nie eines zum bloßen Zuschauen – „Ein paar Worte von uns“ nennt reines Zuschauen als das Letzte. Und ein Video für Kinder muss bei YouTube „speziell für Kinder“ heißen: Dann zeigt YouTube keine Infokarten und keinen Abspann mit Links (Endcards), keine Kommentare – die Werbung für die Seite muss also im Bild und in der Stimme selbst stecken. Neue Texte und Sprecherzeilen kommen wie alles Neue zuerst auf Englisch, andere Sprachen und Aufnahmen nur auf Anfrage. Eine Fassung nur wegen der Länge entsteht nicht, wenn das Video schon etwa so lang ist: Ungefähr 2 Minuten sind 2 Minuten (Entscheidung des Nutzers, 22. November 2026, zum Zähneputz-Video).",
   ideas: [
     {
       id: "Y-01",
@@ -325,6 +325,14 @@ export const youtubeIdeas: IdeaArea = {
       title: "Ein kurzes Lied zu jeder neuen Geschichte",
       text: "Zu einer Geschichte, deren Thema auch als Lied gesucht wird, ein kurzes Lied mit Suno (30–60 Sekunden, `/musik-erzeugen`), das in der Geschichte am Ende kommt und als eigenes Video oder Short läuft: „Bye-bye, Fläschchen“ (H-105), „Im großen Bett“ (H-106), „Beim Zahnarzt“ (H-107), „Ein Baby kommt“ (H-12). Jedes Lied ist ein zweites Video zum selben Thema, das auf dieselbe Seite zeigt. Kostet Suno-Credits, also nur auf Anfrage.",
       why: "Fast jede Alltags-Suche hat ein „… lied“ oder „… song“ als Vorschlag: geschwisterchen lied, zahnarzt kinder lied, kinderarzt lied, fieber kinderlied, abschied kita lied, kinderlied umzug, goodbye pacifier song (Recherche „youtube-themen“).",
+      effort: "M",
+    },
+    {
+      id: "Y-36",
+      emoji: "🎶",
+      title: "Reihe „Sing along with Tapsi“ aus den Mitsing-Helfern",
+      text: "Die Mitsing-Helfer (H-134 bis H-138) als eigene Reihe auf dem Kanal: die Countdown-Timer mit Lied in jeder Länge und unter jedem Timer-Bild („5 Minute Timer with Music – Clean Up with Tapsi“), Hände waschen als Video und als Short, Aufräumen, Anziehen und der ruhige Gute-Nacht-Ablauf. Aufgenommen im geteilten `VideoRecorder` wie Zähne putzen und Aufs Töpfchen, so entsteht jedes Video samt Sprache und Länge ohne Schnitt, und das Vorschaubild ist ein gemaltes Bild aus dem Helfer selbst (H-141) mit den Wörtern der Reihe darauf (fester Aufbau aus Y-16) – ohne ein weiteres Gemini-Bild zu bezahlen.",
+      why: "Jedes Lied wird so mehrfach zum Video: Sieben Countdown-Lieder unter zwanzig Timer-Bildern in fünf Längen sind Hunderte mögliche Videos, von denen man die besten auswählt. Qualität statt Masse heißt dabei: wenige hochladen, die gut aussehen, und die Titel nach dem, was Eltern suchen (Länge und Zweck, Recherche „youtube-suchen“).",
       effort: "M",
     },
   ],

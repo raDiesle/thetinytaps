@@ -60,9 +60,6 @@ const partOf = (entry: LevelEntry) => {
 /** The level's code, loaded once (the same promise every time, as `use()` needs); a failed download is tried again next time. */
 export const loadLevel = (entry: LevelEntry): Promise<ComponentType<LevelProps>> => partOf(entry).load();
 
-/** The level's code once it is loaded, so the level is drawn at once – before the page turns to it, not in the turn's middle. */
-export const loadedLevel = (entry: LevelEntry): ComponentType<LevelProps> | undefined => partOf(entry).loaded();
-
 /** Fetches a level's code ahead, quietly: a failure (offline) leaves it to the tap, which shows the loading paper and tries again. */
 export function prefetchLevel(entry: LevelEntry | undefined) {
   if (entry) loadLevel(entry).catch(() => {});

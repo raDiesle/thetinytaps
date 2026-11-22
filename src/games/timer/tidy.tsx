@@ -1,4 +1,5 @@
 import { memo, useMemo, type CSSProperties, type ReactNode } from "react";
+import { type Frame, holdToEnd, keyframes } from "./keyframes";
 import { Draw, INK, Layer, LeftGlow, STAGE_H, STAGE_W } from "./scenes";
 
 // Tidy Up (H-118, user request, 21 November 2026: a timer for tidying up, best at five minutes): toys lie on the rug
@@ -174,17 +175,6 @@ function inBox(toy: TidyToy) {
   return `translate(${dx.toFixed(2)}%, ${dy.toFixed(2)}%) scale(${HEAP_SCALE})`;
 }
 
-/** One keyframe: when (ms), the transform then, and how it moves on to the next. */
-type Frame = { at: number; transform: string; ease?: string };
-
-/** A `@keyframes` rule for a run of `total` ms from frames in time order. */
-function keyframes(name: string, total: number, frames: Frame[]) {
-  const percent = (ms: number) => ((Math.max(0, Math.min(ms, total)) / total) * 100).toFixed(3);
-  return `@keyframes ${name} {${frames
-    .map((f) => `${percent(f.at)}% { transform: ${f.transform}; animation-timing-function: ${f.ease ?? "ease-in-out"}; }`)
-    .join(" ")}}`;
-}
-
 /**
  * The crane's and the toys' ways as keyframes made for this run, since how many toys there are and when each is
  * carried depends on the time set. The layers name them by `--tm-anim`.
@@ -222,7 +212,7 @@ function TidyKeyframes({ total, toys, times }: { total: number; toys: TidyToy[];
       { at: t.open + Math.min(200, (t.land - t.open) / 2), transform: turned(true) },
     );
   });
-  const end = (frames: Frame[]) => [...frames, { at: total, transform: frames[frames.length - 1].transform }];
+  const end = (frames: Frame[]) => holdToEnd(frames, total);
   const toyFrames = toys.map((toy, k) => {
     const t = times[k];
     const lift = ((CARRY_BOTTOM - toy.y) / TOY) * 100;
@@ -292,8 +282,8 @@ const TidyBackdrop = memo(function TidyBackdrop() {
   );
 });
 
-/** One toy in a 100 × 100 box standing on its bottom edge. */
-function ToyArt({ kind }: { kind: ToyKind }) {
+/** One toy in a 100 × 100 box standing on its bottom edge; Five Boxes (`boxes.tsx`) draws its toys with it too. */
+export function ToyArt({ kind }: { kind: ToyKind }) {
   const line = { stroke: INK, strokeWidth: 4, strokeLinejoin: "round" as const };
   let art: ReactNode;
   if (kind === "block")
