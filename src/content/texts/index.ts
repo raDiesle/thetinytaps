@@ -78,6 +78,8 @@ export interface LanguageTexts {
   goodbyeMilk?: MilkChainTranslation;
   /** Tapsi and the Pacifier Tree, written English first: chapter titles and pages (`pacifiertree/<id>.ts`, German too). */
   pacifierTree?: MilkChainTranslation;
+  /** Tapsi and the Warm Rain, written English first: chapter titles and pages (`hairshower/<id>.ts`, German too). */
+  hairShower?: MilkChainTranslation;
   /** Bye-Bye, Bottle!, written English first: chapter titles and pages (`bottlestory/<id>.ts`, German too). */
   bottleStory?: MilkChainTranslation;
   /** Tapsi's Big Bed, written English first: chapter titles and pages (`bedstory/<id>.ts`, German too). */

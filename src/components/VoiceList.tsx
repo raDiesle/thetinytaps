@@ -11,7 +11,7 @@ const CREDITS_PER_MONTH = 10_000;
 /**
  * Every game, every volume of a game and every other address of a game (a book's second story, like Abstillen's night
  * story at `/abstillen/nachts/`, „Three More Sleeps“ at `/abstillen/abschied/`, the pacifier tree at
- * `/schnullerfee/baum/`) by its address.
+ * `/schnullerfee/baum/`, the shower at `/haare-waschen/dusche/`) by its address.
  */
 const GAME_BY_HREF = new Map<string, { emoji: string; title: Parameters<typeof pick>[0] }>(
   CATEGORIES.flatMap((c) =>

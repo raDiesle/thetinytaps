@@ -172,8 +172,9 @@ export const CATEGORIES: Category[] = [
         // Stillen oder Kita oder Schnullerfee“): „Tapsi and the Foam Crown“, a story in chapters along the steps the guides
         // give for washing a small child's hair calmly (src/games/hairstory), English first.
         href: "/haare-waschen/",
-        // Its short version, from the story's own pages, opened from the book's choice (StoryChoice.tsx).
-        also: ["/haare-waschen/kurz/"],
+        // Its short version, from the story's own pages, and „Tapsi and the Warm Rain“ (src/games/hairshower, idea H-146)
+        // whole and short, for families with a shower and no bathtub, all opened from the book's choice (StoryChoice.tsx).
+        also: ["/haare-waschen/kurz/", "/haare-waschen/dusche/", "/haare-waschen/dusche/kurz/"],
         emoji: "🛁",
         title: HAIR_STORY_BOOK,
         blurb: HAIR_STORY_BLURB,

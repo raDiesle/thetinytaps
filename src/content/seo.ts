@@ -335,6 +335,20 @@ export const SEO_TEXTS: PageSeo[] = [
     text: "Die Kurzfassung von „Tapsi und die Schaumkrone“, für Abende, an denen die ganze Geschichte vor dem Baden zu lang ist, oder für ein Kind, das sie schon kennt. Sie erzählt dieselbe Geschichte mit denselben Bildern, nur das Wichtigste: Tapsi der Fuchs hat Brei und Sand in den Haaren, und Mama sagt vorher, dass heute Haarewaschen ist. Tapsi mag kein Wasser in den Augen, und Mama hört zu. Erst wäscht Tapsi dem Kuschelhasen die Haare, dann gießt Mama in der Wanne langsam warmes Wasser hinten herunter, Tapsi reibt den Schaum selbst ein und sieht im Spiegel eine Schaumkrone. Mit dem Waschlappen vor den Augen sagt Tapsi „Jetzt!“, Mama zählt bis drei und spült, und die Augen bleiben trocken. Läuft doch einmal ein Tropfen ins Auge, hört Mama sofort auf und tröstet. Dann kommt das warme Handtuch, und Mama und Papa haben Tapsi lieb, mit klebrigen Haaren und mit sauberen. Unter jedem Bild steht ein kurzer Satz zum Vorlesen, jedes Tippen blättert weiter, und im Buch „Haare waschen“ steht sie neben der ganzen Geschichte, jede mit der Zahl ihrer Bilder und ihrer ungefähren Dauer.",
   },
   {
+    path: "/haare-waschen/dusche/",
+    title: "Haare waschen unter der Dusche – eine Geschichte",
+    description:
+      "Eine Vorlesegeschichte fürs Haarewaschen ohne Badewanne: Tapsi der Fuchs sitzt in der Dusche, der Regen kommt tief von unten, die Augen bleiben trocken.",
+    text: "Eine Geschichte zum Vorlesen, Kapitel für Kapitel, für Familien mit Dusche und ohne Badewanne, wenn Haarewaschen Tränen bringt oder Angst macht. Tapsi der Fuchs hat Sand in den Haaren, und Papa sagt vorher, was kommt: heute Abend unter der Dusche, erst die Füße, dann die Haare. Tapsi findet die Dusche laut und mag keinen Regen in den Augen, und Papa hört zu: Der Regen wird sanft und kommt tief unten, und Tapsi sagt, wann. Zuerst spielt Tapsi mit dem Kuschelhasen und einer leeren Gießkanne Duschen und lässt es dann auf Papas Füße regnen. In der Dusche sitzt Tapsi auf einer weichen Matte am Boden, Papa kniet direkt daneben, und der warme Regen kommt zuerst auf die Zehen, dann hält Tapsi die Brause selbst. Kopf nach hinten, die Augen schauen hoch zum Fisch auf den Fliesen, Tapsi reibt den Schaum zu Igelstacheln, hält den Waschlappen vor die Augen und sagt „Jetzt!“, und Papa spült von hinten, nie von oben. Spritzt doch einmal Wasser ins Gesicht, dreht Papa sofort ab, tröstet, und Tapsi wählt: weiter mit der Dusche oder mit dem Becher. Dann das warme Handtuch. Im Buch „Haare waschen“ steht sie neben der Geschichte in der Badewanne, ganz und als Kurzfassung, jede mit der Zahl ihrer Bilder und ihrer ungefähren Dauer.",
+  },
+  {
+    path: "/haare-waschen/dusche/kurz/",
+    title: "Haare waschen unter der Dusche – die Kurzfassung",
+    description:
+      "Die Kurzfassung der Dusch-Geschichte zum Vorlesen: dieselben Bilder von Tapsi dem Fuchs unter der Dusche, nur das Wichtigste – kurz vorher gelesen.",
+    text: "Die Kurzfassung von „Tapsi und der warme Regen“, für Abende, an denen die ganze Geschichte vor dem Duschen zu lang ist, oder für ein Kind, das sie schon kennt. Mit denselben Bildern erzählt sie das Wichtigste: Tapsi der Fuchs hat Sand in den Haaren, Papa sagt vorher, dass heute unter der Dusche Haare gewaschen werden, und hört zu, als Tapsi sagt, dass die Dusche laut ist. In der Dusche kommt der warme Regen tief unten zuerst auf die Zehen, Tapsi legt den Kopf zurück und schaut zum Fisch auf den Fliesen, wird mit dem Schaum zum kleinen Igel, sagt mit dem Waschlappen vor den Augen „Jetzt!“, und Papa spült von hinten. Spritzt doch Wasser ins Gesicht, dreht Papa sofort ab und tröstet. Mama und Papa haben Tapsi lieb, mit Sand in den Haaren und mit sauberen. Unter jedem Bild steht ein kurzer Satz zum Vorlesen, und jedes Tippen blättert weiter.",
+  },
+  {
     path: "/flaeschchen/",
     title: "Fläschchen abgewöhnen – „Tschüss, Fläschchen!“",
     description:
@@ -530,6 +544,9 @@ const WAITING_PATHS: string[] = [
   // „Tapsi and the Pacifier Tree“ (`src/games/pacifiertree`), until its pictures are made (`pacifierTreePictures.ts`, its `after`).
   "/schnullerfee/baum/",
   "/schnullerfee/baum/kurz/",
+  // „Tapsi and the Warm Rain“ (`src/games/hairshower`), until its pictures are made (`hairShowerPictures.ts`, its `after`).
+  "/haare-waschen/dusche/",
+  "/haare-waschen/dusche/kurz/",
 ];
 
 /** Every page that should be found: all but the games still being built (`Game.unfinished`), which no one is to find yet. */

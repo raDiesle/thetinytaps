@@ -23,6 +23,11 @@ all alone, and in bed Tapsi promises the bunny a foam crown next time.
   listed in `recordedLines.ts` as `haare-waschen`, recorded only when the user asks), and the loudspeaker above ▶
   switches it off (`VoiceSwitch`); a page without its recording stays silent.
 - `names.ts`: the book's name on the shelf, the story's title and its blurb.
+- **A second story, „Tapsi and the Warm Rain“, in the shower** (`src/games/hairshower`, its own `CLAUDE.md`; idea H-146,
+  23 November 2026), for families without a bathtub: at `/haare-waschen/dusche/` and `/haare-waschen/dusche/kurz/`, its
+  own slips in the same choice. Each story's slip names where the hair is washed – „In the bathtub“ (`HAIR_BATH_KIND`,
+  `names.ts`) and „In the shower“ (`SHOWER_KIND`) –, so a family finds its own at a glance. A new story in this book
+  gets such a kind too.
 
 ## Rules
 

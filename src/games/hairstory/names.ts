@@ -15,6 +15,20 @@ export const HAIR_STORY_TITLE: EnglishFirst = {
   ru: "Тапси и корона из пены",
 };
 
+/**
+ * Its name in the book's choice of stories (`HairStoryGame.tsx`), over its title: where the hair is washed, beside „Unter
+ * der Dusche“ (src/games/hairshower). English first, since it came with that second story (23 November 2026).
+ */
+export const HAIR_BATH_KIND: EnglishFirst = {
+  en: "In the bathtub",
+  de: "In der Badewanne",
+  zh: "在浴缸里",
+  hi: "बाथटब में",
+  es: "En la bañera",
+  ar: "في حوض الاستحمام",
+  ru: "В ванне",
+};
+
 /** The name of its book on the shelf, among the Alltagshelfer beside „Kita-Start“: what parents look for. */
 export const HAIR_STORY_BOOK: EnglishFirst = {
   en: "Hair Washing",

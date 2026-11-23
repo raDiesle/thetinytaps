@@ -84,6 +84,7 @@ export const PICTURE_SOURCES: Record<string, PictureSource> = {
   nightmilk: { title: "Abstillen: nachts", hrefs: ["/abstillen/nachts/"] },
   milkgoodbye: { title: "Abstillen: Noch dreimal schlafen", hrefs: ["/abstillen/abschied/"] },
   pacifiertree: { title: "Schnullerfee: Schnullerbaum", hrefs: ["/schnullerfee/baum/"] },
+  hairshower: { title: "Haare waschen: Dusche", hrefs: ["/haare-waschen/dusche/"] },
   bottlestory: { title: "Fläschchen", hrefs: ["/flaeschchen/"] },
   bedstory: { title: "Großes Bett", hrefs: ["/grosses-bett/"] },
   teeth: { title: "Zähne putzen", hrefs: ["/zaehne/"] },

@@ -63,6 +63,7 @@ import { HAIR_STORY } from "@/games/hairstory/hairStory";
 import { NIGHT_MILK } from "@/games/nightmilk/nightMilk";
 import { GOODBYE_MILK } from "@/games/milkgoodbye/goodbyeMilk";
 import { TREE_STORY } from "@/games/pacifiertree/pacifierTree";
+import { SHOWER_STORY } from "@/games/hairshower/hairShower";
 import { BOTTLE_STORY } from "@/games/bottlestory/bottleStory";
 import { BED_STORY } from "@/games/bedstory/bedStory";
 import { MILK_CHAIN } from "@/games/milkchain/milkChain";
@@ -83,6 +84,7 @@ import hairFiles from "../games/hairstory/stimme/en/*.mp3?glob";
 import nightMilkFiles from "../games/nightmilk/stimme/en/*.mp3?glob";
 import goodbyeMilkFiles from "../games/milkgoodbye/stimme/en/*.mp3?glob";
 import pacifierTreeFiles from "../games/pacifiertree/stimme/en/*.mp3?glob";
+import hairShowerFiles from "../games/hairshower/stimme/en/*.mp3?glob";
 import bottleFiles from "../games/bottlestory/stimme/en/*.mp3?glob";
 import bedFiles from "../games/bedstory/stimme/en/*.mp3?glob";
 import milkChainFiles from "../games/milkchain/stimme/*.mp3?glob";
@@ -385,6 +387,7 @@ const HAIR_TEXTS = byLanguage((texts) => texts.hairStory);
 const NIGHT_MILK_TEXTS = byLanguage((texts) => texts.nightMilk);
 const GOODBYE_MILK_TEXTS = byLanguage((texts) => texts.goodbyeMilk);
 const PACIFIER_TREE_TEXTS = byLanguage((texts) => texts.pacifierTree);
+const HAIR_SHOWER_TEXTS = byLanguage((texts) => texts.hairShower);
 const BOTTLE_TEXTS = byLanguage((texts) => texts.bottleStory);
 const BED_TEXTS = byLanguage((texts) => texts.bedStory);
 
@@ -600,6 +603,7 @@ const RECORDED = new Set(
     nightMilkFiles,
     goodbyeMilkFiles,
     pacifierTreeFiles,
+    hairShowerFiles,
     bottleFiles,
     bedFiles,
   ].flatMap((files) => Object.keys(files).map((file) => file.slice(file.lastIndexOf("/") + 1, -4).replace(/^en-/, ""))),
@@ -650,6 +654,7 @@ export function voiceLines(language: TargetLanguageId = "de"): VoiceGame[] {
     { href: "/abstillen/nachts/", groups: chapterBook(NIGHT_MILK, language, NIGHT_MILK_TEXTS, "en") },
     { href: "/abstillen/abschied/", groups: chapterBook(GOODBYE_MILK, language, GOODBYE_MILK_TEXTS, "en") },
     { href: "/schnullerfee/baum/", groups: chapterBook(TREE_STORY, language, PACIFIER_TREE_TEXTS, "en") },
+    { href: "/haare-waschen/dusche/", groups: chapterBook(SHOWER_STORY, language, HAIR_SHOWER_TEXTS, "en") },
     { href: "/flaeschchen/", groups: chapterBook(BOTTLE_STORY, language, BOTTLE_TEXTS, "en") },
     { href: "/grosses-bett/", groups: chapterBook(BED_STORY, language, BED_TEXTS, "en") },
     {

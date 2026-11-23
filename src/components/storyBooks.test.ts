@@ -3,6 +3,7 @@ import { describe, expect, test } from "bun:test";
 import type { StoryChapter } from "@/components/ChapterBook";
 import { CATEGORIES } from "@/content/games";
 import { BOTTLE_SHORT_PAGES, BOTTLE_STORY, BOTTLE_STORY_SHORT } from "@/games/bottlestory/bottleStory";
+import { SHOWER_SHORT_PAGES, SHOWER_STORY, SHOWER_STORY_SHORT } from "@/games/hairshower/hairShower";
 import { HAIR_SHORT_PAGES, HAIR_STORY, HAIR_STORY_SHORT } from "@/games/hairstory/hairStory";
 import { KITA_SHORT_PAGES, KITA_STORY, KITA_STORY_SHORT } from "@/games/kitastory/kitaStory";
 import { PACIFIER_SHORT_PAGES, PACIFIER_STORY, PACIFIER_STORY_SHORT } from "@/games/pacifierstory/pacifierStory";
@@ -59,6 +60,16 @@ const BOOKS: {
     story: HAIR_STORY,
     short: HAIR_STORY_SHORT,
     ids: HAIR_SHORT_PAGES,
+    cries: /\bcr(y|ies)\b/,
+    comforts: /Mama|Papa|hold|hug|arms|comfort|cuddle/,
+  },
+  {
+    href: "/haare-waschen/dusche/",
+    book: "/haare-waschen/",
+    file: "src/games/hairstory/HairStoryGame.tsx",
+    story: SHOWER_STORY,
+    short: SHOWER_STORY_SHORT,
+    ids: SHOWER_SHORT_PAGES,
     cries: /\bcr(y|ies)\b/,
     comforts: /Mama|Papa|hold|hug|arms|comfort|cuddle/,
   },

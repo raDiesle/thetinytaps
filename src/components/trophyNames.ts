@@ -48,6 +48,14 @@ const NAMERS: Record<string, () => Promise<Namer>> = {
     ),
   // The book Schnullerfee's second story, „Tapsi and the Pacifier Tree“, gives a trophy of its own, level „baum“ (its
   // short version shares it, as the fairy's short version shares the fairy's).
+  // The book Haare waschen's second story, „Tapsi and the Warm Rain“ in the shower, gives a trophy of its own, level
+  // „dusche“ (its short version shares it).
+  "/haare-waschen/": () =>
+    import("@/games/hairshower/names").then(
+      ({ SHOWER_TITLE }) =>
+        (level, language) =>
+          level === "dusche" ? pick(SHOWER_TITLE, language) : undefined,
+    ),
   "/schnullerfee/": () =>
     import("@/games/pacifiertree/names").then(
       ({ TREE_TITLE }) =>

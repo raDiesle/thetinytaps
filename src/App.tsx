@@ -63,7 +63,16 @@ const PacifierStoryPage = page(
   "/schnullerfee/baum/kurz/",
 );
 const KitaStoryPage = page(() => import("@/pages/KitaStoryPage"), "KitaStoryPage", "/kita/", "/kita/kurz/");
-const HairStoryPage = page(() => import("@/pages/HairStoryPage"), "HairStoryPage", "/haare-waschen/", "/haare-waschen/kurz/");
+// The book „Haare waschen“ and its stories: the bath's at its own address and its short version, the shower's whole and
+// short below it.
+const HairStoryPage = page(
+  () => import("@/pages/HairStoryPage"),
+  "HairStoryPage",
+  "/haare-waschen/",
+  "/haare-waschen/kurz/",
+  "/haare-waschen/dusche/",
+  "/haare-waschen/dusche/kurz/",
+);
 const BottleStoryPage = page(() => import("@/pages/BottleStoryPage"), "BottleStoryPage", "/flaeschchen/", "/flaeschchen/kurz/");
 const BedStoryPage = page(() => import("@/pages/BedStoryPage"), "BedStoryPage", "/grosses-bett/");
 const PottyPage = page(() => import("@/pages/PottyPage"), "PottyPage", "/toepfchen/");
@@ -133,6 +142,8 @@ export function App() {
           <Route path="kita/kurz" element={<KitaStoryPage />} />
           <Route path="haare-waschen" element={<HairStoryPage />} />
           <Route path="haare-waschen/kurz" element={<HairStoryPage />} />
+          <Route path="haare-waschen/dusche" element={<HairStoryPage />} />
+          <Route path="haare-waschen/dusche/kurz" element={<HairStoryPage />} />
           <Route path="flaeschchen" element={<BottleStoryPage />} />
           <Route path="flaeschchen/kurz" element={<BottleStoryPage />} />
           <Route path="grosses-bett" element={<BedStoryPage />} />

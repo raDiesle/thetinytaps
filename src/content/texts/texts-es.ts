@@ -32,6 +32,7 @@ import { MILK_CHAIN_ES as milkChain } from "@/games/milkchain/es";
 import { PACIFIER_STORY_ES as pacifierStory } from "@/games/pacifierstory/es";
 import { KITA_STORY_ES as kitaStory } from "@/games/kitastory/es";
 import { HAIR_STORY_ES as hairStory } from "@/games/hairstory/es";
+import { HAIR_SHOWER_ES as hairShower } from "@/games/hairshower/es";
 import { NIGHT_MILK_ES as nightMilk } from "@/games/nightmilk/es";
 import { GOODBYE_MILK_ES as goodbyeMilk } from "@/games/milkgoodbye/es";
 import { PACIFIER_TREE_ES as pacifierTree } from "@/games/pacifiertree/es";
@@ -83,6 +84,7 @@ export const TEXTS: LanguageTexts = {
   pacifierStory,
   kitaStory,
   hairStory,
+  hairShower,
   nightMilk,
   goodbyeMilk,
   pacifierTree,
