@@ -41,11 +41,11 @@ export const KITA_STORY_BOOK: Localized = {
 
 /** Its line for grown-ups. */
 export const KITA_STORY_BLURB: Localized = {
-  de: "Eingewöhnung und Tschüss – in Kapiteln",
-  en: "Settling in and saying bye – in chapters",
-  zh: "适应和道别——分章节",
-  hi: "घुलना-मिलना और टाटा – अध्यायों में",
-  es: "Adaptación y despedida, por capítulos",
-  ar: "التأقلم والوداع، في فصول",
-  ru: "Привыкание и прощание, по главам",
+  de: "Kita oder Tagesmutter – in Kapiteln",
+  en: "Daycare or a childminder – in chapters",
+  zh: "托儿所或保育阿姨家——分章节",
+  hi: "डेकेयर सेंटर या होम डेकेयर – अध्यायों में",
+  es: "Guardería o cuidadora, por capítulos",
+  ar: "الحضانة أو مربّية في بيتها، في فصول",
+  ru: "Садик или няня на дому, по главам",
 };

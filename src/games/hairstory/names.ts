@@ -42,11 +42,11 @@ export const HAIR_STORY_BOOK: EnglishFirst = {
 
 /** Its line for grown-ups. */
 export const HAIR_STORY_BLURB: EnglishFirst = {
-  en: "Washing hair calmly – in chapters",
-  de: "Haare waschen ganz entspannt – in Kapiteln",
-  zh: "安安心心洗头发——分章节讲",
-  hi: "आराम से बाल धोना – अध्यायों में",
-  es: "Lavar el pelo con calma, en capítulos",
-  ar: "غسل الشعر بهدوء – على فصول",
-  ru: "Спокойно моем голову – по главам",
+  en: "In the bath or the shower – in chapters",
+  de: "Wanne oder Dusche – in Kapiteln",
+  zh: "在浴缸里或淋浴下——分章节讲",
+  hi: "टब में या शावर में – अध्यायों में",
+  es: "En la bañera o en la ducha, en capítulos",
+  ar: "في الحوض أو تحت الدُّش – على فصول",
+  ru: "В ванне или под душем – по главам",
 };
