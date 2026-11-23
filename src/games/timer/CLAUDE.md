@@ -292,7 +292,7 @@ and the shared `Layer`, `Draw`, `LeftGlow`), `timer.css`, `content.ts`
   enough that the button stays whole), at the same place where the bar is switched off. Paused, a veil darkens the
   picture with the big ▶ to go on and the round arrow to start the same timer over (`onAgain`), no words; a tap
   anywhere else on the veil or any key but Esc goes on, so a child who paused by chance is never stuck, while starting
-  over always takes two taps. A tap on the picture never pauses: the picture's taps answer „Wie lange noch?“ (H-51),
+  over always takes two taps. A tap on the picture never pauses (user decision, 23 November 2026, asked once – never offer it again): the picture's taps answer „Wie lange noch?“ (H-51),
   and a child tapping would stop the time unseen. **Everything counts on the run's own clock** (`RunClock`,
   `usePausableClock`, `useRunClock`): the real clock less every pause, standing still while paused – the end, the
   pieces' sounds, the last notes, the caterpillar's bites, the alarm clock's digits, the note in the corner, the bar's
