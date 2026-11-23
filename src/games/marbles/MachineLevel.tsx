@@ -1,5 +1,5 @@
 import { memo, useId, useMemo } from "react";
-import { wobble, VIEW_H, type LevelProps } from "./level";
+import { wobble, VIEW_H, type LevelProps, decay } from "./level";
 import {
   BALL,
   BARS,
@@ -46,7 +46,7 @@ import { beside, deg, rad, seg } from "./machineKit";
 import { MachineStage } from "./MachineStage";
 import { DARK_WOOD, Hopper, INK, MARBLE_COLOR, Picture, WallClock, Window, WOOD } from "./scenery";
 import { BALL_R, type Pt } from "./path";
-import { BAR_COLORS, Ball, Rail } from "./parts";
+import { BAR_COLORS, Ball, Rail, still } from "./parts";
 
 /**
  * Level 3: the big machine. One tap lets the marble go, and then one thing
@@ -65,12 +65,25 @@ export function MachineLevel(props: LevelProps) {
   const machine = useMemo(buildMachine, []);
   const ids = useId();
 
+  // The backdrop never changes: a layer of its own, painted once.
+  const backdrop = useMemo(
+    () => [
+      {
+        content: (
+          <>
+            <Room stripes={`${ids}-stripes`} />
+            <Table />
+          </>
+        ),
+      },
+    ],
+    [ids],
+  );
+
   return (
-    <MachineStage machine={machine} level="machine" start={{ x: HOPPER.x, y: HOPPER.y - 22, r: 66 }} {...props}>
+    <MachineStage back={backdrop} machine={machine} level="machine" start={{ x: HOPPER.x, y: HOPPER.y - 22, r: 66 }} {...props}>
       {(t) => (
         <>
-          <Room stripes={`${ids}-stripes`} />
-          <Table />
           <XylophoneRamp machine={machine} t={t} />
           <FunnelBack />
           <CradleFrame />
@@ -200,11 +213,11 @@ function XylophoneRamp({ machine, t }: { machine: Machine; t: number }) {
       {BARS.map((bar, i) => {
         const age = t - machine.barTimes[i];
         const cx = bar.x + bar.w / 2;
-        const dip = age >= 0 && age < 1 ? 5 * Math.exp(-age * 10) : 0;
+        const dip = age >= 0 && age < 1 ? 5 * decay(age * 10) : 0;
         return (
           <g key={i} transform={`translate(${cx} ${rampY(cx) + BALL_R + 9 + dip}) rotate(${slope})`}>
             <rect x={-bar.w / 2} y={-9} width={bar.w} height={18} rx={6} fill={BAR_COLORS[i]} stroke={INK} strokeWidth="3" />
-            <rect x={-bar.w / 2} y={-9} width={bar.w} height={18} rx={6} fill="#fff" opacity={age >= 0 && age < 1 ? 0.7 * Math.exp(-age * 6) : 0} />
+            <rect x={-bar.w / 2} y={-9} width={bar.w} height={18} rx={6} fill="#fff" opacity={age >= 0 && age < 1 ? 0.7 * decay(age * 6) : 0} />
             <circle cx={-bar.w / 2 + 10} cy="0" r="3" fill="#fff8" />
             <circle cx={bar.w / 2 - 10} cy="0" r="3" fill="#fff8" />
           </g>
@@ -234,7 +247,7 @@ function Bell({ age }: { age: number }) {
   );
 }
 
-function FunnelBack() {
+const FunnelBack = memo(function FunnelBack() {
   const { cx, rimY, rx, ry } = FUNNEL;
   return (
     <g>
@@ -243,9 +256,9 @@ function FunnelBack() {
       <ellipse cx={cx} cy={rimY} rx={rx} ry={ry} fill="#1b8fc4" opacity="0.45" />
     </g>
   );
-}
+});
 
-function FunnelFront() {
+const FunnelFront = memo(function FunnelFront() {
   const { cx, rimY, rx, ry, spoutY, spoutW } = FUNNEL;
   const half = spoutW / 2;
   return (
@@ -266,11 +279,11 @@ function FunnelFront() {
       <path d={`M${cx - rx + 28} ${rimY + 26} L${cx - half - 4} ${spoutY - 30}`} stroke="#fffa" strokeWidth="6" strokeLinecap="round" />
     </g>
   );
-}
+});
 
 /* ---------- Table and dominoes ---------- */
 
-function Table() {
+const Table = memo(function Table() {
   const { x0, x1, y } = TABLE;
   return (
     <g>
@@ -280,10 +293,10 @@ function Table() {
       <rect x={x0} y={y} width={x1 - x0} height="22" rx="6" fill={WOOD} stroke={INK} strokeWidth="4" />
     </g>
   );
-}
+});
 
 /** The Newton's cradle's wooden frame, standing on the table at the back, so the marble rolls in front of its leg. */
-function CradleFrame() {
+const CradleFrame = memo(function CradleFrame() {
   const x0 = cradleX(0) - 74;
   const x1 = cradleX(CRADLE.n - 1) + 62;
   const bar = CRADLE_TOP - 14;
@@ -295,7 +308,7 @@ function CradleFrame() {
       <rect x={x0 - 8} y={bar - 6} width={x1 - x0 + 28} height="18" rx="7" fill={WOOD} stroke={INK} strokeWidth="3.5" />
     </g>
   );
-}
+});
 
 /** The cradle's five shiny balls, each on its V of strings from the bar. */
 function CradleBalls({ machine, t }: { machine: Machine; t: number }) {
@@ -361,7 +374,7 @@ function Penguin({ tilt }: { tilt: number }) {
 
 /* ---------- Car, loop and seesaw ---------- */
 
-function CarTrack({ machine }: { machine: Machine }) {
+const CarTrack = still(function CarTrack({ machine }: { machine: Machine }) {
   const { pts, s } = machine.carPath;
   const down = pts.filter((p, i) => p.x >= TABLE.x1 - 4 && s[i] <= machine.loopIn);
   const track = beside(down, 7)
@@ -387,7 +400,7 @@ function CarTrack({ machine }: { machine: Machine }) {
       />
     </g>
   );
-}
+});
 
 /** A red toy car, drawn standing on its wheels with the middle between them at (0, 0), facing right. */
 function Car({ turned }: { turned: number }) {
@@ -456,7 +469,7 @@ function BeachBall({ at, squash }: { at: Pt; squash: number }) {
   );
 }
 
-function Stairs() {
+const Stairs = memo(function Stairs() {
   const { x0, w, top0, rise, n } = STAIRS;
   return (
     <g>
@@ -475,7 +488,7 @@ function Stairs() {
       })}
     </g>
   );
-}
+});
 
 /** The rope runs up from the bucket, over two pulleys and down to the gate. */
 function Pulley({ drop }: { drop: number }) {
@@ -545,7 +558,7 @@ function Gate({ lift }: { lift: number }) {
   );
 }
 
-function Rails() {
+const Rails = memo(function Rails() {
   const x0 = TRAIN.front0 - 360;
   const x1 = TRAIN_STOP + 20;
   return (
@@ -556,7 +569,7 @@ function Rails() {
       <rect x={x0} y={FLOOR - 8} width={x1 - x0} height="6" rx="3" fill="#7d7d96" stroke={INK} strokeWidth="1.5" />
     </g>
   );
-}
+});
 
 const TRAIN_FLOOR = FLOOR - 7;
 
@@ -794,7 +807,7 @@ function Register({ machine, t }: { machine: Machine; t: number }) {
 }
 
 /** The Ferris wheel's two legs, from its hub down to the floor, behind everything round it. */
-function WheelStand() {
+const WheelStand = memo(function WheelStand() {
   const { cx, cy } = WHEEL;
   return (
     <g>
@@ -804,7 +817,7 @@ function WheelStand() {
       <rect x={cx - 200} y={FLOOR - 12} width="400" height="12" rx="5" fill={WOOD} stroke={INK} strokeWidth="3" />
     </g>
   );
-}
+});
 
 /** One gondola hanging from its pin, swinging `sway` degrees; `part` draws its hanger (behind) or its box (in front). */
 function Gondola({ i, pin, sway, part }: { i: number; pin: Pt; sway: number; part: "back" | "front" }) {
@@ -956,7 +969,7 @@ function Jack({ age }: { age: number }) {
   if (age < 0) return null;
   const cx = GIFT.x + GIFT.w / 2;
   const top = FLOOR - GIFT.h;
-  const rise = 250 * (1 - Math.exp(-age * 5) * Math.cos(age * 11));
+  const rise = 250 * (1 - decay(age * 5) * Math.cos(age * 11));
   const head = top + 70 - rise;
   const coils = 9;
   const spring = Array.from({ length: coils * 2 + 1 }, (_, i) => {

@@ -6,7 +6,7 @@
 
 import { memo, useId } from "react";
 import { playBlub, playHop, playLift, playPuff, playRumble, playSleigh, playSlide, playSqueak, playThump, playTwinkle, playWhoosh } from "@/lib/sfx";
-import { VIEW_W, wobble } from "./level";
+import { VIEW_W, wobble, decay } from "./level";
 import { arc, BALL_R, type Pt } from "./path";
 import { TRACK_H } from "./track";
 import { BOB, CHAIRLIFT, INRUN, JUMP, OUTRUN, railPath, SNOW_CUES, STRETCHES, UNDER } from "./trackStretches";
@@ -34,7 +34,7 @@ const SNOW = "#fbfdff";
 const SHADE = "#d6e9f7";
 
 /** A part that has just come pops up from small. */
-const pop = (age: number) => (age < 0 ? 0 : age < 1.2 ? 1 - Math.exp(-age * 8) * Math.cos(age * 20) : 1);
+const pop = (age: number) => (age < 0 ? 0 : age < 1.2 ? 1 - decay(age * 8) * Math.cos(age * 20) : 1);
 
 /** A pale winter sky with snowflakes on it, and snowy hills at the bottom. */
 const SnowBackdrop = memo(function SnowBackdrop() {
@@ -204,8 +204,8 @@ function SnowmanEnd({ layer, parts, t, fullAge, tapAge }: EndProps) {
   }
   const age = (i: number) => (i < parts.length ? (t - parts[i]) / 1000 : -1);
   const head = BALLS[2];
-  const wave = fullAge >= 0 ? 28 * Math.sin(fullAge * 9) * Math.exp(-fullAge * 0.4) : 0;
-  const hatHop = fullAge >= 0 ? Math.abs(14 * Math.sin(fullAge * 9)) * Math.exp(-fullAge * 0.8) : 0;
+  const wave = fullAge >= 0 ? 28 * Math.sin(fullAge * 9) * decay(fullAge * 0.4) : 0;
+  const hatHop = fullAge >= 0 ? Math.abs(14 * Math.sin(fullAge * 9)) * decay(fullAge * 0.8) : 0;
   const sway = wobble(tapAge, 5, 14, 4);
   return (
     <g transform={`rotate(${sway} ${SX} ${TRACK_H})`}>

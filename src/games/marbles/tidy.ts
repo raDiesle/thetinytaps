@@ -51,7 +51,7 @@ import {
   playWhoosh,
 } from "@/lib/sfx";
 import { playNeigh } from "@/lib/realSounds";
-import { VIEW_W, wobble } from "./level";
+import { VIEW_W, wobble, decay } from "./level";
 import {
   along,
   cameraOn,
@@ -70,6 +70,7 @@ import {
   timeline,
   timeWhen,
   turn,
+  hump,
 } from "./machineKit";
 import { arc, line, quad, type Pt } from "./path";
 
@@ -315,7 +316,7 @@ function drive(dist: number, v: number, ramp: number) {
 function rockAt(t: number) {
   if (t <= 0) return 0;
   // Back first, then forward: the kick comes at the first forward swing, and the rocking dies away.
-  return -ROCK * Math.exp(-0.55 * t) * Math.sin((2 * Math.PI * t) / ROCK_PERIOD);
+  return -ROCK * decay(0.55 * t) * Math.sin((2 * Math.PI * t) / ROCK_PERIOD);
 }
 
 /** The front end of the rockers in the room, at a tilt of `tilt` degrees: the rockers roll along the floor as they tilt. */
@@ -382,7 +383,7 @@ export function buildTidy() {
   at(tShut, { sound: playClonk });
   const lidAngle = (t: number) => lerp(LID_OPEN, LID_SHUT, easeIn(seg(t, tLid, tShut)));
   const chestShift = (t: number) => CHEST_JOLT * easeOut(seg(t, tShut, tShut + 0.15));
-  const chestHop = (t: number) => 14 * Math.sin(Math.PI * seg(t, tShut, tShut + 0.25));
+  const chestHop = (t: number) => 14 * hump(seg(t, tShut, tShut + 0.25));
 
   /* The truck drives off, scooping the books into a pile, until the pile bumps into the bellows. */
   const tGo = tShut + 0.08;
@@ -658,7 +659,7 @@ export function buildTidy() {
   /** How far the spring is out of the box (hidden below its rim before the pop), and how far it leans right (degrees). */
   const clownAt = (t: number) => {
     const u = t - tJack;
-    const out = u < 0 ? CLOWN_HIDDEN : CLOWN_HIDDEN + (CLOWN.spring - CLOWN_HIDDEN) * (1 - Math.exp(-6 * u) * Math.cos(14 * u));
+    const out = u < 0 ? CLOWN_HIDDEN : CLOWN_HIDDEN + (CLOWN.spring - CLOWN_HIDDEN) * (1 - decay(6 * u) * Math.cos(14 * u));
     // Leans over slowly, nudges the pyjamas and springs back half way.
     const lean =
       CLOWN.lean * easeInOut(seg(u, 0.55, CLOWN_LEAN)) -
@@ -694,7 +695,7 @@ export function buildTidy() {
     if (t < tArrive) return -0.12 * easeOut(seg(t, tSlide, tSlide + 0.6));
     const u = t - tArrive;
     if (u < 0.32) return lerp(-0.12, SWING, Math.sin((Math.PI / 2) * (u / 0.32)));
-    return SWING * Math.exp(-1.4 * (u - 0.32)) * Math.cos((2 * Math.PI * (u - 0.32)) / 1.1);
+    return SWING * decay(1.4 * (u - 0.32)) * Math.cos((2 * Math.PI * (u - 0.32)) / 1.1);
   };
   /** Where the hanger's hook is on the line, and the pyjamas' swing. */
   const hangerAt = (t: number) => ({
@@ -817,7 +818,7 @@ export function buildTidy() {
   /** How full the cushion is, 1 to 0, flapping as the air goes out. */
   const cushion = (t: number) => clamp01(1 - easeIn(seg(t, tPop + 0.15, tPop + 1.6)) + wobble(t - tPop, 0.12, 22, 2.5));
   /** How high the cushion jumps off the floor. */
-  const cushionHop = (t: number) => 70 * Math.sin(Math.PI * seg(t, tPop, tPop + 0.5));
+  const cushionHop = (t: number) => 70 * hump(seg(t, tPop, tPop + 0.5));
   /** Seconds since the plug came out, while the air rushes out of the hole (-1 otherwise). */
   const jet = (t: number) => (t < tPop || t > tPop + 1.6 ? -1 : t - tPop);
   /** Where the plug's cap is and its turn: on the plug, then flying off high over the vacuum and lying on the floor behind it. */
@@ -834,7 +835,7 @@ export function buildTidy() {
     const lift = { x: bunny0.x, y: bunny0.y - cushionHop(tLaunch) };
     const k = seg(t, tLaunch, tLand);
     // The mattress gives a little as it lands.
-    const sink = 10 * Math.sin(Math.PI * seg(t, tLand, tLand + 0.3));
+    const sink = 10 * hump(seg(t, tLand, tLand + 0.3));
     const p = hop(lift, IN_BED, 280, k);
     return { pt: { x: p.x, y: p.y + sink }, angle: lerp(-90, 450, easeOut(k)) };
   };

@@ -58,7 +58,7 @@ import { deg, hop, seg } from "./machineKit";
 import { MachineStage } from "./MachineStage";
 import { Bunting, DARK_WOOD, INK, MARBLE_COLOR, MID_WOOD, Sparkles, WallClock, Window, WOOD } from "./scenery";
 import type { Pt } from "./path";
-import { BAR_COLORS, Ball } from "./parts";
+import { BAR_COLORS, Ball, still } from "./parts";
 
 /** The tiled wall; also the page colour around the picture. */
 const WALL = "#dff3ea";
@@ -85,12 +85,25 @@ export function KitchenLevel(props: LevelProps) {
   const kitchen = useMemo(buildKitchen, []);
   const ids = useId();
 
+  // The backdrop never changes: a layer of its own, painted once.
+  const backdrop = useMemo(
+    () => [
+      {
+        content: (
+          <>
+            <Room tiles={`${ids}-tiles`} />
+            <Shelf />
+          </>
+        ),
+      },
+    ],
+    [ids],
+  );
+
   return (
-    <MachineStage machine={kitchen} level="kitchen" start={{ x: HOPPER.x, y: HOPPER.y - 70, r: 82 }} {...props}>
+    <MachineStage back={backdrop} machine={kitchen} level="kitchen" start={{ x: HOPPER.x, y: HOPPER.y - 70, r: 82 }} {...props}>
       {(t) => (
         <>
-          <Room tiles={`${ids}-tiles`} />
-          <Shelf />
           <PaperTowel kitchen={kitchen} t={t} />
           <Spoon />
           <Board />
@@ -160,7 +173,7 @@ function MovingThings({ kitchen, t }: { kitchen: Kitchen; t: number }) {
 
 /* ---------- The kitchen ---------- */
 
-function Room({ tiles }: { tiles: string }) {
+const Room = still(function Room({ tiles }: { tiles: string }) {
   return (
     <g>
       <defs>
@@ -198,10 +211,10 @@ function Room({ tiles }: { tiles: string }) {
       <line x1="-400" y1={FLOOR} x2={WORLD_W + 400} y2={FLOOR} stroke={INK} strokeWidth="4" />
     </g>
   );
-}
+});
 
 /** A small shelf with spice jars above the cooktop. */
-function SpiceRack() {
+const SpiceRack = memo(function SpiceRack() {
   const y = 300;
   return (
     <g>
@@ -220,7 +233,7 @@ function SpiceRack() {
       ))}
     </g>
   );
-}
+});
 
 /* ---------- Spice jar, spoon, paper towel ---------- */
 
@@ -250,7 +263,7 @@ function SpiceJar({ t }: { t: number }) {
 }
 
 /** The big wooden spoon: bowl at the top end, handle down to the paper towel roll, on three wall brackets. */
-function Spoon() {
+const Spoon = memo(function Spoon() {
   const { from, to, bowlX } = SPOON;
   const len = Math.hypot(to.x - from.x, to.y - from.y);
   const slope = deg(Math.atan2(to.y - from.y, to.x - from.x));
@@ -275,7 +288,7 @@ function Spoon() {
       </g>
     </g>
   );
-}
+});
 
 /** A cylinder seen from one end, with its other end `depth` up and to the right: the outline of both ends and the sides. */
 function cylinder(c: Pt, r: number, depth: Pt) {
@@ -333,7 +346,7 @@ function PaperTowel({ kitchen, t }: { kitchen: Kitchen; t: number }) {
   );
 }
 
-function Shelf() {
+const Shelf = memo(function Shelf() {
   const { x0, x1, y, h } = SHELF;
   return (
     <g>
@@ -343,12 +356,12 @@ function Shelf() {
       <rect x={x0} y={y} width={x1 - x0} height={h} rx="5" fill={WOOD} stroke={INK} strokeWidth="4" />
     </g>
   );
-}
+});
 
 /* ---------- Rolling pin and cutting board ---------- */
 
 /** The cutting board, hooked under the shelf by its hole, its lower end on the counter. */
-function Board() {
+const Board = memo(function Board() {
   const { from, to, h } = BOARD;
   const len = Math.hypot(to.x - from.x, to.y - from.y);
   const slope = deg(Math.atan2(to.y - from.y, to.x - from.x));
@@ -362,7 +375,7 @@ function Board() {
       <path d={`M${from.x + 12} ${SHELF.y + SHELF.h} L${from.x + 12} ${from.y + 4}`} stroke={INK} strokeWidth="4" strokeLinecap="round" />
     </g>
   );
-}
+});
 
 /** The rolling pin, seen from its end with the rest of it going back to the right; `turned` is how far it has rolled. */
 function RollingPin({ at, turned }: { at: Pt; turned: number }) {
@@ -393,7 +406,7 @@ function RollingPin({ at, turned }: { at: Pt; turned: number }) {
 /* ---------- Ladle and meatball ---------- */
 
 /** The rail the ladle hangs from, a whisk and a spatula next to it, and the wall peg that stops the ladle. */
-function LadleRail() {
+const LadleRail = memo(function LadleRail() {
   const { hook } = LADLE;
   return (
     <g>
@@ -423,10 +436,10 @@ function LadleRail() {
       <circle cx={PEG.x - 3} cy={PEG.y - 3} r="3" fill="#fff8" />
     </g>
   );
-}
+});
 
 /** The ladle's hook, handle and the inside of its bowl, drawn hanging straight from the hook at (0, 0). */
-function LadleBack() {
+const LadleBack = memo(function LadleBack() {
   const { bowl, bowlR } = LADLE;
   return (
     <g>
@@ -437,10 +450,10 @@ function LadleBack() {
       <ellipse cx={bowl.x} cy={bowl.y} rx={bowlR} ry="8" fill="#8d93a8" stroke={INK} strokeWidth="3" />
     </g>
   );
-}
+});
 
 /** The front of the ladle's bowl, over the meatball. */
-function LadleFront() {
+const LadleFront = memo(function LadleFront() {
   const { bowl, bowlR } = LADLE;
   return (
     <g>
@@ -460,7 +473,7 @@ function LadleFront() {
       />
     </g>
   );
-}
+});
 
 function Meatball({ at, spin }: { at: Pt; spin: number }) {
   const r = MEATBALL.r;
@@ -484,7 +497,7 @@ function Meatball({ at, spin }: { at: Pt; spin: number }) {
 }
 
 /** A bowl of spaghetti with tomato sauce, which catches the meatball. */
-function Spaghetti() {
+const Spaghetti = memo(function Spaghetti() {
   const { cx, rimY, w } = SPAGHETTI;
   const h = w / 2;
   return (
@@ -518,12 +531,12 @@ function Spaghetti() {
       ))}
     </g>
   );
-}
+});
 
 /* ---------- Plate and cooktop ---------- */
 
 /** The two little wooden pegs the plate stands between. */
-function PlatePegs() {
+const PlatePegs = memo(function PlatePegs() {
   const { x0, pegW, pegH } = PLATE;
   return (
     <g>
@@ -532,7 +545,7 @@ function PlatePegs() {
       ))}
     </g>
   );
-}
+});
 
 /** The plate rolling on its rim, seen face on; `flat` lays it down backwards onto the counter. */
 function Plate({ at, turned, tilt, flat }: { at: Pt; turned: number; tilt: number; flat: number }) {
@@ -579,7 +592,7 @@ function Cooktop({ kitchen, t }: { kitchen: Kitchen; t: number }) {
   );
 }
 
-function Kettle() {
+const Kettle = memo(function Kettle() {
   const { cx, h } = KETTLE;
   const top = COUNTER - h;
   return (
@@ -609,7 +622,7 @@ function Kettle() {
       />
     </g>
   );
-}
+});
 
 /** Steam from the kettle's spout: a puff now and then once it is hot, and lots of it when it whistles. */
 function Steam({ kitchen, t }: { kitchen: Kitchen; t: number }) {
@@ -617,8 +630,10 @@ function Steam({ kitchen, t }: { kitchen: Kitchen; t: number }) {
   if (t < start) return null;
   const whistle = kitchen.tToast + 0.35;
   const life = 1.6;
+  // The kettle goes quiet a few seconds after it whistled: steaming for ever kept the phone painting it (perf).
+  const last = Math.min(t, whistle + 4);
   const puffs = [];
-  for (let te = start; te <= t; te += te >= whistle ? 0.14 : 0.5) {
+  for (let te = start; te <= last; te += te >= whistle ? 0.14 : 0.5) {
     const age = t - te;
     if (age > life) continue;
     const big = te >= whistle;
@@ -1156,9 +1171,9 @@ function Popcorn({ x, y, s = 1.4 }: { x: number; y: number; s?: number }) {
   );
 }
 
-function PotBack() {
+const PotBack = memo(function PotBack() {
   return <ellipse cx={POT.cx} cy={POT_RIM} rx={POT.w / 2} ry="12" fill="#7a2a3a" stroke={INK} strokeWidth="3" />;
-}
+});
 
 /** The popcorn in the pot, rising as more of it pops. */
 function PopcornHeap({ kitchen, t }: { kitchen: Kitchen; t: number }) {
@@ -1175,7 +1190,7 @@ function PopcornHeap({ kitchen, t }: { kitchen: Kitchen; t: number }) {
   return <g>{blobs}</g>;
 }
 
-function PotFront() {
+const PotFront = memo(function PotFront() {
   const { cx, w } = POT;
   const half = w / 2;
   return (
@@ -1196,7 +1211,7 @@ function PotFront() {
       ))}
     </g>
   );
-}
+});
 
 /** Popcorn in the air, and what has landed on the counter. */
 function Kernels({ kitchen, t }: { kitchen: Kitchen; t: number }) {
@@ -1300,7 +1315,7 @@ function Toast({ kitchen, t }: { kitchen: Kitchen; t: number }) {
 }
 
 /** The breakfast plate lying on the counter, a cup of cocoa and a jar of jam. */
-function BreakfastPlate() {
+const BreakfastPlate = memo(function BreakfastPlate() {
   const { cx, top } = BREAKFAST;
   const cup = cx - 204;
   const jam = cx + 310;
@@ -1329,7 +1344,7 @@ function BreakfastPlate() {
       <path d={`M${jam - 6} 552 l8 -6 l8 6 l8 -6 l8 6 l8 -6 l8 6 l8 -6 l8 6`} fill="none" stroke="#ff5d73" strokeWidth="3" />
     </g>
   );
-}
+});
 
 /** The toy bunny waiting for breakfast; it cheers when the toast lands. */
 function Bunny({ age }: { age: number }) {

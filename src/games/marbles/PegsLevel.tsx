@@ -1,4 +1,4 @@
-import { useEffect, useMemo, useRef, type PointerEvent, type ReactNode } from "react";
+import { memo, useEffect, useMemo, useRef, type PointerEvent, type ReactNode } from "react";
 import { playBoing, playKnock, playPlink, playPop, playTrill } from "@/lib/sfx";
 import { loadRealSounds, playBark, playBuzz, playCroak, playMeow, playMoo, playOink, playQuack } from "@/lib/realSounds";
 import {
@@ -15,9 +15,10 @@ import {
   wobble,
   worldHint,
   type LevelProps,
+  decay,
 } from "./level";
 import { TapHint } from "@/components/TapHint";
-import { BAR_COLORS, Ball } from "./parts";
+import { BAR_COLORS, Ball, Sprite, still } from "./parts";
 import { BALL_R } from "./path";
 import {
   BIN_TOP,
@@ -309,74 +310,141 @@ export function PegsLevel({ sound, onDone, onGoal }: LevelProps) {
   };
 
   const t = now.current;
+  const at = cameraPoint(box.current, PICTURE, PICTURE);
+  // Only the still board is one big picture; everything that moves is a small layer of its own over it (`Sprite`), so a
+  // phone moves finished little pictures instead of painting the whole board again in every frame (perf, November 2026).
   return (
     <div className="marble-level pegs-level" ref={box} onPointerDown={onPointerDown}>
-      <svg ref={svg} className="marble-svg" viewBox={`0 0 ${VIEW_W} ${VIEW_H}`} preserveAspectRatio="xMidYMid meet" aria-label={label}>
-        <Board />
-        <Vine />
-        {PEGS.map((p, i) => (
-          <Nail key={i} x={p.x} y={p.y} color={BAR_COLORS[p.row % BAR_COLORS.length]} age={(t - pegHit.current[i]) / 1000} />
-        ))}
-        <Star angle={movers.current.starAngle} glow={(t - starHit.current) / MOVER_GLOW_MS} />
-        {animals.map((a, i) => {
-          const age = (t - joy.current[i]) / 1000;
-          const trick = (t - trickAt.current[i]) / TRICK_MS;
-          const inTrick = trick >= 0 && trick < 1;
-          // A trick takes the place of the hop for joy.
-          const hop = !inTrick && age >= 0 && age < 0.5 ? a.hop * Math.sin((Math.PI * age) / 0.5) : 0;
-          const squash = !inTrick && age >= 0.5 && age < 1.5 ? 0.1 * Math.exp(-(age - 0.5) * 7) * Math.cos((age - 0.5) * 28) : 0;
-          const climb = Math.max(0, Math.min(1, (t - climbAt.current[i]) / CLIMB_MS));
-          const up = CLIMB_H * climb + 30 * Math.sin(Math.PI * climb);
-          return (
-            <g key={i} transform={`translate(${binCenter(i)} ${FLOOR - hop - up}) scale(${1 + squash} ${1 - squash})`}>
-              <g transform={inTrick ? trickTransform(a.trick, trick) : undefined}>
-                {a.draw({ happy: inTrick || (age >= 0 && age < 1.4), wag: inTrick ? 26 * Math.sin(trick * 18) : wobble(age, 28, 22, 2.5) })}
-              </g>
-            </g>
-          );
-        })}
-        {DIVIDERS.map((x) => (
-          <rect
-            key={x}
-            x={x - DIVIDER_R}
-            y={BIN_TOP - DIVIDER_R}
-            width={DIVIDER_R * 2}
-            height={FLOOR - BIN_TOP + DIVIDER_R}
-            rx={DIVIDER_R}
-            fill={WOOD}
-            stroke={INK}
-            strokeWidth="3"
-          />
-        ))}
+      <StillBoard />
+      {animals.map((a, i) => {
+        const age = (t - joy.current[i]) / 1000;
+        const trick = (t - trickAt.current[i]) / TRICK_MS;
+        const inTrick = trick >= 0 && trick < 1;
+        // A trick takes the place of the hop for joy.
+        const hop = !inTrick && age >= 0 && age < 0.5 ? a.hop * Math.sin((Math.PI * age) / 0.5) : 0;
+        const squash = !inTrick && age >= 0.5 && age < 1.5 ? 0.1 * decay((age - 0.5) * 7) * Math.cos((age - 0.5) * 28) : 0;
+        const climb = Math.max(0, Math.min(1, (t - climbAt.current[i]) / CLIMB_MS));
+        const up = CLIMB_H * climb + 30 * Math.sin(Math.PI * climb);
+        const happy = inTrick || (age >= 0 && age < 1.4);
+        const wag = inTrick ? 26 * Math.sin(trick * 18) : wobble(age, 28, 22, 2.5);
+        return (
+          <Sprite key={i} at={at} x={binCenter(i)} y={FLOOR - hop - up - ANIMAL_MID} pad={ANIMAL_PAD}>
+            <AnimalPose draw={a.draw} happy={happy} wag={wag} squash={squash} pose={inTrick ? trickTransform(a.trick, trick) : ""} />
+          </Sprite>
+        );
+      })}
+      <svg ref={svg} className="marble-svg pegs-layer" viewBox={`0 0 ${VIEW_W} ${VIEW_H}`} preserveAspectRatio="xMidYMid meet" aria-label={label}>
+        <Dividers />
         {lying.current.map((m) => (
           <Ball key={m.id} color={m.color} x={m.x} y={FLOOR + PILE_SLOTS[m.slot].y} spin={m.spin} />
         ))}
         {pops.current.map((p, i) => (
           <Sparkles key={i} x={p.x} y={p.y} age={(t - p.at) / 1000} n={8} spread={90} />
         ))}
-        {(movers.current.bug || t >= bugFlight.current) && (
-          <Ladybug {...bugPose(movers.current, (t - bugFlight.current) / BUG_FLIGHT_MS)} glow={(t - bugHit.current) / MOVER_GLOW_MS} />
-        )}
-        {falling.current.map((d) => {
-          const s = Math.min(1, d.age / SPAWN_S);
-          return (
-            <g key={d.id} transform={`translate(${d.x} ${d.y}) scale(${s}) translate(${-d.x} ${-d.y})`}>
-              <Ball color={d.color} x={d.x} y={d.y} spin={d.spin} />
-            </g>
-          );
-        })}
-        <Frame />
-        {!started.current && (
-          // A marble waiting at the top, and the shared hint round it until the first tap.
-          <g className="pegs-hint" opacity="0.8">
-            <Ball color={BAR_COLORS[0]} x={VIEW_W / 2} y={SPAWN_Y} spin={0} />
-          </g>
-        )}
       </svg>
-      {!started.current && <TapHint key="start" {...worldHint(cameraPoint(box.current, PICTURE, PICTURE), { x: VIEW_W / 2, y: SPAWN_Y, r: 52 })} />}
+      {PEGS.map((p, i) => {
+        const glow = (t - pegHit.current[i]) / 1000 / PEG_GLOW_S;
+        return glow >= 0 && glow < 1 ? (
+          <Sprite key={`peg${i}`} at={at} x={p.x} y={p.y} pad={PEG_R + 32}>
+            <NailGlow color={BAR_COLORS[p.row % BAR_COLORS.length]} glow={glow} />
+          </Sprite>
+        ) : null;
+      })}
+      <Sprite at={at} x={STAR.x} y={STAR.y} pad={STAR.r + 30} angle={movers.current.starAngle}>
+        <Star glow={settled((t - starHit.current) / MOVER_GLOW_MS)} />
+      </Sprite>
+      {(movers.current.bug || t >= bugFlight.current) &&
+        (() => {
+          const { x, y, ...pose } = bugPose(movers.current, (t - bugFlight.current) / BUG_FLIGHT_MS);
+          return (
+            <Sprite at={at} x={x} y={y} pad={LADYBUG.r + 30}>
+              <Ladybug {...pose} glow={(t - bugHit.current) / MOVER_GLOW_MS} />
+            </Sprite>
+          );
+        })()}
+      {falling.current.map((d) => (
+        <Sprite key={d.id} at={at} x={d.x} y={d.y} pad={BALL_R + 4}>
+          <g transform={`scale(${Math.min(1, d.age / SPAWN_S)})`}>
+            <Ball color={d.color} x={0} y={0} spin={d.spin} />
+          </g>
+        </Sprite>
+      ))}
+      <StillFrame waiting={!started.current} />
+      {!started.current && <TapHint key="start" {...worldHint(at, { x: VIEW_W / 2, y: SPAWN_Y, r: 52 })} />}
     </div>
   );
 }
+
+/** A glow's progress while it shows (0 to 1), else -1, so a part at rest gets the same props and is skipped. */
+const settled = (k: number) => (k >= 0 && k < 1 ? k : -1);
+
+/**
+ * An animal's sprite: its middle `ANIMAL_MID` above its feet and `ANIMAL_PAD` round that, just round the animal (about
+ * 170 tall), since a phone rasters the whole sprite again while the animal wags; a trick reaching out of it still shows.
+ */
+const ANIMAL_MID = 85;
+const ANIMAL_PAD = 100;
+
+/**
+ * An animal in its sprite, feet `ANIMAL_MID` below its middle: its hop and climb move the sprite, while squash, trick (`pose`, a transform) and
+ * wag are drawn here. Its props are numbers, so a resting animal is skipped by React and its layer stays as it is.
+ */
+const AnimalPose = still(function AnimalPose({ draw, happy, wag, squash, pose }: { draw: Draw; happy: boolean; wag: number; squash: number; pose: string }) {
+  return (
+    <g transform={`translate(0 ${ANIMAL_MID}) scale(${1 + squash} ${1 - squash})`}>
+      <g transform={pose || undefined}>{draw({ happy, wag })}</g>
+    </g>
+  );
+});
+
+/** The board behind everything, with its vine and every nail at rest: drawn once. */
+const StillBoard = memo(function StillBoard() {
+  return (
+    <svg className="marble-svg pegs-layer" viewBox={`0 0 ${VIEW_W} ${VIEW_H}`} preserveAspectRatio="xMidYMid meet" aria-hidden>
+      <Board />
+      <Vine />
+      {PEGS.map((p, i) => (
+        <Nail key={i} x={p.x} y={p.y} />
+      ))}
+      <circle cx={STAR.x + 3} cy={STAR.y + 5} r={STAR.r * 0.35} fill="#0002" />
+    </svg>
+  );
+});
+
+/** The bins' dividers, in front of the animals. */
+const Dividers = memo(function Dividers() {
+  return (
+    <>
+      {DIVIDERS.map((x) => (
+        <rect
+          key={x}
+          x={x - DIVIDER_R}
+          y={BIN_TOP - DIVIDER_R}
+          width={DIVIDER_R * 2}
+          height={FLOOR - BIN_TOP + DIVIDER_R}
+          rx={DIVIDER_R}
+          fill={WOOD}
+          stroke={INK}
+          strokeWidth="3"
+        />
+      ))}
+    </>
+  );
+});
+
+/** The frame drawn over everything, and before the first tap a marble waiting at the top for the shared hint. */
+const StillFrame = memo(function StillFrame({ waiting }: { waiting: boolean }) {
+  return (
+    <svg className="marble-svg pegs-layer pegs-front" viewBox={`0 0 ${VIEW_W} ${VIEW_H}`} preserveAspectRatio="xMidYMid meet" aria-hidden>
+      <Frame />
+      {waiting && (
+        <g opacity="0.8">
+          <Ball color={BAR_COLORS[0]} x={VIEW_W / 2} y={SPAWN_Y} spin={0} />
+        </g>
+      )}
+    </svg>
+  );
+});
 
 /** The whole board, as the svg shows it (`preserveAspectRatio` meet). */
 const PICTURE = { x: 0, y: 0, w: VIEW_W, h: VIEW_H };
@@ -413,7 +481,7 @@ function bugPose(m: Movers, k: number) {
   const via = { x: 1250, y: 520 };
   const x = (1 - e) * (1 - e) * BUG_FROM.x + 2 * e * (1 - e) * via.x + e * e * to.x;
   const y = (1 - e) * (1 - e) * BUG_FROM.y + 2 * e * (1 - e) * via.y + e * e * to.y;
-  return { x, y: y - 40 * Math.sin(k * 14) * (1 - e), dir: -1 as const, wings: k < 0.93 ? 1 : 0, step: 0 };
+  return { x, y: y - 40 * Math.sin(k * 14) * (1 - e), dir: -1 as const, wings: k < 0.93 ? 1 : 0, step: x * 0.13 };
 }
 
 /**
@@ -421,12 +489,12 @@ function bugPose(m: Movers, k: number) {
  * crawls and six little legs stepping; flying, its shell halves open and its
  * wings whirr. It glows for a moment when a marble bounces off it.
  */
-function Ladybug({ x, y, dir, wings, step, glow }: { x: number; y: number; dir: 1 | -1; wings: number; step: number; glow: number }) {
+function Ladybug({ dir, wings, step, glow }: { dir: 1 | -1; wings: number; step: number; glow: number }) {
   const r = LADYBUG.r;
   const lit = glow >= 0 && glow < 1;
-  const flap = wings ? 0.6 + 0.4 * Math.sin(step + x * 0.9) : 0;
+  const flap = wings ? 0.6 + 0.4 * Math.sin(step * 7) : 0;
   return (
-    <g transform={`translate(${x} ${y}) scale(${dir} 1)`} {...LINE} strokeWidth="2.5">
+    <g transform={`scale(${dir} 1)`} {...LINE} strokeWidth="2.5">
       {lit && <circle r={r + 8 + 14 * glow} fill="none" stroke="#ff5d73" strokeWidth={6 * (1 - glow)} opacity={1 - glow} />}
       {[-10, 0, 10].map((lx, i) => (
         <path key={lx} d={`M${lx} ${r - 6} l${-4 + 4 * Math.sin(step + i * 2)} 9`} fill="none" />
@@ -465,7 +533,7 @@ function Ladybug({ x, y, dir, wings, step, glow }: { x: number; y: number; dir: 
 }
 
 /** The vine painted along the board above the bins, with little leaves: where the ladybug crawls. */
-function Vine() {
+const Vine = memo(function Vine() {
   const y = LADYBUG.y + LADYBUG.r + 3;
   const { left, right } = BOARD;
   const d = `M${left} ${y} ${Array.from({ length: 10 }, (_, i) => `q${(right - left) / 20} ${i % 2 ? 7 : -7} ${(right - left) / 10} 0`).join(" ")}`;
@@ -478,50 +546,63 @@ function Vine() {
       })}
     </g>
   );
-}
+});
 
-/** The wooden star in the middle of the board: five rounded arms in the rainbow's colours round a brass axle, turned by `angle`; it glows for a moment when hit. */
-function Star({ angle, glow }: { angle: number; glow: number }) {
+/**
+ * The wooden star in the middle of the board, drawn round 0, 0 in its own sprite, which turns it: five rounded arms in
+ * the rainbow's colours round a brass axle; it glows for a moment when hit. Its shadow lies on the still board.
+ */
+const Star = still(function Star({ glow }: { glow: number }) {
   const lit = glow >= 0 && glow < 1;
   return (
-    <g transform={`translate(${STAR.x} ${STAR.y})`}>
-      <circle cx="3" cy="5" r={STAR.r * 0.35} fill="#0002" />
+    <g>
       {lit && <circle r={STAR.r + 8 + 18 * glow} fill="none" stroke="#ffd23f" strokeWidth={8 * (1 - glow)} opacity={1 - glow} />}
-      <g transform={`rotate(${(angle * 180) / Math.PI})`}>
-        {Array.from({ length: STAR_ARMS }, (_, i) => (
-          <g key={i} transform={`rotate(${(i * 360) / STAR_ARMS})`}>
-            <path
-              d={`M-12 0 L-10 ${-STAR.r + 12} Q0 ${-STAR.r - 4} 10 ${-STAR.r + 12} L12 0 Z`}
-              fill={BAR_COLORS[(i * 2) % BAR_COLORS.length]}
-              stroke={INK}
-              strokeWidth="3"
-              strokeLinejoin="round"
-            />
-            <circle cy={-STAR.r + 14} r="4" fill="#fff" opacity={lit ? 0.95 : 0.6} />
-          </g>
-        ))}
-      </g>
+      {Array.from({ length: STAR_ARMS }, (_, i) => (
+        <g key={i} transform={`rotate(${(i * 360) / STAR_ARMS})`}>
+          <path
+            d={`M-12 0 L-10 ${-STAR.r + 12} Q0 ${-STAR.r - 4} 10 ${-STAR.r + 12} L12 0 Z`}
+            fill={BAR_COLORS[(i * 2) % BAR_COLORS.length]}
+            stroke={INK}
+            strokeWidth="3"
+            strokeLinejoin="round"
+          />
+          <circle cy={-STAR.r + 14} r="4" fill="#fff" opacity={lit ? 0.95 : 0.6} />
+        </g>
+      ))}
       <circle r="15" fill="#f4c542" stroke={INK} strokeWidth="3" />
       <circle r="5" fill={DARK_WOOD} />
     </g>
   );
-}
+});
 
-/** A nail: a brass head that glows in its row's colour for a moment after a marble hit it. */
-function Nail({ x, y, color, age }: { x: number; y: number; color: string; age: number }) {
-  const glow = age >= 0 && age < PEG_GLOW_S ? age / PEG_GLOW_S : -1;
+/** A nail at rest: a brass head on the still board. */
+function Nail({ x, y }: { x: number; y: number }) {
   return (
     <g>
-      {glow >= 0 && <circle cx={x} cy={y} r={PEG_R + 6 + 24 * glow} fill="none" stroke={color} strokeWidth={8 * (1 - glow)} opacity={1 - glow} />}
       <circle cx={x + 2} cy={y + 3} r={PEG_R} fill="#0002" />
-      <circle cx={x} cy={y} r={PEG_R} fill={glow >= 0 && glow < 0.6 ? color : "#f4c542"} stroke={INK} strokeWidth="3" />
+      <circle cx={x} cy={y} r={PEG_R} fill="#f4c542" stroke={INK} strokeWidth="3" />
       <circle cx={x - 3} cy={y - 3} r="2.5" fill="#fff" opacity="0.85" />
     </g>
   );
 }
 
+/** A nail just hit, round 0, 0 in its own sprite: a ring in its row's colour spreading out, its head lit at first (`glow` 0 to 1). */
+function NailGlow({ color, glow }: { color: string; glow: number }) {
+  return (
+    <g>
+      <circle r={PEG_R + 6 + 24 * glow} fill="none" stroke={color} strokeWidth={8 * (1 - glow)} opacity={1 - glow} />
+      {glow < 0.6 && (
+        <>
+          <circle r={PEG_R} fill={color} stroke={INK} strokeWidth="3" />
+          <circle cx={-3} cy={-3} r="2.5" fill="#fff" opacity="0.85" />
+        </>
+      )}
+    </g>
+  );
+}
+
 /** The wall behind, the light wooden board with its grain, the drop strip at the top and the bins' coloured backs. */
-function Board() {
+const Board = memo(function Board() {
   const { left, right, top } = BOARD;
   return (
     <g>
@@ -552,10 +633,10 @@ function Board() {
       ))}
     </g>
   );
-}
+});
 
 /** The frame's edge drawn over everything, so marbles roll right up to the wood; with a screw in each corner. */
-function Frame() {
+const Frame = memo(function Frame() {
   const { left, right, top } = BOARD;
   return (
     <g pointerEvents="none">
@@ -571,7 +652,7 @@ function Frame() {
       )}
     </g>
   );
-}
+});
 
 /** Five of the six animals, in a new order every round. */
 function pickAnimals(n: number): Animal[] {

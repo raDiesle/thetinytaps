@@ -8,7 +8,7 @@
 import { memo, useId } from "react";
 import { playMusicbox, playPing, playPlink, playPop, playTrill } from "@/lib/sfx";
 import { countLine, SORT_COLORS, TUBE_FULL, TUBE_FULL_LINE, TUBE_TOP, TUBES, tubeSlot } from "./colors";
-import { VIEW_W, wobble } from "./level";
+import { VIEW_W, wobble, decay } from "./level";
 import { Ball } from "./parts";
 import { BALL_R, type Pt } from "./path";
 import { TRACK_H } from "./track";
@@ -192,7 +192,7 @@ function ColorStretch({ layer, ages, onTap }: StretchArtProps) {
     );
   }
   const light = ages[COLOR_CUES.rainbow];
-  const glow = light >= 0 && light < 2 ? 0.55 * Math.exp(-light * 2.5) : 0;
+  const glow = light >= 0 && light < 2 ? 0.55 * decay(light * 2.5) : 0;
   return (
     <g>
       {/* The ramp down to the rainbow and the curve down from it, striped like the rails */}

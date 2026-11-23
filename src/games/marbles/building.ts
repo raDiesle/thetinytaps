@@ -36,7 +36,7 @@ import {
   playWhoosh,
 } from "@/lib/sfx";
 import { playBells, playEngine, playHonk, playSplash } from "@/lib/realSounds";
-import { wobble } from "./level";
+import { wobble, decay } from "./level";
 import {
   along,
   beside,
@@ -56,6 +56,7 @@ import {
   timeline,
   timeWhen,
   turn,
+  hump,
 } from "./machineKit";
 import { arc, BALL_R, line, quad, type Pt } from "./path";
 
@@ -196,6 +197,8 @@ const CRANK_TURN = ROOF.drop / WINCH.drum;
 
 export const LIGHT_X = 4480 + SHIFT;
 export const TRUCK_X = 4560 + SHIFT;
+/** How far the truck drives off before it stops counting: well past the world's right edge, even on the widest screen. */
+const TRUCK_GONE = 4000;
 
 export const WORLD_W = 5100 + SHIFT;
 
@@ -267,12 +270,21 @@ export function buildBuilding() {
   at(0.4, { sound: playRumble });
   at(tSpin, { sound: playCreak });
 
-  /** How far the belt has moved: it speeds up for a moment, then runs steadily. */
+  /**
+   * How far the belt has moved: it speeds up for a moment, then runs steadily until the marble has left it, and then
+   * slows down and stands, so it doesn't keep the phone painting it for the rest of the minute.
+   */
   const ACC = 0.4;
+  const STOP = 0.8;
+  /** When the belt starts to slow down: set once the marble's time off the belt is known. */
+  let tSlow = Number.POSITIVE_INFINITY;
+  const running = (u: number) => (u < ACC ? (BELT.speed * u * u) / (2 * ACC) : BELT.speed * (u - ACC / 2));
   const beltTravel = (t: number) => {
     const u = t - tBelt;
     if (u <= 0) return 0;
-    return u < ACC ? (BELT.speed * u * u) / (2 * ACC) : BELT.speed * (u - ACC / 2);
+    if (t <= tSlow) return running(u);
+    const v = Math.min(t - tSlow, STOP);
+    return running(tSlow - tBelt) + BELT.speed * (v - (v * v) / (2 * STOP));
   };
 
   /* The marble: out of the drum's mouth and along the spirit level. */
@@ -286,6 +298,13 @@ export function buildBuilding() {
   const tRoll = tTipped - 0.05;
   const tLevel = tRoll + levelRun.duration;
   const tVial = tRoll + timeWhen(levelRun, (pt) => pt.x >= VIAL_X);
+  /** How far the mixer's drum has turned (its stripes run round): from the tap until the marble is out on the level, then it slows down and stands. */
+  const drumSpin = (t: number) => {
+    if (t <= 0) return 0;
+    if (t <= tLevel) return t;
+    const v = Math.min(t - tLevel, STOP);
+    return tLevel + v - (v * v) / (2 * STOP);
+  };
   at(tRoll + timeWhen(levelRun, (pt) => pt.x >= SPIRIT.from.x), { sound: () => playKnock(1300) });
   at(tVial - 0.1, { sound: playBlub });
 
@@ -313,6 +332,7 @@ export function buildBuilding() {
   const a1 = -38;
   const overTop = pathOf(arc(BELT.b.x, BELT.b.y, overR, a0, a1));
   const tOff = tTop + overTop.total / BELT.speed;
+  tSlow = tOff + 0.3;
   const offPt = overTop.pts[overTop.pts.length - 1];
   const [boardTop, boardEnd] = onTop(BOARD.from, BOARD.to);
   const landK = 0.08;
@@ -405,7 +425,7 @@ export function buildBuilding() {
     // It bounces back off the tower and sways to a stop.
     const age = t - tHit;
     const f = Math.sqrt(gl);
-    const amp = 0.22 * Math.exp(-age * 0.8);
+    const amp = 0.22 * decay(age * 0.8);
     return { a: -amp * Math.sin(age * f), w: -amp * f * Math.cos(age * f) };
   };
   const ballAt = (t: number): Pt => {
@@ -604,7 +624,7 @@ export function buildBuilding() {
     if (u <= 0) return 0;
     if (t < tJack) return u < ROLL_ACC ? (ROLL_V * u * u) / (2 * ROLL_ACC) : ROLL_V * (u - ROLL_ACC / 2);
     // It stops at the bump and rocks back a little.
-    return rollDist - 10 * Math.sin(Math.PI * seg(t, tJack, tJack + 0.5));
+    return rollDist - 10 * hump(seg(t, tJack, tJack + 0.5));
   };
   /** The heap's top at `x` where the drum hasn't flattened it yet. */
   const heapY = (t: number, x: number) => (x < ROLLER.x0 + rolled(t) ? FLOOR : moundY(HEAP.x, HEAP.w, heapH(t), x));
@@ -732,7 +752,7 @@ export function buildBuilding() {
     if (t < tJump) return PIPE.x;
     if (t < tPipeGo) return lerp(PIPE.x, pipeFrom, seg(t, tJump, tPipeGo));
     if (t < tFoot) return along(pipePath, distAt(pipeRun, t - tPipeGo)).pt.x;
-    return pipeTo + footAt(t) - 12 * Math.sin(Math.PI * seg(t, tPushed, tPushed + 0.5));
+    return pipeTo + footAt(t) - 12 * hump(seg(t, tPushed, tPushed + 0.5));
   };
   /** The concrete pipe: its middle and how far it has turned (radians). */
   const pipeAt = (t: number): { pt: Pt; turned: number } => {
@@ -831,7 +851,8 @@ export function buildBuilding() {
   at(tGo - 0.3, { sound: playHonk });
   at(tGo, { sound: playEngine });
   at(tDone, { done: true });
-  const truckGone = (t: number) => (t < tGo ? 0 : 0.5 * 240 * (t - tGo) ** 2);
+  /** How far the truck has driven off; it stops counting once it is past the world's right edge (`TRUCK_GONE`), where it drove on for ever. */
+  const truckGone = (t: number) => (t < tGo ? 0 : Math.min(TRUCK_GONE, 0.5 * 240 * (t - tGo) ** 2));
 
   /** Where the camera looks: the thing that moves right now. */
   const focusX = (t: number) => {
@@ -895,6 +916,7 @@ export function buildBuilding() {
     tGreen,
     drumAngle,
     beltTravel,
+    drumSpin,
     cleatPhase,
     marbleAt,
     coneAngle,

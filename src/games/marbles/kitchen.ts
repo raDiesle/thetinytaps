@@ -44,7 +44,7 @@ import {
   playWhistle,
   playWhoosh,
 } from "@/lib/sfx";
-import { SETTLE_S, wobble } from "./level";
+import { SETTLE_S, wobble, decay } from "./level";
 import {
   along,
   beside,
@@ -65,6 +65,7 @@ import {
   timeline,
   timeWhen,
   turn,
+  hump,
 } from "./machineKit";
 import { arc, BALL_R, line, quad, type Pt } from "./path";
 
@@ -314,7 +315,7 @@ export function buildKitchen() {
     const d = Math.min(arcLen, distAt(over, t - tRoll));
     const dragged = (d / ROLL.r) * 0.8;
     const tLeave = tRoll + timeWhen(over, (_, s) => s >= arcLen);
-    return t < tLeave ? dragged : dragged + 3.2 * (1 - Math.exp(-(t - tLeave) * 1.6));
+    return t < tLeave ? dragged : dragged + 3.2 * (1 - decay((t - tLeave) * 1.6));
   };
 
   /* The rolling pin: over the shelf edge, a short drop onto the board, down it and along the counter to the ladle. */
@@ -422,11 +423,13 @@ export function buildKitchen() {
 
   /* The salad spinner: the knob is knocked round, the basket whirls and slows down; the lid pops off and the lettuce flies. */
   const WHIRL = 15;
-  const SLOW = 4;
+  /** Seconds until the spinner stands: it slows down as `(1 - u / SLOW)³` and so comes to rest (an exponential never did, and it rattled on through the level). */
+  const SLOW = 12;
+  const left = (t: number) => Math.max(0, 1 - (t - tCrank) / SLOW);
   /** The crank's angle as seen from above (radians): π points left, towards the plate; it turns on and on, slowing down. */
-  const crankAngle = (t: number) => (t < tCrank ? Math.PI : Math.PI - WHIRL * SLOW * (1 - Math.exp(-(t - tCrank) / SLOW)));
+  const crankAngle = (t: number) => (t < tCrank ? Math.PI : Math.PI - ((WHIRL * SLOW) / 4) * (1 - left(t) ** 4));
   /** How fast the spinner turns, from 0 to 1. */
-  const whirl = (t: number) => (t < tCrank ? 0 : Math.exp(-(t - tCrank) / SLOW));
+  const whirl = (t: number) => (t < tCrank ? 0 : left(t) ** 3);
   /** The spinner rattles on the counter while it whirls. */
   const spinnerShake = (t: number) => 2.5 * whirl(t) * Math.sin(t * 61);
   for (let i = 0; i < 6; i++) at(tCrank + 0.05 + i * 0.55, { sound: playWhirr });
@@ -532,7 +535,7 @@ export function buildKitchen() {
       // Tick, tack: the dial steps back with every tick and the timer rocks a little to and fro.
       const ticked = Math.min(TICKS, Math.floor((t - tWound) / TICK) + 1);
       const since = t - tWound - (ticked - 1) * TICK;
-      const tilt = (ticked % 2 ? 4 : -4) * Math.exp(-since * 8);
+      const tilt = (ticked % 2 ? 4 : -4) * decay(since * 8);
       return { pt: TIMER0, tilt, dial: DIAL_MAX * (1 - ticked / TICKS), ringing: false };
     }
     const shake = 7 * Math.sin((t - tRing) * 50);
@@ -591,7 +594,7 @@ export function buildKitchen() {
   /** How far the jelly's top is pushed sideways (to the right is positive), and how much it is squashed down. */
   const jellyAt = (t: number): { sway: number; squash: number } => {
     if (t < tCake) return { sway: 0, squash: 1 };
-    const fade = t < tTopple ? 1 : Math.exp(-2.4 * (t - tTopple));
+    const fade = t < tTopple ? 1 : decay(2.4 * (t - tTopple));
     const sway = t - tTopple > SETTLE_S ? 0 : SWAY.amp * fade * Math.sin((2 * Math.PI * (t - tCake)) / SWAY.period);
     return { sway, squash: 1 - Math.abs(wobble(t - tCake, 0.14, 16, 5)) };
   };
@@ -655,8 +658,9 @@ export function buildKitchen() {
   const cupFull = (t: number) => easeInOut(seg(t, tPour + 0.2, tBrewed));
   const pouring = (t: number) => t >= tPour && t < tBrewed + 0.1;
   /** How fizzy the bottle is (its bubbles), from 0 to 1, and how high it hops at the puff of steam. */
-  const fizz = (t: number) => seg(t, tGrind, tBrewed);
-  const bottleHop = (t: number) => 8 * Math.sin(Math.PI * seg(t, tBrewed, tBrewed + 0.3));
+  // It fizzes up while shaken and calms down once the cork is out, so its bubbles don't rise through the rest of the level.
+  const fizz = (t: number) => seg(t, tGrind, tBrewed) * (1 - seg(t, tBrewed + 1.5, tBrewed + 4.5));
+  const bottleHop = (t: number) => 8 * hump(seg(t, tBrewed, tBrewed + 0.3));
 
   /* The cork: it creeps up out of the shaken bottle, pops at the puff and flies onto the egg. */
   const tCork = tBrewed + 0.45;
@@ -755,7 +759,7 @@ export function buildKitchen() {
   /** The honey jar's tilt in degrees, to the right over its bottom right corner. */
   const jarTilt = (t: number) => {
     if (t < tJar) return 0;
-    if (t < tJar + TEETER) return 12 * Math.sin(Math.PI * seg(t, tJar, tJar + TEETER));
+    if (t < tJar + TEETER) return 12 * hump(seg(t, tJar, tJar + TEETER));
     if (t < tJarDown) return 90 * easeIn(seg(t, tJar + TEETER, tJarDown));
     return 90 - Math.abs(wobble(t - tJarDown, 4, 18, 6));
   };

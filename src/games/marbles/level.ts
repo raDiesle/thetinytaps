@@ -80,6 +80,14 @@ export const HINT_HAND = 150;
 /** Seconds after a hit until its wobble, flash or sparkles are over (`wobble`, `Sparkles`): a level still from then on can stop drawing. */
 export const SETTLE_S = 4;
 
+/**
+ * `Math.exp(-x)` that reaches 0: once it is below about 1/8000 it is 0. Whatever dies away with a plain exponential
+ * (a net's sag, a crank slowing down, a lid settling) never comes to rest and changed the picture by a fraction of a
+ * pixel in every frame for the rest of the level, which kept the phone painting it (perf, November 2026;
+ * `decay.test.ts` keeps the levels on it).
+ */
+export const decay = (x: number) => (x > 9 ? 0 : Math.exp(-x));
+
 /** A wobble that starts at `amp` and dies away, `age` seconds after a hit. */
 export const wobble = (age: number, amp: number, freq: number, damp: number) =>
   age < 0 || age > SETTLE_S ? 0 : amp * Math.exp(-age * damp) * Math.sin(age * freq);

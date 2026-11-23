@@ -7,7 +7,7 @@
 import { memo, useId } from "react";
 import { playBlub, playBoing, playDrops, playGlug, playPop, playSlide, playThump } from "@/lib/sfx";
 import { playQuack, playSplash } from "@/lib/realSounds";
-import { VIEW_W, wobble } from "./level";
+import { VIEW_W, wobble, decay } from "./level";
 import { BALL_R, type Pt } from "./path";
 import { BASKET, TRACK_H } from "./track";
 import { BOARD, DRAIN, railPath, SLIDE_CUES, STRETCHES, sample, UNDER, WAVES, WHIRL, waveAt, whirlAt } from "./trackStretches";
@@ -233,7 +233,7 @@ function SlideStretch({ layer, ages, onTap }: StretchArtProps) {
       </g>
     );
   }
-  const swirl = -720 * (1 - Math.exp(-Math.max(0, ages[SLIDE_CUES.splash]) * 0.4));
+  const swirl = -720 * (1 - decay(Math.max(0, ages[SLIDE_CUES.splash]) * 0.4));
   const bend = wobble(ages[SLIDE_CUES.board], 16, 14, 3.5);
   const humps = (w: number) => Array.from({ length: WAVES[w].humps }, (_, i) => (w === 0 ? 0 : WAVES[0].humps) + i);
   const humpCue = (h: number) => (h < WAVES[0].humps ? SLIDE_CUES.waves[0] + h : SLIDE_CUES.waves[1] + h - WAVES[0].humps);

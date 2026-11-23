@@ -1,5 +1,5 @@
 import { memo, useId, useMemo } from "react";
-import { wobble, VIEW_H, type LevelProps } from "./level";
+import { wobble, VIEW_H, type LevelProps, decay } from "./level";
 import {
   APPLE,
   ARM,
@@ -54,7 +54,7 @@ import { beside, deg, lerp, seg, svgLine } from "./machineKit";
 import { MachineStage } from "./MachineStage";
 import { DARK_WOOD, INK, MARBLE_COLOR, MID_WOOD, Sparkles, WOOD } from "./scenery";
 import { BALL_R, type Pt } from "./path";
-import { BAR_COLORS, Ball } from "./parts";
+import { BAR_COLORS, Ball, still } from "./parts";
 
 const LAWN = "#7fd34e";
 const LEAF = "#4caf50";
@@ -82,13 +82,26 @@ export function GardenLevel(props: LevelProps) {
   const garden = useMemo(buildGarden, []);
   const ids = useId();
 
+  // The backdrop never changes: a layer of its own, painted once.
+  const backdrop = useMemo(
+    () => [
+      {
+        content: (
+          <>
+            <Sky gradient={`${ids}-sky`} />
+            <Fence />
+            <OldTree />
+          </>
+        ),
+      },
+    ],
+    [ids],
+  );
+
   return (
-    <MachineStage machine={garden} level="garden" start={{ x: BIRDHOUSE.x, y: BIRDHOUSE.doorY - 8, r: 84 }} {...props}>
+    <MachineStage back={backdrop} machine={garden} level="garden" start={{ x: BIRDHOUSE.x, y: BIRDHOUSE.doorY - 8, r: 84 }} {...props}>
       {(t) => (
         <>
-          <Sky gradient={`${ids}-sky`} />
-          <Fence />
-          <OldTree />
           <Chimes garden={garden} t={t} />
           <AppleTree sway={garden.swayAt(t)} />
           <NutTree />
@@ -160,7 +173,7 @@ function MovingThings({ garden, t }: { garden: Garden; t: number }) {
 
 /* ---------- Sky, fence and lawn ---------- */
 
-function Sky({ gradient }: { gradient: string }) {
+const Sky = still(function Sky({ gradient }: { gradient: string }) {
   return (
     <g>
       <defs>
@@ -195,7 +208,7 @@ function Sky({ gradient }: { gradient: string }) {
       ))}
     </g>
   );
-}
+});
 
 function Cloud({ x, y, s }: { x: number; y: number; s: number }) {
   return (
@@ -211,7 +224,7 @@ function Cloud({ x, y, s }: { x: number; y: number; s: number }) {
 }
 
 /** A white picket fence all along the back of the garden. */
-function Fence() {
+const Fence = memo(function Fence() {
   const n = Math.ceil((WORLD_W + 800) / 46);
   return (
     <g>
@@ -233,10 +246,10 @@ function Fence() {
       })}
     </g>
   );
-}
+});
 
 /** The lawn: the raised part on the left, the bank, and the rest of the garden. */
-function Lawn() {
+const Lawn = memo(function Lawn() {
   return (
     <g>
       <path d={`${svgLine(GROUND)} L${WORLD_W + 400} ${VIEW_H + 200} L-400 ${VIEW_H + 200} Z`} fill={LAWN} />
@@ -248,11 +261,15 @@ function Lawn() {
       })}
     </g>
   );
-}
+});
+
+/** How long the snail creeps, in seconds: by then the camera has left it. */
+const SNAIL_S = 20;
 
 /** A little snail creeping along the raised lawn, very slowly. */
 function Snail({ t }: { t: number }) {
-  const x = 520 + 4 * Math.max(0, t);
+  // It creeps for the level's first seconds only: creeping for ever, it changed the picture in every frame (perf).
+  const x = 520 + 4 * Math.min(Math.max(0, t), SNAIL_S);
   return (
     <g transform={`translate(${x} ${TERRACE.y})`}>
       <path d="M-30 0 Q-34 -12 -20 -12 L22 -12 Q34 -12 34 0 Z" fill="#ffd9a8" stroke={INK} strokeWidth="3" strokeLinejoin="round" />
@@ -269,7 +286,7 @@ function Snail({ t }: { t: number }) {
 /* ---------- Birdhouse, chimes and gutter ---------- */
 
 /** The old tree at the left edge, whose long branch reaches out over the gutter. */
-function OldTree() {
+const OldTree = memo(function OldTree() {
   const branch = Array.from({ length: 9 }, (_, i) => {
     const x = 90 + i * 96;
     return { x, y: branchY(x) + (i % 2 ? -3 : 3) };
@@ -303,7 +320,7 @@ function OldTree() {
       <circle cx="80" cy="-40" r="60" fill={LEAF_LIGHT} />
     </g>
   );
-}
+});
 
 /** The wind chime tubes on strings, each swinging when the marble brushes its end. */
 function Chimes({ garden, t }: { garden: Garden; t: number }) {
@@ -361,7 +378,7 @@ const gutterBand = (x0: number, x1: number, top: number, bottom: number) =>
   `M${x0} ${gutterY(x0) + top} L${x1} ${gutterY(x1) + top} L${x1} ${gutterY(x1) + bottom} L${x0} ${gutterY(x0) + bottom} Z`;
 
 /** The inside of the gutter, behind the marble, and the posts holding it up. */
-function GutterBack() {
+const GutterBack = memo(function GutterBack() {
   return (
     <g>
       {[330, 660].map((x) => (
@@ -373,10 +390,10 @@ function GutterBack() {
       <path d={gutterBand(GUTTER_X0, GUTTER.to.x, -8, BALL_R + 8)} fill="#8e9bb4" stroke={INK} strokeWidth="3" strokeLinejoin="round" />
     </g>
   );
-}
+});
 
 /** The gutter's front, hiding the lower half of the marble. */
-function GutterFront() {
+const GutterFront = memo(function GutterFront() {
   return (
     <g>
       <path d={gutterBand(GUTTER_X0, GUTTER.to.x, 8, BALL_R + 12)} fill={ZINC} stroke={INK} strokeWidth="4" strokeLinejoin="round" />
@@ -392,10 +409,10 @@ function GutterFront() {
       <rect x={GUTTER_X0 - 6} y={gutterY(GUTTER_X0) - 12} width="12" height={BALL_R + 26} rx="4" fill={ZINC} stroke={INK} strokeWidth="3" />
     </g>
   );
-}
+});
 
 /** The elbow at the end of the gutter that turns the marble down into the cup. */
-function Downpipe() {
+const Downpipe = memo(function Downpipe() {
   const { to } = GUTTER;
   const d = `M${to.x - 20} ${gutterY(to.x - 20)} L${to.x} ${to.y} Q${CUP.x} ${to.y + 6} ${CUP.x} ${to.y + 44}`;
   return (
@@ -412,12 +429,12 @@ function Downpipe() {
       />
     </g>
   );
-}
+});
 
 /* ---------- Watering can and water wheel ---------- */
 
 /** The forked stick the can turns on. */
-function CanStick() {
+const CanStick = memo(function CanStick() {
   const { x, y } = CAN.pivot;
   return (
     <g>
@@ -440,7 +457,7 @@ function CanStick() {
       />
     </g>
   );
-}
+});
 
 /** The red watering can with a tin cup on top, drawn around its pin and tipped by `tilt` degrees. */
 function WateringCan({ tilt }: { tilt: number }) {
@@ -698,7 +715,7 @@ function Apple({ at, spin, hanging, sway }: { at: Pt; spin: number; hanging: boo
 /* ---------- Slide, croquet and shed ---------- */
 
 /** The children's slide: ladder, platform and the chute the apple rolls down. */
-function Slide() {
+const Slide = memo(function Slide() {
   const chute = beside(SLIDE_LINE, APPLE.r + 7);
   const topY = SLIDE.top.y + APPLE.r + 7;
   const end = chute[chute.length - 1];
@@ -728,7 +745,7 @@ function Slide() {
       <path d={svgLine(beside(SLIDE_LINE.slice(2, -12), APPLE.r + 4))} fill="none" stroke="#fff8" strokeWidth="3" strokeLinecap="round" />
     </g>
   );
-}
+});
 
 /** A wooden croquet ball with a stripe round it. */
 function CroquetBall({ at, spin }: { at: Pt; spin: number }) {
@@ -982,17 +999,17 @@ const HOOP_W = 30;
 const hoopPath = `M${HOOP.x - HOOP_W} ${FLOOR + 4} L${HOOP.x - HOOP_W} ${FLOOR - HOOP.h + HOOP_W} A${HOOP_W} ${HOOP_W} 0 0 1 ${HOOP.x + HOOP_W} ${FLOOR - HOOP.h + HOOP_W} L${HOOP.x + HOOP_W} ${FLOOR + 4}`;
 
 /** The croquet hoop: the far half behind the ball … */
-function HoopBack() {
+const HoopBack = memo(function HoopBack() {
   return (
     <g>
       <path d={hoopPath} fill="none" stroke={INK} strokeWidth="10" strokeLinejoin="round" />
       <path d={hoopPath} fill="none" stroke="#fff" strokeWidth="5" strokeLinejoin="round" />
     </g>
   );
-}
+});
 
 /** … and its near leg in front, so the ball goes through. */
-function HoopFront() {
+const HoopFront = memo(function HoopFront() {
   const x = HOOP.x + HOOP_W;
   return (
     <g>
@@ -1000,10 +1017,10 @@ function HoopFront() {
       <line x1={x} y1={FLOOR + 4} x2={x} y2={FLOOR - HOOP.h + HOOP_W} stroke="#fff" strokeWidth="5" />
     </g>
   );
-}
+});
 
 /** The garden shed, with the tap on its wall. */
-function Shed() {
+const Shed = memo(function Shed() {
   const { x0, x1, wallTop, roofTop } = SHED;
   return (
     <g>
@@ -1029,7 +1046,7 @@ function Shed() {
       ))}
     </g>
   );
-}
+});
 
 /** The brass tap; its lever hangs down when shut and is turned `angle` degrees to open it. */
 function Tap({ angle }: { angle: number }) {
@@ -1103,7 +1120,7 @@ function Spray({ drops }: { drops: Pt[] }) {
 }
 
 /** The flower bed: dark soil with a few tulips. */
-function FlowerBed() {
+const FlowerBed = memo(function FlowerBed() {
   const { x0, x1 } = BED;
   return (
     <g>
@@ -1128,7 +1145,7 @@ function FlowerBed() {
       ))}
     </g>
   );
-}
+});
 
 /** The sunflower: a tiny sprout, then a stem that grows in spurts, then the big smiling flower. */
 function Sunflower({ garden, t }: { garden: Garden; t: number }) {
@@ -1651,7 +1668,7 @@ function Pinwheel({ garden, t }: { garden: Garden; t: number }) {
 function PinwheelString({ garden, t }: { garden: Garden; t: number }) {
   const hub = garden.hubAt(t);
   if (!garden.stringOn(t)) {
-    const swing = 14 * Math.exp(-(t - garden.tOpen) * 1.5) * Math.sin((t - garden.tOpen) * 6);
+    const swing = 14 * decay((t - garden.tOpen) * 1.5) * Math.sin((t - garden.tOpen) * 6);
     const d = `M${hub.x} ${hub.y} q${4 + swing / 2} 26 ${6 + swing} 52`;
     return <StringLine d={d} />;
   }

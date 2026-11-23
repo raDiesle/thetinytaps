@@ -1,4 +1,4 @@
-import { memo, useId, useMemo } from "react";
+import { memo, useId, useLayoutEffect, useMemo, useRef } from "react";
 import { VIEW_H, type LevelProps } from "./level";
 import {
   BEAM,
@@ -41,9 +41,9 @@ import {
   WORLD_W,
   wireY,
 } from "./light";
-import { deg, easeOut, lerp, seg } from "./machineKit";
-import { MachineStage } from "./MachineStage";
-import { BAR_COLORS, STAR_POINTS } from "./parts";
+import { deg, easeOut, lerp, seg, hump } from "./machineKit";
+import { MachineStage, type Seen } from "./MachineStage";
+import { BAR_COLORS, STAR_POINTS, still } from "./parts";
 import type { Pt } from "./path";
 import { INK, Picture, Sparkles } from "./scenery";
 
@@ -67,6 +67,12 @@ interface Hole {
 }
 
 /**
+ * The disco ball turns till the level's end, its hundred facets and its spots drawn anew in every frame: while it is
+ * off screen it gets a still time (before it starts), so nothing changes there (perf, November 2026).
+ */
+const disco = (t: number, seen: Seen) => (seen(DISCO.x - 760, DISCO.x + 760) ? t : 0);
+
+/**
  * Level 8: the light chain (R-10). A dark children's room; one tap switches
  * on the torch, its beam bounces off the mirror onto the disco ball, a golden
  * spot from the ball wanders onto the jar of sleeping fireflies, they wake up
@@ -87,17 +93,51 @@ export function LightLevel(props: LevelProps) {
   const light = useMemo(buildLight, []);
   const ids = useId();
 
+  // The backdrop never changes: a layer of its own, painted once.
+  const backdrop = useMemo(() => [{ content: <Room paper={`${ids}-paper`} /> }], [ids]);
+
   return (
-    <MachineStage machine={light} level="light" start={{ x: TORCH.x0 + 85, y: TORCH.lens.y, r: 100 }} {...props}>
-      {(t) => (
+    <MachineStage
+      back={backdrop}
+      machine={light}
+      level="light"
+      start={{ x: TORCH.x0 + 85, y: TORCH.lens.y, r: 100 }}
+      over={(t, at) => <NightVeil light={light} t={t} at={at} />}
+      front={(t, seen) => [
+        {
+          content: (
+            <>
+              <Beam light={light} t={t} />
+              <DiscoSpots light={light} t={disco(t, seen)} />
+              <GoldenSpot light={light} t={t} />
+              <LitBulbs light={light} t={t} glow={`${ids}-glow`} />
+              <Halo x={LAVA.x} y={490} r={170} k={0.3 * light.lavaGlow(t)} glow={`${ids}-glow`} />
+              <Halo x={GLOBE.x} y={GLOBE.y} r={170} k={0.35 * light.globeGlow(t)} glow={`${ids}-glow`} />
+              <LighthouseBeam light={light} t={t} />
+              <StickerGlow light={light} t={t} green={`${ids}-green`} />
+              <Rainbow light={light} t={t} />
+              <StickLight light={light} t={t} green={`${ids}-green`} />
+              <LanternLight light={light} t={t} glow={`${ids}-glow`} />
+              <LampLight light={light} t={t} glow={`${ids}-glow`} />
+              <PaperBird light={light} t={t} />
+              <Fireflies light={light} t={t} glow={`${ids}-glow`} />
+              <LanternBars />
+              <Sparkles x={LAMP.x} y={DOME_Y - 140} age={t - light.tLamp - 0.6} n={12} spread={300} />
+              <Sparkles x={OWL.x} y={OWL.y - 40} age={t - light.tOwl} n={8} spread={140} />
+            </>
+          ),
+        },
+      ]}
+      {...props}
+    >
+      {(t, seen) => (
         <>
-          <Room paper={`${ids}-paper`} />
           <WallShadows light={light} t={t} />
           <Nightstand />
           <Torch on={t >= 0} />
           <Chest />
           <Mirror tilt={light.mirrorTilt} />
-          <DiscoBall spin={light.spin(t)} />
+          <DiscoBall spin={light.spin(disco(t, seen))} />
           <Stool />
           <Jar light={light} t={t} />
           <FairyLights />
@@ -116,26 +156,6 @@ export function LightLevel(props: LevelProps) {
           <Flower light={light} t={t} />
           <Bed />
           <Owl light={light} t={t} />
-
-          <Night light={light} t={t} ids={ids} />
-
-          <Beam light={light} t={t} />
-          <DiscoSpots light={light} t={t} />
-          <GoldenSpot light={light} t={t} />
-          <LitBulbs light={light} t={t} glow={`${ids}-glow`} />
-          <Halo x={LAVA.x} y={490} r={170} k={0.3 * light.lavaGlow(t)} glow={`${ids}-glow`} />
-          <Halo x={GLOBE.x} y={GLOBE.y} r={170} k={0.35 * light.globeGlow(t)} glow={`${ids}-glow`} />
-          <LighthouseBeam light={light} t={t} />
-          <StickerGlow light={light} t={t} green={`${ids}-green`} />
-          <Rainbow light={light} t={t} />
-          <StickLight light={light} t={t} green={`${ids}-green`} />
-          <LanternLight light={light} t={t} glow={`${ids}-glow`} />
-          <LampLight light={light} t={t} glow={`${ids}-glow`} />
-          <PaperBird light={light} t={t} />
-          <Fireflies light={light} t={t} glow={`${ids}-glow`} />
-          <LanternBars />
-          <Sparkles x={LAMP.x} y={DOME_Y - 140} age={t - light.tLamp - 0.6} n={12} spread={300} />
-          <Sparkles x={OWL.x} y={OWL.y - 40} age={t - light.tOwl} n={8} spread={140} />
         </>
       )}
     </MachineStage>
@@ -144,7 +164,7 @@ export function LightLevel(props: LevelProps) {
 
 /* ---------- The room ---------- */
 
-function Room({ paper }: { paper: string }) {
+const Room = still(function Room({ paper }: { paper: string }) {
   return (
     <g>
       <defs>
@@ -168,7 +188,7 @@ function Room({ paper }: { paper: string }) {
       <line x1="-400" y1={FLOOR} x2={WORLD_W + 400} y2={FLOOR} stroke={INK} strokeWidth="4" />
     </g>
   );
-}
+});
 
 /** A window with the night outside: moon and stars, and curtains drawn aside. */
 function NightWindow({ x }: { x: number }) {
@@ -203,7 +223,7 @@ function NightWindow({ x }: { x: number }) {
 }
 
 /** The arched window by the star lamp: stars only, and the prism hanging in it on a thread. */
-function StarWindow() {
+const StarWindow = memo(function StarWindow() {
   const { x0, x1, top, bottom } = WINDOW;
   const r = (x1 - x0) / 2;
   const mid = (x0 + x1) / 2;
@@ -228,7 +248,7 @@ function StarWindow() {
       <PrismShape />
     </g>
   );
-}
+});
 
 /** The glass prism: a cut crystal drop with its facets. */
 function PrismShape({ fill = "#cfe8ff", opacity = 0.85 }: { fill?: string; opacity?: number }) {
@@ -249,7 +269,7 @@ function PrismShape({ fill = "#cfe8ff", opacity = 0.85 }: { fill?: string; opaci
 
 /* ---------- Torch, mirror, disco ball ---------- */
 
-function Nightstand() {
+const Nightstand = memo(function Nightstand() {
   const { x0, x1, top } = NIGHTSTAND;
   return (
     <g>
@@ -261,7 +281,7 @@ function Nightstand() {
       ))}
     </g>
   );
-}
+});
 
 /** The torch lying on its side; the switch on top goes down at the tap and the glass lights up. */
 function Torch({ on }: { on: boolean }) {
@@ -287,7 +307,7 @@ function Torch({ on }: { on: boolean }) {
   );
 }
 
-function Chest() {
+const Chest = memo(function Chest() {
   const { x0, x1, top } = CHEST;
   return (
     <g>
@@ -296,10 +316,10 @@ function Chest() {
       <polygon points={STAR_POINTS} transform={`translate(${(x0 + x1) / 2} ${top + 66}) scale(1.6)`} fill="#ffd23f" stroke={INK} strokeWidth="2" />
     </g>
   );
-}
+});
 
 /** The round mirror on its foot, tilted so the torch's light goes up to the disco ball. */
-function Mirror({ tilt }: { tilt: number }) {
+const Mirror = still(function Mirror({ tilt }: { tilt: number }) {
   const { c, half } = MIRROR;
   return (
     <g>
@@ -314,10 +334,10 @@ function Mirror({ tilt }: { tilt: number }) {
       <circle cx={c.x} cy={c.y} r="6" fill={INK} />
     </g>
   );
-}
+});
 
 /** The disco ball: rows of little mirror squares that move round as it turns. */
-function DiscoBall({ spin }: { spin: number }) {
+const DiscoBall = still(function DiscoBall({ spin }: { spin: number }) {
   const { x, y, r } = DISCO;
   const facets: { fx: number; fy: number; w: number; h: number; i: number }[] = [];
   for (let row = -3; row <= 3; row++) {
@@ -348,11 +368,11 @@ function DiscoBall({ spin }: { spin: number }) {
       <circle cx={x - 22} cy={y - 26} r="10" fill="#fff" opacity="0.8" />
     </g>
   );
-}
+});
 
 /* ---------- Fireflies, fairy lights, star lamp, bed ---------- */
 
-function Stool() {
+const Stool = memo(function Stool() {
   const { x0, x1, top } = STOOL;
   return (
     <g>
@@ -362,7 +382,7 @@ function Stool() {
       <rect x={x0} y={top} width={x1 - x0} height="18" rx="9" fill="#ff8c42" stroke={INK} strokeWidth="4" />
     </g>
   );
-}
+});
 
 /** The glass jar; its lid has air holes and flips open on its hinge when the fireflies are awake. */
 function Jar({ light, t }: { light: Light; t: number }) {
@@ -385,7 +405,7 @@ function Jar({ light, t }: { light: Light; t: number }) {
 }
 
 /** The wire of the fairy lights from nail to nail, with its bulbs still off. */
-function FairyLights() {
+const FairyLights = memo(function FairyLights() {
   const pts: Pt[] = [];
   for (let x = NAILS[0]; x <= NAILS[NAILS.length - 1]; x += 20) pts.push({ x, y: wireY(x) });
   return (
@@ -399,7 +419,7 @@ function FairyLights() {
       ))}
     </g>
   );
-}
+});
 
 function Bulb({ x, color }: { x: number; color: string }) {
   const y = wireY(x);
@@ -855,7 +875,7 @@ function GlowStick({ light, t }: { light: Light; t: number }) {
   );
 }
 
-function Dresser() {
+const Dresser = memo(function Dresser() {
   const { x0, x1, top } = DRESSER;
   return (
     <g>
@@ -868,7 +888,7 @@ function Dresser() {
       ))}
     </g>
   );
-}
+});
 
 /** The star lamp: a dome with star-shaped holes on a base; it turns when it is on. */
 function Lamp({ light, t }: { light: Light; t: number }) {
@@ -907,7 +927,7 @@ function DomeStars({ turn, color }: { turn: number; color: string }) {
   );
 }
 
-function Bed() {
+const Bed = memo(function Bed() {
   const { x0, x1, top } = BED;
   return (
     <g>
@@ -927,12 +947,12 @@ function Bed() {
       ))}
     </g>
   );
-}
+});
 
 /** The toy owl on the pillow: asleep with closed eyes, until the stars wake it and it hops. */
 function Owl({ light, t }: { light: Light; t: number }) {
   const awake = easeOut(seg(t, light.tOwl, light.tOwl + 0.2));
-  const hop = 18 * Math.sin(Math.PI * seg(t, light.tOwl, light.tOwl + 0.5));
+  const hop = 18 * hump(seg(t, light.tOwl, light.tOwl + 0.5));
   return (
     <g transform={`translate(${OWL.x} ${OWL.y - hop})`}>
       <path d="M-30 -42 L-22 -66 L-8 -46 Z M30 -42 L22 -66 L8 -46 Z" fill={PLUSH} stroke={INK} strokeWidth="3" strokeLinejoin="round" />
@@ -955,8 +975,8 @@ function Owl({ light, t }: { light: Light; t: number }) {
 
 /* ---------- The night and the light ---------- */
 
-/** The dark over the whole room, with soft holes wherever something shines. */
-function Night({ light, t, ids }: { light: Light; t: number; ids: string }) {
+/** Where something shines through the dark at `t`: the holes `NightVeil` cuts. */
+function nightHoles(light: Light, t: number): Hole[] {
   const holes: Hole[] = [
     // Moonlight at the window, and a little round the torch so the child sees what to tap.
     { x: 2700, y: 380, r: 260, k: 0.6 },
@@ -1015,27 +1035,54 @@ function Night({ light, t, ids }: { light: Light; t: number; ids: string }) {
   if (stick > 0) holes.push({ x: (STICK.a.x + STICK.b.x) / 2, y: STICK.a.y + 10, r: 130 + 90 * stick, k: stick });
   const lamp = light.lampGlow(t);
   if (lamp > 0) holes.push({ x: LAMP.x, y: DOME_Y - 40, r: 260 + 400 * easeOut(seg(t, light.tLamp, light.tLamp + 2)), k: lamp });
+  return holes;
+}
 
-  const mask = `${ids}-mask`;
-  const hole = `${ids}-hole`;
-  return (
-    <g>
-      <defs>
-        <radialGradient id={hole}>
-          <stop offset="0" stopColor="#000" />
-          <stop offset="0.45" stopColor="#000" stopOpacity="0.85" />
-          <stop offset="1" stopColor="#000" stopOpacity="0" />
-        </radialGradient>
-        <mask id={mask} maskUnits="userSpaceOnUse" x="-400" y="-200" width={WORLD_W + 800} height={VIEW_H + 400}>
-          <rect x="-400" y="-200" width={WORLD_W + 800} height={VIEW_H + 400} fill="#fff" />
-          {holes.map((h, i) => (
-            <circle key={i} cx={h.x} cy={h.y} r={h.r} fill={`url(#${hole})`} opacity={h.k} />
-          ))}
-        </mask>
-      </defs>
-      <rect x="-400" y="-200" width={WORLD_W + 800} height={VIEW_H + 400} fill={NIGHT} opacity={light.dark(t)} mask={`url(#${mask})`} />
-    </g>
-  );
+/** How many CSS pixels one pixel of the dark's canvas covers: the holes are soft, so a coarse canvas looks the same. */
+const VEIL_PX = 4;
+
+/**
+ * The dark over the whole room, with soft holes wherever something shines: a small canvas laid over the machine, which
+ * the compositor stretches over the screen. As a mask over the room's svg it had the phone raster the whole screen two
+ * or three times in every frame a light moved (158 screens a second, perf November 2026); the canvas has a few thousand
+ * pixels to fill.
+ */
+function NightVeil({ light, t, at }: { light: Light; t: number; at: (x: number, y: number) => { x: number; y: number; k: number } }) {
+  const canvas = useRef<HTMLCanvasElement>(null);
+  useLayoutEffect(() => {
+    const c = canvas.current;
+    const box = c?.parentElement;
+    const ctx = c?.getContext("2d");
+    if (!c || !box || !ctx) return;
+    const w = Math.ceil(box.clientWidth / VEIL_PX);
+    const h = Math.ceil(box.clientHeight / VEIL_PX);
+    if (c.width !== w) c.width = w;
+    if (c.height !== h) c.height = h;
+    ctx.globalCompositeOperation = "source-over";
+    ctx.clearRect(0, 0, w, h);
+    const a = at(-400, -200);
+    const b = at(WORLD_W + 400, VIEW_H + 200);
+    ctx.globalAlpha = light.dark(t);
+    ctx.fillStyle = NIGHT;
+    ctx.fillRect(a.x / VEIL_PX, a.y / VEIL_PX, (b.x - a.x) / VEIL_PX, (b.y - a.y) / VEIL_PX);
+    // Each hole takes away from the dark as the svg mask's black circles did: 1 in the middle, 0.85 at 45 %, 0 at the rim.
+    ctx.globalCompositeOperation = "destination-out";
+    ctx.globalAlpha = 1;
+    for (const hole of nightHoles(light, t)) {
+      const p = at(hole.x, hole.y);
+      const x = p.x / VEIL_PX;
+      const y = p.y / VEIL_PX;
+      const r = (hole.r * p.k) / VEIL_PX;
+      if (r <= 0 || hole.k <= 0 || x + r < 0 || y + r < 0 || x - r > w || y - r > h) continue;
+      const g = ctx.createRadialGradient(x, y, 0, x, y, r);
+      g.addColorStop(0, `rgba(0,0,0,${hole.k})`);
+      g.addColorStop(0.45, `rgba(0,0,0,${0.85 * hole.k})`);
+      g.addColorStop(1, "rgba(0,0,0,0)");
+      ctx.fillStyle = g;
+      ctx.fillRect(x - r, y - r, 2 * r, 2 * r);
+    }
+  });
+  return <canvas ref={canvas} className="marble-veil" aria-hidden />;
 }
 
 /** The torch's beam: a widening band of light to the mirror, and from there up to the disco ball. */
@@ -1071,7 +1118,7 @@ function Beam({ light, t }: { light: Light; t: number }) {
 }
 
 /** Little coloured spots of light that circle over the wall around the turning disco ball. */
-function DiscoSpots({ light, t }: { light: Light; t: number }) {
+const DiscoSpots = still(function DiscoSpots({ light, t }: { light: Light; t: number }) {
   if (t < light.tBall) return null;
   const appear = easeOut(seg(t, light.tBall + 0.1, light.tBall + 0.7));
   const spin = light.spin(t);
@@ -1087,7 +1134,7 @@ function DiscoSpots({ light, t }: { light: Light; t: number }) {
       })}
     </g>
   );
-}
+});
 
 /** The golden spot that wanders from the disco ball onto the jar, then melts into the fireflies' light. */
 function GoldenSpot({ light, t }: { light: Light; t: number }) {

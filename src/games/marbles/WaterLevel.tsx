@@ -786,7 +786,7 @@ function FlumeBack({ flow, t }: { flow: number; t: number }) {
   );
 }
 
-function FlumeFront() {
+const FlumeFront = memo(function FlumeFront() {
   const { from, to } = FLUME;
   return (
     <g>
@@ -800,7 +800,7 @@ function FlumeFront() {
       <path d={`M${from.x + 10} ${from.y + 20} L${to.x - 10} ${to.y + 20}`} stroke={WOOD_DARK} strokeWidth="3" />
     </g>
   );
-}
+});
 
 /** The water wheel behind the waterfall: wooden rim, spokes and paddles, and four red pegs that knock the bell. */
 function WaterWheel({ turned }: { turned: number }) {
@@ -869,7 +869,7 @@ function Brook({ flow, t }: { flow: number; t: number }) {
   );
 }
 
-function BrookFront() {
+const BrookFront = memo(function BrookFront() {
   const { from, to, depth } = BROOK;
   return (
     <g>
@@ -880,7 +880,7 @@ function BrookFront() {
       ))}
     </g>
   );
-}
+});
 
 /** The fish leaping over the duck, pointing the way it flies. */
 function Fish({ at }: { at: { pt: Pt; angle: number } | null }) {
@@ -897,7 +897,7 @@ function Fish({ at }: { at: { pt: Pt; angle: number } | null }) {
 }
 
 /** The two lily pads on the third basin. */
-function LilyPads() {
+const LilyPads = memo(function LilyPads() {
   const y = BASINS[2].y - 4;
   return (
     <g>
@@ -906,7 +906,7 @@ function LilyPads() {
       ))}
     </g>
   );
-}
+});
 
 /** The green frog: sitting, leaping with its legs out, or only its eyes over the water. */
 function Frog({ pt, look }: { pt: Pt; look: "sit" | "leap" | "eyes" }) {
@@ -944,7 +944,7 @@ function Frog({ pt, look }: { pt: Pt; look: "sit" | "leap" | "eyes" }) {
 }
 
 /** The tower the twisty slide winds around: a striped pole with a pointed red roof. */
-function Tower() {
+const Tower = memo(function Tower() {
   const bottom = groundY(TOWER.x);
   return (
     <g>
@@ -967,7 +967,7 @@ function Tower() {
       />
     </g>
   );
-}
+});
 
 /** The twisty slide: a red chute under the duck's way, on posts, with water streaming down it while the gate is open. */
 function Slide({ flow, t }: { flow: number; t: number }) {
@@ -1027,17 +1027,17 @@ const POOL_CX = (POOL.x0 + POOL.x1) / 2;
 const POOL_RX = (POOL.x1 - POOL.x0) / 2;
 
 /** The back of the paddling pool's blow-up ring and its water. */
-function PoolBack() {
+const PoolBack = memo(function PoolBack() {
   return (
     <g>
       <ellipse cx={POOL_CX} cy={POOL.y} rx={POOL_RX + 22} ry={POOL.ry + 20} fill="#ff8fa3" stroke={INK} strokeWidth="4" />
       <ellipse cx={POOL_CX} cy={POOL.y + 2} rx={POOL_RX} ry={POOL.ry} fill={WATER} stroke={INK} strokeWidth="3" />
     </g>
   );
-}
+});
 
 /** The front half of the pool: its water in front of the ducks and the blow-up wall down to the lawn. */
-function PoolFront() {
+const PoolFront = memo(function PoolFront() {
   const y = POOL.y + 3;
   return (
     <g>
@@ -1052,7 +1052,7 @@ function PoolFront() {
       <path d={`M${POOL.x0 - 8} ${POOL.lawn - 30} H${POOL.x1 + 8}`} stroke="#fff" strokeWidth="10" strokeDasharray="40 40" />
     </g>
   );
-}
+});
 
 /** The little fountain in the pool: a stone spout, and its drops while it sprays. */
 function Fountain({ drops }: { drops: Pt[] }) {

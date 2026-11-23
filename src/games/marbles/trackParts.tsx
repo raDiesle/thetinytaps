@@ -2,8 +2,8 @@
 // xylophones, switch, barrier, looping, drums, chimes, tunnel, and the wooden world (`WOODEN`) the other worlds replace,
 // with its own stretch down the lower wall (helix tower, step lifter, tipping troughs).
 import { memo, useContext, useId, type PointerEvent, type ReactNode } from "react";
-import { VIEW_W, wobble } from "./level";
-import { Ball, BAR_COLORS, type BallLook, Rail, STAR_POINTS } from "./parts";
+import { VIEW_W, wobble, decay } from "./level";
+import { Ball, BAR_COLORS, type BallLook, Rail, STAR_POINTS, still } from "./parts";
 import { HELIX, helixAt, LIFTER, lifterAt, sample, STRETCHES, TAU, TROUGHS, UNDER, WOOD_CUES } from "./trackStretches";
 import { type EndProps, INK, type StretchArtProps, type ThingProps, TrackLook, type TrackTheme } from "./trackTheme";
 import { BALL_R, type Pt } from "./path";
@@ -54,21 +54,6 @@ export const FLAP_UP = -90;
 export const FLAP_DOWN = 0;
 /** The golden star the tunnel puts on a marble, and the ring of the sunny glow that marks what to tap. */
 export const STAR_GOLD = "#ffd23f";
-
-/**
- * `memo` for the still parts of the wall: the run draws again in every frame, so a part whose props have not changed
- * (objects and arrays compared by their contents, handlers ignored – they only use refs) is skipped by React instead of
- * being compared and patched element by element 60 times a second (A-29: that cost an old phone its frames).
- */
-function still<P extends object>(Part: (props: P) => ReactNode) {
-  const sameValue = (a: unknown, b: unknown): boolean => {
-    if (Object.is(a, b)) return true;
-    if (typeof a !== "object" || typeof b !== "object" || !a || !b) return false;
-    const ka = Object.keys(a);
-    return ka.length === Object.keys(b).length && ka.every((k) => Object.is((a as Record<string, unknown>)[k], (b as Record<string, unknown>)[k]));
-  };
-  return memo(Part, (before, after) => (Object.keys(after) as (keyof P)[]).every((k) => typeof after[k] === "function" || sameValue(before[k], after[k])));
-}
 
 /** The slightly darker board a spot sits on, with a dashed edge: here something can be swapped. */
 export const SpotBoard = still(function SpotBoard({ slot }: { slot: Slot }) {
@@ -256,7 +241,7 @@ export function Shelf({ things, filled, colors, t, onTake }: { things: Roller[];
       {things.map((kind, i) => {
         const at = shelfSpot(i, kind);
         const age = (t - filled[i] - REFILL_MS) / 1000;
-        const k = age < 0 ? 0 : age < 1.5 ? 1 - Math.exp(-age * 7) * Math.cos(age * 22) : 1;
+        const k = age < 0 ? 0 : age < 1.5 ? 1 - decay(age * 7) * Math.cos(age * 22) : 1;
         return (
           <g
             key={i}
@@ -340,13 +325,13 @@ export const Xylophone = still(function Xylophone({ row, ages, onTap }: { row: R
       {bars.map((bar) => {
         const age = ages[bar.i];
         const cx = bar.x + bar.w / 2;
-        const dip = age >= 0 && age < 1 ? 5 * Math.exp(-age * 10) : 0;
+        const dip = age >= 0 && age < 1 ? 5 * decay(age * 10) : 0;
         return (
           <g key={bar.i} transform={`translate(${cx} ${rowY(row, cx) + BALL_R + 9 + dip}) rotate(${slope})`} data-tap onPointerDown={(e) => onTap(bar.i, e)}>
             {/* Taller than the bar, so a small finger finds it */}
             <rect x={-bar.w / 2 + 2} y={-62} width={bar.w - 4} height={100} fill="transparent" />
             <rect x={-bar.w / 2} y={-9} width={bar.w} height={18} rx={6} fill={BAR_COLORS[bar.i % BAR_COLORS.length]} stroke={INK} strokeWidth="3" />
-            <rect x={-bar.w / 2} y={-9} width={bar.w} height={18} rx={6} fill="#fff" opacity={age >= 0 && age < 1 ? 0.7 * Math.exp(-age * 6) : 0} />
+            <rect x={-bar.w / 2} y={-9} width={bar.w} height={18} rx={6} fill="#fff" opacity={age >= 0 && age < 1 ? 0.7 * decay(age * 6) : 0} />
             <circle cx={-bar.w / 2 + 10} cy="0" r="3" fill="#fff8" />
             <circle cx={bar.w / 2 - 10} cy="0" r="3" fill="#fff8" />
           </g>
@@ -439,7 +424,7 @@ export const Spot = still(function Spot({
   layer: "back" | "front";
 }) {
   // A funnel wobbles a little when a marble swirls in or a finger taps it.
-  const k = (age >= 0 && age < 1.5 ? 1 - 0.45 * Math.exp(-age * 7) * Math.cos(age * 22) : 1) * (piece === "funnel" ? 1 + wobble(hitAge, 0.07, 24, 6) : 1);
+  const k = (age >= 0 && age < 1.5 ? 1 - 0.45 * decay(age * 7) * Math.cos(age * 22) : 1) * (piece === "funnel" ? 1 + wobble(hitAge, 0.07, 24, 6) : 1);
   const m = slotMiddle(slot);
   let body: ReactNode = null;
   switch (piece) {
@@ -458,7 +443,7 @@ export const Spot = still(function Spot({
       break;
     }
     case "trampoline":
-      body = layer === "back" ? <Trampoline slot={slot} dip={hitAge >= 0 && hitAge < 1 ? 16 * Math.exp(-hitAge * 7) * Math.cos(hitAge * 24) : 0} /> : null;
+      body = layer === "back" ? <Trampoline slot={slot} dip={hitAge >= 0 && hitAge < 1 ? 16 * decay(hitAge * 7) * Math.cos(hitAge * 24) : 0} /> : null;
       break;
     case "funnel": {
       const f = funnelIn(slot);
@@ -488,8 +473,8 @@ export const Wall = still(function Wall({ turn, index, age }: { turn: Turn; inde
   const top = turn.from.y - 70;
   const bottom = turn.bottom ?? turn.to.y + 40;
   const y = turn.from.y + 3;
-  const flash = age >= 0 && age < 1 ? Math.exp(-age * 6) : 0;
-  const squash = age >= 0 && age < 1 ? 5 * Math.exp(-age * 9) * Math.cos(age * 30) : 0;
+  const flash = age >= 0 && age < 1 ? decay(age * 6) : 0;
+  const squash = age >= 0 && age < 1 ? 5 * decay(age * 9) * Math.cos(age * 30) : 0;
   return (
     <g>
       <rect x={side > 0 ? turn.x : turn.x - 18} y={top} width="18" height={bottom - top} rx="6" fill={post} stroke={INK} strokeWidth="3" />
@@ -510,7 +495,7 @@ export const Wall = still(function Wall({ turn, index, age }: { turn: Turn; inde
 /** The looping: a round track the marble rides inside, glowing for a moment after each marble. */
 export const Loop = still(function Loop({ age }: { age: number }) {
   const r = LOOP.r + BALL_R + 7;
-  const glow = age >= 0 && age < 2 ? Math.exp(-age * 2) : 0;
+  const glow = age >= 0 && age < 2 ? decay(age * 2) : 0;
   return (
     <g>
       <circle cx={LOOP.cx} cy={LOOP.cy} r={r - 6} fill="#ffd23f" opacity={0.18 + 0.3 * glow} />
@@ -529,8 +514,8 @@ export const Drum = still(function Drum({ i, age }: { i: number; age: number }) 
   const { x, top, r, h } = DRUMS[i];
   const ry = r * 0.3;
   const hit = age >= 0 && age < 1;
-  const dip = hit ? 8 * Math.exp(-age * 8) * Math.cos(age * 28) : 0;
-  const jump = hit ? Math.abs(4 * Math.exp(-age * 7) * Math.sin(age * 26)) : 0;
+  const dip = hit ? 8 * decay(age * 8) * Math.cos(age * 28) : 0;
+  const jump = hit ? Math.abs(4 * decay(age * 7) * Math.sin(age * 26)) : 0;
   const body = ["#ff5d73", "#3a86ff", "#3ec300"][i % 3];
   return (
     <g transform={`translate(0 ${-jump})`}>
@@ -574,15 +559,7 @@ export const Chimes = still(function Chimes({ ages, onTap }: { ages: number[]; o
             <line x1={chime.x} y1={y + 6} x2={chime.x} y2={tubeTop} stroke={INK} strokeWidth="2.5" />
             <rect x={chime.x - 8} y={tubeTop} width="16" height={chime.length} rx="5" fill="#cfd8e3" stroke={INK} strokeWidth="3" />
             <line x1={chime.x - 3} y1={tubeTop + 8} x2={chime.x - 3} y2={bottom - 8} stroke="#fff" strokeWidth="3" strokeLinecap="round" />
-            <rect
-              x={chime.x - 8}
-              y={tubeTop}
-              width="16"
-              height={chime.length}
-              rx="5"
-              fill="#fff"
-              opacity={age >= 0 && age < 1 ? 0.7 * Math.exp(-age * 5) : 0}
-            />
+            <rect x={chime.x - 8} y={tubeTop} width="16" height={chime.length} rx="5" fill="#fff" opacity={age >= 0 && age < 1 ? 0.7 * decay(age * 5) : 0} />
           </g>
         );
       })}

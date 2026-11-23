@@ -1,6 +1,6 @@
 import { memo, useId, useMemo } from "react";
 import { MASCOT_COLORS, MascotHead } from "@/components/Mascot";
-import { wobble, VIEW_H, type LevelProps } from "./level";
+import { wobble, VIEW_H, type LevelProps, decay } from "./level";
 import {
   BALLOONS,
   BASKET,
@@ -52,7 +52,7 @@ import { beside, deg, lerp, rad, seg, svgLine } from "./machineKit";
 import { MachineStage } from "./MachineStage";
 import { Bunting, INK, MARBLE_COLOR } from "./scenery";
 import { BALL_R, type Pt } from "./path";
-import { BAR_COLORS, Ball } from "./parts";
+import { BAR_COLORS, Ball, still } from "./parts";
 
 /** The tent's two stripe colours; the red one is the level's main colour. */
 const TENT_RED = "#e8505b";
@@ -77,16 +77,20 @@ export function CircusLevel(props: LevelProps) {
   const circus = useMemo(buildCircus, []);
   const ids = useId();
 
+  // The backdrop never changes: a layer of its own, painted once.
+  const backdrop = useMemo(() => [{ content: <Tent stripes={`${ids}-stripes`} /> }], [ids]);
+
   return (
-    <MachineStage machine={circus} level="circus" start={{ x: HAT.x, y: HAT.y - 46, r: 88 }} {...props}>
-      {(t) => {
+    <MachineStage back={backdrop} machine={circus} level="circus" start={{ x: HAT.x, y: HAT.y - 46, r: 88 }} {...props}>
+      {(t, seen) => {
         const uni = circus.unicycleAt(t);
         const clown = circus.clownAt(t);
         const marble = circus.marbleAt(t);
         const ball = circus.bigBallAt(t);
+        // The hoop's flames flicker for ever: still while the hoop is off screen, so nothing changes there.
+        const flames = seen(HOOP.x - 200, HOOP.x + 200) ? t : 0;
         return (
           <>
-            <Tent stripes={`${ids}-stripes`} />
             <Stage open={seg(t, circus.tShow, circus.tShow + 1.3)} />
             <Cord tassel={circus.tasselY(t)} />
             <Spotlights on={seg(t, circus.tShow, circus.tShow + 0.4)} />
@@ -107,7 +111,7 @@ export function CircusLevel(props: LevelProps) {
             <LionMarks circus={circus} t={t} />
             <HighWire />
             <Mast />
-            <Hoop t={t} tPass={circus.tHoop} part="back" />
+            <Hoop t={flames} tPass={circus.tHoop} part="back" />
             <Net sag={circus.sagAt(t)} />
             <BigBall at={ball.pt} spin={ball.spin} />
             <Striker circus={circus} t={t} />
@@ -117,7 +121,7 @@ export function CircusLevel(props: LevelProps) {
             <Ball color={MARBLE_COLOR} x={marble.pt.x} y={marble.pt.y} spin={marble.spin} />
             <Basket at={uni.pt} lean={uni.lean} />
             <Ribbon tassel={circus.tasselAt(t)} pulled={circus.pulledAt(t)} fired={t >= circus.tFire} />
-            <Hoop t={t} tPass={circus.tHoop} part="front" />
+            <Hoop t={0} tPass={circus.tHoop} part="front" />
             <TopHat />
             <Swing angle={circus.swingOf(t)} />
             <Parrot {...circus.parrotAt(t)} />
@@ -199,14 +203,14 @@ function Star({ x, y, r, fill, turn = 0 }: { x: number; y: number; r: number; fi
 }
 
 /** A red and white striped pole standing from `y0` down to `y1`. */
-function Pole({ x, y0, y1, w = 14 }: { x: number; y0: number; y1: number; w?: number }) {
+const Pole = still(function Pole({ x, y0, y1, w = 14 }: { x: number; y0: number; y1: number; w?: number }) {
   return (
     <g>
       <rect x={x - w / 2} y={y0} width={w} height={y1 - y0} rx="4" fill="#fff" stroke={INK} strokeWidth="3" />
       <line x1={x} y1={y0 + 4} x2={x} y2={y1 - 2} stroke="#ff5d73" strokeWidth={w - 5} strokeDasharray="14 14" />
     </g>
   );
-}
+});
 
 /** A rope from (x, y) up into the top of the tent. */
 function Rope({ x, y }: { x: number; y: number }) {
@@ -214,7 +218,7 @@ function Rope({ x, y }: { x: number; y: number }) {
 }
 
 /** A candy-striped rail just under the marble's way from `a` to `b`. */
-function StripedRail({ a, b }: { a: Pt; b: Pt }) {
+const StripedRail = still(function StripedRail({ a, b }: { a: Pt; b: Pt }) {
   const off = BALL_R + 7;
   return (
     <g>
@@ -223,10 +227,10 @@ function StripedRail({ a, b }: { a: Pt; b: Pt }) {
       <line x1={a.x} y1={a.y + off} x2={b.x} y2={b.y + off} stroke="#ff5d73" strokeWidth="12" strokeDasharray="16 16" />
     </g>
   );
-}
+});
 
 /** A round circus tub to stand on, from `top` down to the floor. */
-function Tub({ cx, top, w, color }: { cx: number; top: number; w: number; color: string }) {
+const Tub = still(function Tub({ cx, top, w, color }: { cx: number; top: number; w: number; color: string }) {
   const half = w / 2;
   const narrow = half * 0.86;
   return (
@@ -244,12 +248,12 @@ function Tub({ cx, top, w, color }: { cx: number; top: number; w: number; color:
       <path d={`M${cx - narrow + 16} ${top + 30} L${cx - half + 18} ${FLOOR - 40}`} stroke="#fff6" strokeWidth="8" strokeLinecap="round" />
     </g>
   );
-}
+});
 
 /* ---------- Top hat, drums, cymbal and trampoline ---------- */
 
 /** The magician's top hat, upside down on two ropes; a hole in its crown lets the marble out. */
-function TopHat() {
+const TopHat = memo(function TopHat() {
   const { x, y } = HAT;
   const top = y - 118;
   const bottom = y + 26;
@@ -276,7 +280,7 @@ function TopHat() {
       <Star x={x + 112} y={y - 104} r={14} fill={GOLD} />
     </g>
   );
-}
+});
 
 const DRUM_COLORS = ["#ff5d73", "#3a86ff", "#3ec300"];
 
@@ -394,7 +398,7 @@ function Seal({ nod, clap }: { nod: number; clap: number }) {
 }
 
 /** The chute from the seal down to the elephant's head: a pole at the top end, a rope near the bottom end. */
-function Chute() {
+const Chute = memo(function Chute() {
   const endX = CHUTE.to.x - 20;
   return (
     <g>
@@ -403,7 +407,7 @@ function Chute() {
       <StripedRail a={CHUTE.from} b={{ x: endX, y: chuteY(endX) }} />
     </g>
   );
-}
+});
 
 const ELEPHANT_COLOR = "#b3b1c9";
 
@@ -491,7 +495,7 @@ function Trapeze({ angle, grabbed, dropped }: { angle: number; grabbed: number; 
   const { x, y, len } = TRAPEZE;
   const holding = grabbed >= 0 && dropped < 0;
   // The feet: a little apart, ready to catch; round the marble; then kicking for joy.
-  const kick = dropped >= 0 ? 10 * Math.sin(dropped * 12) * Math.exp(-dropped * 0.8) : 0;
+  const kick = dropped >= 0 ? 10 * Math.sin(dropped * 12) * decay(dropped * 0.8) : 0;
   const spread = holding ? 24 : 30;
   const feet = [
     { x: FEET.x - spread, y: FEET.y - (holding ? 0 : 4) + kick },
@@ -740,7 +744,7 @@ function LionMarks({ circus, t }: { circus: Circus; t: number }) {
 /* ---------- High wire, hoop and unicycle ---------- */
 
 /** The two platforms on their poles and the high wire between them. */
-function HighWire() {
+const HighWire = memo(function HighWire() {
   const plank = (x0: number, x1: number, y: number) => (
     <g>
       <Pole x={x0 + 22} y0={y + 10} y1={FLOOR} />
@@ -756,7 +760,7 @@ function HighWire() {
       <line x1={WIRE.from.x} y1={WIRE.from.y + 1} x2={WIRE.to.x} y2={WIRE.to.y + 1} stroke="#e8e8f0" strokeWidth="2" />
     </g>
   );
-}
+});
 
 const FLAME_COLORS = ["#ff3b3b", "#ff8c42", "#ffd23f"];
 
@@ -764,7 +768,7 @@ const FLAME_COLORS = ["#ff3b3b", "#ff8c42", "#ffd23f"];
  * The ring of paper flames on its pole. The ring is drawn twice: its `back`
  * with the flames behind the unicycle, its `front` half over it.
  */
-function Hoop({ t, tPass, part }: { t: number; tPass: number; part: "back" | "front" }) {
+const Hoop = still(function Hoop({ t, tPass, part }: { t: number; tPass: number; part: "back" | "front" }) {
   const { x, y, rx, ry } = HOOP;
   if (part === "front") {
     const d = `M${x} ${y - ry} A${rx} ${ry} 0 0 1 ${x} ${y + ry}`;
@@ -804,7 +808,7 @@ function Hoop({ t, tPass, part }: { t: number; tPass: number; part: "back" | "fr
       <ellipse cx={x} cy={y} rx={rx} ry={ry} fill="none" stroke={GOLD} strokeWidth="9" />
     </g>
   );
-}
+});
 
 /** The unicycle with the bear acrobat holding out the back of its basket, its wheel's middle `at`, leaning `lean` degrees. */
 function Unicycle({ at, turned, lean }: { at: Pt; turned: number; lean: number }) {
@@ -868,7 +872,7 @@ const AcrobatFace = memo(function AcrobatFace() {
 const WICKER = "#d9a05b";
 
 /** The inside back of the bear's basket; the marble sits in front of it. */
-function BasketBack() {
+const BasketBack = memo(function BasketBack() {
   const { x, y } = BASKET;
   return (
     <path
@@ -879,7 +883,7 @@ function BasketBack() {
       strokeLinejoin="round"
     />
   );
-}
+});
 
 /** The front of the bear's basket, drawn over the marble; same place and lean as the unicycle. */
 function Basket({ at, lean }: { at: Pt; lean: number }) {
@@ -915,7 +919,7 @@ function Basket({ at, lean }: { at: Pt; lean: number }) {
 /* ---------- Mast and ribbon, cannon, clown and net ---------- */
 
 /** The tall striped mast behind the end of the high wire, with the eye the ribbon runs through at its top. */
-function Mast() {
+const Mast = memo(function Mast() {
   return (
     <g>
       <Pole x={MAST.x} y0={MAST.top + 22} y1={FLOOR} w={16} />
@@ -924,7 +928,7 @@ function Mast() {
       <Star x={MAST.x} y={MAST.top - 20} r={20} fill={GOLD} />
     </g>
   );
-}
+});
 
 /**
  * The cannon's pull cord: a striped ribbon from a pull tab on the barrel up
@@ -967,7 +971,7 @@ function Ribbon({ tassel, pulled, fired }: { tassel: Pt; pulled: number; fired: 
 /** The cannon: a starry barrel on a big wheel with a slot for the pull tab, kicking back a little `age` seconds after it fires. */
 function Cannon({ age }: { age: number }) {
   const { x, y, angle, len, back, r } = CANNON;
-  const kick = age >= 0 ? -14 * Math.exp(-age * 5) * Math.cos(age * 14) : 0;
+  const kick = age >= 0 ? -14 * decay(age * 5) * Math.cos(age * 14) : 0;
   const wheelR = FLOOR - y;
   return (
     <g>

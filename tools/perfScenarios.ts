@@ -94,6 +94,60 @@ const START: Step = { tap: ".start-button, .mode-card", optional: true };
 const TAPS = { selector: "[data-tap]:not(.page-corner)", every: 700 };
 const key = (k: string, times = 1): Step[] => Array.from({ length: times }, () => [{ key: k }, { wait: 150 }]).flat() as Step[];
 
+/**
+ * Every level of Kettenreaktion (`LEVELS` in src/games/marbles/catalog.ts, by its address), so a level that stutters on a
+ * phone is found even where no one plays it in the other scenarios: the whole world is drawn in one big svg there, and a
+ * level that draws a moving thing into it has the phone paint the whole picture again in every frame.
+ */
+export const KETTEN_LEVELS = [
+  "track",
+  "colortrack",
+  "snowtrack",
+  "spacetrack",
+  "slidetrack",
+  "sitetrack",
+  "machine",
+  "sneeze",
+  "kitchen",
+  "garden",
+  "pegs",
+  "topple",
+  "building",
+  "water",
+  "circus",
+  "space",
+  "light",
+  "bath",
+  "farm",
+  "night",
+  "tidy",
+] as const;
+
+/** A marble run, started as a child does: the three things on the shelf tapped one after the other. */
+const RUN_LEVELS = new Set<string>(["track", "colortrack", "snowtrack", "spacetrack", "slidetrack", "sitetrack"]);
+
+/**
+ * One Kettenreaktion level opened at its address, started, and measured twice: the first seconds and a stretch in its
+ * middle (each level lasts about a minute). „Von selbst“ is set, but a machine still stood at its stop in the middle
+ * (November 2026), so a machine also gets a key now and then, which lets it run on from a stop and does nothing else.
+ */
+function chainLevel(id: (typeof KETTEN_LEVELS)[number]): Scenario {
+  const start: Step[] = RUN_LEVELS.has(id) ? [1, 2, 3].flatMap(() => [{ tap: ".run-shelf-thing" }, { wait: 700 }] as Step[]) : key(" ");
+  // The pegboard drops a marble at every key, so a child keeps pressing there.
+  const run = RUN_LEVELS.has(id);
+  const type = id === "pegs" ? { keys: ["a", "s", "d", "f", "g", "h", "j"], every: 600 } : run ? undefined : { keys: [" "], every: 2500 };
+  const middle: Step[] = run ? [{ wait: 12000 }] : [1, 2, 3].flatMap(() => [{ wait: 4000 }, ...key(" ")]);
+  return {
+    name: `ketten-${id}`,
+    path: `/kettenreaktion/${id}/`,
+    storage: `localStorage.setItem("tinytaps.marbles.v1", JSON.stringify({ play: "watch" }))`,
+    parts: [
+      { label: "Anfang", before: [{ wait: 1500 }, ...start], ms: 10000, type },
+      { label: "Mitte", before: middle, ms: 10000, type },
+    ],
+  };
+}
+
 export const SCENARIOS: Scenario[] = [
   {
     // One stretch after the other, with no waits between them: collecting a trace already leaves seconds unmeasured
@@ -432,6 +486,7 @@ export const SCENARIOS: Scenario[] = [
       },
     ],
   },
+  ...KETTEN_LEVELS.map(chainLevel),
   {
     name: "kleine-abenteuer",
     path: "/kleine-abenteuer/",

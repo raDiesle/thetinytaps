@@ -310,5 +310,13 @@ export const allGamesIdeas: IdeaArea = {
       why: "Kleinkinder spielen oft auf alten Handys der Eltern; dort sehen sie das Spiel ruckeln.",
       effort: "M",
     },
+    {
+      id: "A-36",
+      emoji: "🐢",
+      title: "Leistung: Kettenreaktion – der Rest für alte Handys",
+      text: "Begonnen am 23. November 2026: jedes Level mit `bun run perf ketten-<id>` gemessen; die festen Hintergründe liegen jetzt in eigenen Ebenen (`back`), Teile sind `still(…)`, was abseits des Bildschirms für immer flackert bekommt eine feste Zeit (`seen`), und was ausklingt kommt wirklich zur Ruhe (`decay`, `hump`, `decay.test.ts`). Beschäftigt sind alle Level jetzt fast überall unter 60 %, aber neu gemalt wird noch zu viel (Grenze 30 Bildschirme pro Sekunde; letzte Messung vor den letzten Änderungen: Raketenstart Mitte 61, Licht-Kette Anfang 64, Baustelle Anfang 54, Zirkus Mitte 49, Gute Nacht Mitte 44, Nagelbrett Mitte 40, Garten Anfang 38, Alles fällt um Mitte 37, Wasserbahn Anfang 37, Küche Mitte 35, Bauernhof Mitte 34, Aufräumen Anfang 34, Weltraumbahn Anfang 34; Hatschi-Kette 63–65 % beschäftigt). Offen: (1) Was nach dem Ende nie zur Ruhe kommt: im Garten der Vogel bei x 8175, die Noten der Schläfer (GardenLevel.tsx, fontSize 34), der Schlauch bei x 7359; in der Baustelle der Bagger bei EXC.x 3440, der für immer wippt. (2) Winzige Drehungen, die nie ganz 0 werden, im Bauernhof (rotate(0.0001 3618 800), rotate(-0.000003 8550 800)). (3) Wasserbahn, Nagelbrett, Hatschi-Kette und Alles fällt um haben keine MachineStage und wurden so noch nicht abgesucht. (4) Die Licht-Kette maß „Mitte“ 2 % beschäftigt – das Messstück stand wohl am aktiven Halt; prüfen und, wo nötig, in `tools/perfScenarios.ts` weitertippen. (5) Alle neu messen (`bun run perf ketten-` im Hintergrund, etwa 15 Minuten) und die geänderten Level im Vorschaufenster ansehen: Hintergründe in Ebenen (Reihenfolge), Zirkus-Reifen, Baustellen-Band hält an, Salatschleuder, Disco-Kugel, Badeschaum, Wasserkocher hört auf zu dampfen, Rasensprenger geht aus, Rakete fliegt weg, Küken laufen bis zur Henne. So findet man, was sich noch ändert: `KETTEN_SCAN=1 bun test src/games/marbles/stillness.scan.test.tsx` (`LEVELS=garden,building`, `CTX=1`).",
+      why: "Kleinkinder spielen oft auf alten Handys der Eltern; dort sehen sie das Spiel ruckeln.",
+      effort: "M",
+    },
   ],
 };

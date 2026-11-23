@@ -8,7 +8,7 @@ import { join } from "node:path";
 
 const dir = import.meta.dir;
 const files = readdirSync(dir)
-  .filter((f) => f.endsWith(".tsx"))
+  .filter((f) => f.endsWith(".tsx") && !f.endsWith(".test.tsx"))
   .map((f) => ({ name: f, code: readFileSync(join(dir, f), "utf8") }));
 
 describe("marble cameras", () => {

@@ -42,7 +42,7 @@ import {
 } from "./bath";
 import { easeOut, rad, seg, svgLine } from "./machineKit";
 import { MachineStage } from "./MachineStage";
-import { BAR_COLORS } from "./parts";
+import { BAR_COLORS, still } from "./parts";
 import { INK, Sparkles } from "./scenery";
 
 const PAINT = "#e3f4ff";
@@ -80,18 +80,32 @@ export function BathLevel(props: LevelProps) {
   const bath = useMemo(buildBath, []);
   const ids = useId();
 
+  // The backdrop never changes: a layer of its own, painted once.
+  const backdrop = useMemo(
+    () => [
+      {
+        content: (
+          <>
+            <Room tiles={`${ids}-tiles`} />
+            <Washstand />
+            <Shelf />
+          </>
+        ),
+      },
+    ],
+    [ids],
+  );
+
   return (
-    <MachineStage machine={bath} level="bath" start={{ x: BUTTON.x, y: BUTTON.y, r: 62, side: "left" }} {...props}>
-      {(t) => (
+    <MachineStage back={backdrop} machine={bath} level="bath" start={{ x: BUTTON.x, y: BUTTON.y, r: 62, side: "left" }} {...props}>
+      {(t, seen) => (
         <>
-          <Room tiles={`${ids}-tiles`} />
-          <Washstand />
-          <Shelf />
           <Tube bath={bath} t={t} />
           <Mug bath={bath} t={t} />
           <Brush bath={bath} t={t} />
           <Tap bath={bath} t={t} />
-          <Water bath={bath} t={t} inside={`${ids}-inside`} />
+          {/* Its foam bobs till the end: off screen it shows its last moment, which never changes. */}
+          <Water bath={bath} t={seen(TUB.x0, TUB.x1) ? t : bath.duration} inside={`${ids}-inside`} />
           <Soap bath={bath} t={t} />
           <Duck bath={bath} t={t} />
           <Tub />
@@ -451,10 +465,10 @@ const Tub = memo(function Tub() {
 });
 
 /** The water in the tub and the foam on it, both rising until they reach the rim. */
-function Water({ bath, t, inside }: { bath: Bath; t: number; inside: string }) {
+const Water = still(function Water({ bath, t, inside }: { bath: Bath; t: number; inside: string }) {
   const y = bath.waterY(t);
   const foam = bath.foam(t);
-  const still = Math.min(t, bath.duration);
+  const calm = Math.min(t, bath.duration);
   if (bath.pour(t) <= 0 && t < bath.tWater) return null;
   const width = TUB.x1 - TUB.x0;
   return (
@@ -475,7 +489,7 @@ function Water({ bath, t, inside }: { bath: Bath; t: number; inside: string }) {
             <g key={i}>
               <circle
                 cx={bx}
-                cy={y - foam * 0.45 + 6 * Math.sin(still * 2 + i)}
+                cy={y - foam * 0.45 + 6 * Math.sin(calm * 2 + i)}
                 r={r * (0.4 + 0.6 * (foam / 90))}
                 fill={FOAM}
                 stroke="#cbe9f7"
@@ -488,7 +502,7 @@ function Water({ bath, t, inside }: { bath: Bath; t: number; inside: string }) {
       </g>
     </g>
   );
-}
+});
 
 /** Foam spilling down the outside of the tub's right end, and the puddle spreading over the floor. */
 function Overflow({ bath, t }: { bath: Bath; t: number }) {
@@ -958,7 +972,7 @@ function Wand({ bath, t }: { bath: Bath; t: number }) {
 }
 
 /** The pink shower cap with white dots and a frilly edge; its bottom middle is at 0 0. */
-function ShowerCap() {
+const ShowerCap = memo(function ShowerCap() {
   return (
     <g>
       <path d="M-46 0 q0 -50 46 -50 q46 0 46 50 z" fill={CAP_PINK} stroke={INK} strokeWidth="4" strokeLinejoin="round" />
@@ -979,7 +993,7 @@ function ShowerCap() {
       />
     </g>
   );
-}
+});
 
 /** The shower cap on the shelf, then fluttering through the air; once it sits on the lamp the lamp draws it. */
 function FlyingCap({ bath, t }: { bath: Bath; t: number }) {

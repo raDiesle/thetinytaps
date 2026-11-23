@@ -50,6 +50,7 @@ import {
   timeline,
   type MachineEvent,
   type Path,
+  hump,
 } from "./machineKit";
 import { arc, line, quad, type Pt } from "./path";
 
@@ -531,7 +532,7 @@ export function buildWater() {
       return { body, head, tip: add(head, lerp(34, 56, up), lerp(40, 16, up)), wing: flap(t) * (1 - up * 0.6), legs: "trail" };
     }
     // In the nest it throws its head back and clatters its beak, then stands still.
-    const back = Math.sin(Math.PI * seg(t, stork.clatter, stork.clatter + 1));
+    const back = hump(seg(t, stork.clatter, stork.clatter + 1));
     const head = add(body, lerp(40, 16, back), lerp(-120, -132, back));
     const chatter = back > 0 ? 6 * Math.sin((t - stork.clatter) * 38) * back : 0;
     return { body, head, tip: add(head, lerp(56, 18, back), lerp(16, -56, back) + chatter), wing: null, legs: "tuck" };
@@ -630,7 +631,7 @@ export function buildWater() {
     if (t < turtle.bow) {
       const { pt } = spotAt(legs2, t);
       // Nose up while it climbs onto the rock.
-      const tilt = -14 * Math.sin(Math.PI * seg(t, turtle.climb, turtle.bow));
+      const tilt = -14 * hump(seg(t, turtle.climb, turtle.bow));
       const paddle = t >= turtle.swim ? Math.sin((t - turtle.swim) * 4.5) : 0;
       return { top: { x: pt.x, y: pt.y + TURTLE.shell }, tilt, paddle };
     }

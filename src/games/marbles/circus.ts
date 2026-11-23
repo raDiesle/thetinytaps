@@ -38,7 +38,7 @@ import {
   playWhoosh,
 } from "@/lib/sfx";
 import { playBark, playChatter, playGiggle, playLaunch, playRing, playRoar, playSquawk, playTrumpet } from "@/lib/realSounds";
-import { wobble } from "./level";
+import { wobble, decay } from "./level";
 import {
   along,
   beside,
@@ -60,6 +60,7 @@ import {
   timeline,
   timeWhen,
   turn,
+  hump,
 } from "./machineKit";
 import { arc, BALL_R, line, quad, type Pt } from "./path";
 
@@ -334,7 +335,7 @@ export function buildCircus() {
   const nodAt = (t: number) => {
     if (t < tNose) return 0;
     // A little balancing wobble, then the nod, then back up.
-    const balance = 7 * Math.sin((t - tNose) * 7) * Math.exp(-(t - tNose) * 0.9) * (1 - seg(t, tNod - 0.3, tNod));
+    const balance = 7 * Math.sin((t - tNose) * 7) * decay((t - tNose) * 0.9) * (1 - seg(t, tNod - 0.3, tNod));
     const nod = NOD * easeIn(seg(t, tNod, tLetGo)) * (1 - easeInOut(seg(t, tLetGo + 0.5, tLetGo + 1.3)));
     return balance + nod;
   };
@@ -377,7 +378,7 @@ export function buildCircus() {
     const w = (2 * Math.PI) / SWING_T;
     if (t < tDrop) return SWING * (0.3 + 0.7 * easeOut(seg(t, tGrab, tDrop))) * Math.sin(w * (t - tGrab));
     // Swinging out slowly once the monkey has let go.
-    return SWING * Math.cos(w * (t - tDrop)) * Math.exp(-(t - tDrop) * 0.45) * (1 - seg(t, tDrop + 5, tDrop + 8));
+    return SWING * Math.cos(w * (t - tDrop)) * decay((t - tDrop) * 0.45) * (1 - seg(t, tDrop + 5, tDrop + 8));
   };
   for (let k = 0; k < 3; k++) at(tGrab + 0.35 + k * SWING_T, { sound: playCreak });
   at(tDrop - SWING_T / 4, { sound: playWhoosh });
@@ -414,9 +415,9 @@ export function buildCircus() {
     const leapK = seg(t, tLeap, tLand);
     const spot = t < tLeap ? { x: LION_FROM.x, y: LION_FROM.top } : hop({ x: LION_FROM.x, y: LION_FROM.top }, { x: LION_TO.x, y: LION_TO.top }, 160, leapK);
     // A jump in place with the fright.
-    const startle = t < tPlop + 0.55 ? 46 * Math.sin(Math.PI * seg(t, tPlop, tPlop + 0.55)) : 0;
+    const startle = t < tPlop + 0.55 ? 46 * hump(seg(t, tPlop, tPlop + 0.55)) : 0;
     const roar = easeOut(seg(t, tRoar, tRoar + 0.15)) * (1 - seg(t, tRoar + 0.9, tRoar + 1.1));
-    const fright = seg(t, tPlop, tPlop + 0.1) * Math.exp(-Math.max(0, t - tPlop - 0.1) * 2.5);
+    const fright = seg(t, tPlop, tPlop + 0.1) * decay(Math.max(0, t - tPlop - 0.1) * 2.5);
     const crouch = easeInOut(seg(t, tCrouch, tCrouch + 0.35)) * (1 - seg(t, tLeap, tLeap + 0.12));
     const flying = t >= tLeap && t < tLand ? Math.sin(Math.PI * leapK) : 0;
     const squash = 0.2 * crouch - 0.06 * flying + wobble(t - tLand, 0.2, 16, 5);
@@ -556,7 +557,7 @@ export function buildCircus() {
   at(tNet, { sound: playBoing });
 
   /** How far the middle of the net hangs down: it gives with the clown and springs back. */
-  const sagAt = (t: number) => NET.sag + (t < tNet ? 0 : 46 * Math.sin((t - tNet) * 9) * Math.exp(-(t - tNet) * 3));
+  const sagAt = (t: number) => NET.sag + (t < tNet ? 0 : 46 * Math.sin((t - tNet) * 9) * decay((t - tNet) * 3));
 
   /*
    * The net springs back and throws the clown on: a somersault onto the big
@@ -720,7 +721,7 @@ export function buildCircus() {
       return { pt: hop(hopFrom, BOW_SPOT, 220, k), turn: 360 * easeInOut(k), arms: -60, stride: 0 };
     }
     // The bow, turned around its feet.
-    const bow = 30 * Math.sin(Math.PI * seg(t, tBow + 0.25, tBow + 1.25));
+    const bow = 30 * hump(seg(t, tBow + 0.25, tBow + 1.25));
     const feet = { x: BOW_SPOT.x, y: BOW_SPOT.y + CLOWN_FEET };
     return { pt: { x: feet.x + CLOWN_FEET * Math.sin(rad(bow)), y: feet.y - CLOWN_FEET * Math.cos(rad(bow)) }, turn: bow, arms: 10, stride: 0 };
   };

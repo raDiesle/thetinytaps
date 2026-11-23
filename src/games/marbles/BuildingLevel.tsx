@@ -1,5 +1,5 @@
 import { memo, useId, useMemo } from "react";
-import { wobble, VIEW_H, type LevelProps } from "./level";
+import { wobble, VIEW_H, type LevelProps, decay } from "./level";
 import {
   BALL,
   BEAM_Y,
@@ -59,7 +59,7 @@ import { deg, rad } from "./machineKit";
 import { MachineStage } from "./MachineStage";
 import { CabDriver, DARK_WOOD, INK, MARBLE_COLOR, MID_WOOD, Sparkles, WOOD } from "./scenery";
 import { BALL_R, type Pt } from "./path";
-import { BAR_COLORS, Ball } from "./parts";
+import { BAR_COLORS, Ball, still } from "./parts";
 
 /** The sky behind the building site. */
 const SKY = "#bfe9ff";
@@ -91,17 +91,30 @@ export function BuildingLevel(props: LevelProps) {
   // Until it has rolled out of the drum's mouth, the marble is drawn behind the mixer, so it stays hidden inside.
   const inMixer = (t: number) => machine.marbleAt(t).pt.x < SPIRIT.from.x;
 
+  // The backdrop never changes: a layer of its own, painted once.
+  const backdrop = useMemo(
+    () => [
+      {
+        content: (
+          <>
+            <Site ids={ids} />
+            <Scaffold />
+          </>
+        ),
+      },
+    ],
+    [ids],
+  );
+
   return (
-    <MachineStage machine={machine} level="building" start={{ x: MIXER.x + 6, y: MIXER.y, r: 96 }} {...props}>
+    <MachineStage back={backdrop} machine={machine} level="building" start={{ x: MIXER.x + 6, y: MIXER.y, r: 96 }} {...props}>
       {(t) => (
         <>
-          <Site ids={ids} />
-          <Scaffold />
           {inMixer(t) && <Marble machine={machine} t={t} />}
-          <Mixer angle={machine.drumAngle(t)} spin={Math.max(0, t)} />
+          <Mixer angle={machine.drumAngle(t)} spin={machine.drumSpin(t)} />
           <SpiritLevel age={t - machine.tVial} />
           <BeltMotor running={t >= 0} turned={machine.beltTravel(t)} />
-          <Belt machine={machine} t={t} />
+          <Belt machine={machine} travel={machine.beltTravel(t)} />
           <Deck1 />
           <Board />
           <Deck2 />
@@ -162,7 +175,7 @@ function Cloud({ x, y, s = 1 }: { x: number; y: number; s?: number }) {
 }
 
 /** Sky, hills, the site fence and the sandy ground. */
-function Site({ ids }: { ids: string }) {
+const Site = still(function Site({ ids }: { ids: string }) {
   const sky = `${ids}-sky`;
   const mesh = `${ids}-mesh`;
   const panels = Math.ceil((WORLD_W + 800) / 240);
@@ -215,7 +228,7 @@ function Site({ ids }: { ids: string }) {
       <TrafficCone x={3600 + SHIFT} y={FLOOR} />
     </g>
   );
-}
+});
 
 function SandPile({ x, w, h }: { x: number; w: number; h: number }) {
   return (
@@ -257,7 +270,7 @@ function TrafficCone({ x, y, scale = 0.7 }: { x: number; y: number; scale?: numb
 }
 
 /** A traffic cone, its foot's middle at (0, 0), as tall as CONE. */
-function ConeShape() {
+const ConeShape = memo(function ConeShape() {
   const { w, h } = CONE;
   return (
     <g>
@@ -267,11 +280,11 @@ function ConeShape() {
       <rect x={-w / 2} y="-14" width={w} height="14" rx="4" fill="#3b3b4f" stroke={INK} strokeWidth="3" />
     </g>
   );
-}
+});
 
 /* ---------- Mixer, spirit level and chute ---------- */
 
-function Scaffold() {
+const Scaffold = memo(function Scaffold() {
   const y0 = TOP_DECK.y;
   const ledgers = [420, 620];
   return (
@@ -331,10 +344,10 @@ function Scaffold() {
       ))}
     </g>
   );
-}
+});
 
 /** The cement mixer on its stand; `angle` tilts the drum, `spin` turns its stripes round. */
-function Mixer({ angle, spin }: { angle: number; spin: number }) {
+const Mixer = still(function Mixer({ angle, spin }: { angle: number; spin: number }) {
   const { x, y } = MIXER;
   const floor = TOP_DECK.y;
   const half = (sx: number) => (sx < 30 ? 40 + (18 * (sx + 72)) / 102 : 58 - (28 * (sx - 30)) / 70);
@@ -362,7 +375,7 @@ function Mixer({ angle, spin }: { angle: number; spin: number }) {
       <circle cx={x} cy={y} r="9" fill="#4a4a5e" stroke={INK} strokeWidth="3" />
     </g>
   );
-}
+});
 
 /** The big spirit level; its bubble wobbles `age` seconds after the marble rolled over the vial. */
 function SpiritLevel({ age }: { age: number }) {
@@ -389,7 +402,7 @@ function SpiritLevel({ age }: { age: number }) {
 }
 
 /** The rubble chute: see-through orange cones hanging one in the next, drawn in front of the marble. */
-function Chute() {
+const Chute = memo(function Chute() {
   const { x, top, n, h, step, wTop, wBottom } = CHUTE;
   return (
     <g>
@@ -412,12 +425,12 @@ function Chute() {
       })}
     </g>
   );
-}
+});
 
 /* ---------- Conveyor belt ---------- */
 
 /** The belt's motor box at its low end; the lamp shines while it runs. */
-function BeltMotor({ running, turned }: { running: boolean; turned: number }) {
+const BeltMotor = still(function BeltMotor({ running, turned }: { running: boolean; turned: number }) {
   const x = BELT.a.x - 112;
   const y = FLOOR - 92;
   return (
@@ -434,11 +447,10 @@ function BeltMotor({ running, turned }: { running: boolean; turned: number }) {
       ))}
     </g>
   );
-}
+});
 
-function Belt({ machine, t }: { machine: Building; t: number }) {
+const Belt = still(function Belt({ machine, travel }: { machine: Building; travel: number }) {
   const { a, b, r, gap } = BELT;
-  const travel = machine.beltTravel(t);
   const R = r + 2;
   const at = (p: Pt, s: number, off: number): Pt => ({ x: p.x + s * BELT_U.x + off * BELT_N.x, y: p.y + s * BELT_U.y + off * BELT_N.y });
   const p1 = at(a, 0, R);
@@ -492,11 +504,11 @@ function Belt({ machine, t }: { machine: Building; t: number }) {
       {cleats}
     </g>
   );
-}
+});
 
 /* ---------- Deck with the traffic cone, and the wrecking ball ---------- */
 
-function Deck1() {
+const Deck1 = memo(function Deck1() {
   const { x0, x1, y } = DECK1;
   return (
     <g>
@@ -530,10 +542,10 @@ function Deck1() {
       />
     </g>
   );
-}
+});
 
 /** The board leaning on a brick, which leads the marble down onto the deck. */
-function Board() {
+const Board = memo(function Board() {
   const { from, to } = BOARD;
   const len = Math.hypot(to.x - from.x, to.y - from.y);
   return (
@@ -544,7 +556,7 @@ function Board() {
       </g>
     </g>
   );
-}
+});
 
 /** The traffic cone holding the rope's loop; it tips over `angle` radians to the right. */
 function Cone({ angle }: { angle: number }) {
@@ -576,7 +588,7 @@ function WreckingBall({ machine, t }: { machine: Building; t: number }) {
 
 /* ---------- Deck with the tower and the cable drum ---------- */
 
-function Deck2() {
+const Deck2 = memo(function Deck2() {
   const { x0, x1, y } = DECK2;
   const poles = [x0 + 20, x0 + 340, x0 + 660, x1 - 16];
   return (
@@ -595,7 +607,7 @@ function Deck2() {
       <path d={`M${PLUG_X - 30} ${y + 34} l8 -6 l-3 7 l8 -1 l-9 8`} fill="none" stroke={INK} strokeWidth="2" strokeLinejoin="round" />
     </g>
   );
-}
+});
 
 /** The tower of bricks, falling over `angle` radians around its right foot. */
 function Tower({ angle }: { angle: number }) {
@@ -1278,7 +1290,7 @@ function Crane({ drop }: { drop: number }) {
   );
 }
 
-function House() {
+const House = memo(function House() {
   const { x0, x1, top } = HOUSE;
   const w = x1 - x0;
   return (
@@ -1315,7 +1327,7 @@ function House() {
       <circle cx={x0 + w / 2 + 24} cy={FLOOR - 70} r="5" fill="#ffd23f" stroke={INK} strokeWidth="2" />
     </g>
   );
-}
+});
 
 /** The roof, `drop` down from where it starts, hanging from the crane's hook by the eye on its top. */
 function Roof({ drop }: { drop: number }) {
@@ -1356,7 +1368,7 @@ function TopOutTree({ drop, age }: { drop: number; age: number }) {
   if (age < 0) return null;
   const cx = (HOUSE.x0 + HOUSE.x1) / 2 + 170;
   const foot = roofBase(drop) - ROOF.h + (170 * ROOF.h) / (ROOF.w / 2) - 4;
-  const grow = Math.min(1.08, 1 - Math.exp(-age * 7) * Math.cos(age * 13));
+  const grow = Math.min(1.08, 1 - decay(age * 7) * Math.cos(age * 13));
   const sway = wobble(age - 0.3, 8, 6, 1.4);
   return (
     <g transform={`translate(${cx} ${foot}) rotate(${sway}) scale(${grow})`}>
@@ -1373,7 +1385,8 @@ function TopOutTree({ drop, age }: { drop: number; age: number }) {
       ))}
       {Array.from({ length: 5 }, (_, i) => {
         const x = -26 + i * 13;
-        const flap = 6 * Math.sin(age * 9 + i);
+        // The ribbons flutter for a few seconds and hang still: fluttering for ever kept the phone painting (perf).
+        const flap = 6 * Math.sin(age * 9 + i) * Math.max(0, 1 - Math.max(0, age - 3) / 3);
         return (
           <path
             key={i}

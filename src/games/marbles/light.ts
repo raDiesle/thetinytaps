@@ -18,6 +18,7 @@
 // moment. Coordinates are those of the room, 7100 × 900; the screen shows 1600
 // of it at a time.
 
+import { decay } from "./level";
 import {
   playBeam,
   playBlub,
@@ -423,7 +424,7 @@ export function buildLight() {
   /** A wobble in degrees as it starts, dying away. */
   const globeWobble = (t: number) => {
     const u = t - tGlobe;
-    return u <= 0 ? 0 : 7 * Math.sin(u * 14) * Math.exp(-3 * u);
+    return u <= 0 ? 0 : 7 * Math.sin(u * 14) * decay(3 * u);
   };
 
   /* The glowing globe calls the fireflies: they fly over the top of it and on into the lighthouse's lantern, the one furthest left first. */

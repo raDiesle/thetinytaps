@@ -5,6 +5,7 @@
 // by frame (each round brings other things, so it can't be worked out ahead); each link is worked out ahead as a
 // function of the seconds since the last thing of its run fell against it, like a machine.
 
+import { decay } from "./level";
 import {
   playBlow,
   playBoing,
@@ -123,7 +124,7 @@ const rect = (w: number, h: number): Pt[] => [
 const ellipse = (c: Pt, rx: number, ry: number, n = 12): Pt[] =>
   Array.from({ length: n }, (_, i) => ({ x: c.x + rx * Math.cos((i / n) * 2 * Math.PI), y: c.y + ry * Math.sin((i / n) * 2 * Math.PI) }));
 /** A short shake of something that was knocked, `age` seconds after the knock. */
-const jolt = (age: number, amp = 3) => (age > 0 && age < 1 ? amp * Math.exp(-age * 6) * Math.sin(age * 40) : 0);
+const jolt = (age: number, amp = 3) => (age > 0 && age < 1 ? amp * decay(age * 6) * Math.sin(age * 40) : 0);
 
 export type LinkKind = "bench" | "hopper" | "balloon" | "skate" | "fan" | "chair";
 /** The links between the runs, in this order: each one is another way of moving on. */
@@ -348,7 +349,7 @@ function balloonLink(next: Size): BalloonLink {
   const bagRest = { x: POUF.w + 18, y: -half };
   const after = (age: number) => Math.max(0, age - hitAt);
   const basketAt = (age: number): Pt => {
-    const drift = vx * (Math.max(0, Math.min(age, hitAt) - liftAt) + (1 - Math.exp(-after(age))));
+    const drift = vx * (Math.max(0, Math.min(age, hitAt) - liftAt) + (1 - decay(after(age))));
     const bob = 5 * Math.sin(2.4 * Math.max(0, age - liftAt - riseT)) * seg(age, liftAt + riseT - 0.6, liftAt + riseT);
     const y = lerp(lerp(-POUF.h, top, easeInOut(seg(age, liftAt, liftAt + riseT))), -380, easeInOut(seg(age, hitAt, hitAt + 3)));
     return { x: x0 + drift, y: y + bob };
@@ -365,7 +366,7 @@ function balloonLink(next: Size): BalloonLink {
     const puff = Math.max(0, 1 - age / 0.4) * (age > 0 ? 1 : 0);
     if (age < tLift) return { basket, bag: bagRest, slack: true, tied: age < liftAt, puff };
     const u = age - tLift;
-    const phi = phiDrift + (phi0 - phiDrift) * Math.exp(-1.1 * u) * Math.cos(2.6 * u);
+    const phi = phiDrift + (phi0 - phiDrift) * decay(1.1 * u) * Math.cos(2.6 * u);
     const bag = { x: basket.x + rope * Math.sin(phi), y: Math.min(-half, basket.y + rope * Math.cos(phi)) };
     return { basket, bag, slack: false, tied: false, puff };
   };
@@ -434,7 +435,7 @@ function skateLink(next: Size): SkateLink {
   const rest = { x: target.x - 14, y: DECK_Y };
   const rampDeg = -deg(RAMP.angle);
   const pose = (age: number): SkatePose => {
-    const roly = age <= 0 ? 0 : 0.42 * Math.exp(-1.3 * age) * Math.sin((2 * Math.PI * age) / 1.0);
+    const roly = age <= 0 ? 0 : 0.42 * decay(1.3 * age) * Math.sin((2 * Math.PI * age) / 1.0);
     if (age < tRamp) {
       const t = Math.max(0, age - kickAt);
       return { roly, board: { x: start.x + v0 * t - (slow / 2) * t * t, y: DECK_Y }, tilt: 0 };
@@ -588,7 +589,7 @@ function chairLink(next: Size): ChairLink {
   const centre = { x: EGG.x, y: EGG.bottom - EGG.h / 2 };
   const L = centre.y - hook.y;
   const T = 2 * Math.PI * Math.sqrt(L / G);
-  const swing = (age: number) => (age <= 0 ? 0 : 0.45 * Math.exp(-0.08 * age) * Math.sin((2 * Math.PI * age) / T));
+  const swing = (age: number) => (age <= 0 ? 0 : 0.45 * decay(0.08 * age) * Math.sin((2 * Math.PI * age) / T));
   const flingAt = 2 * T;
   const hitAt = flingAt + 0.9;
   const seat = (age: number) => ({ x: centre.x - 10 + 36 * easeInOut(seg(age, 0.2, flingAt)), y: centre.y + 30 });

@@ -17,6 +17,7 @@
 // so FarmLevel.tsx only asks where each thing is at a moment. Coordinates are
 // those of the farmyard, 9080 × 900; the screen shows 1600 of it at a time.
 
+import { decay } from "./level";
 import {
   playBaa,
   playBark,
@@ -47,7 +48,7 @@ import {
   playTwinkle,
   playWhoosh,
 } from "@/lib/sfx";
-import { along, cameraOn, deg, distAt, easeIn, easeInOut, easeOut, hop, lerp, pathOf, rad, roll, seg, timeline, turn } from "./machineKit";
+import { along, cameraOn, deg, distAt, easeIn, easeInOut, easeOut, hop, lerp, pathOf, rad, roll, seg, timeline, turn, hump } from "./machineKit";
 import { line, quad, type Pt } from "./path";
 
 export const WORLD_W = 9080;
@@ -267,7 +268,7 @@ export function buildFarm() {
   /** The pig's middle on the ground, how high it is in the air, and how far it is up (0 asleep to 1 on its legs). */
   const pigAt = (t: number) => {
     const up = easeInOut(seg(t, tPigWake, tPigWake + 0.25));
-    const startle = 70 * Math.sin(Math.PI * seg(t, tPigWake, tPigWake + 0.45));
+    const startle = 70 * hump(seg(t, tPigWake, tPigWake + 0.45));
     const k = seg(t, tPigJump, tSplash);
     const flying = hop({ x: PIG.x, y: 0 }, { x: PUDDLE.x, y: 0 }, 170, k);
     return { x: flying.x, lift: startle - flying.y, up, inPuddle: t >= tSplash };
@@ -348,7 +349,7 @@ export function buildFarm() {
       if (t >= tHop(i)) pt = hop(GOAT_SPOTS[i], GOAT_SPOTS[i + 1], 60, seg(t, tHop(i), tHop(i) + HOP_TIME));
     }
     // Up with a start when the moo arrives.
-    const startle = 46 * Math.sin(Math.PI * seg(t, tGoatWake, tGoatWake + 0.4));
+    const startle = 46 * hump(seg(t, tGoatWake, tGoatWake + 0.4));
     if (t >= tCharge1) pt = { x: lerp(ground.x, buttX, easeIn(seg(t, tCharge1, tButt1))), y: FLOOR };
     // The can doesn't budge: she bounces back with a hop, and runs at it again.
     if (t >= tButt1) pt = hop({ x: buttX, y: FLOOR }, { x: backX, y: FLOOR }, 40, seg(t, tButt1, tButt1 + 0.5));
@@ -358,8 +359,8 @@ export function buildFarm() {
     const lowered = (t0: number, t1: number) => easeInOut(seg(t, t0, t0 + 0.25)) * (1 - easeInOut(seg(t, t1, t1 + 0.4)));
     const head = Math.max(lowered(tGround + 0.1, tButt1 + 0.25), lowered(tCharge - 0.45, tButt + 0.3));
     // She shakes her head after the first butt, and sees stars after the second.
-    const shake = Math.sin(Math.PI * seg(t, tButt1 + 0.45, tButt1 + 1.05)) * Math.sin((t - tButt1) * 30);
-    const dizzy = Math.sin(Math.PI * seg(t, tButt + 0.1, tButt + 2.2));
+    const shake = hump(seg(t, tButt1 + 0.45, tButt1 + 1.05)) * Math.sin((t - tButt1) * 30);
+    const dizzy = hump(seg(t, tButt + 0.1, tButt + 2.2));
     return { pt: { x: pt.x, y: pt.y - startle }, head, shake, awake: t >= tGoatWake, dizzy };
   };
 
@@ -389,7 +390,7 @@ export function buildFarm() {
   /** How far the standing milk can rocks on its bottom (degrees) after the goat's first butt. */
   const canRock = (t: number) => {
     const age = t - tButt1;
-    return age < 0 || t >= tButt ? 0 : 10 * Math.exp(-3 * age) * Math.sin(age * 16);
+    return age < 0 || t >= tButt ? 0 : 10 * decay(3 * age) * Math.sin(age * 16);
   };
 
   /* The kennel shakes, the dog comes out barking and runs to the turkey, his nose just short of its head. */
@@ -424,8 +425,8 @@ export function buildFarm() {
   at(tSackDown, { sound: playThump });
   /** The turkey: how high it jumps with fright, how far its beak is open, and how far its tail is fanned. */
   const turkeyAt = (t: number) => ({
-    lift: 40 * Math.sin(Math.PI * seg(t, tTurkeyBark + 0.1, tTurkeyBark + 0.45)),
-    mouth: Math.max(0, Math.sin(Math.PI * seg(t, tGobble, tGobble + 1.2)) * Math.abs(Math.sin((t - tGobble) * 14))),
+    lift: 40 * hump(seg(t, tTurkeyBark + 0.1, tTurkeyBark + 0.45)),
+    mouth: Math.max(0, hump(seg(t, tGobble, tGobble + 1.2)) * Math.abs(Math.sin((t - tGobble) * 14))),
     fan: fanAt(t),
   });
   /** How far the sack has tipped over (degrees, clockwise round its right corner). */
@@ -495,20 +496,22 @@ export function buildFarm() {
   /** The hen: her middle on the ground or on the mudguard, how far she is up (0 sitting, 1 standing), her pecking head (0 to 1), awake. */
   const henAt = (t: number) => {
     const pecks = [...GRAINS.map((_, i) => tPeck(i)), tHorn, tHorn2];
-    const peck = Math.max(...pecks.map((p) => Math.sin(Math.PI * seg(t, p - 0.14, p + 0.2))));
+    const peck = Math.max(...pecks.map((p) => hump(seg(t, p - 0.14, p + 0.2))));
     const up = easeInOut(seg(t, tHenWake + 0.25, tHenWake + 0.6));
     const awake = t >= tHenWake;
     const guard = (when: number) => ({ x: tractorAt(when).x + GUARD_SPOT.dx, y: GUARD_SPOT.y + tractorAt(when).shake });
     if (t >= tOnGuard) return { pt: guard(t), up, peck, awake };
     if (t >= tHenHop) return { pt: hop({ x: henOnGround(tHenHop), y: FLOOR }, guard(tOnGuard), 70, seg(t, tHenHop, tOnGuard)), up, peck: 0, awake };
-    const startle = 22 * Math.sin(Math.PI * seg(t, tHenWake, tHenWake + 0.3));
+    const startle = 22 * hump(seg(t, tHenWake, tHenWake + 0.3));
     return { pt: { x: henOnGround(t), y: FLOOR - startle }, up, peck, awake };
   };
   /** Where chick `j` is: they follow the hen's way along the grains, hopping, and stay on the grass when she flies up. */
   const chickAt = (j: number, t: number): Pt => {
     const lag = 0.35 * (j + 1);
-    const x = henOnGround(Math.min(t, tHenHop) - lag) - 52 - 30 * j;
-    const moving = Math.abs(henOnGround(Math.min(t, tHenHop) - lag + 0.05) - henOnGround(Math.min(t, tHenHop) - lag)) > 0.2;
+    // They walk on to where she flew up, so none stops mid-step and hops on the spot for the rest of the level.
+    const walked = Math.min(t - lag, tHenHop);
+    const x = henOnGround(walked) - 52 - 30 * j;
+    const moving = Math.abs(henOnGround(walked + 0.05) - henOnGround(walked)) > 0.2;
     return { x, y: FLOOR - (moving ? 10 * Math.abs(Math.sin(t * 14 + j)) : 0) };
   };
 
@@ -523,14 +526,14 @@ export function buildFarm() {
   at(tGooseSplash, { sound: splash });
   /** The goose: its middle, how far its wings are spread, its neck stretched out (0 to 1), its beak open, and whether it swims. */
   const gooseAt = (t: number) => {
-    const startle = 30 * Math.sin(Math.PI * seg(t, tGooseWake, tGooseWake + 0.35));
+    const startle = 30 * hump(seg(t, tGooseWake, tGooseWake + 0.35));
     const bank = { x: GOOSE.x, y: FLOOR - startle };
     const water = { x: GOOSE.water, y: POND.y };
     const pt = t < tGooseJump ? bank : hop(bank, water, 120, easeInOut(seg(t, tGooseJump, tGooseSplash)));
-    const wings = Math.sin(Math.PI * seg(t, tGooseWake + 0.2, tGooseSplash + 0.2));
+    const wings = hump(seg(t, tGooseWake + 0.2, tGooseSplash + 0.2));
     const neck = easeInOut(seg(t, tGooseSplash + 0.55, tGooseHonk)) * (1 - easeInOut(seg(t, tGooseHonk + 1, tGooseHonk + 1.6)));
     const honks = [tGooseWake, tGooseWake + 0.4, tGooseHonk, tGooseHonk + 0.35];
-    const beak = Math.max(...honks.map((h) => Math.sin(Math.PI * seg(t, h, h + 0.3))));
+    const beak = Math.max(...honks.map((h) => hump(seg(t, h, h + 0.3))));
     return { pt, wings: Math.abs(wings * Math.sin((t - tGooseWake) * 22)), neck, beak, awake: t >= tGooseWake, swimming: t >= tGooseSplash };
   };
 
@@ -559,10 +562,7 @@ export function buildFarm() {
   /* With every duck the donkey's back gives a little; after the third he brays „I-aah, I-aah“ and kicks the barn. */
   /** How far the donkey's back is pressed down now by the ducks landing on it. */
   const backDip = (t: number) =>
-    Array.from({ length: DUCKS }, (_, i) => t - tLand(i)).reduce(
-      (sum, age) => sum + (age < 0 || age > 1.2 ? 0 : 14 * Math.exp(-5 * age) * Math.cos(age * 16)),
-      0,
-    );
+    Array.from({ length: DUCKS }, (_, i) => t - tLand(i)).reduce((sum, age) => sum + (age < 0 || age > 1.2 ? 0 : 14 * decay(5 * age) * Math.cos(age * 16)), 0);
   // Three ducks are too many: he stamps a front hoof twice, then brays.
   const tStamp = [tLand(DUCKS - 1) + 0.55, tLand(DUCKS - 1) + 0.95];
   for (const ts of tStamp) at(ts, { sound: () => playKnock(330) });
@@ -585,15 +585,15 @@ export function buildFarm() {
   /** The donkey now: how far he leans (degrees, his rump up), how far his hind legs swing back, his head up (0 to 1), his mouth and a stamping hoof. */
   const donkeyAt = (t: number) => {
     // He crouches a little, then snaps his rump up and his hind legs back, and slowly stands again.
-    const crouch = Math.sin(Math.PI * seg(t, tKick - 0.55, tKick - 0.1));
+    const crouch = hump(seg(t, tKick - 0.55, tKick - 0.1));
     const snap = easeOut(seg(t, tKick - 0.12, tKick)) * (1 - easeInOut(seg(t, tKick + 0.2, tKick + 0.8)));
     const tilt = 5 * crouch + KICK_TILT * snap;
     const swing = KICK_SWING * snap;
     const head = easeInOut(seg(t, tBray - 0.3, tBray)) * (1 - easeInOut(seg(t, tBray + 2.6, tBray + 2.9)));
     const brays = [tBray, tHaw[0], tBray + 1.25, tHaw[1]];
-    const mouth = Math.max(...brays.map((b, i) => (i % 2 ? 1 : 0.6) * Math.sin(Math.PI * seg(t, b, b + (i % 2 ? 0.8 : 0.5)))));
+    const mouth = Math.max(...brays.map((b, i) => (i % 2 ? 1 : 0.6) * hump(seg(t, b, b + (i % 2 ? 0.8 : 0.5)))));
     // How high his front hoof is lifted for a stamp.
-    const stamp = Math.max(...tStamp.map((ts) => Math.sin(Math.PI * seg(t, ts - 0.22, ts))));
+    const stamp = Math.max(...tStamp.map((ts) => hump(seg(t, ts - 0.22, ts))));
     return { tilt, swing, head, mouth, stamp, dip: backDip(t) };
   };
   /** Where a duck on the donkey's back is now: it rides along as he leans and his back gives. */
@@ -687,7 +687,7 @@ export function buildFarm() {
   at(tDone, { done: true });
   /** How much a singer opens its mouth now: when it sings alone (`solo`, an index of `tSolo`) and in the choir. */
   const singing = (solo: number, t: number) => {
-    const alone = Math.sin(Math.PI * seg(t, tSolo[solo], tSolo[solo] + (solo === DONKEY_SOLO ? 2 : 0.7)));
+    const alone = hump(seg(t, tSolo[solo], tSolo[solo] + (solo === DONKEY_SOLO ? 2 : 0.7)));
     const together = t >= tChoir && t < tDone ? 0.6 + 0.4 * Math.sin((t - tChoir) * 9 + solo) : 0;
     return Math.max(alone, together);
   };

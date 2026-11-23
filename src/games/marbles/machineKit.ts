@@ -15,6 +15,12 @@ export const lerp = (a: number, b: number, k: number) => a + (b - a) * k;
 export const clamp01 = (k: number) => Math.min(1, Math.max(0, k));
 /** 0 until `t0`, 1 from `t1` on, a straight line in between. */
 export const seg = (t: number, t0: number, t1: number) => clamp01((t - t0) / (t1 - t0));
+/**
+ * Up and down again as `k` goes from 0 to 1 (a half sine), and exactly 0 outside: `Math.sin(Math.PI * 1)` is 1.2e-16,
+ * which times a fast wiggle (a flapping wing) changed the picture by a fraction of a pixel in every frame for the rest of
+ * the level, and the phone painted it again each time (perf, November 2026; `decay.test.ts`).
+ */
+export const hump = (k: number) => (k <= 0 || k >= 1 ? 0 : Math.sin(Math.PI * k));
 export const easeIn = (k: number) => k * k;
 export const easeOut = (k: number) => 1 - (1 - k) * (1 - k);
 export const easeInOut = (k: number) => (k < 0.5 ? 2 * k * k : 1 - 2 * (1 - k) * (1 - k));

@@ -1,9 +1,9 @@
 import { memo, useId, useMemo, type ReactNode } from "react";
 import { MASCOT_COLORS, MascotHead } from "@/components/Mascot";
 import { useT } from "@/lib/language";
-import { VIEW_H, wobble, type LevelProps } from "./level";
-import { beside, deg, hop, lerp, svgLine } from "./machineKit";
-import { MachineStage } from "./MachineStage";
+import { VIEW_H, wobble, type LevelProps, decay } from "./level";
+import { beside, deg, hop, lerp, seg, svgLine } from "./machineKit";
+import { MachineStage, type WorldLayer } from "./MachineStage";
 import { INK, MARBLE_COLOR, Sparkles } from "./scenery";
 import {
   ARM,
@@ -40,6 +40,7 @@ import {
   ROBOT,
   ROCK,
   ROCKET,
+  ROCKET_RISE,
   SAT,
   SCOPE,
   scopeTip,
@@ -53,7 +54,7 @@ import {
   type Space,
 } from "./space";
 import { BALL_R, type Pt } from "./path";
-import { BAR_COLORS, Ball } from "./parts";
+import { BAR_COLORS, Ball, still } from "./parts";
 
 const SKY_TOP = "#0d1446";
 const SKY_LOW = "#2b3a88";
@@ -81,14 +82,23 @@ const GLOW = "#7dffb2";
 export function SpaceLevel(props: LevelProps) {
   const space = useMemo(buildSpace, []);
   const ids = useId();
+  const sky = useMemo(() => skyLayers(`${ids}-sky`), [ids]);
 
   return (
-    <MachineStage machine={space} level="space" start={{ x: DISH.x, y: DISH.y - 6, r: 96 }} {...props}>
+    <MachineStage
+      machine={space}
+      level="space"
+      start={{ x: DISH.x, y: DISH.y - 6, r: 96 }}
+      back={(t) => sky.map((l, i) => (i === 0 || t < 0 ? l : { ...l, className: `${l.className} ${t >= space.tLift ? "party" : "on"}` }))}
+      {...props}
+    >
       {(t) => {
         const roo = space.kangarooAt(t);
         return (
           <>
-            <Sky sky={`${ids}-sky`} t={t} space={space} />
+            <RingedPlanet x={2350} y={170} />
+            <Moon awake={t >= space.tMoonLand} />
+            <MoonLanding space={space} t={t} />
             <Ground />
             <DishMast />
             <RingRail space={space} t={t} />
@@ -206,42 +216,46 @@ const STARS = Array.from({ length: 170 }, (_, i) => ({
   x: -300 + rand(i) * (WORLD_W + 600),
   y: 14 + rand(i + 500) * 620,
   size: 2 + rand(i + 900) * 5,
-  phase: rand(i + 1300) * 2 * Math.PI,
 }));
 
-function Sky({ sky, t, space }: { sky: string; t: number; space: Space }) {
-  const party = t >= space.tLift;
-  return (
-    <g>
-      <defs>
-        <linearGradient id={sky} x1="0" y1="0" x2="0" y2="1">
-          <stop offset="0" stopColor={SKY_TOP} />
-          <stop offset="1" stopColor={SKY_LOW} />
-        </linearGradient>
-      </defs>
-      <rect x="-400" y="-200" width={WORLD_W + 800} height={FLOOR + 200} fill={`url(#${sky})`} />
-      {STARS.map((s, i) => {
-        const twinkle = t < 0 ? 0.8 : 0.55 + 0.45 * Math.sin(t * (party ? 7 : 2.2) + s.phase);
-        const grow = party ? 1.3 + 0.3 * Math.sin(t * 6 + s.phase) : 1;
-        if (s.size < 4.6) return <circle key={i} cx={s.x} cy={s.y} r={(s.size / 2) * grow} fill="#fff7d6" opacity={twinkle} />;
-        return (
-          <path
-            key={i}
-            transform={`translate(${s.x} ${s.y}) scale(${(s.size / 12) * grow})`}
-            d="M0 -16 L4 -4 L16 0 L4 4 L0 16 L-4 4 L-16 0 L-4 -4 Z"
-            fill="#ffe680"
-            opacity={twinkle}
-          />
-        );
-      })}
-      <RingedPlanet x={2350} y={170} />
-      <Moon awake={t >= space.tMoonLand} />
-      <MoonLanding space={space} t={t} />
-    </g>
-  );
+/** How many groups the stars twinkle in, each a layer of its own a little out of step with the others. */
+const STAR_GROUPS = 3;
+
+/**
+ * The night sky under everything: its colour, then the stars in `STAR_GROUPS` layers. Once the machine runs each layer
+ * twinkles by its opacity (`marble-stars` in marbles.css, faster from the lift-off on), which the phone's compositor
+ * does without painting: every star drawn again in every frame with its own twinkle kept an old phone's main thread
+ * busy and had it raster the whole sky 100 times a second (perf, November 2026).
+ */
+function skyLayers(sky: string): WorldLayer[] {
+  const star = (s: (typeof STARS)[number], i: number) =>
+    s.size < 4.6 ? (
+      <circle key={i} cx={s.x} cy={s.y} r={s.size / 2} fill="#fff7d6" />
+    ) : (
+      <path key={i} transform={`translate(${s.x} ${s.y}) scale(${s.size / 12})`} d="M0 -16 L4 -4 L16 0 L4 4 L0 16 L-4 4 L-16 0 L-4 -4 Z" fill="#ffe680" />
+    );
+  return [
+    {
+      content: (
+        <>
+          <defs>
+            <linearGradient id={sky} x1="0" y1="0" x2="0" y2="1">
+              <stop offset="0" stopColor={SKY_TOP} />
+              <stop offset="1" stopColor={SKY_LOW} />
+            </linearGradient>
+          </defs>
+          <rect x="-400" y="-200" width={WORLD_W + 800} height={FLOOR + 200} fill={`url(#${sky})`} />
+        </>
+      ),
+    },
+    ...Array.from({ length: STAR_GROUPS }, (_, g) => ({
+      content: <>{STARS.map((s, i) => (i % STAR_GROUPS === g ? star(s, i) : null))}</>,
+      className: `marble-stars marble-stars-${g}`,
+    })),
+  ];
 }
 
-function RingedPlanet({ x, y }: { x: number; y: number }) {
+const RingedPlanet = still(function RingedPlanet({ x, y }: { x: number; y: number }) {
   return (
     <g transform={`translate(${x} ${y}) rotate(-14)`}>
       <path d="M-74 0 A74 18 0 0 1 74 0" fill="none" stroke={INK} strokeWidth="11" />
@@ -253,7 +267,7 @@ function RingedPlanet({ x, y }: { x: number; y: number }) {
       <circle cx="-16" cy="-22" r="7" fill="#fff" opacity="0.6" />
     </g>
   );
-}
+});
 
 /** The moon sleeps until the rocket lands on it, then opens its eyes and smiles. */
 function Moon({ awake }: { awake: boolean }) {
@@ -284,7 +298,7 @@ function Moon({ awake }: { awake: boolean }) {
 
 const CRATERS = [180, 640, 1150, 1700, 2300, 2650, 3420, 4000, 4460, 5000, 5360, 6000, 6400, 7000, 7450, 7900, 8300];
 
-function Ground() {
+const Ground = memo(function Ground() {
   const x0 = HILLS[0].x - HILLS[0].w / 2;
   const x1 = HILLS[HILLS.length - 1].x + HILLS[HILLS.length - 1].w / 2;
   const top = Array.from({ length: Math.ceil((x1 - x0) / 8) + 1 }, (_, i) => {
@@ -305,12 +319,12 @@ function Ground() {
       ))}
     </g>
   );
-}
+});
 
 /* ---------- Dish, glowing buttons and glass tube ---------- */
 
 /** The mast holding the dish, and the inside of the dish behind the marble. */
-function DishMast() {
+const DishMast = memo(function DishMast() {
   const { x, y, rx } = DISH;
   return (
     <g>
@@ -325,10 +339,10 @@ function DishMast() {
       <ellipse cx={x} cy={y - 8} rx={rx} ry="18" fill={DARK_STEEL} stroke={INK} strokeWidth="3" />
     </g>
   );
-}
+});
 
 /** The front of the dish bowl, and the feed sticking up over it with a light on top. */
-function DishFront() {
+const DishFront = memo(function DishFront() {
   const { x, y, rx } = DISH;
   return (
     <g>
@@ -357,7 +371,7 @@ function DishFront() {
       <circle cx={x + 14} cy={y - 88} r="10" fill="#ff5d73" stroke={INK} strokeWidth="3" />
     </g>
   );
-}
+});
 
 /** A steel rail just under the marble's path from `a` to `b`. */
 function MetalRail({ a, b }: { a: Pt; b: Pt }) {
@@ -378,11 +392,11 @@ function Ring({ x, color, age, half }: { x: number; color: string; age: number; 
   const d = half === "back" ? "M0 -40 A14 40 0 0 0 0 40" : "M0 -40 A14 40 0 0 1 0 40";
   return (
     <g transform={`translate(${x} ${rampY(x)}) rotate(${slope})`}>
-      {half === "back" && lit && <ellipse rx="34" ry="56" fill={color} opacity={0.2 + 0.4 * Math.exp(-age * 3)} />}
+      {half === "back" && lit && <ellipse rx="34" ry="56" fill={color} opacity={0.2 + 0.4 * decay(age * 3)} />}
       <path d={d} fill="none" stroke={INK} strokeWidth="11" strokeLinecap="round" />
       <path d={d} fill="none" stroke={lit ? color : "#4a4f7d"} strokeWidth="6" strokeLinecap="round" />
       {half === "front" && lit && (
-        <path d="M3 -30 A10 30 0 0 1 9 -6" fill="none" stroke="#fff" strokeWidth="3" strokeLinecap="round" opacity={0.5 + 0.5 * Math.exp(-age * 3)} />
+        <path d="M3 -30 A10 30 0 0 1 9 -6" fill="none" stroke="#fff" strokeWidth="3" strokeLinecap="round" opacity={0.5 + 0.5 * decay(age * 3)} />
       )}
     </g>
   );
@@ -433,7 +447,7 @@ function PipeBack({ space, t }: { space: Space; t: number }) {
 }
 
 /** The front of the see-through pipe: its two edges, a shine and the clamps that hold it to the panel. */
-function PipeFront({ space }: { space: Space }) {
+const PipeFront = still(function PipeFront({ space }: { space: Space }) {
   const inside = space.pipe.filter((p) => p.x <= PANEL.x1);
   const clamps = [0.12, 0.3, 0.55, 0.8].map((k) => inside[Math.round(k * (inside.length - 1))]);
   return (
@@ -456,11 +470,11 @@ function PipeFront({ space }: { space: Space }) {
       ))}
     </g>
   );
-}
+});
 
 /* ---------- Deck, robot and moon buggy ---------- */
 
-function Deck() {
+const Deck = memo(function Deck() {
   const { x0, x1, y } = DECK;
   const legs = [x0 + 20, (x0 + x1) / 2 - 40, x1 - 40];
   return (
@@ -485,10 +499,10 @@ function Deck() {
       ))}
     </g>
   );
-}
+});
 
 /** The steel track from the deck down onto the moon, on two legs. */
-function DownRamp({ space }: { space: Space }) {
+const DownRamp = still(function DownRamp({ space }: { space: Space }) {
   const { pts } = space.buggyPath;
   const down = pts.filter((p) => p.x >= DECK.x1 - 6 && p.x <= DOWN.x1 + 60);
   const track = beside(down, 8);
@@ -503,7 +517,7 @@ function DownRamp({ space }: { space: Space }) {
       <path d={svgLine(track)} fill="none" stroke="#ffb703" strokeWidth="13" strokeLinejoin="round" strokeLinecap="round" />
     </g>
   );
-}
+});
 
 /** The robot sleeps until the marble presses its button; then it wakes, pushes the buggy and waves. */
 function Robot({ space, t }: { space: Space; t: number }) {
@@ -889,7 +903,7 @@ function Telescope({ space, t }: { space: Space; t: number }) {
       </g>
       {glint >= 0 && glint < 1.2 && (
         <path
-          transform={`translate(${tip.x} ${tip.y}) scale(${2.2 * Math.exp(-glint * 2.5)}) rotate(${glint * 90})`}
+          transform={`translate(${tip.x} ${tip.y}) scale(${2.2 * decay(glint * 2.5)}) rotate(${glint * 90})`}
           d="M0 -16 L4 -4 L16 0 L4 4 L0 16 L-4 4 L-16 0 L-4 -4 Z"
           fill="#fff7d6"
         />
@@ -995,9 +1009,9 @@ function MoonRock({ space, t }: { space: Space; t: number }) {
 const LAMP_COLORS = ["#ff3b3b", "#ff8c42", "#ffd23f"];
 
 /** The dark opening of the slot on top of the board, behind the iron ball. */
-function SlotHole() {
+const SlotHole = memo(function SlotHole() {
   return <ellipse cx={SLOT.x} cy={BOARD.y - SLOT.h} rx={SLOT.w / 2 - 6} ry="10" fill="#10163a" stroke={INK} strokeWidth="3" />;
-}
+});
 
 /** The board wakes up when the iron ball drops into its slot, then counts down: three lamps one after the other, then all green for the start. */
 function CountdownBoard({ space, t }: { space: Space; t: number }) {
@@ -1007,7 +1021,7 @@ function CountdownBoard({ space, t }: { space: Space; t: number }) {
   const step = space.countAt(t);
   const awake = t >= space.tWake;
   const tStep = step === 0 ? 0 : step === 4 ? space.tLift : space.tCount[step - 1];
-  const popUp = 1 + 0.35 * Math.exp(-(t - tStep) * 8);
+  const popUp = 1 + 0.35 * decay((t - tStep) * 8);
   const cx = x + w / 2;
   const screen = { y: y + 82, h: h - 104 };
   const cy = screen.y + screen.h / 2;
@@ -1085,7 +1099,7 @@ function LaunchTower({ angle, t }: { angle: number; t: number }) {
   );
 }
 
-function Pad() {
+const Pad = memo(function Pad() {
   const { x0, x1 } = PAD;
   return (
     <g>
@@ -1095,9 +1109,9 @@ function Pad() {
       ))}
     </g>
   );
-}
+});
 
-function Tank() {
+const Tank = memo(function Tank() {
   const { x, w, h } = TANK;
   return (
     <g>
@@ -1111,7 +1125,7 @@ function Tank() {
       <rect x={HOSE.from.x - 14} y={HOSE.from.y - 12} width="18" height="24" rx="4" fill={DARK_STEEL} stroke={INK} strokeWidth="3" />
     </g>
   );
-}
+});
 
 /** The fuel hose from the tank to the rocket; `drop` goes from 0 (plugged in) to 1 (lying on the ground). */
 function Hose({ drop }: { drop: number }) {
@@ -1138,6 +1152,8 @@ function Rocket({ space, t }: { space: Space; t: number }) {
   const { w, h, nose } = ROCKET;
   const half = w / 2;
   const rise = space.rocketRise(t);
+  // Flown out of the picture, it is gone: its flame flickered and the bear waved there for ever, unseen (perf).
+  if (rise >= ROCKET_RISE) return null;
   const top = -30 - h;
   const waving = t >= space.tCount[0];
   // The gloved paw waves beside the cheek, clear of the ear.
@@ -1250,7 +1266,7 @@ function Smoke({ space, t }: { space: Space; t: number }) {
     if (te < space.tLift + 0.5) {
       // Rolling away along the ground on both sides of the pad.
       const big = te < space.tLift ? 0.55 : 1;
-      x = ROCKET.x + side * (50 + 330 * big * (1 - Math.exp(-age * 1.4)) + (i % 3) * 14);
+      x = ROCKET.x + side * (50 + 330 * big * (1 - decay(age * 1.4)) + (i % 3) * 14);
       y = ROCKET.bottom - 16 - 40 * age * big - (i % 4) * 8;
       r = (20 + 46 * Math.min(age, 1.4)) * big;
     } else {
@@ -1454,7 +1470,8 @@ function Satellite({ space, t }: { space: Space; t: number }) {
   const { x, y, wing } = SAT;
   const { awake, wings } = space.satAt(t);
   const reach = lerp(18, wing, wings);
-  const bob = awake ? 4 * Math.sin((t - space.tSatWake) * 3) : 0;
+  // It bobs for a few seconds once awake, then floats still: bobbing for ever kept the phone painting it (perf).
+  const bob = awake ? 4 * Math.sin((t - space.tSatWake) * 3) * (1 - seg(t, space.tSatWake + 4, space.tSatWake + 6)) : 0;
   return (
     <g transform={`translate(${x} ${y + bob})`}>
       {[-1, 1].map((s) => {

@@ -1,6 +1,7 @@
 // The links of „Alles fällt um“ drawn: each in its own units (x from its left edge, the floor at y = 0), posed by
 // `topple.ts` for the seconds since it was hit.
 
+import { decay } from "./level";
 import { lerp } from "./machineKit";
 import {
   BALLOON,
@@ -50,7 +51,7 @@ function Bench({ link, age }: { link: BenchLink; age: number }) {
   const { w, h, seat } = BENCH;
   const tentW = lerp(150, TENT.w, tent);
   const tentH = lerp(TENT.flat - 8 * press, TENT.h, tent);
-  const sway = tent > 0 ? 1 + 0.06 * Math.exp(-(age - link.hitAt + 1.4) * 4) * Math.sin((age - link.hitAt + 1.4) * 22) : 1;
+  const sway = tent > 0 ? 1 + 0.06 * decay((age - link.hitAt + 1.4) * 4) * Math.sin((age - link.hitAt + 1.4) * 22) : 1;
   return (
     <g>
       <g transform={`translate(${jolt} 0)`}>

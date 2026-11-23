@@ -42,7 +42,7 @@ import {
   playWhoosh,
 } from "@/lib/sfx";
 import { playGiggle, playLaunch } from "@/lib/realSounds";
-import { wobble } from "./level";
+import { wobble, decay } from "./level";
 import {
   along,
   cameraOn,
@@ -191,6 +191,8 @@ export const SLOT = { x: MAGNET.x, w: 100, h: 46 };
 /** The launch tower and its arm, which reaches over to the rocket's window. */
 export const TOWER = { x: 5280 + MOVED, w: 70, top: 230 };
 export const ROCKET = { x: 5500 + MOVED, w: 130, h: 400, nose: 120, bottom: FLOOR - 44 };
+/** How high the rocket rises: by then it, flame and all, is out of the picture. */
+export const ROCKET_RISE = 1400;
 export const PAD = { x0: 5360 + MOVED, x1: 5640 + MOVED };
 /** The window's middle, measured up from the rocket's bottom. */
 export const WINDOW_UP = 30 + ROCKET.h * 0.72;
@@ -457,7 +459,7 @@ export function buildSpace() {
   /* The mobile turns; half a turn on, the earth comes round and bonks the telescope's objective. */
   const SPIN = 2.4 * Math.PI;
   const SPIN_SLOW = 3.4;
-  const spinAt = (t: number) => (t < tSpin ? 0 : SPIN * (1 - Math.exp(-(t - tSpin) / SPIN_SLOW)));
+  const spinAt = (t: number) => (t < tSpin ? 0 : SPIN * (1 - decay((t - tSpin) / SPIN_SLOW)));
   const tip0 = scopeTip(SCOPE.rest);
   let u = 0;
   for (; u < 6; u += STEP) {
@@ -660,7 +662,7 @@ export function buildSpace() {
   /** The tower arm's angle: 0 at the rocket's window, -95 folded up. */
   const armAngle = (t: number) => -95 * easeInOut(seg(t, tArm, tArm + 1.1));
   /** How far the rocket has risen. */
-  const rocketRise = (t: number) => 1400 * easeIn(seg(t, tLift, tLift + 2.6));
+  const rocketRise = (t: number) => ROCKET_RISE * easeIn(seg(t, tLift, tLift + 2.6));
   /** How big the flame is: a small flicker once the engine lights, full size once it lifts off. */
   const flameAt = (t: number) =>
     t < tIgnite ? 0 : t < tLift ? 0.35 * easeOut(seg(t, tIgnite, tIgnite + 0.4)) : lerp(0.35, 1, easeOut(seg(t, tLift, tLift + 0.4)));
