@@ -161,6 +161,7 @@ export function treePicture(page: TreePage): QueuedPicture {
 const MADE = new Set<string>([
   "abend",
   "baender",
+  "besuch",
   "buch",
   "kinder",
   "kissen",
@@ -168,10 +169,12 @@ const MADE = new Set<string>([
   "lied",
   "los",
   "meine",
+  "rot",
   "schnuller",
   "spielen",
   "stolz",
   "troesten",
+  "tschuess",
   "vermisst",
   "wann",
 ]);

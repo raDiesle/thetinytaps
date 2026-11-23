@@ -171,7 +171,28 @@ export function showerPicture(page: ShowerPage): QueuedPicture {
 }
 
 /** The pages whose pictures are made (`bilder/dusche-<id>.webp`); the others wait in the queue. */
-const MADE = new Set<string>(["hase", "laut", "leise", "lieb", "papa-fuesse", "sagen", "sand", "stolz", "trocknen", "zehen"]);
+const MADE = new Set<string>([
+  "aus",
+  "becher",
+  "einwickeln",
+  "fisch",
+  "hase",
+  "jetzt",
+  "laut",
+  "leise",
+  "lieb",
+  "matte",
+  "papa-fuesse",
+  "sagen",
+  "sand",
+  "schaum",
+  "selbst",
+  "spritzer",
+  "spuelen",
+  "stolz",
+  "trocknen",
+  "zehen",
+]);
 
 /** Every picture of the story still to make. */
 export const SHOWER_PICTURE_QUEUE: QueuedPicture[] = SHOWER_PAGES.filter((p) => !MADE.has(p.id)).map(showerPicture);

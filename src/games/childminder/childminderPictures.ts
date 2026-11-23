@@ -136,9 +136,18 @@ function thingsOf(page: ChildminderPage): string[] {
 const END =
   "Everyone's face shows plainly what they feel, friendly and warm. The illustration fills the whole picture edge to edge (full bleed): no border, no frame, no white margin, no rounded corners, no vignette. No speech bubbles. No text, no letters, no numbers, also not on signs or doors.";
 
+/**
+ * Pages drawn from another page of their place than its first, and who was where in that one: drawn from „besuch“, where
+ * Papa stands on the doormat and Lotta kneels, the slipper page came back with Mama as a bear, then with Papa, then
+ * with two Mamas – „kuss“ already has Mama kneeling with Tapsi in the hall.
+ */
+const DRAWN_FROM: Partial<Record<string, { page: string; was: string }>> = {
+  haken: { page: "kuss", was: "Mama in her coat kneels on the floor of the hall and hugs Tapsi" },
+};
+
 /** The page a place's reference picture is, if it is one of this story's. */
 const refPage = (page: ChildminderPage) => {
-  const first = PLACES[page.place].first;
+  const first = DRAWN_FROM[page.id]?.page ?? PLACES[page.place].first;
   return first && first !== page.id ? CHILDMINDER_PAGES.find((p) => p.id === first) : undefined;
 };
 
@@ -149,7 +158,8 @@ const borrowed = (page: ChildminderPage) =>
 /** How the characters are named where a prompt says who is not there. */
 const NAMED: Record<Cast, string> = {
   tapsi: "Tapsi",
-  mama: "Mama (the grown-up fox woman)",
+  // Named only as „the grown-up fox woman“, Mama's legs and tail stayed at the kitchen table's end (tm-mittag).
+  mama: "Mama (the grown-up fox woman with a red flower behind one ear, in a yellow sweater and brown trousers)",
   // Named only as „the grown-up fox man“, Papa stayed standing on the hall's doormat of the reference (tm-haken).
   papa: "Papa (the grown-up fox man with round glasses and a green sweater)",
   lotta: "Lotta (the grown-up bear)",
@@ -172,6 +182,8 @@ function absent(page: ChildminderPage): string {
 /** The place's own reference of a page: its place's first picture, or the families' pictures for that first picture. */
 function ownRefs(page: ChildminderPage): string[] {
   const place = PLACES[page.place];
+  const from = DRAWN_FROM[page.id];
+  if (from) return [pictureFile(from.page)];
   if (place.first !== page.id) return [place.ref];
   return page.cast.some(isBear) ? [FAMILY, BEARS] : [FAMILY];
 }
@@ -191,7 +203,7 @@ export function promptOf(page: ChildminderPage): string {
         ]
       : [
           "Redraw this exact place from the first reference picture: keep it exactly as it is – the same walls, windows, furniture and objects at the same places, the same camera framing (no zoom, no shift), the same colours and line style. Only the characters, their poses, the things they hold and the light change, and who is there.",
-          `In that reference picture ${place.was}: that was another moment. Draw each character only where this page says, and leave every other place empty – where someone was in the reference and this page puts them elsewhere, that spot is empty now (Lotta once came back twice, kneeling as in the reference and in the doorway): no second fox or bear, no fox tail left lying on the floor or the furniture.`,
+          `In that reference picture ${DRAWN_FROM[page.id]?.was ?? place.was}: that was another moment. Draw each character only where this page says, and leave every other place empty – where someone was in the reference and this page puts them elsewhere, that spot is empty now (Lotta once came back twice, kneeling as in the reference and in the doorway): no second fox or bear, no fox tail left lying on the floor or the furniture.`,
           absent(page),
         ];
   const ORDINAL = ["first", "second", "third", "fourth"];
@@ -245,6 +257,7 @@ const MADE = new Set<string>([
   "lieb",
   "packen",
   "sagen",
+  "sand",
   "schlafen",
   "sofa",
   "traurig",
@@ -253,6 +266,7 @@ const MADE = new Set<string>([
   "weg",
   "weinen",
   "wieder",
+  "winken",
   "zug",
   "zuhause",
 ]);
