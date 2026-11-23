@@ -102,8 +102,8 @@ test("the end's buttons and its trophy answer without a pointer too", async () =
 // It wasn't clear the landed trophy can be tapped, it was small and its count hard to read (user feedback, November
 // 2026): the shared ring and hand point at it (stopped at their first stage, never darkening „Weiter“), and its count
 // stands on a light plate big enough to read. Then the trophy at nearly half the screen with a golden glow was too loud
-// (user feedback, November 2026): it is a quarter of the screen's height and the hint its quiet form – a thin ring and
-// a small hand, no glow and no waves – still showing it can be tapped.
+// (user feedback, November 2026): it is a quarter of the screen's height and the hint its quiet form – only a small
+// hand, no ring round it (asked for again), no glow and no waves – still showing it can be tapped.
 test("the landed trophy is quiet but plainly tappable, and its count is easy to read", async () => {
   const end = await Bun.file("src/components/GameEnd.tsx").text();
   expect(end).toMatch(/\{landed && trophySize && [^}]*<TrophyHint \{\.\.\.trophySize\} \/>\}/);
@@ -114,6 +114,7 @@ test("the landed trophy is quiet but plainly tappable, and its count is easy to 
   expect(height).toBeLessThanOrEqual(30);
   const hint = await Bun.file("src/components/TapHint.tsx").text();
   expect(hint).toContain('{!quiet && <div className="tap-hint-glow" />}');
+  expect(hint).toContain('{!quiet && <div className="tap-hint-ring" />}');
   const trophy = await Bun.file("src/components/Trophy.tsx").text();
   const plate = trophy.match(/function Plate[\s\S]*?\n\}/)?.[0] ?? "";
   expect(Number(plate.match(/fontSize="([\d.]+)"/)?.[1])).toBeGreaterThanOrEqual(14);

@@ -177,8 +177,8 @@ export function GameEnd({ onAgain, menu = false, next, delayMs = 0, corners = fa
 
   // Landed, the trophy is plainly something to tap (user feedback, November 2026: nobody saw it opens the trophy room):
   // the shared ring and pointing hand round it, measured from its box (untransformed, so it fits on its board) – in
-  // their quiet form, a thin ring and a small hand without glow (user feedback, November 2026: the trophy at the end
-  // was too loud). It stops at the hand tapping and never darkens the rest, since „Weiter“ beside it is the choice most want.
+  // their quiet form, only a small hand – no ring, no glow (user feedback, November 2026: the trophy at the end was
+  // too loud, then the ring round it too). It stops at the hand tapping and never darkens the rest, since „Weiter“ beside it is the choice most want.
   const [trophySize, setTrophySize] = useState<TrophyBox>();
   useLayoutEffect(() => {
     const trophy = trophyRef.current;
@@ -331,13 +331,14 @@ export function GameEnd({ onAgain, menu = false, next, delayMs = 0, corners = fa
 type TrophyBox = { width: number; height: number; room: DOMRect };
 
 /**
- * The ring and hand round the landed trophy: a box reaching out round it, so `TapHint`, which keeps within its box,
+ * The hand pointing at the landed trophy: a box reaching out round it, so `TapHint`, which keeps within its box,
  * shows them whole. The hand lies to the left (the buttons stand to its right), or above it where the trophy stands
  * too close to the screen's left edge for the whole hand – on a phone it stands right at the edge.
  */
 function TrophyHint({ width, height, room }: TrophyBox) {
-  const r = height * 0.52;
-  const hand = Math.max(44, Math.min(96, r * 0.95));
+  // No ring is drawn (`quiet`), so `r` only puts the fingertip just beside the trophy's cup.
+  const r = height * 0.4;
+  const hand = Math.max(44, Math.min(96, height * 0.5));
   const side = room.left + width / 2 - r - hand * 1.1 >= 0 ? "left" : "above";
   const [left, top] = [Math.round(width * 1.6), Math.round(height * 0.9)];
   const style: CSSProperties = { top: -top, left: -left, width: width + 2 * left, height: height + 2 * top };

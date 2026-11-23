@@ -30,8 +30,8 @@ type HintStyle = CSSProperties & Record<`--${string}`, string>;
  * of their own and the picture under them is never painted again. Taps go through it. Mount it anew (a `key`) for a new
  * spot, so it starts calm again; `hand={false}` leaves the hand out until the first stage. `upTo` stops it at an earlier
  * stage, where the spot is one choice beside others and must not darken them (the trophy beside „Weiter“, GameEnd).
- * `quiet` is its calm form for a thing that may be tapped but is no step of the game (the trophy at a level's end): a
- * thin ring without the golden glow, and no rings going out when the hand taps.
+ * `quiet` is its calm form for a thing that may be tapped but is no step of the game (the trophy at a level's end): the
+ * hand alone, no ring, no golden glow and no rings going out when it taps (user feedback, November 2026).
  */
 export function TapHint({
   x,
@@ -88,7 +88,7 @@ export function TapHint({
       <div className="tap-hint-dim" />
       <div className="tap-hint-spot">
         {!quiet && <div className="tap-hint-glow" />}
-        <div className="tap-hint-ring" />
+        {!quiet && <div className="tap-hint-ring" />}
         {stage > 0 && !quiet && <div className="tap-hint-wave" />}
       </div>
       {(hand || stage > 0) && (

@@ -295,7 +295,7 @@
   cursor: pointer;
 }
 
-/* The ring and hand round it once it landed (GameEnd's TrophyHint): taps go through to the trophy. */
+/* The hand pointing at it once it landed (GameEnd's TrophyHint): taps go through to the trophy. */
 .game-end-trophy-hint {
   position: absolute;
   pointer-events: none;

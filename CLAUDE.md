@@ -451,7 +451,8 @@ In a fresh worktree run `bun install` first.
   measured from its board, `GameEnd.test.ts`); a new `GameEnd` passes `level` (the level's or story's id; without it the game has one trophy).
   Landed it is about a quarter of the screen's height (`--trophy-h` in `game-end.css`, smaller in an `inline` end) –
   never a bigger one again – and still plainly something to tap: the shared `TapHint` round it in its quiet form
-  (`quiet`: a thin ring and a small hand, no golden glow, no waves; `TrophyHint`, the hand left of it or above where the
+  (`quiet`: only a small hand pointing at it – no ring round it, no golden glow, no waves, user feedback, November
+  2026; `TrophyHint`, the hand left of it or above where the
   screen's edge is too close), stopped at its first stage (`upTo`) so it never darkens „Weiter“ beside it; its count
   („3×“) on a light plate on the foot, big enough to read at a glance (user feedback, November 2026: it wasn't clear the
   trophy can be tapped and its number was hard to read; `GameEnd.test.ts`).
