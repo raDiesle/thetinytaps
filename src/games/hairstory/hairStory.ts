@@ -1,4 +1,5 @@
 import type { StoryChapter } from "@/components/ChapterBook";
+import { shortOf } from "@/lib/storyPages";
 
 // „Tapsi and the Foam Crown“ (idea H-14, user request, 13 November 2026: „eine neue Alltagshelfer-Buch zu Haare waschen
 // im gleichen Stil wie Stillen oder Kita oder Schnullerfee“): told in chapters that follow what the guides advise for a
@@ -344,3 +345,30 @@ export const HAIR_STORY: HairChapter[] = [
 
 /** Every page of the story in reading order. */
 export const HAIR_PAGES: HairPage[] = HAIR_STORY.flatMap((c) => c.pages);
+
+/**
+ * The pages of the short version (user request, 23 November 2026: „biete auch Kurzversionen an, was schon da ist“), read
+ * in a few minutes: the same story told with its own pages – the sticky hair, Mama saying it is hair-washing night, Tapsi saying
+ * what Tapsi doesn't like and Mama listening, practising on Bunny, the water at the back, the foam, the foam crown in
+ * the mirror, „Now!“ with the cloth over the eyes and the rinse, the drop that stings and Mama stopping at once, the
+ * warm towel, and the love that stays. Only pages of the whole story, in its order, so
+ * its pictures, translations and recordings serve both (`storyBooks.test.ts` checks).
+ */
+export const HAIR_SHORT_PAGES = [
+  "klebrig",
+  "sagen",
+  "augen",
+  "hase",
+  "nass",
+  "schaum",
+  "spiegel",
+  "jetzt",
+  "spuelen",
+  "tropfen",
+  "aufhoeren",
+  "einwickeln",
+  "lieb",
+];
+
+/** The short version's chapters: each chapter with only its pages on `HAIR_SHORT_PAGES`, the empty ones left out. */
+export const HAIR_STORY_SHORT: HairChapter[] = shortOf(HAIR_STORY, HAIR_SHORT_PAGES);

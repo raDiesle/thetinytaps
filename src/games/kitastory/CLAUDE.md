@@ -16,7 +16,7 @@ day (circle, tower, sandpit, lunch, nap), and right after the nap Mama is there,
 - `kitaStory.ts`: the chapters and pages (`KITA_STORY`) and the steps of settling in (`SETTLING_STEPS`).
 - `kitaStoryPictures.ts`: the Gemini prompt of every page (place, light, cast and clothes, bunny, backpack, star), as the
   picture queue takes them; a made picture goes on `MADE`.
-- `KitaStoryGame.tsx` plays it with the shared `ChapterBook` (`src/components/ChapterBook.tsx`, the same as „Abstillen“
+- `KitaStoryGame.tsx` opens like „Abstillen“ on the choice of its stories (`StoryChoice.tsx`, shared by every chapter book, `E0`): its story whole and in a short version at `/kita/kurz/` (`KITA_SHORT_PAGES`, its own pages, so no picture, translation or recording of its own), each a slip with its pictures and minutes – never its chapters – and every story starts on its first page (user request, 23 November 2026). Each story is read with the shared `ChapterBook` (`src/components/ChapterBook.tsx`, the same as „Abstillen“
   and „Schnullerfee“; dev tags `E0`, `E<chapter>-<page>`). A change to how the book reads goes there, so all get it. Tapsi's voice reads each page's sentence (`voice`, from
   `stimme/`, listed in `recordedLines.ts` as `kita`, recorded only when the user asks), and the loudspeaker above ▶
   switches it off (`VoiceSwitch`, user decision, 13 November 2026); a page without its recording stays silent.
@@ -31,6 +31,10 @@ day (circle, tower, sandpit, lunch, nap), and right after the nap Mama is there,
 - **The chapters follow the steps of settling in in the guides' order** (`SETTLING_STEPS`, checked, after the Berliner
   Modell): tell the child, a parent stays as a safe harbour, the first short goodbye, the teacher comforts, the same
   goodbye every morning, the day's order, coming back as said. The last chapter only tells the story.
+- **The short version is made of the whole story's own pages** (`KITA_SHORT_PAGES`, user request, 23 November 2026): in the
+  story's order, from its first page to its last, about a third of it, and where Tapsi cries a grown-up is on that page or
+  holds Tapsi on the next (`src/components/storyBooks.test.ts`). A page renamed or added in the story is weighed for it
+  there too; a new page goes into it only where the short way would miss it.
 - **The morning's chapter is the ritual a family reads every morning** (idea H-10): short (at most six pages), always the
   same, and it ends with waving, never in tears (checked) – sadness after the goodbye belongs to the teacher's chapter.
 - The story is gentle and true to the guides: Mama never sneaks away (checked), says when she comes back by the day's

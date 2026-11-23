@@ -71,7 +71,9 @@ test("every game with scenes, rounds or an end shows the one on screen as `?seit
   }
   const missing = [...folders]
     .filter(([, code]) => /<(GameEnd|DevTag)\b/.test(code))
-    .filter(([folder, code]) => !code.includes("useStepAddress(") && !code.includes("<ChapterBook") && !(folder in WITHOUT_STEPS))
+    .filter(
+      ([folder, code]) => !code.includes("useStepAddress(") && !code.includes("<ChapterBook") && !code.includes("<StoryBookGame") && !(folder in WITHOUT_STEPS),
+    )
     .map(([folder]) => folder);
   expect(missing).toEqual([]);
   for (const folder of Object.keys(WITHOUT_STEPS)) expect(folders.has(folder)).toBe(true);

@@ -22,7 +22,7 @@ the cup everywhere now, sometimes still thinks of the bottle and gets a cuddle, 
 - `bottleStoryPictures.ts`: the Gemini prompt of every page (place from another book's picture, who is not there any
   more, light, cast and clothes, the bottle, the green cup, the bunny, the box), as the picture queue takes them; a made
   picture goes on `MADE`. `AFTER` says what is left once a picture is made, the last one publishing the book.
-- `BottleStoryGame.tsx` plays it with the shared `ChapterBook` (`first="en"`, dev tags `F0`, `F<chapter>-<page>`): a
+- `BottleStoryGame.tsx` opens like „Abstillen“ on the choice of its stories (`StoryChoice.tsx`, shared by every chapter book, `F0`): its story whole and in a short version at `/flaeschchen/kurz/` (`BOTTLE_SHORT_PAGES`, its own pages, so no picture, translation or recording of its own), each a slip with its pictures and minutes – never its chapters – and every story starts on its first page (user request, 23 November 2026). Each story is read with the shared `ChapterBook` (`first="en"`, dev tags `F0`, `F<chapter>-<page>`): a
   change to how the book reads goes there, so every chapter book gets it. Tapsi's voice reads each page (`voice`, from
   `stimme/`, listed in `recordedLines.ts` as `flaeschchen`, recorded only when the user asks), and the loudspeaker
   switches it off (`VoiceSwitch`); a page without its recording stays silent.
@@ -45,6 +45,10 @@ the cup everywhere now, sometimes still thinks of the bottle and gets a cuddle, 
   cup and practise, then one bottle after the other – the daytime bottle first, the morning's next, the bedtime bottle
   last (`BOTTLE_ORDER`, checked) –, the night, the goodbye. The last chapter only tells the story. The sources differ on
   which bottle goes first (research „flasche-abgewoehnen“); the bedtime bottle last is what all agree on – keep it so.
+- **The short version is made of the whole story's own pages** (`BOTTLE_SHORT_PAGES`, user request, 23 November 2026): in the
+  story's order, from its first page to its last, about a third of it, and where Tapsi cries a grown-up is on that page or
+  holds Tapsi on the next (`src/components/storyBooks.test.ts`). A page renamed or added in the story is weighed for it
+  there too; a new page goes into it only where the short way would miss it.
 - **Never a bottle in bed, nor in the evening or the night** (checked): the guides agree a bottle to fall asleep with
   harms the teeth, so the evening milk comes in the cup at the table before brushing, and at night there is water in
   the cup. Once the bottle is in its box, no later picture shows it (checked).

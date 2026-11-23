@@ -23,7 +23,9 @@ close and love Tapsi in the little bed and the big one.
 - `bedStory.ts`: the chapters and pages (`BED_STORY`) and the steps of the move as the guides give them (`BED_STEPS`).
 - `bedStoryPictures.ts`: the Gemini prompt of every page (place, light, cast and night clothes, bunny, blanket, chair,
   night light, boat pillow, a safe bed), as the picture queue takes them; a made picture goes on `MADE`.
-- `BedStoryGame.tsx` plays it with the shared `ChapterBook` (`first="en"`, dev tags `B0`, `B<chapter>-<page>`). A change
+- `BedStoryGame.tsx` opens like „Abstillen“ on the choice (`StoryChoice.tsx`, `B0`): one line with its picture and a
+  „Lesen“ slip telling its pictures and minutes – never its chapters – and the story starts on its first page (user
+  request, 23 November 2026; it has no short version yet). It is read with the shared `ChapterBook` (`first="en"`, dev tags `B0`, `B<chapter>-<page>`). A change
   to how the book reads goes there, so all chapter books get it. Tapsi's voice reads each page (`voice`, from `stimme/`,
   listed in `recordedLines.ts` as `grosses-bett`, recorded only when the user asks), and the loudspeaker switches it off
   (`VoiceSwitch`); a page without its recording stays silent.

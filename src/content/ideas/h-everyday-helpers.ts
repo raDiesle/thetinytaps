@@ -266,5 +266,16 @@ export const everydayHelpersIdeas: IdeaArea = {
       partial:
         "Umgesetzt am 22. November 2026: Die Wahl im Buch Abstillen zeigt je Geschichte Bild, Name und Papierzettel zum Starten mit „N Bilder · ca. M Min.“ (MilkChainGame.tsx, minutesOf), keine Kapitelnummern mehr. „Ganz abstillen“ hat zwei Zettel, „Ganze Geschichte“ (51 Bilder, ca. 12 Min.) und „Kurzfassung“ (18 Bilder, ca. 4 Min., /abstillen/kurz/, SHORT_PAGES in milkChain.ts, dieselben Bilder, Texte und Aufnahmen). Neu ist „Three More Sleeps“ / „Noch dreimal schlafen“ (src/games/milkgoodbye, /abstillen/abschied/): ganz abstillen an einem festen Tag mit Abschiedsfest, vier Kapitel, zwölf Seiten, Englisch zuerst und in alle sieben Sprachen übersetzt. Ihre zwölf Bilder warten in der Bilder-Warteschlange (Claude Cloud), bis dahin sehen Spielende sie nicht und ihre Seite ist noindex; die Aufnahmen kommen nur auf Wunsch.",
     },
+    {
+      id: "H-144",
+      emoji: "📖",
+      title: "Alle Kapitelbücher wie Abstillen: Wahl am Anfang, Kurzfassung, keine Kapitel",
+      text: "Flasche abgewöhnen, Schnullerfee, Kita-Start und Haare waschen öffnen wie Abstillen auf der Wahl ihrer Geschichte: ganz oder als Kurzfassung aus den eigenen Seiten, je Zettel mit Bildern und Dauer, ohne Kapitelliste; jede Geschichte beginnt immer von vorn.",
+      why: "Wunsch der Nutzerin am 23. November 2026: „mache die Menüs … so vom Stil wie Abstillen. Biete auch Kurzversionen an … zeige nicht mehr die einzelnen Kapitel an. Jeder fängt diese immer von Anfang an.“",
+      effort: "M",
+      done: true,
+      partial:
+        "Umgesetzt am 23. November 2026: Die Wahl aus Abstillen ist jetzt ein gemeinsamer Baustein (src/components/StoryChoice.tsx), das Inhaltsverzeichnis mit Kapiteln ist aus ChapterBook entfernt. Kurzfassungen aus vorhandenen Seiten, ohne neue Bilder, Texte oder Aufnahmen: Schnullerfee 18 von 40 Bildern (ca. 4 statt 9 Min., /schnullerfee/kurz/), Kita-Start 16 Bilder (/kita/kurz/), Haare waschen 13 Bilder (/haare-waschen/kurz/), Flasche abgewöhnen 14 von 27 Bildern (ca. 3 statt 7 Min., /flaeschchen/kurz/). Großes Bett öffnet ebenso, mit einem Zettel „Lesen“ und ohne Kurzfassung. Die Suchtexte sagen es in allen sieben Sprachen.",
+    },
   ],
 };

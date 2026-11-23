@@ -1,4 +1,5 @@
-import type { StoryChapter, StoryPage, StoryTranslation } from "@/components/ChapterBook";
+import type { StoryChapter, StoryTranslation } from "@/components/ChapterBook";
+import { shortOf } from "@/lib/storyPages";
 
 // „Tapsis Milchkette“, the second Abstillen story (user request, 9 November 2026): told in chapters that follow the
 // steps weaning guides advise for gentle weaning (`GENTLE_STEPS`, research „abstillen-kapitel“) – tell the child first,
@@ -637,22 +638,4 @@ export const SHORT_PAGES = [
 ];
 
 /** The short version's chapters: each chapter of the whole story with only its pages on `SHORT_PAGES`, the empty ones left out. */
-export const MILK_CHAIN_SHORT: Chapter[] = MILK_CHAIN.map((chapter) => ({
-  ...chapter,
-  pages: chapter.pages.filter((page) => SHORT_PAGES.includes(page.id)),
-})).filter((chapter) => chapter.pages.length > 0);
-
-/**
- * About how many minutes a story takes read aloud to a small child: a few seconds per page to look at its picture, and
- * a slow reader's pace for its sentence (the first language's words). Shown in the choice, so a grown-up sees what fits
- * the evening (user request, 22 November 2026: „die Dauer ca. … je Geschichte“).
- */
-export function minutesOf(pages: StoryPage[]): number {
-  const seconds = pages.reduce((sum, page) => sum + LOOK_SECONDS + page.text.split(/\s+/).length * SECONDS_PER_WORD, 0);
-  return Math.max(1, Math.round(seconds / 60));
-}
-
-/** Seconds a page's picture is looked at and its page turned, beside its sentence. */
-const LOOK_SECONDS = 8;
-/** Seconds a word takes read slowly to a small child. */
-const SECONDS_PER_WORD = 0.45;
+export const MILK_CHAIN_SHORT: Chapter[] = shortOf(MILK_CHAIN, SHORT_PAGES);

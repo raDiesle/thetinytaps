@@ -31,10 +31,15 @@ describe("the voice switch", () => {
 
   test("the chapter books read aloud, with their lines on the recording list", () => {
     for (const book of BOOKS) {
-      expect(readFileSync(book.file, "utf8"), book.file).toMatch(/voice=\{(VOICE|story\.voice)\}/);
+      // Each story names its voice (`BookStory.voice`), which the shared choice hands to `ChapterBook`.
+      expect(readFileSync(book.file, "utf8"), book.file).toMatch(/^ +voice: (recordedVoice\(voiceFiles\)|[A-Z_]+_VOICE),$/m);
       expect(RECORDED_GAMES.find((g) => g.name === book.name)?.folder, book.name).toBe(book.folder);
       expect(voiceLines().find((g) => g.href === book.href)?.groups.length ?? 0, book.href).toBeGreaterThan(0);
     }
+  });
+
+  test("the shared choice hands each story's voice to the book", () => {
+    expect(readFileSync("src/components/StoryChoice.tsx", "utf8")).toContain("voice={story.voice}");
   });
 
   test("a switched-off book loads and says nothing, and the corner's tap never turns the page", () => {

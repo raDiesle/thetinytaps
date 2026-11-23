@@ -1,33 +1,40 @@
-import { ChapterBook } from "@/components/ChapterBook";
-import { GameShell } from "@/components/GameShell";
+import { type BookStory, SHORT_STORY, StoryBookGame, storyBook, WHOLE_STORY } from "@/components/StoryChoice";
 import { byLanguage } from "@/content/texts";
-import { useT } from "@/lib/language";
 import { recordedVoice } from "@/lib/voice";
 import pictureFiles from "./bilder/*.webp?glob";
 import voiceFiles from "./stimme/**/*.mp3?glob";
-import { PACIFIER_STORY } from "./pacifierStory";
-import { PACIFIER_STORY_TITLE } from "./names";
-
-/** Tapsi's voice reading the pages, from `stimme/` (German) and `stimme/<language>/`; a page not recorded yet stays silent. */
-const VOICE = recordedVoice(voiceFiles);
+import { PACIFIER_STORY, PACIFIER_STORY_SHORT } from "./pacifierStory";
+import { PACIFIER_STORY_BOOK, PACIFIER_STORY_TITLE } from "./names";
 
 /** Each page's picture by its file name without extension (`fee-<page id>`). */
 const PICTURES = new Map(Object.entries(pictureFiles).map(([file, url]) => [file.replace(/\.webp$/, ""), url]));
-const pictureOf = (id: string) => PICTURES.get(`fee-${id}`);
 
-/** The story in the other languages, filled as the app's language loads (`pacifierstory/<lang>.ts`). */
-const TRANSLATIONS = byLanguage((texts) => texts.pacifierStory);
+/** „Tapsi und die Schnullerfee“, the whole story. */
+const STORY: BookStory = {
+  href: "/schnullerfee/",
+  kind: PACIFIER_STORY_TITLE,
+  title: PACIFIER_STORY_TITLE,
+  version: WHOLE_STORY,
+  chapters: PACIFIER_STORY,
+  pictureOf: (id) => PICTURES.get(`fee-${id}`),
+  cover: "drei",
+  // Tapsi's voice reading the pages, from `stimme/` (German) and `stimme/<language>/`; a page not recorded yet stays silent.
+  voice: recordedVoice(voiceFiles),
+  // The story in the other languages, filled as each language's texts load (`texts-<id>.ts`).
+  translations: byLanguage((texts) => texts.pacifierStory),
+  code: "S",
+};
 
-/** „Tapsi und die Schnullerfee“, read in chapters like the book „Abstillen“ (`ChapterBook`). */
+/**
+ * The book, opening like „Abstillen“ on the choice of its stories (`StoryChoice.tsx`, user request, 23 November 2026):
+ * its whole story and its short version from its own pages (`PACIFIER_STORY_SHORT`, at `/schnullerfee/kurz/`),
+ * each slip telling its pictures and minutes, never its chapters.
+ */
+const BOOK = storyBook(PACIFIER_STORY_BOOK, "S", [
+  [STORY, { ...STORY, href: "/schnullerfee/kurz/", version: SHORT_STORY, chapters: PACIFIER_STORY_SHORT, code: "Sk" }],
+]);
+
+/** „Tapsi und die Schnullerfee“, read in chapters like the other chapter books (`ChapterBook`), opening at once on its choice. */
 export function PacifierStoryGame() {
-  const t = useT();
-  return (
-    <GameShell
-      title={t(PACIFIER_STORY_TITLE)}
-      // One story with nothing to choose before it: it starts at once, and ✕ goes back to the page before it.
-      startMode="story"
-    >
-      <ChapterBook chapters={PACIFIER_STORY} voice={VOICE} title={PACIFIER_STORY_TITLE} pictureOf={pictureOf} translations={TRANSLATIONS} code="S" />
-    </GameShell>
-  );
+  return <StoryBookGame book={BOOK} />;
 }

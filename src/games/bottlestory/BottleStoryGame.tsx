@@ -1,33 +1,41 @@
-import { ChapterBook } from "@/components/ChapterBook";
-import { GameShell } from "@/components/GameShell";
+import { type BookStory, SHORT_STORY, StoryBookGame, storyBook, WHOLE_STORY } from "@/components/StoryChoice";
 import { byLanguage } from "@/content/texts";
-import { useT } from "@/lib/language";
 import { recordedVoice } from "@/lib/voice";
 import pictureFiles from "./bilder/*.webp?glob";
 import voiceFiles from "./stimme/**/*.mp3?glob";
-import { BOTTLE_STORY } from "./bottleStory";
-import { BOTTLE_STORY_TITLE } from "./names";
-
-/** Tapsi's voice reading the pages, from `stimme/en/` (English first) and `stimme/<language>/`; a page not recorded yet stays silent. */
-const VOICE = recordedVoice(voiceFiles);
-
-/** The story in the other languages, German too, by language, as each language's texts load (`texts-<id>.ts`); none yet. */
-const TRANSLATIONS = byLanguage((texts) => texts.bottleStory);
+import { BOTTLE_STORY, BOTTLE_STORY_SHORT } from "./bottleStory";
+import { BOTTLE_STORY_BOOK, BOTTLE_STORY_TITLE } from "./names";
 
 /** Each page's picture by its file name without extension (`flasche-<page id>`). */
 const PICTURES = new Map(Object.entries(pictureFiles).map(([file, url]) => [file.replace(/\.webp$/, ""), url]));
-const pictureOf = (id: string) => PICTURES.get(`flasche-${id}`);
 
-/** „Bye-Bye, Bottle!“, read in chapters like the books „Abstillen“, „Schnullerfee“, „Kita-Start“ and „Haare waschen“ (`ChapterBook`). */
+/** „Bye-Bye, Bottle!“, the whole story. */
+const STORY: BookStory = {
+  href: "/flaeschchen/",
+  kind: BOTTLE_STORY_TITLE,
+  title: BOTTLE_STORY_TITLE,
+  version: WHOLE_STORY,
+  chapters: BOTTLE_STORY,
+  pictureOf: (id) => PICTURES.get(`flasche-${id}`),
+  cover: "schluck",
+  // Tapsi's voice reading the pages, from `stimme/en/` (English first) and `stimme/<language>/`; a page not recorded yet stays silent.
+  voice: recordedVoice(voiceFiles),
+  // The story in the other languages, filled as each language's texts load (`texts-<id>.ts`).
+  translations: byLanguage((texts) => texts.bottleStory),
+  first: "en",
+  code: "F",
+};
+
+/**
+ * The book, opening like „Abstillen“ on the choice of its stories (`StoryChoice.tsx`, user request, 23 November 2026):
+ * its whole story and its short version from its own pages (`BOTTLE_STORY_SHORT`, at `/flaeschchen/kurz/`),
+ * each slip telling its pictures and minutes, never its chapters.
+ */
+const BOOK = storyBook(BOTTLE_STORY_BOOK, "F", [
+  [STORY, { ...STORY, href: "/flaeschchen/kurz/", version: SHORT_STORY, chapters: BOTTLE_STORY_SHORT, code: "Fk" }],
+]);
+
+/** „Bye-Bye, Bottle!“, read in chapters like the other chapter books (`ChapterBook`), opening at once on its choice. */
 export function BottleStoryGame() {
-  const t = useT();
-  return (
-    <GameShell
-      title={t(BOTTLE_STORY_TITLE)}
-      // One story with nothing to choose before it: it starts at once, and ✕ goes back to the page before it.
-      startMode="story"
-    >
-      <ChapterBook chapters={BOTTLE_STORY} voice={VOICE} title={BOTTLE_STORY_TITLE} pictureOf={pictureOf} code="F" first="en" translations={TRANSLATIONS} />
-    </GameShell>
-  );
+  return <StoryBookGame book={BOOK} />;
 }

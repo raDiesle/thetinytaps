@@ -1,4 +1,5 @@
 import type { StoryChapter } from "@/components/ChapterBook";
+import { shortOf } from "@/lib/storyPages";
 
 // „Tapsi und die Schnullerfee“ (user request, 10 November 2026: a story about the pacifier fairy in the style of the
 // book „Abstillen“): told in chapters that follow the steps guides give for saying goodbye to the pacifier gently
@@ -487,3 +488,35 @@ export const PACIFIER_STORY: FairyChapter[] = [
 
 /** Every page in reading order. */
 export const PACIFIER_PAGES: FairyPage[] = PACIFIER_STORY.flatMap((c) => c.pages);
+
+/**
+ * The pages of the short version (user request, 23 November 2026: „biete auch Kurzversionen an, was schon da ist“), read
+ * in a few minutes: the same story told with its own pages – the pacifier comforting baby Tapsi, the three pacifiers, Tapsi big,
+ * Mama and Papa telling of the fairy who takes them to the babies and brings a present, Tapsi deciding she may come,
+ * the box, the goodbye kiss and the windowsill, the hard first night with Mama close, the fairy taking the box, the
+ * bunny in its place, the evenings getting easier, and the love that stays. Only pages of the whole story, in its order, so
+ * its pictures, translations and recordings serve both (`storyBooks.test.ts` checks).
+ */
+export const PACIFIER_SHORT_PAGES = [
+  "baby",
+  "drei",
+  "gross",
+  "sofa",
+  "fee",
+  "babys",
+  "bereit",
+  "schachtel",
+  "kuss",
+  "fensterbrett",
+  "weinen",
+  "traurig",
+  "kommt",
+  "nimmt",
+  "weg",
+  "hase",
+  "leichter",
+  "lieb",
+];
+
+/** The short version's chapters: each chapter with only its pages on `PACIFIER_SHORT_PAGES`, the empty ones left out. */
+export const PACIFIER_STORY_SHORT: FairyChapter[] = shortOf(PACIFIER_STORY, PACIFIER_SHORT_PAGES);
