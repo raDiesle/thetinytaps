@@ -325,6 +325,35 @@ function Crown({ tooth: t, project, zone }: { tooth: MouthModel["teeth"][number]
   );
 }
 
+/**
+ * A tooth's own piece of gum: its top, drawn under the tooth, or its walls with their darker rim, drawn over the
+ * tooth's foot so it stands in the gum.
+ */
+function GumFaces({ gum, project, top }: { gum: MouthModel["gums"][number]; project: Project; top: boolean }) {
+  const p = project.point;
+  const rims = top ? [] : (["outer", "inner"] as const).filter((kind) => project.facing(surfaceFace(gum.faces, kind).normal) > MIN_FACING);
+  return (
+    <>
+      {gum.faces
+        .filter((f) => (f.kind === "top") === top && project.facing(f.normal) > MIN_FACING)
+        .map((f, j) => (
+          <path key={`gum-${top}-${j}`} d={facePath(f, project)} fill={GUM_FILLS[f.kind]} stroke={GUM_FILLS[f.kind]} strokeWidth={1.5} />
+        ))}
+      {rims.map((kind) => (
+        <path
+          key={kind}
+          d={`M${gum.rims[kind].map((r) => fmt(p(r))).join(" L")}`}
+          fill="none"
+          stroke={GUM_RIM}
+          strokeWidth={2.4}
+          strokeLinecap="round"
+          strokeLinejoin="round"
+        />
+      ))}
+    </>
+  );
+}
+
 /** The mirror's glass behind the head. */
 const MIRROR_GLASS = "#dff6ff";
 
@@ -345,12 +374,26 @@ interface ProfileParts {
 
 /**
  * The profile's parts for lips (`lips3d`, as the view shows them) whose projection with their corners pulled is `lips`;
- * `front` are the front teeth's corners on the screen.
+ * `front` are the front teeth's corners on the screen, `k` how far the view is a profile (`profileOf`).
+ *
+ * The cut is never see-through: while the head turns into the profile its outline slides in from the head's own edge
+ * on the far side, where it covers nothing, to the face's front, so the far cheek goes behind it as if the head turned
+ * on. Faded in by its opacity, the glass and the profile's lips lay half see-through over the front view's lips and
+ * gum for a moment, which looked broken (user feedback, November 2026).
  */
-function profileParts(lips3d: Vec3[], lips: Point2[], face: Project, front: Point2[]): ProfileParts {
-  const line = profileLine(lips3d).map(face.point);
+function profileParts(lips3d: Vec3[], lips: Point2[], face: Project, front: Point2[], k: number): ProfileParts {
   // Past the face's front, as far as the picture could reach: the direction its front faces on the screen.
   const out = face.direction([0, 0, 1]);
+  const head = face.point(HEAD_MIDDLE);
+  const radius = HEAD_RADIUS * face.zoom;
+  const side = Math.sign(out.x) || 1;
+  const line = profileLine(lips3d)
+    .map(face.point)
+    .map((p) => {
+      const dy = Math.max(-radius, Math.min(radius, p.y - head.y));
+      const edge = head.x + side * Math.sqrt(radius * radius - dy * dy);
+      return { ...p, x: edge + (p.x - edge) * k };
+    });
   const length = Math.hypot(out.x, out.y) || 1;
   const far = 6000;
   const away = (p: { x: number; y: number }, up: number) => ({ x: p.x + (out.x / length) * far, y: p.y + (out.y / length) * far + up });
@@ -425,8 +468,8 @@ export function Mouth({ view, zone, monsters, brush, happy, dazzled, action, gli
   const side = useMemo(() => {
     if (profile <= 0) return null;
     const front = model.teeth.filter((t) => t.id.n <= 1).flatMap((t) => surfaceFace(t.faces, "outer").points.map(all[t.id.jaw].point));
-    return profileParts(lips3d, lipPoints, all.face, front);
-  }, [profile > 0, model, lips3d, lipPoints, all]);
+    return profileParts(lips3d, lipPoints, all.face, front, profile);
+  }, [profile, model, lips3d, lipPoints, all]);
 
   const svg = useRef<SVGSVGElement>(null);
   const room = useRoom(svg, free);
@@ -489,27 +532,11 @@ export function Mouth({ view, zone, monsters, brush, happy, dazzled, action, gli
           {teeth.map((t) => {
             // Far teeth first; each one stands in its own piece of gum: the gum's top under it, its walls over its foot.
             const gum = gumsByKey.get(t.key)!;
-            const gumFaces = (top: boolean) =>
-              gum.faces
-                .filter((f) => (f.kind === "top") === top && project.facing(f.normal) > MIN_FACING)
-                .map((f, j) => <path key={`gum-${top}-${j}`} d={facePath(f, project)} fill={GUM_FILLS[f.kind]} stroke={GUM_FILLS[f.kind]} strokeWidth={1.5} />);
-            const rims = (["outer", "inner"] as const).filter((kind) => project.facing(surfaceFace(gum.faces, kind).normal) > MIN_FACING);
             return (
               <g key={t.key}>
-                {gumFaces(true)}
+                <GumFaces gum={gum} project={project} top />
                 <Crown tooth={t} project={project} zone={zoneKeys.has(t.key) ? zoneSurface : undefined} />
-                {gumFaces(false)}
-                {rims.map((kind) => (
-                  <path
-                    key={kind}
-                    d={`M${gum.rims[kind].map((r) => fmt(p(r))).join(" L")}`}
-                    fill="none"
-                    stroke={GUM_RIM}
-                    strokeWidth={2.4}
-                    strokeLinecap="round"
-                    strokeLinejoin="round"
-                  />
-                ))}
+                <GumFaces gum={gum} project={project} top={false} />
               </g>
             );
           })}
@@ -573,19 +600,20 @@ export function Mouth({ view, zone, monsters, brush, happy, dazzled, action, gli
   // Seen from the side, over the lips: the far side of the head past the face's front is the mirror's glass, the face's
   // outline runs down its front, and the lips' near half ends round at the front, a little in front of the front teeth:
   // every tooth stays inside the mouth, growing out of its gum, seen through the lips' opening (user feedback, November
-  // 2026). It comes in as the head turns that far (`profile`), never at once.
+  // 2026). It comes in as the head turns that far (`profile`), never at once, and never see-through: its outline slides
+  // in from the head's far edge (`profileParts`).
   const profileCut = useMemo(() => {
     if (!side) return null;
     const near = smoothPart(lipPoints, side.nearFrom, side.nearCount);
     return (
-      <g opacity={round(profile, 100)}>
+      <g>
         <path d={side.beyond} fill={MIRROR_GLASS} />
         <path d={`M${side.line.map(fmt).join(" L")}`} fill="none" stroke={INK} strokeWidth={7} strokeLinejoin="round" strokeLinecap="round" />
         <path d={near} fill="none" stroke={INK} strokeWidth={34} strokeLinejoin="round" strokeLinecap="round" />
         <path d={near} fill="none" stroke={LIP} strokeWidth={27} strokeLinejoin="round" strokeLinecap="round" />
       </g>
     );
-  }, [side, profile, lipPoints]);
+  }, [side, lipPoints]);
 
   // The lips over the glow's edge, in a layer of their own above it, so the glow stays inside them; with them the
   // monsters waiting for a later step, which stand still. While the head turns or the mouth opens there is no glow and
@@ -637,11 +665,24 @@ export function Mouth({ view, zone, monsters, brush, happy, dazzled, action, gli
           </defs>
           <g clipPath="url(#mirror-glow)">
             <g clipPath="url(#mouth-inside-glow)">
+              {/* The frame lies inside each tooth's face, and the tooth's gum is laid over it again just as the still
+                  picture has it: the face runs on under the gum's walls, and a frame drawn along its whole edge framed a
+                  strip of gum too, with a gap between it and the tooth (user feedback, November 2026). */}
               {zone.teeth.map((id) => {
                 const face = toothFace(id, zone.surface);
                 const at = all[id.jaw];
                 if (at.facing(face.normal) <= MIN_FACING) return null;
-                return <path key={toothKey(id)} d={facePath(face, at)} fill="none" stroke="#ffd23f" strokeWidth={5} strokeLinejoin="round" />;
+                const key = toothKey(id);
+                const d = facePath(face, at, zone.surface === "outer" ? 7 : 3);
+                return (
+                  <g key={key}>
+                    <clipPath id={`zone-tooth-${key}`}>
+                      <path d={d} />
+                    </clipPath>
+                    <path d={d} clipPath={`url(#zone-tooth-${key})`} fill="none" stroke="#ffd23f" strokeWidth={10} strokeLinejoin="round" />
+                    <GumFaces gum={gumsByKey.get(key)!} project={at} top={false} />
+                  </g>
+                );
               })}
             </g>
           </g>
@@ -1194,6 +1235,31 @@ const MONSTER_TOPS = [
 ];
 
 /** A sugar monster's round body with its wavy foot, about 30 wide round (0, 0). */
+/**
+ * Drips of sticky sugar hanging from a monster's foot onto its tooth, each ending in a round drop; drawn under the body,
+ * which covers their tops. Each kind of monster drips a little differently.
+ */
+const MONSTER_DRIPS = [
+  [
+    "M-11 10 C-11.5 15 -12 17 -10 19.5 C-8 21 -6.5 18.5 -7.5 16 C-8 14 -7.5 12 -7.5 10 Z",
+    "M7 11 C7 14 6.5 15.5 8 16.8 C9.6 17.6 10.6 15.8 10 14 C9.6 12.8 10 11.5 10 10 Z",
+  ],
+  [
+    "M-3 12 C-3 16 -3.6 18.5 -1.5 20.5 C0.6 21.8 2.2 19.4 1.4 17 C0.8 15.2 1.2 13.6 1.2 12 Z",
+    "M9 10 C9.4 13 8.6 14.6 10.2 15.8 C11.8 16.6 12.6 14.8 12 13 C11.6 12 12 11 12 9.5 Z",
+  ],
+  [
+    "M-12 9 C-12.2 12.5 -12.8 14.4 -11 15.8 C-9.4 16.8 -8.2 15 -8.8 13.2 C-9.2 12 -8.8 10.6 -8.8 9.5 Z",
+    "M3 12 C3.2 16.5 2.4 19 4.6 20.6 C6.6 21.6 7.8 19.2 6.8 17 C6.2 15.4 6.6 13.8 6.6 12 Z",
+  ],
+];
+
+/** Little paws on both sides, pressed flat onto the tooth where the monster clings to it. */
+const MONSTER_PAWS = "M-14.5 1 C-18 0 -20.5 2 -20.5 4.5 C-20.5 7 -18 8 -15 7 Z M14.5 1 C18 0 20.5 2 20.5 4.5 C20.5 7 18 8 15 7 Z";
+
+/** A wet light on the top of a monster's head. */
+const MONSTER_SHINE = "M-10.5 -7.5 C-10 -11 -7 -13 -4 -13 C-6 -11.6 -8 -9.8 -8.6 -7.4 C-9 -6.4 -10.6 -6.4 -10.5 -7.5 Z";
+
 const MONSTER_BODY = "M-15 8 C-17 -6 -10 -15 0 -15 C10 -15 17 -6 15 8 C12 14 7 11 5 15 C2 11 -2 11 -5 15 C-7 11 -12 14 -15 8 Z";
 
 /** Where the mirror's frame covers its bottom edge, in px from the screen's edge (FRAME_PX: inset and half the ink). */
@@ -1288,9 +1354,18 @@ export function Monster({
       className={`sugar-monster${gone ? " gone" : ""}${scared ? " scared" : ""}${tickled ? " tickled" : ""}${still ? " still" : ""}`}
       style={{ "--blink": `${-(blinkMs % 3700)}ms` } as CSSProperties}
     >
-      {/* The ones to brush now glow. */}
-      {active && <circle className="monster-glow" cy={-3} r={27} fill="url(#monster-glow)" />}
+      {/* The ones to brush now glow, only just round them, so the light stays on their tooth (`.sprite-glow`). */}
+      {active && <circle className="monster-glow" cy={-3} r={21} fill="url(#monster-glow)" />}
       <g className="monster-body" data-tap={gone ? "done" : ""} onPointerDown={stop}>
+        {/* Sticky: the monster has melted a little onto its tooth – a puddle of its sugar under it, drips hanging from
+            its foot and little paws stuck to the tooth on both sides (user feedback, November 2026). */}
+        <ellipse cx={0} cy={13} rx={18} ry={4.5} fill={color} opacity={0.5} />
+        <g fill={color} stroke={INK} strokeWidth={1.6} strokeLinejoin="round">
+          {MONSTER_DRIPS[variant % MONSTER_DRIPS.length].map((d) => (
+            <path key={d} d={d} />
+          ))}
+          <path d={MONSTER_PAWS} />
+        </g>
         <path d={MONSTER_TOPS[variant % MONSTER_TOPS.length]} fill={color} stroke={INK} strokeWidth={2.5} strokeLinejoin="round" strokeLinecap="round" />
         {variant % MONSTER_TOPS.length === 1 && (
           <g fill={color} stroke={INK} strokeWidth={2}>
@@ -1299,6 +1374,8 @@ export function Monster({
           </g>
         )}
         <path d={MONSTER_BODY} fill={color} stroke={INK} strokeWidth={2.5} strokeLinejoin="round" />
+        {/* The wet shine of something sticky. */}
+        <path d={MONSTER_SHINE} fill="#fff" opacity={0.75} />
         <g className="monster-eyes">
           <circle cx={-5.5} cy={-4} r={4.2} fill="#fff" stroke={INK} strokeWidth={1.8} />
           <circle cx={5.5} cy={-4} r={4.2} fill="#fff" stroke={INK} strokeWidth={1.8} />

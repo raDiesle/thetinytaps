@@ -52,9 +52,10 @@ late in the video. A new thing shown beside the picture (a control, a chart, a b
   (`layers.test.ts`), and the grains are few and calm – sugar and foam of the picture, no stars or confetti.
 - While brushing only the song is heard: a monster dissolves silently, no fizz or other sound of its own (user
   feedback, November 2026; `layers.test.ts` checks `TeethPlay`). A tapped monster's giggle stays, since the child set it off.
-- The brush is a child's brush, its head about one and a half milk molars long (`SIZE` in `brush.tsx`), and on the back
-  teeth' outside its handle comes out of the corner of the mouth towards the viewer (`CHEEK_ANGLE`), so it hides as few
-  teeth as it can: a bigger brush lying along the row covered the molars being brushed (user feedback, November 2026).
+- The brush is a child's brush, its head about a milk molar long (`SIZE` in `brush.tsx`, at most 0.75, `brush.test.ts`),
+  and on the back teeth' outside its handle comes out of the corner of the mouth towards the viewer (`CHEEK_ANGLE`), so
+  it hides as few teeth and monsters as it can: a bigger brush lying along the row covered the molars being brushed
+  (user feedback, November 2026, asked twice – the brush was made smaller two times).
 - The teeth change size step by step from the back molars to the front teeth: each tooth a little narrower and its
   chewing surface a little shallower than the one behind it (`TEETH`, `CHEWING_DEPTHS` in `jaw.ts`), never two big
   molars and then a row of flat ones alike (user feedback, November 2026; `jaw.test.ts` checks).
@@ -92,9 +93,22 @@ late in the video. A new thing shown beside the picture (a control, a chart, a b
   every tooth stays inside the mouth behind them, growing out of its gum, the front teeth too: they show only their
   narrow sides, turning away towards the front, with a band of gum over and under them (`PROFILE_LIPS`: the lips end in
   front of the front teeth, past their gums). Front teeth standing out past the lips with no gum looked plainly wrong
-  (user feedback, November 2026, replacing the earlier rule that had them stand out). It fades in as the head turns past
-  50°, never at once, and only with the teeth together. `jaw.test.ts` checks the lips end in front of the front teeth.
+  (user feedback, November 2026, replacing the earlier rule that had them stand out). It comes in as the head turns past
+  50°, never at once, and only with the teeth together – never by fading its opacity: half see-through, its glass and
+  lips lay over the front view's lips and gum for a moment and looked broken (user feedback, November 2026). Its
+  outline slides in from the head's own edge on the far side, where it covers nothing, to the face's front
+  (`profileParts`), so the far cheek goes behind it as if the head turned on. `jaw.test.ts` checks the lips end in front
+  of the front teeth, `layers.test.ts` that the cut has no opacity.
 - A monster sits on its tooth, not over its neighbours: keep `MONSTER_SIZE` (`mouth.tsx`) small, and the story's monsters about a tooth wide.
+- A monster clings to its tooth, a little sticky (user feedback, November 2026): a puddle of its sugar under it, drips
+  in its colour hanging from its foot (`MONSTER_DRIPS`, a little different per kind), little paws pressed flat onto
+  the tooth on both sides (`MONSTER_PAWS`) and a wet shine on its head – all drawn in `Monster`, so the story's are the
+  same. `layers.test.ts` checks.
+- What marks the teeth to brush now stays on the teeth (user feedback, November 2026): the gold frame lies inside each
+  tooth's face, clipped to it, and the tooth's gum walls are laid over it again as the still picture has them
+  (`GumFaces`), so it ends where the gum begins – a frame along the face's whole edge, which runs on under the gum,
+  framed a strip of gum too with a gap to the tooth. The glow behind a monster being brushed is only just round it
+  (`.sprite-glow`, `monster-glow` r 21), never a wide halo reaching onto the gum. `layers.test.ts` checks.
 - A monster lies on its tooth's face like a sticker, in the face's perspective, never upright in front of it: on a face
   turned away (the front teeth seen from the side) it is squashed along the way the face turns, as much as it is turned
   (`leanOn`, at most to `MIN_LEAN`), so it clings to the tooth – upright they looked as if they flew before the teeth
@@ -123,7 +137,9 @@ late in the video. A new thing shown beside the picture (a control, a chart, a b
   the sweet, the toothpaste tube, the clean tooth at the end of the brushing's frame and the brush in its cup, and the
   toothbrush riding along the brushing's steps to where the clock is (`.teeth-runner`, a small HTML layer moved by its
   transform from `--at`, never a redraw; it comes with the brushing, so it never lies over the groove of getting the
-  brush). Never an emoji in their place: until its picture is made, a place shows a drawing in the painted set's manner where
+  brush). Along the upright bar (a screen wider than tall) it lies across the steps, handle on the left by the bar's
+  symbols, its head pointing from the side like an arrow at the step running now, just short of its groove – never
+  turned head down onto the groove, which it hid (user request, November 2026; `layers.test.ts`). Never an emoji in their place: until its picture is made, a place shows a drawing in the painted set's manner where
   there is one (`barSymbols.tsx`: the tube, the cup), else stays empty (`BarSymbol`); the drawing goes once the picture comes. Tapping and
   dragging on the bar reads only its `.teeth-segment`s.
 - The controls are drawn signs (`ControlIcon`), never emoji (⏸️ ▶️ looked poor, user feedback, November 2026), and each says what it does at a glance: „Von vorn“ is a ring with a real arrowhead turning round (a bent hook didn't look like an arrow, user feedback, November 2026); the time before brushing shows where the brushing time does, as the first part of the progress bar with its own clock, never in a corner of its own.

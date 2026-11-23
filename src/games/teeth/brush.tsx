@@ -126,10 +126,10 @@ const WHITE: Box["fills"] = ["#ffffff", "#e3f3ff", "#d2e9f8"];
 const SKY: Box["fills"] = ["#bfe9fb", "#9fd8f2", "#8acbe9"];
 const GRIP: Box["fills"] = ["#80ed99", "#57cc99", "#3fa97f"];
 /**
- * A child's brush head covers about one and a half milk molars: smaller than it once was (1.25), which hid much of the
- * teeth being brushed, above all the back ones (user feedback, November 2026).
+ * A child's brush head covers about a milk molar: smaller than it once was (1.25, then 0.95), which hid much of the
+ * teeth being brushed and their monsters, above all the back ones (user feedback, November 2026, asked twice).
  */
-const SIZE = 0.95;
+export const SIZE = 0.72;
 
 /** Rows of bristle tufts from the tip of the head towards the neck, alternating white and light blue like a real child's brush. */
 const TUFT_ROWS: [number, number][] = [

@@ -1,5 +1,5 @@
 import { describe, expect, test } from "bun:test";
-import { BOXES, drawOrder, type Facing } from "./brush";
+import { BOXES, drawOrder, SIZE, type Facing } from "./brush";
 
 // The bristle tufts stand on the bristle side of the head (b above -11), the head, neck and handle behind them.
 const isTuft = (i: number) => BOXES[i].b[0] >= -11;
@@ -53,5 +53,12 @@ describe("brush drawing order", () => {
   test("with the handle towards the viewer, it covers the head and the bristles", () => {
     const at = places({ u: 0.9, w: 0.1, b: -0.4 });
     expect(Math.max(...at.filter((_, i) => !isHandle(i)))).toBeLessThan(Math.min(...at.filter((_, i) => isHandle(i))));
+  });
+});
+
+describe("brush size", () => {
+  // A bigger brush hid the teeth being brushed and their monsters (user feedback, November 2026, asked twice).
+  test("the brush stays small, about a milk molar's head", () => {
+    expect(SIZE).toBeLessThanOrEqual(0.75);
   });
 });

@@ -145,3 +145,38 @@ test("the end's glints are white, small and slow Sprites", () => {
   const seconds = Number(css.match(/\.tooth-glint > div \{[^}]*animation: teeth-glint ([\d.]+)s/)?.[1]);
   expect(seconds).toBeGreaterThanOrEqual(8);
 });
+
+// Turning from the front to the side, the profile's glass and lips once faded in by their opacity and lay half
+// see-through over the front view's lips and gum for a moment (user feedback, November 2026): the profile is never
+// see-through, its outline slides in from the head's edge instead (`profileParts`).
+test("the side view's cut is never faded in by its opacity", () => {
+  const cut = mouth.match(/const profileCut = useMemo\([\s\S]*?\}, \[/)?.[0] ?? "";
+  expect(cut).toContain("side.beyond");
+  expect(cut).not.toMatch(/opacity/);
+});
+
+// The frame on the teeth to brush once ran along each tooth's whole face, which goes on under the gum, so it framed a
+// strip of gum too, with a gap to the tooth (user feedback, November 2026): it is clipped to the tooth, the gum laid
+// over it again, and the monsters' glow only just round them.
+test("the frame on the teeth to brush stays on the teeth", () => {
+  const glow = mouth.match(/className="mouth mouth-moving zone-glow"[\s\S]*?<\/svg>/)?.[0] ?? "";
+  expect(glow).toMatch(/clipPath=\{`url\(#zone-tooth-/);
+  expect(glow).toContain("<GumFaces");
+  expect(Number(mouth.match(/className="monster-glow" cy=\{-3\} r=\{(\d+)\}/)?.[1])).toBeLessThanOrEqual(22);
+  expect(Number(css.match(/\.sprite-glow \{[^}]*width: ([\d.]+)%/)?.[1])).toBeLessThanOrEqual(64);
+});
+
+// The monsters cling to their teeth, a little sticky (user feedback, November 2026): drips under their foot and paws
+// stuck to the tooth, drawn with the monster itself, so the story's monsters are sticky too.
+test("the monsters look sticky", () => {
+  const monster = mouth.match(/export function Monster\([\s\S]*?\n\}\n/)?.[0] ?? "";
+  expect(monster).toContain("MONSTER_DRIPS");
+  expect(monster).toContain("MONSTER_PAWS");
+});
+
+// Along the upright bar the brush lies across the steps, its head pointing from the side at the step running now
+// (user request, November 2026): turned head down (90°) it hid the groove.
+test("the riding brush points across the upright bar", () => {
+  const rule = css.match(/\.teeth-runner > img \{[^}]*rotate: (-?\d+)deg/)?.[1];
+  expect(Math.abs(Number(rule))).toBeLessThanOrEqual(20);
+});

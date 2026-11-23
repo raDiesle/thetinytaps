@@ -717,18 +717,21 @@
     container-type: size;
   }
 
-  /* Upright the brush rides down the steps, turned so its head points down onto where the clock is. */
+  /* Along the upright bar the brush rides down the steps lying across them, handle on the left by the bar's symbols, its head
+     pointing from the side like an arrow at the step running now (user request, November 2026: turned head down onto
+     the step it hid the groove and didn't point at it). The picture's head is at 86 % across, a little below its
+     middle once levelled by `rotate`; it stops just left of the groove, so the groove stays seen. */
   .teeth-runner {
     top: 0;
-    left: 50%;
+    left: 0;
     transform: translateY(calc((100cqh - var(--gap) * (var(--parts) - 1)) * var(--at) / var(--parts) + var(--gap) * var(--part)));
   }
 
   .teeth-runner > img {
     width: clamp(36px, 7vmin, 54px);
     height: clamp(36px, 7vmin, 54px);
-    translate: -50% -82%;
-    rotate: 90deg;
+    translate: calc(-86% - 2px) -56%;
+    rotate: 15deg;
   }
 
   .teeth-segment {
@@ -2268,12 +2271,14 @@
   }
 }
 
-/* The glow of svg's monster-glow (r 27 round 3 units above the middle), as a soft round light behind the monster. */
+/* The glow of svg's monster-glow (r 21 round 3 units above the middle), as a soft round light behind the monster:
+   only just round it, so it stays on the tooth – a wider one lay over the gum like a second frame (user feedback,
+   November 2026). */
 .sprite-glow {
-  top: 5.9%;
-  left: 10.3%;
-  width: 79.4%;
-  height: 79.4%;
+  top: 14.7%;
+  left: 19.1%;
+  width: 61.8%;
+  height: 61.8%;
   border-radius: 50%;
   background: radial-gradient(closest-side, #fffbd1 50%, #ffd23ff2 72%, #ffb70300);
   animation: glow-breathe 1.07s ease-in-out infinite alternate;
