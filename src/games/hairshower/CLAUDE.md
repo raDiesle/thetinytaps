@@ -31,9 +31,10 @@ sand in the hair and with clean hair.
 
 ## Rules
 
-- **Waiting for its twenty pictures** (queued 23 November 2026, made only in a Claude cloud session): until then players
-  don't see it (`ChapterBook`'s `withPictures`, the choice leaves a story without pictures out), and both addresses are in
-  `WAITING_PATHS` (`seo.ts`: `noindex`, out of the sitemap). What to do once they are made stands in the pictures' `after`.
+- **Published with its twenty pictures** (made with Gemini on 23 November 2026 in a Claude cloud session): the shower
+  pages are drawn from `SHOWER_REF` (Tapsi on the mat, Papa kneeling beside it), never from the first page, where Papa
+  sits on the shower's edge and came back twice in ten of eleven pictures (`/bild-erzeugen`). A page redrawn later keeps
+  to the same references, and a new page with a picture leaves players without it only until its picture is made.
 - **Written English first, translated into all seven languages** (checked in `hairShower.test.ts`: every chapter and
   page, Tapsi in each language's script, the shower named, no Latin letters in Russian, Chinese, Hindi or Arabic). A
   changed page changes its line in every language in the same commit. Tapsi is masculine in Russian, Hindi and Arabic,

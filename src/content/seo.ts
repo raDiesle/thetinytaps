@@ -558,9 +558,6 @@ const WAITING_PATHS: string[] = [
   // „Tapsi and the Pacifier Tree“ (`src/games/pacifiertree`), until its pictures are made (`pacifierTreePictures.ts`, its `after`).
   "/schnullerfee/baum/",
   "/schnullerfee/baum/kurz/",
-  // „Tapsi and the Warm Rain“ (`src/games/hairshower`), until its pictures are made (`hairShowerPictures.ts`, its `after`).
-  "/haare-waschen/dusche/",
-  "/haare-waschen/dusche/kurz/",
   // „Tapsi Goes to Lotta's“ (`src/games/childminder`), until its pictures are made (`childminderPictures.ts`, its `after`).
   "/kita/tagesmutter/",
   "/kita/tagesmutter/kurz/",
