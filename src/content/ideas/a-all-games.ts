@@ -302,5 +302,13 @@ export const allGamesIdeas: IdeaArea = {
       why: "Hält es, kosten auch die Geschichtenbilder etwa die Hälfte.",
       effort: "S",
     },
+    {
+      id: "A-35",
+      emoji: "🐢",
+      title: "Leistung: Bewegungsabenteuer ruckelt auf alten Handys",
+      text: "Messung vom 23. November 2026 (altes Android nachgebildet, dreimal gemessen): Bei den leuchtenden Trommeln ist der Hauptfaden zu 96–99 % beschäftigt (eigene Grenze 95 %, am 9. November 77 %), und in zwei von drei Durchgängen sinkt es auf 48–51 Bilder pro Sekunde, das langsamste Zwanzigstel 33 statt 17 ms. Am Anfang („Tapsi bewegt sich“) 55–66 % beschäftigt (Grenze 60 %, eine Woche davor 49 %) mit 3–4 Hängern bis 250–820 ms. Die Zeit geht fast ganz in three.js, und zwar in die Arbeit je Teil und je Zeichenaufruf, nicht ins Malen: renderBufferDirect, setValueM4, setProgram und refreshMaterialUniforms (je Zeichenaufruf), update und projectObject (jedes Teil der Welt in jedem Bild). Lösung: an den Trommeln zählen, wie viele Teile und Zeichenaufrufe je Bild es sind (renderer.info, im Oktober 396), und mit dem Stand vom 9. November vergleichen; was seither dazukam (Wolkenreise, Feuerwehr, die Arme an Angel, Kurbel und Schlüssel), wie die Requisiten zusammenbacken (mergeParts), gleiche Dinge als InstancedMesh, und die Leuchtränder nur für den Körperteil zeichnen, der gerade leuchtet. Die Hänger am Anfang beim Laden der Welt prüfen (ViewTransitionCallback 2 s im ersten Durchgang).",
+      why: "Kleinkinder spielen oft auf alten Handys der Eltern; dort sehen sie das Spiel ruckeln.",
+      effort: "M",
+    },
   ],
 };
