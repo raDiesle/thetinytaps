@@ -533,7 +533,12 @@ function TimerRun({
     return () => window.removeEventListener("keydown", onKey);
   }, [answer]);
 
-  const down = (e: PointerEvent) => answer(e.clientX, e.clientY);
+  // A tap on the picture answers as always (H-51) and pauses the timer (user decision, 23 November 2026): the veil
+  // with ▶ and the round arrow comes, and a tap on it goes on.
+  const down = (e: PointerEvent) => {
+    answer(e.clientX, e.clientY);
+    if (phase === "running") pause();
+  };
   const next = nextPicture(picture);
   const nextInfo = PICTURES.find((p) => p.id === next);
   const name = PICTURES.find((p) => p.id === picture)?.name;

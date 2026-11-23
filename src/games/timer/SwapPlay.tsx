@@ -229,7 +229,12 @@ export function SwapRun({
     return () => window.removeEventListener("keydown", onKey);
   }, [answer]);
 
-  const down = (e: PointerEvent) => answer(e.clientX, e.clientY);
+  // A tap on the picture answers as always (H-51) and pauses the timer (user decision, 23 November 2026): the veil
+  // with ▶ and the round arrow comes, and a tap on it goes on.
+  const down = (e: PointerEvent) => {
+    answer(e.clientX, e.clientY);
+    if (ticking) pause();
+  };
   const turnStart = turns ? turns.start + turn * turnMs : 0;
   const ticking = running && !done;
   const next = nextPicture(picture);

@@ -1301,6 +1301,8 @@ describe("pause and start over", () => {
       expect(code).toContain("usePausableClock()");
       expect(code).toContain("<RunClockProvider value={clock}>");
       expect(code).toContain("<PauseControls paused={paused} onPause={pause} onResume={resume} onRestart={onAgain} />");
+      // A tap on the picture answers and pauses (user decision, 23 November 2026); keys only answer.
+      expect(code).toMatch(/const down = \(e: PointerEvent\) => \{\s*answer\(e\.clientX, e\.clientY\);\s*if \([^)]*\) pause\(\);/);
     }
   });
 
