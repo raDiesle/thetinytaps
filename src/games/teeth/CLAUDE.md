@@ -123,8 +123,9 @@ late in the video. A new thing shown beside the picture (a control, a chart, a b
   the sweet, the toothpaste tube, the clean tooth at the end of the brushing's frame and the brush in its cup, and the
   toothbrush riding along the brushing's steps to where the clock is (`.teeth-runner`, a small HTML layer moved by its
   transform from `--at`, never a redraw; it comes with the brushing, so it never lies over the groove of getting the
-  brush). Never an emoji in their place: until its picture is made, a place shows a drawing in the painted set's manner where
-  there is one (`barSymbols.tsx`: the tube, the cup), else stays empty (`BarSymbol`); the drawing goes once the picture comes. Tapping and
+  brush). Never an emoji in their place: all five are painted (the tube and the cup came on 23 November 2026, and their drawn
+  stand-ins went); a new symbol not painted yet leaves its place empty (`BarSymbol`) or gets a drawn stand-in in the
+  painted set's manner until it comes. Tapping and
   dragging on the bar reads only its `.teeth-segment`s.
 - The controls are drawn signs (`ControlIcon`), never emoji (⏸️ ▶️ looked poor, user feedback, November 2026), and each says what it does at a glance: „Von vorn“ is a ring with a real arrowhead turning round (a bent hook didn't look like an arrow, user feedback, November 2026); the time before brushing shows where the brushing time does, as the first part of the progress bar with its own clock, never in a corner of its own.
 - A tap or drag on the progress bar lands at the start of a section – a part of the prelude, a step, or the end – never at the

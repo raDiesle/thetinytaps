@@ -27,7 +27,6 @@ import { Prep, PREP_CUES, PREP_MS, PREP_RECORDINGS, TIDY_RECORDINGS } from "./pr
 import type { TeethSettings } from "./settings";
 import { GRIN_VIEW, STEPS, stepText } from "./steps";
 import { sungLanguageFor } from "./sung";
-import { DrawnSymbol, hasDrawnSymbol } from "./barSymbols";
 import { type TeethSymbol, teethSymbol } from "./symbols";
 import { Week } from "./week";
 import voiceFiles from "./stimme/**/*.mp3?glob";
@@ -239,11 +238,11 @@ function preludeTiles(prelude: Prelude[]): { phase: BarPhase; parts: Prelude[] }
   return tiles;
 }
 
-/** A symbol of the bar: its painted picture, its drawn stand-in while the picture waits, else an empty place (never an emoji). */
+/** A symbol of the bar: its painted picture, else an empty place (never an emoji). */
 function BarSymbol({ name }: { name: TeethSymbol | null }) {
   const src = name && teethSymbol(name);
   if (src) return <img className="teeth-symbol" src={src} alt="" draggable={false} aria-hidden />;
-  return name && hasDrawnSymbol(name) ? <DrawnSymbol name={name} /> : <span className="teeth-symbol" aria-hidden />;
+  return <span className="teeth-symbol" aria-hidden />;
 }
 
 /** One phase outside the brushing on the bar: its symbol beside a groove that fills as the time goes by. */

@@ -1,5 +1,5 @@
 import { expect, test } from "bun:test";
-import { readFileSync } from "node:fs";
+import { readdirSync, readFileSync } from "node:fs";
 import { APP_LANGUAGES } from "@/lib/language";
 import { RECORDED_GAMES } from "./recordedLines";
 import { CLONES, VOICE_QUEUE } from "./voiceQueue";
@@ -10,7 +10,9 @@ test("voice jobs have unique ids and a date", () => {
 });
 
 test("a voice job names parts and languages `bun run voice make` knows", () => {
-  const parts = new Set(RECORDED_GAMES.map((game) => game.name));
+  // The Bewegungsabenteuer's stories are parts too, by their folder's name (`--only fireRescue`).
+  const stories = readdirSync("src/games/adventure/stories", { withFileTypes: true }).filter((entry) => entry.isDirectory());
+  const parts = new Set([...RECORDED_GAMES.map((game) => game.name), ...stories.map((entry) => entry.name)]);
   for (const job of VOICE_QUEUE) {
     expect(job.only.length, job.id).toBeGreaterThan(0);
     for (const part of job.only) expect(parts.has(part), `${job.id}: ${part}`).toBe(true);

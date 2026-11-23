@@ -14,7 +14,7 @@
 export const ACCOUNT_KEYS = {
   /** Creator: Tapsi's own voice (`stimme.json`) lives only here. */
   first: "ELEVENLABS_API_KEY",
-  /** Starter, 3 requests at once: only the clones of Tapsi (`bun run voice clone`). */
+  /** Creator since November 2026 (`--parallel 2` stays): only the clones of Tapsi (`bun run voice clone`). */
   second: "ELEVENLABS_API_KEY_2",
 } as const;
 
@@ -51,4 +51,82 @@ export interface VoiceJob {
 }
 
 /** Approved and not made yet, in the order `bun run paid` records them. */
-export const VOICE_QUEUE: VoiceJob[] = [];
+export const VOICE_QUEUE: VoiceJob[] = [
+  {
+    id: "clone-en-ganze-teile",
+    why: "Alle Vorlesebücher, Fire Rescue, die neuen Abenteuer, Gefühle-Szenen und Tage, Timer-Bilder und Farbenbahn – ganze Teile mit dem englischen Klon",
+    date: "2026-11-23",
+    only: [
+      "abstillen",
+      "schnullerfee",
+      "kita",
+      "haare-waschen",
+      "abstillen-nachts",
+      "abstillen-abschied",
+      "flaeschchen",
+      "grosses-bett",
+      "fireRescue",
+      "kleine-abenteuer",
+      "gefuehle",
+      "timer",
+      "kettenreaktion",
+    ],
+    lang: ["en", "zh", "hi", "es", "ar"],
+    account: "second",
+    voice: "iGb9o2uzfokG3rIleRfg",
+    parallel: 2,
+    after:
+      "Delete the four single new machine lines of Kettenreaktion in en/zh/hi/es/ar again (Licht-Kette, Badezimmer, Große Maschine, Verrückte Küche): they would sit among Tapsi's original lines of their level.",
+  },
+  {
+    id: "clone-de-luecken",
+    why: "Deutsch: Vorlesebücher, Fire Rescue, neue Abenteuer, Timer-Bilder und Kettenreaktion mit dem deutschen Klon",
+    date: "2026-11-23",
+    only: [
+      "abstillen",
+      "schnullerfee",
+      "kita",
+      "haare-waschen",
+      "abstillen-nachts",
+      "abstillen-abschied",
+      "flaeschchen",
+      "grosses-bett",
+      "fireRescue",
+      "kleine-abenteuer",
+      "timer",
+      "kettenreaktion",
+    ],
+    lang: ["de"],
+    account: "second",
+    voice: "P8WiXqMIbsXF2nUgvRI0",
+    parallel: 2,
+  },
+  {
+    id: "clone-ru-alles",
+    why: "Russisch: alles, was fehlt (Gefühle, Tiere, Erkennen, Was gehört zusammen?, Vorlesebücher …), mit dem russischen Klon",
+    date: "2026-11-23",
+    only: [
+      "abstillen",
+      "schnullerfee",
+      "kita",
+      "haare-waschen",
+      "abstillen-nachts",
+      "abstillen-abschied",
+      "flaeschchen",
+      "grosses-bett",
+      "fireRescue",
+      "kleine-abenteuer",
+      "gefuehle",
+      "tiere",
+      "schatten",
+      "zusammen",
+      "buchstaben",
+      "timer",
+      "kettenreaktion",
+    ],
+    lang: ["ru"],
+    account: "second",
+    voice: "wlDm46LsfSYnFAMs48Uv",
+    parallel: 2,
+  },
+];
