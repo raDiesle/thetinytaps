@@ -1,4 +1,5 @@
 import { memo, useEffect, useState, type CSSProperties, type ReactNode } from "react";
+import { useRunClock } from "./pause";
 import { Draw, INK, Layer, LeftGlow, STAGE_H, STAGE_W } from "./scenes";
 
 // Wecker (H-70, user request, November 2026): a children's digital alarm clock on the bedside table, as families know
@@ -137,14 +138,16 @@ function Digits({ text }: { text: string }) {
  * (a menu's card) shows the time left now and ticks no more.
  */
 function ClockDigits({ endsAt, total, running, still }: { endsAt: number; total: number; running: boolean; still?: boolean }) {
-  const [now, setNow] = useState(Date.now);
+  // On the run's clock, so the digits stand still while the timer is paused.
+  const clock = useRunClock();
+  const [now, setNow] = useState(clock.now);
   useEffect(() => {
-    if (!running || still) return;
-    const tick = () => setNow(Date.now());
+    if (!running || still || clock.paused) return;
+    const tick = () => setNow(clock.now());
     tick();
     const timer = setInterval(tick, 250);
     return () => clearInterval(timer);
-  }, [running, still]);
+  }, [running, still, clock]);
   const text = clockText(running ? endsAt - now : 0, total);
   return (
     <Part {...DIGITS} className="tm-clock-digits">

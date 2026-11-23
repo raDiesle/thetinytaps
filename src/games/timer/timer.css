@@ -4,7 +4,9 @@
 .tm-play {
   position: absolute;
   inset: 0;
-  overflow: hidden;
+  /* Clipped, never scrollable: the stage reaches past the bottom edge, and the pause button there, focused (a tap,
+     Tab), scrolled the whole picture up by `overflow: hidden`'s hidden scroll. */
+  overflow: clip;
   container-type: size;
   touch-action: none;
   user-select: none;
@@ -3041,7 +3043,11 @@
    set here and used by its children, so `cqh` measures the play area (`.tm-play`), never the bar. */
 .tm-play {
   --tm-bar-h: clamp(14px, 4cqh, 30px);
-  --tm-bar-bottom: calc(max(6px, 1.8cqh) + env(safe-area-inset-bottom));
+  /* The pause's round button at the bar's start (`PauseControls`): big enough for a grown-up's finger on a phone, and
+     the bar lifted so the button, centred on it, stays whole on the screen. */
+  --tm-pause-size: max(44px, calc(var(--tm-bar-h) * 2.2));
+  --tm-bar-bottom: calc(max(6px, 1.8cqh, (var(--tm-pause-size) - var(--tm-bar-h)) / 2 + 6px) + env(safe-area-inset-bottom));
+  --tm-bar-left: calc(6cqw + env(safe-area-inset-left));
   --tm-bar-room: calc(var(--tm-bar-bottom) + var(--tm-bar-h) + 6px);
   /* The digits' note: its font, and its whole width (padding and border round its cells). */
   --tm-note-font: clamp(1.4rem, 5cqh, 2.6rem);
@@ -3063,7 +3069,7 @@
   --tm-bar-flag: #ff6b6b;
   --tm-knob: calc(var(--tm-bar-h) * 1.7);
   position: absolute;
-  left: calc(6cqw + env(safe-area-inset-left));
+  left: var(--tm-bar-left);
   right: calc(7cqw + env(safe-area-inset-right));
   bottom: var(--tm-bar-bottom);
   z-index: 2;
@@ -3388,4 +3394,87 @@
   to {
     opacity: 1;
   }
+}
+
+/* Pause and start over (`pause.tsx`, user request, 23 November 2026): a round paper button at the bar's start, its
+   two bars drawn in the book's ink like Kettenreaktion's and Zähne putzen's (`ControlIcon`), the bar running out from
+   under it – also where the bar is switched off, at the same place. Paused, a veil darkens the picture with the big ▶
+   to go on and the round arrow to start over, side by side and no words, and everything that moves stands still. */
+.tm-pause-button,
+.tm-pause-go-on,
+.tm-pause-again {
+  display: grid;
+  place-items: center;
+  padding: 0;
+  border: 2.5px solid var(--ink, #2a1e5c);
+  border-radius: 50%;
+  background: radial-gradient(circle at 38% 30%, #fff 45%, #f1e8d4);
+  box-shadow:
+    inset 0 -3px 0 #3d30451f,
+    0 2px 4px #2a1e5c44;
+  cursor: pointer;
+  touch-action: manipulation;
+}
+
+.tm-pause-button {
+  position: absolute;
+  left: calc(var(--tm-bar-left) - var(--tm-pause-size) / 2);
+  bottom: calc(var(--tm-bar-bottom) + (var(--tm-bar-h) - var(--tm-pause-size)) / 2);
+  z-index: 3;
+  width: var(--tm-pause-size);
+  height: var(--tm-pause-size);
+}
+
+.tm-pause-icon {
+  width: 60%;
+  height: 60%;
+}
+
+.tm-pause {
+  position: absolute;
+  inset: 0;
+  z-index: 9;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: clamp(24px, 7vw, 90px);
+  background: #1d1438a8;
+}
+
+.tm-pause-go-on {
+  width: clamp(110px, 30vmin, 220px);
+  height: clamp(110px, 30vmin, 220px);
+  border-width: 4px;
+}
+
+.tm-pause-play {
+  width: 60%;
+  height: 60%;
+  translate: 5% 0;
+}
+
+.tm-pause-again {
+  width: clamp(72px, 18vmin, 130px);
+  height: clamp(72px, 18vmin, 130px);
+  border-width: 3px;
+}
+
+.tm-pause-again-arrow {
+  width: 58%;
+  height: 58%;
+}
+
+.tm-pause-button:active,
+.tm-pause-go-on:active,
+.tm-pause-again:active {
+  translate: 0 2px;
+}
+
+/* Paused, everything that moves with the run stands still with its clock: the picture, the bar and the last moments'
+   light. The veil's own taps (`FeedbackLayer`) still answer. */
+.tm-paused :is(.tm-stage, .tm-bar, .tm-final-light),
+.tm-paused :is(.tm-stage, .tm-bar) *,
+.tm-paused :is(.tm-stage, .tm-bar) *::before,
+.tm-paused :is(.tm-stage, .tm-bar) *::after {
+  animation-play-state: paused !important;
 }

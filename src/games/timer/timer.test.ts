@@ -1362,3 +1362,31 @@ describe("the bar along the bottom and the last moments", () => {
     for (const t of TOPPINGS) expect(t.radius + 22).toBeLessThanOrEqual(PIZZA.r - 26);
   });
 });
+
+describe("pause and start over", () => {
+  // User request, 23 November 2026: every timer can be paused and started over, from the bar's start.
+  test("every run mounts the pause and hands its clock to the pictures", async () => {
+    for (const file of ["./TimerPlay.tsx", "./SwapPlay.tsx"]) {
+      const code = await Bun.file(new URL(file, import.meta.url)).text();
+      expect(code).toContain("usePausableClock()");
+      expect(code).toContain("<RunClockProvider value={clock}>");
+      expect(code).toContain("<PauseControls paused={paused} onPause={pause} onResume={resume} onRestart={onAgain} />");
+      // A tap on the picture answers and pauses (user decision, 23 November 2026); keys only answer.
+      expect(code).toMatch(/const down = \(e: PointerEvent\) => \{\s*answer\(e\.clientX, e\.clientY\);\s*if \([^)]*\) pause\(\);/);
+    }
+  });
+
+  // What a picture works out from the clock (bites, digits, turns, the bar) reads the run's clock, never the real one,
+  // or it went on while paused. Only the start screen, the own time's sheet, a menu's card and the clock itself may.
+  test("nothing in a run reads the real clock but the run's clock", async () => {
+    const allowed = new Set(["TimerGame.tsx", "OwnTimeSheet.tsx", "cardArt.tsx", "pause.tsx"]);
+    for await (const file of new Bun.Glob("*.tsx").scan(new URL(".", import.meta.url).pathname)) {
+      if (allowed.has(file)) continue;
+      const code = await Bun.file(new URL(`./${file}`, import.meta.url)).text();
+      const uses = code.split("\n").filter((line) => line.includes("Date.now"));
+      // The question „Bis morgen um …?“ works out the run's length before it runs.
+      const expected = file === "TimerPlay.tsx" ? uses.filter((line) => line.includes("clockOn(until")) : [];
+      expect({ file, uses }).toEqual({ file, uses: expected });
+    }
+  });
+});

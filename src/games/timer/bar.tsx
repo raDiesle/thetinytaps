@@ -2,6 +2,7 @@ import { useEffect, useState, type CSSProperties } from "react";
 import { Choice } from "@/components/SettingControls";
 import { useT } from "@/lib/language";
 import { afterPageMotion } from "@/lib/pageMotion";
+import { useRunClock } from "./pause";
 import { LeftGlow } from "./scenes";
 
 // The bar along the bottom (user request, 22 November 2026: „ganz unten über die fast gesamte Breite eine
@@ -48,9 +49,11 @@ export function TimeBar({
 }) {
   // The animations start where the clock is: from the run's start (later than now while a turn's toy still hops), and
   // again when the page comes back or has finished turning, since animations stand still while a page turns.
-  const [delay, setDelay] = useState(() => startedAt - Date.now());
+  // On the run's clock, so a pause holds it where it is and it goes on from there.
+  const { now } = useRunClock();
+  const [delay, setDelay] = useState(() => startedAt - now());
   useEffect(() => {
-    const resync = () => setDelay(startedAt - Date.now());
+    const resync = () => setDelay(startedAt - now());
     resync();
     const stop = afterPageMotion(resync);
     document.addEventListener("visibilitychange", resync);
@@ -58,7 +61,7 @@ export function TimeBar({
       stop();
       document.removeEventListener("visibilitychange", resync);
     };
-  }, [startedAt]);
+  }, [startedAt, now]);
   const timing = { "--tm-bar-ms": `${total}ms`, "--tm-bar-delay": `${delay}ms` } as CSSProperties;
   const state = `${soon ? " tm-bar-soon" : ""}${final ? " tm-bar-final" : ""}${done ? " tm-bar-done" : ""}`;
   return (
@@ -103,7 +106,8 @@ export function TimeBar({
  */
 export function FinalLight({ endsAt }: { endsAt: number }) {
   // Read once as it comes: a duration changed on a running animation would move it.
-  const [ms] = useState(() => Math.max(0, endsAt - Date.now()));
+  const { now } = useRunClock();
+  const [ms] = useState(() => Math.max(0, endsAt - now()));
   return <div className="tm-final-light" style={{ "--tm-final-ms": `${ms}ms` } as CSSProperties} />;
 }
 
