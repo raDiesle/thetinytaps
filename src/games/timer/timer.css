@@ -2414,18 +2414,6 @@
   transform: var(--tm-end);
 }
 
-/* The road rug's car (H-122) rides on a hop's layer (.tm-hop) and tilts with the road round its wheels. */
-.tm-road-car {
-  transform-origin: 50% 100%;
-}
-
-.tm-road-car > svg {
-  display: block;
-  width: 100%;
-  height: 100%;
-  overflow: visible;
-}
-
 /* Five Boxes (H-120, boxes.tsx): each box's lid folds over its hinge, the half behind the toys shrinking to its edge,
    then the half in front of them growing from it until it lies shut on the opening. */
 .tm-boxes-lid {
@@ -2775,9 +2763,20 @@
   opacity: 1;
 }
 
-/* Hop to the Flag (H-127, jump.tsx): the hopper rides on two hop layers (`.tm-hop`, keyframes written for the run) and
-   bounces once a second while it waits – squashing on its feet, springing up a little, landing –, a small layer by
-   `transform` alone. */
+/* Up to the Moon (H-127, jump.tsx): a world many screens tall (`.tm-jump-world`) moved up and down as one layer by
+   its camera's keyframes, written for the run (`.tm-hop`); inside it the hopper rides on three more such layers
+   (across, up and down, its turn) and bounces once a second while it waits – squashing on its feet, springing up a
+   little, landing –, small layers by `transform` alone. */
+.tm-jump-sky {
+  position: absolute;
+  inset: 0;
+}
+
+.tm-jump-turn {
+  position: absolute;
+  inset: 0;
+}
+
 .tm-jump-bob {
   position: absolute;
   inset: 0;
@@ -2787,7 +2786,8 @@
 }
 
 .tm-jump-bob > svg,
-.tm-jump-star > svg {
+.tm-jump-star > svg,
+.tm-jump-carried > svg {
   display: block;
   width: 100%;
   height: 100%;
@@ -2813,8 +2813,30 @@
   }
 }
 
-/* A star is caught at the top of its hop (`--tm-at`): it grows a little and fades, a small layer by `transform` and
-   `opacity`. */
+/* What the hopper carries (the diving mask, the balloons, the jetpack and its flame) and what waits for it (the
+   balloons on the skyscraper's roof, the jetpack on the highest cloud) come and go by `opacity` on keyframes written
+   for the run; at the end each is as the run leaves it (`--tm-end-o`). */
+.tm-jump-carried {
+  position: absolute;
+}
+
+.tm-jump-fade {
+  will-change: opacity;
+  animation: var(--tm-anim) var(--tm-ms) linear both;
+}
+
+.tm-done .tm-jump-fade {
+  animation: none;
+  opacity: var(--tm-end-o);
+  transform: none;
+}
+
+/* The lake's water lying over the hopper while it swims, so it is plainly under water. */
+.tm-jump-water {
+  background: rgb(116 192 252 / 0.32);
+}
+
+/* A star is caught on the way (`--tm-at`): it grows a little and fades, a small layer by `transform` and `opacity`. */
 .tm-jump-star {
   position: absolute;
   inset: 0;
@@ -2832,14 +2854,18 @@
   }
 }
 
-/* The flag waits at the pole's foot, and goes up as the hopper lands on the hilltop at the end. */
-.tm-jump-flag {
-  transform: var(--tm-flag-low);
-  transition: transform 1.6s ease-out;
+/* The cake: its cherry is gone as the hopper lands in it, and cream splashes up round it. */
+.tm-jump-splash {
+  opacity: 0;
 }
 
-.tm-done .tm-jump-flag {
-  transform: none;
+.tm-done .tm-jump-cherry {
+  opacity: 0;
+}
+
+.tm-done .tm-jump-splash {
+  opacity: 1;
+  animation: pop-in 0.45s ease-out both;
 }
 
 .tm-done .tm-jump-bob,
@@ -2939,12 +2965,6 @@
   --tm-bar-flag: #fcc419;
 }
 
-.tm-play[data-picture="road"] .tm-bar {
-  --tm-bar-a: #ced4da;
-  --tm-bar-b: #868e96;
-  --tm-bar-flag: #fa5252;
-}
-
 .tm-play[data-picture="blocks"] .tm-bar {
   --tm-bar-a: #b2f2bb;
   --tm-bar-b: #5aa84a;
@@ -2958,9 +2978,9 @@
 }
 
 .tm-play[data-picture="jump"] .tm-bar {
-  --tm-bar-a: #d3f9d8;
-  --tm-bar-b: #40c057;
-  --tm-bar-flag: #e03131;
+  --tm-bar-a: #d0ebff;
+  --tm-bar-b: #4c6ef5;
+  --tm-bar-flag: #f783ac;
 }
 
 .tm-play[data-picture="caterpillar"] .tm-bar {
