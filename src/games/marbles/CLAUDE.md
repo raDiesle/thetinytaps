@@ -157,7 +157,9 @@ Then a second part past the tree (`PART2`, `acornAt`, `beeAt`, `kiteAt`; a pure 
   things moving at different heights raster nearly the whole screen in every frame. So:
   - What never changes goes into a layer of its own, drawn once: `MachineStage`'s `back` (behind the world) and `front`
     (over it) take `WorldLayer`s, each its own svg moved by the same camera; a sky or room that no frame changes goes
-    there, and a layer's content is built once (`useMemo`), never again per frame.
+    there, and a layer's content is built once (`useMemo`), never again per frame. A level with a stage of its own
+    (Wasserbahn, Hatschi-Kette, Alles fällt um, Nagelbrett) does the same: its sky, meadow or room is an svg of its own
+    under the one where things move, with the same `cameraLayer` style (A-36).
   - A small thing that moves for long (a falling marble, a turning star, a crawling ladybug, a hopping animal) is a
     `Sprite` (`parts.tsx`): a little svg of its own over the picture, placed and turned by a CSS transform, as the
     marble runs' `.run-marble`. Its drawing is `still(…)` with numbers as props, so it is drawn again only while it
@@ -176,9 +178,24 @@ Then a second part past the tree (`PART2`, `acornAt`, `beeAt`, `kiteAt`; a pure 
     half sine over a segment `hump(seg(…))` (never `Math.sin(Math.PI * seg(…))`, which ends at 1.2e-16, not 0): both
     reach exactly 0, while a fraction of a pixel changing kept the phone painting (`decay.test.ts`). To find what still
     changes, `KETTEN_SCAN=1 bun test src/games/marbles/stillness.scan.test.tsx` renders every machine a frame apart and
-    lists it; the lines after the end must be 0. What is left of this is idea A-36.
+    lists it; the line at the end + 4 s shows what still moves behind the end. As a last guard a machine's clock stands
+    `AFTER_END_S` after its end (`tickClock` in `MachineStage.tsx`, `afterEnd.test.ts`), so nothing is drawn behind the
+    end for ever – but each level lets its own end settle before that (the garden's birds stop singing and its mole
+    stops waving at `tQuiet`, the excavator stops humming after its last move). A `wobble()` is exactly 0 once what is
+    left of it is under `WOBBLE_REST` of its start (the barn kept turning by 0.0001° until `SETTLE_S`).
+    `TIMES=30,40` scans those seconds, `ALL=1` lists every change rather than the first eight.
+    Something that keeps turning or wobbling only as an echo of the moment it was set off – a globe still spinning
+    behind the lighthouse, wings flapping on a firefly that sits still – comes to rest once its job is done (`GLOBE_SPIN`,
+    the fireflies' `flying`), and what turns only while it is on screen (the Licht-Kette's lamp, carousels and shadows,
+    `lamp()`) takes a still time while it is not.
+  - A long thing sweeping across the world (the Licht-Kette's lighthouse beam) is never drawn into a world-sized svg,
+    where each frame rasters the whole band it crosses: it is a few small sprites in `over`, a band stretched by
+    `scaleX`, its spot and its glare each moved by a transform (`LighthouseBeam`).
   - `bun run perf ketten-<id>` (`KETTEN_LEVELS` in `tools/perfScenarios.ts`) measures each level's first seconds and
-    its middle; run it for the level after changing what moves in it (`ketten-` runs all 21, about 15 minutes).
+    its middle; run it for the level after changing what moves in it (`ketten-` runs all 21, about 15 minutes). A
+    level the scenario keeps playing by keys (the Nagelbrett) must still be running at „Mitte“: at a key every 600 ms its
+    twenty marbles were gone before it, and „Mitte“ measured the turn to the next level – look at its `--shots` when a
+    number seems too good (A-36).
 
 ## Working on machines
 

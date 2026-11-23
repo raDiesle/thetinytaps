@@ -88,9 +88,18 @@ export const SETTLE_S = 4;
  */
 export const decay = (x: number) => (x > 9 ? 0 : Math.exp(-x));
 
-/** A wobble that starts at `amp` and dies away, `age` seconds after a hit. */
-export const wobble = (age: number, amp: number, freq: number, damp: number) =>
-  age < 0 || age > SETTLE_S ? 0 : amp * Math.exp(-age * damp) * Math.sin(age * freq);
+/**
+ * What is left of a wobble when it stops: below this share of its start it is too small to see. Until `SETTLE_S` the
+ * farm's barn kept turning by 0.0001° and the phone painted the whole barn again in every frame (perf, A-36).
+ */
+export const WOBBLE_REST = 0.005;
+
+/** A wobble that starts at `amp` and dies away, `age` seconds after a hit; exactly 0 once it is too small to see. */
+export const wobble = (age: number, amp: number, freq: number, damp: number) => {
+  if (age < 0 || age > SETTLE_S) return 0;
+  const left = Math.exp(-age * damp);
+  return left < WOBBLE_REST ? 0 : amp * left * Math.sin(age * freq);
+};
 
 /** True while a camera (or anything gliding after a target) is still visibly on its way, in world units. */
 export const gliding = (from: number, to: number) => Math.abs(to - from) > 0.1;

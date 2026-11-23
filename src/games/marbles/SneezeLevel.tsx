@@ -560,18 +560,18 @@ export function SneezeLevel({ sound, say, onDone }: LevelProps) {
   const meadow = useMemo(() => <Meadow worldW={row.worldW} cloudsTo={row.tree.x} gradient={`${ids}-sky`} />, [row, ids]);
   const still = useMemo(() => <StillThings x={row.tree.x} />, [row]);
 
+  // Zooming out keeps the meadow's ground line in the same place on the screen.
+  const cameraStyle = cameraLayer(box.current, { x: 0, y: 0, w: row.worldW, h: VIEW_H }, { x: camX, y: VIEW_H - VIEW_H / camZ, w: VIEW_W, h: VIEW_H }, camZ);
   return (
     <div className="marble-level" ref={box} onPointerDown={onPointerDown}>
-      {/* Zooming out keeps the meadow's ground line in the same place on the screen. */}
-      <svg
-        className="marble-camera"
-        viewBox={`0 0 ${row.worldW} ${VIEW_H}`}
-        style={cameraLayer(box.current, { x: 0, y: 0, w: row.worldW, h: VIEW_H }, { x: camX, y: VIEW_H - VIEW_H / camZ, w: VIEW_W, h: VIEW_H }, camZ)}
-        aria-label={label}
-      >
+      {/* The meadow and what never moves are a layer of their own, painted once and only moved by the camera: in the
+          animals' svg the phone painted them again in every frame (perf, A-36). */}
+      <svg className="marble-camera" viewBox={`0 0 ${row.worldW} ${VIEW_H}`} style={cameraStyle} aria-hidden>
+        {meadow}
+        {still}
+      </svg>
+      <svg className="marble-camera" viewBox={`0 0 ${row.worldW} ${VIEW_H}`} style={cameraStyle} aria-label={label}>
         <g>
-          {meadow}
-          {still}
           <TreeDrawing tree={row.tree} age={t - leavesT.current}>
             <Squirrel x={X + SQUIRREL.x} y={SQUIRREL.y} u={u} startled={t - leavesT.current} tapped={tapped("squirrel")} />
           </TreeDrawing>

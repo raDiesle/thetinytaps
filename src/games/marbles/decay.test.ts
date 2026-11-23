@@ -2,7 +2,7 @@ import { expect, test } from "bun:test";
 import { readdirSync, readFileSync } from "node:fs";
 import { join } from "node:path";
 import { buildBuilding } from "./building";
-import { decay } from "./level";
+import { decay, wobble, WOBBLE_REST } from "./level";
 import { hump } from "./machineKit";
 
 const HERE = import.meta.dir;
@@ -55,4 +55,12 @@ test("the building site's belt and drum stand once the marble is past them", () 
   expect(site.beltTravel(late)).toBe(site.beltTravel(late - 10));
   expect(site.drumSpin(late)).toBe(site.drumSpin(late - 10));
   expect(site.beltTravel(2)).toBeGreaterThan(site.beltTravel(1));
+});
+
+test("a wobble is exactly 0 once it is too small to see, long before SETTLE_S", () => {
+  // The barn's kick: 1.2° damped by 3.5 a second is under 0.006° after 1.6 s.
+  expect(wobble(1.6, 1.2, 26, 3.5)).toBe(0);
+  expect(wobble(0.3, 1.2, 26, 3.5)).not.toBe(0);
+  const age = -Math.log(WOBBLE_REST) / 3.5;
+  expect(wobble(age + 0.01, 5, 36, 3.5)).toBe(0);
 });

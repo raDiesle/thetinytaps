@@ -133,9 +133,11 @@ const RUN_LEVELS = new Set<string>(["track", "colortrack", "snowtrack", "spacetr
  */
 function chainLevel(id: (typeof KETTEN_LEVELS)[number]): Scenario {
   const start: Step[] = RUN_LEVELS.has(id) ? [1, 2, 3].flatMap(() => [{ tap: ".run-shelf-thing" }, { wait: 700 }] as Step[]) : key(" ");
-  // The pegboard drops a marble at every key, so a child keeps pressing there.
+  // The pegboard drops a marble at every key, so a child keeps pressing there – but slowly enough that its twenty
+  // marbles last into the middle: at a key every 600 ms the level was over before it, and „Mitte“ measured the turn to
+  // the next level (A-36).
   const run = RUN_LEVELS.has(id);
-  const type = id === "pegs" ? { keys: ["a", "s", "d", "f", "g", "h", "j"], every: 600 } : run ? undefined : { keys: [" "], every: 2500 };
+  const type = id === "pegs" ? { keys: ["a", "s", "d", "f", "g", "h", "j"], every: 1500 } : run ? undefined : { keys: [" "], every: 2500 };
   const middle: Step[] = run ? [{ wait: 12000 }] : [1, 2, 3].flatMap(() => [{ wait: 4000 }, ...key(" ")]);
   return {
     name: `ketten-${id}`,

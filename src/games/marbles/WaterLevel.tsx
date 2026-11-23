@@ -215,25 +215,34 @@ export function WaterLevel({ sound, say, onDone, watch }: LevelProps) {
   const t3 = timeOf(2);
   const t4 = timeOf(3);
   const turtle = water.turtleAt(t2);
+  const backdrop = useMemo(
+    () => (
+      <>
+        <Sky gradient={`${ids}-sky`} />
+        <Hill />
+        <NestPole />
+        {BASINS.map((b, i) => (
+          <BasinBack key={i} basin={b} />
+        ))}
+        <PondBack pond={REED_POND} kind="reeds" />
+        <PondBack pond={TURTLE_POND} kind="grass" />
+        <PondBack pond={HOT_SPRING} kind="stones" />
+      </>
+    ),
+    [ids],
+  );
 
+  const viewBox = `0 ${SKY_TOP} ${WORLD_W} ${WORLD_H - SKY_TOP}`;
+  const cameraStyle = cameraLayer(box.current, WATER_WORLD, { x: cam.x, y: cam.y, w: VIEW_W, h: VIEW_H });
   return (
     <div className="marble-level" ref={box} onPointerDown={onPointerDown}>
-      <svg
-        className="marble-camera"
-        viewBox={`0 ${SKY_TOP} ${WORLD_W} ${WORLD_H - SKY_TOP}`}
-        style={cameraLayer(box.current, WATER_WORLD, { x: cam.x, y: cam.y, w: VIEW_W, h: VIEW_H })}
-        aria-label={label}
-      >
+      {/* The sky, the hill and the basins' insides never change: a layer of their own, painted once and only moved by
+          the camera – in the duck's svg the phone painted them again in every frame (perf, A-36). */}
+      <svg className="marble-camera" viewBox={viewBox} style={cameraStyle} aria-hidden>
+        {backdrop}
+      </svg>
+      <svg className="marble-camera" viewBox={viewBox} style={cameraStyle} aria-label={label}>
         <g ref={world}>
-          <Sky gradient={`${ids}-sky`} />
-          <Hill />
-          <NestPole />
-          {BASINS.map((b, i) => (
-            <BasinBack key={i} basin={b} />
-          ))}
-          <PondBack pond={REED_POND} kind="reeds" />
-          <PondBack pond={TURTLE_POND} kind="grass" />
-          <PondBack pond={HOT_SPRING} kind="stones" />
           <Bell swing={water.bellAt(t1)} />
           <WaterWheel turned={water.wheelAt(t1)} />
           <Waterfall pts={[FLUME.to, { x: 1440, y: FLUME.to.y + 10 }, { x: 1470, y: REED_POND.y }]} flow={flowAt(stretches[0], t1)} t={t1} />

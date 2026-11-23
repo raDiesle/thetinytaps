@@ -878,6 +878,8 @@ export function buildGarden() {
   return {
     events,
     duration: tDone,
+    /** When the water is off and the finale settles: the birds stop singing, the butterfly and the sunflower hold still (A-36). */
+    tQuiet: tDone + SPRAY_AFTER,
     stops,
     chimeTimes,
     tMarble,

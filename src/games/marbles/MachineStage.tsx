@@ -25,6 +25,16 @@ export interface MachineStop {
   active?: boolean;
 }
 
+/**
+ * How long a machine's picture may still move after its end, in seconds: then its clock stands and nothing is drawn
+ * again. Ends that kept moving (a sprinkler, birds singing, a mole waving, an excavator humming) had an old phone paint
+ * in every frame behind the end for as long as it was shown (perf, A-36); each level lets its end settle well before.
+ */
+export const AFTER_END_S = 6;
+
+/** The machine's clock `dt` seconds on from `t`: it runs until `AFTER_END_S` after the end and stands there. */
+export const tickClock = (machine: Pick<MachineBase, "duration">, t: number, dt: number) => Math.min(t + dt, Math.max(t, machine.duration + AFTER_END_S));
+
 /** The stops a machine really waits at: only the active one. */
 export const activeStops = (machine: MachineBase) => machine.stops.filter((s) => s.active);
 
@@ -94,7 +104,7 @@ export function MachineStage({
    * HTML laid over the machine's svg, under `front`, at the machine's seconds: `at` maps world units to its pixels (the
    * Lichterkette's dark, a small canvas the compositor stretches over the screen).
    */
-  over?: (t: number, at: ReturnType<typeof cameraPoint>) => ReactNode;
+  over?: (t: number, at: ReturnType<typeof cameraPoint>, seen: Seen) => ReactNode;
   /** Still or seldom changing parts over the machine, top last; a function of the machine's seconds where it must know them. */
   front?: WorldLayer[] | ((t: number, seen: Seen) => WorldLayer[]);
   /**
@@ -118,8 +128,9 @@ export function MachineStage({
   useEffect(() => loadRealSounds(machine.events.map((e) => e.sound)), [machine]);
 
   useFrames((dt) => {
+    const before = clock.current;
     if (clock.current >= 0 && !waiting.current) {
-      clock.current += dt;
+      clock.current = tickClock(machine, clock.current, dt);
       const next = stops[nextStop.current];
       if (next && clock.current >= next.at) {
         clock.current = next.at;
@@ -138,9 +149,9 @@ export function MachineStage({
     const target = machine.cameraTarget(clock.current);
     const from = camera.current;
     camera.current += (target - camera.current) * (1 - Math.exp(-dt * CAMERA_FOLLOW));
-    // Still before the tap and at a stop, once the camera is there; after the end it runs on, since some machines'
-    // pictures keep moving then (the good-night machine's „z z z“).
-    return (clock.current >= 0 && !waiting.current) || gliding(from, target);
+    // Still before the tap and at a stop, once the camera is there; after the end it runs on for `AFTER_END_S`, since
+    // some machines' pictures keep moving then (the good-night machine's „z z z“), and then stands for good.
+    return clock.current !== before || gliding(from, target);
   });
 
   // For trying out the machine in the browser console: __machine.seek(20)
@@ -199,7 +210,7 @@ export function MachineStage({
       <svg className="marble-camera" viewBox={viewBox} style={cameraStyle} aria-label={label}>
         {children(clock.current, seen)}
       </svg>
-      {over?.(clock.current, at)}
+      {over?.(clock.current, at, seen)}
       {fronts?.map((l, i) => layer(l, `front${i}`))}
       {clock.current < 0 && <TapHint key="start" {...worldHint(at, startSpot)} side={startSpot.side} />}
       {stop && <TapHint key={`stop${nextStop.current}`} {...worldHint(at, { x: stop.x, y: stop.y, r: STOP_HINT.ring })} side={stopFinger(stop).side} />}

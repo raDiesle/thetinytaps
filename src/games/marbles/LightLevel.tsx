@@ -41,9 +41,9 @@ import {
   WORLD_W,
   wireY,
 } from "./light";
-import { deg, easeOut, lerp, seg, hump } from "./machineKit";
+import { clamp01, deg, easeOut, lerp, seg, hump } from "./machineKit";
 import { MachineStage, type Seen } from "./MachineStage";
-import { BAR_COLORS, STAR_POINTS, still } from "./parts";
+import { BAR_COLORS, type ScreenAt, STAR_POINTS, still } from "./parts";
 import type { Pt } from "./path";
 import { INK, Picture, Sparkles } from "./scenery";
 
@@ -71,6 +71,13 @@ interface Hole {
  * off screen it gets a still time (before it starts), so nothing changes there (perf, November 2026).
  */
 const disco = (t: number, seen: Seen) => (seen(DISCO.x - 760, DISCO.x + 760) ? t : 0);
+
+/**
+ * The lava lamp's time, with its carousel and the shadows on the wall: once the camera has left them behind, the time the
+ * paper bird landed on the globe, so blobs, carousel and shadows stand still off screen instead of going round to the end
+ * (perf, A-36). Before they are reached `t` is earlier than that anyway.
+ */
+const lamp = (light: Light, t: number, seen: Seen) => (seen(LAVA.x - SHADOW.sweep - 300, LAVA.x + SHADOW.sweep + 300) ? t : Math.min(t, light.tGlobe));
 
 /**
  * Level 8: the light chain (R-10). A dark children's room; one tap switches
@@ -102,18 +109,22 @@ export function LightLevel(props: LevelProps) {
       machine={light}
       level="light"
       start={{ x: TORCH.x0 + 85, y: TORCH.lens.y, r: 100 }}
-      over={(t, at) => <NightVeil light={light} t={t} at={at} />}
-      front={(t, seen) => [
+      over={(t, at, seen) => (
+        <>
+          <NightVeil light={light} t={t} at={at} />
+          <DiscoSpots light={light} t={disco(t, seen)} at={at} />
+          <LighthouseBeam light={light} t={t} at={at} />
+        </>
+      )}
+      front={(t) => [
         {
           content: (
             <>
               <Beam light={light} t={t} />
-              <DiscoSpots light={light} t={disco(t, seen)} />
               <GoldenSpot light={light} t={t} />
               <LitBulbs light={light} t={t} glow={`${ids}-glow`} />
               <Halo x={LAVA.x} y={490} r={170} k={0.3 * light.lavaGlow(t)} glow={`${ids}-glow`} />
               <Halo x={GLOBE.x} y={GLOBE.y} r={170} k={0.35 * light.globeGlow(t)} glow={`${ids}-glow`} />
-              <LighthouseBeam light={light} t={t} />
               <StickerGlow light={light} t={t} green={`${ids}-green`} />
               <Rainbow light={light} t={t} />
               <StickLight light={light} t={t} green={`${ids}-green`} />
@@ -132,7 +143,7 @@ export function LightLevel(props: LevelProps) {
     >
       {(t, seen) => (
         <>
-          <WallShadows light={light} t={t} />
+          <WallShadows light={light} t={lamp(light, t, seen)} />
           <Nightstand />
           <Torch on={t >= 0} />
           <Chest />
@@ -142,10 +153,10 @@ export function LightLevel(props: LevelProps) {
           <Jar light={light} t={t} />
           <FairyLights />
           <SideTable />
-          <Carousel light={light} t={t} side="back" />
-          <LavaLamp light={light} t={t} />
-          <Carousel light={light} t={t} side="front" />
-          <WarmAir light={light} t={t} />
+          <Carousel light={light} t={lamp(light, t, seen)} side="back" />
+          <LavaLamp light={light} t={lamp(light, t, seen)} />
+          <Carousel light={light} t={lamp(light, t, seen)} side="front" />
+          <WarmAir light={light} t={lamp(light, t, seen)} />
           <Desk />
           <Globe light={light} t={t} />
           <Stickers />
@@ -1049,6 +1060,8 @@ const VEIL_PX = 4;
  */
 function NightVeil({ light, t, at }: { light: Light; t: number; at: (x: number, y: number) => { x: number; y: number; k: number } }) {
   const canvas = useRef<HTMLCanvasElement>(null);
+  /** What the veil was last drawn from: drawn again only when that changes, so the dark doesn't change while all is still. */
+  const drawn = useRef("");
   useLayoutEffect(() => {
     const c = canvas.current;
     const box = c?.parentElement;
@@ -1056,19 +1069,24 @@ function NightVeil({ light, t, at }: { light: Light; t: number; at: (x: number, 
     if (!c || !box || !ctx) return;
     const w = Math.ceil(box.clientWidth / VEIL_PX);
     const h = Math.ceil(box.clientHeight / VEIL_PX);
+    const a = at(-400, -200);
+    const b = at(WORLD_W + 400, VIEW_H + 200);
+    const dark = light.dark(t);
+    const holes = nightHoles(light, t);
+    const key = JSON.stringify([w, h, a, b, dark, holes]);
+    if (key === drawn.current) return;
+    drawn.current = key;
     if (c.width !== w) c.width = w;
     if (c.height !== h) c.height = h;
     ctx.globalCompositeOperation = "source-over";
     ctx.clearRect(0, 0, w, h);
-    const a = at(-400, -200);
-    const b = at(WORLD_W + 400, VIEW_H + 200);
-    ctx.globalAlpha = light.dark(t);
+    ctx.globalAlpha = dark;
     ctx.fillStyle = NIGHT;
     ctx.fillRect(a.x / VEIL_PX, a.y / VEIL_PX, (b.x - a.x) / VEIL_PX, (b.y - a.y) / VEIL_PX);
     // Each hole takes away from the dark as the svg mask's black circles did: 1 in the middle, 0.85 at 45 %, 0 at the rim.
     ctx.globalCompositeOperation = "destination-out";
     ctx.globalAlpha = 1;
-    for (const hole of nightHoles(light, t)) {
+    for (const hole of holes) {
       const p = at(hole.x, hole.y);
       const x = p.x / VEIL_PX;
       const y = p.y / VEIL_PX;
@@ -1117,20 +1135,51 @@ function Beam({ light, t }: { light: Light; t: number }) {
   );
 }
 
-/** Little coloured spots of light that circle over the wall around the turning disco ball. */
-const DiscoSpots = still(function DiscoSpots({ light, t }: { light: Light; t: number }) {
+/** How far the disco spots reach from their middle, in world units: the furthest ring and a dot. */
+const DISCO_PAD = 550;
+/** The spots' ellipse: wider than high, as the wall is seen from the side. Their dots are made a little smaller for it. */
+const DISCO_SX = 1.4;
+const DISCO_SY = 0.8;
+
+/**
+ * Little coloured spots of light that circle over the wall around the turning disco ball: one ring of dots drawn once in
+ * a layer of its own, turned and stretched into its ellipse by a CSS transform. Moved one by one inside the svg over the
+ * room, they changed most of the wall in every frame and the phone rastered 64 screens a second (perf, A-36).
+ */
+function DiscoSpots({ light, t, at }: { light: Light; t: number; at: ScreenAt }) {
   if (t < light.tBall) return null;
   const appear = easeOut(seg(t, light.tBall + 0.1, light.tBall + 0.7));
-  const spin = light.spin(t);
+  const turn = light.spin(t) * 0.5;
+  const p = at(DISCO.x, DISCO.y + 120);
+  const half = DISCO_PAD * p.k;
   return (
-    <g opacity={appear * 0.85}>
+    <svg
+      className="marble-sprite"
+      viewBox={`${-DISCO_PAD} ${-DISCO_PAD} ${2 * DISCO_PAD} ${2 * DISCO_PAD}`}
+      style={{
+        width: 2 * half,
+        height: 2 * half,
+        opacity: appear * 0.85,
+        transform: `translate3d(${p.x - half}px, ${p.y - half}px, 0) scale(${DISCO_SX}, ${DISCO_SY}) rotate(${turn}rad)`,
+      }}
+      aria-hidden
+    >
+      <DiscoDots />
+    </svg>
+  );
+}
+
+/** The ring of dots round 0, 0, before it is turned and stretched: drawn once. */
+const DiscoDots = memo(function DiscoDots() {
+  const shrink = 1 / Math.sqrt(DISCO_SX * DISCO_SY);
+  return (
+    <g>
       {Array.from({ length: 16 }, (_, j) => {
-        const a = (j * 2 * Math.PI) / 16 + spin * 0.5;
+        const a = (j * 2 * Math.PI) / 16;
         const r = 150 + ((j * 97) % 380);
-        const x = DISCO.x + 1.4 * r * Math.cos(a);
-        const y = DISCO.y + 120 + 0.8 * r * Math.sin(a);
-        if (y > FLOOR + 60) return null;
-        return <circle key={j} cx={x} cy={y} r={10 + (j % 3) * 4} fill={j % 2 ? "#fff" : BAR_COLORS[j % BAR_COLORS.length]} />;
+        return (
+          <circle key={j} cx={r * Math.cos(a)} cy={r * Math.sin(a)} r={(10 + (j % 3) * 4) * shrink} fill={j % 2 ? "#fff" : BAR_COLORS[j % BAR_COLORS.length]} />
+        );
       })}
     </g>
   );
@@ -1228,8 +1277,11 @@ function Fireflies({ light, t, glow }: { light: Light; t: number; glow: string }
       {Array.from({ length: FIREFLIES }, (_, i) => {
         const f = light.fireflyAt(i, t);
         const awake = f.glow > 0.2;
-        // Wings beat while awake, and stop when the level is over.
-        const flap = awake ? 18 * Math.sin(Math.min(t, light.duration) * 38 + i) : 0;
+        // Wings beat while it flies, and rest while it sits (on the table, on the lamp): beating on, they had an old phone
+        // paint their band of the screen in every frame long after their flight (perf, A-36).
+        const before = light.fireflyAt(i, t - 1 / 30).pt;
+        const flying = clamp01(Math.hypot(f.pt.x - before.x, f.pt.y - before.y) / 2);
+        const flap = awake ? 18 * flying * Math.sin(Math.min(t, light.duration) * 38 + i) : 0;
         // Small enough to fit six in the jar, big enough to follow on a phone once the lid is open, small again in the
         // lighthouse's lantern, and a bit smaller round the lamp.
         const size = 1.2 + 0.5 * seg(t, light.tLid, light.tLid + 1) - 0.75 * f.inside - 0.3 * seg(t, light.tLamp - 2, light.tLamp);
@@ -1248,24 +1300,83 @@ function Fireflies({ light, t, glow }: { light: Light; t: number; glow: string }
   );
 }
 
-/** The lighthouse's beam: a band of light from the lantern to its spot on the wall, and a soft glare while it shines at the child. */
-function LighthouseBeam({ light, t }: { light: Light; t: number }) {
+/** How long the lighthouse's band of light is drawn before CSS stretches it to its spot. */
+const BAND_LEN = 1000;
+/** The biggest the glare round the lantern gets, in world units. */
+const GLARE_R = 110;
+
+/**
+ * The lighthouse's beam: a band of light from the lantern to its spot on the wall, and a soft glare while it shines at
+ * the child. Three small HTML layers over the dark, each drawn once and only moved, stretched and faded by CSS: drawn in
+ * the front svg, the band sweeping over the wall had an old phone raster 60 screens a second (perf, A-36).
+ */
+function LighthouseBeam({ light, t, at }: { light: Light; t: number; at: ScreenAt }) {
   const s = light.beamSpot(t);
   if (s.show <= 0 && s.facing <= 0) return null;
-  const { x, y } = LANTERN;
+  const o = at(LANTERN.x, LANTERN.y);
+  const p = at(s.x, s.y);
+  const { rx, ry } = BEAM;
   return (
-    <g>
+    <>
       {s.show > 0 && (
-        <g opacity={s.show}>
-          <path d={`M${x} ${y - 16} L${s.x} ${s.y - BEAM.ry * 0.8} L${s.x} ${s.y + BEAM.ry * 0.8} L${x} ${y + 16} Z`} fill={LIGHT} opacity="0.22" />
-          <ellipse cx={s.x} cy={s.y} rx={BEAM.rx} ry={BEAM.ry} fill={LIGHT} opacity="0.35" />
-          <ellipse cx={s.x} cy={s.y} rx={BEAM.rx * 0.6} ry={BEAM.ry * 0.6} fill={LIGHT} opacity="0.45" />
-        </g>
+        <>
+          <svg
+            className="marble-sprite"
+            viewBox={`0 ${-ry} ${BAND_LEN} ${2 * ry}`}
+            style={{
+              width: BAND_LEN * o.k,
+              height: 2 * ry * o.k,
+              opacity: s.show,
+              transformOrigin: "0 50%",
+              transform: `translate3d(${o.x}px, ${o.y - ry * o.k}px, 0) scaleX(${(s.x - LANTERN.x) / BAND_LEN})`,
+            }}
+            aria-hidden
+          >
+            <BeamBand />
+          </svg>
+          <svg
+            className="marble-sprite"
+            viewBox={`${-rx} ${-ry} ${2 * rx} ${2 * ry}`}
+            style={{ width: 2 * rx * p.k, height: 2 * ry * p.k, opacity: s.show, transform: `translate3d(${p.x - rx * p.k}px, ${p.y - ry * p.k}px, 0)` }}
+            aria-hidden
+          >
+            <BeamSpot />
+          </svg>
+        </>
       )}
-      {s.facing > 0 && <circle cx={x} cy={y} r={50 + 60 * s.facing} fill="#fff" opacity={0.45 * s.facing ** 3} />}
-    </g>
+      {s.facing > 0 && (
+        <svg
+          className="marble-sprite"
+          viewBox={`${-GLARE_R} ${-GLARE_R} ${2 * GLARE_R} ${2 * GLARE_R}`}
+          style={{
+            width: 2 * GLARE_R * o.k,
+            height: 2 * GLARE_R * o.k,
+            opacity: 0.45 * s.facing ** 3,
+            transform: `translate3d(${o.x - GLARE_R * o.k}px, ${o.y - GLARE_R * o.k}px, 0) scale(${(50 + 60 * s.facing) / GLARE_R})`,
+          }}
+          aria-hidden
+        >
+          <circle r={GLARE_R} fill="#fff" />
+        </svg>
+      )}
+    </>
   );
 }
+
+/** The band from the lantern (at 0, 0) to the right, `BAND_LEN` long: drawn once, stretched by CSS. */
+const BeamBand = memo(function BeamBand() {
+  return <path d={`M0 -16 L${BAND_LEN} ${-BEAM.ry * 0.8} L${BAND_LEN} ${BEAM.ry * 0.8} L0 16 Z`} fill={LIGHT} opacity="0.22" />;
+});
+
+/** The spot on the wall round 0, 0: drawn once, moved by CSS. */
+const BeamSpot = memo(function BeamSpot() {
+  return (
+    <>
+      <ellipse rx={BEAM.rx} ry={BEAM.ry} fill={LIGHT} opacity="0.35" />
+      <ellipse rx={BEAM.rx * 0.6} ry={BEAM.ry * 0.6} fill={LIGHT} opacity="0.45" />
+    </>
+  );
+});
 
 /** The lantern shining with the fireflies' light, and the lens inside turning with the lighthouse. */
 function LanternLight({ light, t, glow }: { light: Light; t: number; glow: string }) {

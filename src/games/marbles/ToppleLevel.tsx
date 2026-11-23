@@ -127,6 +127,7 @@ export function ToppleLevel({ sound, say, onDone }: LevelProps) {
   const first = things[0];
   const world = { x: 0, y: 0, w: worldW, h: VIEW_H };
   const view = { x: camera.current, y: 0, w: VIEW_W, h: VIEW_H };
+  const cameraStyle = cameraLayer(box.current, world, view);
   // Round the first thing, the one the tap pushes over; the hand comes from the left, where the push comes from.
   const firstSpot = {
     x: MARGIN + (lefts[0] + first.w / 2) * SCALE,
@@ -136,9 +137,13 @@ export function ToppleLevel({ sound, say, onDone }: LevelProps) {
 
   return (
     <div className="marble-level" ref={box} onPointerDown={push}>
-      <svg className="marble-camera" viewBox={`0 0 ${worldW} ${VIEW_H}`} style={cameraLayer(box.current, world, view)} aria-label={label}>
+      {/* The room is a layer of its own, painted once and only moved by the camera: in the things' svg the phone painted
+          the whole room again in every frame while they fell (perf, A-36). */}
+      <svg className="marble-camera" viewBox={`0 0 ${worldW} ${VIEW_H}`} style={cameraStyle} aria-hidden>
+        {room}
+      </svg>
+      <svg className="marble-camera" viewBox={`0 0 ${worldW} ${VIEW_H}`} style={cameraStyle} aria-label={label}>
         <g>
-          {room}
           <g transform={`translate(${MARGIN} ${FLOOR}) scale(${SCALE})`}>
             {links.map(({ link, left }, k) => (
               <LinkArt key={k} link={link} left={left} age={linkAge(sim, k)} />

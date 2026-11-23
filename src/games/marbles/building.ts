@@ -581,8 +581,10 @@ export function buildBuilding() {
     }
     const { e, w } = reachFor(pose.w);
     const face = -Math.cos(Math.PI * easeInOut(seg(t, tSwing, tSwung)));
-    // Waking up it shudders hard, working it hums along.
-    const shake = t < tWake ? 0 : t < t0 ? 4 * Math.sin((t - tWake) * 55) * (1 - seg(t, tWake + 0.4, t0)) : 0.8 * Math.sin(t * 47);
+    // Waking up it shudders hard, working it hums along, and once its arm is up after the pat it goes quiet over a
+    // second: humming for ever, it kept an old phone painting in every frame (perf, A-36).
+    const hum = 1 - seg(t, last.at, last.at + 1);
+    const shake = t < tWake ? 0 : t < t0 ? 4 * Math.sin((t - tWake) * 55) * (1 - seg(t, tWake + 0.4, t0)) : hum > 0 ? 0.8 * hum * Math.sin(t * 47) : 0;
     return { face, shake, e, w, cup: pose.cup, full: t >= tDig + 0.35 && t < tTip + 0.45 };
   };
   /** The wrist in site coordinates. */

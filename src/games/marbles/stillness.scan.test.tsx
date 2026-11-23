@@ -1,8 +1,10 @@
 // Which parts of each machine still change from one frame to the next – a tool, not a check, run only when asked:
-//   KETTEN_SCAN=1 bun test src/games/marbles/stillness.scan.test.tsx   (LEVELS=garden,building to pick, CTX=1 for context)
+//   KETTEN_SCAN=1 bun test src/games/marbles/stillness.scan.test.tsx   (LEVELS=garden,building to pick, CTX=1 for context,
+//   TIMES=30,40 for those seconds, ALL=1 for every change rather than the first eight)
 // Every machine is a pure function of its seconds, so it renders each level with a stand-in MachineStage at a moment and
-// one frame later and lists the tags that differ. The lines after the end (duration + 4 s and + 20 s) are what never
-// comes to rest – each one kept an old phone painting in every frame (perf, November 2026). The stand-in replaces
+// one frame later and lists the tags that differ. The line at duration + 4 s is what still moves behind the end, which
+// the stage stops AFTER_END_S after it (afterEnd.test.ts) – keep it small all the same, so an end settles by itself
+// (perf, A-36; the garden's sprinkler going off is the last). The stand-in replaces
 // MachineStage for the whole test process, so it is mocked inside the test, which runs only with KETTEN_SCAN.
 import { mock, test } from "bun:test";
 import type { ComponentProps, FunctionComponent, ReactNode } from "react";
@@ -14,7 +16,8 @@ import { VIEW_W } from "./level";
 const g = globalThis as { __T?: number };
 /** The stand-in: draws the machine at `__T` seconds, its back and front layers round it, with no clock, camera or tap. */
 function Stand({ machine, back, front, children }: ComponentProps<typeof real.MachineStage>): ReactNode {
-  const T = g.__T ?? 0;
+  // The stage's clock stands AFTER_END_S after the end, so the line at duration + 20 s shows that moment.
+  const T = Math.min(g.__T ?? 0, machine.duration + real.AFTER_END_S);
   const cam = machine.cameraTarget(T);
   const seen = (x0: number, x1: number) => x1 >= cam - VIEW_W / 2 && x0 <= cam + 1.5 * VIEW_W;
   const b = typeof back === "function" ? back(T, seen) : back;
@@ -64,7 +67,8 @@ test.skipIf(!process.env.KETTEN_SCAN)(
       };
       const D = DURATIONS[id] ?? 60;
       const lines: string[] = [];
-      for (const T of [0.3 * D, 0.55 * D, 0.8 * D, 0.97 * D, D + 4, D + 20]) {
+      const times = process.env.TIMES ? process.env.TIMES.split(",").map(Number) : [0.3 * D, 0.55 * D, 0.8 * D, 0.97 * D, D + 4, D + 20];
+      for (const T of times) {
         const a = at(T);
         const b = at(T + 1 / 60);
         const c = at(T + 0.5);
@@ -99,7 +103,7 @@ test.skipIf(!process.env.KETTEN_SCAN)(
           `  ${T.toFixed(1)}s: ${diff.length}${
             diff.length
               ? ` | ${diff
-                  .slice(0, 8)
+                  .slice(0, process.env.ALL ? undefined : 8)
                   .map((d) => d.slice(0, 110))
                   .join(" | ")}`
               : ""

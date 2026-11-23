@@ -121,8 +121,8 @@ export function GardenLevel(props: LevelProps) {
           <LeafPile heap={garden.pileAt(t)} />
           <Pinwheel garden={garden} t={t} />
           <FlowerBed />
-          <Sunflower garden={garden} t={t} />
-          <Hose fill={garden.hoseAt(t)} t={t} />
+          <Sunflower garden={garden} t={Math.min(t, garden.tQuiet)} />
+          <Hose fill={garden.hoseAt(t)} t={Math.min(t, garden.tQuiet)} />
           <Sprinkler spin={garden.spinAt(t)} />
           <Tap angle={garden.leverAt(t)} />
           <PinwheelString garden={garden} t={t} />
@@ -140,7 +140,7 @@ export function GardenLevel(props: LevelProps) {
           <Gust k={garden.gustAt(t)} />
           <Spray drops={garden.sprayAt(t)} />
           <Birds garden={garden} t={t} />
-          <Butterfly garden={garden} t={t} />
+          <Butterfly garden={garden} t={Math.min(t, garden.tQuiet)} />
           <Sparkles x={SUN.x} y={SUN.headY} age={t - garden.tBloom} n={12} spread={240} />
         </>
       )}
@@ -1245,7 +1245,9 @@ function Birds({ garden, t }: { garden: Garden; t: number }) {
       {[0, 1].map((i) => {
         const { pt, flying } = garden.birdAt(i, t);
         const flap = flying ? 40 * Math.sin(t * 30 + i) : 10;
-        const bob = flying ? 0 : 3 * Math.sin(t * 9 + i * 2);
+        // Once the water is off they stop singing and sit still: bobbing and singing for ever kept the phone painting.
+        const singing = !flying && t < garden.tQuiet;
+        const bob = singing ? 3 * Math.sin(t * 9 + i * 2) : 0;
         const color = i ? "#ff8c42" : "#00b4d8";
         const note = (t * 1.2 + i * 0.5) % 1;
         return (
@@ -1270,7 +1272,7 @@ function Birds({ garden, t }: { garden: Garden; t: number }) {
                 </>
               )}
             </g>
-            {!flying && (
+            {singing && (
               <text x={pt.x - 40 - 20 * note} y={pt.y - 60 - 60 * note} fontSize="34" fill={INK} opacity={1 - note} textAnchor="middle">
                 ♪
               </text>
@@ -1353,6 +1355,8 @@ function MoleTunnel({ garden, t, clip }: { garden: Garden; t: number; clip: stri
         // The home hill shakes when the croquet ball bumps it.
         const squash = i === 0 ? wobble(t - garden.tKnock, 0.12, 30, 5) : 0;
         const up = moles[i];
+        // The last mole waves and blinks only until the finale settles; waving for ever kept the phone painting (A-36).
+        const calm = Math.min(t, garden.tQuiet);
         const look = i === 0 ? -3 : i === 1 ? 4 * Math.sin((t - garden.tMid) * 4) : 3;
         return (
           <g key={hill.x}>
@@ -1363,7 +1367,7 @@ function MoleTunnel({ garden, t, clip }: { garden: Garden; t: number; clip: stri
                 </clipPath>
                 <g clipPath={`url(#${clip}${i})`}>
                   <g transform={`translate(${hill.x} ${top + 90 - 148 * up}) scale(${MOLE_SIZE})`}>
-                    <Mole look={look} blink={(t * 0.7 + i * 0.3) % 1 < 0.08} rub={i === 0} wave={i === 2 ? Math.sin(t * 10) : 0} t={t} />
+                    <Mole look={look} blink={(calm * 0.7 + i * 0.3) % 1 < 0.08} rub={i === 0} wave={i === 2 ? Math.sin(calm * 10) : 0} t={calm} />
                   </g>
                 </g>
               </>
