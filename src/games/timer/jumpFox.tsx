@@ -4,18 +4,19 @@ import { Arm, BODY, Foot, FoxTail, MASCOT_COLORS, MASCOT_INK, MascotHead, type M
 // The fox of Up to the Moon (user request, 23 November 2026: „wir ändern das Männchen, dass es ein Fuchs ist – muss aber
 // sehr gute Grafik sein“, with arms it uses): the app's own fox, its head the shared `MascotHead`, its body, tail, arms
 // and paws those of `Mascot.tsx`, in a blue T-shirt with a yellow star. It is the one doing the run, so it has a pose of
-// its own for every way it moves (`FoxPose`): it swims with strokes and kicks behind a diving mask, hops with its arms
-// flapping, sits in the cable car's basket waving, points up in the lift, hangs from the balloons and the parachute
+// its own for every way it moves (`FoxPose`): it swims with strokes behind a diving mask and a snorkel, its legs in a
+// mermaid's tail fin that beats up and down (user request, 23 November 2026), walks out of the lake swinging arms and
+// legs, hops with its arms flapping, sits in the cable car's basket waving, points up in the lift, hangs from the balloons and the parachute
 // with its legs dangling, flies with the jetpack like a superhero, and drops into the cake cheering. Every pose is a
 // layer of its own shown only while it fits (opacity keyframes written for the run); in it the body and the head are
 // still drawings, and an arm or leg that moves is a small layer of its own turning at its shoulder or hip once a second
 // – never a part moved inside an svg, which a phone would paint anew each frame.
 
 /** How the fox moves at a moment of the run, one drawing each. */
-export type FoxPose = "swim" | "hop" | "ride" | "lift" | "hang" | "jet" | "drop";
+export type FoxPose = "swim" | "walk" | "hop" | "ride" | "lift" | "hang" | "jet" | "drop";
 
 /** Every pose, in the order their layers lie. */
-export const FOX_POSES: readonly FoxPose[] = ["swim", "hop", "ride", "lift", "hang", "jet", "drop"];
+export const FOX_POSES: readonly FoxPose[] = ["swim", "walk", "hop", "ride", "lift", "hang", "jet", "drop"];
 
 const FOX = MASCOT_COLORS.fox;
 
@@ -42,9 +43,11 @@ interface PoseSpec {
   /** How far the whole fox leans (degrees, forwards in the way it goes): swimming up at a slant, flying with the jetpack. */
   tilt?: number;
   arms: [LimbSpec, LimbSpec];
-  legs: "stand" | "none" | [LimbSpec, LimbSpec];
+  /** Its legs: feet standing, legs of their own, hidden (in the basket), or together in a mermaid's tail fin beating up and down. */
+  legs: "stand" | "none" | "fin" | [LimbSpec, LimbSpec];
   eyes: MascotEyes;
   mouth: MascotMouth;
+  /** The diving mask and its snorkel. */
   mask?: boolean;
   jetpack?: boolean;
 }
@@ -57,17 +60,31 @@ const dangling = (swing?: [number, number]): [LimbSpec, LimbSpec] => [
 
 /** The poses (user request, 23 November 2026: every move should fit what it does, with more difference between them). */
 const POSES: Record<FoxPose, PoseSpec> = {
-  // Swimming up at a slant: breaststroke arms sweeping out and back, legs kicking in turn, the diving mask on.
+  // Swimming up at a slant: breaststroke arms sweeping out and back, legs together in a mermaid's tail fin beating up
+  // and down, the diving mask and snorkel on.
   swim: {
     tilt: 26,
     arms: [
       { from: [60, 176], via: [32, 168], to: [12, 138], swing: [-14, 46] },
       { from: [140, 176], via: [168, 168], to: [188, 138], swing: [14, -46] },
     ],
-    legs: dangling([-16, 16]),
+    legs: "fin",
     eyes: "open",
     mouth: "smile",
     mask: true,
+  },
+  // Walking on the meadow: arms and legs swinging in turn, as a child walks.
+  walk: {
+    arms: [
+      { from: [58, 178], via: [46, 208], to: [46, 238], swing: [-22, 22] },
+      { from: [142, 178], via: [154, 208], to: [154, 238], swing: [-22, 22], late: true },
+    ],
+    legs: [
+      { from: [86, 248], via: [84, 272], to: [84, 296], swing: [-20, 20], late: true },
+      { from: [114, 248], via: [116, 272], to: [116, 296], swing: [-20, 20] },
+    ],
+    eyes: "open",
+    mouth: "smile",
   },
   // Hopping: arms flapping up and down with joy, feet together.
   hop: {
@@ -191,6 +208,9 @@ function LimbLayer({ limb, sleeve }: { limb: LimbSpec; sleeve?: boolean }) {
 function Jetpack() {
   return (
     <>
+      {/* The back plate joining the two tanks, so it is one jetpack while it waits; worn, the body covers it. */}
+      <rect x="34" y="160" width="132" height="62" rx="14" fill="#868e96" stroke={MASCOT_INK} strokeWidth="4.5" />
+      <path d="M60 176 H140 M60 204 H140" stroke="#adb5bd" strokeWidth="6" strokeLinecap="round" />
       {[16, 154].map((x) => (
         <g key={x}>
           <rect x={x} y="148" width="30" height="86" rx="14" fill="#ced4da" stroke={MASCOT_INK} strokeWidth="4.5" />
@@ -200,6 +220,54 @@ function Jetpack() {
         </g>
       ))}
     </>
+  );
+}
+
+/** The jetpack alone as it sits on the fox's back in the `jet` pose (leaning as it does): it waits for the fox like this and docks onto it. */
+export function FoxJetpack() {
+  return (
+    <div className="tm-jump-part" style={{ transform: `rotate(${POSES.jet.tilt}deg)`, transformOrigin: TILT_ORIGIN }}>
+      <Part>
+        <Jetpack />
+      </Part>
+    </div>
+  );
+}
+
+/** Where a leaning pose turns, round its middle a little below the head. */
+const TILT_ORIGIN = "50% 62%";
+
+/**
+ * The legs together in a mermaid's tail (user request, 23 November 2026), turquoise with scales, ending in a wide fin
+ * – a layer beating up and down at the hips once a second.
+ */
+function Fin() {
+  const style = {
+    transformOrigin: `${((150 / 300) * 100).toFixed(1)}% ${((246 / 300) * 100).toFixed(1)}%`,
+    "--tm-limb-a": "-16deg",
+    "--tm-limb-b": "16deg",
+  } as CSSProperties;
+  return (
+    <Part className="tm-jump-limb" style={style}>
+      <path
+        d="M76 240 Q74 274 92 300 Q96 306 100 306 Q104 306 108 300 Q126 274 124 240 Z"
+        fill="#38d9a9"
+        stroke={MASCOT_INK}
+        strokeWidth="4.5"
+        strokeLinejoin="round"
+      />
+      {[262, 280].map((y) => (
+        <path key={y} d={`M${86 + (y - 262) / 3} ${y} q7 7 14 0 q7 7 14 0`} fill="none" stroke="#0ca678" strokeWidth="3" strokeLinecap="round" />
+      ))}
+      <path
+        d="M100 300 Q78 304 60 330 Q78 326 88 334 Q96 320 100 312 Q104 320 112 334 Q122 326 140 330 Q122 304 100 300 Z"
+        fill="#20c997"
+        stroke={MASCOT_INK}
+        strokeWidth="4.5"
+        strokeLinejoin="round"
+      />
+      <path d="M100 310 L80 326 M100 310 L120 326" stroke="#0ca678" strokeWidth="3" strokeLinecap="round" />
+    </Part>
   );
 }
 
@@ -269,6 +337,11 @@ function Head({ spec }: { spec: PoseSpec }) {
               <rect x="21" y="43" width="58" height="25" rx="11" fill="#a5d8ff" fillOpacity="0.45" stroke="#1971c2" strokeWidth="3.5" />
               <path d="M50 45 V66" stroke="#1971c2" strokeWidth="3" />
               <path d="M27 49 Q31 46 36 46" fill="none" stroke="#fff" strokeWidth="2.4" strokeLinecap="round" opacity="0.8" />
+              {/* The snorkel: from the mouth past the cheek and up beside the head, its top orange. */}
+              <path d="M62 82 Q74 86 84 78 Q90 72 90 60 V8" fill="none" stroke={MASCOT_INK} strokeWidth="9" strokeLinecap="round" strokeLinejoin="round" />
+              <path d="M62 82 Q74 86 84 78 Q90 72 90 60 V8" fill="none" stroke="#74c0fc" strokeWidth="5" strokeLinecap="round" strokeLinejoin="round" />
+              <path d="M90 22 V8" stroke="#ff922b" strokeWidth="5" strokeLinecap="round" />
+              <ellipse cx="61" cy="81" rx="5" ry="4" fill="#1971c2" stroke={MASCOT_INK} strokeWidth="2" />
             </g>
           )}
         </MascotHead>
@@ -283,6 +356,7 @@ export function FoxPoseArt({ pose }: { pose: FoxPose }) {
   const legs = Array.isArray(spec.legs) ? spec.legs : [];
   const inner = (
     <>
+      {spec.legs === "fin" && <Fin />}
       {legs.map((leg, i) => (
         <LimbLayer key={`leg${i}`} limb={leg} />
       ))}
@@ -295,7 +369,7 @@ export function FoxPoseArt({ pose }: { pose: FoxPose }) {
     </>
   );
   return spec.tilt ? (
-    <div className="tm-jump-part" style={{ transform: `rotate(${spec.tilt}deg)`, transformOrigin: "50% 62%" }}>
+    <div className="tm-jump-part" style={{ transform: `rotate(${spec.tilt}deg)`, transformOrigin: TILT_ORIGIN }}>
       {inner}
     </div>
   ) : (

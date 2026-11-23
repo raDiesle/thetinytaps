@@ -167,32 +167,45 @@ taken out (user request, November 2026). The pictures:
   following the fox like a camera. The world (`WORLD_H`, six screens of 900) is one HTML layer moved by a transform on
   keyframes written for the run (`tm-jump-cam`, `cameraAt`: the feet stand at `ANCHOR`, never looking past the world's
   top or bottom), never a changing viewBox; its drawings are built once (`memo`). From the bottom: a lake on the left
-  (`SURFACE`, left of `SHORE`) with fish, seaweed and a sandy floor; the meadow (`GROUND`) with a stone by the shore, a
+  (`SURFACE`, left of `SHORE`) with fish, seaweed and a sandy floor; the meadow (`GROUND`) with a
   big tree (`TREE`) with wooden steps nailed to its trunk, left and right in turn as for a treehouse (`STEPS`), and the
   treehouse on its crown (`DECK`, a hatch in its floor, a red roof, a flag), the cake, and the skyscraper (`SKYSCRAPER`)
   with its glass lift's shaft up its side (`SHAFT`) and an open window; a rope from the treehouse's post to that window
-  for a cable car (`ROPE`); clouds; space with an asteroid, a ringed planet (`PLANET`) and the moon (`MOON`) at the top,
+  for a cable car (`ROPE`); clouds; space with a ringed planet (`PLANET`) and the moon (`MOON`) at the top,
   the sky's one gradient going from morning to night. Nothing stands in the water (user feedback, 23 November 2026:
   high-rises in the lake made no sense). Each height has its own way to move (`SPOTS`, each with `by`; `MoveKind`): it
-  **swims** up from the lake's floor wearing a diving mask, **hops** onto the stone and the meadow and up the steps two
-  at a time, through the hatch into the treehouse and into the cable car's basket, **rides** the basket along the rope
-  to the skyscraper's window, hops over the sill into the glass lift and **rides it up** (`lift`) to the roof, takes the
-  balloons waiting there and **floats** hanging from them from cloud to cloud, lets them go on the highest cloud and
-  takes the jetpack waiting there, and **flies** with it from the asteroid to the planet to the moon. The figure is a
+  **swims** up from the lake's floor with a snorkel and a mermaid's tail (`Fin`, the legs together beating), **walks**
+  out of the water over the meadow to the tree (`walk`, swinging arms and legs), **hops** up the steps two at a time,
+  through the hatch into the treehouse and into the cable car's basket, **rides** the basket along the rope to the
+  skyscraper's window, hops over the sill into the glass lift and **rides it up** (`lift`) to the roof, takes the very
+  balloons waiting there on a wooden stand and **floats** hanging from them from cloud to cloud, floats in front of the
+  jetpack waiting on the highest cloud, which comes up and docks onto its back (`dockFrames`) as it lets the balloons
+  go, and **flies** with it by the planet and once round the moon (`ORBIT`, `ORBIT_R`, its spot's `slow`) before
+  landing on top of it. The figure is a
   fox child (`jumpFox.tsx`, user request, 23 November 2026: arms it uses, better still a fox, „sehr gute Grafik“) drawn
   with the shared `MascotHead`, `Arm`, `Foot` and `FoxTail` in a blue T-shirt with a star, with a pose of its own for
-  each kind of move (`FoxPose`, `POSE_OF`): swimming with a mask, arms stroking and legs kicking; hopping with its arms
+  each kind of move (`FoxPose`, `POSE_OF`): swimming with a mask and snorkel, arms stroking and its fin beating; walking;
+  hopping with its arms
   flapping; in the basket waving with a paw on the rim; in the lift pointing up; hanging from the balloons and the
   parachute by both paws (`HANG_PAWS`, where the strings and cords end); flying with the jetpack on its back and its
   flames; dropping with its arms up. Its arms and legs swing at their own pace as small layers (`.tm-jump-limb`), the
   poses swap at once by opacity keyframes written for the run (`poseTimeline`, `poseLooks`). The basket and the lift's
   cabin are cars of their own (`BASKET`, `CABIN`, `carFrames`): each waits where the fox gets in, goes with it step for
-  step and stays where it got out, in a back half behind the fox and a front half over it. Each move takes its whole
-  share of the time, moving along its way (`jumpPlan`, `wayOf`, `trackAt`: never waiting and then hurrying), with
-  something under its feet all the way and the bounce once a second (user feedback, 23 November 2026); a hop is an arc
-  from point to point (`hopArc`, rising slower to its top and falling from it, `LIFT` over its higher end), while the
-  picture follows at an even pace. It faces the way it goes (`.tm-jump-turn`). Over every move hangs a star, caught
-  halfway (`starAt`). The way down is a part of the timer, a fifth of the time (`DIVE_SHARE`): it leaps off the moon,
+  step and stays where it got out, in a back half behind the fox and a front half over it. The moves follow each other
+  with no wait (`jumpPlan`, `wayOf`, `trackAt`), with something under its feet all the way and the bounce once a
+  second: a hop is quick, `HOP_MS` a leap (user feedback, 23 November 2026: slow leaps looked odd), crouching on the
+  spot for its first `PUSH`, then an arc from point to point (`hopArc`, rising slower to its top and falling from it,
+  `LIFT` over its higher end, `timeShares`), its body squashing as it pushes off and lands and stretching in the air
+  like a rubber ball (`squashFrames`, `.tm-jump-squash` from its feet); the other ways share the time the hops leave by
+  their `PACE` – swimming, the lift, the balloons and the jetpack slowest – while the picture follows at an even pace.
+  It faces the way it goes (`.tm-jump-turn`). Over every move hangs a star, caught halfway (`starAt`) as in a platform
+  game: it pops up turning like a coin and shrinks away while a ring of light widens and six sparkles burst out
+  (`.tm-jump-star`, `.tm-jump-ring`, `.tm-jump-spark`), with a bright two-note „ba-ding“ (`playCoin`). Round the way the
+  world lives a little (user request, 23 November 2026: „Luft … drehende bewegende Sterne … Vögel und Fische“): the
+  tree's crown sways in the wind (`TreeCrown`, `.tm-jump-crown`), puffs of wind drift through the sky, three birds flap
+  across behind the houses, the stars of space twinkle and turn, now and then a shooting star, and in the lake two fish
+  swim to and fro and bubbles rise (`SkyLife`, `LakeLife`) – each a small layer on a CSS loop of its own, standing
+  still at the end. The way down is a part of the timer, a fifth of the time (`DIVE_SHARE`): it leaps off the moon,
   opens a parachute and sails down swaying from side to side (`swingCount`, `swingX`, `SWAY`, `SWING_MS`, tilting by
   `TILT`) past everything it climbed, slowly enough to see each height go by, lets go above the cake (`RELEASE_Y`) and
   drops into it spinning once (user feedback, 23 November 2026: the fall straight down in 4.5 s looked like a teleport).
@@ -202,11 +215,12 @@ taken out (user request, November 2026). The pictures:
   trunk and steps and the skyscraper's wall (`BITS`, `BURST`, `.tm-jump-bit-x`/`-y`/`-spin`; user feedback: it should
   be broken everywhere). What it carries and what waits for it come and go by opacity keyframes written for the run
   (`gearLooks`, `shownFrames`: every keyframe names every property it changes, since a property left out of one is
-  passed over, not held). Five minutes are all 24 moves, a shorter run starts further up, with what it passed already
+  passed over, not held); what waits is drawn exactly as the fox will hold it (`AsFoxAt`, `ownBox`, `FoxJetpack`), so
+  the two swap within one keyframe (`swapMs`). Five minutes are all 24 moves, a shorter run starts further up, with what it passed already
   taken (`moveCount`, at least `MIN_MOVES`, a move never under `MIN_UNIT`). No enemies, no falling off, no count of
-  stars. A star caught plays a bright note climbing the scale (spaced), the leap off the moon a whoosh, the landing a
+  stars. A star caught plays a bright „ba-ding“ climbing the scale (spaced), the leap off the moon a whoosh, the landing a
   plop; a tap boings and lights the stars still hanging. Its card shows the fox in the cable car's basket between the
-  treehouse and the skyscraper (`LATER` in `cardArt.tsx`, 0.32 of the run), since its middle is the lift with sky round
+  treehouse and the skyscraper (`LATER` in `cardArt.tsx`, 0.23 of the run), since its middle is the lift with sky round
   it and in space the fox is too small to see on a card. Its name and lines (`jumpNames.ts`) were written English first
   and translated into every app language at once. The way, its stars and the cake stay within x 235–1340 (a tablet's
   4:3 cut with the paper's margin; `timer.test.ts` checks).
@@ -389,7 +403,20 @@ and the shared `Layer`, `Draw`, `LeftGlow`), `timer.css`, `content.ts`
   move has a pose of its own that uses arms and legs for it – stroking and kicking in the water, flapping while it
   hops, holding on where it hangs or rides – and the kinds differ plainly; it goes only where it could in life (wooden
   steps nailed up a trunk, a cable car on a rope, a lift in its shaft, never a house standing in a lake or a hop higher
-  than a fox could leap; `timer.test.ts` checks the steps, the shore and every leap).
+  than a fox could leap; `timer.test.ts` checks the steps, the shore and every leap). Coming out of the water it walks
+  on the ground before it hops, and its gear fits where it is (a snorkel and a mermaid's tail in the water). A hop is
+  quick and bouncy – pushing off from a crouch, the body squashing and stretching like a rubber ball – while gliding
+  ways (swimming, a lift, balloons, space) go slowly (user feedback, 23 November 2026: slow hops looked odd).
+- **One thing changes hands, never two at once** (user feedback on Up to the Moon, 23 November 2026: the balloons
+  waiting and the balloons held were seen at the same time): what waits for a figure is the very thing it then takes,
+  drawn where the figure will hold it and swapped in one keyframe; what docks on (the jetpack) waits until the figure
+  is right in front of it and comes onto it there (`timer.test.ts` checks both).
+- **Nothing beside the goal may look like it** (user feedback, 23 November 2026: a grey rock with a flat top looked
+  like half a moon next to the moon) – a second thing of the goal's shape and colour goes.
+- **A game-look timer's world may live a little** (user request on Up to the Moon, 23 November 2026): wind, birds,
+  fish, a swaying tree or twinkling stars round the way are welcome there, each a small HTML layer on a slow CSS loop
+  by `transform` and `opacity`, behind the figure, never over what moves towards the goal, and still at `.tm-done`;
+  the calmer pictures keep to „as few things and movements as can be“.
 - **No fox or bear figure in any picture** (user feedback, November 2026): first a family standing by every picture was
   taken out (children wanted to tap it, and a timer to watch needs as few things and movements as can be), then the
   children that pushed the cart, held the hose and blew out the candle – drawn in SVG they looked odd, a bear with two
@@ -423,9 +450,10 @@ and the shared `Layer`, `Draw`, `LeftGlow`), `timer.css`, `content.ts`
 - **A game-like picture moves towards its goal all the time** (user feedback on the Block House, 22 November 2026):
   what makes progress (a block carried, a toy put away) is seen moving the whole of its share – slowly, every second a
   little nearer, now and then a playful slip – never standing still and then hopping into place at its share's end.
-  A figure moving along a way does the same (user feedback on Up to the Moon, 23 November 2026): each move fills its
-  whole share at an even pace, with something to stand on all the way, and an ending (a fall, a dive) is a real share of
-  the time, slow enough to see every station it passes – never a rush of a few seconds that looks like a teleport.
+  A figure moving along a way does the same (user feedback on Up to the Moon, 23 November 2026): each move leaves as
+  the one before lands, so it is on its way every second, with something to stand on all the way – quick hops leave
+  their time to the slow, gliding ways – and an ending (a fall, a dive) is a real share of the time, slow enough to see
+  every station it passes – never a rush of a few seconds that looks like a teleport.
 - **Time up is plain in every timer** (user feedback, 23 November 2026): the corner's note stays, showing a red „0:00“
   that blinks softly (the one blink allowed here, asked for by the user; still under `prefers-reduced-motion`), and an
   end that breaks something (the cake) scatters it widely, in every direction, not a small splash.

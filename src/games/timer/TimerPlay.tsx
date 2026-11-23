@@ -23,6 +23,7 @@ import {
   playKnock,
   playLeaves,
   playMelody,
+  playCoin,
   playPlink,
   playPlop,
   playTusch,
@@ -418,7 +419,7 @@ function TimerRun({
           else if (picture === "blocks") playKnock(520);
           else if (picture === "tunnel") playCrack();
           // A star caught: a bright note climbing the scale star by star; the leap off the moon whooshes.
-          else if (picture === "jump") nextMoment.current === moments.length ? playWhoosh() : playPlink(nextMoment.current + 3);
+          else if (picture === "jump") nextMoment.current === moments.length ? playWhoosh() : playCoin(nextMoment.current + 3);
           else if (picture === "disc") playPlink(nextMoment.current);
           else playDing();
         }

@@ -2821,6 +2821,13 @@
   inset: 0;
 }
 
+/* Its body squashing and stretching on every hop like a rubber ball, at its feet (keyframes written for the run). */
+.tm-jump-squash {
+  position: absolute;
+  inset: 0;
+  transform-origin: 50% 100%;
+}
+
 .tm-jump-bob {
   position: absolute;
   inset: 0;
@@ -2919,26 +2926,277 @@
   transform: none;
 }
 
+/* What lives round the fox while it climbs (user request, November 2026): the tree's crown swaying in the wind, birds
+   flapping across, puffs of wind drifting by, the stars of space twinkling and turning, a shooting star now and then,
+   fish swimming to and fro and bubbles rising in the lake – each a small layer on a loop of its own by `transform` and
+   `opacity` (durations and delays set inline), standing still once the run is done. */
+.tm-jump-life {
+  inset: 0;
+}
+
+.tm-jump-crown {
+  animation: tm-jump-sway 4.5s ease-in-out infinite alternate;
+}
+
+@keyframes tm-jump-sway {
+  from {
+    transform: rotate(-1.4deg);
+  }
+  to {
+    transform: rotate(1.4deg);
+  }
+}
+
+.tm-jump-bird {
+  animation: tm-jump-bird 30s linear infinite;
+}
+
+@keyframes tm-jump-bird {
+  0% {
+    transform: translate(0, 0);
+  }
+  25% {
+    transform: translate(calc(var(--tm-dx) * 0.25), -60%);
+  }
+  50% {
+    transform: translate(calc(var(--tm-dx) * 0.5), 20%);
+  }
+  75% {
+    transform: translate(calc(var(--tm-dx) * 0.75), -40%);
+  }
+  100% {
+    transform: translate(var(--tm-dx), 0);
+  }
+}
+
+.tm-jump-wing {
+  position: absolute;
+  inset: 0;
+  animation: tm-jump-flap 0.45s ease-in-out infinite alternate;
+}
+
+.tm-jump-wing > svg {
+  display: block;
+  width: 100%;
+  height: 100%;
+  overflow: visible;
+}
+
+@keyframes tm-jump-flap {
+  from {
+    transform: scaleY(1);
+  }
+  to {
+    transform: scaleY(-0.5);
+  }
+}
+
+.tm-jump-wind {
+  opacity: 0;
+  animation: tm-jump-wind 12s ease-in-out infinite;
+}
+
+@keyframes tm-jump-wind {
+  0% {
+    opacity: 0;
+    transform: translateX(0);
+  }
+  20% {
+    opacity: 0.7;
+  }
+  70% {
+    opacity: 0.7;
+  }
+  100% {
+    opacity: 0;
+    transform: translateX(110%);
+  }
+}
+
+.tm-jump-twinkle {
+  animation: tm-jump-twinkle 6s ease-in-out infinite;
+}
+
+@keyframes tm-jump-twinkle {
+  0% {
+    opacity: 1;
+    transform: rotate(0) scale(1);
+  }
+  50% {
+    opacity: 0.55;
+    transform: rotate(45deg) scale(0.55);
+  }
+  100% {
+    opacity: 1;
+    transform: rotate(90deg) scale(1);
+  }
+}
+
+.tm-jump-comet {
+  opacity: 0;
+  animation: tm-jump-comet 13s ease-in infinite 3s;
+}
+
+@keyframes tm-jump-comet {
+  0% {
+    opacity: 0;
+    transform: translate(0, 0);
+  }
+  1% {
+    opacity: 1;
+  }
+  8% {
+    opacity: 0;
+    transform: translate(400%, 380%);
+  }
+  100% {
+    opacity: 0;
+    transform: translate(400%, 380%);
+  }
+}
+
+.tm-jump-fish {
+  transform: scaleX(var(--tm-face));
+  animation: tm-jump-fish 16s linear infinite;
+}
+
+@keyframes tm-jump-fish {
+  0% {
+    transform: translateX(0) scaleX(var(--tm-face));
+  }
+  46% {
+    transform: translateX(var(--tm-dx)) scaleX(var(--tm-face));
+  }
+  50% {
+    transform: translateX(var(--tm-dx)) scaleX(calc(-1 * var(--tm-face)));
+  }
+  96% {
+    transform: translateX(0) scaleX(calc(-1 * var(--tm-face)));
+  }
+  100% {
+    transform: translateX(0) scaleX(var(--tm-face));
+  }
+}
+
+.tm-jump-bubble {
+  opacity: 0;
+  animation: tm-jump-bubble 8s ease-in infinite;
+}
+
+@keyframes tm-jump-bubble {
+  0% {
+    opacity: 0;
+    transform: translateY(0);
+  }
+  10% {
+    opacity: 0.9;
+  }
+  90% {
+    opacity: 0.9;
+  }
+  100% {
+    opacity: 0;
+    transform: translateY(var(--tm-dy));
+  }
+}
+
 /* The lake's water lying over the fox while it swims, so it is plainly under water. */
 .tm-jump-water {
   background: rgb(116 192 252 / 0.32);
 }
 
-/* A star is caught on the way (`--tm-at`): it grows a little and fades, a small layer by `transform` and `opacity`. */
-.tm-jump-star {
+/* A star is caught on the way (`--tm-at`) as in a platform game: it pops up turning like a coin (its width going to
+   nothing and back, seen edge on) and shrinks away at the top, a ring of light widens round it and six sparkles burst
+   out – each a small layer by `transform` and `opacity`. */
+.tm-jump-star,
+.tm-jump-ring,
+.tm-jump-spark {
   position: absolute;
   inset: 0;
-  animation: tm-jump-caught 0.35s ease-out var(--tm-at) both;
+}
+
+.tm-jump-star {
+  animation: tm-jump-caught 0.7s linear var(--tm-at) both;
 }
 
 @keyframes tm-jump-caught {
   0% {
     opacity: 1;
-    transform: scale(1);
+    transform: none;
+    animation-timing-function: cubic-bezier(0.2, 0.8, 0.4, 1);
+  }
+  14% {
+    transform: translateY(-40%) scale(1.3);
+  }
+  30% {
+    transform: translateY(-85%) scale(0.06, 1.25);
+  }
+  46% {
+    transform: translateY(-115%) scale(1.15);
+  }
+  62% {
+    opacity: 1;
+    transform: translateY(-135%) scale(0.06, 1.1);
+  }
+  78% {
+    opacity: 1;
+    transform: translateY(-145%) scale(0.9);
+    animation-timing-function: ease-in;
   }
   100% {
     opacity: 0;
-    transform: scale(1.5);
+    transform: translateY(-150%) scale(0);
+  }
+}
+
+.tm-jump-ring {
+  border: 5px solid #ffe066;
+  border-radius: 50%;
+  animation: tm-jump-ring 0.45s ease-out var(--tm-at) both;
+}
+
+@keyframes tm-jump-ring {
+  0% {
+    opacity: 0;
+    transform: scale(0.3);
+  }
+  10% {
+    opacity: 1;
+  }
+  100% {
+    opacity: 0;
+    transform: scale(2.2);
+  }
+}
+
+.tm-jump-spark {
+  animation: tm-jump-spark 0.6s ease-out var(--tm-at) both;
+}
+
+.tm-jump-spark > svg {
+  position: absolute;
+  inset: 25%;
+  display: block;
+  width: 50%;
+  height: 50%;
+  overflow: visible;
+}
+
+@keyframes tm-jump-spark {
+  0% {
+    opacity: 0;
+    transform: scale(0);
+  }
+  15% {
+    opacity: 1;
+  }
+  60% {
+    opacity: 1;
+    transform: translate(var(--tm-dx), var(--tm-dy)) scale(var(--tm-size)) rotate(90deg);
+  }
+  100% {
+    opacity: 0;
+    transform: translate(calc(var(--tm-dx) * 1.2), calc(var(--tm-dy) * 1.2)) scale(0) rotate(180deg);
   }
 }
 
@@ -3028,12 +3286,27 @@
 
 .tm-done .tm-jump-bob,
 .tm-done .tm-jump-star,
+.tm-done .tm-jump-ring,
+.tm-done .tm-jump-spark,
 .tm-done .tm-jump-limb,
-.tm-done .tm-jump-flame {
+.tm-done .tm-jump-flame,
+.tm-done .tm-jump-crown,
+.tm-done .tm-jump-bird,
+.tm-done .tm-jump-wing,
+.tm-done .tm-jump-fish,
+.tm-done .tm-jump-bubble,
+.tm-done .tm-jump-wind,
+.tm-done .tm-jump-twinkle,
+.tm-done .tm-jump-comet {
   animation: none;
 }
 
-.tm-done .tm-jump-star {
+.tm-done .tm-jump-star,
+.tm-done .tm-jump-ring,
+.tm-done .tm-jump-spark,
+.tm-done .tm-jump-bubble,
+.tm-done .tm-jump-wind,
+.tm-done .tm-jump-comet {
   visibility: hidden;
 }
 

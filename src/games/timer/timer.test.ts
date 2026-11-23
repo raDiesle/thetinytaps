@@ -60,14 +60,20 @@ import {
   FINAL,
   GROUND,
   gearLooks,
+  HOP_MS,
   hopArc,
   jumpFrames,
   jumpPlan,
+  leapsOf,
   MAX_MOVES,
   MIN_MOVES,
   MIN_UNIT,
   MOON as JUMP_MOON,
   moveCount,
+  ORBIT,
+  ORBIT_R,
+  PACE,
+  PLANET,
   POSE_OF,
   poseLooks,
   poseTimeline,
@@ -77,6 +83,7 @@ import {
   SHORE,
   SKYSCRAPER,
   SPOTS as HOP_SPOTS,
+  squashFrames,
   STAR,
   STEPS,
   starAt,
@@ -849,24 +856,32 @@ describe("Timer", () => {
       expect(css, part).toMatch(new RegExp(`\\.tm-done \\.tm-${part}[,\\s{]`));
   });
 
-  test("Up to the Moon: every move at five minutes, each taking the whole of its share, then the way down as a fifth of the time, landing as it is up (H-127)", () => {
+  test("Up to the Moon: every move at five minutes, quick hops and slow ways one after the other, then the way down as a fifth of the time, landing as it is up (H-127)", () => {
     expect(moveCount(5 * 60_000)).toBe(MAX_MOVES);
     expect(moveCount(10_000)).toBe(MIN_MOVES);
     expect(moveCount(3 * 3600_000)).toBe(MAX_MOVES);
     for (const total of [10_000, 60_000, 5 * 60_000, 3 * 3600_000]) {
-      const { first, unit, moves, dive } = jumpPlan(total, moveCount(total));
+      const { first, unit, leap, moves, dive } = jumpPlan(total, moveCount(total));
       // It always ends on the moon, a short time starting further up, never hurrying.
       expect(first + moves.length).toBe(MAX_MOVES);
       if (moves.length > MIN_MOVES) expect(unit).toBeGreaterThanOrEqual(MIN_UNIT);
       // User feedback, 23 November 2026: never standing still and then a quick move – each move leaves as the one
-      // before lands and takes its whole share, its star caught halfway.
+      // before lands, its star caught halfway. A hop is quick, `HOP_MS` a leap (slow leaps looked odd), and the slow
+      // ways – swimming, the lift, the balloons, space – take the time the hops leave, by their pace.
+      expect(leap).toBeLessThanOrEqual(HOP_MS);
+      expect(HOP_MS).toBeLessThanOrEqual(1200);
       for (const [i, m] of moves.entries()) {
         expect(m.k).toBe(first + i);
         expect(m.kind).toBe(HOP_SPOTS[m.k + 1].by!);
-        expect(m.start).toBeCloseTo(i * unit);
-        expect(m.land).toBeCloseTo((i + 1) * unit);
+        expect(m.start).toBeCloseTo(i ? moves[i - 1].land : 0);
         expect(m.star).toBeCloseTo((m.start + m.land) / 2);
+        if (m.kind === "hop") expect(m.land - m.start, `hop ${m.k}`).toBeCloseTo(leapsOf(m.k) * leap);
       }
+      expect(moves.at(-1)!.land).toBeCloseTo(total - diveMs(total));
+      const slow = moves.slice(0, -1).filter((m) => m.kind !== "hop");
+      const per = (m: (typeof moves)[number]) => (m.land - m.start) / (PACE[m.kind as keyof typeof PACE] * (HOP_SPOTS[m.k + 1].slow ?? 1));
+      for (const m of slow) expect(per(m) / per(slow[0]), `move ${m.k}`).toBeCloseTo(1);
+      for (const m of slow) expect(m.land - m.start, `move ${m.k}`).toBeGreaterThan(leap);
       // The way down is part of the timer, slow enough to see every place it passes (user feedback, 23 November 2026).
       expect(dive.start).toBeCloseTo(moves.at(-1)!.land);
       expect(dive.land - dive.start).toBeCloseTo(diveMs(total));
@@ -900,7 +915,32 @@ describe("Timer", () => {
       expect(new Set(frames.upDown.filter((f) => f.at < dive.start).map((f) => f.ease ?? "linear")).size).toBeLessThanOrEqual(3);
       for (const m of moves.filter((m) => m.kind === "hop"))
         expect(frames.upDown.filter((f) => f.at > m.start && f.at < m.land && f.ease !== "linear").length, `hop ${m.k}`).toBeGreaterThanOrEqual(1);
+      // Its body bounces like a rubber ball on every hop (user request, 23 November 2026): squashed as it pushes off
+      // and as it lands, stretched as it goes up – and plain again between hops.
+      const squash = frames.squash;
+      for (const m of moves.filter((m) => m.kind === "hop")) {
+        const during = squash.filter((f) => f.at >= m.start && f.at <= m.land);
+        expect(
+          during.some((f) => /scale\(1\.\d+, 0\.\d+\)/.test(f.transform)),
+          `crouch ${m.k}`,
+        ).toBe(true);
+        expect(
+          during.some((f) => /scale\(0\.\d+, 1\.\d+\)/.test(f.transform)),
+          `stretch ${m.k}`,
+        ).toBe(true);
+      }
+      for (const m of slow) expect(squash.filter((f) => f.at > m.start + 400 && f.at < m.land).every((f) => f.transform === "scale(1, 1)")).toBe(true);
     }
+  });
+
+  test("Up to the Moon: a hop squashes, stretches and lands again, its frames in order and its body back to round (H-127)", () => {
+    const frames = squashFrames([
+      { from: 1000, to: 2000 },
+      { from: 2000, to: 3000 },
+    ]);
+    for (let i = 1; i < frames.length; i++) expect(frames[i].at).toBeGreaterThanOrEqual(frames[i - 1].at);
+    expect(frames.at(-1)!.transform).toBe("scale(1, 1)");
+    expect(frames.filter((f) => f.at === 2000).length).toBeGreaterThanOrEqual(1);
   });
 
   test("Up to the Moon: on every move it is somewhere new each second, never waiting in place (H-127)", () => {
@@ -963,7 +1003,14 @@ describe("Timer", () => {
     const kinds = HOP_SPOTS.slice(1).map((s) => s.by);
     // Swimming in the lake, hopping up the tree, the cable car to the skyscraper's window, the glass lift, the balloons
     // past the clouds, the jetpack in space – in that order (user request, 23 November 2026).
-    expect(kinds.filter((k, i) => k !== kinds[i - 1])).toEqual(["swim", "hop", "ride", "hop", "lift", "hop", "fly", "jet"]);
+    expect(kinds.filter((k, i) => k !== kinds[i - 1])).toEqual(["swim", "walk", "hop", "ride", "hop", "lift", "hop", "fly", "jet"]);
+    // Out of the water it walks on the meadow first, then hops (user request, 23 November 2026).
+    const walk = HOP_SPOTS.findIndex((s) => s.by === "walk");
+    expect(HOP_SPOTS[walk].y).toBe(GROUND);
+    expect(HOP_SPOTS[walk].x).toBeGreaterThan(SHORE);
+    expect(HOP_SPOTS[walk + 1].by).toBe("hop");
+    // Swimming, the lift, the balloons and space go slower than walking (user request, 23 November 2026).
+    for (const kind of ["swim", "lift", "fly", "jet"] as const) expect(PACE[kind], kind).toBeGreaterThan(PACE.walk);
     // It starts under water and ends at the top, going up all the way (a leap never higher than a fox can hop).
     expect(HOP_SPOTS[0].y).toBeGreaterThan(SURFACE + 300);
     expect(HOP_SPOTS.at(-1)!.y).toBeLessThan(600);
@@ -1017,6 +1064,26 @@ describe("Timer", () => {
     expect(HOP_SPOTS[CABIN.to].y).toBe(SKYSCRAPER.top);
     expect(HOP_SPOTS.some((s) => s.y === SKYSCRAPER.top && s.x > SKYSCRAPER.x && s.x < SKYSCRAPER.x + SKYSCRAPER.w && s.x !== SHAFT.x)).toBe(true);
     expect(HOP_SPOTS.at(-1)!.y).toBe(JUMP_MOON.cy - JUMP_MOON.r);
+    // With the jetpack it flies once round the moon before landing on top of it (user request, 23 November 2026):
+    // the way's angle round the moon turns a whole circle, clear of the moon and the planet, on a tablet's screen.
+    const last = HOP_SPOTS.at(-1)!;
+    expect(last.via).toBe(ORBIT);
+    let turned = 0;
+    const angle = (p: { x: number; y: number }) => Math.atan2(p.y - JUMP_MOON.cy, p.x - JUMP_MOON.cx);
+    for (let i = 1; i < ORBIT.length; i++) {
+      let d = angle(ORBIT[i]) - angle(ORBIT[i - 1]);
+      if (d > Math.PI) d -= 2 * Math.PI;
+      if (d < -Math.PI) d += 2 * Math.PI;
+      turned += d;
+    }
+    expect(Math.abs(turned)).toBeGreaterThanOrEqual(2 * Math.PI);
+    expect(ORBIT_R).toBeGreaterThan(JUMP_MOON.r + RUNNER * 0.6);
+    for (const p of ORBIT) {
+      expect(Math.hypot(p.x - PLANET.cx, p.y - PLANET.cy)).toBeGreaterThan(PLANET.r);
+      expect(p.x - RUNNER / 2).toBeGreaterThanOrEqual(235);
+      expect(p.x + RUNNER / 2).toBeLessThanOrEqual(RIGHT_EDGE);
+      expect(p.y - RUNNER).toBeGreaterThanOrEqual(0);
+    }
     // The cake stands on the meadow, seen whole, and the fox ends in it.
     expect(CAKE.x - CAKE.low / 2).toBeGreaterThanOrEqual(235);
     expect(FINAL.x).toBe(CAKE.x);
@@ -1090,6 +1157,14 @@ describe("Timer", () => {
       // The balloons are held all the way from the roof to the highest cloud, then let go.
       for (const m of moves.filter((m) => m.kind === "fly")) expect(at(gear.balloons.frames, (m.start + m.land) / 2), `move ${m.k}`).toBe(true);
       for (const m of moves.filter((m) => m.kind === "jet")) expect(at(gear.balloons.frames, m.land), `move ${m.k}`).toBe(false);
+      // What waits is the very thing it takes (user feedback, 23 November 2026: two sets of balloons were seen at
+      // once): the one waiting and the one held are never shown together.
+      for (let ms = 0; ms <= total; ms += total / 2000) {
+        expect(at(gear["waiting-balloons"].frames, ms) && at(gear.balloons.frames, ms), `balloons at ${ms}`).toBe(false);
+      }
+      // The jetpack waits on the highest cloud until the fox has floated in front of it and docked it.
+      const arrive = moves.find((m) => m.k === jetpackFrom - 1);
+      if (arrive) expect(at(gear["waiting-jetpack"].frames, arrive.land)).toBe(true);
       // At the end nothing is held any more (the jetpack is part of the fox's poses), the parachute let go.
       for (const g of ["balloons", "parachute", "waiting-balloons", "waiting-jetpack"] as const) {
         expect(at(gear[g].frames, total), g).toBe(false);
@@ -1105,6 +1180,8 @@ describe("Timer", () => {
   test("Up to the Moon: the world, the fox and what it carries are layers on CSS animations that stop at the end, with no clip path (H-127)", async () => {
     const code = await Bun.file(new URL("./jump.tsx", import.meta.url)).text();
     expect(code).not.toMatch(/clip-?[pP]ath/);
+    // Nothing in space looks like a second moon (user feedback, 23 November 2026: a grey half rock was taken out).
+    expect(code).not.toMatch(/asteroid/i);
     // The world moves as one layer by a transform, never by a changing viewBox.
     expect(code).not.toMatch(/viewBox=\{`[^`]*\$\{c/);
     const css = await Bun.file(new URL("./timer.css", import.meta.url)).text();
@@ -1121,6 +1198,16 @@ describe("Timer", () => {
       "jump-bit-spin",
       "jump-limb",
       "jump-flame",
+      "jump-ring",
+      "jump-spark",
+      "jump-crown",
+      "jump-bird",
+      "jump-wing",
+      "jump-fish",
+      "jump-bubble",
+      "jump-wind",
+      "jump-twinkle",
+      "jump-comet",
       "hop",
     ])
       expect(css, part).toMatch(new RegExp(`\\.tm-done \\.tm-${part}[,\\s{]`));

@@ -178,6 +178,14 @@ export function playPlink(i: number) {
   note({ from: freq * 3, duration: 0.07, type: "sine", volume: 0.04 });
 }
 
+/** "Ba-ding!" – a coin or star picked up in a platform game: two quick bright notes, the second higher, low (0) to high. */
+export function playCoin(i: number) {
+  const n = PENTATONIC.length;
+  const freq = PENTATONIC[((Math.round(i) % n) + n) % n] * 2;
+  note({ from: freq, duration: 0.08, type: "square", volume: 0.05, lowpass: 3500 });
+  note({ from: freq * 1.5, duration: 0.35, type: "square", volume: 0.05, lowpass: 3500, delay: 0.075 });
+}
+
 /** A soft clap: two short bursts of noise, as two small hands meet. */
 export function playClap() {
   hiss({ from: 2400, to: 1400, duration: 0.09, volume: 0.5, q: 0.9 });
