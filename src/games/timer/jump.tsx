@@ -1853,7 +1853,7 @@ const CarsFront = memo(function CarsFront() {
   );
 });
 
-/** The sparkles bursting out of a star as it is caught: which way each flies (in % of the star) and how big it is. */
+/** The sparkles bursting out of a star as it is caught: where each ends (in % of the star from its middle) and how big it is. */
 const SPARKS: readonly [number, number, number][] = [
   [0, -150, 1],
   [130, -80, 0.8],
@@ -1865,9 +1865,10 @@ const SPARKS: readonly [number, number, number][] = [
 
 /**
  * The stars still to catch, one over every move of the run, each caught on the way as in a platform game (user request,
- * 23 November 2026, „wie in Spielen, z. B. Super Mario“): it pops up out of the fox's reach turning like a coin, a ring
- * of light widens and sparkles burst out round it, then it is gone – each a small layer by `transform` and `opacity`.
- * While it hangs a tap lights it (H-51).
+ * 23 November 2026, „wie in Spielen, z. B. Super Mario“): it pops up out of the fox's reach turning like a coin, while a
+ * ring of light widens and sparkles burst out round it (`Burst`), then it is gone. Two small layers a star, by
+ * `transform` and `opacity` – the ring and its sparkles one drawing, never a layer each: 24 stars with eight layers
+ * each kept an old phone's main thread twice as busy (`bun run perf timer-mond`). While it hangs a tap lights it (H-51).
  */
 const Stars = memo(function Stars({ moves, glow }: { moves: RunMove[]; glow: number }) {
   return (
@@ -1877,16 +1878,9 @@ const Stars = memo(function Stars({ moves, glow }: { moves: RunMove[]; glow: num
         const at = { "--tm-at": `${m.star}ms` } as CSSProperties;
         return (
           <At key={m.k} x={c.x - STAR / 2} y={c.y - STAR / 2} w={STAR} h={STAR}>
-            <div className="tm-jump-ring" style={at} />
-            {SPARKS.map(([dx, dy, size]) => (
-              <div
-                key={`${dx},${dy}`}
-                className="tm-jump-spark"
-                style={{ ...at, "--tm-dx": `${dx}%`, "--tm-dy": `${dy}%`, "--tm-size": size } as CSSProperties}
-              >
-                <SparkArt />
-              </div>
-            ))}
+            <div className="tm-jump-burst" style={at}>
+              <Burst />
+            </div>
             <div className="tm-jump-star" style={at}>
               <StarArt />
             </div>
@@ -1900,11 +1894,26 @@ const Stars = memo(function Stars({ moves, glow }: { moves: RunMove[]; glow: num
   );
 });
 
-/** A sparkle: four thin points, white with a golden rim. */
-function SparkArt() {
+/**
+ * A caught star's ring of light and its six sparkles (white with a golden rim) as they lie at the burst's widest, in %
+ * of the star round its middle; the layer grows into it and fades (`tm-jump-burst`).
+ */
+function Burst() {
+  const line = (10 / STAR) * 100;
   return (
-    <svg viewBox="0 0 20 20">
-      <path d="M10 0 Q11 9 20 10 Q11 11 10 20 Q9 11 0 10 Q9 9 10 0 Z" fill="#fff9db" stroke="#fab005" strokeWidth="1.5" strokeLinejoin="round" />
+    <svg viewBox="-150 -150 300 300">
+      <circle r={110 - line / 2} fill="none" stroke="#ffe066" strokeWidth={line} />
+      {SPARKS.map(([dx, dy, size]) => (
+        <path
+          key={`${dx},${dy}`}
+          transform={`translate(${dx} ${dy}) scale(${2.5 * size}) translate(-10 -10)`}
+          d="M10 0 Q11 9 20 10 Q11 11 10 20 Q9 11 0 10 Q9 9 10 0 Z"
+          fill="#fff9db"
+          stroke="#fab005"
+          strokeWidth="1.5"
+          strokeLinejoin="round"
+        />
+      ))}
     </svg>
   );
 }

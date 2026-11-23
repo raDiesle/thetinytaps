@@ -1182,6 +1182,10 @@ describe("Timer", () => {
     expect(code).not.toMatch(/clip-?[pP]ath/);
     // Nothing in space looks like a second moon (user feedback, 23 November 2026: a grey half rock was taken out).
     expect(code).not.toMatch(/asteroid/i);
+    // A caught star's ring and sparkles are one drawing in one layer: a layer per sparkle, 24 stars of eight layers,
+    // kept an old phone's main thread twice as busy (`bun run perf timer-mond`, 23 November 2026).
+    expect(code).not.toMatch(/SPARKS\.map\([^)]*\)\s*=>\s*\(\s*<div/);
+    expect(code).toMatch(/className="tm-jump-burst"/);
     // The world moves as one layer by a transform, never by a changing viewBox.
     expect(code).not.toMatch(/viewBox=\{`[^`]*\$\{c/);
     const css = await Bun.file(new URL("./timer.css", import.meta.url)).text();
@@ -1198,8 +1202,7 @@ describe("Timer", () => {
       "jump-bit-spin",
       "jump-limb",
       "jump-flame",
-      "jump-ring",
-      "jump-spark",
+      "jump-burst",
       "jump-crown",
       "jump-bird",
       "jump-wing",

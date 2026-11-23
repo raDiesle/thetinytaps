@@ -200,7 +200,7 @@ taken out (user request, November 2026). The pictures:
   their `PACE` – swimming, the lift, the balloons and the jetpack slowest – while the picture follows at an even pace.
   It faces the way it goes (`.tm-jump-turn`). Over every move hangs a star, caught halfway (`starAt`) as in a platform
   game: it pops up turning like a coin and shrinks away while a ring of light widens and six sparkles burst out
-  (`.tm-jump-star`, `.tm-jump-ring`, `.tm-jump-spark`), with a bright two-note „ba-ding“ (`playCoin`). Round the way the
+  (`.tm-jump-star`, and `.tm-jump-burst`: ring and sparkles one drawing, `Burst`, never a layer per sparkle), with a bright two-note „ba-ding“ (`playCoin`). Round the way the
   world lives a little (user request, 23 November 2026: „Luft … drehende bewegende Sterne … Vögel und Fische“): the
   tree's crown sways in the wind (`TreeCrown`, `.tm-jump-crown`), puffs of wind drift through the sky, three birds flap
   across behind the houses, the stars of space twinkle and turn, now and then a shooting star, and in the lake two fish
@@ -439,7 +439,11 @@ and the shared `Layer`, `Draw`, `LeftGlow`), `timer.css`, `content.ts`
 - **Phones keep up**: everything that moves is an HTML layer of its own (`Layer`), moved by one CSS animation as long
   as the timer (`--tm-ms` on the stage), never React drawing per frame; the backdrops are `memo` and drawn once. The
   stage is 1600 × 900 covering the screen: keep what matters within x 200–1400 and y 80–820, and a figure's right edge within 1340 – the book's paper margin and the ⚙️ note lie over the right edge, and a fox standing to 1380 was cut
-  off there (`RIGHT` in `timer.test.ts`).
+  off there (`RIGHT` in `timer.test.ts`). Many small things that go off together (a caught star's ring and sparkles)
+  are one drawing in one layer that grows and fades, never a layer each: Up to the Moon's 24 stars with eight layers
+  each, sparkles moved by `var()` in their keyframes, kept an old phone's main thread twice as busy (23 November 2026).
+  After changing what moves, run the picture's perf scenario (`bun run perf timer-<name>`) and compare with the commit
+  before.
 - **A clock time behind us is never quietly tomorrow's** (H-60): the sheet asks „Bis morgen um …?“ and keeps the answer
   for that day only (`tomorrowFrom`); a kept „bis 17:30“ started after 17:30 asks again before it runs (`TimerStart`).
   The time left stands small in the picture's bottom right corner, letting taps through: minutes and seconds by default,

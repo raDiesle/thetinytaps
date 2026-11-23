@@ -3106,13 +3106,42 @@
 }
 
 /* A star is caught on the way (`--tm-at`) as in a platform game: it pops up turning like a coin (its width going to
-   nothing and back, seen edge on) and shrinks away at the top, a ring of light widens round it and six sparkles burst
-   out – each a small layer by `transform` and `opacity`. */
+   nothing and back, seen edge on) and shrinks away at the top, while its burst – a ring of light and six sparkles drawn
+   as one svg (`Burst`) – grows out of its middle, turning a little, and fades. Two small layers by `transform` and
+   `opacity`, never a layer per sparkle. */
 .tm-jump-star,
-.tm-jump-ring,
-.tm-jump-spark {
+.tm-jump-burst {
   position: absolute;
   inset: 0;
+}
+
+.tm-jump-burst {
+  inset: -100%;
+  animation: tm-jump-burst 0.55s ease-out var(--tm-at) both;
+}
+
+.tm-jump-burst > svg {
+  display: block;
+  width: 100%;
+  height: 100%;
+  overflow: visible;
+}
+
+@keyframes tm-jump-burst {
+  0% {
+    opacity: 0;
+    transform: scale(0.15) rotate(0);
+  }
+  12% {
+    opacity: 1;
+  }
+  55% {
+    opacity: 1;
+  }
+  100% {
+    opacity: 0;
+    transform: scale(1) rotate(25deg);
+  }
 }
 
 .tm-jump-star {
@@ -3146,57 +3175,6 @@
   100% {
     opacity: 0;
     transform: translateY(-150%) scale(0);
-  }
-}
-
-.tm-jump-ring {
-  border: 5px solid #ffe066;
-  border-radius: 50%;
-  animation: tm-jump-ring 0.45s ease-out var(--tm-at) both;
-}
-
-@keyframes tm-jump-ring {
-  0% {
-    opacity: 0;
-    transform: scale(0.3);
-  }
-  10% {
-    opacity: 1;
-  }
-  100% {
-    opacity: 0;
-    transform: scale(2.2);
-  }
-}
-
-.tm-jump-spark {
-  animation: tm-jump-spark 0.6s ease-out var(--tm-at) both;
-}
-
-.tm-jump-spark > svg {
-  position: absolute;
-  inset: 25%;
-  display: block;
-  width: 50%;
-  height: 50%;
-  overflow: visible;
-}
-
-@keyframes tm-jump-spark {
-  0% {
-    opacity: 0;
-    transform: scale(0);
-  }
-  15% {
-    opacity: 1;
-  }
-  60% {
-    opacity: 1;
-    transform: translate(var(--tm-dx), var(--tm-dy)) scale(var(--tm-size)) rotate(90deg);
-  }
-  100% {
-    opacity: 0;
-    transform: translate(calc(var(--tm-dx) * 1.2), calc(var(--tm-dy) * 1.2)) scale(0) rotate(180deg);
   }
 }
 
@@ -3286,8 +3264,7 @@
 
 .tm-done .tm-jump-bob,
 .tm-done .tm-jump-star,
-.tm-done .tm-jump-ring,
-.tm-done .tm-jump-spark,
+.tm-done .tm-jump-burst,
 .tm-done .tm-jump-limb,
 .tm-done .tm-jump-flame,
 .tm-done .tm-jump-crown,
@@ -3302,8 +3279,7 @@
 }
 
 .tm-done .tm-jump-star,
-.tm-done .tm-jump-ring,
-.tm-done .tm-jump-spark,
+.tm-done .tm-jump-burst,
 .tm-done .tm-jump-bubble,
 .tm-done .tm-jump-wind,
 .tm-done .tm-jump-comet {
