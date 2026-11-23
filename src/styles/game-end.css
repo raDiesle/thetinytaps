@@ -22,6 +22,40 @@
   }
 }
 
+/*
+ * Over the picture's foot the trophy stands apart from the buttons, in the bottom left corner, where there is room
+ * (user request, 23 November 2026: beside „Weiter“ it crowded the buttons): the end spans the picture's width, its
+ * buttons in the middle columns and the trophy in the first. Where the room beside the buttons is narrower than the
+ * trophy, that column only takes the trophy's width and the buttons move right beside it. Only the buttons and the
+ * trophy take taps: the rest of the strip lets them through to the picture.
+ */
+.game-end:not(.inline, .corners) {
+  left: max(16px, env(safe-area-inset-left));
+  right: max(16px, env(safe-area-inset-right));
+  display: grid;
+  grid-template-columns: 1fr auto auto 1fr;
+  column-gap: clamp(12px, 3vw, 36px);
+  translate: none;
+  pointer-events: none;
+}
+
+.game-end:not(.inline, .corners) > .game-end-prize {
+  grid-column: 1;
+  justify-self: start;
+}
+
+.game-end:not(.inline, .corners) > .game-end-small {
+  grid-column: 2;
+}
+
+.game-end:not(.inline, .corners) > .game-end-button.next {
+  grid-column: 3;
+}
+
+.game-end:not(.inline, .corners) > :not(.game-end-prize) {
+  pointer-events: auto;
+}
+
 /* In the game's own layout (`inline`), where it places the buttons itself. */
 .game-end.inline {
   position: static;
@@ -96,6 +130,12 @@
   border-radius: 8px;
   object-fit: cover;
   pointer-events: none;
+}
+
+/* A drawn picture of what comes (`next.art`: the Timer's card, the Counting Tower's goal) in the same frame. */
+.game-end-next-art {
+  position: relative;
+  overflow: hidden;
 }
 
 /* „Nochmal“ as the drawn round arrow beside it, on the same paper slip. */

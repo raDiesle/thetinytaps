@@ -1,6 +1,6 @@
 import { memo, useLayoutEffect, useRef, useState } from "react";
 import { pieceCount, MAX_STOPS } from "./pieces";
-import type { SwapToy, TimerPicture } from "./settings";
+import { DEFAULT_TIMER_SETTINGS, type SwapToy, type TimerPicture } from "./settings";
 import { SAW, Seesaw, SeesawBackdrop, SeesawStand, SeesawSun } from "./seesaw";
 import { SwapBackdrop, SwapCushions, SwapHourglass, SwapLight, SwapShade, Toy } from "./swap";
 import { SceneParts, stageStyle } from "./TimerPlay";
@@ -50,7 +50,7 @@ function holdAt(card: HTMLElement | null, at: number) {
  * child's lamp on, the toy on its cushion and the hourglass half run; the Wippe the fox child's side in the sun, its seat
  * on its way down with the chick walking over to it.
  */
-export const TimerCardArt = memo(function TimerCardArt({ picture, toy }: { picture: TimerPicture; toy: SwapToy }) {
+export const TimerCardArt = memo(function TimerCardArt({ picture, toy = DEFAULT_TIMER_SETTINGS.toy }: { picture: TimerPicture; toy?: SwapToy }) {
   const at = CARD_MS * (LATER[picture] ?? MIDDLE);
   const [startedAt] = useState(() => Date.now() - at);
   const card = useRef<HTMLSpanElement>(null);

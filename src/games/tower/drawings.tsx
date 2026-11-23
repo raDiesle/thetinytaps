@@ -422,3 +422,45 @@ function LeafPile({ l }: { l: TowerLayout }) {
     </g>
   );
 }
+
+/**
+ * The next round's goal as a still card, for „Weiter“ at a round's end (`GameEnd`'s `next.art`; user request, 23
+ * November 2026: „Weiter“ shows what comes next in every game): its sky and meadow, the goal big in the middle – the
+ * nest and the owl's hollow with their mother on them, the moon awake among a few stars.
+ */
+export const GoalCard = memo(function GoalCard({ goal }: { goal: GoalId }) {
+  const sky = SKY[goal];
+  return (
+    <span className="tw-goal-card" style={{ background: `linear-gradient(${sky.top}, ${sky.low} 74%, ${sky.grass} 74%, ${sky.grassDark})` }}>
+      {STARRY.includes(goal) && (
+        <span className="tw-goal-card-stars">
+          <Star />
+          <Star />
+          <Star />
+        </span>
+      )}
+      <span className={`tw-goal-card-thing tw-goal-card-${goal}`}>
+        {goal === "balloon" && <Balloon hang={24} />}
+        {goal === "kite" && <Kite hang={24} aside={-12} />}
+        {goal === "plane" && <Plane />}
+        {goal === "cloud" && <CloudSeat awake />}
+        {goal === "rainbow" && <Rainbow w={150} h={100} from={{ x: 8, y: 30 }} bend={{ x: 70, y: -10 }} to={{ x: 140, y: 62 }} b={36} bands={RAINBOW.length} />}
+        {goal === "bird" && <Bird />}
+        {goal === "hotair" && <HotAir />}
+        {goal === "nest" && (
+          <>
+            <Bird />
+            <Nest />
+          </>
+        )}
+        {goal === "owl" && (
+          <>
+            <Owl />
+            <Hollow />
+          </>
+        )}
+        {goal === "moon" && <Moon awake />}
+      </span>
+    </span>
+  );
+});
