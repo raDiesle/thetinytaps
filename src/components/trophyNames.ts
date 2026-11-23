@@ -56,6 +56,14 @@ const NAMERS: Record<string, () => Promise<Namer>> = {
         (level, language) =>
           level === "dusche" ? pick(SHOWER_TITLE, language) : undefined,
     ),
+  // The book Kita-Start's second story, „Tapsi Goes to Lotta's“ at a childminder's, gives a trophy of its own, level
+  // „tagesmutter“ (its short version shares it).
+  "/kita/": () =>
+    import("@/games/childminder/names").then(
+      ({ CHILDMINDER_TITLE }) =>
+        (level, language) =>
+          level === "tagesmutter" ? pick(CHILDMINDER_TITLE, language) : undefined,
+    ),
   "/schnullerfee/": () =>
     import("@/games/pacifiertree/names").then(
       ({ TREE_TITLE }) =>

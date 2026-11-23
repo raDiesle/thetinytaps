@@ -161,8 +161,10 @@ export const CATEGORIES: Category[] = [
         // Abstillen“): „Tapsi geht in die Kita“, a story in chapters along the steps of settling in and the morning's
         // goodbye ritual (src/games/kitastory).
         href: "/kita/",
-        // Its short version, from the story's own pages, opened from the book's choice (StoryChoice.tsx).
-        also: ["/kita/kurz/"],
+        // Its short version, from the story's own pages, and „Tapsi Goes to Lotta's“ (src/games/childminder, idea H-147)
+        // whole and short, for families whose child goes to a childminder (Tagesmutter), all opened from the book's choice
+        // (StoryChoice.tsx).
+        also: ["/kita/kurz/", "/kita/tagesmutter/", "/kita/tagesmutter/kurz/"],
         emoji: "🎒",
         title: KITA_STORY_BOOK,
         blurb: KITA_STORY_BLURB,

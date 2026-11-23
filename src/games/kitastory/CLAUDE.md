@@ -25,6 +25,11 @@ day (circle, tower, sandpit, lunch, nap), and right after the nap Mama is there,
   `byLanguage` (`kitaStory`), passed to `ChapterBook` as `translations`. A changed German sentence is translated again in the
   same commit (root CLAUDE.md, user decision, 22 November 2026).
 - `names.ts`: the book's name on the shelf („Kita-Start“), the story's title and its blurb in every language.
+- **A second story, „Tapsi Goes to Lotta's“ at a childminder's** (`src/games/childminder`, idea H-147, 23 November 2026),
+  whole at `/kita/tagesmutter/` and short at `/kita/tagesmutter/kurz/`, stands in the book's choice beside this one. The
+  choice names each by where the child is looked after: „In der Kita“ (`KITA_CENTRE_KIND`) and „Bei der Tagesmutter“
+  (`CHILDMINDER_KIND`); a further story in this book gets such a name too. Its trophy is level `tagesmutter`
+  (`trophyNames.ts`), and the tab's title follows the story on screen (`titleAt`).
 
 ## Rules
 

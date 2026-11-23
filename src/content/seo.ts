@@ -321,6 +321,20 @@ export const SEO_TEXTS: PageSeo[] = [
     text: "Die Kurzfassung von „Tapsi geht in die Kita“, für Morgen und Abende, an denen die ganze Geschichte zu lang ist, oder für ein Kind, das sie schon kennt. Sie erzählt dieselbe Geschichte mit denselben Bildern, nur das Wichtigste: Mama und Papa erzählen Tapsi dem Fuchs von der Kita, und zusammen packen sie den Rucksack mit dem Kuschelhasen. Am ersten Tag bleibt Mama auf einem kleinen Stuhl dabei, während Tapsi Mia kennenlernt, die Erzieherin. Dann geht Mama kurz hinaus und sagt vorher, dass sie wiederkommt; Tapsi weint, Mia tröstet, und Mama ist wieder da, genau wie sie gesagt hat. Jeden Tag bleibt Mama etwas länger weg, und jeden Morgen ist der Abschied gleich: derselbe Weg, ein Kuss auf die Nase, „Ich hole dich nach dem Mittagsschlaf ab“, Mias Hand und Winken am Fenster – Mama schleicht sich nie weg. Nach dem Mittagsschlaf steht Mama in der Tür, wie sie gesagt hat. Unter jedem Bild steht ein kurzer Satz zum Vorlesen, jedes Tippen blättert weiter, und im Buch „Kita-Start“ steht sie neben der ganzen Geschichte, jede mit der Zahl ihrer Bilder und ihrer ungefähren Dauer.",
   },
   {
+    path: "/kita/tagesmutter/",
+    title: "Eingewöhnung bei der Tagesmutter – eine Geschichte",
+    description:
+      "Eine Vorlesegeschichte für die Eingewöhnung in der Kindertagespflege: Tapsi der Fuchs geht zu Lotta, der Tagesmutter, und Mama kommt immer wieder.",
+    text: "Eine Geschichte zum Vorlesen, Kapitel für Kapitel, wenn das Kind zu einer Tagesmutter kommt oder der Abschied am Morgen schwerfällt. Mama und Papa erzählen Tapsi dem Fuchs von Lotta, die in ihrer Wohnung auf ein paar Kinder aufpasst, Papa und Tapsi besuchen sie, und zusammen packen sie den Rucksack mit Hausschuhen, Wechselsachen und dem Kuschelhasen. Am ersten Tag sitzt Mama auf Lottas Sofa, Tapsi auf ihrem Schoß, und dann klettert Tapsi hinunter und spielt mit Emil Eisenbahn. Ein paar Tage später sagt Mama: „Ich gehe kurz hinaus, dann komme ich wieder.“ Tapsi weint, Lotta nimmt Tapsi in den Arm, und Mama ist wieder da, wie sie gesagt hat. Lotta hilft beim Apfel am großen Küchentisch und bleibt nah, wenn Tapsi traurig ist, und Mama bleibt jeden Tag etwas länger weg. Ein Kapitel ist das Abschiedsritual für jeden Morgen: derselbe Weg zu Lottas Tür, die Jacke an den Haken mit dem Marienkäfer, einmal fest drücken, ein Kuss auf die Nase, „Ich hole dich nach dem Mittagsschlaf ab“, Lottas Hand und Winken am Küchenfenster – Mama schleicht sich nie weg. Dann Tapsis Tag: mit dem Bollerwagen zum Spielplatz, Sandkasten, Nudeln am Küchentisch und Mittagsschlaf in einem kleinen Bett bei Lotta, und genau danach steht Mama da. Im Buch „Kita-Start“ steht sie neben der Geschichte von der Kita, ganz und als Kurzfassung, jede mit der Zahl ihrer Bilder und ihrer ungefähren Dauer.",
+  },
+  {
+    path: "/kita/tagesmutter/kurz/",
+    title: "Eingewöhnung bei der Tagesmutter – die Kurzfassung",
+    description:
+      "Die Kurzfassung der Tagesmutter-Geschichte zum Vorlesen: dieselben Bilder von Tapsi dem Fuchs bei Lotta, nur das Wichtigste – gut für jeden Morgen.",
+    text: "Die Kurzfassung von „Tapsi geht zu Lotta“, für Morgen und Abende, an denen die ganze Geschichte zu lang ist, oder für ein Kind, das sie schon kennt. Mit denselben Bildern erzählt sie das Wichtigste: Mama und Papa erzählen Tapsi dem Fuchs von Lotta, der Tagesmutter, die in ihrer Wohnung auf ein paar Kinder aufpasst. Am ersten Tag kommt Mama mit und sitzt auf Lottas Sofa. Ein paar Tage später geht Mama kurz hinaus und sagt vorher, dass sie wiederkommt; Tapsi weint, Lotta tröstet, und Mama ist wieder da. Bald hilft Lotta am großen Küchentisch, und jeden Morgen ist der Abschied gleich: ein Kuss auf die Nase, „Ich hole dich nach dem Mittagsschlaf ab“ und Winken am Küchenfenster. Nach dem Mittagsschlaf bei Lotta steht Mama da, wie sie gesagt hat, und Mama und Papa haben Tapsi lieb, zu Hause und bei Lotta. Unter jedem Bild steht ein kurzer Satz zum Vorlesen, und jedes Tippen blättert weiter.",
+  },
+  {
     path: "/haare-waschen/",
     title: "Haare waschen ohne Tränen – eine Geschichte",
     description:
@@ -547,6 +561,9 @@ const WAITING_PATHS: string[] = [
   // „Tapsi and the Warm Rain“ (`src/games/hairshower`), until its pictures are made (`hairShowerPictures.ts`, its `after`).
   "/haare-waschen/dusche/",
   "/haare-waschen/dusche/kurz/",
+  // „Tapsi Goes to Lotta's“ (`src/games/childminder`), until its pictures are made (`childminderPictures.ts`, its `after`).
+  "/kita/tagesmutter/",
+  "/kita/tagesmutter/kurz/",
 ];
 
 /** Every page that should be found: all but the games still being built (`Game.unfinished`), which no one is to find yet. */

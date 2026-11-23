@@ -15,6 +15,7 @@ const BOOKS = [
   { file: "src/games/milkchain/MilkChainGame.tsx", href: "/abstillen/", name: "abstillen", folder: "src/games/milkchain/stimme" },
   { file: "src/games/pacifierstory/PacifierStoryGame.tsx", href: "/schnullerfee/", name: "schnullerfee", folder: "src/games/pacifierstory/stimme" },
   { file: "src/games/kitastory/KitaStoryGame.tsx", href: "/kita/", name: "kita", folder: "src/games/kitastory/stimme" },
+  { file: "src/games/kitastory/KitaStoryGame.tsx", href: "/kita/tagesmutter/", name: "kita-tagesmutter", folder: "src/games/childminder/stimme" },
   { file: "src/games/hairstory/HairStoryGame.tsx", href: "/haare-waschen/", name: "haare-waschen", folder: "src/games/hairstory/stimme" },
   // The night story is read in the same book (`WeaningBook`), its voice from its own folder.
   { file: "src/games/milkchain/MilkChainGame.tsx", href: "/abstillen/nachts/", name: "abstillen-nachts", folder: "src/games/nightmilk/stimme" },

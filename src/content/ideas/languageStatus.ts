@@ -181,9 +181,27 @@ export const LANGUAGE_STATUS: LanguageStatusRow[] = [
   },
   {
     href: "/kita/",
-    note: "Das Buch „Kita-Start“ mit „Tapsi geht in die Kita“, einer Geschichte in Kapiteln (kitaStory.ts, 11. November 2026): Name, Satz fürs Regal (names.ts), Kapitel und Sätze in <Sprache>.ts im Ordner, übersetzt auf Wunsch am 19. November 2026. Tapsis Stimme liest jede Seite vor (ChapterBook, 13. November 2026), unten rechts über ▶ schaltet ein Lautsprecher sie für Erwachsene aus, die selbst vorlesen; Aufnahmen gibt es noch keine (bun run voice make --only kita), bis dahin bleibt es still. Die Wörter des Buchs selbst (Kapitel, Weiter) kommen aus ChapterBook; die Texte für Suchmaschinen sind in allen sieben Sprachen da.",
-    recorded: true,
-    languages: { de: "text", en: "text", zh: "text", hi: "text", es: "text", ar: "text", ru: "text" },
+    note: "Das Buch „Kita-Start“ mit zwei Geschichten in Kapiteln, jede ganz und als Kurzfassung (StoryChoice, 23. November 2026), die Tapsis Stimme vorliest; unten rechts über ▶ schaltet ein Lautsprecher sie für Erwachsene aus, die selbst vorlesen. Die Wörter des Buchs selbst (Kapitel, Weiter, die Wahl) kommen aus ChapterBook und StoryChoice.",
+    parts: [
+      {
+        label: "🏫 Tapsi geht in die Kita",
+        recorded: true,
+        languages: { de: "text", en: "text", zh: "text", hi: "text", es: "text", ar: "text", ru: "text" },
+        note: "Die Geschichte in der Kita (kitaStory.ts, 11. November 2026): Name, Satz fürs Regal (names.ts), Kapitel und Sätze in <Sprache>.ts im Ordner, übersetzt auf Wunsch am 19. November 2026. Aufnahmen gibt es noch keine (bun run voice make --only kita), bis dahin bleibt es still. Ihr Name in der Wahl des Buchs („In der Kita“, names.ts) ist seit dem 23. November 2026 in allen sieben Sprachen da; die Texte für Suchmaschinen auch.",
+      },
+      {
+        label: "🏡 Tapsi Goes to Lotta's",
+        recorded: true,
+        languages: { de: "text", en: "text", zh: "text", hi: "text", es: "text", ar: "text", ru: "text" },
+        note: 'Die zweite Geschichte bei der Tagesmutter, für Familien in der Kindertagespflege (H-147, childminder.ts, /kita/tagesmutter/ und /kita/tagesmutter/kurz/, 23. November 2026), Englisch zuerst geschrieben (ChapterBook first="en") und am selben Tag in alle sechs anderen Sprachen übersetzt, Deutsch eingeschlossen: Titel und Name in der Wahl (names.ts), Kapitel und Sätze in <Sprache>.ts im Ordner, geladen über texts-<Sprache>.ts. Aufnahmen gibt es noch keine (bun run voice make --only kita-tagesmutter, nur auf Wunsch). Die Texte für Suchmaschinen sind in allen sieben Sprachen da. Die 28 Bilder warten in der Bilder-Warteschlange (Claude Cloud); bis sie gemacht sind, sehen Spieler die Geschichte nicht, und ihre Seiten stehen nicht im Index.',
+        files: [
+          "src/games/childminder/names.ts",
+          "src/games/childminder/story.ts",
+          "src/games/childminder/childminder.ts",
+          "src/games/childminder/childminderPictures.ts",
+        ],
+      },
+    ],
   },
   {
     href: "/haare-waschen/",

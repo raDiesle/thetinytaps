@@ -80,6 +80,8 @@ export interface LanguageTexts {
   pacifierTree?: MilkChainTranslation;
   /** Tapsi and the Warm Rain, written English first: chapter titles and pages (`hairshower/<id>.ts`, German too). */
   hairShower?: MilkChainTranslation;
+  /** Tapsi Goes to Lotta's (the book Kita-Start's childminder story), written English first: chapter titles and pages (`childminder/<id>.ts`, German too). */
+  childminder?: MilkChainTranslation;
   /** Bye-Bye, Bottle!, written English first: chapter titles and pages (`bottlestory/<id>.ts`, German too). */
   bottleStory?: MilkChainTranslation;
   /** Tapsi's Big Bed, written English first: chapter titles and pages (`bedstory/<id>.ts`, German too). */

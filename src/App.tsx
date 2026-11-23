@@ -62,7 +62,9 @@ const PacifierStoryPage = page(
   "/schnullerfee/baum/",
   "/schnullerfee/baum/kurz/",
 );
-const KitaStoryPage = page(() => import("@/pages/KitaStoryPage"), "KitaStoryPage", "/kita/", "/kita/kurz/");
+// The book „Kita-Start“ and its stories: the Kita's at its own address and its short version, the childminder's whole and
+// short below it.
+const KitaStoryPage = page(() => import("@/pages/KitaStoryPage"), "KitaStoryPage", "/kita/", "/kita/kurz/", "/kita/tagesmutter/", "/kita/tagesmutter/kurz/");
 // The book „Haare waschen“ and its stories: the bath's at its own address and its short version, the shower's whole and
 // short below it.
 const HairStoryPage = page(
@@ -140,6 +142,8 @@ export function App() {
           <Route path="schnullerfee/baum/kurz" element={<PacifierStoryPage />} />
           <Route path="kita" element={<KitaStoryPage />} />
           <Route path="kita/kurz" element={<KitaStoryPage />} />
+          <Route path="kita/tagesmutter" element={<KitaStoryPage />} />
+          <Route path="kita/tagesmutter/kurz" element={<KitaStoryPage />} />
           <Route path="haare-waschen" element={<HairStoryPage />} />
           <Route path="haare-waschen/kurz" element={<HairStoryPage />} />
           <Route path="haare-waschen/dusche" element={<HairStoryPage />} />

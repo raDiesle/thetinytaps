@@ -2,6 +2,7 @@ import { readFileSync } from "node:fs";
 import { describe, expect, test } from "bun:test";
 import type { StoryChapter } from "@/components/ChapterBook";
 import { CATEGORIES } from "@/content/games";
+import { CHILDMINDER_SHORT_PAGES, CHILDMINDER_STORY, CHILDMINDER_STORY_SHORT } from "@/games/childminder/childminder";
 import { BOTTLE_SHORT_PAGES, BOTTLE_STORY, BOTTLE_STORY_SHORT } from "@/games/bottlestory/bottleStory";
 import { SHOWER_SHORT_PAGES, SHOWER_STORY, SHOWER_STORY_SHORT } from "@/games/hairshower/hairShower";
 import { HAIR_SHORT_PAGES, HAIR_STORY, HAIR_STORY_SHORT } from "@/games/hairstory/hairStory";
@@ -53,6 +54,16 @@ const BOOKS: {
     ids: KITA_SHORT_PAGES,
     cries: /weint/,
     comforts: /Mama|Papa|Mia|hält|tröst|Arm|kuschel|drück/,
+  },
+  {
+    href: "/kita/tagesmutter/",
+    book: "/kita/",
+    file: "src/games/kitastory/KitaStoryGame.tsx",
+    story: CHILDMINDER_STORY,
+    short: CHILDMINDER_STORY_SHORT,
+    ids: CHILDMINDER_SHORT_PAGES,
+    cries: /\bcr(y|ies)\b/,
+    comforts: /Mama|Papa|Lotta|hold|hug|arms|comfort|cuddle/,
   },
   {
     href: "/haare-waschen/",
