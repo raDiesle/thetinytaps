@@ -1940,12 +1940,13 @@
 
 /* The trophy and „Menü“ never grow wider than the sheet either (held upright, „Menü“ ran off the screen). */
 .teeth-end .game-end.inline {
-  --trophy-h: min(clamp(110px, 36vh, 280px), 40cqw);
+  --trophy-h: min(clamp(84px, 26vh, 220px), 32cqw);
   max-width: 100%;
 }
 
-/* On a wide screen the sheet is the right half's height, and the trophy as big as the room under the week allows
-   (user feedback, November 2026: the trophy much bigger) – the room is a size container, so the trophy measures it. */
+/* On a wide screen the sheet is the right half's height, and the trophy sized by the room under the week – plainly
+   seen, yet quiet beside „Menü“ (user feedback, November 2026: first much bigger, then the trophy at every end too
+   loud) – the room is a size container, so the trophy measures it. */
 @media (orientation: landscape) {
   .teeth-end {
     height: calc(100% - var(--corner-clear, 0px));
@@ -1957,7 +1958,7 @@
     width: 100%;
     min-height: 0;
     justify-content: center;
-    --trophy-h: min(300px, 42cqw, 90cqh);
+    --trophy-h: min(220px, 32cqw, 70cqh);
   }
 }
 

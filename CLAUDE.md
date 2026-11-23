@@ -443,15 +443,19 @@ In a fresh worktree run `bun install` first.
   What a child does collect are **trophies** (user decision, November 2026): every level's or story's end gives the
   trophy of that level, and it waits in the trophy room next to the shelf – never a count while playing; won again, its foot shows how often („3×“, `wins`, counted once per end: a trophy given early by `onGoal` is not counted again by its `GameEnd`). One system for
   every game: `GameEnd` awards it (`awardTrophy`, `src/lib/trophies.ts`, finding the game by its address) and hands it
-  over so it is plainly won (user feedback, November 2026: small beside the buttons, bottom right in Aufs Töpfchen, it
-  was hardly seen): big in the middle of the screen with „Geschafft!“ under it, then shrinking onto its little wooden
-  board beside the buttons – into the collection – and only then the buttons come (`AWARD_MS`, a tap on it lands it at
-  once; one transform, measured from its board, `GameEnd.test.ts`); a new `GameEnd` passes `level` (the level's or story's id; without it the game has one trophy).
-  Landed it stays big (`--trophy-h` in `game-end.css`, a good part of the screen's height, also in an `inline` end) and
-  plainly something to tap: the shared `TapHint`'s golden ring and hand round it (`TrophyHint`, the hand left of it or
-  above where the screen's edge is too close), stopped at its first stage (`upTo`) so it never darkens „Weiter“ beside
-  it; its count („3×“) on a light plate on the foot, big enough to read at a glance (user feedback, November 2026: it
-  wasn't clear the trophy can be tapped, the trophy was small and its number hard to read; `GameEnd.test.ts`).
+  over so it is plainly won, yet calmly (user feedback, November 2026: small beside the buttons, bottom right in Aufs
+  Töpfchen, it was hardly seen; then, at two thirds of the screen for over three seconds and nearly half of it landed
+  with a golden glow, too loud): in the middle of the screen at about two fifths of its height with a small
+  „Geschafft!“ under it, for a short moment, then shrinking onto its little wooden board beside the buttons – into the
+  collection – and only then the buttons come (`AWARD_MS`, `AWARD_HEIGHT`, a tap on it lands it at once; one transform,
+  measured from its board, `GameEnd.test.ts`); a new `GameEnd` passes `level` (the level's or story's id; without it the game has one trophy).
+  Landed it is about a quarter of the screen's height (`--trophy-h` in `game-end.css`, smaller in an `inline` end) –
+  never a bigger one again – and still plainly something to tap: the shared `TapHint` round it in its quiet form
+  (`quiet`: only a small hand pointing at it – no ring round it, no golden glow, no waves, user feedback, November
+  2026; `TrophyHint`, the hand left of it or above where the
+  screen's edge is too close), stopped at its first stage (`upTo`) so it never darkens „Weiter“ beside it; its count
+  („3×“) on a light plate on the foot, big enough to read at a glance (user feedback, November 2026: it wasn't clear the
+  trophy can be tapped and its number was hard to read; `GameEnd.test.ts`).
   Each looks like no other (`Trophy.tsx`: its metal by the game, form, handles, lid and foot by the level, the level's
   own picture in its medallion, `trophyPictures.ts`), drawn still, handed over once slowly – never shining, sparkling or
   bouncing. They stand in the trophy room, a page of its own at `/pokale/` (`TrophyMuseum`, user request, November
@@ -473,7 +477,10 @@ In a fresh worktree run `bun install` first.
   and a category too big for one room is a wing, a hall of its own with a door for each game (`museumTree`). A small
   brass plate under each trophy names its level in small letters; the category stands once, on the room's sign, never
   repeated on every trophy (the game's name only where a room holds several games). A tap on a trophy shows it whole
-  and big (`trophyNames.ts`, loaded per game, never a whole game's code; `trophies.test.ts`). The way back to the shelf
+  and big (`trophyNames.ts`, loaded per game, never a whole game's code; `trophies.test.ts`), with its level's picture
+  taped on beside it and the drawn play sign over it, which opens that very level (`trophyHref`; user request, November
+  2026) – and ✕ there leads back into the room, the trophy still big: a page that opens a game to come back to it
+  passes `BackVisit` (`src/lib/goBack.ts`), which `GameShell` follows before its own menu. The way back to the shelf
   is always there, in the top left (the ribbon's shelf label); the left doorway leads one room back, the hall's to the shelf.
   Every door says where it leads (a sign over the left doorway: „← Hall“, the wing, the shelf; the hall's doors carry the
   category's name), and a plan of all rooms behind the map note beside the fullscreen one shows where one is and walks to

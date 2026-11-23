@@ -5,7 +5,8 @@ import { MILK_CHAIN_AR } from "./ar";
 import { MILK_CHAIN_EN } from "./en";
 import { MILK_CHAIN_ES } from "./es";
 import { MILK_CHAIN_HI } from "./hi";
-import { GENTLE_STEPS, goneOn, MILK_CHAIN, MILK_CHAIN_PAGES, MILK_CHAIN_SHORT, MILK_ORDER, minutesOf, SHORT_PAGES } from "./milkChain";
+import { minutesOf } from "@/lib/storyPages";
+import { GENTLE_STEPS, goneOn, MILK_CHAIN, MILK_CHAIN_PAGES, MILK_CHAIN_SHORT, MILK_ORDER, SHORT_PAGES } from "./milkChain";
 import { MILK_CHAIN_RU } from "./ru";
 import { MILK_CHAIN_ZH } from "./zh";
 
@@ -56,30 +57,30 @@ describe("Tapsis Milchkette", () => {
   });
 });
 
-// User request, 9 November 2026: a story read over many days opens on its chapters, and the corner goes back to them.
-test("the book opens on its table of contents, and the corner leads back to it", () => {
+// User requests, 22 and 23 November 2026: a chapter book opens on the choice of its stories, never on its chapters, and
+// a story always starts on its first page; the corner leads back to the choice.
+test("a story opens on its first page, and the corner leads back to the choice", () => {
   const play = readFileSync("src/components/ChapterBook.tsx", "utf8");
-  // Only a link to one of its pages (`?seite=7`), or a chapter picked outside the book (`opensAt`), opens it there.
-  expect(play).toContain("useState(() => opensAt ?? stepIndexInAddress(pages.length) ?? CONTENTS)");
-  expect(play).toMatch(/useInnerBack\(index === CONTENTS \? undefined : toContents\)/);
+  // Only a link to one of its pages (`?seite=7`), passed in by the choice as `opensAt`, opens it elsewhere.
+  expect(play).toContain("useState(() => Math.min(Math.max(0, opensAt), LAST))");
+  expect(play).toContain("useInnerBack(onContents);");
+  const choice = readFileSync("src/components/StoryChoice.tsx", "utf8");
+  expect(choice).toContain("setOpen({ story, page: 0, from });");
 });
 
 // User request, 22 November 2026: „Abstillen“ is one book whose first page chooses its story, and that choice shows
 // only how many pictures each story has, about how long it takes and where it starts – no chapter numbers any more.
 test("the book Abstillen opens on the choice of its stories, each with its pictures, minutes and start slips", () => {
   const book = readFileSync("src/games/milkchain/MilkChainGame.tsx", "utf8");
-  expect([...book.matchAll(/^ {2,6}href: "([^"]+)",$/gm)].map((m) => m[1])).toEqual([
-    "/abstillen/",
-    "/abstillen/kurz/",
-    "/abstillen/abschied/",
-    "/abstillen/nachts/",
-  ]);
+  expect([...book.matchAll(/href: "([^"]+)"/g)].map((m) => m[1])).toEqual(["/abstillen/", "/abstillen/kurz/", "/abstillen/abschied/", "/abstillen/nachts/"]);
+  expect(book).toContain("<StoryBookGame book={BOOK} />");
+  const choice = readFileSync("src/components/StoryChoice.tsx", "utf8");
   // Without a link to a page, nothing is open: the choice.
-  expect(book).toContain('return typeof opened?.page === "number" ? { story: here, page: opened.page, from } : undefined;');
+  expect(choice).toContain('return typeof opened?.page === "number" ? { story: here, page: opened.page, from } : undefined;');
   // Each story's way back to its contents leads to the choice; every version has a slip with its size to start it.
-  expect(book).toContain("onContents={toChoice}");
-  expect(book).toMatch(/className="cb-story-start"[\s\S]*?className="cb-story-start-label"[\s\S]*?className="cb-story-start-size"/);
-  expect(book).not.toContain("cb-story-chapter");
+  expect(choice).toContain("onContents={toChoice}");
+  expect(choice).toMatch(/className="cb-story-start"[\s\S]*?className="cb-story-start-label"[\s\S]*?className="cb-story-start-size"/);
+  expect(choice).not.toContain("cb-story-chapter");
   // One book on the shelf, no longer two tied together.
   expect(CATEGORIES.flatMap((c) => c.games).find((g) => g.href === "/abstillen/")?.volumes).toBeUndefined();
 });

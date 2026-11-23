@@ -1,9 +1,9 @@
 /* ---------- End of a level: again or on to the next (GameEnd.tsx); the way back is the corner ---------- */
 
 .game-end {
-  /* The trophy's height on its board: big, so it is seen as won and as something to tap (user feedback, November
-     2026: at a third of the screen it was too small). */
-  --trophy-h: clamp(130px, 46vh, 380px);
+  /* The trophy's height on its board: big enough to be seen as won and as something to tap, small enough to stay
+     quiet beside „Weiter“ (user feedback, November 2026: at nearly half the screen it was too loud). */
+  --trophy-h: clamp(84px, 26vh, 220px);
   position: absolute;
   bottom: max(20px, env(safe-area-inset-bottom));
   left: 50%;
@@ -157,8 +157,8 @@
 
 /*
  * The level's trophy (Trophy.tsx), handed over so it is plainly won (user feedback, November 2026: small beside the
- * buttons in the bottom corner it was hardly seen): it grows in big in the middle of the screen with „Geschafft!“ under
- * it, stays a moment, then shrinks back onto its little wooden board beside the buttons – into the collection – and
+ * buttons in the bottom corner it was hardly seen) but calmly (then: too big and too long in the middle was too loud):
+ * it appears in the middle of the screen with „Geschafft!“ under it, stays a moment, then shrinks back onto its little wooden board beside the buttons – into the collection – and
  * stands still there. Once, slowly: no shine running over it, no bounce, no sparkle. GameEnd measures where its board
  * is and sets `--award-x`, `--award-y` (from there to the middle) and `--award-s` (how much bigger it is there).
  */
@@ -194,14 +194,15 @@
 .game-end-trophy.awarding {
   pointer-events: auto;
   will-change: transform;
-  animation: game-end-trophy-award var(--award-ms, 3.4s) both;
+  animation: game-end-trophy-award var(--award-ms, 2.2s) both;
 }
 
-/* Grows in big in the middle (0.6 s), stays there (to 60 %), then shrinks onto its board. Each step eases on its own. */
+/* Fades in in the middle, growing a little (0.4 s), stays there (to 55 %), then shrinks onto its board. Each step eases
+   on its own. */
 @keyframes game-end-trophy-award {
   0% {
     opacity: 0;
-    transform: translate(var(--award-x), var(--award-y)) scale(calc(var(--award-s) * 0.7));
+    transform: translate(var(--award-x), var(--award-y)) scale(calc(var(--award-s) * 0.85));
     animation-timing-function: ease-out;
   }
   18% {
@@ -209,7 +210,7 @@
     transform: translate(var(--award-x), var(--award-y)) scale(var(--award-s));
     animation-timing-function: linear;
   }
-  60% {
+  55% {
     transform: translate(var(--award-x), var(--award-y)) scale(var(--award-s));
     animation-timing-function: ease-in-out;
   }
@@ -219,18 +220,18 @@
   }
 }
 
-/* A soft, still light behind the big trophy, so it stands out on a busy picture too; it goes with „Geschafft!“. */
+/* A faint, still light behind the trophy in the middle, so it stands out on a busy picture too; it goes with „Geschafft!“. */
 .game-end-trophy.awarding::before {
   content: "";
   position: absolute;
-  inset: -18% -45%;
+  inset: -12% -35%;
   z-index: -1;
   border-radius: 50%;
-  background: radial-gradient(closest-side, #fff8dccc, #fff3c466 55%, #fff3c400);
-  animation: game-end-done var(--award-ms, 3.4s) both;
+  background: radial-gradient(closest-side, #fff8dc88, #fff3c433 55%, #fff3c400);
+  animation: game-end-done var(--award-ms, 2.2s) both;
 }
 
-/* „Geschafft!“ under the big trophy, for the grown-up beside the child; it shrinks away with it and is gone on the board. */
+/* „Geschafft!“ under the trophy in the middle, for the grown-up beside the child; it shrinks away with it and is gone on the board. */
 .game-end-done {
   position: absolute;
   top: 100%;
@@ -238,14 +239,14 @@
   translate: -50% 0;
   margin-top: calc(0.6rem / var(--award-s, 1));
   color: #fff;
-  font-size: calc(clamp(2.2rem, 11vh, 5rem) / var(--award-s, 1));
+  font-size: calc(clamp(1.3rem, 6.5vh, 2.8rem) / var(--award-s, 1));
   font-weight: 800;
   line-height: 1;
   white-space: nowrap;
   -webkit-text-stroke: 0.1em var(--ink);
   paint-order: stroke fill;
   text-shadow: 0 0.06em 0.12em #2a180c55;
-  animation: game-end-done var(--award-ms, 3.4s) both;
+  animation: game-end-done var(--award-ms, 2.2s) both;
 }
 
 @keyframes game-end-done {
@@ -253,11 +254,11 @@
   10% {
     opacity: 0;
   }
-  24%,
-  62% {
+  22%,
+  56% {
     opacity: 1;
   }
-  80%,
+  74%,
   100% {
     opacity: 0;
   }
@@ -294,18 +295,18 @@
   cursor: pointer;
 }
 
-/* The ring and hand round it once it landed (GameEnd's TrophyHint): taps go through to the trophy. */
+/* The hand pointing at it once it landed (GameEnd's TrophyHint): taps go through to the trophy. */
 .game-end-trophy-hint {
   position: absolute;
   pointer-events: none;
 }
 
 .game-end.inline {
-  --trophy-h: clamp(110px, 36vh, 280px);
+  --trophy-h: clamp(76px, 22vh, 180px);
 }
 
 .game-end.corners {
-  --trophy-h: clamp(96px, 32vh, 230px);
+  --trophy-h: clamp(70px, 22vh, 170px);
 }
 
 @media (prefers-reduced-motion: reduce) {
@@ -314,7 +315,7 @@
   }
 }
 
-/* With less motion asked for: big in the middle and back again without the way between, fading. */
+/* With less motion asked for: in the middle and back again without the way between, fading. */
 @keyframes game-end-trophy-calm {
   0% {
     opacity: 0;

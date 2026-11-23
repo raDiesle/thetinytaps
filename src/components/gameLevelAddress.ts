@@ -4,6 +4,7 @@
  * reload, the browser's forward and back buttons) plays it or goes back to the cards. GameShell starts and stops the
  * game; these hooks only read and follow the address.
  */
+import type { BackVisit } from "@/lib/goBack";
 import { createContext, useContext, useEffect, useRef, useState, type Dispatch, type SetStateAction } from "react";
 import type { NavigateFunction } from "react-router";
 import { useParams } from "react-router";
@@ -69,6 +70,8 @@ interface LevelSync extends ReturnType<typeof useLevelAddress> {
   /** Neither a routine's step nor a tool: no play time is counted or checked. */
   free: boolean;
   start: () => Promise<void>;
+  /** The page the game was opened from to come back to (`BackVisit`), kept when the address goes on to another level. */
+  backTo?: string;
 }
 
 /** The two effects that keep the address and the level on screen in step, run after GameShell's own. */
@@ -87,6 +90,7 @@ export function useLevelSync({
   onMode,
   free,
   start,
+  backTo,
 }: LevelSync) {
   // The address names another level than the one shown: a link, a reload or the browser's forward button opened it, so
   // it plays at once (an unknown one, or any while play time is over, leads to the cards). No level while playing: the
@@ -120,6 +124,6 @@ export function useLevelSync({
     if (!playing) setOnScreen(undefined);
     if (!levels || !playing || !current || current === addressed || !playable(current)) return;
     shownLevel.current = current;
-    navigate(levelHref(home, current), { replace: true });
+    navigate(levelHref(home, current), { replace: true, state: backTo ? ({ backTo } satisfies BackVisit) : undefined });
   }, [current, playing]);
 }

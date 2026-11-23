@@ -55,11 +55,31 @@ export function useHistoryTrail() {
   useEffect(() => notePage(pathname, type === "PUSH"), [pathname, type]);
 }
 
-/** Whether the page before this one in the history is `to`, so going back there is a step back. */
+/**
+ * Whether the page before this one in the history is `to`, so going back there is a step back. The trail keeps pages
+ * by their path, so a `to` with a question (the trophy room opening on a trophy, `?pokal=`) is matched by its path.
+ */
 const cameFrom = (to: string) => {
   const idx = place();
-  return idx !== undefined && idx > 0 && trail[idx - 1] === to;
+  return idx !== undefined && idx > 0 && trail[idx - 1] === to.replace(/[?#].*$/, "");
 };
+
+/**
+ * The router state a page passes when it opens a game that is to lead back to it, not to the game's own menu: the
+ * trophy room's play sign opens a trophy's level (user request, November 2026), and ✕ there goes back into the room,
+ * the screen seen before. Unlike a routine's step (`RoutineVisit`) the game plays as it always does, with play time.
+ */
+export interface BackVisit {
+  /** The page to go back to, a path of this app, with its question where it opens on something. */
+  backTo: string;
+}
+
+/** Where a game opened with `BackVisit` goes back to (from the router's `location.state`); none otherwise. */
+export function backFrom(state: unknown): string | undefined {
+  const to = (state as Partial<BackVisit> | null)?.backTo;
+  // Only a path inside the app: never another site (`//host`).
+  return typeof to === "string" && to.startsWith("/") && !to.startsWith("//") ? to : undefined;
+}
 
 /**
  * Goes back to `to`, a page the child came from. It replaces the current page at once, so a page turn sees the new

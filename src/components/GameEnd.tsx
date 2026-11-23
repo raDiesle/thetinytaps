@@ -38,14 +38,14 @@ export const AGAIN_ONLY: Localized = { de: "Nochmal?", ru: "Ещё раз?", en:
 /** How long the question waits after the buttons came, so the game's own end line comes first. */
 const ASK_AFTER_MS = 1500;
 /**
- * How long the trophy is handed over before the buttons come (user feedback, November 2026: beside the buttons in the
- * bottom corner it was hardly seen): it grows in big in the middle of the screen with „Geschafft!“ under it, stays a
- * moment, then shrinks onto its little board beside the buttons – into the collection. `game-end-trophy-award` in
- * game-end.css runs exactly this long.
+ * How long the trophy is handed over before the buttons come: it appears in the middle of the screen with „Geschafft!“
+ * under it, stays a moment, then shrinks onto its little board beside the buttons – into the collection. Short and
+ * not too big (user feedback, November 2026: at two thirds of the screen for over three seconds it was too loud; small
+ * in the corner before that, it was hardly seen). `game-end-trophy-award` in game-end.css runs exactly this long.
  */
-const AWARD_MS = 3400;
+const AWARD_MS = 2200;
 /** The trophy's height in the middle of the screen, as a share of the screen's height (and at most of its width). */
-const AWARD_HEIGHT = 0.64;
+const AWARD_HEIGHT = 0.4;
 
 const endVoice = recordedVoice(endFiles);
 
@@ -101,7 +101,7 @@ interface GameEndProps {
 
 /**
  * The end of a level: play it again („Nochmal“) or go on to the next („Weiter“, only where there is another), and the
- * level's trophy, won now or before (Trophy.tsx, user decision, November 2026): handed over big in the middle with
+ * level's trophy, won now or before (Trophy.tsx, user decision, November 2026): handed over in the middle with
  * „Geschafft!“, then on its board beside them (`AWARD_MS`). Nothing else stands beside
  * them: a fox or bear family cheering there (D-12) was only decoration a child wanted to tap, and was taken out again
  * (user feedback, November 2026). No emoji and no words, since children don't read (user feedback and request, November 2026): „Nochmal“
@@ -120,7 +120,7 @@ export function GameEnd({ onAgain, menu = false, next, delayMs = 0, corners = fa
   const leave = useLeaveGame();
   const toShelf = useLeavesToShelf();
   const [shown, setShown] = useState(delayMs <= 0);
-  // The trophy first in the middle, big, then on its board: the buttons come once it has landed.
+  // The trophy first in the middle, then on its board: the buttons come once it has landed.
   const [landed, setLanded] = useState(false);
   const [award, setAward] = useState<CSSProperties>();
   const trophyRef = useRef<HTMLSpanElement>(null);
@@ -159,7 +159,7 @@ export function GameEnd({ onAgain, menu = false, next, delayMs = 0, corners = fa
     if (!shown || landed || award || !trophy) return;
     const box = trophy.getBoundingClientRect();
     if (box.height <= 0) return setLanded(true);
-    const height = Math.min(window.innerHeight * AWARD_HEIGHT, window.innerWidth * 0.6);
+    const height = Math.min(window.innerHeight * AWARD_HEIGHT, window.innerWidth * 0.4);
     // Its middle a little above the screen's, so „Geschafft!“ fits under it.
     setAward({
       "--award-x": `${(window.innerWidth / 2 - (box.left + box.width / 2)).toFixed(1)}px`,
@@ -176,8 +176,9 @@ export function GameEnd({ onAgain, menu = false, next, delayMs = 0, corners = fa
   }, [shown, landed, hasTrophy]);
 
   // Landed, the trophy is plainly something to tap (user feedback, November 2026: nobody saw it opens the trophy room):
-  // the shared golden ring and pointing hand round it, measured from its box (untransformed, so it fits on its board).
-  // It stops at the hand tapping and never darkens the rest, since „Weiter“ beside it is the choice most want.
+  // the shared ring and pointing hand round it, measured from its box (untransformed, so it fits on its board) – in
+  // their quiet form, only a small hand – no ring, no glow (user feedback, November 2026: the trophy at the end was
+  // too loud, then the ring round it too). It stops at the hand tapping and never darkens the rest, since „Weiter“ beside it is the choice most want.
   const [trophySize, setTrophySize] = useState<TrophyBox>();
   useLayoutEffect(() => {
     const trophy = trophyRef.current;
@@ -252,8 +253,8 @@ export function GameEnd({ onAgain, menu = false, next, delayMs = 0, corners = fa
       onPointerDown={(e) => e.stopPropagation()}
     >
       {/*
-       * The trophy won: handed over big in the middle with „Geschafft!“ under it, then on its board beside the buttons,
-       * still, with how often it was won on its foot. A tap on it while it is big puts it on its board at once; on its
+       * The trophy won: handed over in the middle with „Geschafft!“ under it, then on its board beside the buttons,
+       * still, with how often it was won on its foot. A tap on it while it is in the middle puts it on its board at once; on its
        * board a tap opens the trophy room at it.
        */}
       {game && (
@@ -330,19 +331,20 @@ export function GameEnd({ onAgain, menu = false, next, delayMs = 0, corners = fa
 type TrophyBox = { width: number; height: number; room: DOMRect };
 
 /**
- * The ring and hand round the landed trophy: a box reaching out round it, so `TapHint`, which keeps within its box,
+ * The hand pointing at the landed trophy: a box reaching out round it, so `TapHint`, which keeps within its box,
  * shows them whole. The hand lies to the left (the buttons stand to its right), or above it where the trophy stands
  * too close to the screen's left edge for the whole hand – on a phone it stands right at the edge.
  */
 function TrophyHint({ width, height, room }: TrophyBox) {
-  const r = height * 0.56;
-  const hand = Math.max(60, Math.min(150, r * 1.35));
+  // No ring is drawn (`quiet`), so `r` only puts the fingertip just beside the trophy's cup.
+  const r = height * 0.4;
+  const hand = Math.max(44, Math.min(96, height * 0.5));
   const side = room.left + width / 2 - r - hand * 1.1 >= 0 ? "left" : "above";
   const [left, top] = [Math.round(width * 1.6), Math.round(height * 0.9)];
   const style: CSSProperties = { top: -top, left: -left, width: width + 2 * left, height: height + 2 * top };
   return (
     <span className="game-end-trophy-hint" style={style} aria-hidden>
-      <TapHint x={left + width / 2} y={top + height * 0.52} r={r} side={side} upTo={1} />
+      <TapHint x={left + width / 2} y={top + height * 0.52} r={r} side={side} size={hand} upTo={1} quiet />
     </span>
   );
 }
