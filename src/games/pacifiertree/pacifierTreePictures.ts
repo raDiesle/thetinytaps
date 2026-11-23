@@ -163,6 +163,7 @@ export function treePicture(page: TreePage): QueuedPicture {
 /** The pages whose pictures are made (`bilder/baum-<id>.webp`); the others wait in the queue. */
 const MADE = new Set<string>([
   "abend",
+  "alle",
   "baender",
   "baum",
   "besuch",

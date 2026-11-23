@@ -555,9 +555,6 @@ export const SEO_TEXTS: PageSeo[] = [
  * in the queue: its texts wait here like an unfinished game's, out of the search pages and `noindex` until it shows.
  */
 const WAITING_PATHS: string[] = [
-  // „Tapsi and the Pacifier Tree“ (`src/games/pacifiertree`), until its pictures are made (`pacifierTreePictures.ts`, its `after`).
-  "/schnullerfee/baum/",
-  "/schnullerfee/baum/kurz/",
   // „Tapsi Goes to Lotta's“ (`src/games/childminder`), until its pictures are made (`childminderPictures.ts`, its `after`).
   "/kita/tagesmutter/",
   "/kita/tagesmutter/kurz/",

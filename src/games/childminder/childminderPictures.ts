@@ -139,10 +139,14 @@ const END =
 /**
  * Pages drawn from another page of their place than its first, and who was where in that one: drawn from „besuch“, where
  * Papa stands on the doormat and Lotta kneels, the slipper page came back with Mama as a bear, then with Papa, then
- * with two Mamas – „kuss“ already has Mama kneeling with Tapsi in the hall.
+ * with two Mamas – „kuss“ already has Mama kneeling with Tapsi in the hall. Pick a page whose people stand where this
+ * page wants nobody, or where this page wants them.
  */
 const DRAWN_FROM: Partial<Record<string, { page: string; was: string }>> = {
   haken: { page: "kuss", was: "Mama in her coat kneels on the floor of the hall and hugs Tapsi" },
+  // Drawn from „essen“, where Mama sits at the table's end, lunch came back with a fox in Lotta's clothes there, then
+  // with two Lottas: „winken“ shows the kitchen with the table empty.
+  mittag: { page: "winken", was: "Lotta holds Tapsi up on her arm at the kitchen window and Mama stands outside on the pavement" },
 };
 
 /** The page a place's reference picture is, if it is one of this story's. */
