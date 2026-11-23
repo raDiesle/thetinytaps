@@ -158,7 +158,23 @@ export function treePicture(page: TreePage): QueuedPicture {
 }
 
 /** The pages whose pictures are made (`bilder/baum-<id>.webp`); the others wait in the queue. */
-const MADE = new Set<string>(["abend", "baender", "buch", "kinder", "kissen", "lieb", "lied", "schnuller", "spielen", "stolz", "troesten", "vermisst", "wann"]);
+const MADE = new Set<string>([
+  "abend",
+  "baender",
+  "buch",
+  "kinder",
+  "kissen",
+  "lieb",
+  "lied",
+  "los",
+  "meine",
+  "schnuller",
+  "spielen",
+  "stolz",
+  "troesten",
+  "vermisst",
+  "wann",
+]);
 
 /** Every picture of the story still to make. */
 export const TREE_PICTURE_QUEUE: QueuedPicture[] = TREE_PAGES.filter((p) => !MADE.has(p.id)).map(treePicture);

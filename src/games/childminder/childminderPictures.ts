@@ -150,7 +150,8 @@ const borrowed = (page: ChildminderPage) =>
 const NAMED: Record<Cast, string> = {
   tapsi: "Tapsi",
   mama: "Mama (the grown-up fox woman)",
-  papa: "Papa (the grown-up fox man)",
+  // Named only as „the grown-up fox man“, Papa stayed standing on the hall's doormat of the reference (tm-haken).
+  papa: "Papa (the grown-up fox man with round glasses and a green sweater)",
   lotta: "Lotta (the grown-up bear)",
   emil: "Emil",
   kinder: "the bear baby and the bigger bear girl",
@@ -229,7 +230,32 @@ export function childminderPicture(page: ChildminderPage): QueuedPicture {
 }
 
 /** The pages whose pictures are made (`bilder/tm-<id>.webp`); the others wait in the queue. */
-const MADE = new Set<string>(["besuch", "da", "erzaehlen", "erzaehlt", "heim", "kuss", "lieb", "packen", "schlafen", "sofa", "wann", "weg", "zuhause"]);
+const MADE = new Set<string>([
+  "ankommen",
+  "aufwachen",
+  "besuch",
+  "da",
+  "erzaehlen",
+  "erzaehlt",
+  "essen",
+  "hand",
+  "heim",
+  "kuss",
+  "laenger",
+  "lieb",
+  "packen",
+  "sagen",
+  "schlafen",
+  "sofa",
+  "traurig",
+  "wagen",
+  "wann",
+  "weg",
+  "weinen",
+  "wieder",
+  "zug",
+  "zuhause",
+]);
 
 /** Every picture of the story still to make. */
 export const CHILDMINDER_PICTURE_QUEUE: QueuedPicture[] = CHILDMINDER_PAGES.filter((p) => !MADE.has(p.id)).map(childminderPicture);

@@ -224,6 +224,12 @@ comma-separated, one `--panel "<what differs>"` each, the prompt holds what is s
   second blue one) in Tapsi's paws, and on a page naming only the red one the other three turned up on a windowsill
   (Schnullerbaum, November 2026) – say „never a fourth, never two of one colour, the ones this page doesn't name are
   not in the picture at all“, and count them on every picture.
+  The picture a place's pages are drawn from must show the arrangement most of them have: Haare waschen's shower pages
+  were drawn from the one page where Papa sits on the shower's edge, and ten of eleven kept a Papa there – a second
+  Papa, a floating head, his tail lying in front, Tapsi moved out onto the bath mat (November 2026). Draw the place's
+  first page from the families, then one typical page from it, and every other page from that one (`SHOWER_REF`). Name
+  an absent grown-up by what Gemini sees in the reference too („Papa, the fox man with round glasses and a green
+  sweater“): named only as „the grown-up fox man“, Papa stayed standing on the doormat of the reference.
   A character that leaves its place is drawn twice just the same (the little bear still on top of the slide and in the
   sandpit, a second fox at the party): say its old place is empty and „only ONE … in the whole picture“ for each. A
   story drawn from one first picture names in every prompt where the characters stand in that reference and says those
