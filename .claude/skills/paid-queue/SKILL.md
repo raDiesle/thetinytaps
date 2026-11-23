@@ -30,7 +30,12 @@ retries of a picture or sound that came out wrong (step 4).
    loudness to the sound itself, saved small) and add its row to the README's table.
 4. Look at everything made as `/bild-erzeugen` says (steps 3–5 there: what was asked, clean cut-outs, no text, judge as
    the user does, not stricter): every sheet in `.image-raw/` and every saved file; a recording or sound by its length
-   and loudness (and `whisper-cli` for a line's words where it is at hand). A plainly broken one is made again with a
+   and loudness (and `whisper-cli` for a line's words where it is at hand). For recordings without Whisper, compare each
+   take's seconds per character with its language's median (lines from `RECORDED_GAMES`, `recordingName` for the file):
+   a take far longer than its text has extra speech after it (`silencedetect` shows the pause before it). Never record
+   such a take again: the voice script sends a fixed seed, so the same take comes back (November 2026, a Chinese line
+   with a second of echo, twice alike) – cut it after its line as `src/games/adventure/CLAUDE.md` says for shortened
+   lines (22,050 Hz mono, 32 kbit/s). A plainly broken picture or sound is made again with a
    better prompt, at most about three tries; what is still wrong keeps its queue entry, its file left out – say so.
 5. Do each entry's `after` (the run prints them at its end): a crop, a line of code, `bun run previews <folder>`, a
    placeholder taken out, a `languageStatus.ts` row. Where the game shows the new thing, look at it as the root
