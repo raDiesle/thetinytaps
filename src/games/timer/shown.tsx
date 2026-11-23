@@ -97,34 +97,46 @@ export function noteRoom(shown: TimeShown, total: number): { className: string; 
 }
 
 /**
- * The time left to `endsAt`, shown as `shown` says (nothing when off or once the time is up); `total` is the whole
- * run, which sets what a tally mark stands for: a share of it (`percentMarks`), or a stretch of time (`markUnit`).
+ * The time left to `endsAt`, shown as `shown` says (nothing when off); `total` is the whole run, which sets what a tally
+ * mark stands for: a share of it (`percentMarks`), or a stretch of time (`markUnit`). Once the time is up (`up`) it
+ * stays, as 0:00 in red, blinking (user request, 23 November 2026: the end should be plain to see, in every timer) –
+ * in digits also where marks were shown, since no marks left says less than 0:00.
  */
-export function TimeShownNote({ shown, endsAt, total }: { shown: TimeShown; endsAt: number; total: number }) {
+export function TimeShownNote({ shown, endsAt, total, up }: { shown: TimeShown; endsAt: number; total: number; up?: boolean }) {
   const [now, setNow] = useState(Date.now);
+  const ticking = shown !== "off" && !up;
   useEffect(() => {
-    if (shown === "off") return;
+    if (!ticking) return;
     const tick = () => setNow(Date.now());
     tick();
     const timer = setInterval(tick, 250);
     return () => clearInterval(timer);
-  }, [shown]);
-  const left = endsAt - now;
-  if (shown === "off" || left <= 0) return null;
+  }, [ticking]);
+  if (shown === "off") return null;
+  const left = up ? 0 : endsAt - now;
+  if (up || left <= 0)
+    return (
+      <div className="tm-shown tm-shown-digits tm-shown-up" aria-hidden>
+        <Digits text={digits(0)} total={total} />
+      </div>
+    );
   const unit = shown === "percent" ? total / percentMarks(total) : markUnit(total);
   return (
     <div className={`tm-shown tm-shown-${shown === "percent" ? "marks" : shown}`} aria-hidden>
-      {shown === "digits" ? (
-        <b style={{ "--tm-note-em": digitsEm(total) } as CSSProperties}>
-          {[...digits(left)].map((ch, i) => (
-            <span key={i} className={ch === ":" ? "tm-colon" : undefined}>
-              {ch}
-            </span>
-          ))}
-        </b>
-      ) : (
-        <Tally count={marksLeft(left, unit)} slots={marksLeft(total, unit)} />
-      )}
+      {shown === "digits" ? <Digits text={digits(left)} total={total} /> : <Tally count={marksLeft(left, unit)} slots={marksLeft(total, unit)} />}
     </div>
+  );
+}
+
+/** The digits of the note, each in a cell of its own, the note as wide as the run's longest text. */
+function Digits({ text, total }: { text: string; total: number }) {
+  return (
+    <b style={{ "--tm-note-em": digitsEm(total) } as CSSProperties}>
+      {[...text].map((ch, i) => (
+        <span key={i} className={ch === ":" ? "tm-colon" : undefined}>
+          {ch}
+        </span>
+      ))}
+    </b>
   );
 }

@@ -5,12 +5,13 @@ import { INK, LeftGlow, STAGE_H, STAGE_W } from "./scenes";
 // Up to the Moon (H-127, rebuilt on user request, 23 November 2026: „nach oben hüpfen, und das Bild scrollt mit“): a
 // jump-and-run going up, through a world many screens tall that the picture follows like a camera. A little round
 // hopper starts at the bottom of a lake and swims up to the surface, hops ashore over the meadow, climbs a tree's trunk
-// and hops through its crown, hops from roof to roof, climbs the ladder up a skyscraper, floats past the clouds on a
+// and hops up the branches of its crown, up planks from roof to roof, climbs the ladder up a skyscraper, floats past the clouds on a
 // bunch of balloons waiting on its roof and flies on with a jetpack waiting on the highest cloud, from an asteroid to a
-// ringed planet up to the moon – each height its own way to move. From the moon it jumps all the way down, the picture
-// racing down with it past everything it climbed, into the cake that stood on the meadow by the lake from the start:
-// the goal seen from the first second. A star hangs over every move, caught on the way. A genre's look of our own –
-// our own figure and world, nothing of one game.
+// ringed planet up to the moon – each height its own way to move. It never stands still: each move takes the whole of
+// its share, so the time is seen going up all the way. From the moon it leaps off and sails down on a parachute, the
+// picture going down with it past everything it climbed, and drops into the cake that stood on the meadow by the lake
+// from the start: the goal seen from the first second. A star hangs over every move, caught on the way. A genre's look
+// of our own – our own figure and world, nothing of one game.
 
 /** The hopper's layer, a square standing with its feet's middle on its spot. */
 export const RUNNER = 84;
@@ -28,23 +29,28 @@ export const SHORE = 790;
 /** How a move goes, one kind for each height: swimming in the lake, hopping, climbing, floating on balloons, flying with the jetpack. */
 export type MoveKind = "swim" | "hop" | "climb" | "fly" | "jet";
 
-/** Where the hopper stands, one spot after the other from the lake's floor up to the moon, with how it gets to each. */
-export const SPOTS: readonly { x: number; y: number; by?: MoveKind }[] = [
+/**
+ * Where the hopper stands, one spot after the other from the lake's floor up to the moon, with how it gets to each and
+ * the points its way passes on the way there (`via`). Every way goes along something to hop or climb on – the stone,
+ * the meadow, a branch, a plank from roof to roof, the ladder – or through water or air where it swims or floats, so it
+ * can go at an even pace the whole of its share.
+ */
+export const SPOTS: readonly { x: number; y: number; by?: MoveKind; via?: readonly { x: number; y: number }[] }[] = [
   // In the lake: on its floor, then swimming up to float at the surface.
   { x: 1150, y: 5270 },
   { x: 1000, y: 5100, by: "swim" },
   { x: 1160, y: 4940, by: "swim" },
   { x: 1010, y: 4775, by: "swim" },
-  // Out of the water: a stone by the shore, the meadow beside the tree.
+  // Out of the water: onto the stone by the shore, along the meadow to the tree.
   { x: 875, y: 4700, by: "hop" },
   { x: 700, y: GROUND, by: "hop" },
-  // Up the tree's trunk, then through its crown: a leafy side, the top.
+  // Up the tree's trunk, then up its branches through the crown: a leafy side, the top.
   { x: 600, y: 4490, by: "climb" },
   { x: 600, y: 4260, by: "climb" },
   { x: 600, y: 3990, by: "climb" },
   { x: 440, y: 3752, by: "hop" },
   { x: 600, y: 3532, by: "hop" },
-  // From roof to roof, the houses standing taller one after the other.
+  // Up a plank from the crown to the first roof, and from roof to roof, the houses standing taller one after the other.
   { x: 880, y: 3330, by: "hop" },
   { x: 1080, y: 3110, by: "hop" },
   { x: 1290, y: 2890, by: "hop" },
@@ -52,7 +58,7 @@ export const SPOTS: readonly { x: number; y: number; by?: MoveKind }[] = [
   { x: 1215, y: 2660, by: "climb" },
   { x: 1215, y: 2430, by: "climb" },
   { x: 1215, y: 2200, by: "climb" },
-  { x: 1060, y: 2050, by: "hop" },
+  { x: 1060, y: 2050, by: "hop", via: [{ x: 1215, y: 2050 }] },
   // On the balloons from cloud to cloud; the jetpack waits on the highest.
   { x: 800, y: 1760, by: "fly" },
   { x: 1060, y: 1500, by: "fly" },
@@ -63,7 +69,7 @@ export const SPOTS: readonly { x: number; y: number; by?: MoveKind }[] = [
   { x: 990, y: 440, by: "jet" },
 ];
 
-/** How many moves the whole way has: five minutes take all of them, one about every 13 seconds. */
+/** How many moves the whole way has: five minutes take all of them, one about every 10 seconds. */
 export const MAX_MOVES = SPOTS.length - 1;
 
 /** The fewest moves a run makes: a short time starts further up. */
@@ -72,41 +78,69 @@ export const MIN_MOVES = 5;
 /** The time a move gets at least: a shorter run starts further up rather than hurrying. */
 export const MIN_UNIT = 1500;
 
-/** The jump from the moon into the cake, at most this long: a fifth of a short run. */
-export const DIVE_MS = 4500;
+/**
+ * The share of the time the way down from the moon takes (user feedback, 23 November 2026: the jump into the cake was
+ * so quick it looked as if it teleported, and none of the places it passed were seen): a fifth of every run, a minute
+ * of five, sailing down on a parachute past everything it climbed.
+ */
+export const DIVE_SHARE = 0.2;
 
-/** How long the jump down takes in a run of `total` ms. */
-export const diveMs = (total: number) => Math.min(DIVE_MS, total * 0.2);
+/** How long the way down takes in a run of `total` ms. */
+export const diveMs = (total: number) => total * DIVE_SHARE;
 
 /** How many moves a run of `ms` makes. */
 export function moveCount(ms: number): number {
   return Math.max(MIN_MOVES, Math.min(MAX_MOVES, Math.floor((ms - diveMs(ms)) / MIN_UNIT)));
 }
 
-/** How long a move of each kind takes at most: less when the moves come quickly, never more than half its share of the time. */
-export const MOVE_MS: Record<MoveKind, number> = { swim: 1800, hop: 750, climb: 1500, fly: 2600, jet: 1700 };
+/** The points of move `k`'s way, from its spot over any `via` to the next spot: the hopper goes along them at an even pace. */
+export function wayOf(k: number): { x: number; y: number }[] {
+  const to = SPOTS[k + 1];
+  return [SPOTS[k], ...(to.via ?? []), to];
+}
 
-/** How high the hopper's feet go over the higher of its two spots when it hops. */
-export const HOP_H = 90;
+/** How far along a way each of its points lies, from 0 at its start to 1 at its end. */
+function shares(way: { x: number; y: number }[]): number[] {
+  const steps = way.slice(1).map((p, i) => Math.hypot(p.x - way[i].x, p.y - way[i].y));
+  const length = steps.reduce((a, b) => a + b, 0) || 1;
+  const at = [0];
+  for (const s of steps) at.push(at[at.length - 1] + s / length);
+  return at;
+}
 
-/** Where in its hop the hopper is at the top of its arc (a share of the hop's time). */
-const TOP_AT = 0.45;
+/** The point `f` (0 to 1) along a way, measured by its length. */
+function along(way: { x: number; y: number }[], f: number): { x: number; y: number } {
+  const at = shares(way);
+  const i = Math.max(
+    1,
+    at.findIndex((s) => s >= f),
+  );
+  const part = (f - at[i - 1]) / (at[i] - at[i - 1] || 1);
+  return { x: way[i - 1].x + (way[i].x - way[i - 1].x) * part, y: way[i - 1].y + (way[i].y - way[i - 1].y) * part };
+}
 
-/** One move of a run: from which spot (to the next), its kind, when it leaves and lands, how high a hop goes, and when its star is caught. */
+/**
+ * One move of a run: from which spot (to the next), its kind, when it leaves and lands, and when its star is caught.
+ * A move fills its whole share: it leaves as the one before lands (user feedback, 23 November 2026: standing still and
+ * then a quick hop to the next place hid the time going; now it goes up all the time, a little every second).
+ */
 export interface RunMove {
   k: number;
   kind: MoveKind;
   start: number;
   land: number;
-  peak: number;
   star: number;
 }
 
-/** The jump down: it stands on the moon until `leap`, leaps up until `top`, then falls into the cake, landing as the time is up. */
+/**
+ * The way down: it leaps off the moon as the climb ends (`start`), opens its parachute at the top of the leap (`top`),
+ * sails down swinging under it past everything it climbed, lets go of it over the cake (`release`) and drops into it,
+ * landing as the time is up.
+ */
 export interface Dive {
   start: number;
-  leap: number;
   top: number;
+  release: number;
   land: number;
 }
 
@@ -130,13 +164,28 @@ const cakeBox = (x: number, y: number, w: number, h: number) => ({
 /** Where the hopper ends: sunk into the cake's top. */
 export const FINAL = { x: CAKE.x, y: CAKE.top + 34 * CAKE_SCALE } as const;
 
-/** How high it leaps off the moon before it falls. */
+/** How high it leaps off the moon before its parachute opens. */
 const LEAP = 130;
+
+/** The leap off the moon takes this long at most, and the drop from the parachute into the cake this long. */
+const LEAP_MS = 1600;
+const DROP_MS = 900;
+
+/** Where it lets go of the parachute: this high over the cake's top, so the last bit is a real drop with a splash. */
+export const RELEASE_Y = CAKE.top - 240;
+
+/** How far it swings to either side under the parachute, how long one swing takes, and how much it tilts then. */
+export const SWAY = 70;
+const SWING_MS = 2600;
+const TILT = 9;
+
+/** The most swings a way down has: a long run swings slower rather than writing ever more keyframes. */
+const MAX_SWINGS = 60;
 
 /**
  * Works out a run of `total` ms making `count` moves: the hopper starts on the spot `count` moves below the moon
- * (`first`), each move has the same share of the climbing time (`unit`) and lands at its end; then it jumps down into
- * the cake, landing as the time is up.
+ * (`first`), each move takes the whole of its share of the climbing time (`unit`), then it goes down into the cake,
+ * landing as the time is up.
  */
 export function jumpPlan(total: number, count: number): { first: number; unit: number; moves: RunMove[]; dive: Dive } {
   const first = MAX_MOVES - count;
@@ -145,22 +194,16 @@ export function jumpPlan(total: number, count: number): { first: number; unit: n
   const unit = climb / count;
   const moves = Array.from({ length: count }, (_, i) => {
     const k = first + i;
-    const kind = SPOTS[k + 1].by ?? "hop";
-    const ms = Math.min(MOVE_MS[kind], unit * 0.5);
-    const land = (i + 1) * unit;
-    const start = land - ms;
-    const peak = Math.min(SPOTS[k].y, SPOTS[k + 1].y) - HOP_H;
-    return { k, kind, start, land, peak, star: start + ms * (kind === "hop" ? TOP_AT : 0.5) };
+    const start = i * unit;
+    return { k, kind: SPOTS[k + 1].by ?? "hop", start, land: start + unit, star: start + unit / 2 };
   });
-  return { first, unit, moves, dive: { start: climb, leap: climb + D * 0.25, top: climb + D * 0.4, land: total } };
+  return { first, unit, moves, dive: { start: climb, top: climb + Math.min(LEAP_MS, D * 0.15), release: total - Math.min(DROP_MS, D * 0.1), land: total } };
 }
 
-/** The star of a move: where the hopper's body is when it catches it – the top of a hop's arc, else halfway. */
-export function starAt(m: Pick<RunMove, "k" | "kind" | "peak">): { x: number; y: number } {
-  const from = SPOTS[m.k];
-  const to = SPOTS[m.k + 1];
-  if (m.kind === "hop") return { x: from.x + (to.x - from.x) * TOP_AT, y: m.peak - RUNNER / 2 };
-  return { x: (from.x + to.x) / 2, y: (from.y + to.y) / 2 - RUNNER / 2 };
+/** The star of move `k`: where the hopper's body is halfway along its way, as it passes. */
+export function starAt(k: number): { x: number; y: number } {
+  const half = along(wayOf(k), 0.5);
+  return { x: half.x, y: half.y - RUNNER / 2 };
 }
 
 /** A star's square layer. */
@@ -178,22 +221,19 @@ const move = (axis: "X" | "Y", d: number) => `translate${axis}(${((d / RUNNER) *
 /** A transform moving the world up so that the stage shows it from `c` down. */
 const cam = (c: number) => `translateY(${((-c / WORLD_H) * 100).toFixed(3)}%)`;
 
-/** How the hopper turns: facing right (1) or left (−1), and how far round it spins (degrees). */
-const turn = (face: number, spin = 0) => `scaleX(${face}) rotate(${spin}deg)`;
+/** How the hopper turns: facing right (1) or left (−1), and how far round it turns (degrees, as seen). */
+const turn = (face: number, spin = 0) => `scaleX(${face}) rotate(${face * spin}deg)`;
 
-/** The fall's curve, the same for the hopper and the picture following it, so it stays on the screen. */
-const FALL = "cubic-bezier(0.4, 0, 0.6, 1)";
+/** The swings of the way down from `top` to `release`: how many, each one way, never more than `MAX_SWINGS`. */
+export const swingCount = (dive: Dive) => Math.max(1, Math.min(MAX_SWINGS, Math.round((dive.release - dive.top) / SWING_MS)));
 
-/** How the hopper goes up and down in a move of each kind: a hop rising slower and falling faster (as `hop.tsx`), the others gliding. */
-const GLIDE: Record<Exclude<MoveKind, "hop" | "climb">, string> = {
-  swim: "ease-in-out",
-  fly: "ease-in-out",
-  jet: "cubic-bezier(0.45, 0, 0.3, 1)",
-};
+/** Where across the hopper is after swing `j` of `n` on the way down from `fromX`: on the line to the cake, out to one side and the other, on it at the end. */
+export const swingX = (fromX: number, j: number, n: number) => fromX + (FINAL.x - fromX) * (j / n) + (j < n ? (j % 2 ? SWAY : -SWAY) : 0);
 
 /**
- * The hopper's way and the picture's as lists of keyframes: across, up and down (in arcs, glides or the climb's three
- * pulls), its turn (facing the way it goes, spinning once as it falls), and the camera following it.
+ * The hopper's way and the picture's as lists of keyframes: across and up and down at an even pace along each move's
+ * way (it never stands still; its bounce once a second is the step a child sees), its turn (facing the way it goes,
+ * tilting as it swings under the parachute, spinning once as it drops into the cake), and the camera following it.
  */
 export function jumpFrames(first: number, moves: RunMove[], dive: Dive): { across: Frame[]; upDown: Frame[]; turning: Frame[]; camera: Frame[] } {
   const origin = SPOTS[first];
@@ -204,48 +244,48 @@ export function jumpFrames(first: number, moves: RunMove[], dive: Dive): { acros
   const camera: Frame[] = [{ at: 0, transform: cam(cameraAt(origin.y)) }];
   const faceTo = (at: number, to: number, within: number) => {
     if (to === face) return;
-    turning.push({ at, transform: turn(face) }, { at: at + Math.min(150, within / 3), transform: turn(to) });
+    turning.push({ at, transform: turn(face) }, { at: at + Math.min(300, within / 3), transform: turn(to) });
     face = to;
   };
+  const point = (at: number, p: { x: number; y: number }, ease = "linear") => {
+    across.push({ at, transform: move("X", p.x - origin.x), ease });
+    upDown.push({ at, transform: move("Y", p.y - origin.y), ease });
+    camera.push({ at, transform: cam(cameraAt(p.y)), ease });
+  };
   for (const m of moves) {
-    const from = SPOTS[m.k];
-    const to = SPOTS[m.k + 1];
-    const ms = m.land - m.start;
-    // It faces the way it goes; climbing straight up it keeps facing as it was.
-    if (Math.abs(to.x - from.x) > 30) faceTo(m.start, Math.sign(to.x - from.x), ms);
-    across.push(
-      { at: m.start, transform: move("X", from.x - origin.x), ease: m.kind === "hop" ? "linear" : "ease-in-out" },
-      { at: m.land, transform: move("X", to.x - origin.x) },
-    );
-    if (m.kind === "hop")
-      upDown.push(
-        { at: m.start, transform: move("Y", from.y - origin.y), ease: "cubic-bezier(0.2, 0.7, 0.4, 1)" },
-        { at: m.start + ms * TOP_AT, transform: move("Y", m.peak - origin.y), ease: "cubic-bezier(0.6, 0, 0.8, 0.4)" },
-        { at: m.land, transform: move("Y", to.y - origin.y) },
-      );
-    else if (m.kind === "climb")
-      // Three pulls up, each quick at first and slowing as the paws take hold.
-      for (let j = 0; j <= 3; j++)
-        upDown.push({ at: m.start + (ms * j) / 3, transform: move("Y", from.y + ((to.y - from.y) * j) / 3 - origin.y), ease: "cubic-bezier(0.3, 0, 0.2, 1)" });
-    else upDown.push({ at: m.start, transform: move("Y", from.y - origin.y), ease: GLIDE[m.kind] }, { at: m.land, transform: move("Y", to.y - origin.y) });
-    camera.push({ at: m.start, transform: cam(cameraAt(from.y)), ease: "ease-in-out" }, { at: m.land, transform: cam(cameraAt(to.y)) });
+    const way = wayOf(m.k);
+    const to = way.at(-1)!;
+    // It faces the way it goes; going straight up it keeps facing as it was.
+    if (Math.abs(to.x - way[0].x) > 30) faceTo(m.start, Math.sign(to.x - way[0].x), m.land - m.start);
+    const at = shares(way);
+    for (let j = 1; j < way.length; j++) point(m.start + (m.land - m.start) * at[j], way[j]);
   }
-  // The jump down: a leap up off the moon, turning towards the cake, then the fall, spinning once, the picture with it.
+  // The way down: a leap up off the moon towards the cake, the parachute opening at its top.
   const moon = SPOTS[MAX_MOVES];
-  const leapX = moon.x + Math.sign(FINAL.x - moon.x) * 40;
-  faceTo(dive.leap, Math.sign(FINAL.x - moon.x), dive.top - dive.leap);
-  across.push(
-    { at: dive.leap, transform: move("X", moon.x - origin.x), ease: "ease-out" },
-    { at: dive.top, transform: move("X", leapX - origin.x), ease: FALL },
-    { at: dive.land, transform: move("X", FINAL.x - origin.x) },
-  );
-  upDown.push(
-    { at: dive.leap, transform: move("Y", moon.y - origin.y), ease: "cubic-bezier(0.2, 0.7, 0.4, 1)" },
-    { at: dive.top, transform: move("Y", moon.y - LEAP - origin.y), ease: FALL },
-    { at: dive.land, transform: move("Y", FINAL.y - origin.y) },
-  );
-  turning.push({ at: dive.top, transform: turn(face), ease: FALL }, { at: dive.land, transform: turn(face, 360) });
-  camera.push({ at: dive.top, transform: cam(cameraAt(moon.y)), ease: FALL }, { at: dive.land, transform: cam(cameraAt(FINAL.y)) });
+  const dir = Math.sign(FINAL.x - moon.x);
+  const topX = moon.x + dir * 50;
+  faceTo(dive.start, dir, dive.top - dive.start);
+  across.push({ at: dive.start, transform: move("X", moon.x - origin.x), ease: "ease-out" });
+  upDown.push({ at: dive.start, transform: move("Y", moon.y - origin.y), ease: "cubic-bezier(0.2, 0.7, 0.4, 1)" });
+  camera.push({ at: dive.start, transform: cam(cameraAt(moon.y)), ease: "cubic-bezier(0.2, 0.7, 0.4, 1)" });
+  across.push({ at: dive.top, transform: move("X", topX - origin.x), ease: "ease-in-out" });
+  upDown.push({ at: dive.top, transform: move("Y", moon.y - LEAP - origin.y), ease: "linear" });
+  camera.push({ at: dive.top, transform: cam(cameraAt(moon.y - LEAP)), ease: "linear" });
+  // Sailing down at an even pace, swinging from side to side and tilting with each swing.
+  const n = swingCount(dive);
+  for (let j = 1; j <= n; j++) {
+    const at = dive.top + ((dive.release - dive.top) * j) / n;
+    const x = swingX(topX, j, n);
+    across.push({ at, transform: move("X", x - origin.x), ease: "ease-in-out" });
+    turning.push({ at, transform: turn(face, j < n ? (j % 2 ? -TILT : TILT) : 0), ease: "ease-in-out" });
+  }
+  upDown.push({ at: dive.release, transform: move("Y", RELEASE_Y - origin.y), ease: "cubic-bezier(0.5, 0, 1, 1)" });
+  camera.push({ at: dive.release, transform: cam(cameraAt(RELEASE_Y)), ease: "cubic-bezier(0.5, 0, 1, 1)" });
+  // Letting go of the parachute: the drop into the cake, spinning once.
+  across.push({ at: dive.land, transform: move("X", FINAL.x - origin.x) });
+  upDown.push({ at: dive.land, transform: move("Y", FINAL.y - origin.y) });
+  camera.push({ at: dive.land, transform: cam(cameraAt(FINAL.y)) });
+  turning.push({ at: dive.land, transform: turn(face, 360) });
   return { across, upDown, turning, camera };
 }
 
@@ -286,22 +326,32 @@ const BALLOONS_FROM = 17;
 const JETPACK_FROM = 20;
 
 /** What the hopper carries and what waits for it, each its own layer coming and going by keyframes written for the run. */
-const GEAR = ["mask", "balloons", "jetpack", "flame", "waiting-balloons", "waiting-jetpack"] as const;
+const GEAR = ["mask", "balloons", "jetpack", "flame", "parachute", "waiting-balloons", "waiting-jetpack"] as const;
 type Gear = (typeof GEAR)[number];
 
 /** Each thing's keyframes for a run starting on spot `first`, and how it is left at the end (shown or not). */
-export function gearLooks(first: number, moves: RunMove[]): Record<Gear, { frames: Look[]; end: number }> {
+export function gearLooks(first: number, moves: RunMove[], dive: Dive): Record<Gear, { frames: Look[]; end: number }> {
+  // The flame burns from the first move with the jetpack to the moon, and goes out as it leaps off.
+  const jets = moves.filter((m) => m.kind === "jet");
   const flame: Look[] = [{ at: 0, css: "opacity: 0" }];
-  for (const m of moves)
-    if (m.kind === "jet")
-      flame.push(
-        { at: m.start, css: "opacity: 0" },
-        { at: m.start + FADE, css: "opacity: 1" },
-        { at: m.land - FADE, css: "opacity: 1" },
-        { at: m.land, css: "opacity: 0" },
-      );
+  if (jets.length)
+    flame.push(
+      { at: jets[0].start, css: "opacity: 0" },
+      { at: jets[0].start + FADE, css: "opacity: 1" },
+      { at: jets.at(-1)!.land - FADE, css: "opacity: 1" },
+      { at: jets.at(-1)!.land, css: "opacity: 0" },
+    );
+  // The parachute opens at the top of the leap and is let go over the cake: it floats up and away.
+  const opening = Math.min(600, (dive.top - dive.start) / 2);
+  const parachute: Look[] = [
+    { at: 0, css: "opacity: 0; transform: scale(0.2)" },
+    { at: dive.top - opening, css: "opacity: 0; transform: scale(0.2)", ease: "ease-out" },
+    { at: dive.top, css: "opacity: 1; transform: none" },
+    { at: dive.release, css: "opacity: 1; transform: none", ease: "ease-in" },
+    { at: Math.min(dive.land, dive.release + FADE * 3), css: "opacity: 0; transform: translateY(-70%)" },
+  ];
   return {
-    // A diving mask in the lake, taken off as it hops ashore.
+    // A diving mask in the lake, taken off as it climbs ashore.
     mask: { frames: shownFrames(first, moves, -1, OUT_OF_WATER), end: 0 },
     // The balloons from the skyscraper's roof to the highest cloud, let go there: they float up and away.
     balloons: {
@@ -310,6 +360,7 @@ export function gearLooks(first: number, moves: RunMove[]): Record<Gear, { frame
     },
     jetpack: { frames: shownFrames(first, moves, JETPACK_FROM, MAX_MOVES), end: 1 },
     flame: { frames: flame, end: 0 },
+    parachute: { frames: parachute, end: 0 },
     "waiting-balloons": { frames: shownFrames(first, moves, -1, BALLOONS_FROM), end: 0 },
     "waiting-jetpack": { frames: shownFrames(first, moves, -1, JETPACK_FROM), end: 0 },
   };
@@ -318,7 +369,7 @@ export function gearLooks(first: number, moves: RunMove[]): Record<Gear, { frame
 /** The ways of the hopper, the picture and the things it takes along, as keyframes made for this run. */
 function JumpKeyframes({ total, first, moves, dive }: { total: number; first: number; moves: RunMove[]; dive: Dive }) {
   const { across, upDown, turning, camera } = jumpFrames(first, moves, dive);
-  const gear = gearLooks(first, moves);
+  const gear = gearLooks(first, moves, dive);
   const rules = [
     keyframes("tm-jump-x", total, holdToEnd(across, total)),
     keyframes("tm-jump-y", total, holdToEnd(upDown, total)),
@@ -551,6 +602,62 @@ const CROWN: readonly { cx: number; cy: number; r: number }[] = [
   { cx: SPOTS[10].x, cy: SPOTS[10].y + 188, r: 190 },
 ];
 
+/** How far under the hopper's feet the top of a plank or branch lies. */
+const UNDERFOOT = 6;
+
+/**
+ * The plank (or branch) under move `k`'s way, from its spot to the next: a board with slats across it to hop up on, or
+ * a crooked brown branch with a leaf or two – so a hop up through the air always has something under its feet.
+ */
+function Plank({ k, branch }: { k: number; branch?: boolean }) {
+  const [a, b] = [SPOTS[k], SPOTS[k + 1]];
+  const [ax, ay, bx, by] = [a.x, a.y + UNDERFOOT, b.x, b.y + UNDERFOOT];
+  const length = Math.hypot(bx - ax, by - ay);
+  const [nx, ny] = [-(by - ay) / length, (bx - ax) / length];
+  const side = ny < 0 ? -1 : 1;
+  // The board's thickness lies under its top, away from the feet.
+  const [ox, oy] = [nx * side * 14, ny * side * 14];
+  if (branch)
+    return (
+      <g>
+        <path
+          d={`M${ax} ${ay + 8} Q${(ax + bx) / 2 + ox * 0.8} ${(ay + by) / 2 + oy * 0.8} ${bx} ${by + 8}`}
+          fill="none"
+          stroke={INK}
+          strokeWidth="26"
+          strokeLinecap="round"
+        />
+        <path
+          d={`M${ax} ${ay + 8} Q${(ax + bx) / 2 + ox * 0.8} ${(ay + by) / 2 + oy * 0.8} ${bx} ${by + 8}`}
+          fill="none"
+          stroke="#8a5a2b"
+          strokeWidth="17"
+          strokeLinecap="round"
+        />
+        <ellipse cx={(ax + bx) / 2 + ox * 2.4} cy={(ay + by) / 2 + oy * 2.4 + 8} rx="20" ry="11" fill="#40c057" stroke={INK} strokeWidth="3" />
+      </g>
+    );
+  const slats = Math.floor(length / 40);
+  return (
+    <g>
+      <path
+        d={`M${ax} ${ay} L${bx} ${by} L${bx + ox} ${by + oy} L${ax + ox} ${ay + oy} Z`}
+        fill="#d9a066"
+        stroke={INK}
+        strokeWidth="4"
+        strokeLinejoin="round"
+      />
+      {Array.from({ length: slats }, (_, i) => {
+        const f = (i + 0.5) / slats;
+        const [x, y] = [ax + (bx - ax) * f, ay + (by - ay) * f];
+        return (
+          <path key={i} d={`M${x - nx * side * 5} ${y - ny * side * 5} l${ox * 0.5} ${oy * 0.5}`} stroke="#8a5a2b" strokeWidth="8" strokeLinecap="round" />
+        );
+      })}
+    </g>
+  );
+}
+
 /**
  * The land: two skyscrapers and three houses on the lake's far shore, the ladder up the big one, the tree on the
  * meadow, the meadow with its earth, the stone by the shore and the lake with its floor, seaweed and fish. Drawn once.
@@ -608,6 +715,14 @@ const Land = memo(function Land() {
         [780, 3850],
       ].map(([x, y]) => (
         <circle key={`${x},${y}`} cx={x} cy={y} r="11" fill="#2f9e44" />
+      ))}
+      {/* The branches it hops up through the crown, from the trunk to a leafy side and on to the top. */}
+      {[8, 9].map((k) => (
+        <Plank key={k} k={k} branch />
+      ))}
+      {/* The planks laid from the crown's top to the first roof and from roof to roof, with slats to hop up on. */}
+      {[10, 11, 12].map((k) => (
+        <Plank key={k} k={k} />
       ))}
       {/* The lake from the far shore down to its sandy floor, with soft waves on top. */}
       <rect x={0} y={SURFACE} width={STAGE_W} height={WORLD_H - SURFACE} fill="#4dabf7" />
@@ -727,14 +842,17 @@ function CakeArt({ front }: { front?: boolean }) {
   );
 }
 
-/** The cake's layers: its body behind the hopper, the upper icing in front of it, the cherry (gone once it is landed on) and the cream splashing at the end. */
+/** The cake's layers: its body behind the hopper, the upper icing in front of it, the cherry (gone once it is landed on), and the smashed cake that takes their place at the end. */
 const CAKE_BOX = cakeBox(CAKE.x - 110, CAKE_ART.top - 40, 220, GROUND - CAKE_ART.top + 50);
 
 const Cake = memo(function Cake() {
   return (
     <>
-      <At {...CAKE_BOX}>
+      <At {...CAKE_BOX} className="tm-jump-cake-whole">
         <CakeArt />
+      </At>
+      <At {...CAKE_BOX} className="tm-jump-cake-smashed">
+        <SmashedCakeArt />
       </At>
       <At {...cakeBox(CAKE.x - 16, CAKE_ART.top - 40, 32, 34)} className="tm-jump-cherry">
         <svg viewBox="0 0 32 34">
@@ -750,25 +868,267 @@ const Cake = memo(function Cake() {
 const CakeFront = memo(function CakeFront() {
   return (
     <>
-      <At {...CAKE_BOX}>
+      <At {...CAKE_BOX} className="tm-jump-cake-whole">
         <CakeArt front />
       </At>
-      <At {...cakeBox(CAKE.x - 130, CAKE_ART.top - 70, 260, 110)} className="tm-jump-splash">
-        <svg viewBox="0 0 260 110">
-          {[
-            [30, 70, 16],
-            [62, 36, 12],
-            [104, 18, 10],
-            [160, 22, 11],
-            [204, 40, 13],
-            [232, 74, 15],
-          ].map(([x, y, r]) => (
-            <circle key={x} cx={x} cy={y} r={r} fill="#fff" stroke={INK} strokeWidth="3" />
-          ))}
-          <circle cx="128" cy="8" r="9" fill="#e03131" stroke={INK} strokeWidth="3" />
-        </svg>
+      <At {...CAKE_BOX} className="tm-jump-cake-smashed">
+        <SmashedCakeArt front />
       </At>
     </>
+  );
+});
+
+/**
+ * The cake once the hopper has dropped into it (user feedback, 23 November 2026: it should be broken all over): the
+ * upper tier burst apart, the lower one cracked with a jagged crater where the hopper sits, cream and icing smeared down
+ * its sides and crumbs on the plate; `front` is the crater's broken rim lying over the hopper's feet. In the cake's own
+ * units, like `CakeArt`.
+ */
+function SmashedCakeArt({ front }: { front?: boolean }) {
+  const { top } = CAKE_ART;
+  const x = CAKE.x;
+  if (front)
+    return (
+      <svg viewBox={`${x - 110} ${top - 40} 220 ${GROUND - top + 50}`} preserveAspectRatio="none">
+        <path
+          d={`M${x - 44} ${top + 60} L${x - 40} ${top + 34} L${x - 28} ${top + 40} L${x - 18} ${top + 28} L${x - 6} ${top + 38} L${x + 6} ${top + 26} L${x + 18} ${top + 36} L${x + 30} ${top + 30} L${x + 42} ${top + 42} L${x + 46} ${top + 60} Z`}
+          fill="#ffe3e3"
+          stroke={INK}
+          strokeWidth="4"
+          strokeLinejoin="round"
+        />
+        {[-30, -8, 16, 36].map((dx, i) => (
+          <circle key={dx} cx={x + dx} cy={top + 34 - (i % 2) * 4} r={8 + (i % 2) * 3} fill="#fff" stroke={INK} strokeWidth="3" />
+        ))}
+        <path d={`M${x - 36} ${top + 48} l10 -5 8 6 10 -6 8 5`} fill="none" stroke="#f783ac" strokeWidth="5" strokeLinecap="round" strokeLinejoin="round" />
+      </svg>
+    );
+  const jag = [
+    [-85, 92],
+    [-76, 66],
+    [-62, 76],
+    [-50, 52],
+    [-36, 64],
+    [-22, 48],
+    [-8, 58],
+    [8, 46],
+    [24, 60],
+    [38, 50],
+    [52, 66],
+    [66, 56],
+    [78, 72],
+    [85, 94],
+  ];
+  return (
+    <svg viewBox={`${x - 110} ${top - 40} 220 ${GROUND - top + 50}`} preserveAspectRatio="none">
+      {/* The plate, cracked, with crumbs and cream all round on it. */}
+      <ellipse cx={x} cy={GROUND - 2} rx="109" ry="12" fill="#e9ecef" stroke={INK} strokeWidth="4" />
+      <path d={`M${x + 60} ${GROUND - 12} l-8 8 6 4 -6 8`} fill="none" stroke={INK} strokeWidth="2.5" />
+      {/* The lower tier, broken open at the top, leaning a little, with a crack down its side. */}
+      <path
+        d={`M${x - 85} ${GROUND - 6} ${jag.map(([dx, dy]) => `L${x + dx} ${top + dy}`).join(" ")} L${x + 85} ${GROUND - 6} Z`}
+        fill="#ffe3e3"
+        stroke={INK}
+        strokeWidth="5"
+        strokeLinejoin="round"
+      />
+      <path d={`M${x - 8} ${top + 58} V${top + 66} L${x + 4} ${top + 64}`} fill="#ffd8a8" />
+      <path d={`M${x - 50} ${top + 54} l6 18 -8 14 7 20 -5 14`} fill="none" stroke={INK} strokeWidth="3" strokeLinecap="round" strokeLinejoin="round" />
+      <path d={`M${x + 52} ${top + 68} l-5 16 7 14 -6 18`} fill="none" stroke={INK} strokeWidth="3" strokeLinecap="round" strokeLinejoin="round" />
+      {/* Its pink icing torn into pieces, sliding down. */}
+      {[
+        [-80, 80, 26],
+        [-42, 74, 20],
+        [10, 70, 30],
+        [56, 82, 22],
+      ].map(([dx, dy, w]) => (
+        <path
+          key={dx}
+          d={`M${x + dx} ${top + dy} h${w} l-3 12 q-${w / 4} 10 -${w / 2} 2 q-${w / 4} 12 -${w / 2 - 3} -2 Z`}
+          fill="#f783ac"
+          stroke={INK}
+          strokeWidth="2.5"
+          strokeLinejoin="round"
+        />
+      ))}
+      {/* Cream running down its sides. */}
+      {[
+        [-70, 70, 34],
+        [-20, 54, 46],
+        [30, 60, 40],
+        [70, 64, 30],
+      ].map(([dx, dy, h]) => (
+        <path key={dx} d={`M${x + dx - 8} ${top + dy} q8 -8 16 0 v${h} q-8 8 -16 0 Z`} fill="#fff" stroke={INK} strokeWidth="2.5" opacity="0.95" />
+      ))}
+      {/* What is left of the upper tier: two broken lumps lying askew beside the hopper. */}
+      <path
+        d={`M${x - 66} ${top + 50} L${x - 70} ${top + 22} L${x - 50} ${top + 12} L${x - 30} ${top + 20} L${x - 28} ${top + 48} Z`}
+        fill="#fff0f6"
+        stroke={INK}
+        strokeWidth="4"
+        strokeLinejoin="round"
+      />
+      <path d={`M${x - 70} ${top + 22} L${x - 50} ${top + 12} L${x - 30} ${top + 20} L${x - 34} ${top + 30} L${x - 52} ${top + 24} Z`} fill="#f783ac" />
+      <path
+        d={`M${x + 28} ${top + 50} L${x + 26} ${top + 18} L${x + 48} ${top + 24} L${x + 68} ${top + 16} L${x + 70} ${top + 48} Z`}
+        fill="#fff0f6"
+        stroke={INK}
+        strokeWidth="4"
+        strokeLinejoin="round"
+      />
+      <path d={`M${x + 26} ${top + 18} L${x + 48} ${top + 24} L${x + 68} ${top + 16} L${x + 66} ${top + 28} L${x + 30} ${top + 30} Z`} fill="#f783ac" />
+      {/* Crumbs and blobs of cream on the plate round its foot. */}
+      {[
+        [-100, -10, 9, "#fff"],
+        [-92, -4, 6, "#ffe3e3"],
+        [96, -8, 10, "#fff"],
+        [102, -2, 6, "#f783ac"],
+        [-60, 2, 7, "#ffe3e3"],
+        [64, 4, 8, "#fff"],
+      ].map(([dx, dy, r, c]) => (
+        <circle key={`${dx},${dy}`} cx={x + (dx as number)} cy={GROUND + (dy as number)} r={r as number} fill={c as string} stroke={INK} strokeWidth="2.5" />
+      ))}
+    </svg>
+  );
+}
+
+/** What a piece flying out of the cake is: a blob of cream, a chunk of sponge with icing, a shard of icing, a crumb, a splat stuck on a wall or trunk, or the cherry. */
+type BitKind = "cream" | "sponge" | "icing" | "crumb" | "splat" | "cherry";
+
+/**
+ * Where the pieces of the cake land as the hopper drops into it, in all directions (user feedback, 23 November 2026:
+ * the cake should be broken and scattered everywhere): on the meadow to both sides, floating on the lake, on the
+ * stone, stuck on the tree's trunk and on the walls of the houses and towers behind. Each its middle, size and kind.
+ */
+export const BITS: readonly { x: number; y: number; size: number; kind: BitKind }[] = [
+  // On the meadow left of the cake, and far left where a wide screen shows it.
+  { x: 90, y: GROUND - 16, size: 44, kind: "cream" },
+  { x: 160, y: GROUND - 20, size: 52, kind: "sponge" },
+  { x: 205, y: GROUND - 6, size: 18, kind: "crumb" },
+  { x: 255, y: GROUND - 12, size: 40, kind: "icing" },
+  { x: 300, y: GROUND - 14, size: 36, kind: "cream" },
+  { x: 345, y: GROUND - 6, size: 16, kind: "crumb" },
+  // On the meadow right of it, up to the shore, and the cherry among them.
+  { x: 520, y: GROUND - 16, size: 42, kind: "sponge" },
+  { x: 565, y: GROUND - 6, size: 18, kind: "crumb" },
+  { x: 660, y: GROUND - 16, size: 46, kind: "cream" },
+  { x: 715, y: GROUND - 12, size: 34, kind: "cherry" },
+  { x: 765, y: GROUND - 10, size: 30, kind: "icing" },
+  // On the stone, and floating on the lake.
+  { x: 878, y: 4688, size: 40, kind: "cream" },
+  { x: 965, y: SURFACE, size: 44, kind: "sponge" },
+  { x: 1100, y: SURFACE, size: 36, kind: "cream" },
+  { x: 1235, y: SURFACE, size: 34, kind: "icing" },
+  { x: 1320, y: SURFACE, size: 20, kind: "crumb" },
+  // Stuck on the tree's trunk.
+  { x: 612, y: 4460, size: 46, kind: "splat" },
+  { x: 592, y: 4600, size: 34, kind: "splat" },
+  // Stuck on the tower behind the cake, high above it.
+  { x: 300, y: 4300, size: 52, kind: "splat" },
+  { x: 470, y: 4230, size: 42, kind: "splat" },
+  { x: 380, y: 4430, size: 40, kind: "splat" },
+  // Stuck on the houses and the skyscraper across the lake.
+  { x: 845, y: 4330, size: 52, kind: "splat" },
+  { x: 1000, y: 4200, size: 46, kind: "splat" },
+  { x: 1150, y: 4400, size: 56, kind: "splat" },
+  { x: 1300, y: 4270, size: 46, kind: "splat" },
+  { x: 1040, y: 4530, size: 40, kind: "splat" },
+  { x: 1230, y: 4580, size: 36, kind: "splat" },
+];
+
+/** Where the pieces fly from: the cake's top, as the hopper lands in it. */
+export const BURST = { x: CAKE.x, y: CAKE.top + 20 } as const;
+
+/** One piece's drawing in its box `0 0 100 100`. */
+function BitArt({ kind }: { kind: BitKind }) {
+  if (kind === "cherry")
+    return (
+      <svg viewBox="0 0 100 100">
+        <path d="M50 52 Q56 18 80 6" fill="none" stroke="#2f9e44" strokeWidth="8" strokeLinecap="round" />
+        <circle cx="46" cy="64" r="32" fill="#e03131" stroke={INK} strokeWidth="7" />
+        <circle cx="34" cy="52" r="8" fill="#ffc9c9" />
+      </svg>
+    );
+  if (kind === "sponge")
+    return (
+      <svg viewBox="0 0 100 100">
+        <path d="M8 34 L30 20 L62 26 L92 16 L90 84 L12 90 Z" fill="#ffe3e3" stroke={INK} strokeWidth="6" strokeLinejoin="round" />
+        <path d="M8 34 L30 20 L62 26 L92 16 L91 36 Q70 46 52 38 Q30 48 9 46 Z" fill="#f783ac" />
+        <circle cx="38" cy="62" r="4" fill="#ffd8a8" />
+        <circle cx="64" cy="70" r="3" fill="#ffd8a8" />
+        <circle cx="54" cy="18" r="12" fill="#fff" stroke={INK} strokeWidth="5" />
+      </svg>
+    );
+  if (kind === "icing")
+    return (
+      <svg viewBox="0 0 100 100">
+        <path d="M6 40 L44 22 L94 34 L78 58 Q60 76 46 60 Q30 78 14 62 Z" fill="#f783ac" stroke={INK} strokeWidth="6" strokeLinejoin="round" />
+        <path d="M30 38 Q46 30 62 36" fill="none" stroke="#fcc2d7" strokeWidth="6" strokeLinecap="round" />
+      </svg>
+    );
+  if (kind === "crumb")
+    return (
+      <svg viewBox="0 0 100 100">
+        <path d="M14 30 L60 10 L90 50 L56 92 L10 70 Z" fill="#ffe3e3" stroke={INK} strokeWidth="10" strokeLinejoin="round" />
+      </svg>
+    );
+  if (kind === "splat")
+    return (
+      <svg viewBox="0 0 100 100">
+        <path
+          d="M50 10 Q60 28 74 14 Q74 34 92 34 Q78 46 90 62 Q70 60 66 76 L64 96 Q56 98 56 78 Q48 92 36 80 Q38 64 18 70 Q26 54 8 44 Q28 38 22 20 Q40 30 50 10 Z"
+          fill="#fff"
+          stroke={INK}
+          strokeWidth="5"
+          strokeLinejoin="round"
+        />
+        <circle cx="44" cy="48" r="9" fill="#f783ac" />
+        <circle cx="62" cy="40" r="5" fill="#ffe3e3" stroke={INK} strokeWidth="2" />
+      </svg>
+    );
+  return (
+    <svg viewBox="0 0 100 100">
+      <path d="M10 78 Q4 56 24 50 Q20 26 44 26 Q52 6 70 22 Q92 24 86 48 Q98 64 84 80 Z" fill="#fff" stroke={INK} strokeWidth="6" strokeLinejoin="round" />
+      <path d="M34 56 Q46 44 60 52" fill="none" stroke="#dee2e6" strokeWidth="6" strokeLinecap="round" />
+    </svg>
+  );
+}
+
+/**
+ * The pieces of the cake flying out as the hopper lands in it, shown only at the end (`.tm-done`): each a small layer at
+ * its landing place, thrown there once from the cake's top in an arc, turning as it flies – three nested layers moved
+ * by `transform` alone (across, up and down, turning), then still.
+ */
+const CakeBits = memo(function CakeBits() {
+  return (
+    <div className="tm-jump-bits">
+      {BITS.map((b, i) => {
+        const pct = (d: number) => `${((d / b.size) * 100).toFixed(1)}%`;
+        const far = Math.hypot(b.x - BURST.x, b.y - BURST.y);
+        const peak = Math.min(b.y, BURST.y) - 90 - far * 0.35;
+        const spin = (i % 2 ? 1 : -1) * (200 + (i % 4) * 90);
+        const style = {
+          "--fx": pct(BURST.x - b.x),
+          "--fy": pct(BURST.y - b.y),
+          "--py": pct(peak - b.y),
+          "--spin": `${spin}deg`,
+          "--rest": `${((i * 47) % 60) - 30}deg`,
+          "--tm-fly": `${Math.round(620 + far * 0.45)}ms`,
+          "--tm-delay": `${(i % 6) * 35}ms`,
+        } as CSSProperties;
+        return (
+          <At key={`${b.x},${b.y}`} x={b.x - b.size / 2} y={b.y - b.size / 2} w={b.size} h={b.size} style={style}>
+            <div className="tm-jump-bit-x">
+              <div className="tm-jump-bit-y">
+                <div className="tm-jump-bit-spin">
+                  <BitArt kind={b.kind} />
+                </div>
+              </div>
+            </div>
+          </At>
+        );
+      })}
+    </div>
   );
 });
 
@@ -792,6 +1152,35 @@ function BalloonsArt() {
         </g>
       ))}
     </>
+  );
+}
+
+/** The parachute over the hopper, red and white, its cords meeting at the hopper's sides, in its box `0 0 164 170`. */
+function ParachuteArt() {
+  const rim = [6, 44, 82, 120, 158];
+  return (
+    <svg viewBox="0 0 164 170">
+      {[
+        [54, 166],
+        [110, 166],
+      ].map(([x, y]) => (
+        <g key={x}>
+          {rim.map((r) => (
+            <path key={r} d={`M${r} 66 L${x} ${y}`} stroke={INK} strokeWidth="2" opacity="0.7" />
+          ))}
+        </g>
+      ))}
+      <path
+        d="M6 66 Q6 4 82 4 Q158 4 158 66 Q139 54 120 66 Q101 54 82 66 Q63 54 44 66 Q25 54 6 66 Z"
+        fill="#fff"
+        stroke={INK}
+        strokeWidth="4"
+        strokeLinejoin="round"
+      />
+      <path d="M44 66 Q38 20 82 4 Q63 22 63 60 Q54 56 44 66 Z M120 66 Q126 20 82 4 Q101 22 101 60 Q110 56 120 66 Z" fill="#ff6b6b" />
+      <path d="M6 66 Q6 4 82 4 Q158 4 158 66" fill="none" stroke={INK} strokeWidth="4" />
+      <path d="M30 30 Q46 14 66 12" fill="none" stroke="#fff" strokeWidth="5" strokeLinecap="round" opacity="0.8" />
+    </svg>
   );
 }
 
@@ -834,7 +1223,7 @@ const Stars = memo(function Stars({ moves, glow }: { moves: RunMove[]; glow: num
   return (
     <>
       {moves.map((m) => {
-        const c = starAt(m);
+        const c = starAt(m.k);
         const at = { "--tm-at": `${m.star}ms` } as CSSProperties;
         return (
           <At key={m.k} x={c.x - STAR / 2} y={c.y - STAR / 2} w={STAR} h={STAR}>
@@ -891,12 +1280,40 @@ function HopperArt() {
 }
 
 /** A thing the hopper carries: a layer round it in its own units (`x`, `y`, `w`, `h` in the hopper's 84), coming and going by its keyframes. */
-function Carried({ gear, x, y, w, h, end, children }: { gear: Gear; x: number; y: number; w: number; h: number; end: number; children: ReactNode }) {
+function Carried({
+  gear,
+  x,
+  y,
+  w,
+  h,
+  end,
+  origin,
+  children,
+}: {
+  gear: Gear;
+  x: number;
+  y: number;
+  w: number;
+  h: number;
+  end: number;
+  origin?: string;
+  children: ReactNode;
+}) {
   const pct = (v: number) => `${((v / RUNNER) * 100).toFixed(2)}%`;
   return (
     <div
       className="tm-jump-fade tm-jump-carried"
-      style={{ left: pct(x), top: pct(y), width: pct(w), height: pct(h), "--tm-anim": `tm-jump-${gear}`, "--tm-end-o": end } as CSSProperties}
+      style={
+        {
+          left: pct(x),
+          top: pct(y),
+          width: pct(w),
+          height: pct(h),
+          transformOrigin: origin,
+          "--tm-anim": `tm-jump-${gear}`,
+          "--tm-end-o": end,
+        } as CSSProperties
+      }
     >
       {children}
     </div>
@@ -925,6 +1342,9 @@ const Runner = memo(function Runner({ first }: { first: number }) {
           style={{ "--tm-anim": "tm-jump-turn", "--tm-end": turn(Math.sign(FINAL.x - SPOTS[MAX_MOVES].x)) } as CSSProperties}
         >
           <div className="tm-jump-bob">
+            <Carried gear="parachute" x={-40} y={-150} w={164} h={170} end={0} origin="50% 100%">
+              <ParachuteArt />
+            </Carried>
             <Carried gear="balloons" x={-18} y={-170} w={120} h={190} end={0}>
               <svg viewBox="0 0 120 190">
                 <BalloonsArt />
@@ -988,8 +1408,9 @@ export function JumpScene({ count, total, glow }: { count: number; total: number
         <Waiting />
         <Stars moves={moves} glow={glow} />
         <Runner first={first} />
-        <WaterFront />
         <CakeFront />
+        <CakeBits />
+        <WaterFront />
       </div>
     </>
   );

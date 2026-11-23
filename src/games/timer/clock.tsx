@@ -99,7 +99,7 @@ function Digit({ char, x }: { char: string; x: number }) {
   return (
     <g transform={`translate(${x} 0) skewX(-6)`}>
       {Object.entries(SHAPES).map(([name, points]) => (
-        <polygon key={name} points={points} fill={lit.includes(name) ? LIT : GHOST} />
+        <polygon key={name} points={points} fill={lit.includes(name) ? LIT : GHOST} className={lit.includes(name) ? "tm-clock-on" : undefined} />
       ))}
     </g>
   );
@@ -114,7 +114,7 @@ function Digits({ text }: { text: string }) {
   [...text].forEach((c, i) => {
     if (c === ":") {
       parts.push(
-        <g key={i} fill={LIT}>
+        <g key={i} fill={LIT} className="tm-clock-on">
           <circle cx={x + DIGIT.colon / 2 - 6} cy={DIGIT.h * 0.3} r={10} />
           <circle cx={x + DIGIT.colon / 2 - 10} cy={DIGIT.h * 0.7} r={10} />
         </g>,

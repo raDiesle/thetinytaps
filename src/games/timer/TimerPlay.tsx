@@ -357,10 +357,10 @@ function TimerRun({
       return tunnelPlan(total, digCount(set))
         .blocks.slice(0, -1)
         .map((b) => b.gone);
-    // Up to the Moon (H-127): each star caught on the way, then the leap off the moon into the cake (always the last).
+    // Up to the Moon (H-127): each star caught on the way, then the leap off the moon (always the last).
     if (picture === "jump") {
       const plan = jumpPlan(total, moveCount(set));
-      return [...plan.moves.map((m) => m.star), plan.dive.leap];
+      return [...plan.moves.map((m) => m.star), plan.dive.start];
     }
     // The ladybug leaves a dot as it is back at the top (H-67).
     if (picture === "disc") return pieceMoments(total, ladybugLaps(set).dots);
@@ -546,8 +546,8 @@ function TimerRun({
         </div>
         {final && <FinalLight endsAt={endsAt} />}
         {bar && <TimeBar startedAt={endsAt - total} total={total} soon={soon} final={final && phase === "running"} glow={poke} done={phase !== "running"} />}
-        {/* The alarm clock shows the time left on its own screen, so it needs no note in the corner. */}
-        <TimeShownNote shown={phase === "running" && !clock ? shown : "off"} endsAt={endsAt} total={total} />
+        {/* The alarm clock shows the time left on its own screen, so it needs no note in the corner; once the time is up the note stays at 0:00. */}
+        <TimeShownNote shown={clock ? "off" : shown} endsAt={endsAt} total={total} up={phase !== "running"} />
         <FeedbackLayer effects={effects} />
         {phase === "done" && (
           <GameEnd

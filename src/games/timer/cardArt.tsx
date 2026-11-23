@@ -20,7 +20,7 @@ const MIDDLE = 0.5;
  * still well up; the Block House's middle has a block just landed, so its card shows the next one carried by the beam;
  * Up to the Moon's middle is only house walls, so its card shows the hopper with its jetpack in space, the moon above.
  */
-const LATER: Partial<Record<TimerPicture, number>> = { sunset: 0.68, seesaw: 0.25, blocks: 0.53, jump: 0.915 };
+const LATER: Partial<Record<TimerPicture, number>> = { sunset: 0.68, seesaw: 0.25, blocks: 0.53, jump: 0.75 };
 
 /**
  * Stops a card's drawing `at` ms into its run: every animation in it is put at that moment, its look there written into

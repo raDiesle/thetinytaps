@@ -14,7 +14,9 @@ note (`shown.tsx`, kept as `timeNote`): by default as minutes and seconds („Za
 request, November 2026 – the tally marks were the default before). Behind ⚙️ its „Zeit im Bild“ switches to tally marks
 in bundles of five that go one by one – „Striche in %“, a full row of `MAX_MARKS` each a share of the run, one a second
 for a short time (`percentMarks`), or „Striche in Zeit“, each mark 1 s up to 15 min (`markUnit`, at most
-`MAX_MARKS`) – or „Aus“.
+`MAX_MARKS`) – or „Aus“. Once the time is up the note shows a red „0:00“ blinking softly (`up` of `TimeShownNote`,
+`.tm-shown-up`), also where tally marks were chosen, and the Wecker's digits turn red and blink alike (`.tm-clock-on`),
+until the end is left – only „Aus“ keeps the corner empty.
 The start screen's cards are the pictures themselves as they look halfway through a run, with no words on them (user
 request, November 2026; the middle rather than the end, user feedback, November 2026; `TimerCardArt` in `cardArt.tsx`,
 `GameMode.art`): the very drawing of a run (`SceneParts`), cut as for 5 minutes and started half of it ago, every
@@ -169,21 +171,27 @@ taken out (user request, November 2026). The pictures:
   (`HOUSES`) and a skyscraper with a ladder up its side (`SKYSCRAPER`, `LADDER`); clouds; space with an asteroid, a
   ringed planet (`PLANET`) and the moon (`MOON`) at the top, the sky's one gradient going from morning to night. Each
   height has its own way to move (`SPOTS`, each with `by`): it **swims** up from the lake's floor wearing a diving
-  mask, **hops** ashore, **climbs** the trunk in three pulls a move, **hops** through the crown and over the roofs,
-  **climbs** the ladder, takes the balloons tied on the skyscraper's roof and **floats** from cloud to cloud, lets them
+  mask, **hops** ashore, **climbs** the trunk in three pulls a move, walks the branches out of the crown (`Plank branch`) and
+  the planks laid from roof to roof (`Plank`), **climbs** the ladder to the roof's height (`via`, `wayOf`), takes the balloons tied on the skyscraper's roof and **floats** from cloud to cloud, lets them
   go on the highest cloud and takes the jetpack waiting there, and **flies** with it (a flame while it flies) from the
-  asteroid to the planet to the moon (`jumpPlan`: each move the same share of the time, `MOVE_MS` long by its kind,
-  never more than half a share). It faces the way it goes (`.tm-jump-turn`). Over every move hangs a star, caught on
-  the way (`starAt`: a hop's at the top of its arc, else halfway). Then, as the last fifth of a short run or the last
-  4.5 s (`diveMs`), it leaps off the moon and falls all the way down, spinning once, the picture racing down with it
-  past everything it climbed, into the cake on the meadow – the goal seen from the first second – where cream splashes
-  up and the cherry is gone (`FINAL`, `CAKE`, `.tm-jump-splash`). What it carries and what waits for it come and go by
+  asteroid to the planet to the moon (a flame burning the whole way). Each move takes its whole share of the time,
+  moving evenly along its way (`jumpPlan`, `wayOf`: never waiting and then hurrying), with something under its feet
+  all the way and the bounce once a second (user feedback, 23 November 2026). It faces the way it goes
+  (`.tm-jump-turn`). Over every move hangs a star, caught halfway (`starAt`). The way down is a part of the timer, a
+  fifth of the time (`DIVE_SHARE`): it leaps off the moon, opens a parachute and sails down swaying from side to side
+  (`swingCount`, `swingX`, `SWAY`, `SWING_MS`, tilting by `TILT`) past everything it climbed, slowly enough to see each
+  height go by, lets go above the cake (`RELEASE_Y`) and drops into it spinning once (user feedback, 23 November 2026:
+  the fall straight down in 4.5 s looked like a teleport). The cake on the meadow – the goal seen from the first second
+  – bursts: whole layers swap for a smashed one (a cracked plate, the torn tiers, lumps and drips;
+  `.tm-jump-cake-whole`, `.tm-jump-cake-smashed`) and pieces of cake, cream and cherries fly in every direction over the
+  whole picture and stay where they land, on the meadow, the lake, the tree and the walls (`BITS`, `BURST`,
+  `.tm-jump-bit-x`/`-y`/`-spin`; user feedback: it should be broken everywhere). What it carries and what waits for it come and go by
   opacity keyframes written for the run (`gearLooks`, `shownFrames`: every keyframe names every property it changes,
   since a property left out of one is passed over, not held). Five minutes are all 23 moves, a shorter run starts
   further up, with what it passed already taken (`moveCount`, at least `MIN_MOVES`, a move never under `MIN_UNIT`). No
   enemies, no falling off, no count of stars. A star caught plays a bright note climbing the scale (spaced), the leap
-  off the moon a whoosh, the landing a plop; a tap boings and lights the stars still hanging. Its card shows it in
-  space with the jetpack (`LATER` in `cardArt.tsx`), since its middle is only house walls. Its name and lines
+  off the moon a whoosh, the landing a plop; a tap boings and lights the stars still hanging. Its card shows it among
+  the clouds and planets (`LATER` in `cardArt.tsx`, 0.75 of the run), since its middle is only house walls. Its name and lines
   (`jumpNames.ts`) were written English first and translated into every app language at once. The way, its stars and
   the cake stay within x 235–1340 (a tablet's 4:3 cut with the paper's margin; `timer.test.ts` checks).
   **A game-look timer may be big** (user feedback with this rebuild): a world many screens tall or wide that the
@@ -374,6 +382,12 @@ and the shared `Layer`, `Draw`, `LeftGlow`), `timer.css`, `content.ts`
 - **A game-like picture moves towards its goal all the time** (user feedback on the Block House, 22 November 2026):
   what makes progress (a block carried, a toy put away) is seen moving the whole of its share – slowly, every second a
   little nearer, now and then a playful slip – never standing still and then hopping into place at its share's end.
+  A figure moving along a way does the same (user feedback on Up to the Moon, 23 November 2026): each move fills its
+  whole share at an even pace, with something to stand on all the way, and an ending (a fall, a dive) is a real share of
+  the time, slow enough to see every station it passes – never a rush of a few seconds that looks like a teleport.
+- **Time up is plain in every timer** (user feedback, 23 November 2026): the corner's note stays, showing a red „0:00“
+  that blinks softly (the one blink allowed here, asked for by the user; still under `prefers-reduced-motion`), and an
+  end that breaks something (the cake) scatters it widely, in every direction, not a small splash.
 - **Tally marks start many** (user feedback, November 2026: ten were too few to see them go): every way of marks starts
   with a full row or, for a short time, one a second (10 s: ten marks), never a handful (`timer.test.ts` checks). A
   changed default of `timeNote` gets the field a new name, or everyone who played before keeps the old one.

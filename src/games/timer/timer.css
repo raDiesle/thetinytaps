@@ -2194,6 +2194,47 @@
   width: 0.34em;
 }
 
+/* The time is up (user request, 23 November 2026: plain to see in every timer): the note stays at 0:00, red, and
+   blinks on and off – a small layer by `opacity` alone; the alarm clock's own digits do the same. Still where motion is
+   turned down. */
+.tm-shown-up {
+  border-color: #c92a2a;
+  background: #fff5f5;
+  color: #e03131;
+  will-change: opacity;
+  animation: tm-time-up 1.2s ease-in-out infinite;
+}
+
+.tm-done .tm-clock-on {
+  fill: #ff4d4d;
+}
+
+.tm-done .tm-clock-digits {
+  filter: drop-shadow(0 0 8px rgb(255 77 77 / 0.7));
+  animation: tm-time-up 1.2s ease-in-out infinite;
+}
+
+@keyframes tm-time-up {
+  0%,
+  45% {
+    opacity: 1;
+  }
+  60%,
+  85% {
+    opacity: 0.15;
+  }
+  100% {
+    opacity: 1;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .tm-shown-up,
+  .tm-done .tm-clock-digits {
+    animation: none;
+  }
+}
+
 .tm-tally {
   display: flex;
   flex-wrap: wrap;
@@ -2765,8 +2806,8 @@
 
 /* Up to the Moon (H-127, jump.tsx): a world many screens tall (`.tm-jump-world`) moved up and down as one layer by
    its camera's keyframes, written for the run (`.tm-hop`); inside it the hopper rides on three more such layers
-   (across, up and down, its turn) and bounces once a second while it waits – squashing on its feet, springing up a
-   little, landing –, small layers by `transform` alone. */
+   (across, up and down, its turn), going on at an even pace the whole run, and bounces once a second as it goes –
+   squashing on its feet, springing up a little, landing –, small layers by `transform` alone. */
 .tm-jump-sky {
   position: absolute;
   inset: 0;
@@ -2854,18 +2895,88 @@
   }
 }
 
-/* The cake: its cherry is gone as the hopper lands in it, and cream splashes up round it. */
-.tm-jump-splash {
+/* The cake: as the hopper drops into it, the whole cake and its cherry give way to the smashed one, and its pieces
+   fly out in all directions (`CakeBits`) – each once, in an arc from the cake's top to its own place, turning as it
+   goes, then still. Shown only at the end. */
+.tm-jump-cake-smashed {
   opacity: 0;
 }
 
+.tm-done .tm-jump-cake-smashed {
+  opacity: 1;
+}
+
+.tm-done .tm-jump-cake-whole,
 .tm-done .tm-jump-cherry {
   opacity: 0;
 }
 
-.tm-done .tm-jump-splash {
-  opacity: 1;
-  animation: pop-in 0.45s ease-out both;
+.tm-jump-bits {
+  position: absolute;
+  inset: 0;
+  display: none;
+}
+
+.tm-done .tm-jump-bits {
+  display: block;
+}
+
+.tm-jump-bit-x,
+.tm-jump-bit-y,
+.tm-jump-bit-spin {
+  position: absolute;
+  inset: 0;
+}
+
+.tm-jump-bit-spin > svg {
+  display: block;
+  width: 100%;
+  height: 100%;
+  overflow: visible;
+}
+
+.tm-done .tm-jump-bit-x {
+  animation: tm-jump-bit-x var(--tm-fly) linear var(--tm-delay) both;
+}
+
+.tm-done .tm-jump-bit-y {
+  animation: tm-jump-bit-y var(--tm-fly) linear var(--tm-delay) both;
+}
+
+.tm-done .tm-jump-bit-spin {
+  animation: tm-jump-bit-spin var(--tm-fly) ease-out var(--tm-delay) both;
+}
+
+@keyframes tm-jump-bit-x {
+  from {
+    transform: translateX(var(--fx));
+  }
+  to {
+    transform: none;
+  }
+}
+
+@keyframes tm-jump-bit-y {
+  0% {
+    transform: translateY(var(--fy));
+    animation-timing-function: cubic-bezier(0.2, 0.7, 0.4, 1);
+  }
+  42% {
+    transform: translateY(var(--py));
+    animation-timing-function: cubic-bezier(0.6, 0, 0.8, 0.4);
+  }
+  100% {
+    transform: none;
+  }
+}
+
+@keyframes tm-jump-bit-spin {
+  from {
+    transform: rotate(0deg) scale(0.4);
+  }
+  to {
+    transform: rotate(calc(var(--spin) + var(--rest))) scale(1);
+  }
 }
 
 .tm-done .tm-jump-bob,
