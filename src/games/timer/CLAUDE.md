@@ -162,43 +162,59 @@ taken out (user request, November 2026). The pictures:
   lights the blocks still standing. Its name and lines (`tunnelNames.ts`) were written English first and translated
   into every app language at once.
 - „Up to the Moon“ 🚀 (`jump.tsx`, H-127: first „Hop to the Flag“ on one screen, 22 November 2026; rebuilt on user
-  request, 23 November 2026, as a climb through a world many screens tall – the old level was too small and simple): a
-  jump-and-run going **up**, the picture following the hopper like a camera. The world (`WORLD_H`, six screens of 900)
-  is one HTML layer moved by a transform on keyframes written for the run (`tm-jump-cam`, `cameraAt`: the feet stand
-  at `ANCHOR`, never looking past the world's top or bottom), never a changing viewBox; its drawings are built once
-  (`memo`). From the bottom: a lake (`SURFACE`) with fish, seaweed and a sandy floor; the meadow (`GROUND`, left of
-  `SHORE`) with a stone by the shore, a tree (`TREE`) and the cake; three houses rising one after the other
-  (`HOUSES`) and a skyscraper with a ladder up its side (`SKYSCRAPER`, `LADDER`); clouds; space with an asteroid, a
-  ringed planet (`PLANET`) and the moon (`MOON`) at the top, the sky's one gradient going from morning to night. Each
-  height has its own way to move (`SPOTS`, each with `by`): it **swims** up from the lake's floor wearing a diving
-  mask, **hops** ashore, **climbs** the trunk in three pulls a move, walks the branches out of the crown (`Plank branch`) and
-  the planks laid from roof to roof (`Plank`), **climbs** the ladder to the roof's height (`via`, `wayOf`), takes the balloons tied on the skyscraper's roof and **floats** from cloud to cloud, lets them
-  go on the highest cloud and takes the jetpack waiting there, and **flies** with it (a flame while it flies) from the
-  asteroid to the planet to the moon (a flame burning the whole way). Each move takes its whole share of the time,
-  moving evenly along its way (`jumpPlan`, `wayOf`: never waiting and then hurrying), with something under its feet
-  all the way and the bounce once a second (user feedback, 23 November 2026). It faces the way it goes
-  (`.tm-jump-turn`). Over every move hangs a star, caught halfway (`starAt`). The way down is a part of the timer, a
-  fifth of the time (`DIVE_SHARE`): it leaps off the moon, opens a parachute and sails down swaying from side to side
-  (`swingCount`, `swingX`, `SWAY`, `SWING_MS`, tilting by `TILT`) past everything it climbed, slowly enough to see each
-  height go by, lets go above the cake (`RELEASE_Y`) and drops into it spinning once (user feedback, 23 November 2026:
-  the fall straight down in 4.5 s looked like a teleport). The cake on the meadow – the goal seen from the first second
-  – bursts: whole layers swap for a smashed one (a cracked plate, the torn tiers, lumps and drips;
-  `.tm-jump-cake-whole`, `.tm-jump-cake-smashed`) and pieces of cake, cream and cherries fly in every direction over the
-  whole picture and stay where they land, on the meadow, the lake, the tree and the walls (`BITS`, `BURST`,
-  `.tm-jump-bit-x`/`-y`/`-spin`; user feedback: it should be broken everywhere). What it carries and what waits for it come and go by
-  opacity keyframes written for the run (`gearLooks`, `shownFrames`: every keyframe names every property it changes,
-  since a property left out of one is passed over, not held). Five minutes are all 23 moves, a shorter run starts
-  further up, with what it passed already taken (`moveCount`, at least `MIN_MOVES`, a move never under `MIN_UNIT`). No
-  enemies, no falling off, no count of stars. A star caught plays a bright note climbing the scale (spaced), the leap
-  off the moon a whoosh, the landing a plop; a tap boings and lights the stars still hanging. Its card shows it among
-  the clouds and planets (`LATER` in `cardArt.tsx`, 0.75 of the run), since its middle is only house walls. Its name and lines
-  (`jumpNames.ts`) were written English first and translated into every app language at once. The way, its stars and
-  the cake stay within x 235–1340 (a tablet's 4:3 cut with the paper's margin; `timer.test.ts` checks).
+  request, 23 November 2026, as a climb through a world many screens tall – the old level was too small and simple –
+  and the same day once more with a fox and a world that makes sense): a jump-and-run going **up**, the picture
+  following the fox like a camera. The world (`WORLD_H`, six screens of 900) is one HTML layer moved by a transform on
+  keyframes written for the run (`tm-jump-cam`, `cameraAt`: the feet stand at `ANCHOR`, never looking past the world's
+  top or bottom), never a changing viewBox; its drawings are built once (`memo`). From the bottom: a lake on the left
+  (`SURFACE`, left of `SHORE`) with fish, seaweed and a sandy floor; the meadow (`GROUND`) with a stone by the shore, a
+  big tree (`TREE`) with wooden steps nailed to its trunk, left and right in turn as for a treehouse (`STEPS`), and the
+  treehouse on its crown (`DECK`, a hatch in its floor, a red roof, a flag), the cake, and the skyscraper (`SKYSCRAPER`)
+  with its glass lift's shaft up its side (`SHAFT`) and an open window; a rope from the treehouse's post to that window
+  for a cable car (`ROPE`); clouds; space with an asteroid, a ringed planet (`PLANET`) and the moon (`MOON`) at the top,
+  the sky's one gradient going from morning to night. Nothing stands in the water (user feedback, 23 November 2026:
+  high-rises in the lake made no sense). Each height has its own way to move (`SPOTS`, each with `by`; `MoveKind`): it
+  **swims** up from the lake's floor wearing a diving mask, **hops** onto the stone and the meadow and up the steps two
+  at a time, through the hatch into the treehouse and into the cable car's basket, **rides** the basket along the rope
+  to the skyscraper's window, hops over the sill into the glass lift and **rides it up** (`lift`) to the roof, takes the
+  balloons waiting there and **floats** hanging from them from cloud to cloud, lets them go on the highest cloud and
+  takes the jetpack waiting there, and **flies** with it from the asteroid to the planet to the moon. The figure is a
+  fox child (`jumpFox.tsx`, user request, 23 November 2026: arms it uses, better still a fox, „sehr gute Grafik“) drawn
+  with the shared `MascotHead`, `Arm`, `Foot` and `FoxTail` in a blue T-shirt with a star, with a pose of its own for
+  each kind of move (`FoxPose`, `POSE_OF`): swimming with a mask, arms stroking and legs kicking; hopping with its arms
+  flapping; in the basket waving with a paw on the rim; in the lift pointing up; hanging from the balloons and the
+  parachute by both paws (`HANG_PAWS`, where the strings and cords end); flying with the jetpack on its back and its
+  flames; dropping with its arms up. Its arms and legs swing at their own pace as small layers (`.tm-jump-limb`), the
+  poses swap at once by opacity keyframes written for the run (`poseTimeline`, `poseLooks`). The basket and the lift's
+  cabin are cars of their own (`BASKET`, `CABIN`, `carFrames`): each waits where the fox gets in, goes with it step for
+  step and stays where it got out, in a back half behind the fox and a front half over it. Each move takes its whole
+  share of the time, moving along its way (`jumpPlan`, `wayOf`, `trackAt`: never waiting and then hurrying), with
+  something under its feet all the way and the bounce once a second (user feedback, 23 November 2026); a hop is an arc
+  from point to point (`hopArc`, rising slower to its top and falling from it, `LIFT` over its higher end), while the
+  picture follows at an even pace. It faces the way it goes (`.tm-jump-turn`). Over every move hangs a star, caught
+  halfway (`starAt`). The way down is a part of the timer, a fifth of the time (`DIVE_SHARE`): it leaps off the moon,
+  opens a parachute and sails down swaying from side to side (`swingCount`, `swingX`, `SWAY`, `SWING_MS`, tilting by
+  `TILT`) past everything it climbed, slowly enough to see each height go by, lets go above the cake (`RELEASE_Y`) and
+  drops into it spinning once (user feedback, 23 November 2026: the fall straight down in 4.5 s looked like a teleport).
+  The cake on the meadow – the goal seen from the first second – bursts: whole layers swap for a smashed one (a cracked
+  plate, the torn tiers, lumps and drips; `.tm-jump-cake-whole`, `.tm-jump-cake-smashed`) and pieces of cake, cream and
+  cherries fly in every direction over the whole picture and stay where they land, on the meadow, the lake, the tree's
+  trunk and steps and the skyscraper's wall (`BITS`, `BURST`, `.tm-jump-bit-x`/`-y`/`-spin`; user feedback: it should
+  be broken everywhere). What it carries and what waits for it come and go by opacity keyframes written for the run
+  (`gearLooks`, `shownFrames`: every keyframe names every property it changes, since a property left out of one is
+  passed over, not held). Five minutes are all 24 moves, a shorter run starts further up, with what it passed already
+  taken (`moveCount`, at least `MIN_MOVES`, a move never under `MIN_UNIT`). No enemies, no falling off, no count of
+  stars. A star caught plays a bright note climbing the scale (spaced), the leap off the moon a whoosh, the landing a
+  plop; a tap boings and lights the stars still hanging. Its card shows the fox in the cable car's basket between the
+  treehouse and the skyscraper (`LATER` in `cardArt.tsx`, 0.32 of the run), since its middle is the lift with sky round
+  it and in space the fox is too small to see on a card. Its name and lines (`jumpNames.ts`) were written English first
+  and translated into every app language at once. The way, its stars and the cake stay within x 235–1340 (a tablet's
+  4:3 cut with the paper's margin; `timer.test.ts` checks).
   **A game-look timer may be big** (user feedback with this rebuild): a world many screens tall or wide that the
   picture follows is welcome where it shows how far the way has come (here the heights), moved as one layer, and a
-  long way is told by changing what the figure does on it (swim, climb, fly) rather than by more of the same. A picture
-  that is too simple or does not make sense (the Road Rug, whose car drove on while toys hopped off its road into a
-  box, H-122) is taken out rather than kept.
+  long way is told by changing what the figure does on it (swim, hop, ride, float, fly) rather than by more of the
+  same. A picture that is too simple or does not make sense (the Road Rug, whose car drove on while toys hopped off its
+  road into a box, H-122) is taken out rather than kept.
 - „Abwechseln“ 🔁 (H-52): two children take turns with a toy. The time set is one turn. Its hourglass is the
   Sanduhr's own (`Hourglass` in `scenes.tsx`, user request, November 2026: one drawing, never a second one built
   beside it), standing between two floor cushions (`SWAP_SEATS`, the same way left and right of it): the fox child's
@@ -257,7 +273,7 @@ Files: `TimerGame.tsx` (start screen: cards, minutes and the own time's slip), `
 run: working out its length, the question when a clock time is past, the clock, the phases `running` →
 `blow` (candle only) → `done`, taps, the end, the sounds of the pieces), `pieces.ts` (how a run is cut into pieces, the
 train's halts, where the apples hang; tested), `SwapPlay.tsx` and `swap.tsx` („Abwechseln“: its turns, and its room,
-lamps, cushions and toys), `seesaw.tsx` (the Wippe's playground, plank, stand and chick), `apples.tsx`, `caterpillar.tsx`, `clock.tsx`, `disc.tsx`, `flower.tsx`, `sunset.tsx`, `pizza.tsx`, `tidy.tsx`, `boxes.tsx`, `blocks.tsx`, `tunnel.tsx`, `jump.tsx` (one picture each; `tidyNames.ts`, `boxesNames.ts`, `blocksNames.ts`, `tunnelNames.ts` and `jumpNames.ts` their texts), `hop.tsx` (a toy hopping
+lamps, cushions and toys), `seesaw.tsx` (the Wippe's playground, plank, stand and chick), `apples.tsx`, `caterpillar.tsx`, `clock.tsx`, `disc.tsx`, `flower.tsx`, `sunset.tsx`, `pizza.tsx`, `tidy.tsx`, `boxes.tsx`, `blocks.tsx`, `tunnel.tsx`, `jump.tsx` (one picture each, `jumpFox.tsx` its fox's poses; `tidyNames.ts`, `boxesNames.ts`, `blocksNames.ts`, `tunnelNames.ts` and `jumpNames.ts` their texts), `hop.tsx` (a toy hopping
 into its box, shared), `keyframes.ts` (keyframes written for a run), `shown.tsx`
 („Zeit im Bild“: its choice, the note with digits or tally marks), `scenes.tsx` (the other drawings
 and the shared `Layer`, `Draw`, `LeftGlow`), `timer.css`, `content.ts`
@@ -352,6 +368,11 @@ and the shared `Layer`, `Draw`, `LeftGlow`), `timer.css`, `content.ts`
   for that moment and no more (`still`). Where the middle shows little (the Sonnenaufgang between moon and sun), the
   card takes a later moment (`LATER`) – look at every card (`timer.test.ts`).
 
+- **A figure on a way moves as it would in life** (user feedback on Up to the Moon, 23 November 2026): every kind of
+  move has a pose of its own that uses arms and legs for it – stroking and kicking in the water, flapping while it
+  hops, holding on where it hangs or rides – and the kinds differ plainly; it goes only where it could in life (wooden
+  steps nailed up a trunk, a cable car on a rope, a lift in its shaft, never a house standing in a lake or a hop higher
+  than a fox could leap; `timer.test.ts` checks the steps, the shore and every leap).
 - **No fox or bear figure in any picture** (user feedback, November 2026): first a family standing by every picture was
   taken out (children wanted to tap it, and a timer to watch needs as few things and movements as can be), then the
   children that pushed the cart, held the hose and blew out the candle – drawn in SVG they looked odd, a bear with two
@@ -359,6 +380,8 @@ and the shared `Layer`, `Draw`, `LeftGlow`), `timer.css`, `content.ts`
   stick, the last candle going out by itself); where it is about the real children (Abwechseln), a thing of theirs
   stands for them (the cushions in fox and bear colours, no face). `timer.test.ts` checks that no picture draws one.
   Tennis, whose players were the shared `Mascot` children, was the one exception and is taken out (21 November 2026).
+  The one exception is Up to the Moon's fox child (`jumpFox.tsx`, user request, 23 November 2026): it is the figure doing
+  the run, never one standing by, drawn with the shared head, arms, feet and tail of `Mascot.tsx`.
 - **What grows, grows as a whole** (user feedback, November 2026): a plant rising gets bigger as it rises – its stalk
   thicker, its leaves bigger – scaled from its foot (`transform-origin` at the soil, never stretched one way), and a
   flower grows open from small to big with all its petals at once, never petal after petal.

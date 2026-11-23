@@ -62,7 +62,7 @@ export const PICTURES: { id: TimerPicture; emoji: string; name: Texts }[] = [
   { id: "blocks", emoji: "🧱", name: BLOCKS_NAME },
   // The treasure tunnel (H-126, 22 November 2026), the second like a block world played by itself: a tunnel dug block by block to a chest.
   { id: "tunnel", emoji: "⛏️", name: TUNNEL_NAME },
-  // Up to the Moon (H-127, rebuilt 23 November 2026), a jump-and-run going up: a hopper swims, hops, climbs and flies from a lake up to the moon, the picture following it, then jumps down into a cake.
+  // Up to the Moon (H-127, rebuilt 23 November 2026), a jump-and-run going up: a fox swims, hops up a tree, rides a cable car and a lift and flies from a lake up to the moon, the picture following it, then sails down into a cake.
   { id: "jump", emoji: "🚀", name: JUMP_NAME },
   {
     id: "train",

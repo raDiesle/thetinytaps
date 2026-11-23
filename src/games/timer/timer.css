@@ -2805,9 +2805,10 @@
 }
 
 /* Up to the Moon (H-127, jump.tsx): a world many screens tall (`.tm-jump-world`) moved up and down as one layer by
-   its camera's keyframes, written for the run (`.tm-hop`); inside it the hopper rides on three more such layers
-   (across, up and down, its turn), going on at an even pace the whole run, and bounces once a second as it goes –
-   squashing on its feet, springing up a little, landing –, small layers by `transform` alone. */
+   its camera's keyframes, written for the run (`.tm-hop`); inside it the fox rides on three more such layers (across,
+   up and down, its turn), going on at an even pace the whole run and floating gently once a second as it goes; the
+   cable car's basket and the lift's cabin ride on keyframes of their own along with it. Small layers by `transform`
+   alone. */
 .tm-jump-sky {
   position: absolute;
   inset: 0;
@@ -2836,27 +2837,71 @@
 }
 
 @keyframes tm-jump-bob {
-  0% {
-    transform: scale(1);
-    animation-timing-function: ease-out;
-  }
-  14% {
-    transform: scale(1.08, 0.9);
-    animation-timing-function: ease-out;
-  }
-  42% {
-    transform: translateY(-12%) scale(0.96, 1.05);
-    animation-timing-function: ease-in;
-  }
-  70%,
+  0%,
   100% {
-    transform: scale(1);
+    transform: none;
+  }
+  50% {
+    transform: translateY(-3%);
   }
 }
 
-/* What the hopper carries (the diving mask, the balloons, the jetpack and its flame) and what waits for it (the
-   balloons on the skyscraper's roof, the jetpack on the highest cloud) come and go by `opacity` on keyframes written
-   for the run; at the end each is as the run leaves it (`--tm-end-o`). */
+/* The fox (jumpFox.tsx): one pose shown at a time (`.tm-jump-pose`, coming and going by `.tm-jump-fade`), each made of
+   still parts (`.tm-jump-part`: body, head) and the arms and legs it moves, each a small layer turning at its shoulder or
+   hip between `--tm-limb-a` and `--tm-limb-b` once a second (`.tm-jump-limb`), and the jetpack's flames flickering. */
+.tm-jump-pose,
+.tm-jump-part {
+  position: absolute;
+  inset: 0;
+}
+
+.tm-jump-part > svg {
+  display: block;
+  width: 100%;
+  height: 100%;
+  overflow: visible;
+}
+
+.tm-jump-limb {
+  will-change: transform;
+  animation: tm-jump-limb 0.5s ease-in-out infinite alternate;
+}
+
+@keyframes tm-jump-limb {
+  from {
+    transform: rotate(var(--tm-limb-a));
+  }
+  to {
+    transform: rotate(var(--tm-limb-b));
+  }
+}
+
+.tm-jump-flame {
+  transform-origin: 50% 81%;
+  will-change: transform;
+  animation: tm-jump-flame 0.2s ease-in-out infinite alternate;
+}
+
+@keyframes tm-jump-flame {
+  from {
+    transform: scaleY(0.8);
+  }
+  to {
+    transform: scaleY(1.12);
+  }
+}
+
+/* The cable car's basket and the lift's cabin: each a layer behind the fox and one over it, on the same keyframes. */
+.tm-jump-car > svg {
+  display: block;
+  width: 100%;
+  height: 100%;
+  overflow: visible;
+}
+
+/* The fox's poses, what it holds (the balloons, the parachute) and what waits for it (the balloons on the skyscraper's
+   roof, the jetpack on the highest cloud) come and go by `opacity` on keyframes written for the run; at the end each is
+   as the run leaves it (`--tm-end-o`). */
 .tm-jump-carried {
   position: absolute;
 }
@@ -2872,7 +2917,7 @@
   transform: none;
 }
 
-/* The lake's water lying over the hopper while it swims, so it is plainly under water. */
+/* The lake's water lying over the fox while it swims, so it is plainly under water. */
 .tm-jump-water {
   background: rgb(116 192 252 / 0.32);
 }
@@ -2895,7 +2940,7 @@
   }
 }
 
-/* The cake: as the hopper drops into it, the whole cake and its cherry give way to the smashed one, and its pieces
+/* The cake: as the fox drops into it, the whole cake and its cherry give way to the smashed one, and its pieces
    fly out in all directions (`CakeBits`) – each once, in an arc from the cake's top to its own place, turning as it
    goes, then still. Shown only at the end. */
 .tm-jump-cake-smashed {
@@ -2980,7 +3025,9 @@
 }
 
 .tm-done .tm-jump-bob,
-.tm-done .tm-jump-star {
+.tm-done .tm-jump-star,
+.tm-done .tm-jump-limb,
+.tm-done .tm-jump-flame {
   animation: none;
 }
 
