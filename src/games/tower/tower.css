@@ -109,3 +109,75 @@
   pointer-events: none;
   animation: pop-in 0.35s ease-out;
 }
+
+/* The next goal on „Weiter“ at a round's end (`GoalCard`): its sky and meadow filling the frame, the goal big in it. */
+.tw-goal-card {
+  position: absolute;
+  inset: 0;
+  display: grid;
+  place-items: center;
+  overflow: hidden;
+}
+
+.tw-goal-card-thing {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  height: 78%;
+  width: 80%;
+}
+
+.tw-goal-card-thing svg {
+  display: block;
+  flex: 1 1 0;
+  min-height: 0;
+  max-width: 100%;
+  overflow: visible;
+}
+
+/* The mother sits on her home: the home wide below, she smaller on top. */
+.tw-goal-card-nest svg:first-child,
+.tw-goal-card-owl svg:first-child {
+  flex-grow: 1.1;
+  margin-bottom: -12%;
+}
+
+.tw-goal-card-plane svg,
+.tw-goal-card-cloud svg,
+.tw-goal-card-rainbow svg {
+  flex: none;
+  width: 100%;
+  height: auto;
+}
+
+.tw-goal-card-bird svg {
+  transform: scaleX(-1);
+}
+
+.tw-goal-card-stars {
+  position: absolute;
+  inset: 0;
+}
+
+.tw-goal-card-stars svg {
+  position: absolute;
+  width: 12%;
+}
+
+.tw-goal-card-stars svg:nth-child(1) {
+  left: 8%;
+  top: 10%;
+}
+
+.tw-goal-card-stars svg:nth-child(2) {
+  left: 78%;
+  top: 6%;
+  width: 9%;
+}
+
+.tw-goal-card-stars svg:nth-child(3) {
+  left: 16%;
+  top: 52%;
+  width: 8%;
+}

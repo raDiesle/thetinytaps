@@ -1,4 +1,4 @@
-import { type CSSProperties, type KeyboardEvent, type PointerEvent, useEffect, useLayoutEffect, useRef, useState } from "react";
+import { type CSSProperties, type KeyboardEvent, type PointerEvent, type ReactNode, useEffect, useLayoutEffect, useRef, useState } from "react";
 import { useLocation, useNavigate } from "react-router";
 import { useCountsPlaytime, useEndShown, useLeaveGame, useLeavesToShelf } from "@/components/GameShell";
 import { ShelfLabelArt } from "@/components/PageCornerArt";
@@ -74,6 +74,12 @@ interface GameEndProps {
      * drawn play sign.
      */
     picture?: string;
+    /**
+     * The next level's picture where its menu card is drawn rather than a still file (the Timer's cards, the Counting
+     * Tower's goals): the same drawing, still, in the same frame as `picture`. Every game with a next level hands one of
+     * the two (user request, 23 November 2026: „Weiter“ shows what comes next in every game).
+     */
+    art?: ReactNode;
   };
   /** Waits this long before showing up, so the party can be watched first. */
   delayMs?: number;
@@ -219,7 +225,7 @@ export function GameEnd({ onAgain, menu = false, next, delayMs = 0, corners = fa
   if (!shown) return null;
 
   // „Weiter“ is the next level's picture where the game hands one over, else the drawn play sign (children don't read).
-  const pictured = Boolean(next?.picture);
+  const pictured = Boolean(next?.picture || next?.art);
 
   // Pointer down, not click: it reacts right away, and the game underneath doesn't get the tap.
   // „Nochmal“ and „Weiter“ each start one more game, for a game limit.
@@ -315,8 +321,10 @@ export function GameEnd({ onAgain, menu = false, next, delayMs = 0, corners = fa
           aria-label={[t(NEXT), next.name].filter(Boolean).join(": ")}
           {...press("weiter", next.onNext)}
         >
-          {pictured ? (
+          {next.picture ? (
             <img className="game-end-next-picture" src={next.picture} alt="" draggable={false} />
+          ) : next.art ? (
+            <span className="game-end-next-picture game-end-next-art">{next.art}</span>
           ) : (
             <ControlIcon kind="play" className="game-end-next-arrow" />
           )}

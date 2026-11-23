@@ -45,6 +45,7 @@ import { FINAL_NOTES, FinalLight, finalMs, TimeBar, TimeBarChoice } from "./bar"
 import { CaterpillarScene } from "./caterpillar";
 import { ClockScene } from "./clock";
 import { isTurns, nextPicture, OTHER_TIME, PICTURES, tomorrowAt } from "./content";
+import { TimerCardArt } from "./cardArt";
 import { DiscScene } from "./disc";
 import { FlowerScene } from "./flower";
 import { appleCount, appleTimes, haltMs, ladybugLaps, MAX_STOPS, pieceCount, pieceMoments, soonMs, trainSteps } from "./pieces";
@@ -554,7 +555,7 @@ function TimerRun({
             delayMs={picture === "caterpillar" ? END_MS_CATERPILLAR : END_MS}
             level={picture}
             onAgain={onAgain}
-            next={nextInfo && { name: t(nextInfo.name), onNext: () => onPicture(next) }}
+            next={nextInfo && { name: t(nextInfo.name), onNext: () => onPicture(next), art: <TimerCardArt picture={next} /> }}
           />
         )}
       </div>

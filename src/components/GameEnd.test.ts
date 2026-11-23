@@ -15,18 +15,32 @@ test("the end of a level shows the drawn arrow and the next level's picture, nev
   expect(source).toContain('<ControlIcon kind="play" className="game-end-next-arrow" />');
 });
 
-// A game whose levels have menu pictures (`vorschau/`) hands the next one's to „Weiter“.
-test("every game with pictures of its levels shows the next one at the end", async () => {
-  const handing = [
-    "src/games/marbles/MarblePlay.tsx",
-    "src/games/scenes/ScenePlay.tsx",
-    "src/games/elevator/cards.tsx",
-    "src/games/feelings/FeelingsPlay.tsx",
-    "src/games/adventure/AdventureGame.tsx",
-    // The next pass's first feeling, the painted picture it starts with.
-    "src/games/cause/CausePlay.tsx",
-  ];
-  for (const file of handing) expect(`${file}: ${/picture: /.test(await Bun.file(file).text())}`).toBe(`${file}: true`);
+// „Weiter“ shows what comes next in every game (user request, 23 November 2026, first for the Timer, whose „Weiter“
+// was the bare play sign): its menu card's cut (`picture`) or the same drawing (`art`, where the menu draws its cards
+// live, or a still drawing of what comes, the Counting Tower's next goal). A file whose `GameEnd` gets its `next` handed
+// through from elsewhere names where it is built.
+test("every game with a next level shows the next one's picture on „Weiter“", async () => {
+  const builtIn: Record<string, string> = {
+    "src/games/adventure/AdventurePlay.tsx": "src/games/adventure/AdventureGame.tsx",
+    "src/games/feelings/DayPlay.tsx": "src/games/feelings/FeelingsPlay.tsx",
+    "src/games/feelings/PassPlay.tsx": "src/games/feelings/FeelingsPlay.tsx",
+  };
+  const missing: string[] = [];
+  for (const file of new Bun.Glob("src/**/*.tsx").scanSync()) {
+    const source = await Bun.file(file).text();
+    for (const [end] of source.matchAll(/<GameEnd\b[\s\S]*?\/>/g)) {
+      if (!/\bnext=/.test(end)) continue;
+      const passed = /\bnext=\{next\}/.test(end) || /\bnext=\{nextLevel\}/.test(end);
+      const where = passed ? (builtIn[file] ?? `${file} (add where its next is built)`) : file;
+      const text = passed
+        ? await Bun.file(where)
+            .text()
+            .catch(() => "")
+        : end;
+      if (!/\b(picture|art): /.test(text)) missing.push(where);
+    }
+  }
+  expect(missing).toEqual([]);
 });
 
 // Zähne putzen and Gefühle had end buttons of their own (🔁, round symbols without words): every end is `GameEnd`, and

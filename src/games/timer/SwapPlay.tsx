@@ -10,6 +10,7 @@ import { hush } from "@/lib/voice";
 import { useWakeLock } from "@/lib/wakeLock";
 import { TimeBar, TimeBarChoice } from "./bar";
 import { nextPicture, PICTURES, SWAP_NAME } from "./content";
+import { TimerCardArt } from "./cardArt";
 import type { SwapToy, TimeShown, TimerPicture, TurnPicture } from "./settings";
 import { noteRoom, TimeShownChoice, TimeShownNote } from "./shown";
 import { SAW, Seesaw, SeesawBackdrop, SeesawGoal, SeesawStand, SeesawSun } from "./seesaw";
@@ -286,7 +287,14 @@ export function SwapRun({
         {bar && ticking && holder && <TimeBar key={`${turnStart}-${turn}`} startedAt={turnStart} total={turnMs} tone={holder} glow={poke} />}
         {ticking && <TimeShownNote shown={timeShown} endsAt={turnStart + turnMs} total={turnMs} />}
         <FeedbackLayer effects={effects} />
-        {done && <GameEnd delayMs={4200} level={picture} onAgain={onAgain} next={nextInfo && { name: t(nextInfo.name), onNext: () => onPicture(next) }} />}
+        {done && (
+          <GameEnd
+            delayMs={4200}
+            level={picture}
+            onAgain={onAgain}
+            next={nextInfo && { name: t(nextInfo.name), onNext: () => onPicture(next), art: <TimerCardArt picture={next} /> }}
+          />
+        )}
       </div>
       <PlayOptions>
         <SettingsGroup title={t(SWAP_NAME)}>

@@ -446,8 +446,11 @@ In a fresh worktree run `bun install` first.
   over so it is plainly won, yet calmly (user feedback, November 2026: small beside the buttons, bottom right in Aufs
   Töpfchen, it was hardly seen; then, at two thirds of the screen for over three seconds and nearly half of it landed
   with a golden glow, too loud): in the middle of the screen at about two fifths of its height with a small
-  „Geschafft!“ under it, for a short moment, then shrinking onto its little wooden board beside the buttons – into the
-  collection – and only then the buttons come (`AWARD_MS`, `AWARD_HEIGHT`, a tap on it lands it at once; one transform,
+  „Geschafft!“ under it, for a short moment, then shrinking onto its little wooden board – into the collection – which
+  stands apart from the buttons in the bottom left corner wherever there is room beside them (user request, 23 November
+  2026: beside „Weiter“ it crowded the buttons; the end spans the picture's foot as a grid, `game-end.css`, and only
+  where the room is too narrow the buttons move up beside it; an `inline` or `corners` end keeps it beside them) – and
+  only then the buttons come (`AWARD_MS`, `AWARD_HEIGHT`, a tap on it lands it at once; one transform,
   measured from its board, `GameEnd.test.ts`); a new `GameEnd` passes `level` (the level's or story's id; without it the game has one trophy).
   Landed it is about a quarter of the screen's height (`--trophy-h` in `game-end.css`, smaller in an `inline` end) –
   never a bigger one again – and still plainly something to tap: the shared `TapHint` round it in its quiet form
@@ -786,8 +789,11 @@ A game may give it before its end where reaching the goal once is enough (Ketten
   level's emoji looked bad, user feedback, November 2026; words were the next try, user request, 22 November 2026, for
   every game; `GameEnd.test.ts`): „Nochmal“ is the drawn round arrow (`ControlIcon`) on a small paper slip, and „Weiter“,
   what most want next, the next level's picture taped onto the page (`next.picture`, its menu card's cut from
-  `vorschau/`) – a game whose levels have menu pictures always passes it (the test lists them) – else the drawn play
-  sign on a big painted label; only „Menü“ keeps its word. So a start screen has no „all in turn“ card (`GameMode` has no such kind):
+  `vorschau/`, or `next.art`, the same drawing where the menu draws its cards live, as the Timer's `TimerCardArt`, or a
+  still drawing of what comes, as the Counting Tower's next goal, `GoalCard`) – **every game with a next level passes
+  one** (user request, 23 November 2026, first for the Timer: „Weiter“ shows what comes next in every game;
+  `GameEnd.test.ts` fails on a `next` without either) – the drawn play sign on a big painted label only while one is
+  missing; only „Menü“ keeps its word. So a start screen has no „all in turn“ card (`GameMode` has no such kind):
   the picked level plays first and „Weiter“ goes on from there. A game with only one level or story leaves „Weiter“ out (`next` is optional):
   two buttons doing the same thing confuse. A game that flows on from round to round by itself (Socken-Paare: the next
   wash comes on its own) has no end to show it at; it counts each round as a game itself (`gameEnded`, `countGame`). No game draws its own end buttons: one that places them in its own layout (Gefühle's

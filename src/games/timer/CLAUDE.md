@@ -229,7 +229,8 @@ taken out (user request, November 2026). The pictures:
   English first and translated into every app language on 22 November 2026.
   At the end the picture's own sound, then children cheer (the `cheer` recording) while a warm light spreads over the
   picture (`.tm-done-light`), a friendly tune after it, then `GameEnd` with the picture's trophy (nothing rises, the trophy replaced it, user decision, November 2026) with „Nochmal“ and „Weiter“ (the next picture,
-  the same minutes, `nextPicture`). Every tap or key during the run answers (steam and a whistle, twinkling, the flame
+  the same minutes, `nextPicture`; „Weiter“ shows that picture's card, `TimerCardArt` as `next.art`, user request, 23
+  November 2026). Every tap or key during the run answers (steam and a whistle, twinkling, the flame
   flaring) with a warm light where it was, and what is still left lights up softly for a moment (H-51, „Wie lange
   noch?“: the rail to the station, the sand on top, the wax, the slices – `LeftGlow`, inside the shrinking part so it is
   exactly as big as what is left); nothing has to be tapped, so there is no glow before it or pointing hand.
