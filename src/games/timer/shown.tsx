@@ -1,6 +1,7 @@
 import { type CSSProperties, useEffect, useState } from "react";
 import { Choice } from "@/components/SettingControls";
 import { useT } from "@/lib/language";
+import { useRunClock } from "./pause";
 import { markUnit, marksLeft, percentMarks } from "./pieces";
 import type { TimeShown } from "./settings";
 import { digits } from "./time";
@@ -103,15 +104,17 @@ export function noteRoom(shown: TimeShown, total: number): { className: string; 
  * in digits also where marks were shown, since no marks left says less than 0:00.
  */
 export function TimeShownNote({ shown, endsAt, total, up }: { shown: TimeShown; endsAt: number; total: number; up?: boolean }) {
-  const [now, setNow] = useState(Date.now);
-  const ticking = shown !== "off" && !up;
+  // On the run's clock, so it stands still while the timer is paused.
+  const clock = useRunClock();
+  const [now, setNow] = useState(clock.now);
+  const ticking = shown !== "off" && !up && !clock.paused;
   useEffect(() => {
     if (!ticking) return;
-    const tick = () => setNow(Date.now());
+    const tick = () => setNow(clock.now());
     tick();
     const timer = setInterval(tick, 250);
     return () => clearInterval(timer);
-  }, [ticking]);
+  }, [ticking, clock]);
   if (shown === "off") return null;
   const left = up ? 0 : endsAt - now;
   if (up || left <= 0)

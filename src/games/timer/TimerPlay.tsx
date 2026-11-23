@@ -49,6 +49,7 @@ import { TimerCardArt } from "./cardArt";
 import { DiscScene } from "./disc";
 import { FlowerScene } from "./flower";
 import { appleCount, appleTimes, haltMs, ladybugLaps, MAX_STOPS, pieceCount, pieceMoments, soonMs, trainSteps } from "./pieces";
+import { PauseControls, RunClockProvider, usePausableClock, useRunClock } from "./pause";
 import { PizzaScene, SLICES } from "./pizza";
 import { CandleBackdrop, Candles, Hourglass, Layer, RAIL_Y, RailAhead, SandBackdrop, TRAIN, Train, TrainBackdrop, TrainStops } from "./scenes";
 import type { SwapToy, TimeShown, TimerPicture, TimerSettings } from "./settings";
@@ -220,11 +221,12 @@ function TimerStart({
  */
 export function TimeLeft({ endsAt, until, title }: { endsAt: number; until?: string; title?: string }) {
   const t = useT();
-  const [now, setNow] = useState(Date.now);
+  const clock = useRunClock();
+  const [now, setNow] = useState(clock.now);
   useEffect(() => {
-    const timer = setInterval(() => setNow(Date.now()), 250);
+    const timer = setInterval(() => setNow(clock.now()), 250);
     return () => clearInterval(timer);
-  }, []);
+  }, [clock]);
   const left = endsAt - now;
   return (
     <SettingsGroup
@@ -301,8 +303,11 @@ function TimerRun({
   onPicture: (picture: TimerPicture) => void;
 }) {
   const t = useT();
-  // Real time, not the page's clock: a phone put to sleep in between still ends when the minutes are over.
-  const [endsAt] = useState(() => Date.now() + total);
+  // The run's own clock: real time less every pause (`pause.tsx`), so a phone put to sleep in between still ends when
+  // the minutes are over, and a grown-up's pause holds everything worked out from it.
+  const { clock, pause, resume, pausedOnce } = usePausableClock();
+  const { now, paused } = clock;
+  const [endsAt] = useState(() => now() + total);
   const [phase, setPhase] = useState<Phase>("running");
   const [poke, setPoke] = useState(0);
   const [far, setFar] = useState(false);
@@ -316,7 +321,7 @@ function TimerRun({
   const [final, setFinal] = useState(false);
   const { later } = useTimers();
   const { effects, ripple, glow } = useTapFeedback();
-  useWakeLock(phase === "running");
+  useWakeLock(phase === "running" && !paused);
   useEffect(() => loadRecordings(["cheer"]), []);
 
   // The voice (H-72): where the picture goes as it starts – once the page lies still, as `say` waits for that – the
@@ -375,36 +380,37 @@ function TimerRun({
   // Seen from afar (H-48): a while after the last tap the small things step back, and a tap brings them back.
   useEffect(() => {
     setFar(false);
-    if (phase !== "running") return;
+    if (phase !== "running" || paused) return;
     const timer = setTimeout(() => setFar(true), FAR_AFTER_MS);
     return () => clearTimeout(timer);
-  }, [phase, poke, soon]);
+  }, [phase, poke, soon, paused]);
 
   // The end: checked at least every second, and again whenever the page comes back (timers sleep in the background).
+  // Paused, nothing is checked: the run's clock stands still, and checking goes on from there.
   useEffect(() => {
-    if (phase !== "running") return;
+    if (phase !== "running" || paused) return;
     let timer: ReturnType<typeof setTimeout>;
     const startedAt = endsAt - total;
     const check = () => {
-      const now = Date.now();
-      const left = endsAt - now;
+      const at = now();
+      const left = endsAt - at;
       if (left <= 0) return setPhase(picture === "candle" ? "blow" : "done");
-      if (now >= soonAt && !soonRang.current) {
+      if (at >= soonAt && !soonRang.current) {
         soonRang.current = true;
         setSoon(true);
         playDing();
         say(SOON_LINE, true);
       }
-      if (now >= finalAt && !finalOn.current) {
+      if (at >= finalAt && !finalOn.current) {
         finalOn.current = true;
         setFinal(true);
       }
       // A piece done: one sound, also when several passed while the page was away.
-      if (nextMoment.current < moments.length && now >= startedAt + moments[nextMoment.current]) {
-        while (nextMoment.current < moments.length && now >= startedAt + moments[nextMoment.current]) nextMoment.current++;
+      if (nextMoment.current < moments.length && at >= startedAt + moments[nextMoment.current]) {
+        while (nextMoment.current < moments.length && at >= startedAt + moments[nextMoment.current]) nextMoment.current++;
         // Many apples or slices fall every few seconds: their sound is spaced, so it never becomes a din.
-        if (now - lastPieceSound.current >= PIECE_SOUND_GAP_MS) {
-          lastPieceSound.current = now;
+        if (at - lastPieceSound.current >= PIECE_SOUND_GAP_MS) {
+          lastPieceSound.current = at;
           if (picture === "apple") playPlop();
           else if (picture === "pizza") playMunch();
           else if (picture === "tidy") playClonk();
@@ -417,9 +423,9 @@ function TimerRun({
           else playDing();
         }
       }
-      const toMoment = nextMoment.current < moments.length ? startedAt + moments[nextMoment.current] - now : Number.POSITIVE_INFINITY;
-      const toSoon = soonRang.current ? Number.POSITIVE_INFINITY : soonAt - now;
-      const toFinal = finalOn.current ? Number.POSITIVE_INFINITY : finalAt - now;
+      const toMoment = nextMoment.current < moments.length ? startedAt + moments[nextMoment.current] - at : Number.POSITIVE_INFINITY;
+      const toSoon = soonRang.current ? Number.POSITIVE_INFINITY : soonAt - at;
+      const toFinal = finalOn.current ? Number.POSITIVE_INFINITY : finalAt - at;
       timer = setTimeout(check, Math.max(10, Math.min(left, 1000, toMoment, toSoon, toFinal)));
     };
     const onVisible = () => {
@@ -432,17 +438,20 @@ function TimerRun({
       clearTimeout(timer);
       document.removeEventListener("visibilitychange", onVisible);
     };
-  }, [phase, endsAt, total, picture, moments, soonAt, finalAt, say, set]);
+  }, [phase, paused, now, endsAt, total, picture, moments, soonAt, finalAt, say, set]);
 
   // The last seconds rise note by note, softly, the last one a second before the end, so the end's own sound follows.
+  // A pause drops the notes still waiting, and going on sets the rest again from the run's clock.
   useEffect(() => {
-    if (!final) return;
+    if (!final || paused) return;
     const notes = Math.min(FINAL_NOTES, Math.floor(lastMs / 1000));
+    const waiting: ReturnType<typeof later>[] = [];
     for (let k = notes; k >= 1; k--) {
-      const wait = endsAt - k * 1000 - Date.now();
-      if (wait >= 0) later(() => playChimeNote(notes - k + 2), wait);
+      const wait = endsAt - k * 1000 - now();
+      if (wait >= 0) waiting.push(later(() => playChimeNote(notes - k + 2), wait));
     }
-  }, [final, endsAt, lastMs, later]);
+    return () => waiting.forEach(clearTimeout);
+  }, [final, paused, now, endsAt, lastMs, later]);
 
   useEffect(() => {
     if (phase === "blow") {
@@ -494,7 +503,7 @@ function TimerRun({
       if (picture === "train") playWhistle();
       else if (picture === "sand") playTwinkle();
       // The leaves rustle; once the blossoms are out, the bees buzz.
-      else if (picture === "apple") (Date.now() - (endsAt - total) < appleTimes(total, apples).grown ? playLeaves : playBuzz)();
+      else if (picture === "apple") (now() - (endsAt - total) < appleTimes(total, apples).grown ? playLeaves : playBuzz)();
       else if (picture === "caterpillar" || picture === "pizza") playMunch();
       else if (picture === "flower") playDrops();
       // The snooze bar is pressed down.
@@ -512,7 +521,7 @@ function TimerRun({
       else if (picture === "jump") playBoing();
       else playChimeNote(Math.floor(Math.random() * 8));
     },
-    [phase, picture, ripple, glow, endsAt, total, apples],
+    [phase, picture, ripple, glow, now, endsAt, total, apples],
   );
 
   useEffect(() => {
@@ -528,13 +537,13 @@ function TimerRun({
   const next = nextPicture(picture);
   const nextInfo = PICTURES.find((p) => p.id === next);
   const name = PICTURES.find((p) => p.id === picture)?.name;
-  const clock = picture === "clock";
+  const alarm = picture === "clock";
   // The note's room is kept for the whole run, so the bar never changes its length.
-  const room = noteRoom(clock ? "off" : shown, total);
+  const room = noteRoom(alarm ? "off" : shown, total);
   return (
-    <>
+    <RunClockProvider value={clock}>
       <div
-        className={`tm-play${bar ? " tm-with-bar" : ""}${room.className}`}
+        className={`tm-play${bar ? " tm-with-bar" : ""}${paused ? " tm-paused" : ""}${room.className}`}
         style={room.style}
         data-picture={picture}
         onPointerDown={down}
@@ -548,7 +557,8 @@ function TimerRun({
         {final && <FinalLight endsAt={endsAt} />}
         {bar && <TimeBar startedAt={endsAt - total} total={total} soon={soon} final={final && phase === "running"} glow={poke} done={phase !== "running"} />}
         {/* The alarm clock shows the time left on its own screen, so it needs no note in the corner; once the time is up the note stays at 0:00. */}
-        <TimeShownNote shown={clock ? "off" : shown} endsAt={endsAt} total={total} up={phase !== "running"} />
+        <TimeShownNote shown={alarm ? "off" : shown} endsAt={endsAt} total={total} up={phase !== "running"} />
+        {phase === "running" && <PauseControls paused={paused} onPause={pause} onResume={resume} onRestart={onAgain} />}
         <FeedbackLayer effects={effects} />
         {phase === "done" && (
           <GameEnd
@@ -560,11 +570,12 @@ function TimerRun({
         )}
       </div>
       <PlayOptions>
-        <TimeLeft endsAt={endsAt} until={until} />
-        {!clock && <TimeShownChoice value={shown} onChange={onShown} />}
+        {/* A clock time set („bis 17:30“) is no longer where it ends once it was paused. */}
+        <TimeLeft endsAt={endsAt} until={pausedOnce ? undefined : until} />
+        {!alarm && <TimeShownChoice value={shown} onChange={onShown} />}
         <TimeBarChoice value={bar} onChange={onBar} />
       </PlayOptions>
-    </>
+    </RunClockProvider>
   );
 }
 

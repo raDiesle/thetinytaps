@@ -258,7 +258,7 @@ run: working out its length, the question when a clock time is past, the clock, 
 `blow` (candle only) → `done`, taps, the end, the sounds of the pieces), `pieces.ts` (how a run is cut into pieces, the
 train's halts, where the apples hang; tested), `SwapPlay.tsx` and `swap.tsx` („Abwechseln“: its turns, and its room,
 lamps, cushions and toys), `seesaw.tsx` (the Wippe's playground, plank, stand and chick), `apples.tsx`, `caterpillar.tsx`, `clock.tsx`, `disc.tsx`, `flower.tsx`, `sunset.tsx`, `pizza.tsx`, `tidy.tsx`, `boxes.tsx`, `blocks.tsx`, `tunnel.tsx`, `jump.tsx` (one picture each; `tidyNames.ts`, `boxesNames.ts`, `blocksNames.ts`, `tunnelNames.ts` and `jumpNames.ts` their texts), `hop.tsx` (a toy hopping
-into its box, shared), `keyframes.ts` (keyframes written for a run), `shown.tsx`
+into its box, shared), `pause.tsx` (the run's clock, pause and start over), `keyframes.ts` (keyframes written for a run), `shown.tsx`
 („Zeit im Bild“: its choice, the note with digits or tally marks), `scenes.tsx` (the other drawings
 and the shared `Layer`, `Draw`, `LeftGlow`), `timer.css`, `content.ts`
 (names, order), `settings.ts`.
@@ -286,6 +286,21 @@ and the shared `Layer`, `Draw`, `LeftGlow`), `timer.css`, `content.ts`
   bar it looked set somewhere; `noteRoom` in `shown.tsx` gives `.tm-play` the note's width, `--tm-note-em`, and
   `.tm-note-digits .tm-bar` its room); tally marks, a row too wide for the corner, stay above the bar's right end. At
   the end the bar fades for the end's light, trophy and buttons. A tap lights its way still to go too (H-51).
+- **Every timer can be paused and started over** (user request, 23 November 2026: „verbunden mit der
+  Prozessleiste“; `pause.tsx`): a round paper button with two drawn bars (`ControlIcon`, like Kettenreaktion's pause)
+  sits on the bar's start, the bar running out from under it (`--tm-pause-size`, `--tm-bar-left`; the bar lifted just
+  enough that the button stays whole), at the same place where the bar is switched off. Paused, a veil darkens the
+  picture with the big ▶ to go on and the round arrow to start the same timer over (`onAgain`), no words; a tap
+  anywhere else on the veil or any key but Esc goes on, so a child who paused by chance is never stuck, while starting
+  over always takes two taps. A tap on the picture never pauses: the picture's taps answer „Wie lange noch?“ (H-51),
+  and a child tapping would stop the time unseen. **Everything counts on the run's own clock** (`RunClock`,
+  `usePausableClock`, `useRunClock`): the real clock less every pause, standing still while paused – the end, the
+  pieces' sounds, the last notes, the caterpillar's bites, the alarm clock's digits, the note in the corner, the bar's
+  and the seesaw's delays, whose turn it is. CSS animations stand still under `.tm-paused` and go on in step with it.
+  A new picture or anything new worked out from the time reads `useRunClock().now()`, never `Date.now()`
+  (`timer.test.ts` checks every file of a run). A clock time set („bis 17:30“) is no longer named behind ⚙️ once
+  paused, since it ends later now. `.tm-play` is `overflow: clip`, never `hidden`: focusing the button at its foot
+  scrolled the whole picture up.
 - **The last moments are felt, never hurried** (H-124): `finalMs` (ten seconds, a quarter of a short run) before the
   end a warm light gathers from the screen's edges (`FinalLight`, one layer by `opacity`), the bar's marker and the
   flag's light swell softly once a second, and the last `FINAL_NOTES` seconds each sound one soft rising note, the
