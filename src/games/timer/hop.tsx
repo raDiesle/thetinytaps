@@ -2,7 +2,7 @@ import type { CSSProperties, ReactNode } from "react";
 import { type Frame, holdToEnd, keyframes } from "./keyframes";
 import { Layer } from "./scenes";
 
-// A toy hopping from the floor into its box (Five Boxes, the road rug): one hop in a high arc, as a child tosses it,
+// A toy hopping from the floor into its box (Five Boxes): one hop in a high arc, as a child tosses it,
 // landing smaller where it lies in the box. Three small layers inside each other, each on one keyframe rule written for
 // the run: the outer moves it across at an even pace, the middle up and down (rising slower at the top, falling faster,
 // as a thrown thing does), the inner makes it smaller from its foot (and straightens one lying askew, `tilt`). While it waits its turn it wiggles a second at a

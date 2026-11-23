@@ -5,7 +5,6 @@ import type { TimerPicture, TurnPicture } from "./settings";
 import type { Holder } from "./swap";
 import { BLOCKS_LINES } from "./blocksNames";
 import { BOXES_LINES } from "./boxesNames";
-import { ROAD_LINES } from "./roadNames";
 import { TUNNEL_LINES } from "./tunnelNames";
 import { JUMP_LINES } from "./jumpNames";
 import { TIDY_LINES } from "./tidyNames";
@@ -239,7 +238,6 @@ export const PICTURE_LINES: Record<TimedPicture, { start: Texts; end: Texts }> =
   },
   tidy: TIDY_LINES,
   boxes: BOXES_LINES,
-  road: ROAD_LINES,
   blocks: BLOCKS_LINES,
   tunnel: TUNNEL_LINES,
   jump: JUMP_LINES,

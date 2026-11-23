@@ -19,7 +19,6 @@ export type TimerPicture =
   | "clock"
   | "tidy"
   | "boxes"
-  | "road"
   | "blocks"
   | "tunnel"
   | "jump"

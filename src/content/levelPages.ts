@@ -20,7 +20,6 @@ export const LEVEL_IDS: Record<string, readonly string[]> = {
     "clock",
     "tidy",
     "boxes",
-    "road",
     "blocks",
     "tunnel",
     "jump",

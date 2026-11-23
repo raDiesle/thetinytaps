@@ -96,13 +96,6 @@ export const LANGUAGE_STATUS: LanguageStatusRow[] = [
         files: ["src/games/timer/boxesNames.ts"],
       },
       {
-        label: "🛣️ Road Rug",
-        languages: { de: "text", en: "text", zh: "text", hi: "text", es: "text", ar: "text", ru: "text" },
-        recorded: true,
-        note: "Das Bild mit dem Straßenteppich, von dessen Straße die Spielsachen in die Kiste hüpfen, während das Spielzeugauto nachrückt (H-122, road.tsx, 22. November 2026), Englisch zuerst geschrieben und gleich in alle Sprachen übersetzt: sein Name „Road Rug“ („Straßenteppich“) und seine zwei Sätze am Anfang und am Ende (roadNames.ts). Aufgenommen ist noch nichts (bun run voice make --only timer, nur auf Wunsch), bis dahin bleibt es still. Die Texte für Suchmaschinen nennen es in allen sieben Sprachen.",
-        files: ["src/games/timer/roadNames.ts"],
-      },
-      {
         label: "🧱 Block House",
         languages: { de: "text", en: "text", zh: "text", hi: "text", es: "text", ar: "text", ru: "text" },
         recorded: true,
@@ -117,10 +110,10 @@ export const LANGUAGE_STATUS: LanguageStatusRow[] = [
         files: ["src/games/timer/tunnelNames.ts"],
       },
       {
-        label: "🏃 Hop to the Flag",
+        label: "🚀 Up to the Moon",
         languages: { de: "text", en: "text", zh: "text", hi: "text", es: "text", ar: "text", ru: "text" },
         recorded: true,
-        note: "Das dritte Spiel-Video-Bild und das erste, das keine Klötzchenwelt ist: ein Jump'n'Run, in dem ein kleiner Hüpfer Stern für Stern bis zur Fahne auf dem Hügel springt (H-127, jump.tsx, 22. November 2026), Englisch zuerst geschrieben und gleich in alle Sprachen übersetzt: sein Name „Hop to the Flag“ („Hüpf zur Fahne“) und seine zwei Sätze am Anfang und am Ende (jumpNames.ts). Aufgenommen ist noch nichts (bun run voice make --only timer, nur auf Wunsch), bis dahin bleibt es still. Die Texte für Suchmaschinen nennen es in allen sieben Sprachen.",
+        note: "Das dritte Spiel-Video-Bild und das erste, das keine Klötzchenwelt ist: ein Jump'n'Run nach oben, in dem ein kleiner Hüpfer vom Grund eines Sees bis zum Mond schwimmt, hüpft, klettert und fliegt und am Ende in eine Torte springt (H-127, jump.tsx; am 23. November 2026 neu gebaut statt „Hop to the Flag“), Englisch zuerst geschrieben und gleich in alle Sprachen übersetzt: sein Name „Up to the Moon“ („Hoch bis zum Mond“) und seine zwei Sätze am Anfang und am Ende (jumpNames.ts). Aufgenommen ist noch nichts (bun run voice make --only timer, nur auf Wunsch), bis dahin bleibt es still. Die Texte für Suchmaschinen nennen es in allen sieben Sprachen.",
         files: ["src/games/timer/jumpNames.ts"],
       },
     ],
