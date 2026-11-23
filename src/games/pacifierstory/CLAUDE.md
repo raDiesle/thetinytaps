@@ -13,6 +13,10 @@ stars on the window, one taken down each morning; on the day Tapsi gathers the t
 them goodbye and puts the box on the windowsill with a drawing. The first night is hard, Mama and Papa stay; the fairy (a
 little bear with wings) takes the box and leaves a present, a cuddly bunny that helps with falling asleep from then on.
 Tapsi misses the pacifier, is comforted, and Mama and Papa love Tapsi with and without it.
+
+Since 23 November 2026 the book holds a second story without a fairy, „Tapsi and the Pacifier Tree“ (H-145,
+`src/games/pacifiertree`, its own `CLAUDE.md`), half as long and also whole and short: the choice names each by how the
+pacifiers go („With the pacifier fairy“, `PACIFIER_FAIRY_KIND`; „At the pacifier tree“, `TREE_KIND`).
 - `pacifierStory.ts`: the chapters and pages (`PACIFIER_STORY`) and the steps of a gentle goodbye (`PACIFIER_STEPS`).
 - `pacifierStoryPictures.ts`: the Gemini prompt of every page (place, light, cast and clothes, the pacifiers, box and
   toys), as the picture queue takes them; a made picture goes on `MADE`.

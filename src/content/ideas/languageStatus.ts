@@ -157,9 +157,27 @@ export const LANGUAGE_STATUS: LanguageStatusRow[] = [
   },
   {
     href: "/schnullerfee/",
-    note: "Das Buch „Schnullerfee“ mit „Tapsi und die Schnullerfee“, einer Geschichte in Kapiteln (pacifierStory.ts, November 2026): Name, Satz fürs Regal, Kapitel und Sätze in <Sprache>.ts im Ordner, übersetzt auf Wunsch am 10. November 2026. Tapsis Stimme liest jede Seite vor (ChapterBook, 13. November 2026), unten rechts über ▶ schaltet ein Lautsprecher sie für Erwachsene aus, die selbst vorlesen; Aufnahmen gibt es noch keine (bun run voice make --only schnullerfee), bis dahin bleibt es still. Die Wörter des Buchs selbst (Kapitel, Weiter) kommen aus ChapterBook.",
-    recorded: true,
-    languages: { de: "text", en: "text", zh: "text", hi: "text", es: "text", ar: "text", ru: "text" },
+    note: "Das Buch „Schnullerfee“ mit zwei Geschichten in Kapiteln, jede ganz und als Kurzfassung (StoryChoice, 23. November 2026), die Tapsis Stimme vorliest; unten rechts über ▶ schaltet ein Lautsprecher sie für Erwachsene aus, die selbst vorlesen. Die Wörter des Buchs selbst (Kapitel, Weiter, die Wahl) kommen aus ChapterBook und StoryChoice.",
+    parts: [
+      {
+        label: "🧚 Tapsi und die Schnullerfee",
+        recorded: true,
+        languages: { de: "text", en: "text", zh: "text", hi: "text", es: "text", ar: "text", ru: "text" },
+        note: "Die Geschichte von der Schnullerfee in Kapiteln (pacifierStory.ts, November 2026): Name, Satz fürs Regal, Kapitel und Sätze in <Sprache>.ts im Ordner, übersetzt auf Wunsch am 10. November 2026. Aufnahmen gibt es noch keine (bun run voice make --only schnullerfee), bis dahin bleibt es still. Ihr Name in der Wahl des Buchs („Mit der Schnullerfee“, names.ts) ist seit dem 23. November 2026 in allen sieben Sprachen da.",
+      },
+      {
+        label: "🌳 Tapsi and the Pacifier Tree",
+        recorded: true,
+        languages: { de: "text", en: "text", zh: "text", hi: "text", es: "text", ar: "text", ru: "text" },
+        note: 'Die zweite Geschichte ohne Fee: Tapsi bindet die drei Schnuller an den Schnullerbaum im Park (H-145, pacifierTree.ts, /schnullerfee/baum/ und /schnullerfee/baum/kurz/, 23. November 2026), Englisch zuerst geschrieben (ChapterBook first="en") und am selben Tag in alle sechs anderen Sprachen übersetzt, Deutsch eingeschlossen: Titel und Name in der Wahl (names.ts), Kapitel und Sätze in <Sprache>.ts im Ordner, geladen über texts-<Sprache>.ts. Aufnahmen gibt es noch keine (bun run voice make --only schnullerbaum, nur auf Wunsch). Die Texte für Suchmaschinen sind in allen sieben Sprachen da. Die zwanzig Bilder warten in der Bilder-Warteschlange (Claude Cloud); bis sie gemacht sind, sehen Spieler die Geschichte nicht, und ihre Seiten stehen nicht im Index.',
+        files: [
+          "src/games/pacifiertree/names.ts",
+          "src/games/pacifiertree/story.ts",
+          "src/games/pacifiertree/pacifierTree.ts",
+          "src/games/pacifiertree/pacifierTreePictures.ts",
+        ],
+      },
+    ],
   },
   {
     href: "/kita/",

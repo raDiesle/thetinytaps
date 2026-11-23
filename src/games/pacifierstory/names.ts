@@ -1,4 +1,4 @@
-import type { Localized } from "@/lib/language";
+import type { EnglishFirst, Localized } from "@/lib/language";
 
 // The story's name and its line for grown-ups, kept here rather than in `games.ts`: the story's own row in the language
 // table answers for them, not the home page's (`inlineTexts.test.ts`). Translated on request on 10 November 2026.
@@ -34,4 +34,18 @@ export const PACIFIER_STORY_BLURB: Localized = {
   es: "Adiós, chupete, por capítulos",
   ar: "وداعًا يا لهاية، في فصول",
   ru: "Пока, пустышка, по главам",
+};
+
+/**
+ * Its name in the book's choice of stories (`PacifierStoryGame.tsx`), over its title: how the pacifiers go, beside „Am
+ * Schnullerbaum“ (src/games/pacifiertree). English first, since it came with that second story (23 November 2026).
+ */
+export const PACIFIER_FAIRY_KIND: EnglishFirst = {
+  en: "With the pacifier fairy",
+  de: "Mit der Schnullerfee",
+  zh: "请奶嘴仙子来",
+  hi: "चुसनी परी के साथ",
+  es: "Con el hada del chupete",
+  ar: "مع جنية اللهاية",
+  ru: "С феей пустышек",
 };

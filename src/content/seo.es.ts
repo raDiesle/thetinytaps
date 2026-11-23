@@ -197,6 +197,17 @@ export const SEO_ES: SeoTranslation = {
         "La versión corta del cuento del hada del chupete: las mismas imágenes del zorro Tapsi, solo lo más importante, para leer en voz alta en pocos minutos.",
       text: "La versión corta de «Tapsi y el hada del chupete», para las noches en que el cuento entero resulta demasiado largo o para quien ya lo conoce. Cuenta la misma historia con las mismas imágenes, solo lo más importante: de bebé, el chupete consolaba al zorro Tapsi y le ayudaba a dormirse, y ahora Tapsi es mayor. Mamá y papá le hablan del hada del chupete, que lleva los chupetes a los bebés y deja un regalo a cambio, y Tapsi dice que el hada puede venir. Los tres chupetes van a una caja, cada uno recibe un beso de despedida, y la caja queda en el alféizar con un dibujo. La primera noche cuesta, Tapsi llora, y mamá se queda cerca. De noche el hada se lleva la caja, por la mañana hay un conejito de peluche, y cada noche dormirse cuesta un poco menos. Mamá y papá quieren a Tapsi, con chupete y sin él. Bajo cada imagen hay una frase corta para leer, cada toque pasa una página, y en el libro «Hada del chupete» está junto al cuento entero, y cada uno indica cuántas imágenes tiene y cuánto dura más o menos.",
     },
+    "/schnullerfee/baum/": {
+      title: "Árbol de los chupetes – dejar el chupete sin hada",
+      description: "Un cuento para leer en voz alta sin hada: Tapsi, el zorrito, ata sus tres chupetes al árbol del parque y les dice adiós. Completo o corto.",
+      text: "Un cuento para leer en voz alta, capítulo a capítulo, para familias que quieren despedirse del chupete sin hada. Tapsi, el zorrito, tiene tres chupetes: uno rojo, uno azul y uno amarillo. Papá le enseña a Tapsi un libro con el árbol de los chupetes, donde los niños cuelgan sus chupetes para decirles adiós. Al principio Tapsi no quiere darlos, y está bien sentir pena. Ahora, de día, los chupetes se quedan en la cama, y Tapsi elige cuándo ir al árbol y una cinta para cada chupete. En el parque papá levanta a Tapsi, Tapsi ata los chupetes a una rama y les dice adiós con la mano. La primera noche Tapsi llora, mamá abraza a Tapsi, papá canta, y por la mañana Tapsi siente orgullo. En un paseo Tapsi visita los chupetes en el árbol. Más corto que el cuento del hada del chupete, y también en versión corta de pocos minutos.",
+    },
+    "/schnullerfee/baum/kurz/": {
+      title: "Árbol de los chupetes – versión corta",
+      description:
+        "La versión corta del cuento del árbol de los chupetes para leer en voz alta: las mismas imágenes de Tapsi, el zorrito, solo lo esencial, en tres minutos.",
+      text: "La versión corta de «Tapsi y el árbol de los chupetes», para noches con prisa o para quien ya conoce el cuento. Con las mismas imágenes cuenta lo esencial: Tapsi, el zorrito, tiene tres chupetes, papá le enseña el árbol de los chupetes en un libro y Tapsi elige el día. En el parque Tapsi ata los chupetes a una rama y dice adiós. La primera noche Tapsi llora y alguien le abraza, por la mañana Tapsi siente orgullo, y mamá y papá quieren a Tapsi, con chupete y sin chupete.",
+    },
     "/kita/": {
       title: "Empezar la guardería – un cuento para la adaptación",
       description:

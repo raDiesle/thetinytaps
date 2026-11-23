@@ -190,6 +190,17 @@ export const SEO_EN: SeoTranslation = {
         "The short version of the pacifier fairy story to read aloud: the same pictures of Tapsi the fox, only what matters most – read in a few minutes.",
       text: "The short version of “Tapsi and the Pacifier Fairy”, for evenings when the whole story is too long, or for a child who already knows it. It tells the same story with the same pictures, only what matters most: as a baby, Tapsi the fox was comforted by the pacifier and fell asleep with it, and now Tapsi is big. Mom and dad tell of the pacifier fairy, who takes the pacifiers to the little babies and leaves a present, and Tapsi says the fairy may come. The three pacifiers go into a box, each gets a goodbye kiss, and the box stands on the windowsill with a drawing. The first night is hard, Tapsi cries, and mom stays close. At night the fairy takes the box, in the morning there is a cuddly bunny, and every evening falling asleep gets a little easier. Mom and dad love Tapsi, with a pacifier and without. Below every picture stands a short sentence to read aloud, every tap turns a page, and in the book “Pacifier Fairy” it stands beside the whole story, each showing how many pictures it has and about how long it takes.",
     },
+    "/schnullerfee/baum/": {
+      title: "Pacifier Tree Story – Saying Goodbye Without a Fairy",
+      description: "A read-aloud story without a fairy: Tapsi the fox ties three pacifiers to the pacifier tree in the park and says goodbye – whole or short.",
+      text: "A story to read aloud, chapter by chapter, for families who want to say goodbye to the pacifier without a fairy. Tapsi the fox has three pacifiers, a red one, a blue one and a yellow one. Dad shows Tapsi a book with the pacifier tree, where children hang their pacifiers to say goodbye. At first Tapsi doesn't want to give them away, and it's all right to be sad. In the daytime the pacifiers now stay in bed, and Tapsi picks the day to go to the tree, and a ribbon for every pacifier. In the park dad lifts Tapsi up, Tapsi ties the pacifiers to a branch and waves to them. On the first night Tapsi cries, mom holds Tapsi, dad sings, and in the morning Tapsi is proud. On a walk Tapsi visits the pacifiers in the tree. Shorter than the pacifier fairy story, and as a short version read in a few minutes.",
+    },
+    "/schnullerfee/baum/kurz/": {
+      title: "Pacifier Tree Story – Short Version",
+      description:
+        "The short version of the pacifier tree story to read aloud: the same pictures of Tapsi the fox, only what matters most – read in three minutes.",
+      text: "The short version of “Tapsi and the Pacifier Tree”, for evenings that need to be quick, or for a child who already knows the story. With the same pictures it tells what matters most: Tapsi the fox has three pacifiers, dad shows the pacifier tree in a book, and Tapsi picks the day to go there. In the park Tapsi ties the pacifiers to a branch and says goodbye. On the first night Tapsi cries and is held, in the morning Tapsi is proud, and mom and dad love Tapsi, with a pacifier and without one.",
+    },
     "/kita/": {
       title: "Starting Daycare – A Story for Settling In and Goodbyes",
       description: "A read-aloud story in chapters for settling into daycare and the morning goodbye: Tapsi the fox starts daycare, and mom always comes back.",
