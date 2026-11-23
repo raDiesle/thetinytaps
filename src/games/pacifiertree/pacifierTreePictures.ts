@@ -89,6 +89,9 @@ function thingsOf(page: TreePage): string[] {
     things.push(
       "Only Tapsi holds pacifiers, just these three ribbons bunched in the paws; Mama and Papa hold no pacifier and no ribbon, their paws are empty or hold Tapsi's.",
     );
+  // Drawn from the walk, where Tapsi carries them, Tapsi still held them while they already hung in the tree (baum-alle).
+  if (ownPacifiers(page) && /hang/.test(page.picture) && !/carries|holds|in both paws/.test(page.picture))
+    things.push("Tapsi's paws are empty: the three pacifiers hang in the tree now, nobody holds a pacifier or a ribbon.");
   if (/tree/.test(page.picture) && page.place === "park")
     things.push(
       "The pacifier tree is the big old tree of the reference with the many small pacifiers of other children hanging from its low branches on little ribbons; keep it exactly as it is.",
@@ -161,6 +164,7 @@ export function treePicture(page: TreePage): QueuedPicture {
 const MADE = new Set<string>([
   "abend",
   "baender",
+  "baum",
   "besuch",
   "buch",
   "kinder",

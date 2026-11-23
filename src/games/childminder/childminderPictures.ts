@@ -250,6 +250,7 @@ const MADE = new Set<string>([
   "erzaehlen",
   "erzaehlt",
   "essen",
+  "haken",
   "hand",
   "heim",
   "kuss",
