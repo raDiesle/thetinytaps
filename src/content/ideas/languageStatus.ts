@@ -111,9 +111,9 @@ export const LANGUAGE_STATUS: LanguageStatusRow[] = [
       },
       {
         label: "🚀 Up to the Moon",
-        languages: { de: "text", en: "text", zh: "text", hi: "text", es: "text", ar: "text", ru: "text" },
+        languages: { de: "done", en: "done", zh: "done", hi: "done", es: "done", ar: "done", ru: "done" },
         recorded: true,
-        note: "Das dritte Spiel-Video-Bild und das erste, das keine Klötzchenwelt ist: ein Jump'n'Run nach oben, in dem ein kleiner Hüpfer vom Grund eines Sees bis zum Mond schwimmt, hüpft, klettert und fliegt und am Ende in eine Torte springt (H-127, jump.tsx; am 23. November 2026 neu gebaut statt „Hop to the Flag“), Englisch zuerst geschrieben und gleich in alle Sprachen übersetzt: sein Name „Up to the Moon“ („Hoch bis zum Mond“) und seine zwei Sätze am Anfang und am Ende (jumpNames.ts). Aufgenommen ist noch nichts (bun run voice make --only timer, nur auf Wunsch), bis dahin bleibt es still. Die Texte für Suchmaschinen nennen es in allen sieben Sprachen.",
+        note: "Das dritte Spiel-Video-Bild und das erste, das keine Klötzchenwelt ist: ein Jump'n'Run nach oben, in dem ein kleiner Hüpfer vom Grund eines Sees bis zum Mond schwimmt, hüpft, klettert und fliegt und am Ende in eine Torte springt (H-127, jump.tsx; am 23. November 2026 neu gebaut statt „Hop to the Flag“), Englisch zuerst geschrieben und gleich in alle Sprachen übersetzt: sein Name „Up to the Moon“ („Hoch bis zum Mond“) und seine zwei Sätze am Anfang und am Ende (jumpNames.ts). Beide Sätze am 23. November 2026 von ElevenLabs gesprochen mit den Klonen von Tapsis Stimme im zweiten Konto: Englisch, Chinesisch, Hindi, Spanisch und Arabisch mit „Tapsi Coach (Klon)“, Deutsch mit „Tapsi Coach (Klon de)“, Russisch mit „Tapsi Coach (Klon ru)“ – beide Sätze eines Bildes aus einer Stimme, wie bei den anderen Bildern. Die Texte für Suchmaschinen nennen es in allen sieben Sprachen.",
         files: ["src/games/timer/jumpNames.ts"],
       },
     ],
@@ -168,8 +168,8 @@ export const LANGUAGE_STATUS: LanguageStatusRow[] = [
       {
         label: "🌳 Tapsi and the Pacifier Tree",
         recorded: true,
-        languages: { de: "text", en: "text", zh: "text", hi: "text", es: "text", ar: "text", ru: "text" },
-        note: 'Die zweite Geschichte ohne Fee: Tapsi bindet die drei Schnuller an den Schnullerbaum im Park (H-145, pacifierTree.ts, /schnullerfee/baum/ und /schnullerfee/baum/kurz/, 23. November 2026), Englisch zuerst geschrieben (ChapterBook first="en") und am selben Tag in alle sechs anderen Sprachen übersetzt, Deutsch eingeschlossen: Titel und Name in der Wahl (names.ts), Kapitel und Sätze in <Sprache>.ts im Ordner, geladen über texts-<Sprache>.ts. Aufnahmen gibt es noch keine (bun run voice make --only schnullerbaum, nur auf Wunsch). Die Texte für Suchmaschinen sind in allen sieben Sprachen da. Die zwanzig Bilder warten in der Bilder-Warteschlange (Claude Cloud); bis sie gemacht sind, sehen Spieler die Geschichte nicht, und ihre Seiten stehen nicht im Index.',
+        languages: { de: "done", en: "done", zh: "done", hi: "done", es: "done", ar: "done", ru: "done" },
+        note: 'Die zweite Geschichte ohne Fee: Tapsi bindet die drei Schnuller an den Schnullerbaum im Park (H-145, pacifierTree.ts, /schnullerfee/baum/ und /schnullerfee/baum/kurz/, 23. November 2026), Englisch zuerst geschrieben (ChapterBook first="en") und am selben Tag in alle sechs anderen Sprachen übersetzt, Deutsch eingeschlossen: Titel und Name in der Wahl (names.ts), Kapitel und Sätze in <Sprache>.ts im Ordner, geladen über texts-<Sprache>.ts. Ganz vorgelesen am 23. November 2026 von ElevenLabs gesprochen mit den Klonen von Tapsis Stimme im zweiten Konto: Englisch, Chinesisch, Hindi, Spanisch und Arabisch mit „Tapsi Coach (Klon)“, Deutsch mit „Tapsi Coach (Klon de)“, Russisch mit „Tapsi Coach (Klon ru)“, die Geschichte ganz aus einer Stimme. Die Texte für Suchmaschinen sind in allen sieben Sprachen da. Die zwanzig Bilder warten in der Bilder-Warteschlange (Claude Cloud); bis sie gemacht sind, sehen Spieler die Geschichte nicht, und ihre Seiten stehen nicht im Index.',
         files: [
           "src/games/pacifiertree/names.ts",
           "src/games/pacifiertree/story.ts",
@@ -192,8 +192,8 @@ export const LANGUAGE_STATUS: LanguageStatusRow[] = [
       {
         label: "🏡 Tapsi Goes to Lotta's",
         recorded: true,
-        languages: { de: "text", en: "text", zh: "text", hi: "text", es: "text", ar: "text", ru: "text" },
-        note: 'Die zweite Geschichte bei der Tagesmutter, für Familien in der Kindertagespflege (H-147, childminder.ts, /kita/tagesmutter/ und /kita/tagesmutter/kurz/, 23. November 2026), Englisch zuerst geschrieben (ChapterBook first="en") und am selben Tag in alle sechs anderen Sprachen übersetzt, Deutsch eingeschlossen: Titel und Name in der Wahl (names.ts), Kapitel und Sätze in <Sprache>.ts im Ordner, geladen über texts-<Sprache>.ts. Aufnahmen gibt es noch keine (bun run voice make --only kita-tagesmutter, nur auf Wunsch). Die Texte für Suchmaschinen sind in allen sieben Sprachen da. Die 28 Bilder warten in der Bilder-Warteschlange (Claude Cloud); bis sie gemacht sind, sehen Spieler die Geschichte nicht, und ihre Seiten stehen nicht im Index.',
+        languages: { de: "done", en: "done", zh: "done", hi: "done", es: "done", ar: "done", ru: "done" },
+        note: 'Die zweite Geschichte bei der Tagesmutter, für Familien in der Kindertagespflege (H-147, childminder.ts, /kita/tagesmutter/ und /kita/tagesmutter/kurz/, 23. November 2026), Englisch zuerst geschrieben (ChapterBook first="en") und am selben Tag in alle sechs anderen Sprachen übersetzt, Deutsch eingeschlossen: Titel und Name in der Wahl (names.ts), Kapitel und Sätze in <Sprache>.ts im Ordner, geladen über texts-<Sprache>.ts. Ganz vorgelesen am 23. November 2026 von ElevenLabs gesprochen mit den Klonen von Tapsis Stimme im zweiten Konto: Englisch, Chinesisch, Hindi, Spanisch und Arabisch mit „Tapsi Coach (Klon)“, Deutsch mit „Tapsi Coach (Klon de)“, Russisch mit „Tapsi Coach (Klon ru)“, die Geschichte ganz aus einer Stimme. Die Texte für Suchmaschinen sind in allen sieben Sprachen da. Die 28 Bilder warten in der Bilder-Warteschlange (Claude Cloud); bis sie gemacht sind, sehen Spieler die Geschichte nicht, und ihre Seiten stehen nicht im Index.',
         files: [
           "src/games/childminder/names.ts",
           "src/games/childminder/story.ts",
@@ -216,8 +216,8 @@ export const LANGUAGE_STATUS: LanguageStatusRow[] = [
       {
         label: "🚿 Tapsi and the Warm Rain",
         recorded: true,
-        languages: { de: "text", en: "text", zh: "text", hi: "text", es: "text", ar: "text", ru: "text" },
-        note: 'Die zweite Geschichte unter der Dusche, für Familien ohne Badewanne (H-146, hairShower.ts, /haare-waschen/dusche/ und /haare-waschen/dusche/kurz/, 23. November 2026), Englisch zuerst geschrieben (ChapterBook first="en") und am selben Tag in alle sechs anderen Sprachen übersetzt, Deutsch eingeschlossen: Titel und Name in der Wahl (names.ts), Kapitel und Sätze in <Sprache>.ts im Ordner, geladen über texts-<Sprache>.ts. Aufnahmen gibt es noch keine (bun run voice make --only haare-dusche, nur auf Wunsch). Die Texte für Suchmaschinen sind in allen sieben Sprachen da. Die zwanzig Bilder warten in der Bilder-Warteschlange (Claude Cloud); bis sie gemacht sind, sehen Spieler die Geschichte nicht, und ihre Seiten stehen nicht im Index.',
+        languages: { de: "done", en: "done", zh: "done", hi: "done", es: "done", ar: "done", ru: "done" },
+        note: 'Die zweite Geschichte unter der Dusche, für Familien ohne Badewanne (H-146, hairShower.ts, /haare-waschen/dusche/ und /haare-waschen/dusche/kurz/, 23. November 2026), Englisch zuerst geschrieben (ChapterBook first="en") und am selben Tag in alle sechs anderen Sprachen übersetzt, Deutsch eingeschlossen: Titel und Name in der Wahl (names.ts), Kapitel und Sätze in <Sprache>.ts im Ordner, geladen über texts-<Sprache>.ts. Ganz vorgelesen am 23. November 2026 von ElevenLabs gesprochen mit den Klonen von Tapsis Stimme im zweiten Konto: Englisch, Chinesisch, Hindi, Spanisch und Arabisch mit „Tapsi Coach (Klon)“, Deutsch mit „Tapsi Coach (Klon de)“, Russisch mit „Tapsi Coach (Klon ru)“, die Geschichte ganz aus einer Stimme. Die Texte für Suchmaschinen sind in allen sieben Sprachen da. Die zwanzig Bilder warten in der Bilder-Warteschlange (Claude Cloud); bis sie gemacht sind, sehen Spieler die Geschichte nicht, und ihre Seiten stehen nicht im Index.',
         files: [
           "src/games/hairshower/names.ts",
           "src/games/hairshower/story.ts",
