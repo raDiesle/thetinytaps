@@ -52,7 +52,16 @@ const MoodPage = page(() => import("@/pages/MoodPage"), "MoodPage", "/wie-gehts-
 const CausePage = page(() => import("@/pages/CausePage"), "CausePage", "/was-ist-passiert/");
 const TowerPage = page(() => import("@/pages/TowerPage"), "TowerPage", "/zaehlturm/");
 const MarblePage = page(() => import("@/pages/MarblePage"), "MarblePage", "/kettenreaktion/");
-const PacifierStoryPage = page(() => import("@/pages/PacifierStoryPage"), "PacifierStoryPage", "/schnullerfee/", "/schnullerfee/kurz/");
+// The book „Schnullerfee“ and its stories: the fairy's at its own address and its short version, the pacifier tree's
+// whole and short below it.
+const PacifierStoryPage = page(
+  () => import("@/pages/PacifierStoryPage"),
+  "PacifierStoryPage",
+  "/schnullerfee/",
+  "/schnullerfee/kurz/",
+  "/schnullerfee/baum/",
+  "/schnullerfee/baum/kurz/",
+);
 const KitaStoryPage = page(() => import("@/pages/KitaStoryPage"), "KitaStoryPage", "/kita/", "/kita/kurz/");
 const HairStoryPage = page(() => import("@/pages/HairStoryPage"), "HairStoryPage", "/haare-waschen/", "/haare-waschen/kurz/");
 const BottleStoryPage = page(() => import("@/pages/BottleStoryPage"), "BottleStoryPage", "/flaeschchen/", "/flaeschchen/kurz/");
@@ -118,6 +127,8 @@ export function App() {
           <Route path="abstillen/nachts" element={<MilkChainPage />} />
           <Route path="schnullerfee" element={<PacifierStoryPage />} />
           <Route path="schnullerfee/kurz" element={<PacifierStoryPage />} />
+          <Route path="schnullerfee/baum" element={<PacifierStoryPage />} />
+          <Route path="schnullerfee/baum/kurz" element={<PacifierStoryPage />} />
           <Route path="kita" element={<KitaStoryPage />} />
           <Route path="kita/kurz" element={<KitaStoryPage />} />
           <Route path="haare-waschen" element={<HairStoryPage />} />

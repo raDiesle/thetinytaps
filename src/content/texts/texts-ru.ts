@@ -34,6 +34,7 @@ import { KITA_STORY_RU as kitaStory } from "@/games/kitastory/ru";
 import { HAIR_STORY_RU as hairStory } from "@/games/hairstory/ru";
 import { NIGHT_MILK_RU as nightMilk } from "@/games/nightmilk/ru";
 import { GOODBYE_MILK_RU as goodbyeMilk } from "@/games/milkgoodbye/ru";
+import { PACIFIER_TREE_RU as pacifierTree } from "@/games/pacifiertree/ru";
 import { BOTTLE_STORY_RU as bottleStory } from "@/games/bottlestory/ru";
 import { BED_STORY_RU as bedStory } from "@/games/bedstory/ru";
 import { TRANSLATION as cloudTrip } from "@/games/adventure/stories/cloudTrip/lines.ru";
@@ -84,6 +85,7 @@ export const TEXTS: LanguageTexts = {
   hairStory,
   nightMilk,
   goodbyeMilk,
+  pacifierTree,
   bottleStory,
   bedStory,
   cause,

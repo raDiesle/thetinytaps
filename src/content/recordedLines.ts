@@ -133,6 +133,7 @@ export const RECORDED_GAMES: RecordedGame[] = [
   { name: "haare-waschen", folder: "src/games/hairstory/stimme", lines: spoken("/haare-waschen/", { first: "en" }) },
   { name: "abstillen-nachts", folder: "src/games/nightmilk/stimme", lines: spoken("/abstillen/nachts/", { first: "en" }) },
   { name: "abstillen-abschied", folder: "src/games/milkgoodbye/stimme", lines: spoken("/abstillen/abschied/", { first: "en" }) },
+  { name: "schnullerbaum", folder: "src/games/pacifiertree/stimme", lines: spoken("/schnullerfee/baum/", { first: "en" }) },
   { name: "flaeschchen", folder: "src/games/bottlestory/stimme", lines: spoken("/flaeschchen/", { first: "en" }) },
   { name: "grosses-bett", folder: "src/games/bedstory/stimme", lines: spoken("/grosses-bett/", { first: "en" }) },
 ];

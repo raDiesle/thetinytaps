@@ -284,6 +284,9 @@ export const everydayHelpersIdeas: IdeaArea = {
       text: "Im Buch Schnullerfee eine zweite Geschichte neben „Tapsi und die Schnullerfee“, gewählt wie bei Abstillen (StoryChoice), mit eigener Adresse: ohne Fee. Tapsi sucht mit Mama oder Papa den Tag aus, sammelt die Schnuller selbst, bindet sie mit einem bunten Band an den Schnullerbaum im Park, wo schon viele hängen, und sagt Tschüss; die ersten Abende tröstet Kuscheln statt Schnuller, und später besucht Tapsi den Baum und zeigt stolz auf den eigenen. Kürzer als die Fee-Geschichte, so wahr und sanft wie sie (vorher erzählen, das Kind gibt selbst ab, kein Schnuller kommt zurück).",
       why: "Die Recherche „schnullerfee-kapitel“ nennt den Schnullerbaum als zweiten sanften Weg neben der Fee; Familien, die dem Kind keine Fee erzählen wollen, finden im Buch bisher nichts. Wie oft „Schnullerbaum“ gesucht wird, ist noch nicht gemessen.",
       effort: "M",
+      done: true,
+      partial:
+        "Gebaut am 23. November 2026 als „Tapsi and the Pacifier Tree“ (src/games/pacifiertree): 20 Seiten in sieben Kapiteln, ganz unter /schnullerfee/baum/ (ca. 5 Min.) und als Kurzfassung aus 11 eigenen Seiten unter /schnullerfee/baum/kurz/ (ca. 3 Min.) – neben der Fee ganz (40 Seiten) und kurz (18) also vier verschiedene Längen. Englisch zuerst, in alle sieben Sprachen übersetzt, Suchtexte in allen sieben. Die 20 Bilder warten in der Bilder-Warteschlange (Claude Cloud), bis dahin sehen Spieler die Geschichte nicht; Aufnahmen nur auf Wunsch.",
     },
     {
       id: "H-146",

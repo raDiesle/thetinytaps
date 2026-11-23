@@ -46,6 +46,14 @@ const NAMERS: Record<string, () => Promise<Namer>> = {
         (level, language) =>
           level === "nachts" ? pick(NIGHT_MILK_TITLE, language) : level === "abschied" ? pick(GOODBYE_MILK_TITLE, language) : undefined,
     ),
+  // The book Schnullerfee's second story, „Tapsi and the Pacifier Tree“, gives a trophy of its own, level „baum“ (its
+  // short version shares it, as the fairy's short version shares the fairy's).
+  "/schnullerfee/": () =>
+    import("@/games/pacifiertree/names").then(
+      ({ TREE_TITLE }) =>
+        (level, language) =>
+          level === "baum" ? pick(TREE_TITLE, language) : undefined,
+    ),
 };
 
 /** „Tag“ and „Runde“ with their number, in each app language. */

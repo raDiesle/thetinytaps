@@ -6,6 +6,7 @@ import { BOTTLE_SHORT_PAGES, BOTTLE_STORY, BOTTLE_STORY_SHORT } from "@/games/bo
 import { HAIR_SHORT_PAGES, HAIR_STORY, HAIR_STORY_SHORT } from "@/games/hairstory/hairStory";
 import { KITA_SHORT_PAGES, KITA_STORY, KITA_STORY_SHORT } from "@/games/kitastory/kitaStory";
 import { PACIFIER_SHORT_PAGES, PACIFIER_STORY, PACIFIER_STORY_SHORT } from "@/games/pacifierstory/pacifierStory";
+import { TREE_SHORT_PAGES, TREE_STORY, TREE_STORY_SHORT } from "@/games/pacifiertree/pacifierTree";
 
 // Every chapter book opens like „Abstillen“ on the choice of its stories, with a short version made of its own pages
 // where it has one, and never lists its chapters; a story always starts on its first page (user request, 23 November
@@ -15,6 +16,8 @@ import { PACIFIER_SHORT_PAGES, PACIFIER_STORY, PACIFIER_STORY_SHORT } from "@/ga
 /** Each book's whole story, its short version and the ids it is made of, with the words its pages cry and comfort in. */
 const BOOKS: {
   href: string;
+  /** The book's own address, where the story is not its first one (a second story lives below it). */
+  book?: string;
   file: string;
   story: StoryChapter[];
   short: StoryChapter[];
@@ -30,6 +33,16 @@ const BOOKS: {
     ids: PACIFIER_SHORT_PAGES,
     cries: /weint/,
     comforts: /Mama|Papa|hält|tröst|Arm|kuschel|drück/,
+  },
+  {
+    href: "/schnullerfee/baum/",
+    book: "/schnullerfee/",
+    file: "src/games/pacifierstory/PacifierStoryGame.tsx",
+    story: TREE_STORY,
+    short: TREE_STORY_SHORT,
+    ids: TREE_SHORT_PAGES,
+    cries: /\bcr(y|ies)\b/,
+    comforts: /Mama|Papa|hold|hug|arms|comfort|cuddle/,
   },
   {
     href: "/kita/",
@@ -88,7 +101,7 @@ for (const book of BOOKS) {
     });
 
     test("has an address of its own, below the book's, opened from the choice", () => {
-      const game = CATEGORIES.flatMap((c) => c.games).find((g) => g.href === book.href);
+      const game = CATEGORIES.flatMap((c) => c.games).find((g) => g.href === (book.book ?? book.href));
       expect(game?.also).toContain(`${book.href}kurz/`);
       expect(readFileSync(book.file, "utf8")).toContain(`href: "${book.href}kurz/", version: SHORT_STORY`);
       expect(readFileSync("src/App.tsx", "utf8")).toContain(`"${book.href}kurz/"`);
@@ -97,7 +110,7 @@ for (const book of BOOKS) {
 }
 
 test("every chapter book opens on the shared choice, and none lists its chapters", () => {
-  const books = [...BOOKS.map((b) => b.file), "src/games/milkchain/MilkChainGame.tsx", "src/games/bedstory/BedStoryGame.tsx"];
+  const books = [...new Set(BOOKS.map((b) => b.file)), "src/games/milkchain/MilkChainGame.tsx", "src/games/bedstory/BedStoryGame.tsx"];
   for (const file of books) expect(readFileSync(file, "utf8"), file).toContain("<StoryBookGame book={BOOK} />");
   // Only the shared choice opens a story in `ChapterBook`; the chapter list and its classes are gone.
   const sources = [...new Bun.Glob("src/**/*.{ts,tsx,css}").scanSync()].filter((file) => !/\.test\.tsx?$/.test(file));

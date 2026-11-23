@@ -149,8 +149,9 @@ export const CATEGORIES: Category[] = [
         // The book „Schnullerfee“ beside „Abstillen“ (user request, 10 November 2026): „Tapsi und die Schnullerfee“, a
         // story in chapters along the steps of a gentle goodbye to the pacifier (src/games/pacifierstory).
         href: "/schnullerfee/",
-        // Its short version, from the story's own pages, opened from the book's choice (StoryChoice.tsx).
-        also: ["/schnullerfee/kurz/"],
+        // Its short version, from the story's own pages, and „Tapsi and the Pacifier Tree“ (src/games/pacifiertree, idea
+        // H-145) whole and short, for families who want no fairy, all opened from the book's choice (StoryChoice.tsx).
+        also: ["/schnullerfee/kurz/", "/schnullerfee/baum/", "/schnullerfee/baum/kurz/"],
         emoji: "🧚",
         title: PACIFIER_STORY_BOOK,
         blurb: PACIFIER_STORY_BLURB,

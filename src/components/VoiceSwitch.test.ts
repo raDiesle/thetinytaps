@@ -19,6 +19,8 @@ const BOOKS = [
   // The night story is read in the same book (`WeaningBook`), its voice from its own folder.
   { file: "src/games/milkchain/MilkChainGame.tsx", href: "/abstillen/nachts/", name: "abstillen-nachts", folder: "src/games/nightmilk/stimme" },
   { file: "src/games/milkchain/MilkChainGame.tsx", href: "/abstillen/abschied/", name: "abstillen-abschied", folder: "src/games/milkgoodbye/stimme" },
+  // „Tapsi and the Pacifier Tree“ is read in the book Schnullerfee, its voice from its own folder.
+  { file: "src/games/pacifierstory/PacifierStoryGame.tsx", href: "/schnullerfee/baum/", name: "schnullerbaum", folder: "src/games/pacifiertree/stimme" },
   { file: "src/games/bottlestory/BottleStoryGame.tsx", href: "/flaeschchen/", name: "flaeschchen", folder: "src/games/bottlestory/stimme" },
   { file: "src/games/bedstory/BedStoryGame.tsx", href: "/grosses-bett/", name: "grosses-bett", folder: "src/games/bedstory/stimme" },
 ];

@@ -294,6 +294,19 @@ export const SEO_TEXTS: PageSeo[] = [
     text: "Die Kurzfassung von „Tapsi und die Schnullerfee“, für Abende, an denen die ganze Geschichte zu lang ist, oder für ein Kind, das sie schon kennt. Sie erzählt dieselbe Geschichte mit denselben Bildern, nur das Wichtigste: Tapsi der Fuchs hat als Baby mit dem Schnuller getröstet und eingeschlafen und ist jetzt groß. Mama und Papa erzählen von der Schnullerfee, die die Schnuller zu den kleinen Babys bringt und dafür ein Geschenk dalässt, und Tapsi sagt selbst, dass sie kommen darf. Die drei Schnuller kommen in eine Schachtel, jeder bekommt einen Abschiedskuss, und die Schachtel steht mit einem gemalten Bild auf dem Fensterbrett. Die erste Nacht ist schwer, Tapsi weint, und Mama bleibt da. Nachts holt die Fee die Schachtel, am Morgen liegt ein Kuschelhase da, und jeden Abend geht das Einschlafen ein bisschen leichter. Mama und Papa haben Tapsi lieb, mit Schnuller und ohne. Unter jedem Bild steht ein kurzer Satz zum Vorlesen, jedes Tippen blättert weiter, und im Buch „Schnullerfee“ steht sie neben der ganzen Geschichte, jede mit der Zahl ihrer Bilder und ihrer ungefähren Dauer.",
   },
   {
+    path: "/schnullerfee/baum/",
+    title: "Schnullerbaum – Schnuller abgewöhnen ohne Fee",
+    description: "Eine Vorlesegeschichte ohne Fee: Tapsi der Fuchs bindet seine drei Schnuller an den Schnullerbaum im Park und sagt Tschüss – ganz oder kurz.",
+    text: "Eine Geschichte zum Vorlesen, Kapitel für Kapitel, für Familien, die den Schnuller ohne Fee verabschieden möchten. Tapsi der Fuchs hat drei Schnuller, einen roten, einen blauen und einen gelben. Papa zeigt Tapsi ein Buch mit dem Schnullerbaum, an den Kinder ihre Schnuller hängen, um Tschüss zu sagen. Tapsi will die Schnuller erst nicht hergeben und darf traurig sein. Am Tag bleiben die Schnuller nun im Bett, und Tapsi sucht selbst aus, wann es zum Baum geht, und für jeden Schnuller ein Band. Im Park hebt Papa Tapsi hoch, Tapsi bindet die Schnuller an einen Ast und winkt ihnen zu. In der ersten Nacht weint Tapsi, Mama hält Tapsi, Papa singt, und am Morgen ist Tapsi stolz. Beim Spaziergang besucht Tapsi die Schnuller im Baum. Kürzer als die Geschichte von der Schnullerfee, und auch als Kurzfassung in wenigen Minuten gelesen.",
+  },
+  {
+    path: "/schnullerfee/baum/kurz/",
+    title: "Schnullerbaum kurz erzählt – die Kurzfassung",
+    description:
+      "Die Kurzfassung der Schnullerbaum-Geschichte zum Vorlesen: dieselben Bilder von Tapsi dem Fuchs, nur das Wichtigste – in drei Minuten gelesen.",
+    text: "Die Kurzfassung von „Tapsi und der Schnullerbaum“, für Abende, an denen es schnell gehen soll, oder für ein Kind, das die Geschichte schon kennt. Mit denselben Bildern erzählt sie das Wichtigste: Tapsi der Fuchs hat drei Schnuller, Papa zeigt im Buch den Schnullerbaum, und Tapsi sucht selbst aus, wann es dorthin geht. Im Park bindet Tapsi die Schnuller an einen Ast und sagt Tschüss. In der ersten Nacht weint Tapsi und wird gehalten, am Morgen ist Tapsi stolz, und Mama und Papa haben Tapsi lieb, mit Schnuller und ohne.",
+  },
+  {
     path: "/kita/",
     title: "Kita-Eingewöhnung und Abschied – eine Geschichte",
     description:
@@ -513,7 +526,11 @@ export const SEO_TEXTS: PageSeo[] = [
  * Another address of a published game whose content players can't see yet – a story of a book whose pictures are still
  * in the queue: its texts wait here like an unfinished game's, out of the search pages and `noindex` until it shows.
  */
-const WAITING_PATHS: string[] = [];
+const WAITING_PATHS: string[] = [
+  // „Tapsi and the Pacifier Tree“ (`src/games/pacifiertree`), until its pictures are made (`pacifierTreePictures.ts`, its `after`).
+  "/schnullerfee/baum/",
+  "/schnullerfee/baum/kurz/",
+];
 
 /** Every page that should be found: all but the games still being built (`Game.unfinished`), which no one is to find yet. */
 export const SEO_PAGES: PageSeo[] = SEO_TEXTS.filter((page) => !isUnfinished(page.path) && !WAITING_PATHS.includes(page.path));
