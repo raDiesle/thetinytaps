@@ -59,7 +59,8 @@ function castOf(page: TreePage): string {
   const who: Record<Cast, string> = {
     tapsi: `Tapsi, a small fox toddler with orange fur and a white muzzle, in ${pyjamas ? "light-blue pyjamas with small yellow stars" : "a light-blue T-shirt and light-blue trousers"}`,
     mama: "Mama, a grown-up fox woman with a small red flower behind one ear, in a yellow sweater and brown trousers",
-    papa: "Papa, a grown-up fox man with round glasses, in a green sweater and brown trousers",
+    // Gemini once drew Papa's sweater navy (Meine Schnuller).
+    papa: "Papa, a grown-up fox man with round glasses, in a green sweater (fir-tree green, never navy, blue or grey) and brown trousers",
   };
   const n = page.cast.length;
   // With both grown-ups at one table Gemini once drew one fox with Mama's flower and Papa's glasses (Three More Sleeps).
@@ -83,6 +84,11 @@ function thingsOf(page: TreePage): string[] {
     );
   if (/ribbon/.test(page.picture) && ownPacifiers(page))
     things.push("Each of Tapsi's pacifiers hangs on a short satin ribbon of its own colour, tied to its ring.");
+  // On the walk to the park Gemini put more pacifiers into Tapsi's paws and some into Papa's as well.
+  if (/Tapsi .*carries/.test(page.picture) && ownPacifiers(page))
+    things.push(
+      "Only Tapsi holds pacifiers, just these three ribbons bunched in the paws; Mama and Papa hold no pacifier and no ribbon, their paws are empty or hold Tapsi's.",
+    );
   if (/tree/.test(page.picture) && page.place === "park")
     things.push(
       "The pacifier tree is the big old tree of the reference with the many small pacifiers of other children hanging from its low branches on little ribbons; keep it exactly as it is.",
@@ -152,7 +158,7 @@ export function treePicture(page: TreePage): QueuedPicture {
 }
 
 /** The pages whose pictures are made (`bilder/baum-<id>.webp`); the others wait in the queue. */
-const MADE = new Set<string>(["abend", "baender", "buch", "kinder", "kissen", "lieb", "lied", "schnuller", "spielen", "stolz", "vermisst", "wann"]);
+const MADE = new Set<string>(["abend", "baender", "buch", "kinder", "kissen", "lieb", "lied", "schnuller", "spielen", "stolz", "troesten", "vermisst", "wann"]);
 
 /** Every picture of the story still to make. */
 export const TREE_PICTURE_QUEUE: QueuedPicture[] = TREE_PAGES.filter((p) => !MADE.has(p.id)).map(treePicture);

@@ -102,10 +102,11 @@ const GROUP_SIZE: Partial<Record<Cast, number>> = { kinder: 2 };
 function castOf(page: ChildminderPage): string {
   const who: Record<Cast, string> = {
     tapsi: `Tapsi, a small fox toddler with orange fur and a white muzzle, in ${page.picture.includes("pyjamas") ? "light-blue pyjamas with small yellow stars" : /Tapsi in a jacket/.test(page.picture) ? "a yellow rain jacket over a light-blue T-shirt and light-blue trousers" : "a light-blue T-shirt and light-blue trousers"}`,
-    mama: `Mama, a grown-up fox woman with a small red flower behind one ear, in ${page.picture.includes("coat") ? "a red coat over a yellow sweater, and brown trousers" : "a yellow sweater and brown trousers"}`,
+    // Kneeling where Lotta knelt in the hall's reference, Mama came back as a bear (tm-haken).
+    mama: `Mama, a grown-up fox woman with orange fur and a white muzzle like Tapsi's (a fox, never a bear, never brown fur), with a small red flower behind one ear, in ${page.picture.includes("coat") ? "a red coat over a yellow sweater, and brown trousers" : "a yellow sweater and brown trousers"}`,
     papa: "Papa, a grown-up fox man with round glasses, in a green sweater and brown trousers",
     lotta:
-      "Lotta, the childminder, a grown-up bear woman with warm chestnut-brown fur and round ears, in a mustard-yellow knitted cardigan over a white-and-red striped shirt and dark-green trousers, a red scarf tied in her hair-tuft, with only a tiny round bear tail, never a long bushy one",
+      "Lotta, the childminder, a grown-up bear woman with warm chestnut-brown fur and round ears, in a mustard-yellow knitted cardigan over a white-and-red striped shirt and dark-green trousers, a red scarf tied in her hair-tuft, with only a tiny round bear tail, never a long bushy one; she wears this cardigan and scarf on every page, never a plain shirt or dress (tm-hand lost them once)",
     emil: "Emil, Tapsi's friend, a small bear toddler as tall as Tapsi with sandy-blond fur, in a teal T-shirt and red dungarees, with only a tiny round bear tail",
     kinder:
       "two more small children Lotta looks after, each with only a tiny round bear tail: a bear baby with cream-coloured fur in a pale-green romper, smaller than Tapsi, and a bigger bear girl a head taller than Tapsi with dark-brown fur in a lilac dress",
@@ -189,7 +190,7 @@ export function promptOf(page: ChildminderPage): string {
         ]
       : [
           "Redraw this exact place from the first reference picture: keep it exactly as it is – the same walls, windows, furniture and objects at the same places, the same camera framing (no zoom, no shift), the same colours and line style. Only the characters, their poses, the things they hold and the light change, and who is there.",
-          `In that reference picture ${place.was}: that was another moment. Draw each character only where this page says, and leave every other place empty – no second fox or bear, no fox tail left lying on the floor or the furniture.`,
+          `In that reference picture ${place.was}: that was another moment. Draw each character only where this page says, and leave every other place empty – where someone was in the reference and this page puts them elsewhere, that spot is empty now (Lotta once came back twice, kneeling as in the reference and in the doorway): no second fox or bear, no fox tail left lying on the floor or the furniture.`,
           absent(page),
         ];
   const ORDINAL = ["first", "second", "third", "fourth"];
@@ -228,7 +229,7 @@ export function childminderPicture(page: ChildminderPage): QueuedPicture {
 }
 
 /** The pages whose pictures are made (`bilder/tm-<id>.webp`); the others wait in the queue. */
-const MADE = new Set<string>(["besuch", "erzaehlen", "heim", "lieb", "packen", "zuhause"]);
+const MADE = new Set<string>(["besuch", "da", "erzaehlen", "erzaehlt", "heim", "kuss", "lieb", "packen", "schlafen", "sofa", "wann", "weg", "zuhause"]);
 
 /** Every picture of the story still to make. */
 export const CHILDMINDER_PICTURE_QUEUE: QueuedPicture[] = CHILDMINDER_PAGES.filter((p) => !MADE.has(p.id)).map(childminderPicture);
