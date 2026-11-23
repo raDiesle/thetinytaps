@@ -20,14 +20,17 @@ Tapsi misses it, lays the head on Mama's breast and hears her heart, and Mama an
   milk times go (`MILK_ORDER`), what comes instead (`INSTEAD`) and which drops are gone on a page (`goneOn`).
 - `milkChainPictures.ts`: the Gemini prompt of every page (place, light, chain, cast and clothes, nursing), as the
   picture queue takes them; a made picture goes on `MADE`.
-- `milkChain.ts` also holds `SHORT_PAGES`, the pages of the short version in the long story's order (`MILK_CHAIN_SHORT`,
-  the same pictures, translations and recordings), and `minutesOf`, about how long a story takes read aloud.
-- `MilkChainGame.tsx` is the book: `LINES`, one line per story and in it its versions (the long story whole and short
+- `milkChain.ts` also holds `SHORT_PAGES`, the pages of the short version in the long story's order (`MILK_CHAIN_SHORT`
+  by `shortOf`, the same pictures, translations and recordings); `shortOf` and `minutesOf` (about how long a story takes
+  read aloud) live in `src/lib/storyPages.ts`, shared by every chapter book.
+- `MilkChainGame.tsx` is the book: one line per story and in it its versions (the long story whole and short
   here, „Mit Abschiedsfest“ from `src/games/milkgoodbye/story.ts`, „Nachts abstillen“ from `src/games/nightmilk/story.ts`),
-  and `WeaningBook`, which opens on the choice (`Choice`, `?seite=inhalt`, `DevTag` `A0`): one big line per story – its
-  picture, what it is for (`*_KIND`) and its title small under it – and a paper slip per version to start it („Ganze
+  handed to `storyBook` and `StoryBookGame` of `src/components/StoryChoice.tsx` – the choice every chapter book opens on
+  since 23 November 2026 (Schnullerfee, Kita-Start, Haare waschen, Flasche abgewöhnen and Großes Bett too; a change there
+  reaches all). It opens on the choice (`?seite=inhalt`, `DevTag` `A0`): one big line per story – its
+  picture, what it is for (`*_KIND`) and its title small under it where it differs – and a paper slip per version to start it („Ganze
   Geschichte“ / „Kurzfassung“, „Lesen“ where there is one), with its pictures and minutes small under its word
-  („51 Bilder · ca. 12 Min.“, counted from the pages played, `SIZE`). A tap on the line opens its first version. Each story is read with the shared
+  („51 Bilder · ca. 12 Min.“, counted from the pages played). A tap on the line opens its first version, always on its first page. Each story is read with the shared
   `ChapterBook` (`src/components/ChapterBook.tsx`, classes `cb-` in `chapterBook.css`, also the books „Schnullerfee“,
   „Kita-Start“ … – a change there reaches all), opened at that page (`opensAt`), its way back to its contents leading to
   the choice (`onContents`). Every route (`/abstillen/`, `/abstillen/kurz/`, `/abstillen/abschied/`, `/abstillen/nachts/`)
@@ -55,7 +58,7 @@ Tapsi misses it, lays the head on Mama's breast and hears her heart, and Mama an
   dass klar wird, wo man die Geschichte starten kann … die Dauer ca.“, replacing the chapters as small numbers): never
   chapter numbers there, and every version a slip of its own to start it. The book never starts on page one, and while
   a page is open the corner goes back to the choice (`useInnerBack`). A new story about weaning gets its line in
-  `LINES`, a shorter telling of one a second slip in its line – never a book or volume of its own on the shelf.
+  `MilkChainGame.tsx`'s `storyBook`, a shorter telling of one a second slip in its line – never a book or volume of its own on the shelf.
   `milkchain.test.ts` checks.
 - **The short version is made of the long story's own pages** (`SHORT_PAGES`, checked: in order, from the baby to the
   love that stays, every milk time, a page holding Tapsi after each one where Tapsi cries), so it needs no picture,

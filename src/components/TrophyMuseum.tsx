@@ -1,16 +1,20 @@
 import { type CSSProperties, memo, useEffect, useLayoutEffect, useMemo, useRef, useState } from "react";
 import { useLocation, useNavigate } from "react-router";
+import { ControlIcon } from "@/components/ControlIcon";
 import { FullscreenButton } from "@/components/FullscreenButton";
 import { ShelfLabelArt } from "@/components/PageCornerArt";
 import { Trophy } from "@/components/Trophy";
 import { useLevelNames } from "@/components/trophyNames";
+import { trophyPicture } from "@/components/trophyPictures";
 import { BACK, CELL_HIGH, type MuseumLayout, type MuseumNode, museumLayout, museumTree, tierPlan } from "@/components/museumLayout";
-import { goBack } from "@/lib/goBack";
+import { useFigure } from "@/lib/common";
+import { type BackVisit, goBack } from "@/lib/goBack";
 import { useAppLanguage, useT } from "@/lib/language";
 import { TROPHY_PARAM, TROPHY_ROOM, useMuseumTrophies } from "@/lib/museum";
+import { loadOnIntent, pageCodeSoon } from "@/lib/preloadPages";
 import { useStepAddress } from "@/lib/stepAddress";
 import { BACK_TO_SHELF } from "@/lib/sharedTexts";
-import { gameOf, type TrophyWon, trophyKey } from "@/lib/trophies";
+import { gameOf, trophyHref, type TrophyWon, trophyKey } from "@/lib/trophies";
 import "@/styles/museum.css";
 
 /*
@@ -21,7 +25,8 @@ import "@/styles/museum.css";
  * each level. A category with more trophies than a room shows big becomes a wing: its own hall with a door for each game.
  * The rooms are drawn in simple perspective – back wall, side walls, ceiling and a floor of boards running to one vanishing
  * point; the left doorway always leads one room back (the first one to the shelf), as does the round shelf label in the
- * top left. A tap on a trophy shows it big. Everything is drawn once and stands still; only walking through a door and a
+ * top left. A tap on a trophy shows it big, with its level's picture and a play sign beside it that opens that level; ✕
+ * there leads back into the room, the trophy still big (user request, November 2026). Everything is drawn once and stands still; only walking through a door and a
  * trophy coming close move, by transforms and opacity.
  */
 
@@ -92,6 +97,20 @@ export function TrophyMuseum() {
     if (!url.searchParams.has(TROPHY_PARAM)) return;
     url.searchParams.delete(TROPHY_PARAM);
     window.history.replaceState(window.history.state, "", url);
+  };
+  // The play sign beside a trophy shown big opens its level. The room's address names the trophy first, so ✕ in the game
+  // (`BackVisit`, GameShell) comes back to it shown big in its room, and a step back in the history lands there too.
+  const going = useRef(false);
+  const play = (trophy: TrophyWon) => {
+    const href = trophyHref(trophy.game, trophy.level);
+    if (!href || going.current) return;
+    going.current = true;
+    const url = new URL(window.location.href);
+    url.searchParams.set(TROPHY_PARAM, trophyKey(trophy.game, trophy.level));
+    window.history.replaceState(window.history.state, "", url);
+    const back: BackVisit = { backTo: `${url.pathname}${url.search}` };
+    // The game's code first, so its page is drawn at once rather than the loading paper.
+    void pageCodeSoon(href).then(() => navigate(href, { state: back }));
   };
   const walkTo = (to: string[], origin = "50% 62%") => {
     if (walk) return;
@@ -209,7 +228,9 @@ export function TrophyMuseum() {
           }}
         />
       )}
-      {big && <BigTrophy trophy={big.trophy} from={big.from} name={names(big.trophy.game, big.trophy.level)} onClose={putBack} />}
+      {big && (
+        <BigTrophy trophy={big.trophy} from={big.from} name={names(big.trophy.game, big.trophy.level)} onClose={putBack} onPlay={() => play(big.trophy)} />
+      )}
     </main>
   );
 }
@@ -635,9 +656,10 @@ function Plan({
 
 /**
  * A trophy shown big (a tap on it in the room): it comes from its plinth into the middle of the dimmed room, its plate
- * big under it with the level, the game, how often it was won and since when. A tap anywhere, or Esc, puts it back.
+ * big under it with the level, the game, how often it was won and since when. Beside it the level's picture taped on
+ * with the drawn play sign over it (children don't read): a tap opens that level. A tap anywhere else, or Esc, puts it back.
  */
-function BigTrophy({ trophy, from, name, onClose }: { trophy: TrophyWon; from?: DOMRect; name?: string; onClose: () => void }) {
+function BigTrophy({ trophy, from, name, onClose, onPlay }: { trophy: TrophyWon; from?: DOMRect; name?: string; onClose: () => void; onPlay: () => void }) {
   const t = useT();
   const language = useAppLanguage();
   const art = useRef<HTMLDivElement>(null);
@@ -654,6 +676,9 @@ function BigTrophy({ trophy, from, name, onClose }: { trophy: TrophyWon; from?: 
   }, [from]);
   const game = gameOf(trophy.game);
   const since = new Intl.DateTimeFormat(language.id, { day: "numeric", month: "long", year: "numeric" }).format(trophy.at);
+  const href = trophyHref(trophy.game, trophy.level);
+  const picture = trophyPicture(trophy.game, trophy.level, useFigure());
+  const playLabel = t({ en: "Play", de: "Spielen", zh: "去玩", hi: "चलो खेलें", es: "Jugar", ar: "هيّا نلعب", ru: "Играть" });
   return (
     <div className="museum-big" role="dialog" aria-label={name ?? (game ? t(game.title) : "")}>
       {/* The whole screen puts it back: one tap anywhere. */}
@@ -697,6 +722,24 @@ function BigTrophy({ trophy, from, name, onClose }: { trophy: TrophyWon; from?: 
           </span>
         )}
       </div>
+      {href && (
+        <div className="museum-big-side">
+          <button
+            type="button"
+            className="museum-big-play"
+            aria-label={[playLabel, name ?? (game ? t(game.title) : "")].filter(Boolean).join(": ")}
+            title={playLabel}
+            data-tap=""
+            onClick={onPlay}
+            {...loadOnIntent(href)}
+          >
+            {picture && <img className="museum-big-play-picture" src={picture} alt="" draggable={false} />}
+            <span className="museum-big-play-sign">
+              <ControlIcon kind="play" />
+            </span>
+          </button>
+        </div>
+      )}
     </div>
   );
 }

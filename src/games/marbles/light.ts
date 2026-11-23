@@ -18,6 +18,7 @@
 // moment. Coordinates are those of the room, 7100 × 900; the screen shows 1600
 // of it at a time.
 
+import { decay } from "./level";
 import {
   playBeam,
   playBlub,
@@ -201,6 +202,8 @@ const FLY_GAP = 0.45;
 const UNDER_WIRE = 64;
 /** How fast the carousel turns once the warm air has got it going (radians per second). */
 const CAROUSEL_SPEED = 1.4;
+/** How many seconds the lit globe turns before it slows down and stands (two more): the fireflies are on their way to the lantern by then. */
+export const GLOBE_SPIN = 6;
 /** Where on the hoop the paper bird comes loose: behind the lamp, on its way to the right. */
 const LOOSE_AT = 2.0;
 /** How far from the globe's middle the fireflies fly round it. */
@@ -415,15 +418,22 @@ export function buildLight() {
   const globeButton = (t: number) => easeOut(seg(t, tGlobe - 0.05, tGlobe + 0.1));
   /** How brightly the globe shines (0 to 1). */
   const globeGlow = (t: number) => easeOut(seg(t, tGlobe + 0.1, tGlobe + 0.7));
-  /** How far the globe has turned, in radians: it speeds up, then turns evenly, and stops when the level is over. */
+  /**
+   * How far the globe has turned, in radians: it speeds up, turns evenly while it calls the fireflies, then slows down
+   * and stands. Turning on until the end, it had an old phone paint its band of the screen in every frame behind the
+   * lighthouse's whole sweep (perf, A-36).
+   */
   const globeTurn = (t: number) => {
-    const u = Math.max(0, Math.min(t, tDone) - tGlobe - 0.3);
-    return u < 1 ? 0.8 * u * u : 0.8 + 1.6 * (u - 1);
+    const u = Math.max(0, t - tGlobe - 0.3);
+    if (u < 1) return 0.8 * u * u;
+    if (u < GLOBE_SPIN) return 0.8 + 1.6 * (u - 1);
+    const v = Math.min(u - GLOBE_SPIN, 2);
+    return 0.8 + 1.6 * (GLOBE_SPIN - 1) + 1.6 * v - 0.4 * v * v;
   };
   /** A wobble in degrees as it starts, dying away. */
   const globeWobble = (t: number) => {
     const u = t - tGlobe;
-    return u <= 0 ? 0 : 7 * Math.sin(u * 14) * Math.exp(-3 * u);
+    return u <= 0 ? 0 : 7 * Math.sin(u * 14) * decay(3 * u);
   };
 
   /* The glowing globe calls the fireflies: they fly over the top of it and on into the lighthouse's lantern, the one furthest left first. */

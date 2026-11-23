@@ -4,7 +4,6 @@ import { BLOCKS_NAME } from "./blocksNames";
 import { BOXES_NAME } from "./boxesNames";
 import { TUNNEL_NAME } from "./tunnelNames";
 import { JUMP_NAME } from "./jumpNames";
-import { ROAD_NAME } from "./roadNames";
 import { TIDY_NAME } from "./tidyNames";
 
 /** The game's name, on its start screen, its spine on the shelf and in the browser tab. */
@@ -59,14 +58,12 @@ export const PICTURES: { id: TimerPicture; emoji: string; name: Texts }[] = [
   { id: "tidy", emoji: "🧸", name: TIDY_NAME },
   // Five Boxes (H-120, 22 November 2026): a box for each sort, its toys hopping in and its lid shutting, one a minute at five minutes.
   { id: "boxes", emoji: "📦", name: BOXES_NAME },
-  // The road rug (H-122, 22 November 2026): toys hop off a play rug's road into the box, and the toy car drives on to the next one.
-  { id: "road", emoji: "🛣️", name: ROAD_NAME },
   // The block house (H-125, 22 November 2026), the first timer like a game played by itself: blocks hop out of a jumble into a house.
   { id: "blocks", emoji: "🧱", name: BLOCKS_NAME },
   // The treasure tunnel (H-126, 22 November 2026), the second like a block world played by itself: a tunnel dug block by block to a chest.
   { id: "tunnel", emoji: "⛏️", name: TUNNEL_NAME },
-  // Hop to the Flag (H-127, 22 November 2026), the first game look that is no block world: a jump-and-run, a hopper catching a trail of stars on its way to the flag.
-  { id: "jump", emoji: "🏃", name: JUMP_NAME },
+  // Up to the Moon (H-127, rebuilt 23 November 2026), a jump-and-run going up: a fox swims, hops up a tree, rides a cable car and a lift and flies from a lake up to the moon, the picture following it, then sails down into a cake.
+  { id: "jump", emoji: "🚀", name: JUMP_NAME },
   {
     id: "train",
     emoji: "🚂",

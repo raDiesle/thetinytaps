@@ -1,4 +1,5 @@
 import { memo, useEffect, useRef, useState, type CSSProperties } from "react";
+import { useRunClock } from "./pause";
 import { INK, Layer, STAGE_H, STAGE_W } from "./scenes";
 import { Cushion, type Holder } from "./swap";
 
@@ -229,9 +230,10 @@ export function Seesaw({
   }, []);
   // The animations' delay is read once as the turns start to run, never again at the renders every second after: a
   // delay changed on a running animation moves it.
+  const clock = useRunClock();
   const anchor = useRef({ key: "", delay: 0 });
   const key = `${round}-${wake}-${running}-${startedAt}`;
-  if (anchor.current.key !== key) anchor.current = { key, delay: startedAt - Date.now() };
+  if (anchor.current.key !== key) anchor.current = { key, delay: startedAt - clock.now() };
   const name = running ? ` tm-saw-${(round + wake) % 2 ? "b" : "a"}` : "";
   const style = {
     transformOrigin: `${((SAW.x - B.x) / B.w) * 100}% ${((SAW.y - B.y) / B.h) * 100}%`,

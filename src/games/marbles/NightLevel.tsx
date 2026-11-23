@@ -1,7 +1,7 @@
 import { memo, useEffect, useId, useMemo } from "react";
 import { loadRecordings } from "@/lib/sfx";
 import { VIEW_H, type LevelProps } from "./level";
-import { deg, easeOut, lerp, seg } from "./machineKit";
+import { deg, easeOut, lerp, seg, hump } from "./machineKit";
 import { MachineStage } from "./MachineStage";
 import {
   BASKET,
@@ -77,13 +77,15 @@ export function NightLevel(props: LevelProps) {
   // The carousel's sheep stops facing us when the crank has run down.
   const finalTurn = night.crankTurn(1000);
 
+  // The backdrop never changes: a layer of its own, painted once.
+  const backdrop = useMemo(() => [{ content: <Room /> }], []);
+
   return (
-    <MachineStage machine={night} level="night" start={{ x: CRANK.x - 10, y: CRANK.y + 5, r: 70 }} {...props}>
+    <MachineStage back={backdrop} machine={night} level="night" start={{ x: CRANK.x - 10, y: CRANK.y + 5, r: 70 }} {...props}>
       {(t) => {
         const end = Math.min(t, night.duration);
         return (
           <>
-            <Room />
             <SunsetWindow night={night} t={t} ids={ids} />
             <Shelf />
             <MusicBox night={night} t={t} finalTurn={finalTurn} />
@@ -125,7 +127,7 @@ export function NightLevel(props: LevelProps) {
 
 /* ---------- The room ---------- */
 
-function Room() {
+const Room = memo(function Room() {
   return (
     <g>
       <rect x="-400" y="-200" width={WORLD_W + 800} height={FLOOR + 200} fill={WALL} />
@@ -142,7 +144,7 @@ function Room() {
       <ellipse cx={CRADLE.x0 + 160} cy={FLOOR + 50} rx="420" ry="34" fill="#ffb3e1" stroke={INK} strokeWidth="3" />
     </g>
   );
-}
+});
 
 /** The big window with the sun going down behind purple hills; it sinks a little while the machine runs. */
 function SunsetWindow({ night, t, ids }: { night: Night; t: number; ids: string }) {
@@ -179,7 +181,7 @@ function SunsetWindow({ night, t, ids }: { night: Night; t: number; ids: string 
 
 /* ---------- Music box, gutter, basket ---------- */
 
-function Shelf() {
+const Shelf = memo(function Shelf() {
   const { x0, x1, top } = SHELF;
   return (
     <g>
@@ -189,7 +191,7 @@ function Shelf() {
       <rect x={x0} y={top} width={x1 - x0} height="18" rx="6" fill={WOOD} stroke={INK} strokeWidth="4" />
     </g>
   );
-}
+});
 
 /** The music box: a crank on its right side, and on its lid a little carousel where a sheep and a cloud ride round. */
 function MusicBox({ night, t, finalTurn }: { night: Night; t: number; finalTurn: number }) {
@@ -272,9 +274,9 @@ function Sheep({ sleep }: { sleep: number }) {
 }
 
 /** The little cloud riding opposite the sheep. */
-function Cloud() {
+const Cloud = memo(function Cloud() {
   return <path d="M-24 -10 a12 12 0 0 1 8 -20 a16 16 0 0 1 28 -4 a12 12 0 0 1 12 24 Z" fill="#e8f6ff" stroke={INK} strokeWidth="2.5" strokeLinejoin="round" />;
-}
+});
 
 /** An eye: a dot while awake, closing to a soft downward arc as `sleep` goes from 0 to 1. */
 function Eye({ x, y, r, sleep }: { x: number; y: number; r: number; sleep: number }) {
@@ -291,7 +293,7 @@ function Eye({ x, y, r, sleep }: { x: number; y: number; r: number; sleep: numbe
 }
 
 /** The wooden gutter: three gently sloping stretches, a curved wall at each turn, and pegs holding it on the wall. */
-function Gutter() {
+const Gutter = memo(function Gutter() {
   const off = STAR_R + 6;
   const wall = (c: { x: number; y: number; r: number }, from: number, to: number) => {
     const r = c.r + off;
@@ -326,7 +328,7 @@ function Gutter() {
       </g>
     </g>
   );
-}
+});
 
 /** The cord from the basket over the two pulleys on the ceiling and back along the rail to the curtain's front edge. */
 function Cords({ night, t }: { night: Night; t: number }) {
@@ -1014,7 +1016,7 @@ function Cradle({ night, t }: { night: Night; t: number }) {
   const { x0, x1, top, bottom } = CRADLE;
   const mid = (x0 + x1) / 2;
   const sleep = night.asleep(t, night.tTeddy);
-  const yawn = Math.sin(Math.PI * seg(t, night.tYawn, night.tYawn + 1.1));
+  const yawn = hump(seg(t, night.tYawn, night.tYawn + 1.1));
   return (
     <g transform={`rotate(${night.rock(t)} ${mid} ${FLOOR})`}>
       <path d={`M${x0 - 20} ${bottom + 30} Q${mid} ${FLOOR + 22} ${x1 + 20} ${bottom + 30}`} fill="none" stroke={INK} strokeWidth="16" strokeLinecap="round" />

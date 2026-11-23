@@ -52,10 +52,30 @@ const MoodPage = page(() => import("@/pages/MoodPage"), "MoodPage", "/wie-gehts-
 const CausePage = page(() => import("@/pages/CausePage"), "CausePage", "/was-ist-passiert/");
 const TowerPage = page(() => import("@/pages/TowerPage"), "TowerPage", "/zaehlturm/");
 const MarblePage = page(() => import("@/pages/MarblePage"), "MarblePage", "/kettenreaktion/");
-const PacifierStoryPage = page(() => import("@/pages/PacifierStoryPage"), "PacifierStoryPage", "/schnullerfee/");
-const KitaStoryPage = page(() => import("@/pages/KitaStoryPage"), "KitaStoryPage", "/kita/");
-const HairStoryPage = page(() => import("@/pages/HairStoryPage"), "HairStoryPage", "/haare-waschen/");
-const BottleStoryPage = page(() => import("@/pages/BottleStoryPage"), "BottleStoryPage", "/flaeschchen/");
+// The book „Schnullerfee“ and its stories: the fairy's at its own address and its short version, the pacifier tree's
+// whole and short below it.
+const PacifierStoryPage = page(
+  () => import("@/pages/PacifierStoryPage"),
+  "PacifierStoryPage",
+  "/schnullerfee/",
+  "/schnullerfee/kurz/",
+  "/schnullerfee/baum/",
+  "/schnullerfee/baum/kurz/",
+);
+// The book „Kita-Start“ and its stories: the Kita's at its own address and its short version, the childminder's whole and
+// short below it.
+const KitaStoryPage = page(() => import("@/pages/KitaStoryPage"), "KitaStoryPage", "/kita/", "/kita/kurz/", "/kita/tagesmutter/", "/kita/tagesmutter/kurz/");
+// The book „Haare waschen“ and its stories: the bath's at its own address and its short version, the shower's whole and
+// short below it.
+const HairStoryPage = page(
+  () => import("@/pages/HairStoryPage"),
+  "HairStoryPage",
+  "/haare-waschen/",
+  "/haare-waschen/kurz/",
+  "/haare-waschen/dusche/",
+  "/haare-waschen/dusche/kurz/",
+);
+const BottleStoryPage = page(() => import("@/pages/BottleStoryPage"), "BottleStoryPage", "/flaeschchen/", "/flaeschchen/kurz/");
 const BedStoryPage = page(() => import("@/pages/BedStoryPage"), "BedStoryPage", "/grosses-bett/");
 const PottyPage = page(() => import("@/pages/PottyPage"), "PottyPage", "/toepfchen/");
 const RewardsPage = page(() => import("@/pages/RewardsPage"), "RewardsPage", "/belohnungstafel/");
@@ -111,15 +131,25 @@ export function App() {
           <Route path="zaehne" element={<TeethPage />} />
           <Route path="haende-waschen" element={<HandwashPage />} />
           <Route path="toepfchen" element={<PottyPage />} />
-          {/* One book of two stories, opening on their choice: the same page at both addresses, so it stays between them. */}
+          {/* A chapter book opens on the choice of its stories (StoryChoice.tsx): the same page at each story's address, so it stays between them. */}
           <Route path="abstillen" element={<MilkChainPage />} />
           <Route path="abstillen/kurz" element={<MilkChainPage />} />
           <Route path="abstillen/abschied" element={<MilkChainPage />} />
           <Route path="abstillen/nachts" element={<MilkChainPage />} />
           <Route path="schnullerfee" element={<PacifierStoryPage />} />
+          <Route path="schnullerfee/kurz" element={<PacifierStoryPage />} />
+          <Route path="schnullerfee/baum" element={<PacifierStoryPage />} />
+          <Route path="schnullerfee/baum/kurz" element={<PacifierStoryPage />} />
           <Route path="kita" element={<KitaStoryPage />} />
+          <Route path="kita/kurz" element={<KitaStoryPage />} />
+          <Route path="kita/tagesmutter" element={<KitaStoryPage />} />
+          <Route path="kita/tagesmutter/kurz" element={<KitaStoryPage />} />
           <Route path="haare-waschen" element={<HairStoryPage />} />
+          <Route path="haare-waschen/kurz" element={<HairStoryPage />} />
+          <Route path="haare-waschen/dusche" element={<HairStoryPage />} />
+          <Route path="haare-waschen/dusche/kurz" element={<HairStoryPage />} />
           <Route path="flaeschchen" element={<BottleStoryPage />} />
+          <Route path="flaeschchen/kurz" element={<BottleStoryPage />} />
           <Route path="grosses-bett" element={<BedStoryPage />} />
           <Route path="belohnungstafel" element={<RewardsPage />} />
           {/* The Tagesplan shares the Belohnungstafel's page; its own address opens it on a plan (and keeps its search entry). */}

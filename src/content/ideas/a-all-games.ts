@@ -302,5 +302,32 @@ export const allGamesIdeas: IdeaArea = {
       why: "Hält es, kosten auch die Geschichtenbilder etwa die Hälfte.",
       effort: "S",
     },
+    {
+      id: "A-35",
+      emoji: "🐢",
+      title: "Leistung: Bewegungsabenteuer ruckelt auf alten Handys",
+      text: "Messung vom 23. November 2026 (altes Android nachgebildet, dreimal gemessen): Bei den leuchtenden Trommeln ist der Hauptfaden zu 96–99 % beschäftigt (eigene Grenze 95 %, am 9. November 77 %), und in zwei von drei Durchgängen sinkt es auf 48–51 Bilder pro Sekunde, das langsamste Zwanzigstel 33 statt 17 ms. Am Anfang („Tapsi bewegt sich“) 55–66 % beschäftigt (Grenze 60 %, eine Woche davor 49 %) mit 3–4 Hängern bis 250–820 ms. Die Zeit geht fast ganz in three.js, und zwar in die Arbeit je Teil und je Zeichenaufruf, nicht ins Malen: renderBufferDirect, setValueM4, setProgram und refreshMaterialUniforms (je Zeichenaufruf), update und projectObject (jedes Teil der Welt in jedem Bild). Lösung: an den Trommeln zählen, wie viele Teile und Zeichenaufrufe je Bild es sind (renderer.info, im Oktober 396), und mit dem Stand vom 9. November vergleichen; was seither dazukam (Wolkenreise, Feuerwehr, die Arme an Angel, Kurbel und Schlüssel), wie die Requisiten zusammenbacken (mergeParts), gleiche Dinge als InstancedMesh, und die Leuchtränder nur für den Körperteil zeichnen, der gerade leuchtet. Die Hänger am Anfang beim Laden der Welt prüfen (ViewTransitionCallback 2 s im ersten Durchgang).",
+      why: "Kleinkinder spielen oft auf alten Handys der Eltern; dort sehen sie das Spiel ruckeln.",
+      effort: "M",
+    },
+    {
+      id: "A-36",
+      emoji: "🐢",
+      title: "Leistung: Kettenreaktion – der Rest für alte Handys",
+      text: "Begonnen am 23. November 2026: jedes Level mit `bun run perf ketten-<id>` gemessen; die festen Hintergründe liegen jetzt in eigenen Ebenen (`back`), Teile sind `still(…)`, was abseits des Bildschirms für immer flackert bekommt eine feste Zeit (`seen`), und was ausklingt kommt wirklich zur Ruhe (`decay`, `hump`, `decay.test.ts`). Beschäftigt sind alle Level jetzt fast überall unter 60 %, aber neu gemalt wird noch zu viel (Grenze 30 Bildschirme pro Sekunde; letzte Messung vor den letzten Änderungen: Raketenstart Mitte 61, Licht-Kette Anfang 64, Baustelle Anfang 54, Zirkus Mitte 49, Gute Nacht Mitte 44, Nagelbrett Mitte 40, Garten Anfang 38, Alles fällt um Mitte 37, Wasserbahn Anfang 37, Küche Mitte 35, Bauernhof Mitte 34, Aufräumen Anfang 34, Weltraumbahn Anfang 34; Hatschi-Kette 63–65 % beschäftigt). Offen: (1) Was nach dem Ende nie zur Ruhe kommt: im Garten der Vogel bei x 8175, die Noten der Schläfer (GardenLevel.tsx, fontSize 34), der Schlauch bei x 7359; in der Baustelle der Bagger bei EXC.x 3440, der für immer wippt. (2) Winzige Drehungen, die nie ganz 0 werden, im Bauernhof (rotate(0.0001 3618 800), rotate(-0.000003 8550 800)). (3) Wasserbahn, Nagelbrett, Hatschi-Kette und Alles fällt um haben keine MachineStage und wurden so noch nicht abgesucht. (4) Die Licht-Kette maß „Mitte“ 2 % beschäftigt – das Messstück stand wohl am aktiven Halt; prüfen und, wo nötig, in `tools/perfScenarios.ts` weitertippen. (5) Alle neu messen (`bun run perf ketten-` im Hintergrund, etwa 15 Minuten) und die geänderten Level im Vorschaufenster ansehen: Hintergründe in Ebenen (Reihenfolge), Zirkus-Reifen, Baustellen-Band hält an, Salatschleuder, Disco-Kugel, Badeschaum, Wasserkocher hört auf zu dampfen, Rasensprenger geht aus, Rakete fliegt weg, Küken laufen bis zur Henne. So findet man, was sich noch ändert: `KETTEN_SCAN=1 bun test src/games/marbles/stillness.scan.test.tsx` (`LEVELS=garden,building`, `CTX=1`).",
+      why: "Kleinkinder spielen oft auf alten Handys der Eltern; dort sehen sie das Spiel ruckeln.",
+      effort: "M",
+      done: true,
+      partial:
+        "Umgesetzt am 23. November 2026: (1) Garten und Baustelle kommen nach dem Ende zur Ruhe (Vögel, Maulwurf und Noten bis `tQuiet`, der Bagger summt nach seinem letzten Zug aus), und als letzte Sicherung bleibt die Uhr jeder Maschine 6 s nach ihrem Ende stehen (`AFTER_END_S`, `afterEnd.test.ts`). (2) `wobble()` wird genau 0 (`WOBBLE_REST`), der Bauernhof dreht nichts mehr um Bruchteile. (3) Wasserbahn, Hatschi-Kette und Alles fällt um malen ihren Hintergrund in einer eigenen Ebene; abgesucht, nichts bewegt sich nach dem Ende. In der Licht-Kette sind der Leuchtturmstrahl und die Disco-Lichter kleine eigene Ebenen, der Globus hört auf zu drehen, sitzende Glühwürmchen schlagen nicht mehr mit den Flügeln, Lampe und Karussells stehen abseits des Bildschirms still. (4) Die 2 % der Licht-Kette kamen in zwei neuen Messungen nicht wieder; falsch war dagegen das Nagelbrett: seine 20 Kugeln waren vor „Mitte“ alle gefallen, gemessen wurde der Wechsel zum nächsten Level – jetzt fällt dort nur alle 1,5 s eine Kugel. (5) Alle 21 Level gemessen: 22 von 42 Abschnitten im Rahmen, alle mit 60 Bildern pro Sekunde und ohne Hänger. Was noch darüber liegt: A-37.",
+    },
+    {
+      id: "A-37",
+      emoji: "🐢",
+      title: "Leistung: Kettenreaktion – was noch über dem Rahmen liegt",
+      text: "Messung vom 23. November 2026 nach A-36 (altes Android nachgebildet; Rahmen: höchstens 60 % beschäftigt, höchstens 30 Bildschirme pro Sekunde neu gemalt). Am meisten beschäftigt: Baustelle 78–79 % (Anfang und Mitte, dazu 48 Bildschirme am Anfang), Zirkus 64–65 % (Mitte auch 43 Bildschirme), Raketenstart 61–63 % (Mitte 56 Bildschirme), Schneebahn Anfang 62 % (45 Bildschirme), Klingende Kugelbahn und Baustellen-Bahn Mitte 60–61 %, Wasserbahn Anfang 60 %. Zu viel neu gemalt: Licht-Kette Mitte 56 (übrig sind die Glühwürmchen und die Linse in der Laterne, im `front`-svg), Gute Nacht Mitte 45, Farbenbahn Anfang 37, Garten Anfang 37, Aufräumen Anfang 34, Weltraumbahn Anfang 34, Alles fällt um Mitte 32, Klingende Kugelbahn und Baustellen-Bahn Anfang 32, Badezimmer Anfang 31. Lösung je Level: mit `bun run perf ketten-<id> --profile` sehen, was den Hauptfaden beschäftigt (Baustelle, Zirkus, Raketenstart zuerst), und mit `--shots` und `KETTEN_SCAN=1 bun test src/games/marbles/stillness.scan.test.tsx` (`LEVELS=`, `TIMES=`, `ALL=1`), was sich im großen svg noch ändert; kleine bewegte Dinge als `Sprite`, lange als eigene Ebenen wie der Leuchtturmstrahl. Ungeklärt: einmal maß die Licht-Kette „Mitte“ nur 2 % beschäftigt, zwei spätere Messungen nicht mehr.",
+      why: "Kleinkinder spielen oft auf alten Handys der Eltern; dort sehen sie das Spiel ruckeln.",
+      effort: "M",
+    },
   ],
 };

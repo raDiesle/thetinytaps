@@ -33,6 +33,7 @@ const MASCOT_DRAWINGS = [
   "src/games/scenes/weltall/parts.tsx",
   "src/games/scenes/strand/beach.tsx",
   "src/games/scenes/winterbaustelle/people.tsx",
+  "src/games/timer/jumpFox.tsx",
 ];
 
 /** Pieces of the old flat heads (triangle ears, an egg of a head), copied from file to file before. */

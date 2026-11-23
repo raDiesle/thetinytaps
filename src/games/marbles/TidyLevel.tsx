@@ -2,7 +2,7 @@ import { memo, useId, useMemo } from "react";
 import { VIEW_H, type LevelProps } from "./level";
 import { clamp01, deg, lerp, svgLine } from "./machineKit";
 import { MachineStage } from "./MachineStage";
-import { BAR_COLORS, STAR_POINTS } from "./parts";
+import { BAR_COLORS, STAR_POINTS, still } from "./parts";
 import { INK, Picture, Sparkles, WallClock, Window } from "./scenery";
 import type { Pt } from "./path";
 import {
@@ -81,11 +81,13 @@ export function TidyLevel(props: LevelProps) {
   const tidy = useMemo(buildTidy, []);
   const ids = useId();
 
+  // The backdrop never changes: a layer of its own, painted once.
+  const backdrop = useMemo(() => [{ content: <Room paper={`${ids}-paper`} /> }], [ids]);
+
   return (
-    <MachineStage machine={tidy} level="tidy" start={{ x: HORSE.x + 10, y: FLOOR - 170, r: 150, side: "left" }} {...props}>
+    <MachineStage back={backdrop} machine={tidy} level="tidy" start={{ x: HORSE.x + 10, y: FLOOR - 170, r: 150, side: "left" }} {...props}>
       {(t) => (
         <>
-          <Room paper={`${ids}-paper`} />
           {t < 0 && <StartGlow id={`${ids}-glow`} />}
           <RockingHorse tilt={tidy.rock(t)} />
           <ChestInside tidy={tidy} t={t} />
@@ -190,7 +192,7 @@ const Room = memo(function Room({ paper }: { paper: string }) {
 });
 
 /** A soft, still glow behind the rocking horse: what to tap, until the machine starts. */
-function StartGlow({ id }: { id: string }) {
+const StartGlow = still(function StartGlow({ id }: { id: string }) {
   return (
     <g>
       <defs>
@@ -202,7 +204,7 @@ function StartGlow({ id }: { id: string }) {
       <ellipse cx={HORSE.x + 20} cy={FLOOR - 170} rx="300" ry="240" fill={`url(#${id})`} />
     </g>
   );
-}
+});
 
 /* ---------- Rocking horse, blocks, football, chest ---------- */
 

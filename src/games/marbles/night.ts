@@ -20,6 +20,7 @@
 // each thing is at a moment. Coordinates are those of the room, 4650 × 900; the
 // screen shows 1600 of it at a time.
 
+import { decay } from "./level";
 import {
   playChimeNote,
   playClick,
@@ -36,7 +37,7 @@ import {
   playYawn,
 } from "@/lib/sfx";
 import { playCuckoo } from "@/lib/realSounds";
-import { along, cameraOn, distAt, easeInOut, easeOut, hop, lerp, pathOf, rad, roll, seg, timeline, timeWhen, turn } from "./machineKit";
+import { along, cameraOn, distAt, easeInOut, easeOut, hop, lerp, pathOf, rad, roll, seg, timeline, timeWhen, turn, hump } from "./machineKit";
 import { arc, line, type Pt } from "./path";
 
 /** The recording the hamster squeaks with, loaded when the level opens. */
@@ -291,7 +292,7 @@ export function buildNight() {
   const chairAngle = (t: number) => {
     if (t < tShut) return chairPush(curtainEdge(t));
     const u = Math.min(t, tDone) - tShut;
-    return TIP * Math.exp(-u / ROCK_FADE) * Math.cos((2 * Math.PI * u) / ROCK_PERIOD);
+    return TIP * decay(u / ROCK_FADE) * Math.cos((2 * Math.PI * u) / ROCK_PERIOD);
   };
   /** When the curtain's edge first touches the knob. */
   let tNudge = tSink;
@@ -332,15 +333,12 @@ export function buildNight() {
   /** How far the door is open (0 shut, 1 wide open). */
   const doorOpen = (t: number) => easeInOut(seg(t, tHour, tHour + 0.5)) - easeInOut(seg(t, tBackEnd, tBackEnd + 0.4));
   /** How far the cuckoo leans into its yawn (0 to 1 and back). */
-  const birdLean = (t: number) => Math.sin(Math.PI * seg(t, tBirdYawn, tBirdYawn + YAWN_S));
+  const birdLean = (t: number) => hump(seg(t, tBirdYawn, tBirdYawn + YAWN_S));
   /** Where the cuckoo's middle is: hidden in the clock, out on its perch, scooting forward while it yawns. */
   const birdX = (t: number) => lerp(BIRD.inX, BIRD.outX, easeInOut(seg(t, tOut, tOutEnd)) - easeInOut(seg(t, tBack, tBackEnd))) + BIRD.lean * birdLean(t);
   /** How far its beak is open: a little with every „kuckuck“, wide in the yawn. */
   const beakOpen = (t: number) =>
-    Math.max(
-      0.6 * Math.max(...CALL_NOTES.map((d) => Math.sin(Math.PI * seg(t, tCall + d, tCall + d + 0.24)))),
-      Math.sin(Math.PI * seg(t, tBirdYawn, tBirdYawn + 1.3)),
-    );
+    Math.max(0.6 * Math.max(...CALL_NOTES.map((d) => hump(seg(t, tCall + d, tCall + d + 0.24)))), hump(seg(t, tBirdYawn, tBirdYawn + 1.3)));
   /** How sleepy it looks: eyes half shut while it calls, then shut from the yawn on. */
   const birdSleep = (t: number) => 0.45 + 0.55 * easeOut(seg(t, tBirdYawn, tBack));
 
@@ -543,7 +541,7 @@ export function buildNight() {
   /** The cradle rocks gently once the teddy is asleep, slower and slower, and stops when the level is over. */
   const rock = (t: number) => {
     const u = Math.min(t, tDone) - tTeddy;
-    return u <= 0 ? 0 : 3 * Math.exp(-u / 6) * Math.sin(u * 2.2);
+    return u <= 0 ? 0 : 3 * decay(u / 6) * Math.sin(u * 2.2);
   };
 
   /** Where the camera looks: the music box and the top of the gutter, then the star on its last stretch, the curtain, the reading corner, the hamster and its cable car, the moon, and slowly back. */

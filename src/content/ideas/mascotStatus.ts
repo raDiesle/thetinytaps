@@ -45,8 +45,15 @@ export interface MascotStatusRow {
 export const MASCOT_STATUS: MascotStatusRow[] = [
   {
     href: "/timer/",
-    note: "Kein Fuchs und kein Bär mehr im Bild (Feedback November 2026: die gezeichneten Kinder sahen komisch aus). Beim Abwechseln liegen dafür zwei Sitzkissen in Fuchs- und Bärenfarbe, mit Fuchs- und Bärenohren – auf dem Boden neben der Sanduhr und auf den Sitzen der Wippe (H-109). „Tennis“, wo Fuchskind und Bärenkind spielten, ist wieder raus (Wunsch 21. November 2026).",
+    note: "Kein Fuchs und kein Bär mehr im Bild (Feedback November 2026: die gezeichneten Kinder sahen komisch aus). Beim Abwechseln liegen dafür zwei Sitzkissen in Fuchs- und Bärenfarbe, mit Fuchs- und Bärenohren – auf dem Boden neben der Sanduhr und auf den Sitzen der Wippe (H-109). „Tennis“, wo Fuchskind und Bärenkind spielten, ist wieder raus (Wunsch 21. November 2026). Die eine Ausnahme ist „Up to the Moon“: dort ist das Fuchskind die Figur, die den ganzen Weg geht – schwimmt, die Holzstufen am Baum hochhüpft, Seilbahn und Glasaufzug fährt, an Ballons hängt und mit dem Raketenrucksack fliegt (Wunsch 23. November 2026, `jumpFox.tsx` mit dem gemeinsamen Kopf).",
     tasks: [
+      {
+        label: "Fuchskind läuft den Weg bei „Up to the Moon“, mit eigener Haltung für jede Art der Bewegung",
+        work: "drawing",
+        effort: "M",
+        idea: "H-127",
+        state: "done",
+      },
       {
         label: "Fuchs- oder Bärenkind, wo es im Bild etwas tut (Erntewagen, Gartenschlauch, Kerze, Abwechseln)",
         work: "drawing",

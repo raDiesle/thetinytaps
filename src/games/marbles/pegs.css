@@ -9,7 +9,12 @@
   touch-action: none;
 }
 
-/* The marble waiting at the top before the first tap lets taps through. */
-.pegs-hint {
+/* The board's layers lie on each other (`StillBoard`, the bins' svg, `StillFrame`); the frame lets taps through. */
+.pegs-layer {
+  position: absolute;
+  inset: 0;
+}
+
+.pegs-front {
   pointer-events: none;
 }

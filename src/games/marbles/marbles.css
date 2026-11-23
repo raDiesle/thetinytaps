@@ -94,6 +94,51 @@
   }
 }
 
+/* The Lichterkette's dark: a small canvas stretched over the screen (`NightVeil`), smoothly. */
+.marble-veil {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  pointer-events: none;
+}
+
+/*
+ * The Raketenstart's stars, in layers of their own (`skyLayers`): still before the tap, then each layer twinkles by its
+ * opacity alone, a little out of step with the others, and faster from the lift-off on. Opacity of a whole layer is the
+ * compositor's job: the phone paints the stars once.
+ */
+.marble-stars {
+  opacity: 0.8;
+}
+
+.marble-stars.on,
+.marble-stars.party {
+  will-change: transform, opacity;
+  animation: marble-twinkle 2.9s ease-in-out infinite alternate;
+}
+
+.marble-stars.party {
+  animation-duration: 0.9s;
+}
+
+.marble-stars-1 {
+  animation-delay: -1s;
+}
+
+.marble-stars-2 {
+  animation-delay: -2s;
+}
+
+@keyframes marble-twinkle {
+  from {
+    opacity: 1;
+  }
+  to {
+    opacity: 0.15;
+  }
+}
+
 @media (prefers-reduced-motion: reduce) {
   .thing-drop {
     animation: none;
@@ -189,4 +234,14 @@
 .marble-play.paused :is(.marble-level, .run-level),
 .marble-play.paused :is(.marble-level, .run-level) * {
   animation-play-state: paused !important;
+}
+
+/* A small thing moving on its own as a layer of its own (`Sprite` in parts.tsx), placed by a transform. */
+.marble-sprite {
+  position: absolute;
+  top: 0;
+  left: 0;
+  overflow: visible;
+  will-change: transform;
+  pointer-events: none;
 }

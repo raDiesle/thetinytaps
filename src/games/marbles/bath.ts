@@ -46,8 +46,8 @@ import {
   playWhoosh,
 } from "@/lib/sfx";
 import { playBlow, playFlush, playSplash, playWash, playWhale } from "@/lib/realSounds";
-import { wobble } from "./level";
-import { cameraOn, clamp01, easeIn, easeInOut, easeOut, hop, lerp, rad, seg, timeline, turn } from "./machineKit";
+import { wobble, decay } from "./level";
+import { cameraOn, clamp01, easeIn, easeInOut, easeOut, hop, lerp, rad, seg, timeline, turn, hump } from "./machineKit";
 import type { Pt } from "./path";
 
 export const FLOOR = 800;
@@ -341,7 +341,7 @@ export function buildBath() {
     if (t < tLidPop) return 0;
     if (t < tLidPop + LID_FLY) return LID_OPEN * easeOut(seg(t, tLidPop, tLidPop + LID_FLY));
     const age = Math.min(t, tLidPop + LID_FLY + 3) - tLidPop - LID_FLY;
-    return LID_REST + (LID_OPEN - LID_REST) * Math.exp(-age * 4) * Math.cos(age * 9);
+    return LID_REST + (LID_OPEN - LID_REST) * decay(age * 4) * Math.cos(age * 9);
   };
   /** How close the lid at angle `a` comes to the roll on its holder, beyond the roll's and the lid's half thickness. */
   const lidGap = (a: number) => {
@@ -498,7 +498,7 @@ export function buildBath() {
     const lift = stepping ? 8 * Math.abs(Math.sin(phase * Math.PI)) : 0;
     /** Which foot is up (-1 back, 1 front) and how far (0 to 1). */
     const foot = stepping ? Math.sin(phase * Math.PI) : 0;
-    const swell = 0.1 * Math.sin(Math.PI * seg(t, tStop + 0.3, tFountain + 0.15));
+    const swell = 0.1 * hump(seg(t, tStop + 0.3, tFountain + 0.15));
     const keyTurn = 1080 * easeOut(seg(t, tKey, tWound)) - 1080 * walk;
     return { x, tilt, lift, foot, awake: t >= tWake, swell, keyTurn };
   };
@@ -507,7 +507,7 @@ export function buildBath() {
   /** The whale's little spurt straight up: the top of the water and how strong it is (0 to 1), or null. */
   const spurtAt = (t: number): { top: number; k: number } | null => {
     if (t < tSpurt || t >= tSpurt + 0.5) return null;
-    const k = Math.sin(Math.PI * seg(t, tSpurt, tSpurt + 0.5));
+    const k = hump(seg(t, tSpurt, tSpurt + 0.5));
     return { top: blowholeY - 50 * k, k: 0.5 * k };
   };
   const blowhole = { x: WHALE.stop + BLOWHOLE.dx, y: blowholeY };
@@ -668,7 +668,7 @@ export function buildBath() {
   const lampSwing = (t: number) => {
     const still = Math.min(t, tDone);
     const age = still - tLast;
-    return wobble(still - tCapLand, 4, 6, 2) + (age < 0 ? 0 : 9 * Math.exp(-age * 0.9) * Math.sin(age * 4.5));
+    return wobble(still - tCapLand, 4, 6, 2) + (age < 0 ? 0 : 9 * decay(age * 0.9) * Math.sin(age * 4.5));
   };
 
   /** The brush: its middle and turn (degrees; 0 lying with its head to the right, 270 standing head up). */
@@ -690,7 +690,7 @@ export function buildBath() {
   /** The mug's wobble after the brush lands in it, then its fall (degrees). */
   const mugAngle = (t: number) => {
     if (t < tInMug) return 0;
-    if (t < tTopple) return 4 * Math.exp(-(t - tInMug) * 5) * Math.sin((t - tInMug) * 30);
+    if (t < tTopple) return 4 * decay((t - tInMug) * 5) * Math.sin((t - tInMug) * 30);
     return mugTurn(t);
   };
 

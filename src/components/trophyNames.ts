@@ -46,6 +46,30 @@ const NAMERS: Record<string, () => Promise<Namer>> = {
         (level, language) =>
           level === "nachts" ? pick(NIGHT_MILK_TITLE, language) : level === "abschied" ? pick(GOODBYE_MILK_TITLE, language) : undefined,
     ),
+  // The book Schnullerfee's second story, „Tapsi and the Pacifier Tree“, gives a trophy of its own, level „baum“ (its
+  // short version shares it, as the fairy's short version shares the fairy's).
+  // The book Haare waschen's second story, „Tapsi and the Warm Rain“ in the shower, gives a trophy of its own, level
+  // „dusche“ (its short version shares it).
+  "/haare-waschen/": () =>
+    import("@/games/hairshower/names").then(
+      ({ SHOWER_TITLE }) =>
+        (level, language) =>
+          level === "dusche" ? pick(SHOWER_TITLE, language) : undefined,
+    ),
+  // The book Kita-Start's second story, „Tapsi Goes to Lotta's“ at a childminder's, gives a trophy of its own, level
+  // „tagesmutter“ (its short version shares it).
+  "/kita/": () =>
+    import("@/games/childminder/names").then(
+      ({ CHILDMINDER_TITLE }) =>
+        (level, language) =>
+          level === "tagesmutter" ? pick(CHILDMINDER_TITLE, language) : undefined,
+    ),
+  "/schnullerfee/": () =>
+    import("@/games/pacifiertree/names").then(
+      ({ TREE_TITLE }) =>
+        (level, language) =>
+          level === "baum" ? pick(TREE_TITLE, language) : undefined,
+    ),
 };
 
 /** „Tag“ and „Runde“ with their number, in each app language. */

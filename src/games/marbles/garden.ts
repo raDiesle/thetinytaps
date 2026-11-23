@@ -44,7 +44,7 @@ import {
   playWhoosh,
 } from "@/lib/sfx";
 import { playFlush, playMunch, playSplash, playTweet } from "@/lib/realSounds";
-import { wobble } from "./level";
+import { wobble, decay } from "./level";
 import {
   along,
   beside,
@@ -701,8 +701,8 @@ export function buildGarden() {
     const x0 = pileLeft + 20 + ((i * 0.53) % 1) * (LEAF_PILE.w - 40);
     const vx = 220 + 380 * ((i * 0.618) % 1);
     const vy = -(380 + 260 * ((i * 0.41) % 1));
-    const x = x0 + (vx * (1 - Math.exp(-1.5 * age))) / 1.5 + 18 * Math.exp(-0.8 * age) * Math.sin(age * 5 + i);
-    const y = FLOOR - LEAF_PILE.h * 0.6 + (vy * (1 - Math.exp(-2 * age))) / 2 + 70 * age;
+    const x = x0 + (vx * (1 - decay(1.5 * age))) / 1.5 + 18 * decay(0.8 * age) * Math.sin(age * 5 + i);
+    const y = FLOOR - LEAF_PILE.h * 0.6 + (vy * (1 - decay(2 * age))) / 2 + 70 * age;
     if (y >= FLOOR - 6) return { pt: { x, y: FLOOR - 6 }, angle: (i * 37) % 180 };
     return { pt: { x, y }, angle: 40 * Math.sin(age * 6 + i) + age * 90 };
   };
@@ -730,7 +730,7 @@ export function buildGarden() {
     if (u < PIN_UP) return (PIN_W * u * u) / (2 * PIN_UP);
     const b = tOpen - tGust;
     if (u < b) return PIN_W * (PIN_UP / 2 + u - PIN_UP);
-    return PIN_W * (PIN_UP / 2 + b - PIN_UP) + PIN_W * PIN_DOWN * (1 - Math.exp(-(u - b) / PIN_DOWN));
+    return PIN_W * (PIN_UP / 2 + b - PIN_UP) + PIN_W * PIN_DOWN * (1 - decay((u - b) / PIN_DOWN));
   };
   /** How far the pinwheel's stick leans in the gust, in degrees around the pot's rim. */
   const leanAt = (t: number) => wobble(t - tGust, 7, 9, 2.2);
@@ -757,10 +757,19 @@ export function buildGarden() {
   at(tSpray - 0.2, { sound: playBlub });
   at(tSpray, { sound: playSplash });
 
+  /**
+   * The water goes off a few seconds after the sunflower has bloomed (`tDone + SPRAY_AFTER`): the sprinkler slows down
+   * over a second and stands, and its last drops fall. It sprayed for ever, behind the level's end too, and the phone
+   * painted it in every frame (perf, November 2026).
+   */
+  const SPRAY_AFTER = 4;
+  const turning = (u: number) => (u <= 0 ? 0 : u < 0.5 ? (9 * u * u) / (2 * 0.5) : 9 * (u - 0.25));
   const spinAt = (t: number) => {
+    const off = tDone + SPRAY_AFTER - tSpray;
     const u = t - tSpray;
-    if (u <= 0) return 0;
-    return u < 0.5 ? (9 * u * u) / (2 * 0.5) : 9 * (u - 0.25);
+    if (u <= off) return turning(u);
+    const d = Math.min(1, u - off);
+    return turning(off) + 9 * d - 4.5 * d * d;
   };
   /** Every drop the sprinkler throws: from the end of its arm, in an arc to one side or the other. */
   const SPRAY_EVERY = 0.03;
@@ -770,7 +779,7 @@ export function buildGarden() {
     const first = Math.ceil((t - 1 - tSpray - 0.15) / SPRAY_EVERY);
     for (let i = Math.max(0, first); ; i++) {
       const te = tSpray + 0.15 + i * SPRAY_EVERY;
-      if (te > t) break;
+      if (te > t || te > tDone + SPRAY_AFTER) break;
       const age = t - te;
       const side = i % 2 ? 1 : -1;
       const vx = side * (250 + 160 * ((i * 0.618) % 1));
@@ -869,6 +878,8 @@ export function buildGarden() {
   return {
     events,
     duration: tDone,
+    /** When the water is off and the finale settles: the birds stop singing, the butterfly and the sunflower hold still (A-36). */
+    tQuiet: tDone + SPRAY_AFTER,
     stops,
     chimeTimes,
     tMarble,

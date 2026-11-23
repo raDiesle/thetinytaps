@@ -1,4 +1,5 @@
 import { memo, useEffect, useState, type CSSProperties, type ReactNode } from "react";
+import { useRunClock } from "./pause";
 import { Draw, INK, Layer, LeftGlow, STAGE_H, STAGE_W } from "./scenes";
 
 // Wecker (H-70, user request, November 2026): a children's digital alarm clock on the bedside table, as families know
@@ -99,7 +100,7 @@ function Digit({ char, x }: { char: string; x: number }) {
   return (
     <g transform={`translate(${x} 0) skewX(-6)`}>
       {Object.entries(SHAPES).map(([name, points]) => (
-        <polygon key={name} points={points} fill={lit.includes(name) ? LIT : GHOST} />
+        <polygon key={name} points={points} fill={lit.includes(name) ? LIT : GHOST} className={lit.includes(name) ? "tm-clock-on" : undefined} />
       ))}
     </g>
   );
@@ -114,7 +115,7 @@ function Digits({ text }: { text: string }) {
   [...text].forEach((c, i) => {
     if (c === ":") {
       parts.push(
-        <g key={i} fill={LIT}>
+        <g key={i} fill={LIT} className="tm-clock-on">
           <circle cx={x + DIGIT.colon / 2 - 6} cy={DIGIT.h * 0.3} r={10} />
           <circle cx={x + DIGIT.colon / 2 - 10} cy={DIGIT.h * 0.7} r={10} />
         </g>,
@@ -137,14 +138,16 @@ function Digits({ text }: { text: string }) {
  * (a menu's card) shows the time left now and ticks no more.
  */
 function ClockDigits({ endsAt, total, running, still }: { endsAt: number; total: number; running: boolean; still?: boolean }) {
-  const [now, setNow] = useState(Date.now);
+  // On the run's clock, so the digits stand still while the timer is paused.
+  const clock = useRunClock();
+  const [now, setNow] = useState(clock.now);
   useEffect(() => {
-    if (!running || still) return;
-    const tick = () => setNow(Date.now());
+    if (!running || still || clock.paused) return;
+    const tick = () => setNow(clock.now());
     tick();
     const timer = setInterval(tick, 250);
     return () => clearInterval(timer);
-  }, [running, still]);
+  }, [running, still, clock]);
   const text = clockText(running ? endsAt - now : 0, total);
   return (
     <Part {...DIGITS} className="tm-clock-digits">

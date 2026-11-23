@@ -1,4 +1,5 @@
 import { memo, useId, type CSSProperties, type ReactNode } from "react";
+import { useRunClock } from "./pause";
 
 // Everything is drawn on a stage of STAGE_W × STAGE_H that covers the screen (`.tm-stage`): what matters stays within
 // x 200–1400 (cut off at 4:3) and y 80–820 (cut off on a phone on its side). What moves is an HTML layer of its own
@@ -700,7 +701,8 @@ function Smoke({ puff }: { puff?: boolean }) {
  * light up, never the stubs already burnt.
  */
 export function Candles({ out, flare, glow, startedAt, total }: { out: boolean; flare: number; glow: number; startedAt: number; total: number }) {
-  const now = glow ? candleAt((Date.now() - startedAt) / total) : 0;
+  const clock = useRunClock();
+  const now = glow ? candleAt((clock.now() - startedAt) / total) : 0;
   return (
     <>
       {CANDLE.xs.map((_, i) => (

@@ -10,7 +10,9 @@ import { hush } from "@/lib/voice";
 import { useWakeLock } from "@/lib/wakeLock";
 import { TimeBar, TimeBarChoice } from "./bar";
 import { nextPicture, PICTURES, SWAP_NAME } from "./content";
+import { TimerCardArt } from "./cardArt";
 import type { SwapToy, TimeShown, TimerPicture, TurnPicture } from "./settings";
+import { PauseControls, RunClockProvider, usePausableClock } from "./pause";
 import { noteRoom, TimeShownChoice, TimeShownNote } from "./shown";
 import { SAW, Seesaw, SeesawBackdrop, SeesawGoal, SeesawStand, SeesawSun } from "./seesaw";
 import { type Holder, SWAP_TOYS, SwapBackdrop, SwapCushions, SwapHourglass, SwapLight, SwapShade, Toy } from "./swap";
@@ -85,7 +87,10 @@ export function SwapRun({
   onPicture: (picture: TimerPicture) => void;
 }) {
   const t = useT();
-  const [endsAt] = useState(() => (totalMs === undefined ? undefined : Date.now() + totalMs));
+  // The run's own clock (`pause.tsx`): real time less every pause, so a paused turn goes on where it stood.
+  const { clock, pause, resume, pausedOnce } = usePausableClock();
+  const { now, paused } = clock;
+  const [endsAt] = useState(() => (totalMs === undefined ? undefined : now() + totalMs));
   /** The turns, once the page lies still (null while it still turns). */
   const [turns, setTurns] = useState<Turns | null>(null);
   const [turn, setTurn] = useState(0);
@@ -101,7 +106,7 @@ export function SwapRun({
   const holderNow = useRef<Holder | null>(null);
   const startTimers = useRef<ReturnType<typeof setTimeout>[]>([]);
   const { effects, ripple, glow } = useTapFeedback();
-  useWakeLock(!done);
+  useWakeLock(!done && !paused);
   useEffect(() => loadRecordings(["cheer"]), []);
 
   // The voice (H-72): who begins as the turns start, and „Tauschen! …“ at every change.
@@ -117,19 +122,19 @@ export function SwapRun({
       for (const timer of startTimers.current) clearTimeout(timer);
       startTimers.current = [];
       setRunning(false);
-      setTurns({ start: Date.now() + after, first });
+      setTurns({ start: now() + after, first });
       setRound((n) => n + 1);
       setHop((n) => n + 1);
       if (!seesaw) playWhoosh();
       startTimers.current.push(setTimeout(playChime, seesaw ? 0 : 700));
     },
-    [seesaw],
+    [seesaw, now],
   );
 
   // The first child's turn starts as soon as the page lies still: the toy hops onto its cushion (on the seesaw, whose
   // first seat already stands up high, the chick sets off at once).
   useEffect(() => {
-    if (endsAt !== undefined && Date.now() >= endsAt) return;
+    if (endsAt !== undefined && now() >= endsAt) return;
     const cancel = afterPageMotion(() => {
       begin(FIRST_TURN, seesaw ? 0 : HOP_MS);
       say(BEGINS[FIRST_TURN], true);
@@ -138,23 +143,24 @@ export function SwapRun({
       cancel();
       for (const timer of startTimers.current) clearTimeout(timer);
     };
-  }, [begin, endsAt, say, seesaw]);
+  }, [begin, endsAt, say, seesaw, now]);
 
-  // The turn, checked at least every second and again when the page comes back (timers sleep in the background).
+  // The turn, checked at least every second and again when the page comes back (timers sleep in the background);
+  // paused, not at all.
   useEffect(() => {
-    if (done) return;
+    if (done || paused) return;
     let timer: ReturnType<typeof setTimeout>;
     const check = () => {
-      const now = Date.now();
-      if (endsAt !== undefined && now >= endsAt) return setDone(true);
+      const at = now();
+      if (endsAt !== undefined && at >= endsAt) return setDone(true);
       if (!turns) {
         timer = setTimeout(check, 1000);
         return;
       }
-      setRunning(now >= turns.start);
-      const current = turnAt(turns, turnMs, now);
+      setRunning(at >= turns.start);
+      const current = turnAt(turns, turnMs, at);
       setTurn(current);
-      const nextChange = now < turns.start ? turns.start - now : turns.start + (current + 1) * turnMs - now;
+      const nextChange = at < turns.start ? turns.start - at : turns.start + (current + 1) * turnMs - at;
       timer = setTimeout(check, Math.max(50, Math.min(nextChange, 1000)));
     };
     const onVisible = () => {
@@ -167,7 +173,7 @@ export function SwapRun({
       clearTimeout(timer);
       document.removeEventListener("visibilitychange", onVisible);
     };
-  }, [turns, turnMs, endsAt, done]);
+  }, [turns, turnMs, endsAt, done, paused, now]);
 
   // The toy hops over with a whoosh and a chime as the next turn starts – on the seesaw the seat touches down with a soft
   // bump and a chime, and the chick turns round.
@@ -223,7 +229,12 @@ export function SwapRun({
     return () => window.removeEventListener("keydown", onKey);
   }, [answer]);
 
-  const down = (e: PointerEvent) => answer(e.clientX, e.clientY);
+  // A tap on the picture answers as always (H-51) and pauses the timer (user decision, 23 November 2026): the veil
+  // with ▶ and the round arrow comes, and a tap on it goes on.
+  const down = (e: PointerEvent) => {
+    answer(e.clientX, e.clientY);
+    if (ticking) pause();
+  };
   const turnStart = turns ? turns.start + turn * turnMs : 0;
   const ticking = running && !done;
   const next = nextPicture(picture);
@@ -232,9 +243,9 @@ export function SwapRun({
   const room = noteRoom(timeShown, turnMs);
 
   return (
-    <>
+    <RunClockProvider value={clock}>
       <div
-        className={`tm-play${bar ? " tm-with-bar" : ""}${room.className}`}
+        className={`tm-play${bar ? " tm-with-bar" : ""}${paused ? " tm-paused" : ""}${room.className}`}
         style={room.style}
         data-picture={picture}
         onPointerDown={down}
@@ -284,9 +295,17 @@ export function SwapRun({
           </div>
         )}
         {bar && ticking && holder && <TimeBar key={`${turnStart}-${turn}`} startedAt={turnStart} total={turnMs} tone={holder} glow={poke} />}
-        {ticking && <TimeShownNote shown={timeShown} endsAt={turnStart + turnMs} total={turnMs} />}
+        {(ticking || done) && <TimeShownNote shown={timeShown} endsAt={turnStart + turnMs} total={turnMs} up={done} />}
+        {ticking && <PauseControls paused={paused} onPause={pause} onResume={resume} onRestart={onAgain} />}
         <FeedbackLayer effects={effects} />
-        {done && <GameEnd delayMs={4200} level={picture} onAgain={onAgain} next={nextInfo && { name: t(nextInfo.name), onNext: () => onPicture(next) }} />}
+        {done && (
+          <GameEnd
+            delayMs={4200}
+            level={picture}
+            onAgain={onAgain}
+            next={nextInfo && { name: t(nextInfo.name), onNext: () => onPicture(next), art: <TimerCardArt picture={next} /> }}
+          />
+        )}
       </div>
       <PlayOptions>
         <SettingsGroup title={t(SWAP_NAME)}>
@@ -356,10 +375,10 @@ export function SwapRun({
             })}
           />
         )}
-        {endsAt !== undefined && <TimeLeft endsAt={endsAt} until={until} />}
+        {endsAt !== undefined && <TimeLeft endsAt={endsAt} until={pausedOnce ? undefined : until} />}
         <TimeShownChoice value={timeShown} onChange={onShown} />
         <TimeBarChoice value={bar} onChange={onBar} />
       </PlayOptions>
-    </>
+    </RunClockProvider>
   );
 }

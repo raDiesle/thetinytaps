@@ -41,7 +41,7 @@ import {
   playWhoosh,
 } from "@/lib/sfx";
 import { playCuckoo, playHonk, playWhistle } from "@/lib/realSounds";
-import { wobble } from "./level";
+import { wobble, decay } from "./level";
 import {
   along,
   cameraOn,
@@ -61,6 +61,7 @@ import {
   steady,
   timeWhen,
   turn,
+  hump,
 } from "./machineKit";
 import { arc, BALL_R, line, quad, type Pt } from "./path";
 
@@ -322,7 +323,7 @@ export function buildMachine() {
   const taps = PENGUIN.leans.map((_, k) => tHit + CRADLE.half / 2 + k * PENGUIN.period);
   const tCar = taps[taps.length - 1] + PENGUIN.period / 4;
   /** How far the cradle's balls swing out: as far each time until the car is off, then less and less. */
-  const cradleAmp = (t: number) => (t < tCar ? CRADLE.swing : CRADLE.swing * Math.exp(-(t - tCar) * 1.5));
+  const cradleAmp = (t: number) => (t < tCar ? CRADLE.swing : CRADLE.swing * decay((t - tCar) * 1.5));
   /** How far ball `i` has swung out (degrees, to the right): the last one, then the first, in turn. */
   const cradleSwing = (i: number, t: number) => {
     if (t < tHit || (i > 0 && i < CRADLE.n - 1)) return 0;
@@ -343,7 +344,7 @@ export function buildMachine() {
     if (t < taps[0]) return 0;
     if (t >= tCar) {
       const a = t - tCar;
-      return leans[leans.length - 1] * Math.cos((2 * Math.PI * a) / period) * Math.exp(-a * 1.2);
+      return leans[leans.length - 1] * Math.cos((2 * Math.PI * a) / period) * decay(a * 1.2);
     }
     const k = Math.min(leans.length - 1, Math.floor((t - taps[0]) / period));
     const u = (t - taps[k]) / period;
@@ -433,7 +434,7 @@ export function buildMachine() {
     const h = hops.find((h) => t < h.t1);
     if (!h || t < tLaunch) return { pt: ball0, squash: 0 };
     const age = t - h.t0;
-    return { pt: hop(h.a, h.b, h.h, seg(t, h.t0, h.t1)), squash: h === hops[0] ? 0 : 0.22 * Math.exp(-age * 16) * Math.cos(age * 20) };
+    return { pt: hop(h.a, h.b, h.h, seg(t, h.t0, h.t1)), squash: h === hops[0] ? 0 : 0.22 * decay(age * 16) * Math.cos(age * 20) };
   };
 
   /* The train: once the gate is up it chugs along, past the level crossing, and brakes against the spinning top. */
@@ -511,7 +512,7 @@ export function buildMachine() {
   /** The top's lean while it wobbles after the tower: wider and wider as it slows down. */
   const lateWobble = (t: number) => {
     const a = t - tTower;
-    return (3 + 7 * a) * Math.sin(a * 9) + wanderTilt(tTower) * Math.exp(-a * 6);
+    return (3 + 7 * a) * Math.sin(a * 9) + wanderTilt(tTower) * decay(a * 6);
   };
   /** How far the body of a top leaning `tilt` degrees reaches below its tip, so it never sinks into the floor. */
   const kreiselLift = (tilt: number) => {
@@ -690,7 +691,7 @@ export function buildMachine() {
   const gondolaAt = (i: number, t: number): { pin: Pt; sway: number } => {
     const a = rad(90 + (i * 360) / WHEEL.n + wheelTurn(t));
     const pin = { x: WHEEL.cx + WHEEL.r * Math.cos(a), y: WHEEL.cy + WHEEL.r * Math.sin(a) };
-    const sway = t < tTop ? -8 * Math.sin(Math.PI * seg(t, tWheel, tWheel + 1)) : wobble(t - tTop, 9, 8, 1.8);
+    const sway = t < tTop ? -8 * hump(seg(t, tWheel, tWheel + 1)) : wobble(t - tTop, 9, 8, 1.8);
     return { pin, sway: t < tWheel ? 0 : sway };
   };
   for (let n = 1; n <= 6; n++) at(tWheel + TURN * (1 - Math.sqrt(1 - n / 6)), { sound: playClick });

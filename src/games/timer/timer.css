@@ -4,7 +4,9 @@
 .tm-play {
   position: absolute;
   inset: 0;
-  overflow: hidden;
+  /* Clipped, never scrollable: the stage reaches past the bottom edge, and the pause button there, focused (a tap,
+     Tab), scrolled the whole picture up by `overflow: hidden`'s hidden scroll. */
+  overflow: clip;
   container-type: size;
   touch-action: none;
   user-select: none;
@@ -2194,6 +2196,47 @@
   width: 0.34em;
 }
 
+/* The time is up (user request, 23 November 2026: plain to see in every timer): the note stays at 0:00, red, and
+   blinks on and off – a small layer by `opacity` alone; the alarm clock's own digits do the same. Still where motion is
+   turned down. */
+.tm-shown-up {
+  border-color: #c92a2a;
+  background: #fff5f5;
+  color: #e03131;
+  will-change: opacity;
+  animation: tm-time-up 1.2s ease-in-out infinite;
+}
+
+.tm-done .tm-clock-on {
+  fill: #ff4d4d;
+}
+
+.tm-done .tm-clock-digits {
+  filter: drop-shadow(0 0 8px rgb(255 77 77 / 0.7));
+  animation: tm-time-up 1.2s ease-in-out infinite;
+}
+
+@keyframes tm-time-up {
+  0%,
+  45% {
+    opacity: 1;
+  }
+  60%,
+  85% {
+    opacity: 0.15;
+  }
+  100% {
+    opacity: 1;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .tm-shown-up,
+  .tm-done .tm-clock-digits {
+    animation: none;
+  }
+}
+
 .tm-tally {
   display: flex;
   flex-wrap: wrap;
@@ -2412,18 +2455,6 @@
 
 .tm-done .tm-hop {
   transform: var(--tm-end);
-}
-
-/* The road rug's car (H-122) rides on a hop's layer (.tm-hop) and tilts with the road round its wheels. */
-.tm-road-car {
-  transform-origin: 50% 100%;
-}
-
-.tm-road-car > svg {
-  display: block;
-  width: 100%;
-  height: 100%;
-  overflow: visible;
 }
 
 /* Five Boxes (H-120, boxes.tsx): each box's lid folds over its hinge, the half behind the toys shrinking to its edge,
@@ -2775,9 +2806,21 @@
   opacity: 1;
 }
 
-/* Hop to the Flag (H-127, jump.tsx): the hopper rides on two hop layers (`.tm-hop`, keyframes written for the run) and
-   bounces once a second while it waits – squashing on its feet, springing up a little, landing –, a small layer by
-   `transform` alone. */
+/* Up to the Moon (H-127, jump.tsx): a world many screens tall (`.tm-jump-world`) moved up and down as one layer by
+   its camera's keyframes, written for the run (`.tm-hop`); inside it the fox rides on three more such layers (across,
+   up and down, its turn), going on at an even pace the whole run and floating gently once a second as it goes; the
+   cable car's basket and the lift's cabin ride on keyframes of their own along with it. Small layers by `transform`
+   alone. */
+.tm-jump-sky {
+  position: absolute;
+  inset: 0;
+}
+
+.tm-jump-turn {
+  position: absolute;
+  inset: 0;
+}
+
 .tm-jump-bob {
   position: absolute;
   inset: 0;
@@ -2787,7 +2830,8 @@
 }
 
 .tm-jump-bob > svg,
-.tm-jump-star > svg {
+.tm-jump-star > svg,
+.tm-jump-carried > svg {
   display: block;
   width: 100%;
   height: 100%;
@@ -2795,26 +2839,92 @@
 }
 
 @keyframes tm-jump-bob {
-  0% {
-    transform: scale(1);
-    animation-timing-function: ease-out;
-  }
-  14% {
-    transform: scale(1.08, 0.9);
-    animation-timing-function: ease-out;
-  }
-  42% {
-    transform: translateY(-12%) scale(0.96, 1.05);
-    animation-timing-function: ease-in;
-  }
-  70%,
+  0%,
   100% {
-    transform: scale(1);
+    transform: none;
+  }
+  50% {
+    transform: translateY(-3%);
   }
 }
 
-/* A star is caught at the top of its hop (`--tm-at`): it grows a little and fades, a small layer by `transform` and
-   `opacity`. */
+/* The fox (jumpFox.tsx): one pose shown at a time (`.tm-jump-pose`, coming and going by `.tm-jump-fade`), each made of
+   still parts (`.tm-jump-part`: body, head) and the arms and legs it moves, each a small layer turning at its shoulder or
+   hip between `--tm-limb-a` and `--tm-limb-b` once a second (`.tm-jump-limb`), and the jetpack's flames flickering. */
+.tm-jump-pose,
+.tm-jump-part {
+  position: absolute;
+  inset: 0;
+}
+
+.tm-jump-part > svg {
+  display: block;
+  width: 100%;
+  height: 100%;
+  overflow: visible;
+}
+
+.tm-jump-limb {
+  will-change: transform;
+  animation: tm-jump-limb 0.5s ease-in-out infinite alternate;
+}
+
+@keyframes tm-jump-limb {
+  from {
+    transform: rotate(var(--tm-limb-a));
+  }
+  to {
+    transform: rotate(var(--tm-limb-b));
+  }
+}
+
+.tm-jump-flame {
+  transform-origin: 50% 81%;
+  will-change: transform;
+  animation: tm-jump-flame 0.2s ease-in-out infinite alternate;
+}
+
+@keyframes tm-jump-flame {
+  from {
+    transform: scaleY(0.8);
+  }
+  to {
+    transform: scaleY(1.12);
+  }
+}
+
+/* The cable car's basket and the lift's cabin: each a layer behind the fox and one over it, on the same keyframes. */
+.tm-jump-car > svg {
+  display: block;
+  width: 100%;
+  height: 100%;
+  overflow: visible;
+}
+
+/* The fox's poses, what it holds (the balloons, the parachute) and what waits for it (the balloons on the skyscraper's
+   roof, the jetpack on the highest cloud) come and go by `opacity` on keyframes written for the run; at the end each is
+   as the run leaves it (`--tm-end-o`). */
+.tm-jump-carried {
+  position: absolute;
+}
+
+.tm-jump-fade {
+  will-change: opacity;
+  animation: var(--tm-anim) var(--tm-ms) linear both;
+}
+
+.tm-done .tm-jump-fade {
+  animation: none;
+  opacity: var(--tm-end-o);
+  transform: none;
+}
+
+/* The lake's water lying over the fox while it swims, so it is plainly under water. */
+.tm-jump-water {
+  background: rgb(116 192 252 / 0.32);
+}
+
+/* A star is caught on the way (`--tm-at`): it grows a little and fades, a small layer by `transform` and `opacity`. */
 .tm-jump-star {
   position: absolute;
   inset: 0;
@@ -2832,18 +2942,94 @@
   }
 }
 
-/* The flag waits at the pole's foot, and goes up as the hopper lands on the hilltop at the end. */
-.tm-jump-flag {
-  transform: var(--tm-flag-low);
-  transition: transform 1.6s ease-out;
+/* The cake: as the fox drops into it, the whole cake and its cherry give way to the smashed one, and its pieces
+   fly out in all directions (`CakeBits`) – each once, in an arc from the cake's top to its own place, turning as it
+   goes, then still. Shown only at the end. */
+.tm-jump-cake-smashed {
+  opacity: 0;
 }
 
-.tm-done .tm-jump-flag {
-  transform: none;
+.tm-done .tm-jump-cake-smashed {
+  opacity: 1;
+}
+
+.tm-done .tm-jump-cake-whole,
+.tm-done .tm-jump-cherry {
+  opacity: 0;
+}
+
+.tm-jump-bits {
+  position: absolute;
+  inset: 0;
+  display: none;
+}
+
+.tm-done .tm-jump-bits {
+  display: block;
+}
+
+.tm-jump-bit-x,
+.tm-jump-bit-y,
+.tm-jump-bit-spin {
+  position: absolute;
+  inset: 0;
+}
+
+.tm-jump-bit-spin > svg {
+  display: block;
+  width: 100%;
+  height: 100%;
+  overflow: visible;
+}
+
+.tm-done .tm-jump-bit-x {
+  animation: tm-jump-bit-x var(--tm-fly) linear var(--tm-delay) both;
+}
+
+.tm-done .tm-jump-bit-y {
+  animation: tm-jump-bit-y var(--tm-fly) linear var(--tm-delay) both;
+}
+
+.tm-done .tm-jump-bit-spin {
+  animation: tm-jump-bit-spin var(--tm-fly) ease-out var(--tm-delay) both;
+}
+
+@keyframes tm-jump-bit-x {
+  from {
+    transform: translateX(var(--fx));
+  }
+  to {
+    transform: none;
+  }
+}
+
+@keyframes tm-jump-bit-y {
+  0% {
+    transform: translateY(var(--fy));
+    animation-timing-function: cubic-bezier(0.2, 0.7, 0.4, 1);
+  }
+  42% {
+    transform: translateY(var(--py));
+    animation-timing-function: cubic-bezier(0.6, 0, 0.8, 0.4);
+  }
+  100% {
+    transform: none;
+  }
+}
+
+@keyframes tm-jump-bit-spin {
+  from {
+    transform: rotate(0deg) scale(0.4);
+  }
+  to {
+    transform: rotate(calc(var(--spin) + var(--rest))) scale(1);
+  }
 }
 
 .tm-done .tm-jump-bob,
-.tm-done .tm-jump-star {
+.tm-done .tm-jump-star,
+.tm-done .tm-jump-limb,
+.tm-done .tm-jump-flame {
   animation: none;
 }
 
@@ -2857,7 +3043,11 @@
    set here and used by its children, so `cqh` measures the play area (`.tm-play`), never the bar. */
 .tm-play {
   --tm-bar-h: clamp(14px, 4cqh, 30px);
-  --tm-bar-bottom: calc(max(6px, 1.8cqh) + env(safe-area-inset-bottom));
+  /* The pause's round button at the bar's start (`PauseControls`): big enough for a grown-up's finger on a phone, and
+     the bar lifted so the button, centred on it, stays whole on the screen. */
+  --tm-pause-size: max(44px, calc(var(--tm-bar-h) * 2.2));
+  --tm-bar-bottom: calc(max(6px, 1.8cqh, (var(--tm-pause-size) - var(--tm-bar-h)) / 2 + 6px) + env(safe-area-inset-bottom));
+  --tm-bar-left: calc(6cqw + env(safe-area-inset-left));
   --tm-bar-room: calc(var(--tm-bar-bottom) + var(--tm-bar-h) + 6px);
   /* The digits' note: its font, and its whole width (padding and border round its cells). */
   --tm-note-font: clamp(1.4rem, 5cqh, 2.6rem);
@@ -2879,7 +3069,7 @@
   --tm-bar-flag: #ff6b6b;
   --tm-knob: calc(var(--tm-bar-h) * 1.7);
   position: absolute;
-  left: calc(6cqw + env(safe-area-inset-left));
+  left: var(--tm-bar-left);
   right: calc(7cqw + env(safe-area-inset-right));
   bottom: var(--tm-bar-bottom);
   z-index: 2;
@@ -2939,12 +3129,6 @@
   --tm-bar-flag: #fcc419;
 }
 
-.tm-play[data-picture="road"] .tm-bar {
-  --tm-bar-a: #ced4da;
-  --tm-bar-b: #868e96;
-  --tm-bar-flag: #fa5252;
-}
-
 .tm-play[data-picture="blocks"] .tm-bar {
   --tm-bar-a: #b2f2bb;
   --tm-bar-b: #5aa84a;
@@ -2958,9 +3142,9 @@
 }
 
 .tm-play[data-picture="jump"] .tm-bar {
-  --tm-bar-a: #d3f9d8;
-  --tm-bar-b: #40c057;
-  --tm-bar-flag: #e03131;
+  --tm-bar-a: #d0ebff;
+  --tm-bar-b: #4c6ef5;
+  --tm-bar-flag: #f783ac;
 }
 
 .tm-play[data-picture="caterpillar"] .tm-bar {
@@ -3210,4 +3394,87 @@
   to {
     opacity: 1;
   }
+}
+
+/* Pause and start over (`pause.tsx`, user request, 23 November 2026): a round paper button at the bar's start, its
+   two bars drawn in the book's ink like Kettenreaktion's and Zähne putzen's (`ControlIcon`), the bar running out from
+   under it – also where the bar is switched off, at the same place. Paused, a veil darkens the picture with the big ▶
+   to go on and the round arrow to start over, side by side and no words, and everything that moves stands still. */
+.tm-pause-button,
+.tm-pause-go-on,
+.tm-pause-again {
+  display: grid;
+  place-items: center;
+  padding: 0;
+  border: 2.5px solid var(--ink, #2a1e5c);
+  border-radius: 50%;
+  background: radial-gradient(circle at 38% 30%, #fff 45%, #f1e8d4);
+  box-shadow:
+    inset 0 -3px 0 #3d30451f,
+    0 2px 4px #2a1e5c44;
+  cursor: pointer;
+  touch-action: manipulation;
+}
+
+.tm-pause-button {
+  position: absolute;
+  left: calc(var(--tm-bar-left) - var(--tm-pause-size) / 2);
+  bottom: calc(var(--tm-bar-bottom) + (var(--tm-bar-h) - var(--tm-pause-size)) / 2);
+  z-index: 3;
+  width: var(--tm-pause-size);
+  height: var(--tm-pause-size);
+}
+
+.tm-pause-icon {
+  width: 60%;
+  height: 60%;
+}
+
+.tm-pause {
+  position: absolute;
+  inset: 0;
+  z-index: 9;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: clamp(24px, 7vw, 90px);
+  background: #1d1438a8;
+}
+
+.tm-pause-go-on {
+  width: clamp(110px, 30vmin, 220px);
+  height: clamp(110px, 30vmin, 220px);
+  border-width: 4px;
+}
+
+.tm-pause-play {
+  width: 60%;
+  height: 60%;
+  translate: 5% 0;
+}
+
+.tm-pause-again {
+  width: clamp(72px, 18vmin, 130px);
+  height: clamp(72px, 18vmin, 130px);
+  border-width: 3px;
+}
+
+.tm-pause-again-arrow {
+  width: 58%;
+  height: 58%;
+}
+
+.tm-pause-button:active,
+.tm-pause-go-on:active,
+.tm-pause-again:active {
+  translate: 0 2px;
+}
+
+/* Paused, everything that moves with the run stands still with its clock: the picture, the bar and the last moments'
+   light. The veil's own taps (`FeedbackLayer`) still answer. */
+.tm-paused :is(.tm-stage, .tm-bar, .tm-final-light),
+.tm-paused :is(.tm-stage, .tm-bar) *,
+.tm-paused :is(.tm-stage, .tm-bar) *::before,
+.tm-paused :is(.tm-stage, .tm-bar) *::after {
+  animation-play-state: paused !important;
 }

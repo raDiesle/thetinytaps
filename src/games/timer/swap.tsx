@@ -1,6 +1,7 @@
 import { memo, useId, useState, type CSSProperties } from "react";
 import { MASCOT_COLORS } from "@/components/Mascot";
 import type { Localized } from "@/lib/language";
+import { useRunClock } from "./pause";
 import { HOURGLASS_BOX, Hourglass, Layer, SAND_FLOOR, STAGE_H, STAGE_W } from "./scenes";
 import type { SwapToy } from "./settings";
 
@@ -159,7 +160,8 @@ export function SwapShade({ kind, on, edge }: { kind: Holder; on: boolean; edge?
  * comes: give each turn its own `key`. While `waiting` (the lamps still draw who begins) it stands full, the sand still.
  */
 export function SwapHourglass({ ms, startedAt, flip, waiting, glow }: { ms: number; startedAt: number; flip: boolean; waiting: boolean; glow: number }) {
-  const [delay] = useState(() => (waiting ? 0 : Math.max(0, Date.now() - startedAt)));
+  const clock = useRunClock();
+  const [delay] = useState(() => (waiting ? 0 : Math.max(0, clock.now() - startedAt)));
   const [flipped] = useState(flip);
   return (
     <Hourglass

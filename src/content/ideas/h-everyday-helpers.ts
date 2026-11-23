@@ -266,5 +266,49 @@ export const everydayHelpersIdeas: IdeaArea = {
       partial:
         "Umgesetzt am 22. November 2026: Die Wahl im Buch Abstillen zeigt je Geschichte Bild, Name und Papierzettel zum Starten mit „N Bilder · ca. M Min.“ (MilkChainGame.tsx, minutesOf), keine Kapitelnummern mehr. „Ganz abstillen“ hat zwei Zettel, „Ganze Geschichte“ (51 Bilder, ca. 12 Min.) und „Kurzfassung“ (18 Bilder, ca. 4 Min., /abstillen/kurz/, SHORT_PAGES in milkChain.ts, dieselben Bilder, Texte und Aufnahmen). Neu ist „Three More Sleeps“ / „Noch dreimal schlafen“ (src/games/milkgoodbye, /abstillen/abschied/): ganz abstillen an einem festen Tag mit Abschiedsfest, vier Kapitel, zwölf Seiten, Englisch zuerst und in alle sieben Sprachen übersetzt. Ihre zwölf Bilder warten in der Bilder-Warteschlange (Claude Cloud), bis dahin sehen Spielende sie nicht und ihre Seite ist noindex; die Aufnahmen kommen nur auf Wunsch.",
     },
+    {
+      id: "H-144",
+      emoji: "📖",
+      title: "Alle Kapitelbücher wie Abstillen: Wahl am Anfang, Kurzfassung, keine Kapitel",
+      text: "Flasche abgewöhnen, Schnullerfee, Kita-Start und Haare waschen öffnen wie Abstillen auf der Wahl ihrer Geschichte: ganz oder als Kurzfassung aus den eigenen Seiten, je Zettel mit Bildern und Dauer, ohne Kapitelliste; jede Geschichte beginnt immer von vorn.",
+      why: "Wunsch der Nutzerin am 23. November 2026: „mache die Menüs … so vom Stil wie Abstillen. Biete auch Kurzversionen an … zeige nicht mehr die einzelnen Kapitel an. Jeder fängt diese immer von Anfang an.“",
+      effort: "M",
+      done: true,
+      partial:
+        "Umgesetzt am 23. November 2026: Die Wahl aus Abstillen ist jetzt ein gemeinsamer Baustein (src/components/StoryChoice.tsx), das Inhaltsverzeichnis mit Kapiteln ist aus ChapterBook entfernt. Kurzfassungen aus vorhandenen Seiten, ohne neue Bilder, Texte oder Aufnahmen: Schnullerfee 18 von 40 Bildern (ca. 4 statt 9 Min., /schnullerfee/kurz/), Kita-Start 16 Bilder (/kita/kurz/), Haare waschen 13 Bilder (/haare-waschen/kurz/), Flasche abgewöhnen 14 von 27 Bildern (ca. 3 statt 7 Min., /flaeschchen/kurz/). Großes Bett öffnet ebenso, mit einem Zettel „Lesen“ und ohne Kurzfassung. Die Suchtexte sagen es in allen sieben Sprachen.",
+    },
+    {
+      id: "H-145",
+      emoji: "🌳",
+      title: "Schnullerfee: eine zweite Geschichte, der Schnullerbaum",
+      text: "Im Buch Schnullerfee eine zweite Geschichte neben „Tapsi und die Schnullerfee“, gewählt wie bei Abstillen (StoryChoice), mit eigener Adresse: ohne Fee. Tapsi sucht mit Mama oder Papa den Tag aus, sammelt die Schnuller selbst, bindet sie mit einem bunten Band an den Schnullerbaum im Park, wo schon viele hängen, und sagt Tschüss; die ersten Abende tröstet Kuscheln statt Schnuller, und später besucht Tapsi den Baum und zeigt stolz auf den eigenen. Kürzer als die Fee-Geschichte, so wahr und sanft wie sie (vorher erzählen, das Kind gibt selbst ab, kein Schnuller kommt zurück).",
+      why: "Die Recherche „schnullerfee-kapitel“ nennt den Schnullerbaum als zweiten sanften Weg neben der Fee; Familien, die dem Kind keine Fee erzählen wollen, finden im Buch bisher nichts. Wie oft „Schnullerbaum“ gesucht wird, ist noch nicht gemessen.",
+      effort: "M",
+      done: true,
+      partial:
+        "Gebaut am 23. November 2026 als „Tapsi and the Pacifier Tree“ (src/games/pacifiertree): 20 Seiten in sieben Kapiteln, ganz unter /schnullerfee/baum/ (ca. 5 Min.) und als Kurzfassung aus 11 eigenen Seiten unter /schnullerfee/baum/kurz/ (ca. 3 Min.) – neben der Fee ganz (40 Seiten) und kurz (18) also vier verschiedene Längen. Englisch zuerst, in alle sieben Sprachen übersetzt, Suchtexte in allen sieben. Die 20 Bilder warten in der Bilder-Warteschlange (Claude Cloud), bis dahin sehen Spieler die Geschichte nicht; Aufnahmen nur auf Wunsch.",
+    },
+    {
+      id: "H-146",
+      emoji: "🚿",
+      title: "Haare waschen: eine zweite Geschichte unter der Dusche",
+      text: "Im Buch Haare waschen eine zweite Geschichte neben „Tapsi and the Foam Crown“, gewählt wie bei Abstillen (StoryChoice), mit eigener Adresse: für Familien ohne Badewanne. Tapsi sitzt oder steht in der Dusche, Papa oder Mama hält die Brause tief und lässt Tapsi zuerst die Füße und Hände nass machen, Tapsi gibt das Zeichen, Kopf nach hinten mit dem Waschlappen vor den Augen, ausspülen von hinten, nie von oben; am Ende ein warmes Handtuch. Dieselben Regeln wie die erste Geschichte (nicht zwingen, Tapsi darf aufhören, ein Erwachsener ist in jedem Bild dabei).",
+      why: "Die erste Geschichte spielt ganz in der Wanne; viele Wohnungen haben nur eine Dusche, und dort geht es um anderes (die Brause, wo das Kind steht oder sitzt). Ob die Quellen der Recherche „haare-waschen“ zur Dusche bei Kleinkindern etwas sagen, ist vor dem Schreiben nachzulesen.",
+      effort: "M",
+      done: true,
+      partial:
+        "Gebaut am 23. November 2026 als „Tapsi and the Warm Rain“ (src/games/hairshower): 20 Seiten in sechs Kapiteln nach denselben Schritten wie die Wannen-Geschichte, ganz unter /haare-waschen/dusche/ (ca. 4 Min.) und als Kurzfassung aus 11 eigenen Seiten unter /haare-waschen/dusche/kurz/. Diesmal ist Papa dabei: Tapsi findet die Dusche laut, übt mit Hase und auf Papas Füßen, sitzt auf einer weichen Matte am Boden der Dusche, der Regen kommt tief und zuerst auf die Zehen, Tapsi hält die Brause selbst, Kopf zurück zum Fisch auf den Fliesen, Schaum-Igel, „Jetzt!“, spülen von hinten, nie von oben; spritzt es ins Gesicht, dreht Papa sofort ab, und Tapsi wählt Dusche oder Becher. Die Quellen zur Dusche wurden vorher nachgelesen (Recherche „haare-waschen“, Nachtrag). In der Wahl des Buchs heißen die beiden „In der Badewanne“ und „Unter der Dusche“. Englisch zuerst, in alle sieben Sprachen übersetzt, Suchtexte in allen sieben. Die 20 Bilder warten in der Bilder-Warteschlange (Claude Cloud), bis dahin sehen Spieler die Geschichte nicht; Aufnahmen nur auf Wunsch.",
+    },
+    {
+      id: "H-147",
+      emoji: "🏡",
+      title: "Kita-Start: eine zweite Geschichte bei der Tagesmutter",
+      text: "Im Buch Kita-Start eine zweite Geschichte neben „Tapsi geht in die Kita“, gewählt wie bei Abstillen (StoryChoice), mit eigener Adresse: die Eingewöhnung bei einer Tagesmutter (Kindertagespflege) – eine Wohnung statt eines Hauses, drei bis fünf Kinder, eine einzige Bezugsperson, gemeinsames Essen am Küchentisch, Mittagsschlaf im fremden Bettchen. Die Schritte wie in der Kita-Geschichte (ein Elternteil bleibt zuerst als sicherer Hafen, die erste kurze Trennung, die Tagesmutter tröstet, das Abschiedsritual), die Tagesmutter eine Bärin oder Füchsin in ihrer Rolle.",
+      why: "Ein Teil der Kinder unter drei wird nicht in einer Kita, sondern bei einer Tagesmutter betreut, und deren Alltag sieht anders aus als im Buch; eine Geschichte dafür fehlt bei uns. Wie viele Familien das sind und wie oft „Eingewöhnung Tagesmutter“ gesucht wird, ist noch nachzuschlagen (nicht geschätzt).",
+      effort: "M",
+      done: true,
+      partial:
+        "Gebaut am 23. November 2026 als „Tapsi Goes to Lotta's“ (src/games/childminder): 28 Seiten in sieben Kapiteln nach denselben Schritten wie die Kita-Geschichte, ganz unter /kita/tagesmutter/ und als Kurzfassung aus 13 eigenen Seiten unter /kita/tagesmutter/kurz/. Lotta ist eine Bärin, die in ihrer Wohnung auf ein paar Kinder aufpasst (Emil, ein Baby und ein größeres Mädchen): Besuch mit Papa vorher, Mama auf Lottas Sofa, „Ich gehe kurz hinaus“, Tapsi weint und Lotta tröstet, Apfel am großen Küchentisch, das Abschiedsritual mit dem Marienkäfer-Haken, „Ich hole dich nach dem Mittagsschlaf ab“ und Winken am Küchenfenster, dann mit dem Bollerwagen zum Spielplatz, Nudeln am Küchentisch und Mittagsschlaf im kleinen Bett bei Lotta. In der Wahl des Buchs heißen die beiden „In der Kita“ und „Bei der Tagesmutter“. Die offene Frage ist beantwortet (Recherche „kita-eingewoehnung“, Nachtrag): am 1. März 2026 waren 109 351 Kinder unter drei in der Kindertagespflege, rund jedes siebte betreute; wie oft gesucht wird, wurde nicht gemessen. Englisch zuerst, in alle sieben Sprachen übersetzt, Suchtexte in allen sieben. Die 28 Bilder warten in der Bilder-Warteschlange (Claude Cloud), bis dahin sehen Spieler die Geschichte nicht; Aufnahmen nur auf Wunsch.",
+    },
   ],
 };

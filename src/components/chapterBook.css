@@ -2,7 +2,7 @@
  * A story book in chapters (`ChapterBook`: Tapsis Milchkette, Tapsi und die Schnullerfee): the page's picture as big
  * as the room above allows (.cb-picture-room, a size container), under it what the grown-up reads (.cb-words), the chapter's title over its first page; ◀ bottom left, ▶ bottom right
  * with the loudspeaker above it where the book is read aloud.
- * Nothing moves but the page changing. Before the first page, the table of contents (.cb-contents, below).
+ * Nothing moves but the page changing. Before the first page, the book's choice of its stories (.cb-contents, below).
  */
 
 .cb-play {
@@ -181,10 +181,7 @@
 }
 
 /*
- * The table of contents the book opens on: the story's name, then one line per chapter in two columns (the first
- * half down the left, the rest down the right), each a round picture of its first page, its number and title, dots
- * leading to its page number – like a picture book's contents. The lines share the room below the name, each a size
- * container its type grows with, and the whole line is the tap.
+ * Every chapter book opens on the choice of its stories (`StoryChoice.tsx`): the book's name over them.
  */
 .cb-contents {
   gap: clamp(4px, 1.5vh, 14px);
@@ -200,129 +197,8 @@
   color: #5a3d52;
 }
 
-.cb-toc {
-  flex: 1 1 0;
-  min-height: 0;
-  width: min(100%, 1200px);
-  display: grid;
-  grid-template-columns: repeat(2, minmax(0, 1fr));
-  grid-template-rows: repeat(var(--cb-rows), minmax(0, 1fr));
-  grid-auto-flow: column;
-  gap: clamp(4px, 1.4vh, 14px) clamp(14px, 3vw, 40px);
-  margin: 0;
-  padding: 0;
-  list-style: none;
-}
-
-.cb-toc > li {
-  min-height: 0;
-  container-type: size;
-}
-
-.cb-toc-line {
-  display: flex;
-  align-items: center;
-  gap: min(3cqw, 14cqh);
-  width: 100%;
-  height: 100%;
-  padding: 0 min(3cqw, 18cqh) 0 min(1.2cqw, 6cqh);
-  border: none;
-  border-radius: 999px 22px 22px 999px;
-  background: linear-gradient(90deg, #f2c9a8b0, #f6dcc066 75%, #f6dcc033);
-  color: inherit;
-  font: inherit;
-  text-align: start;
-  cursor: pointer;
-  -webkit-tap-highlight-color: transparent;
-}
-
-.cb-toc > li:nth-child(3n + 2) .cb-toc-line {
-  background: linear-gradient(90deg, #e9c3d6b0, #f1d8e466 75%, #f1d8e433);
-}
-
-.cb-toc > li:nth-child(3n + 3) .cb-toc-line {
-  background: linear-gradient(90deg, #c9d9b8b0, #dde8d166 75%, #dde8d133);
-}
-
-.cb-toc-line:active {
-  translate: 2px 2px;
-}
-
-.cb-toc-line:focus-visible {
-  outline: 4px solid #3d3045;
-  outline-offset: 2px;
-}
-
-/* The chapter's first picture, cut round like a print pasted in. */
-.cb-toc-picture {
-  flex: none;
-  width: min(88cqh, 18cqw);
-  height: min(88cqh, 18cqw);
-  overflow: hidden;
-  border: 2px solid #3d3045;
-  border-radius: 50%;
-  background: #fffaf0;
-}
-
-.cb-toc-picture img {
-  display: block;
-  width: 100%;
-  height: 100%;
-  object-fit: cover;
-}
-
-.cb-toc-name {
-  display: flex;
-  flex: 0 1 auto;
-  flex-direction: column;
-  min-width: 0;
-}
-
-/* „Kapitel 4“, small over the title, only where the line is tall enough for both. */
-.cb-toc-chapter {
-  display: none;
-  font-size: min(17cqh, 3.2cqw);
-  line-height: 1.2;
-  color: #8a6a7a;
-}
-
-@container (min-height: 64px) {
-  .cb-toc-chapter {
-    display: block;
-  }
-}
-
-/* Up to two lines, so a long title is read whole, never cut off. */
-.cb-toc-title {
-  display: -webkit-box;
-  overflow: hidden;
-  -webkit-box-orient: vertical;
-  -webkit-line-clamp: 2;
-  font-size: min(36cqh, 4.4cqw);
-  font-weight: 700;
-  line-height: 1.15;
-}
-
-.cb-toc-dots {
-  flex: 1 1 1em;
-  min-width: 1em;
-  height: 6px;
-  background: radial-gradient(circle, #3d3045a6 0 1.4px, #0000 2px) 0 50% / 11px 6px repeat-x;
-}
-
-.cb-toc-page {
-  flex: none;
-  min-width: 1.3em;
-  font-family: Georgia, "Times New Roman", serif;
-  font-size: min(36cqh, 4.6cqw);
-  font-style: italic;
-  font-weight: 700;
-  text-align: end;
-}
-
 /*
- * A book of several stories (Abstillen's `WeaningBook`) opens on their choice instead: the book's name, then one line
- * per story sharing the room below it – its picture, what it is for, its title, and a start slip per version telling
+ * The choice: the book's name, then one line per story sharing the room below it – its picture, what it is for, its title, and a start slip per version telling
  * its pictures and minutes (user request, 22 November 2026: where to start plainly marked, no chapters' numbers). The
  * whole line is a tap that starts its first version, laid under the slips; each line a size container its type grows
  * with. On a wide screen the lines stand side by side as columns, the picture on top, so each stays big.
@@ -340,7 +216,7 @@
 }
 
 @media (min-aspect-ratio: 3 / 2) {
-  .cb-story-list {
+  .cb-story-list:not([data-lines="1"]) {
     width: min(100%, 1400px);
     grid-auto-flow: column;
     grid-auto-columns: minmax(0, 1fr);
@@ -511,41 +387,78 @@
 
 /* Side by side as columns: the picture on top across the line, the name and the slips under it. */
 @media (min-aspect-ratio: 3 / 2) {
-  .cb-story {
+  .cb-story-list:not([data-lines="1"]) .cb-story {
     --pad: min(4cqw, 3cqh);
     --pic-w: calc(100cqw - 2 * var(--pad));
     --pic-h: min(calc(var(--pic-w) * 3 / 4), 52cqh);
   }
 
-  .cb-story-body {
+  .cb-story-list:not([data-lines="1"]) .cb-story-body {
     grid-template-columns: minmax(0, 1fr);
     /* The slips right under the name, never at the line's foot with an empty gap above them. */
     grid-template-rows: auto auto minmax(0, 1fr);
     align-content: start;
   }
 
-  .cb-story-picture {
+  .cb-story-list:not([data-lines="1"]) .cb-story-picture {
     grid-row: auto;
   }
 
-  .cb-story-name {
+  .cb-story-list:not([data-lines="1"]) .cb-story-name {
     justify-content: flex-start;
   }
 
-  .cb-story-starts {
+  .cb-story-list:not([data-lines="1"]) .cb-story-starts {
     align-content: flex-start;
     align-items: flex-start;
   }
 
-  .cb-story-kind {
+  .cb-story-list:not([data-lines="1"]) .cb-story-kind {
     font-size: min(9cqw, 6.5cqh);
   }
 
-  .cb-story-title {
+  .cb-story-list:not([data-lines="1"]) .cb-story-title {
     font-size: min(6cqw, 4.2cqh);
   }
 
-  .cb-story-start {
+  .cb-story-list:not([data-lines="1"]) .cb-story-start {
     --slip: max(12px, min(5.6cqw, 4.6cqh));
   }
+}
+
+/*
+ * A book of one story (Schnullerfee, Kita-Start, …: its whole story and its short version) has one line: it keeps the
+ * picture beside its name on every screen, as a 4 : 3 print as big as the line allows, and the line only as wide as
+ * picture and name need, so no wide empty band stands beside them.
+ */
+.cb-story-list[data-lines="1"] {
+  width: min(100%, 1100px);
+  max-height: 640px;
+  align-self: center;
+}
+
+.cb-story-list[data-lines="1"] .cb-story {
+  --pic-h: min(calc(100cqh - 2 * var(--pad)), calc(56cqw * 3 / 4));
+  --pic-w: calc(var(--pic-h) * 4 / 3);
+}
+
+.cb-story-list[data-lines="1"] .cb-story-picture {
+  align-self: center;
+}
+
+.cb-story-list[data-lines="1"] .cb-story-name {
+  justify-content: center;
+}
+
+.cb-story-list[data-lines="1"] .cb-story-kind {
+  font-size: min(10cqh, 4.4cqw);
+}
+
+.cb-story-list[data-lines="1"] .cb-story-starts {
+  flex-direction: column;
+  align-items: flex-start;
+}
+
+.cb-story-list[data-lines="1"] .cb-story-start {
+  --slip: max(13px, min(7cqh, 2.6cqw));
 }

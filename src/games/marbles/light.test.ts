@@ -14,6 +14,7 @@ import {
   fromStick,
   GLOBE,
   GLOBE_BUTTON,
+  GLOBE_SPIN,
   LAMP,
   LANTERN,
   LAVA,
@@ -148,6 +149,11 @@ describe("Licht-Kette", () => {
     expect(light.globeGlow(light.tGlobe)).toBe(0);
     expect(light.globeTurn(light.tGlobe)).toBe(0);
     expect(light.globeGlow(light.tGlobe + 1)).toBe(1);
+    // It turns while it calls the fireflies, then stands, so nothing is painted there again behind the lighthouse (A-36).
+    expect(light.globeTurn(light.tGlobe + 4)).toBeGreaterThan(light.globeTurn(light.tGlobe + 3));
+    const rest = light.tGlobe + 0.3 + GLOBE_SPIN + 2;
+    expect(light.globeTurn(rest + 5)).toBe(light.globeTurn(rest));
+    expect(light.globeTurn(rest - 0.05)).toBeCloseTo(light.globeTurn(rest), 2);
     for (const t of times(light.tLoose, light.duration)) {
       const pt = light.birdFlying(t)?.pt;
       expect(pt?.x).toBeGreaterThan(LAVA.x);

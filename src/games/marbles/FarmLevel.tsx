@@ -43,7 +43,7 @@ import {
   YARN_R,
 } from "./farm";
 import { VIEW_H, type LevelProps, wobble } from "./level";
-import { along, easeOut, lerp, seg } from "./machineKit";
+import { along, easeOut, lerp, seg, hump } from "./machineKit";
 import { MachineStage } from "./MachineStage";
 import { BAR_COLORS } from "./parts";
 import { CabDriver, INK, Sparkles } from "./scenery";
@@ -76,11 +76,13 @@ export function FarmLevel(props: LevelProps) {
   // Things that keep moving (singing, wagging) stop when the level is over.
   const still = (t: number) => Math.min(t, farm.tDone);
 
+  // The backdrop never changes: a layer of its own, painted once.
+  const backdrop = useMemo(() => [{ content: <Yard /> }], []);
+
   return (
-    <MachineStage machine={farm} level="farm" start={{ x: POST.x + 10, y: POST.top - 80, r: 92 }} {...props}>
+    <MachineStage back={backdrop} machine={farm} level="farm" start={{ x: POST.x + 10, y: POST.top - 80, r: 92 }} {...props}>
       {(t) => (
         <>
-          <Yard />
           <StartGlow t={t} glow={`${ids}-glow`} />
           <Fence />
           <Rooster farm={farm} t={t} />
@@ -124,7 +126,7 @@ export function FarmLevel(props: LevelProps) {
 
 /* ---------- The farmyard ---------- */
 
-function Yard() {
+const Yard = memo(function Yard() {
   return (
     <g>
       <rect x="-400" y="-200" width={WORLD_W + 800} height="800" fill="#9ad8ff" />
@@ -148,7 +150,7 @@ function Yard() {
       ))}
     </g>
   );
-}
+});
 
 /** A soft, still glow behind the rooster: what to tap. */
 function StartGlow({ t, glow }: { t: number; glow: string }) {
@@ -167,7 +169,7 @@ function StartGlow({ t, glow }: { t: number; glow: string }) {
 }
 
 /** A piece of wooden fence; the rooster stands on its tallest post. */
-function Fence() {
+const Fence = memo(function Fence() {
   return (
     <g stroke={INK} strokeWidth="4" strokeLinejoin="round">
       {[640, 710].map((y) => (
@@ -179,13 +181,13 @@ function Fence() {
       <rect x={POST.x - 22} y={POST.top} width="44" height={FLOOR - POST.top} rx="5" fill="#c68a4f" />
     </g>
   );
-}
+});
 
 /* ---------- The animals ---------- */
 
 /** The rooster, side on, looking right; he throws his head back and flaps while he crows. */
 function Rooster({ farm, t }: { farm: Farm; t: number }) {
-  const c = Math.sin(Math.PI * seg(t, farm.tCrow, farm.tCrow + 1.4));
+  const c = hump(seg(t, farm.tCrow, farm.tCrow + 1.4));
   const flap = c * 25 * Math.sin(t * 22);
   return (
     <g transform={`translate(${POST.x} ${POST.top})`} stroke={INK} strokeWidth="4" strokeLinejoin="round">
@@ -297,7 +299,7 @@ function Pig({ farm, t }: { farm: Farm; t: number }) {
 }
 
 /** The hay bale, and the plank the wool rolls down. */
-function Bale() {
+const Bale = memo(function Bale() {
   const dx = PLANK.b.x - PLANK.a.x;
   const dy = PLANK.b.y - PLANK.a.y;
   const angle = (Math.atan2(dy, dx) * 180) / Math.PI;
@@ -315,7 +317,7 @@ function Bale() {
       ))}
     </g>
   );
-}
+});
 
 /** The ball of wool: it turns as it rolls, and lays a red thread behind it. */
 function Yarn({ farm, t }: { farm: Farm; t: number }) {
@@ -341,8 +343,8 @@ function Yarn({ farm, t }: { farm: Farm; t: number }) {
 /** The cat: curled up asleep on the bale, then up with a jump and a meow, and a pat of her paw at the wool. */
 function Cat({ farm, t }: { farm: Farm; t: number }) {
   const awake = t >= farm.tCatWake;
-  const jump = 80 * Math.sin(Math.PI * seg(t, farm.tCatWake, farm.tCatWake + 0.5));
-  const swat = Math.sin(Math.PI * seg(t, farm.tSwat - 0.2, farm.tSwat + 0.3));
+  const jump = 80 * hump(seg(t, farm.tCatWake, farm.tCatWake + 0.5));
+  const swat = hump(seg(t, farm.tSwat - 0.2, farm.tSwat + 0.3));
   const fur = "#f4a261";
   if (!awake) {
     return (
@@ -365,7 +367,7 @@ function Cat({ farm, t }: { farm: Farm; t: number }) {
         <rect key={x} x={x - 9} y="-50" width="18" height="50" rx="8" fill={fur} />
       ))}
       <rect x="37" y="-50" width="18" height="50" rx="8" fill={fur} transform={`rotate(${-70 * swat} 46 -46)`} />
-      <ellipse cx="0" cy="-62" rx="60" ry={28 + 6 * Math.sin(Math.PI * seg(t, farm.tCatWake, farm.tCatWake + 0.6))} fill={fur} />
+      <ellipse cx="0" cy="-62" rx="60" ry={28 + 6 * hump(seg(t, farm.tCatWake, farm.tCatWake + 0.6))} fill={fur} />
       {[-30, -8, 14].map((x) => (
         <path key={x} d={`M${x} -88 q4 12 0 24`} fill="none" stroke="#d07a3a" strokeWidth="5" strokeLinecap="round" />
       ))}
@@ -383,7 +385,7 @@ function Cat({ farm, t }: { farm: Farm; t: number }) {
         <circle cx="14" cy="-6" r="7" fill="#fff" />
         <circle cx="-5" cy="-6" r="3.5" fill={INK} stroke="none" />
         <circle cx="15" cy="-6" r="3.5" fill={INK} stroke="none" />
-        <ellipse cx="6" cy="8" rx="7" ry={2 + 5 * Math.sin(Math.PI * seg(t, farm.tCatWake, farm.tCatWake + 0.8))} fill="#8a3355" />
+        <ellipse cx="6" cy="8" rx="7" ry={2 + 5 * hump(seg(t, farm.tCatWake, farm.tCatWake + 0.8))} fill="#8a3355" />
         <path d="M-30 6 h-18 M-30 12 l-16 6 M34 6 h18 M34 12 l16 6" strokeWidth="2" />
       </g>
     </g>
@@ -405,7 +407,7 @@ function Mud({ farm, t }: { farm: Farm; t: number }) {
 /** The cow, side on, facing left: grazing until the wool bumps her nose, then her head goes up and she moos. */
 function Cow({ farm, t }: { farm: Farm; t: number }) {
   const up = farm.cowHead(t);
-  const mouth = Math.sin(Math.PI * seg(t, farm.tMoo, farm.tMoo + 1.1));
+  const mouth = hump(seg(t, farm.tMoo, farm.tMoo + 1.1));
   const swish = 18 * Math.sin(Math.PI * 2 * seg(t, farm.tMoo, farm.tMoo + 1.1));
   const angle = -51 + 63 * up;
   return (
@@ -585,7 +587,7 @@ function Dog({ farm, t, still }: { farm: Farm; t: number; still: number }) {
   const stride = d.running ? 30 * Math.sin(t * 18) : 0;
   const bob = d.running ? 6 * Math.abs(Math.sin(t * 18)) : 0;
   const barks = [farm.tDog, farm.tTurkeyBark];
-  const mouth = Math.max(farm.singing(3, t), ...barks.map((b) => Math.sin(Math.PI * seg(t, b, b + 0.4))));
+  const mouth = Math.max(farm.singing(3, t), ...barks.map((b) => hump(seg(t, b, b + 0.4))));
   const wag = still > farm.tDog && still < farm.tDone ? 20 * Math.sin(still * 16) : 0;
   const fur = "#b5835a";
   return (
@@ -679,7 +681,7 @@ function Donkey({ farm, t, still }: { farm: Farm; t: number; still: number }) {
 }
 
 /** The duck pond further back in the meadow, with reeds. */
-function Pond() {
+const Pond = memo(function Pond() {
   return (
     <g stroke={INK} strokeWidth="4">
       <ellipse cx={POND.x} cy={POND.y + 10} rx={POND.rx} ry={POND.ry} fill="#4fb3e8" />
@@ -694,7 +696,7 @@ function Pond() {
       )}
     </g>
   );
-}
+});
 
 /** A duck, side on, looking right: on the pond, in the air with beating wings, on the donkey's back, with a somersault onto the barn roof, singing along at the end. */
 function Duck({ farm, i, t, still }: { farm: Farm; i: number; t: number; still: number }) {
@@ -789,7 +791,7 @@ function Grains({ farm, t }: { farm: Farm; t: number }) {
 }
 
 /** The straw nest the hen dozes in. */
-function Nest() {
+const Nest = memo(function Nest() {
   return (
     <g stroke={INK} strokeWidth="4">
       <ellipse cx={HEN.x - 10} cy={FLOOR - 8} rx="74" ry="18" fill="#e9c46a" />
@@ -801,7 +803,7 @@ function Nest() {
       />
     </g>
   );
-}
+});
 
 /** The brown mother hen, side on, looking right: asleep in her nest, then pecking her way to the tractor and riding on it. */
 function MotherHen({ farm, t }: { farm: Farm; t: number }) {
@@ -809,7 +811,7 @@ function MotherHen({ farm, t }: { farm: Farm; t: number }) {
   const head = { x: lerp(38, 28, h.peck), y: lerp(-86 - 24 * h.up, -18, h.peck) };
   const bodyY = -34 - 22 * h.up;
   const clucks = [farm.tHenWake + 0.1, farm.tOnGuard];
-  const beak = Math.max(...clucks.map((c) => Math.sin(Math.PI * seg(t, c, c + 0.35))));
+  const beak = Math.max(...clucks.map((c) => hump(seg(t, c, c + 0.35))));
   return (
     <g transform={`translate(${h.pt.x} ${h.pt.y})`} stroke={INK} strokeWidth="3.5" strokeLinejoin="round">
       {h.up > 0.05 && <path d={`M-8 ${bodyY + 26} V0 M10 ${bodyY + 26} V0`} stroke={BEAK} strokeWidth="5" strokeLinecap="round" />}
@@ -863,7 +865,7 @@ function Tractor({ farm, t }: { farm: Farm; t: number }) {
   const clip = useId();
   const { x, spin, shake } = farm.tractorAt(t);
   const awake = farm.farmerAwake(t);
-  const squash = Math.max(...[farm.tHorn, farm.tHorn2].map((h) => Math.sin(Math.PI * seg(t, h - 0.05, h + 0.25))));
+  const squash = Math.max(...[farm.tHorn, farm.tHorn2].map((h) => hump(seg(t, h - 0.05, h + 0.25))));
   const orange = "#e8742c";
   const wheel = (cx: number, r: number, turn: number) => (
     <g transform={`rotate(${turn} ${cx} ${-r})`}>

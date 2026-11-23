@@ -170,7 +170,10 @@ export function playMusicbox() {
 
 /** "Plink" – a marble on a nail: a short, bright note of the pentatonic scale, low (0) to high. */
 export function playPlink(i: number) {
-  const freq = PENTATONIC[i % PENTATONIC.length];
+  // Any whole number picks a note, negative ones too (the Licht-Kette's rabbit counts its hops below 0): a plain `%`
+  // gave no note there and the browser threw on its frequency.
+  const n = PENTATONIC.length;
+  const freq = PENTATONIC[((Math.round(i) % n) + n) % n];
   note({ from: freq, duration: 0.3, type: "triangle", volume: 0.12 });
   note({ from: freq * 3, duration: 0.07, type: "sine", volume: 0.04 });
 }

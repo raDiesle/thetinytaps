@@ -18,7 +18,8 @@ its name, the goals' names and the options behind ⚙️ wait for their translat
 - At ten the goal does its own thing with the child (`FINALE`: floats carry it down, homes take the baby animal back and
   the child jumps into the leaves, the cloud and the moon rock it, the rainbow is a slide, the bird and the hot-air
   balloon take it for a ride), the tower tumbles, and `GameEnd` shows that round's trophy (`level` = the goal).
-  „Nochmal“ builds the same round again, „Weiter“ goes on to the next ten (after 100: from 1).
+  „Nochmal“ builds the same round again, „Weiter“ goes on to the next ten (after 100: from 1),
+  showing the next goal on its sky (`GoalCard` in `drawings.tsx`, user request, 23 November 2026).
 - Behind ⚙️ (held, `PlayOptions`, as play starts its `intro`) only two things, user request November 2026: „Start at“, a
   slider 1–100 that jumps to any number and goes on from there – the earlier blocks of that round already stand, without
   flying in – and „From 1“. Nothing else goes there; no settings of the start screen.
@@ -35,4 +36,4 @@ its name, the goals' names and the options behind ⚙️ wait for their translat
 - The voice: one to nine from the letters games' recordings (`lettersVoice`), 10–99 their English two-digit words
   (`TWO_DIGIT_WORDS`), 100 `HUNDRED` – silent until recorded, listed in `voiceLines.ts`.
 - A new goal gets its place in `goalPlace` (`layout.ts`, checked on every screen in `layout.test.ts`), its drawing, its
-  `FINALE` timing, its name in `GOAL_NAMES` and its trophy picture, and the SEO texts in all seven languages name it.
+  `FINALE` timing, its name in `GOAL_NAMES`, its trophy picture, its `GoalCard`, and the SEO texts in all seven languages name it.

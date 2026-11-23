@@ -1,4 +1,5 @@
 import type { StoryChapter } from "@/components/ChapterBook";
+import { shortOf } from "@/lib/storyPages";
 
 // „Bye-Bye, Bottle!“ (idea H-105, user request, 21 November 2026: „setze um in hoher Qualität Idee H-105“): like
 // „Tapsis Milchkette“, but for the bottle, and shorter – told in chapters that follow what the guides advise for moving a
@@ -388,3 +389,32 @@ export const BOTTLE_STORY: BottleChapter[] = [
 
 /** Every page of the story in reading order. */
 export const BOTTLE_PAGES: BottlePage[] = BOTTLE_STORY.flatMap((c) => c.pages);
+
+/**
+ * The pages of the short version (user request, 23 November 2026: „biete auch Kurzversionen an, was schon da ist“), read
+ * in a few minutes: the same story told with its own pages – baby Tapsi with the bottle in Papa's arms, Tapsi big, Mama telling that
+ * the bottle says bye-bye bit by bit, the first sip from the green cup, the daytime bottle resting in the cupboard and
+ * the milk in the cup at lunch, the morning milk in the cup, the evening milk at the table and bed without a bottle,
+ * the tears in Mama's arms, Papa with water at night, the bottle laid in its box, and the love that stays – the bottles
+ * still going in `BOTTLE_ORDER`. Only pages of the whole story, in its order, so
+ * its pictures, translations and recordings serve both (`storyBooks.test.ts` checks).
+ */
+export const BOTTLE_SHORT_PAGES = [
+  "baby",
+  "gross",
+  "sagen",
+  "schluck",
+  "schrank",
+  "mittag",
+  "morgenmilch",
+  "abendmilch",
+  "bett",
+  "traurig",
+  "wach",
+  "wasser",
+  "kiste",
+  "lieb",
+];
+
+/** The short version's chapters: each chapter with only its pages on `BOTTLE_SHORT_PAGES`, the empty ones left out. */
+export const BOTTLE_STORY_SHORT: BottleChapter[] = shortOf(BOTTLE_STORY, BOTTLE_SHORT_PAGES);

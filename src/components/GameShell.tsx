@@ -15,7 +15,7 @@ import { useFitGrid } from "@/lib/fitGrid";
 import { enterKidMode, exitKidMode } from "@/lib/fullscreen";
 import { useT } from "@/lib/language";
 import { codeSoon } from "@/lib/lazyPart";
-import { goBack } from "@/lib/goBack";
+import { backFrom, goBack } from "@/lib/goBack";
 import { levelHref } from "@/lib/levelAddress";
 import { countGame, isPlaytimeOver, usePlaytime } from "@/lib/playtime";
 import { track } from "@/lib/analytics";
@@ -159,6 +159,8 @@ export function GameShell({
   const t = useT();
   // Opened as a step of a routine (the Tagesplan): plays at once, without play time, and goes back there afterwards.
   const returnTo = routineReturn(location.state);
+  // Opened from another page that is to come back (the trophy room's play sign, `BackVisit`): ✕ goes back there.
+  const backTo = returnTo ? undefined : backFrom(location.state);
   // Neither a routine's step nor a tool counts as play, nor stops when play time is over.
   const free = !!returnTo || !!tool;
   // A game still being built and on no shelf is opened from the management page only, so its way back leads there.
@@ -246,6 +248,7 @@ export function GameShell({
       setPlaying(false);
       // Back in the history too, so the phone's back button doesn't open the game again (goBack.ts).
       if (returnTo) goBack(navigate, returnTo);
+      else if (backTo) goBack(navigate, backTo);
       else if (menu) goBack(navigate, menu);
       else if (levels && addressed) {
         shownLevel.current = undefined;
@@ -254,8 +257,8 @@ export function GameShell({
     };
     // The page turns back from the game to its menu: as many pages as lie between them, or the book
     // closes and goes back on the shelf.
-    if (!returnTo && menu === "/") putBookBack(location.pathname, leave);
-    else turnPageWith("back", leave, !returnTo && menu ? pagesBetween(location.pathname, menu) : 1);
+    if (!returnTo && !backTo && menu === "/") putBookBack(location.pathname, leave);
+    else turnPageWith("back", leave, !returnTo && !backTo && menu ? pagesBetween(location.pathname, menu) : 1);
   };
   const stopRef = useRef(stop);
   stopRef.current = stop;
@@ -288,11 +291,11 @@ export function GameShell({
     else void start();
   }, []);
 
-  useLevelSync({ ...address, navigate, playing, setPlaying, mode, onMode, free, start });
+  useLevelSync({ ...address, navigate, playing, setPlaying, mode, onMode, free, start, backTo });
 
   if (playing) {
     // Leaving closes the book and puts it back on the shelf (see `stop`).
-    const toShelf = !returnTo && menu === "/";
+    const toShelf = !returnTo && !backTo && menu === "/";
     return (
       // Resuming audio on any tap helps after a reload, when no "Los" click unlocked it.
       <div ref={playArea} className="play-area" onPointerDownCapture={unlockAudio}>

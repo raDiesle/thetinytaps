@@ -9,6 +9,9 @@ import { KITA_PICTURE_QUEUE } from "@/games/kitastory/kitaStoryPictures";
 import { HAIR_PICTURE_QUEUE } from "@/games/hairstory/hairStoryPictures";
 import { NIGHT_PICTURE_QUEUE } from "@/games/nightmilk/nightMilkPictures";
 import { GOODBYE_PICTURE_QUEUE } from "@/games/milkgoodbye/goodbyeMilkPictures";
+import { TREE_PICTURE_QUEUE } from "@/games/pacifiertree/pacifierTreePictures";
+import { SHOWER_PICTURE_QUEUE } from "@/games/hairshower/hairShowerPictures";
+import { CHILDMINDER_PICTURE_QUEUE } from "@/games/childminder/childminderPictures";
 import { BOTTLE_PICTURE_QUEUE } from "@/games/bottlestory/bottleStoryPictures";
 import { BED_PICTURE_QUEUE } from "@/games/bedstory/bedStoryPictures";
 import { CAUSE_PICTURE_QUEUE } from "@/games/cause/causePictures";
@@ -98,6 +101,9 @@ export const PICTURE_QUEUE: QueuedPicture[] = [
   ...HAIR_PICTURE_QUEUE,
   ...NIGHT_PICTURE_QUEUE,
   ...GOODBYE_PICTURE_QUEUE,
+  ...TREE_PICTURE_QUEUE,
+  ...SHOWER_PICTURE_QUEUE,
+  ...CHILDMINDER_PICTURE_QUEUE,
   ...BOTTLE_PICTURE_QUEUE,
   ...CAUSE_PICTURE_QUEUE,
   ...READER_PICTURE_QUEUE,

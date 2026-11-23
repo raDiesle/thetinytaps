@@ -18,11 +18,16 @@ all alone, and in bed Tapsi promises the bunny a foam crown next time.
 - `hairStory.ts`: the chapters and pages (`HAIR_STORY`) and the steps of washing hair gently (`WASH_STEPS`).
 - `hairStoryPictures.ts`: the Gemini prompt of every page (place, light, cast and clothes, bunny, cup, washcloth,
   shampoo, towel, mirror), as the picture queue takes them; a made picture goes on `MADE`.
-- `HairStoryGame.tsx` plays it with the shared `ChapterBook` (`first="en"`, dev tags `H0`, `H<chapter>-<page>`). A
+- `HairStoryGame.tsx` opens like „Abstillen“ on the choice of its stories (`StoryChoice.tsx`, shared by every chapter book, `H0`): its story whole and in a short version at `/haare-waschen/kurz/` (`HAIR_SHORT_PAGES`, its own pages, so no picture, translation or recording of its own), each a slip with its pictures and minutes – never its chapters – and every story starts on its first page (user request, 23 November 2026). Each story is read with the shared `ChapterBook` (`first="en"`, dev tags `H0`, `H<chapter>-<page>`). A
   change to how the book reads goes there, so all four get it. Tapsi's voice reads each page (`voice`, from `stimme/`,
   listed in `recordedLines.ts` as `haare-waschen`, recorded only when the user asks), and the loudspeaker above ▶
   switches it off (`VoiceSwitch`); a page without its recording stays silent.
 - `names.ts`: the book's name on the shelf, the story's title and its blurb.
+- **A second story, „Tapsi and the Warm Rain“, in the shower** (`src/games/hairshower`, its own `CLAUDE.md`; idea H-146,
+  23 November 2026), for families without a bathtub: at `/haare-waschen/dusche/` and `/haare-waschen/dusche/kurz/`, its
+  own slips in the same choice. Each story's slip names where the hair is washed – „In the bathtub“ (`HAIR_BATH_KIND`,
+  `names.ts`) and „In the shower“ (`SHOWER_KIND`) –, so a family finds its own at a glance. A new story in this book
+  gets such a kind too.
 
 ## Rules
 
@@ -35,6 +40,10 @@ all alone, and in bed Tapsi promises the bunny a foam crown next time.
 - **The chapters follow the guides' steps in their order** (`WASH_STEPS`, checked): tell what comes and in which order,
   practise on a soft toy and on a grown-up, let the child choose and join in, keep the eyes dry, stop when it is too
   much, the warm towel and praise afterwards. The last chapter only tells the story.
+- **The short version is made of the whole story's own pages** (`HAIR_SHORT_PAGES`, user request, 23 November 2026): in the
+  story's order, from its first page to its last, about a third of it, and where Tapsi cries a grown-up is on that page or
+  holds Tapsi on the next (`src/components/storyBooks.test.ts`). A page renamed or added in the story is weighed for it
+  there too; a new page goes into it only where the short way would miss it.
 - Never forced: when it is too much, Mama stops at once, Tapsi may cry, and Tapsi decides how to go on (checked).
   Nobody holds Tapsi still, scolds, hurries or praises by „good boy“; no clock, age or weekday (checked). Lines ≤ 110
   characters, in the present tense, ending in love.

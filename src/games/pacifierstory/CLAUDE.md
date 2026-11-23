@@ -13,11 +13,15 @@ stars on the window, one taken down each morning; on the day Tapsi gathers the t
 them goodbye and puts the box on the windowsill with a drawing. The first night is hard, Mama and Papa stay; the fairy (a
 little bear with wings) takes the box and leaves a present, a cuddly bunny that helps with falling asleep from then on.
 Tapsi misses the pacifier, is comforted, and Mama and Papa love Tapsi with and without it.
+
+Since 23 November 2026 the book holds a second story without a fairy, „Tapsi and the Pacifier Tree“ (H-145,
+`src/games/pacifiertree`, its own `CLAUDE.md`), half as long and also whole and short: the choice names each by how the
+pacifiers go („With the pacifier fairy“, `PACIFIER_FAIRY_KIND`; „At the pacifier tree“, `TREE_KIND`).
 - `pacifierStory.ts`: the chapters and pages (`PACIFIER_STORY`) and the steps of a gentle goodbye (`PACIFIER_STEPS`).
 - `pacifierStoryPictures.ts`: the Gemini prompt of every page (place, light, cast and clothes, the pacifiers, box and
   toys), as the picture queue takes them; a made picture goes on `MADE`.
-- `PacifierStoryGame.tsx` plays it with the shared `ChapterBook` (`src/components/ChapterBook.tsx`, the same as
-  „Abstillen“: table of contents first, one page per tap, the picture big and the sentence small under it; dev tags
+- `PacifierStoryGame.tsx` opens like „Abstillen“ on the choice of its stories (`StoryChoice.tsx`, shared by every chapter book, `S0`): its story whole and in a short version at `/schnullerfee/kurz/` (`PACIFIER_SHORT_PAGES`, its own pages, so no picture, translation or recording of its own), each a slip with its pictures and minutes – never its chapters – and every story starts on its first page (user request, 23 November 2026). Each story is read with the shared `ChapterBook` (`src/components/ChapterBook.tsx`, the same as
+  „Abstillen“: one page per tap, the picture big and the sentence small under it; dev tags
   `S0`, `S<chapter>-<page>`). A change to how the book reads goes there, so both books get it. Tapsi's voice reads each page's sentence (`voice`, from
   `stimme/`, listed in `recordedLines.ts` as `schnullerfee`, recorded only when the user asks), and the loudspeaker above ▶
   switches it off (`VoiceSwitch`, user decision, 13 November 2026); a page without its recording stays silent.
@@ -31,6 +35,10 @@ Tapsi misses the pacifier, is comforted, and Mama and Papa love Tapsi with and w
 - **The chapters follow the steps of a gentle goodbye in the guides' order** (`PACIFIER_STEPS`, checked): tell the
   child, keep the pacifier for falling asleep only, pick the day together, gather and give them away, the first night,
   the swap, stay with it. A chapter without a step (the start, the farewell, the fairy, the end) only tells the story.
+- **The short version is made of the whole story's own pages** (`PACIFIER_SHORT_PAGES`, user request, 23 November 2026): in the
+  story's order, from its first page to its last, about a third of it, and where Tapsi cries a grown-up is on that page or
+  holds Tapsi on the next (`src/components/storyBooks.test.ts`). A page renamed or added in the story is weighed for it
+  there too; a new page goes into it only where the short way would miss it.
 - The story is gentle and true: the child takes part and decides the day, nothing is done behind its back (no cut
   pacifier, no trick), and the pacifiers stay gone – after the fairy took them no picture shows one again (checked).
   Tapsi may cry and be sad, a grown-up is always close. Nobody scolds, nothing is bad or for babies only

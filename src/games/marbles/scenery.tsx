@@ -1,5 +1,6 @@
 // Drawings the machines share: ink and wood colours, and things on the wall.
 
+import { decay } from "./level";
 import { MascotHead } from "@/components/Mascot";
 import { BAR_COLORS } from "./parts";
 
@@ -91,7 +92,7 @@ export function Sparkles({ x, y, age, n = 10, spread = 220 }: { x: number; y: nu
     <g opacity={Math.min(1, 3 - age)}>
       {Array.from({ length: n }, (_, i) => {
         const a = (i / n) * 2 * Math.PI + 0.4;
-        const r = spread * (0.35 + 0.65 * (1 - Math.exp(-age * 3))) * (0.7 + 0.3 * ((i * 7) % 3));
+        const r = spread * (0.35 + 0.65 * (1 - decay(age * 3))) * (0.7 + 0.3 * ((i * 7) % 3));
         const s = 0.6 + 0.4 * Math.sin(age * 9 + i);
         return (
           <path

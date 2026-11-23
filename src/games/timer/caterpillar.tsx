@@ -1,4 +1,5 @@
 import { memo, useEffect, useMemo, useState, type CSSProperties } from "react";
+import { useRunClock } from "./pause";
 import { runSeconds } from "./pieces";
 import { Draw, INK, Layer, LeftGlow, STAGE_H, STAGE_W } from "./scenes";
 
@@ -349,8 +350,10 @@ function leafPolygon(front: readonly number[]): string {
  * `still` counts them once and no more (a menu's card).
  */
 function useBites(startedAt: number, count: number, done: boolean, still?: boolean): number {
-  const running = !done && !still;
-  const due = () => Math.min(count, Math.max(0, Math.floor((Date.now() - startedAt) / 1000 + 0.5)));
+  // On the run's clock: paused, the caterpillar takes no bite.
+  const clock = useRunClock();
+  const running = !done && !still && !clock.paused;
+  const due = () => Math.min(count, Math.max(0, Math.floor((clock.now() - startedAt) / 1000 + 0.5)));
   const [bites, setBites] = useState(due);
   useEffect(() => {
     if (!running) return;
@@ -358,7 +361,7 @@ function useBites(startedAt: number, count: number, done: boolean, still?: boole
     const tick = () => {
       const n = due();
       setBites(n);
-      if (n < count) timer = setTimeout(tick, Math.max(10, startedAt + (n + 0.5) * 1000 - Date.now()));
+      if (n < count) timer = setTimeout(tick, Math.max(10, startedAt + (n + 0.5) * 1000 - clock.now()));
     };
     const onVisible = () => {
       clearTimeout(timer);
@@ -370,7 +373,7 @@ function useBites(startedAt: number, count: number, done: boolean, still?: boole
       clearTimeout(timer);
       document.removeEventListener("visibilitychange", onVisible);
     };
-  }, [startedAt, count, running]);
+  }, [startedAt, count, running, clock]);
   return done ? count : bites;
 }
 

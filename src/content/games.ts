@@ -139,6 +139,8 @@ export const CATEGORIES: Category[] = [
         // bottle, breastfed or not (src/games/bottlestory), English first. Published once its pictures were made (21
         // November 2026).
         href: "/flaeschchen/",
+        // Its short version, from the story's own pages, opened from the book's choice (StoryChoice.tsx).
+        also: ["/flaeschchen/kurz/"],
         emoji: "🍼",
         title: BOTTLE_STORY_BOOK,
         blurb: BOTTLE_STORY_BLURB,
@@ -147,6 +149,9 @@ export const CATEGORIES: Category[] = [
         // The book „Schnullerfee“ beside „Abstillen“ (user request, 10 November 2026): „Tapsi und die Schnullerfee“, a
         // story in chapters along the steps of a gentle goodbye to the pacifier (src/games/pacifierstory).
         href: "/schnullerfee/",
+        // Its short version, from the story's own pages, and „Tapsi and the Pacifier Tree“ (src/games/pacifiertree, idea
+        // H-145) whole and short, for families who want no fairy, all opened from the book's choice (StoryChoice.tsx).
+        also: ["/schnullerfee/kurz/", "/schnullerfee/baum/", "/schnullerfee/baum/kurz/"],
         emoji: "🧚",
         title: PACIFIER_STORY_BOOK,
         blurb: PACIFIER_STORY_BLURB,
@@ -156,6 +161,10 @@ export const CATEGORIES: Category[] = [
         // Abstillen“): „Tapsi geht in die Kita“, a story in chapters along the steps of settling in and the morning's
         // goodbye ritual (src/games/kitastory).
         href: "/kita/",
+        // Its short version, from the story's own pages, and „Tapsi Goes to Lotta's“ (src/games/childminder, idea H-147)
+        // whole and short, for families whose child goes to a childminder (Tagesmutter), all opened from the book's choice
+        // (StoryChoice.tsx).
+        also: ["/kita/kurz/", "/kita/tagesmutter/", "/kita/tagesmutter/kurz/"],
         emoji: "🎒",
         title: KITA_STORY_BOOK,
         blurb: KITA_STORY_BLURB,
@@ -165,6 +174,9 @@ export const CATEGORIES: Category[] = [
         // Stillen oder Kita oder Schnullerfee“): „Tapsi and the Foam Crown“, a story in chapters along the steps the guides
         // give for washing a small child's hair calmly (src/games/hairstory), English first.
         href: "/haare-waschen/",
+        // Its short version, from the story's own pages, and „Tapsi and the Warm Rain“ (src/games/hairshower, idea H-146)
+        // whole and short, for families with a shower and no bathtub, all opened from the book's choice (StoryChoice.tsx).
+        also: ["/haare-waschen/kurz/", "/haare-waschen/dusche/", "/haare-waschen/dusche/kurz/"],
         emoji: "🛁",
         title: HAIR_STORY_BOOK,
         blurb: HAIR_STORY_BLURB,

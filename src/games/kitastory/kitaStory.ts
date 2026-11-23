@@ -1,4 +1,5 @@
 import type { StoryChapter } from "@/components/ChapterBook";
+import { shortOf } from "@/lib/storyPages";
 
 // „Tapsi geht in die Kita“ (idea H-10, user request, 11 November 2026: „im gleichen Stil wie Abstillen“): told in
 // chapters that follow the steps of settling a small child into a Kita gently (`SETTLING_STEPS`, research
@@ -424,3 +425,33 @@ export const KITA_STORY: KitaChapter[] = [
 
 /** Every page in reading order. */
 export const KITA_PAGES: KitaPage[] = KITA_STORY.flatMap((c) => c.pages);
+
+/**
+ * The pages of the short version (user request, 23 November 2026: „biete auch Kurzversionen an, was schon da ist“), read
+ * in a few minutes: the same story told with its own pages – Mama and Papa telling of the Kita, packing the backpack, the first day
+ * with Mia and Mama on the little chair, the first short goodbye with tears Mia comforts and Mama coming back as she
+ * said, Mama staying away longer, the morning's goodbye (the same way, the kiss, „after the nap“, Mia's hand, waving –
+ * never sneaking away), the nap, and Mama there right after it, as she said. Only pages of the whole story, in its order, so
+ * its pictures, translations and recordings serve both (`storyBooks.test.ts` checks).
+ */
+export const KITA_SHORT_PAGES = [
+  "erzaehlen",
+  "packen",
+  "ankommen",
+  "stuhl",
+  "sagen",
+  "weinen",
+  "wieder",
+  "laenger",
+  "weg",
+  "kuss",
+  "wann",
+  "hand",
+  "winken",
+  "schlafen",
+  "da",
+  "lieb",
+];
+
+/** The short version's chapters: each chapter with only its pages on `KITA_SHORT_PAGES`, the empty ones left out. */
+export const KITA_STORY_SHORT: KitaChapter[] = shortOf(KITA_STORY, KITA_SHORT_PAGES);

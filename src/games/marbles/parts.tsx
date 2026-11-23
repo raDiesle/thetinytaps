@@ -1,3 +1,4 @@
+import { memo, type ReactNode } from "react";
 import { BALL_R, type Pt } from "./path";
 
 /** The xylophone's colours, low to high; the machines use them for bright bits too. */
@@ -42,4 +43,45 @@ export function Ball({ color, x, y, spin, look = "plain" }: { color: string; x: 
       <circle cx="-7" cy="-8" r="5.5" fill="#fff" opacity="0.75" />
     </g>
   );
+}
+
+/** Where a world point lands on the screen and how many pixels one world unit is there (`cameraPoint` in level.ts). */
+export type ScreenAt = (x: number, y: number) => { x: number; y: number; k: number };
+
+/**
+ * A small thing that moves on its own (a falling marble, a turning star) as an HTML layer of its own: a little svg
+ * `2 * pad` world units square round its middle, placed at the world point `x`, `y` by `at` and turned by `angle`
+ * (radians) with a CSS transform. The phone then only moves the finished little picture, where the same thing drawn
+ * inside the level's big svg had it paint and raster bands as wide as the screen in every frame (perf, November 2026).
+ * `children` draw round 0, 0 in world units.
+ */
+export function Sprite({ at, x, y, pad, angle = 0, children }: { at: ScreenAt; x: number; y: number; pad: number; angle?: number; children: ReactNode }) {
+  const p = at(x, y);
+  const half = pad * p.k;
+  return (
+    <svg
+      className="marble-sprite"
+      viewBox={`${-pad} ${-pad} ${2 * pad} ${2 * pad}`}
+      style={{ width: 2 * half, height: 2 * half, transform: `translate3d(${p.x - half}px, ${p.y - half}px, 0)${angle ? ` rotate(${angle}rad)` : ""}` }}
+      aria-hidden
+    >
+      {children}
+    </svg>
+  );
+}
+
+/**
+ * `memo` for a drawn part whose props are numbers, strings or flat objects of them: skipped by React while they stay the
+ * same (objects compared by their contents, functions ignored). A part drawn again in every frame though nothing about
+ * it changed cost an old phone's main thread its time (Kettenreaktion's levels draw 60 times a second while they run);
+ * give such a part its age only while it changes (`SETTLE_S`), so it settles.
+ */
+export function still<P extends object>(Part: (props: P) => ReactNode) {
+  const sameValue = (a: unknown, b: unknown): boolean => {
+    if (Object.is(a, b)) return true;
+    if (typeof a !== "object" || typeof b !== "object" || !a || !b) return false;
+    const ka = Object.keys(a);
+    return ka.length === Object.keys(b).length && ka.every((k) => Object.is((a as Record<string, unknown>)[k], (b as Record<string, unknown>)[k]));
+  };
+  return memo(Part, (before, after) => (Object.keys(after) as (keyof P)[]).every((k) => typeof after[k] === "function" || sameValue(before[k], after[k])));
 }

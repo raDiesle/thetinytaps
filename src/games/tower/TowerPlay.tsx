@@ -41,6 +41,7 @@ import {
   Kite,
   LEAF_COLORS,
   Leaf,
+  GoalCard,
   Moon,
   Nest,
   Owl,
@@ -143,7 +144,11 @@ export function TowerPlay() {
           <GameEnd
             level={goal}
             onAgain={() => startAt(first + 1)}
-            next={{ name: pick(GOAL_NAMES[GOAL_ORDER[roundOf(following) / BLOCKS]], language), onNext: () => startAt(following) }}
+            next={{
+              name: pick(GOAL_NAMES[GOAL_ORDER[roundOf(following) / BLOCKS]], language),
+              onNext: () => startAt(following),
+              art: <GoalCard goal={GOAL_ORDER[roundOf(following) / BLOCKS]} />,
+            }}
           />
         }
       />

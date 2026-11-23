@@ -1,4 +1,4 @@
-import { useEffect, useMemo, useRef, type CSSProperties } from "react";
+import { memo, useEffect, useMemo, useRef, type CSSProperties } from "react";
 import { playDrum, playKnock, playTwinkle } from "@/lib/sfx";
 import {
   cameraLayer,
@@ -14,6 +14,7 @@ import {
   VIEW_W,
   worldHint,
   type LevelProps,
+  decay,
 } from "./level";
 import { TapHint } from "@/components/TapHint";
 import { cameraOn } from "./machineKit";
@@ -122,10 +123,11 @@ export function ToppleLevel({ sound, say, onDone }: LevelProps) {
 
   const t = now.current;
   const drumAge = (t - drumAt.current) / 1000;
-  const drumSquash = drumAge >= 0 && drumAge < 2 ? 0.12 * Math.exp(-drumAge * 5) * Math.cos(drumAge * 30) : 0;
+  const drumSquash = drumAge >= 0 && drumAge < 2 ? 0.12 * decay(drumAge * 5) * Math.cos(drumAge * 30) : 0;
   const first = things[0];
   const world = { x: 0, y: 0, w: worldW, h: VIEW_H };
   const view = { x: camera.current, y: 0, w: VIEW_W, h: VIEW_H };
+  const cameraStyle = cameraLayer(box.current, world, view);
   // Round the first thing, the one the tap pushes over; the hand comes from the left, where the push comes from.
   const firstSpot = {
     x: MARGIN + (lefts[0] + first.w / 2) * SCALE,
@@ -135,9 +137,13 @@ export function ToppleLevel({ sound, say, onDone }: LevelProps) {
 
   return (
     <div className="marble-level" ref={box} onPointerDown={push}>
-      <svg className="marble-camera" viewBox={`0 0 ${worldW} ${VIEW_H}`} style={cameraLayer(box.current, world, view)} aria-label={label}>
+      {/* The room is a layer of its own, painted once and only moved by the camera: in the things' svg the phone painted
+          the whole room again in every frame while they fell (perf, A-36). */}
+      <svg className="marble-camera" viewBox={`0 0 ${worldW} ${VIEW_H}`} style={cameraStyle} aria-hidden>
+        {room}
+      </svg>
+      <svg className="marble-camera" viewBox={`0 0 ${worldW} ${VIEW_H}`} style={cameraStyle} aria-label={label}>
         <g>
-          {room}
           <g transform={`translate(${MARGIN} ${FLOOR}) scale(${SCALE})`}>
             {links.map(({ link, left }, k) => (
               <LinkArt key={k} link={link} left={left} age={linkAge(sim, k)} />
@@ -164,7 +170,7 @@ export function ToppleLevel({ sound, say, onDone }: LevelProps) {
   );
 }
 
-function Drum() {
+const Drum = memo(function Drum() {
   const { w, h } = DRUM;
   return (
     <g>
@@ -182,7 +188,7 @@ function Drum() {
       <circle cx={w + 30} cy={-h - 40} r="9" fill="#ffd6e0" stroke={INK} strokeWidth="3" />
     </g>
   );
-}
+});
 
 /** A cosy room as wide as the row: wallpaper, windows, pictures, and the wooden floor everything stands on. */
 function Room({ width }: { width: number }) {

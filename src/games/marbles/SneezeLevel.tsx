@@ -32,7 +32,21 @@ import {
   playTrumpet,
   playTweet,
 } from "@/lib/realSounds";
-import { cameraLayer, cameraPoint, gliding, SETTLE_S, useAnyKey, useFrames, useLevelName, VIEW_H, VIEW_W, wobble, worldHint, type LevelProps } from "./level";
+import {
+  cameraLayer,
+  cameraPoint,
+  gliding,
+  SETTLE_S,
+  useAnyKey,
+  useFrames,
+  useLevelName,
+  VIEW_H,
+  VIEW_W,
+  wobble,
+  worldHint,
+  type LevelProps,
+  decay,
+} from "./level";
 import { TapHint } from "@/components/TapHint";
 import { deg, easeIn, easeInOut, easeOut, lerp } from "./machineKit";
 import type { Pt } from "./path";
@@ -262,7 +276,7 @@ const restPose = (): Pose => ({
  */
 function flourish(pose: Pose, id: AnimalId, since: number) {
   if (since < 0 || since > 1.4) return;
-  const fade = Math.exp(-since * 3);
+  const fade = decay(since * 3);
   const back = Math.sin(Math.min(1, since / 1.1) * Math.PI);
   if (id === "mouse") pose.roll = -26 * back;
   else if (id === "pig") pose.roll = -16 * back;
@@ -295,7 +309,7 @@ function facePose(u: number, at: { hit: number; ha: number; sneeze: number } | n
   }
   const since = at ? u - at.sneeze : -1;
   if (since >= 0 && since < 1.5) {
-    pose.jerk = since < 0.07 ? since / 0.07 : Math.exp(-(since - 0.07) * 4);
+    pose.jerk = since < 0.07 ? since / 0.07 : decay((since - 0.07) * 4);
     pose.eyes = since < 0.45 ? "shut" : "open";
     pose.mouth = since < 0.3 ? "big" : "smile";
     pose.blush = Math.max(0, 1 - since);
@@ -546,18 +560,18 @@ export function SneezeLevel({ sound, say, onDone }: LevelProps) {
   const meadow = useMemo(() => <Meadow worldW={row.worldW} cloudsTo={row.tree.x} gradient={`${ids}-sky`} />, [row, ids]);
   const still = useMemo(() => <StillThings x={row.tree.x} />, [row]);
 
+  // Zooming out keeps the meadow's ground line in the same place on the screen.
+  const cameraStyle = cameraLayer(box.current, { x: 0, y: 0, w: row.worldW, h: VIEW_H }, { x: camX, y: VIEW_H - VIEW_H / camZ, w: VIEW_W, h: VIEW_H }, camZ);
   return (
     <div className="marble-level" ref={box} onPointerDown={onPointerDown}>
-      {/* Zooming out keeps the meadow's ground line in the same place on the screen. */}
-      <svg
-        className="marble-camera"
-        viewBox={`0 0 ${row.worldW} ${VIEW_H}`}
-        style={cameraLayer(box.current, { x: 0, y: 0, w: row.worldW, h: VIEW_H }, { x: camX, y: VIEW_H - VIEW_H / camZ, w: VIEW_W, h: VIEW_H }, camZ)}
-        aria-label={label}
-      >
+      {/* The meadow and what never moves are a layer of their own, painted once and only moved by the camera: in the
+          animals' svg the phone painted them again in every frame (perf, A-36). */}
+      <svg className="marble-camera" viewBox={`0 0 ${row.worldW} ${VIEW_H}`} style={cameraStyle} aria-hidden>
+        {meadow}
+        {still}
+      </svg>
+      <svg className="marble-camera" viewBox={`0 0 ${row.worldW} ${VIEW_H}`} style={cameraStyle} aria-label={label}>
         <g>
-          {meadow}
-          {still}
           <TreeDrawing tree={row.tree} age={t - leavesT.current}>
             <Squirrel x={X + SQUIRREL.x} y={SQUIRREL.y} u={u} startled={t - leavesT.current} tapped={tapped("squirrel")} />
           </TreeDrawing>
@@ -603,7 +617,7 @@ function poseAt(b: Beast, kind: AnimalKind, t: number, laughT: number): Pose {
   const pose = restPose();
   const sinceHit = t - b.hitT;
   if (sinceHit >= 0) {
-    pose.ruffle = Math.exp(-sinceHit * 2.2) * (sinceHit < 2.5 ? 1 : 0);
+    pose.ruffle = decay(sinceHit * 2.2) * (sinceHit < 2.5 ? 1 : 0);
     pose.shake = wobble(sinceHit, 7, 30, 4);
     if (t < b.haT) {
       pose.eyes = "wide";
@@ -627,7 +641,7 @@ function poseAt(b: Beast, kind: AnimalKind, t: number, laughT: number): Pose {
   const sinceSneeze = t - b.sneezeT;
   if (sinceSneeze >= 0) {
     // HATSCHI! The head snaps forward and slowly comes back.
-    pose.jerk = sinceSneeze < 0.07 ? sinceSneeze / 0.07 : Math.exp(-(sinceSneeze - 0.07) * 4);
+    pose.jerk = sinceSneeze < 0.07 ? sinceSneeze / 0.07 : decay((sinceSneeze - 0.07) * 4);
     pose.eyes = sinceSneeze < 0.45 ? "shut" : "open";
     pose.mouth = sinceSneeze < 0.3 ? "big" : "smile";
     pose.blush = Math.max(0, 1 - sinceSneeze);
@@ -1394,7 +1408,7 @@ function Squirrel({ x, y, u, startled, tapped }: { x: number; y: number; u: numb
 
 /** The puffball on the grass: it squashes when the acorn bumps it (`age` seconds after) or a finger taps it. */
 function Puffball({ x, age, tap }: { x: number; age: number; tap: number }) {
-  const bump = (a: number, amp: number) => (a >= 0 && a < 1 ? amp * Math.exp(-a * 4) * Math.cos(a * 16) : 0);
+  const bump = (a: number, amp: number) => (a >= 0 && a < 1 ? amp * decay(a * 4) * Math.cos(a * 16) : 0);
   const squash = bump(age, 0.22) + bump(tap, 0.12);
   const { r } = PUFFBALL;
   return (
@@ -1439,7 +1453,7 @@ function Tortoise({ x, u, laugh, tap }: { x: number; u: number; laugh: number; t
   const between = (a: number, b: number) => Math.min(1, Math.max(0, (u - a) / (b - a)));
   const tuck = u < PART2.land + 0.4 ? between(PART2.hide, PART2.hide + 0.3) : 1 - between(PART2.land + 0.4, PART2.land + 0.8);
   const landed = u - PART2.land;
-  const squash = landed >= 0 && landed < 1 ? 0.12 * Math.exp(-landed * 5) * Math.cos(landed * 20) : 0;
+  const squash = landed >= 0 && landed < 1 ? 0.12 * decay(landed * 5) * Math.cos(landed * 20) : 0;
   const pose = facePose(u, { hit: PART2.sniff, ha: PART2.ha, sneeze: PART2.tortoise }, laugh, tap);
   const head = { x: TORTOISE.nose.dx + 10, y: TORTOISE.nose.y - FLOOR - 4 };
   const neck = `M-70 -26 L${head.x + 12} ${head.y + 6}`;

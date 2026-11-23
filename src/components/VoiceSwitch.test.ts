@@ -15,10 +15,15 @@ const BOOKS = [
   { file: "src/games/milkchain/MilkChainGame.tsx", href: "/abstillen/", name: "abstillen", folder: "src/games/milkchain/stimme" },
   { file: "src/games/pacifierstory/PacifierStoryGame.tsx", href: "/schnullerfee/", name: "schnullerfee", folder: "src/games/pacifierstory/stimme" },
   { file: "src/games/kitastory/KitaStoryGame.tsx", href: "/kita/", name: "kita", folder: "src/games/kitastory/stimme" },
+  { file: "src/games/kitastory/KitaStoryGame.tsx", href: "/kita/tagesmutter/", name: "kita-tagesmutter", folder: "src/games/childminder/stimme" },
   { file: "src/games/hairstory/HairStoryGame.tsx", href: "/haare-waschen/", name: "haare-waschen", folder: "src/games/hairstory/stimme" },
   // The night story is read in the same book (`WeaningBook`), its voice from its own folder.
   { file: "src/games/milkchain/MilkChainGame.tsx", href: "/abstillen/nachts/", name: "abstillen-nachts", folder: "src/games/nightmilk/stimme" },
   { file: "src/games/milkchain/MilkChainGame.tsx", href: "/abstillen/abschied/", name: "abstillen-abschied", folder: "src/games/milkgoodbye/stimme" },
+  // „Tapsi and the Pacifier Tree“ is read in the book Schnullerfee, its voice from its own folder.
+  // „Tapsi and the Warm Rain“ is read in the book Haare waschen, its voice from its own folder.
+  { file: "src/games/hairstory/HairStoryGame.tsx", href: "/haare-waschen/dusche/", name: "haare-dusche", folder: "src/games/hairshower/stimme" },
+  { file: "src/games/pacifierstory/PacifierStoryGame.tsx", href: "/schnullerfee/baum/", name: "schnullerbaum", folder: "src/games/pacifiertree/stimme" },
   { file: "src/games/bottlestory/BottleStoryGame.tsx", href: "/flaeschchen/", name: "flaeschchen", folder: "src/games/bottlestory/stimme" },
   { file: "src/games/bedstory/BedStoryGame.tsx", href: "/grosses-bett/", name: "grosses-bett", folder: "src/games/bedstory/stimme" },
 ];
@@ -31,10 +36,15 @@ describe("the voice switch", () => {
 
   test("the chapter books read aloud, with their lines on the recording list", () => {
     for (const book of BOOKS) {
-      expect(readFileSync(book.file, "utf8"), book.file).toMatch(/voice=\{(VOICE|story\.voice)\}/);
+      // Each story names its voice (`BookStory.voice`), which the shared choice hands to `ChapterBook`.
+      expect(readFileSync(book.file, "utf8"), book.file).toMatch(/^ +voice: (recordedVoice\(voiceFiles\)|[A-Z_]+_VOICE),$/m);
       expect(RECORDED_GAMES.find((g) => g.name === book.name)?.folder, book.name).toBe(book.folder);
       expect(voiceLines().find((g) => g.href === book.href)?.groups.length ?? 0, book.href).toBeGreaterThan(0);
     }
+  });
+
+  test("the shared choice hands each story's voice to the book", () => {
+    expect(readFileSync("src/components/StoryChoice.tsx", "utf8")).toContain("voice={story.voice}");
   });
 
   test("a switched-off book loads and says nothing, and the corner's tap never turns the page", () => {

@@ -15,18 +15,32 @@ test("the end of a level shows the drawn arrow and the next level's picture, nev
   expect(source).toContain('<ControlIcon kind="play" className="game-end-next-arrow" />');
 });
 
-// A game whose levels have menu pictures (`vorschau/`) hands the next one's to „Weiter“.
-test("every game with pictures of its levels shows the next one at the end", async () => {
-  const handing = [
-    "src/games/marbles/MarblePlay.tsx",
-    "src/games/scenes/ScenePlay.tsx",
-    "src/games/elevator/cards.tsx",
-    "src/games/feelings/FeelingsPlay.tsx",
-    "src/games/adventure/AdventureGame.tsx",
-    // The next pass's first feeling, the painted picture it starts with.
-    "src/games/cause/CausePlay.tsx",
-  ];
-  for (const file of handing) expect(`${file}: ${/picture: /.test(await Bun.file(file).text())}`).toBe(`${file}: true`);
+// „Weiter“ shows what comes next in every game (user request, 23 November 2026, first for the Timer, whose „Weiter“
+// was the bare play sign): its menu card's cut (`picture`) or the same drawing (`art`, where the menu draws its cards
+// live, or a still drawing of what comes, the Counting Tower's next goal). A file whose `GameEnd` gets its `next` handed
+// through from elsewhere names where it is built.
+test("every game with a next level shows the next one's picture on „Weiter“", async () => {
+  const builtIn: Record<string, string> = {
+    "src/games/adventure/AdventurePlay.tsx": "src/games/adventure/AdventureGame.tsx",
+    "src/games/feelings/DayPlay.tsx": "src/games/feelings/FeelingsPlay.tsx",
+    "src/games/feelings/PassPlay.tsx": "src/games/feelings/FeelingsPlay.tsx",
+  };
+  const missing: string[] = [];
+  for (const file of new Bun.Glob("src/**/*.tsx").scanSync()) {
+    const source = await Bun.file(file).text();
+    for (const [end] of source.matchAll(/<GameEnd\b[\s\S]*?\/>/g)) {
+      if (!/\bnext=/.test(end)) continue;
+      const passed = /\bnext=\{next\}/.test(end) || /\bnext=\{nextLevel\}/.test(end);
+      const where = passed ? (builtIn[file] ?? `${file} (add where its next is built)`) : file;
+      const text = passed
+        ? await Bun.file(where)
+            .text()
+            .catch(() => "")
+        : end;
+      if (!/\b(picture|art): /.test(text)) missing.push(where);
+    }
+  }
+  expect(missing).toEqual([]);
 });
 
 // Zähne putzen and Gefühle had end buttons of their own (🔁, round symbols without words): every end is `GameEnd`, and
@@ -64,10 +78,14 @@ test("the end of a level has no way back of its own: the corner is it, but in Z�
 });
 
 // Small beside the buttons (bottom right in Aufs Töpfchen) the trophy was hardly seen (user feedback, November 2026): it
-// is handed over big in the middle with „Geschafft!“ under it, then shrinks onto its board beside the buttons, and the
-// buttons come only once it has landed – as one transform from where it stands, which a phone moves cheaply.
-test("the trophy is handed over big in the middle, then lands on its board before the buttons come", async () => {
+// is handed over in the middle with „Geschafft!“ under it, then shrinks onto its board beside the buttons, and the
+// buttons come only once it has landed – as one transform from where it stands, which a phone moves cheaply. Then it
+// was too loud, at two thirds of the screen for over three seconds (user feedback, November 2026): in the middle it is
+// at most about two fifths of the screen's height, and the handover is short.
+test("the trophy is handed over calmly in the middle, then lands on its board before the buttons come", async () => {
   const end = await Bun.file("src/components/GameEnd.tsx").text();
+  expect(Number(end.match(/const AWARD_HEIGHT = ([\d.]+);/)?.[1])).toBeLessThanOrEqual(0.42);
+  expect(Number(end.match(/const AWARD_MS = (\d+);/)?.[1])).toBeLessThanOrEqual(2600);
   expect(end).toMatch(/de: "Geschafft!"/);
   expect(end).toMatch(/className="game-end-board"/);
   expect(end).toMatch(/if \(!landed \|\| !asks\) return;/);
@@ -96,15 +114,21 @@ test("the end's buttons and its trophy answer without a pointer too", async () =
 });
 
 // It wasn't clear the landed trophy can be tapped, it was small and its count hard to read (user feedback, November
-// 2026): it stays big, the shared ring and hand point at it (stopped at their first stage, never darkening „Weiter“),
-// and its count stands on a light plate big enough to read.
-test("the landed trophy is big, marked by the shared tap hint, and its count is easy to read", async () => {
+// 2026): the shared ring and hand point at it (stopped at their first stage, never darkening „Weiter“), and its count
+// stands on a light plate big enough to read. Then the trophy at nearly half the screen with a golden glow was too loud
+// (user feedback, November 2026): it is a quarter of the screen's height and the hint its quiet form – only a small
+// hand, no ring round it (asked for again), no glow and no waves – still showing it can be tapped.
+test("the landed trophy is quiet but plainly tappable, and its count is easy to read", async () => {
   const end = await Bun.file("src/components/GameEnd.tsx").text();
   expect(end).toMatch(/\{landed && trophySize && [^}]*<TrophyHint \{\.\.\.trophySize\} \/>\}/);
-  expect(end).toMatch(/<TapHint\b[^>]*\bupTo=\{1\}/);
+  expect(end).toMatch(/<TapHint\b[^>]*\bupTo=\{1\}[^>]*\bquiet\b/);
   const css = await Bun.file("src/styles/game-end.css").text();
   const height = Number(css.match(/\.game-end \{[^}]*--trophy-h: clamp\((\d+)px, (\d+)vh/)?.[2]);
-  expect(height).toBeGreaterThanOrEqual(40);
+  expect(height).toBeGreaterThanOrEqual(20);
+  expect(height).toBeLessThanOrEqual(30);
+  const hint = await Bun.file("src/components/TapHint.tsx").text();
+  expect(hint).toContain('{!quiet && <div className="tap-hint-glow" />}');
+  expect(hint).toContain('{!quiet && <div className="tap-hint-ring" />}');
   const trophy = await Bun.file("src/components/Trophy.tsx").text();
   const plate = trophy.match(/function Plate[\s\S]*?\n\}/)?.[0] ?? "";
   expect(Number(plate.match(/fontSize="([\d.]+)"/)?.[1])).toBeGreaterThanOrEqual(14);

@@ -16,7 +16,7 @@ day (circle, tower, sandpit, lunch, nap), and right after the nap Mama is there,
 - `kitaStory.ts`: the chapters and pages (`KITA_STORY`) and the steps of settling in (`SETTLING_STEPS`).
 - `kitaStoryPictures.ts`: the Gemini prompt of every page (place, light, cast and clothes, bunny, backpack, star), as the
   picture queue takes them; a made picture goes on `MADE`.
-- `KitaStoryGame.tsx` plays it with the shared `ChapterBook` (`src/components/ChapterBook.tsx`, the same as „Abstillen“
+- `KitaStoryGame.tsx` opens like „Abstillen“ on the choice of its stories (`StoryChoice.tsx`, shared by every chapter book, `E0`): its story whole and in a short version at `/kita/kurz/` (`KITA_SHORT_PAGES`, its own pages, so no picture, translation or recording of its own), each a slip with its pictures and minutes – never its chapters – and every story starts on its first page (user request, 23 November 2026). Each story is read with the shared `ChapterBook` (`src/components/ChapterBook.tsx`, the same as „Abstillen“
   and „Schnullerfee“; dev tags `E0`, `E<chapter>-<page>`). A change to how the book reads goes there, so all get it. Tapsi's voice reads each page's sentence (`voice`, from
   `stimme/`, listed in `recordedLines.ts` as `kita`, recorded only when the user asks), and the loudspeaker above ▶
   switches it off (`VoiceSwitch`, user decision, 13 November 2026); a page without its recording stays silent.
@@ -25,12 +25,21 @@ day (circle, tower, sandpit, lunch, nap), and right after the nap Mama is there,
   `byLanguage` (`kitaStory`), passed to `ChapterBook` as `translations`. A changed German sentence is translated again in the
   same commit (root CLAUDE.md, user decision, 22 November 2026).
 - `names.ts`: the book's name on the shelf („Kita-Start“), the story's title and its blurb in every language.
+- **A second story, „Tapsi Goes to Lotta's“ at a childminder's** (`src/games/childminder`, idea H-147, 23 November 2026),
+  whole at `/kita/tagesmutter/` and short at `/kita/tagesmutter/kurz/`, stands in the book's choice beside this one. The
+  choice names each by where the child is looked after: „In der Kita“ (`KITA_CENTRE_KIND`) and „Bei der Tagesmutter“
+  (`CHILDMINDER_KIND`); a further story in this book gets such a name too. Its trophy is level `tagesmutter`
+  (`trophyNames.ts`), and the tab's title follows the story on screen (`titleAt`).
 
 ## Rules
 
 - **The chapters follow the steps of settling in in the guides' order** (`SETTLING_STEPS`, checked, after the Berliner
   Modell): tell the child, a parent stays as a safe harbour, the first short goodbye, the teacher comforts, the same
   goodbye every morning, the day's order, coming back as said. The last chapter only tells the story.
+- **The short version is made of the whole story's own pages** (`KITA_SHORT_PAGES`, user request, 23 November 2026): in the
+  story's order, from its first page to its last, about a third of it, and where Tapsi cries a grown-up is on that page or
+  holds Tapsi on the next (`src/components/storyBooks.test.ts`). A page renamed or added in the story is weighed for it
+  there too; a new page goes into it only where the short way would miss it.
 - **The morning's chapter is the ritual a family reads every morning** (idea H-10): short (at most six pages), always the
   same, and it ends with waving, never in tears (checked) – sadness after the goodbye belongs to the teacher's chapter.
 - The story is gentle and true to the guides: Mama never sneaks away (checked), says when she comes back by the day's

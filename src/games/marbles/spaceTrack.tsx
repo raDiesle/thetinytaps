@@ -5,7 +5,7 @@
 
 import { memo, type PointerEvent, useId } from "react";
 import { playBeam, playBoing, playPing, playPlink, playPop, playRumble, playSwirl, playThump, playTrill, playTwinkle, playWhoosh } from "@/lib/sfx";
-import { VIEW_W, wobble } from "./level";
+import { VIEW_W, wobble, decay } from "./level";
 import { STAR_POINTS } from "./parts";
 import { BALL_R, type Pt } from "./path";
 import { BASKET, TRACK_H } from "./track";
@@ -226,7 +226,7 @@ function Swirl({ at, turn, dir }: { at: Pt; turn: number; dir: 1 | -1 }) {
 }
 
 /** How far a swirl has turned, `age` seconds after a thing went in or came out: once round, slowing down. */
-const swirlTurn = (age: number) => (age < 0 ? 0 : 1 - Math.exp(-age * 1.5));
+const swirlTurn = (age: number) => (age < 0 ? 0 : 1 - decay(age * 1.5));
 
 /**
  * The space run's own stretch: a big striped planet with a friendly face, which the things orbit two and a quarter

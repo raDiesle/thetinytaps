@@ -1,4 +1,6 @@
 import { CATEGORIES, type Game } from "@/content/games";
+import { LEVEL_IDS } from "@/content/levelPages";
+import { levelHref } from "@/lib/levelAddress";
 import { createStore, useStore } from "@/lib/store";
 
 /*
@@ -92,6 +94,17 @@ export function gameOfPath(pathname: string): Game | undefined {
 
 /** The game a trophy was won in, by its stored address. */
 export const gameOf = (href: string) => GAMES.find((game) => game.href === href);
+
+/**
+ * Where a trophy's play sign in the trophy room leads (user request, November 2026): its level's own address where the
+ * level has one (`LEVEL_IDS`, and Lebendige Bilder's pictures at `/bilder/<id>/`), else the game's own address – a story
+ * or a round without an address of its own opens its game. Undefined for a game no longer on the shelf.
+ */
+export function trophyHref(game: string, level: string): string | undefined {
+  if (!gameOf(game)) return undefined;
+  const addressed = game === "/bilder/" || LEVEL_IDS[game]?.includes(level);
+  return level && addressed ? levelHref(game, level) : game;
+}
 
 /** Where a game stands among all games: trophies are shown in the shelf's order of the games. */
 export const gameOrder = (href: string) => GAMES.findIndex((game) => game.href === href);

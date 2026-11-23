@@ -14,13 +14,15 @@ note (`shown.tsx`, kept as `timeNote`): by default as minutes and seconds („Za
 request, November 2026 – the tally marks were the default before). Behind ⚙️ its „Zeit im Bild“ switches to tally marks
 in bundles of five that go one by one – „Striche in %“, a full row of `MAX_MARKS` each a share of the run, one a second
 for a short time (`percentMarks`), or „Striche in Zeit“, each mark 1 s up to 15 min (`markUnit`, at most
-`MAX_MARKS`) – or „Aus“.
+`MAX_MARKS`) – or „Aus“. Once the time is up the note shows a red „0:00“ blinking softly (`up` of `TimeShownNote`,
+`.tm-shown-up`), also where tally marks were chosen, and the Wecker's digits turn red and blink alike (`.tm-clock-on`),
+until the end is left – only „Aus“ keeps the corner empty.
 The start screen's cards are the pictures themselves as they look halfway through a run, with no words on them (user
 request, November 2026; the middle rather than the end, user feedback, November 2026; `TimerCardArt` in `cardArt.tsx`,
 `GameMode.art`): the very drawing of a run (`SceneParts`), cut as for 5 minutes and started half of it ago, every
 animation in it put at that moment and then stopped (`holdAt`, `.tm-card-art.tm-still`), so the menu stands still. The cards come as wide as
 the picture (`ART_ASPECT`). Names are only read out and their tooltip. They stand in the order the user chose (November
-2026, `PICTURES`): Rote Scheibe, Sanduhr, Kerze, Apfelbaum, Blume, Pizza, Wecker, then Tidy Up, Five Boxes, Road Rug, Block House, Treasure Tunnel, Hop to the Flag and the others, on one frame with
+2026, `PICTURES`): Rote Scheibe, Sanduhr, Kerze, Apfelbaum, Blume, Pizza, Wecker, then Tidy Up, Five Boxes, Block House, Treasure Tunnel, Up to the Moon and the others, on one frame with
 no name; after all of them Abwechseln is a category of its own, named on its frame (`GameMode.kind`): its two children
 with the toy, the lamps and the hourglass, then the Wippe, and that they run on without end is said in their tooltip (`SWAP_NOTE`). Where there is
 room, its frame stands beside the pictures' rather than in a row of its own below (`packGroups`' `reserve`), so all
@@ -118,23 +120,9 @@ taken out (user request, November 2026). The pictures:
   throws them (see the rules): the toys hop by themselves, as Abwechseln's toy does. The toy whose turn comes wiggles
   once a second while it waits (`Hopper`'s `waitFrom`). A hop is three small layers inside each other on keyframes
   written for the run (`hop.tsx`: across at an even pace, up and down slower at the top and faster falling, smaller
-  from its foot), shared with the Road Rug; `keyframes.ts` writes them, as for the crane. A landing
+  from its foot); `keyframes.ts` writes them, as for the crane. A landing
   clonks, a lid shutting knocks (both spaced); a tap makes a toy hop sound and lights the toys still on the floor.
   Its name and lines (`boxesNames.ts`) were written English first and translated into every app language at once.
-- „Road Rug“ 🛣️ (`road.tsx`, H-122, user request, 22 November 2026): a green play rug lies on the floor with a winding
-  grey road (`ROAD`, `roadY`, swinging gently so nothing on it tilts more than a little, `roadTilt`), the Tidy Up's toy
-  car (`ToyArt`, bigger, `CAR`) at its chequered start line and a toy house with a chequered flag on its roof at its
-  end, the goal seen from the start (`HOUSE`); the toy box stands at the wall behind the rug (`ROAD_BOX`). Toys lie on
-  the road in the car's way (`roadToyX`, never a car among them). One after the other, from the nearest, a toy hops
-  into the box (`Hopper`, landing on its own place, `roadBoxSlot`), and as it lies there the car drives on along the
-  road to just behind the next (`carStop`), setting off gently and braking, tilting with the road (`carFrames`, one
-  keyframe every `ROAD_STEP` of road), with a little honk; after the last it drives home, arriving as the time is up
-  (`roadPlan`, each toy the same share of the time). The idea had the car drive the whole road only at the end; it
-  drives on with every toy instead, so the road coming free shows at every piece. Five minutes take eight toys
-  (`roadToyCount`, `MIN_ROAD_TOYS` to `MAX_ROAD_TOYS`: more would stand on each other on the road). The toy whose turn
-  comes wiggles once a second. The road and the house stay bright from afar (the way the time goes); a tap makes the
-  car's engine hum and lights the toys still on the road. Its name and lines (`roadNames.ts`) were written English
-  first and translated into every app language at once.
 - „Block House“ 🧱 (`blocks.tsx`, H-125, user request, 22 November 2026: timers that look like a well-known kind of game
   played by itself, like a video, the first a block-building game for tidying up): on a meadow of square grass a
   jumble of blocks lies in three rows (`JUMBLE`, each a little tilted), beside a house's plan drawn in dashed outlines
@@ -173,22 +161,60 @@ taken out (user request, November 2026). The pictures:
   first part dug (`digCount`, at least `MIN_DIG`). A block going cracks, a tap gives the pickaxe's bright tink and
   lights the blocks still standing. Its name and lines (`tunnelNames.ts`) were written English first and translated
   into every app language at once.
-- „Hop to the Flag“ 🏃 (`jump.tsx`, H-127, 22 November 2026, chosen for variety after two block worlds: the first game
-  look that is no block world, a jump-and-run): one sunny level seen from the side on one screen, never a world
-  scrolling past, so the goal shows from the start – meadow, a stone, three floating islands over a pond (`ISLANDS`,
-  `POND`), a log, three steps up a hill (`STEPS`), and on the hilltop a flagpole (`POLE`) with its red flag still down
-  at its foot (`FLAG.low`), flying to the left so it stays in the picture and right of the hopper's last spot, never
-  behind it. A little round hopper (orange, big eyes looking ahead, two feet – no animal, see the rules) stands on the
-  first spot (`SPOTS`); over every hop hangs a star at the top of its arc (`starAt`), together a trail of stars up to the
-  hill. One hop after the other it jumps on (`jumpPlan`: each hop the same share of the time, landing at its end, the
-  last as the time is up; `HOP_MS` long, never more than half a share), catching its star at the top of the arc, where
-  the star grows a little and fades; between hops it bounces once a second on its spot (`.tm-jump-bob`). Its way is two
-  layers on keyframes written for the run (`runnerFrames`: across at an even pace, up and down with the curves of
-  `hop.tsx`). The stars still hanging are the time left. Five minutes are all 13 hops, a short time starts further
-  along (`hopCount`, at least `MIN_HOPS`). No enemies, no falling, no count of stars. A star caught plays a bright note
-  climbing the scale (spaced), the landing on the hilltop a hop, and the flag goes up; a tap boings and lights the stars
-  still hanging. Its name and lines (`jumpNames.ts`) were written English first and translated into every app language
-  at once. The level stays within x 235–1340 (a tablet's 4:3 cut with the paper's margin; `timer.test.ts` checks).
+- „Up to the Moon“ 🚀 (`jump.tsx`, H-127: first „Hop to the Flag“ on one screen, 22 November 2026; rebuilt on user
+  request, 23 November 2026, as a climb through a world many screens tall – the old level was too small and simple –
+  and the same day once more with a fox and a world that makes sense): a jump-and-run going **up**, the picture
+  following the fox like a camera. The world (`WORLD_H`, six screens of 900) is one HTML layer moved by a transform on
+  keyframes written for the run (`tm-jump-cam`, `cameraAt`: the feet stand at `ANCHOR`, never looking past the world's
+  top or bottom), never a changing viewBox; its drawings are built once (`memo`). From the bottom: a lake on the left
+  (`SURFACE`, left of `SHORE`) with fish, seaweed and a sandy floor; the meadow (`GROUND`) with a stone by the shore, a
+  big tree (`TREE`) with wooden steps nailed to its trunk, left and right in turn as for a treehouse (`STEPS`), and the
+  treehouse on its crown (`DECK`, a hatch in its floor, a red roof, a flag), the cake, and the skyscraper (`SKYSCRAPER`)
+  with its glass lift's shaft up its side (`SHAFT`) and an open window; a rope from the treehouse's post to that window
+  for a cable car (`ROPE`); clouds; space with an asteroid, a ringed planet (`PLANET`) and the moon (`MOON`) at the top,
+  the sky's one gradient going from morning to night. Nothing stands in the water (user feedback, 23 November 2026:
+  high-rises in the lake made no sense). Each height has its own way to move (`SPOTS`, each with `by`; `MoveKind`): it
+  **swims** up from the lake's floor wearing a diving mask, **hops** onto the stone and the meadow and up the steps two
+  at a time, through the hatch into the treehouse and into the cable car's basket, **rides** the basket along the rope
+  to the skyscraper's window, hops over the sill into the glass lift and **rides it up** (`lift`) to the roof, takes the
+  balloons waiting there and **floats** hanging from them from cloud to cloud, lets them go on the highest cloud and
+  takes the jetpack waiting there, and **flies** with it from the asteroid to the planet to the moon. The figure is a
+  fox child (`jumpFox.tsx`, user request, 23 November 2026: arms it uses, better still a fox, „sehr gute Grafik“) drawn
+  with the shared `MascotHead`, `Arm`, `Foot` and `FoxTail` in a blue T-shirt with a star, with a pose of its own for
+  each kind of move (`FoxPose`, `POSE_OF`): swimming with a mask, arms stroking and legs kicking; hopping with its arms
+  flapping; in the basket waving with a paw on the rim; in the lift pointing up; hanging from the balloons and the
+  parachute by both paws (`HANG_PAWS`, where the strings and cords end); flying with the jetpack on its back and its
+  flames; dropping with its arms up. Its arms and legs swing at their own pace as small layers (`.tm-jump-limb`), the
+  poses swap at once by opacity keyframes written for the run (`poseTimeline`, `poseLooks`). The basket and the lift's
+  cabin are cars of their own (`BASKET`, `CABIN`, `carFrames`): each waits where the fox gets in, goes with it step for
+  step and stays where it got out, in a back half behind the fox and a front half over it. Each move takes its whole
+  share of the time, moving along its way (`jumpPlan`, `wayOf`, `trackAt`: never waiting and then hurrying), with
+  something under its feet all the way and the bounce once a second (user feedback, 23 November 2026); a hop is an arc
+  from point to point (`hopArc`, rising slower to its top and falling from it, `LIFT` over its higher end), while the
+  picture follows at an even pace. It faces the way it goes (`.tm-jump-turn`). Over every move hangs a star, caught
+  halfway (`starAt`). The way down is a part of the timer, a fifth of the time (`DIVE_SHARE`): it leaps off the moon,
+  opens a parachute and sails down swaying from side to side (`swingCount`, `swingX`, `SWAY`, `SWING_MS`, tilting by
+  `TILT`) past everything it climbed, slowly enough to see each height go by, lets go above the cake (`RELEASE_Y`) and
+  drops into it spinning once (user feedback, 23 November 2026: the fall straight down in 4.5 s looked like a teleport).
+  The cake on the meadow – the goal seen from the first second – bursts: whole layers swap for a smashed one (a cracked
+  plate, the torn tiers, lumps and drips; `.tm-jump-cake-whole`, `.tm-jump-cake-smashed`) and pieces of cake, cream and
+  cherries fly in every direction over the whole picture and stay where they land, on the meadow, the lake, the tree's
+  trunk and steps and the skyscraper's wall (`BITS`, `BURST`, `.tm-jump-bit-x`/`-y`/`-spin`; user feedback: it should
+  be broken everywhere). What it carries and what waits for it come and go by opacity keyframes written for the run
+  (`gearLooks`, `shownFrames`: every keyframe names every property it changes, since a property left out of one is
+  passed over, not held). Five minutes are all 24 moves, a shorter run starts further up, with what it passed already
+  taken (`moveCount`, at least `MIN_MOVES`, a move never under `MIN_UNIT`). No enemies, no falling off, no count of
+  stars. A star caught plays a bright note climbing the scale (spaced), the leap off the moon a whoosh, the landing a
+  plop; a tap boings and lights the stars still hanging. Its card shows the fox in the cable car's basket between the
+  treehouse and the skyscraper (`LATER` in `cardArt.tsx`, 0.32 of the run), since its middle is the lift with sky round
+  it and in space the fox is too small to see on a card. Its name and lines (`jumpNames.ts`) were written English first
+  and translated into every app language at once. The way, its stars and the cake stay within x 235–1340 (a tablet's
+  4:3 cut with the paper's margin; `timer.test.ts` checks).
+  **A game-look timer may be big** (user feedback with this rebuild): a world many screens tall or wide that the
+  picture follows is welcome where it shows how far the way has come (here the heights), moved as one layer, and a
+  long way is told by changing what the figure does on it (swim, hop, ride, float, fly) rather than by more of the
+  same. A picture that is too simple or does not make sense (the Road Rug, whose car drove on while toys hopped off its
+  road into a box, H-122) is taken out rather than kept.
 - „Abwechseln“ 🔁 (H-52): two children take turns with a toy. The time set is one turn. Its hourglass is the
   Sanduhr's own (`Hourglass` in `scenes.tsx`, user request, November 2026: one drawing, never a second one built
   beside it), standing between two floor cushions (`SWAP_SEATS`, the same way left and right of it): the fox child's
@@ -227,7 +253,8 @@ taken out (user request, November 2026). The pictures:
   English first and translated into every app language on 22 November 2026.
   At the end the picture's own sound, then children cheer (the `cheer` recording) while a warm light spreads over the
   picture (`.tm-done-light`), a friendly tune after it, then `GameEnd` with the picture's trophy (nothing rises, the trophy replaced it, user decision, November 2026) with „Nochmal“ and „Weiter“ (the next picture,
-  the same minutes, `nextPicture`). Every tap or key during the run answers (steam and a whistle, twinkling, the flame
+  the same minutes, `nextPicture`; „Weiter“ shows that picture's card, `TimerCardArt` as `next.art`, user request, 23
+  November 2026). Every tap or key during the run answers (steam and a whistle, twinkling, the flame
   flaring) with a warm light where it was, and what is still left lights up softly for a moment (H-51, „Wie lange
   noch?“: the rail to the station, the sand on top, the wax, the slices – `LeftGlow`, inside the shrinking part so it is
   exactly as big as what is left); nothing has to be tapped, so there is no glow before it or pointing hand.
@@ -246,8 +273,8 @@ Files: `TimerGame.tsx` (start screen: cards, minutes and the own time's slip), `
 run: working out its length, the question when a clock time is past, the clock, the phases `running` →
 `blow` (candle only) → `done`, taps, the end, the sounds of the pieces), `pieces.ts` (how a run is cut into pieces, the
 train's halts, where the apples hang; tested), `SwapPlay.tsx` and `swap.tsx` („Abwechseln“: its turns, and its room,
-lamps, cushions and toys), `seesaw.tsx` (the Wippe's playground, plank, stand and chick), `apples.tsx`, `caterpillar.tsx`, `clock.tsx`, `disc.tsx`, `flower.tsx`, `sunset.tsx`, `pizza.tsx`, `tidy.tsx`, `boxes.tsx`, `road.tsx`, `blocks.tsx`, `tunnel.tsx`, `jump.tsx` (one picture each; `tidyNames.ts`, `boxesNames.ts`, `roadNames.ts`, `blocksNames.ts`, `tunnelNames.ts` and `jumpNames.ts` their texts), `hop.tsx` (a toy hopping
-into its box, shared), `keyframes.ts` (keyframes written for a run), `shown.tsx`
+lamps, cushions and toys), `seesaw.tsx` (the Wippe's playground, plank, stand and chick), `apples.tsx`, `caterpillar.tsx`, `clock.tsx`, `disc.tsx`, `flower.tsx`, `sunset.tsx`, `pizza.tsx`, `tidy.tsx`, `boxes.tsx`, `blocks.tsx`, `tunnel.tsx`, `jump.tsx` (one picture each, `jumpFox.tsx` its fox's poses; `tidyNames.ts`, `boxesNames.ts`, `blocksNames.ts`, `tunnelNames.ts` and `jumpNames.ts` their texts), `hop.tsx` (a toy hopping
+into its box, shared), `pause.tsx` (the run's clock, pause and start over), `keyframes.ts` (keyframes written for a run), `shown.tsx`
 („Zeit im Bild“: its choice, the note with digits or tally marks), `scenes.tsx` (the other drawings
 and the shared `Layer`, `Draw`, `LeftGlow`), `timer.css`, `content.ts`
 (names, order), `settings.ts`.
@@ -275,6 +302,23 @@ and the shared `Layer`, `Draw`, `LeftGlow`), `timer.css`, `content.ts`
   bar it looked set somewhere; `noteRoom` in `shown.tsx` gives `.tm-play` the note's width, `--tm-note-em`, and
   `.tm-note-digits .tm-bar` its room); tally marks, a row too wide for the corner, stay above the bar's right end. At
   the end the bar fades for the end's light, trophy and buttons. A tap lights its way still to go too (H-51).
+- **Every timer can be paused and started over** (user request, 23 November 2026: „verbunden mit der
+  Prozessleiste“; `pause.tsx`): a round paper button with two drawn bars (`ControlIcon`, like Kettenreaktion's pause)
+  sits on the bar's start, the bar running out from under it (`--tm-pause-size`, `--tm-bar-left`; the bar lifted just
+  enough that the button stays whole), at the same place where the bar is switched off. Paused, a veil darkens the
+  picture with the big ▶ to go on and the round arrow to start the same timer over (`onAgain`), no words; a tap
+  anywhere else on the veil or any key but Esc goes on, so a child who paused by chance is never stuck, while starting
+  over always takes two taps. A tap on the picture pauses too (user decision, 23 November 2026: first only the bar's
+  button was kept, then the user changed their mind): it still answers as always – its sound, the warm light, what is
+  left lighting up (H-51) – and then the veil comes; keys only answer, they never pause, since children press them while
+  watching. **Everything counts on the run's own clock** (`RunClock`,
+  `usePausableClock`, `useRunClock`): the real clock less every pause, standing still while paused – the end, the
+  pieces' sounds, the last notes, the caterpillar's bites, the alarm clock's digits, the note in the corner, the bar's
+  and the seesaw's delays, whose turn it is. CSS animations stand still under `.tm-paused` and go on in step with it.
+  A new picture or anything new worked out from the time reads `useRunClock().now()`, never `Date.now()`
+  (`timer.test.ts` checks every file of a run). A clock time set („bis 17:30“) is no longer named behind ⚙️ once
+  paused, since it ends later now. `.tm-play` is `overflow: clip`, never `hidden`: focusing the button at its foot
+  scrolled the whole picture up.
 - **The last moments are felt, never hurried** (H-124): `finalMs` (ten seconds, a quarter of a short run) before the
   end a warm light gathers from the screen's edges (`FinalLight`, one layer by `opacity`), the bar's marker and the
   flag's light swell softly once a second, and the last `FINAL_NOTES` seconds each sound one soft rising note, the
@@ -330,7 +374,7 @@ and the shared `Layer`, `Draw`, `LeftGlow`), `timer.css`, `content.ts`
 - **One drawing for one thing**: a thing two pictures show (the hourglass) is one component both use, never copied and
   drawn again with its own sizes (user request, November 2026; `timer.test.ts` checks the hourglass).
 - **The cards' order is the user's** (November 2026: Rote Scheibe, Sanduhr, Kerze, Apfelbaum, Blume, Pizza, then the
-  Wecker, then Tidy Up, Five Boxes, Road Rug, Block House, Treasure Tunnel and Hop to the Flag; Abwechseln last): keep it when adding a picture (a new one goes after these, before Abwechseln, unless the
+  Wecker, then Tidy Up, Five Boxes, Block House, Treasure Tunnel and Up to the Moon; Abwechseln last): keep it when adding a picture (a new one goes after these, before Abwechseln, unless the
   user says otherwise), and add it to the perf scenarios' list in `tools/perfScenarios.ts`, which taps each card by its
   name (`timer.test.ts` checks the order). Abwechseln is another thing to do than the pictures that run until the time
   is up – taking turns without end – so it stands in a group of its own after them (`GameMode.kind`, user request,
@@ -341,6 +385,11 @@ and the shared `Layer`, `Draw`, `LeftGlow`), `timer.css`, `content.ts`
   for that moment and no more (`still`). Where the middle shows little (the Sonnenaufgang between moon and sun), the
   card takes a later moment (`LATER`) – look at every card (`timer.test.ts`).
 
+- **A figure on a way moves as it would in life** (user feedback on Up to the Moon, 23 November 2026): every kind of
+  move has a pose of its own that uses arms and legs for it – stroking and kicking in the water, flapping while it
+  hops, holding on where it hangs or rides – and the kinds differ plainly; it goes only where it could in life (wooden
+  steps nailed up a trunk, a cable car on a rope, a lift in its shaft, never a house standing in a lake or a hop higher
+  than a fox could leap; `timer.test.ts` checks the steps, the shore and every leap).
 - **No fox or bear figure in any picture** (user feedback, November 2026): first a family standing by every picture was
   taken out (children wanted to tap it, and a timer to watch needs as few things and movements as can be), then the
   children that pushed the cart, held the hose and blew out the candle – drawn in SVG they looked odd, a bear with two
@@ -348,6 +397,8 @@ and the shared `Layer`, `Draw`, `LeftGlow`), `timer.css`, `content.ts`
   stick, the last candle going out by itself); where it is about the real children (Abwechseln), a thing of theirs
   stands for them (the cushions in fox and bear colours, no face). `timer.test.ts` checks that no picture draws one.
   Tennis, whose players were the shared `Mascot` children, was the one exception and is taken out (21 November 2026).
+  The one exception is Up to the Moon's fox child (`jumpFox.tsx`, user request, 23 November 2026): it is the figure doing
+  the run, never one standing by, drawn with the shared head, arms, feet and tail of `Mascot.tsx`.
 - **What grows, grows as a whole** (user feedback, November 2026): a plant rising gets bigger as it rises – its stalk
   thicker, its leaves bigger – scaled from its foot (`transform-origin` at the soil, never stretched one way), and a
   flower grows open from small to big with all its petals at once, never petal after petal.
@@ -372,6 +423,12 @@ and the shared `Layer`, `Draw`, `LeftGlow`), `timer.css`, `content.ts`
 - **A game-like picture moves towards its goal all the time** (user feedback on the Block House, 22 November 2026):
   what makes progress (a block carried, a toy put away) is seen moving the whole of its share – slowly, every second a
   little nearer, now and then a playful slip – never standing still and then hopping into place at its share's end.
+  A figure moving along a way does the same (user feedback on Up to the Moon, 23 November 2026): each move fills its
+  whole share at an even pace, with something to stand on all the way, and an ending (a fall, a dive) is a real share of
+  the time, slow enough to see every station it passes – never a rush of a few seconds that looks like a teleport.
+- **Time up is plain in every timer** (user feedback, 23 November 2026): the corner's note stays, showing a red „0:00“
+  that blinks softly (the one blink allowed here, asked for by the user; still under `prefers-reduced-motion`), and an
+  end that breaks something (the cake) scatters it widely, in every direction, not a small splash.
 - **Tally marks start many** (user feedback, November 2026: ten were too few to see them go): every way of marks starts
   with a full row or, for a short time, one a second (10 s: ten marks), never a handful (`timer.test.ts` checks). A
   changed default of `timeNote` gets the field a new name, or everyone who played before keeps the old one.
