@@ -473,7 +473,10 @@ In a fresh worktree run `bun install` first.
   and a category too big for one room is a wing, a hall of its own with a door for each game (`museumTree`). A small
   brass plate under each trophy names its level in small letters; the category stands once, on the room's sign, never
   repeated on every trophy (the game's name only where a room holds several games). A tap on a trophy shows it whole
-  and big (`trophyNames.ts`, loaded per game, never a whole game's code; `trophies.test.ts`). The way back to the shelf
+  and big (`trophyNames.ts`, loaded per game, never a whole game's code; `trophies.test.ts`), with its level's picture
+  taped on beside it and the drawn play sign over it, which opens that very level (`trophyHref`; user request, November
+  2026) – and ✕ there leads back into the room, the trophy still big: a page that opens a game to come back to it
+  passes `BackVisit` (`src/lib/goBack.ts`), which `GameShell` follows before its own menu. The way back to the shelf
   is always there, in the top left (the ribbon's shelf label); the left doorway leads one room back, the hall's to the shelf.
   Every door says where it leads (a sign over the left doorway: „← Hall“, the wing, the shelf; the hall's doors carry the
   category's name), and a plan of all rooms behind the map note beside the fullscreen one shows where one is and walks to

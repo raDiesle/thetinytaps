@@ -1,6 +1,6 @@
 import { afterEach, expect, test } from "bun:test";
 import type { NavigateFunction } from "react-router";
-import { goBack, notePage, STEP_BACK_WAIT_MS } from "./goBack";
+import { backFrom, goBack, notePage, STEP_BACK_WAIT_MS } from "./goBack";
 
 // A browser history as the router keeps it: entries with their `idx`, a step back arriving a moment later (popstate) –
 // or never, with `lost`: the browser stays where it is and reports nothing.
@@ -58,6 +58,15 @@ test("going back to the page before steps back in the history instead of adding 
   expect(browser.depth()).toBe(0);
 });
 
+// The trophy room's play sign opens a level (`BackVisit`); ✕ there goes back to the room opening on that trophy.
+test("a way back to a page with a question steps back to the page before it all the same", () => {
+  const browser = fakeBrowser();
+  browser.open("/pokale/");
+  browser.open("/timer/sand/");
+  goBack(browser.navigate, "/pokale/?pokal=%2Ftimer%2F%23sand");
+  expect(browser.depth()).toBe(0);
+});
+
 test("a way back to a page not just before replaces the page left", () => {
   const browser = fakeBrowser();
   browser.open("/kettenreaktion/");
@@ -83,4 +92,10 @@ test("a step back that never lands holds the ways back only for a moment", async
   // To a page not just before, so this test leaves no step back on its way.
   goBack(browser.navigate, "/kettenreaktion/");
   expect(browser.shown()).toBe("/kettenreaktion/");
+});
+
+test("a game opened to come back leads only to a page of this app", () => {
+  expect(backFrom({ backTo: "/pokale/?pokal=x" })).toBe("/pokale/?pokal=x");
+  expect(backFrom({ backTo: "//evil.example/" })).toBeUndefined();
+  expect(backFrom(null)).toBeUndefined();
 });

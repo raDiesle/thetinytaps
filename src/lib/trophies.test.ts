@@ -4,7 +4,7 @@ import { METALS, trophyLook } from "@/components/Trophy";
 import { museumLayout, museumTree, type MuseumNode, tierPlan } from "@/components/museumLayout";
 import { everyTrophy, trophyPicture } from "@/components/trophyPictures";
 import { CATEGORIES } from "@/content/games";
-import { awardTrophy, gameOfPath, hasTrophy, resetTrophiesForTest, trophyWins } from "./trophies";
+import { awardTrophy, gameOfPath, hasTrophy, resetTrophiesForTest, trophyHref, trophyWins } from "./trophies";
 
 // The trophies a child collects (CLAUDE.md, „What a child does collect are trophies“): one per level, each looking like
 // no other, awarded by the shared GameEnd of every game.
@@ -118,6 +118,23 @@ describe("trophies", () => {
   test("a trophy won again shows its count on its foot, and a tap on it at a level's end opens the trophy room", () => {
     expect(readFileSync("src/components/Trophy.tsx", "utf8")).toContain("trophy-wins");
     expect(readFileSync("src/components/GameEnd.tsx", "utf8")).toContain("museumHref(");
+  });
+
+  test("a trophy shown big in the trophy room leads to its level, and ✕ there back into the room (user request, November 2026)", () => {
+    expect(trophyHref("/timer/", "sand")).toBe("/timer/sand/");
+    expect(trophyHref("/bilder/", "zoo")).toBe("/bilder/zoo/");
+    expect(trophyHref("/kettenreaktion/", "track")).toBe("/kettenreaktion/track/");
+    // A round or story without an address of its own opens its game; a game no longer on the shelf, nothing.
+    expect(trophyHref("/was-ist-passiert/", "runde-1")).toBe("/was-ist-passiert/");
+    expect(trophyHref("/zaehne/", "")).toBe("/zaehne/");
+    expect(trophyHref("/gibt-es-nicht/", "")).toBeUndefined();
+    // Every trophy of the test view leads somewhere.
+    for (const trophy of everyTrophy()) expect(trophyHref(trophy.game, trophy.level), `${trophy.game}#${trophy.level}`).toBeTruthy();
+    const museum = readFileSync("src/components/TrophyMuseum.tsx", "utf8");
+    expect(museum).toContain("museum-big-play");
+    expect(museum).toContain("backTo:");
+    const shell = readFileSync("src/components/GameShell.tsx", "utf8");
+    expect(shell).toContain("else if (backTo) goBack(navigate, backTo);");
   });
 
   test("Kettenreaktion's trophies hold a ball in their cup, and one ball in the goal wins one", () => {
