@@ -69,6 +69,13 @@
     inset 0 0 0 2px rgb(255 255 255 / 0.9);
 }
 
+/* Quiet (`quiet`, the trophy at a level's end): a thinner ring, a little see-through, and no glow nor waves (TapHint
+   leaves them out). */
+.tap-hint.quiet .tap-hint-ring {
+  border-width: max(3px, calc(var(--r) * 0.04));
+  opacity: 0.85;
+}
+
 /* At each press of the hand a ring goes out from the spot, like the rings of a tap on water. */
 .tap-hint-wave {
   left: calc(var(--r) * -1);

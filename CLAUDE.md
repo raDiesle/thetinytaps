@@ -443,15 +443,18 @@ In a fresh worktree run `bun install` first.
   What a child does collect are **trophies** (user decision, November 2026): every level's or story's end gives the
   trophy of that level, and it waits in the trophy room next to the shelf – never a count while playing; won again, its foot shows how often („3×“, `wins`, counted once per end: a trophy given early by `onGoal` is not counted again by its `GameEnd`). One system for
   every game: `GameEnd` awards it (`awardTrophy`, `src/lib/trophies.ts`, finding the game by its address) and hands it
-  over so it is plainly won (user feedback, November 2026: small beside the buttons, bottom right in Aufs Töpfchen, it
-  was hardly seen): big in the middle of the screen with „Geschafft!“ under it, then shrinking onto its little wooden
-  board beside the buttons – into the collection – and only then the buttons come (`AWARD_MS`, a tap on it lands it at
-  once; one transform, measured from its board, `GameEnd.test.ts`); a new `GameEnd` passes `level` (the level's or story's id; without it the game has one trophy).
-  Landed it stays big (`--trophy-h` in `game-end.css`, a good part of the screen's height, also in an `inline` end) and
-  plainly something to tap: the shared `TapHint`'s golden ring and hand round it (`TrophyHint`, the hand left of it or
-  above where the screen's edge is too close), stopped at its first stage (`upTo`) so it never darkens „Weiter“ beside
-  it; its count („3×“) on a light plate on the foot, big enough to read at a glance (user feedback, November 2026: it
-  wasn't clear the trophy can be tapped, the trophy was small and its number hard to read; `GameEnd.test.ts`).
+  over so it is plainly won, yet calmly (user feedback, November 2026: small beside the buttons, bottom right in Aufs
+  Töpfchen, it was hardly seen; then, at two thirds of the screen for over three seconds and nearly half of it landed
+  with a golden glow, too loud): in the middle of the screen at about two fifths of its height with a small
+  „Geschafft!“ under it, for a short moment, then shrinking onto its little wooden board beside the buttons – into the
+  collection – and only then the buttons come (`AWARD_MS`, `AWARD_HEIGHT`, a tap on it lands it at once; one transform,
+  measured from its board, `GameEnd.test.ts`); a new `GameEnd` passes `level` (the level's or story's id; without it the game has one trophy).
+  Landed it is about a quarter of the screen's height (`--trophy-h` in `game-end.css`, smaller in an `inline` end) –
+  never a bigger one again – and still plainly something to tap: the shared `TapHint` round it in its quiet form
+  (`quiet`: a thin ring and a small hand, no golden glow, no waves; `TrophyHint`, the hand left of it or above where the
+  screen's edge is too close), stopped at its first stage (`upTo`) so it never darkens „Weiter“ beside it; its count
+  („3×“) on a light plate on the foot, big enough to read at a glance (user feedback, November 2026: it wasn't clear the
+  trophy can be tapped and its number was hard to read; `GameEnd.test.ts`).
   Each looks like no other (`Trophy.tsx`: its metal by the game, form, handles, lid and foot by the level, the level's
   own picture in its medallion, `trophyPictures.ts`), drawn still, handed over once slowly – never shining, sparkling or
   bouncing. They stand in the trophy room, a page of its own at `/pokale/` (`TrophyMuseum`, user request, November
