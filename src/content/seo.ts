@@ -555,9 +555,7 @@ export const SEO_TEXTS: PageSeo[] = [
  * in the queue: its texts wait here like an unfinished game's, out of the search pages and `noindex` until it shows.
  */
 const WAITING_PATHS: string[] = [
-  // „Tapsi Goes to Lotta's“ (`src/games/childminder`), until its pictures are made (`childminderPictures.ts`, its `after`).
-  "/kita/tagesmutter/",
-  "/kita/tagesmutter/kurz/",
+  // None now: the three second stories of 23 November 2026 were published once their pictures were made.
 ];
 
 /** Every page that should be found: all but the games still being built (`Game.unfinished`), which no one is to find yet. */
