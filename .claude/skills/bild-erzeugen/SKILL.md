@@ -220,6 +220,10 @@ comma-separated, one `--panel "<what differs>"` each, the prompt holds what is s
   there is only one of the thing. The same goes for a thing a character picks up in a later picture: say that its
   old place is empty now („picked up from the chair, so that chair corner is empty“). „Exactly one plush bunny“ alone
   still gave a second bunny in the bear's arms, beside the one left on the chair (Gefühle, the broken cookie).
+  A set the story counts goes wrong the same way: „exactly three, a red, a blue and a yellow one“ still gave four (a
+  second blue one) in Tapsi's paws, and on a page naming only the red one the other three turned up on a windowsill
+  (Schnullerbaum, November 2026) – say „never a fourth, never two of one colour, the ones this page doesn't name are
+  not in the picture at all“, and count them on every picture.
   A character that leaves its place is drawn twice just the same (the little bear still on top of the slide and in the
   sandpit, a second fox at the party): say its old place is empty and „only ONE … in the whole picture“ for each. A
   story drawn from one first picture names in every prompt where the characters stand in that reference and says those

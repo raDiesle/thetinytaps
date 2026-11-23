@@ -228,7 +228,7 @@ export function childminderPicture(page: ChildminderPage): QueuedPicture {
 }
 
 /** The pages whose pictures are made (`bilder/tm-<id>.webp`); the others wait in the queue. */
-const MADE = new Set<string>([]);
+const MADE = new Set<string>(["besuch", "erzaehlen", "heim", "lieb", "packen", "zuhause"]);
 
 /** Every picture of the story still to make. */
 export const CHILDMINDER_PICTURE_QUEUE: QueuedPicture[] = CHILDMINDER_PAGES.filter((p) => !MADE.has(p.id)).map(childminderPicture);

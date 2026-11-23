@@ -70,7 +70,7 @@ function castOf(page: ShowerPage): string {
   const who: Record<Cast, string> = {
     tapsi: `Tapsi, a small fox toddler with orange fur and a white muzzle, in ${tapsiWears(page)}`,
     mama: `Mama, a grown-up fox woman with a small red flower behind one ear, in a yellow sweater${page.place === "dusche" ? " with the sleeves pushed up" : ""} and brown trousers`,
-    papa: `Papa, a grown-up fox man with round glasses, in a green sweater${page.place === "dusche" ? " with the sleeves pushed up" : ""} and brown trousers`,
+    papa: `Papa, a grown-up fox man with round glasses, in a green sweater${page.place === "dusche" ? " with the sleeves pushed up" : ""} (green like a fir tree, never orange: Gemini once made it orange in the shower) and brown trousers`,
   };
   const n = page.cast.length;
   const both =
@@ -164,7 +164,7 @@ export function showerPicture(page: ShowerPage): QueuedPicture {
 }
 
 /** The pages whose pictures are made (`bilder/dusche-<id>.webp`); the others wait in the queue. */
-const MADE = new Set<string>([]);
+const MADE = new Set<string>(["hase", "laut", "leise", "lieb", "sagen", "sand", "stolz", "trocknen"]);
 
 /** Every picture of the story still to make. */
 export const SHOWER_PICTURE_QUEUE: QueuedPicture[] = SHOWER_PAGES.filter((p) => !MADE.has(p.id)).map(showerPicture);

@@ -78,7 +78,8 @@ function thingsOf(page: TreePage): string[] {
   const things: string[] = [];
   if (ownPacifiers(page))
     things.push(
-      "A pacifier is a toddler's dummy: a small soft teat on a round shield with a ring handle. Tapsi has exactly three, a red, a blue and a yellow one; draw each of them once, only where this page says.",
+      // Gemini drew a fourth (a second blue one) in a paw, and three more on a windowsill beside the one in Tapsi's mouth.
+      "A pacifier is a toddler's dummy: a small soft teat on a round shield with a ring handle. Tapsi has exactly three, a red, a blue and a yellow one; draw each of them once, only where this page says. Count them: never a fourth, never two of one colour, and where this page names only some of them the others are not in the picture at all – no pacifier on a windowsill, shelf, floor or sofa unless this page puts it there.",
     );
   if (/ribbon/.test(page.picture) && ownPacifiers(page))
     things.push("Each of Tapsi's pacifiers hangs on a short satin ribbon of its own colour, tied to its ring.");
@@ -116,7 +117,8 @@ export function promptOf(page: TreePage): string {
       ? [PARK, "Draw the foxes like the fox family in the reference picture: the same fur, faces and clothes."]
       : [
           "Redraw this exact place from the reference picture: keep it exactly as it is – the same walls, window, furniture, trees and objects at the same places, the same camera framing (no zoom, no shift), the same colours and line style. Only the characters, their poses, the things they hold and the light change, and who is there.",
-          `In that reference picture ${place.was}: that was another moment. Draw each character only where this page says, and leave every other place empty – no second fox, no fox tail left lying on the floor, the furniture or the path.`,
+          // Tapsi once stayed on the rug of the reference and sat on Papa's lap as well.
+          `In that reference picture ${place.was}: that was another moment. Draw each character only where this page says, and leave every other place empty – where someone was in the reference and this page puts them elsewhere, that spot is empty now: no second fox, no fox tail left lying on the floor, the furniture or the path.`,
           absent(page),
         ];
   // Tapsi's room is drawn from a picture with the three pacifiers: where this page names none, none of Tapsi's is there.
@@ -150,7 +152,7 @@ export function treePicture(page: TreePage): QueuedPicture {
 }
 
 /** The pages whose pictures are made (`bilder/baum-<id>.webp`); the others wait in the queue. */
-const MADE = new Set<string>([]);
+const MADE = new Set<string>(["abend", "baender", "buch", "kinder", "kissen", "lieb", "lied", "schnuller", "spielen", "stolz", "vermisst", "wann"]);
 
 /** Every picture of the story still to make. */
 export const TREE_PICTURE_QUEUE: QueuedPicture[] = TREE_PAGES.filter((p) => !MADE.has(p.id)).map(treePicture);
