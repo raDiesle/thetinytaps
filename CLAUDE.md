@@ -702,8 +702,10 @@ A game may give it before its end where reaching the goal once is enough (Ketten
   books' lines in `src/components/vorschau/<book id>.webp`) made by `bun run previews` in headless Chrome – never the
   game's own svg drawn into the menu, which would have a phone draw every game at once. The picture is framed like a
   photo pasted in, as big as the card allows above its name (beside it on a flat card), and on a table of contents' line
-  a big rounded rectangle as tall as the line – never over the name, never a small round cut (user feedback, November
-  2026, twice: round cuts showed too little, then pictures filling the card lay over the words); only where many cards'
+  a big rounded rectangle as tall as the line, or as wide as it where the line is tall (see the table of contents
+  below) – never over the name, never a small round cut (user feedback, November 2026, three times: round cuts showed
+  too little, then pictures filling the card lay over the words, then one column of flat lines left them far too
+  small); only where many cards'
   pictures are the point the picture fills the card and the name lies on it in a small paper box (`GameShell
   labelOnPicture`, Kettenreaktion, user request). A cut shows what the game is about, close enough to be recognised and whole: the figure and the thing
   it is about (an animal with the right food and at least one wrong one), the letter, picture and word together, the
@@ -956,9 +958,13 @@ src/lib/                 speech, sfx (synthesized + recorded sounds), storage, d
   no `data-look` or other branch (`look.test.ts`). Like this: the home page is a room with a bookshelf (`Bookshelf`, D-20, user
   decision, October 2026), the app's name „Fun for Both“ in its title, each category a picture book standing on it with its cover out;
   a category's page looks like its book's table of contents (`BookContents`, user feedback, October 2026): one line per
-  game sharing the page's height – its framed picture, its name, dots leading to its page number (the first game on page 1,
+  game – its framed picture, its name, dots leading to its page number (the first game on page 1,
   `gamePage`, user feedback, October 2026) – each line a soft wash of
-  its world's colour and all of it the tap, never cards; every
+  its world's colour and all of it the tap, never cards. The lines stand side by side in columns and share the page's
+  room (`contentsGrid`: up to three in a row, more in two rows, two columns upright), never one long column of flat
+  lines, so the pictures are big (user request, November 2026); a tall line has its picture above the name, a flat one
+  beside it, whichever leaves the picture bigger, and the name never cut off (two or three lines beside it, look at
+  844×390 with six games); every
   menu is a paper page, and the game's picture lies inside the page's paper margin (`.book-frame`). The page seen is
   always the book's **left** page: its outer edge on the left with the board and the table round it, the spine on the
   right with the facing page in its shadow beyond it (`--page-left`, `--page-right`; `look.test.ts`). Most of it is CSS
