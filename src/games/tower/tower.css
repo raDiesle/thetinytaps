@@ -111,7 +111,7 @@
   opacity: 0;
 }
 
-/* The elevator panel on the right: a brass plate with an arrow up, the number in its display and an arrow down. */
+/* The elevator panel on the right: a brass plate with an arrow up and an arrow down, nothing between them. */
 .zt-panel {
   position: absolute;
   z-index: 2;
@@ -126,25 +126,6 @@
   box-shadow:
     0 6px 14px rgb(40 25 10 / 0.35),
     inset 0 2px 0 rgb(255 255 255 / 0.45);
-}
-
-.zt-display {
-  display: grid;
-  place-items: center;
-  width: 100%;
-  aspect-ratio: 1;
-  border-radius: 12px;
-  background: #1d2433;
-  border: 3px solid #6b4a1c;
-  box-shadow: inset 0 3px 8px rgb(0 0 0 / 0.6);
-  font-family: var(--font-rounded);
-  font-weight: 900;
-  line-height: 1;
-}
-
-.zt-number {
-  display: block;
-  text-shadow: 0 0 0.18em currentColor;
 }
 
 .zt-jump {

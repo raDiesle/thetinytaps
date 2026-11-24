@@ -21,8 +21,10 @@ house built from 1 to 100 in one go. Its name, line and the panel's arrows' name
   comes down slowly to a drum roll.
 - **Big blocks** (user request): as big as ten across the room left of the panel allow, at most a fifth of the screen's
   height (`layout.test.ts` checks every screen).
-- **Jump a ten up or back** (user request): the elevator panel on the right shows the number laid; ▲ goes on at the
-  next ten (11, 21 …), ▼ back to the ten before (on the first floor: from 1). The scene is built anew there and the
+- **Jump a ten up or back** (user request): the elevator panel on the right holds only its two arrows; ▲ goes on at the
+  next ten (11, 21 …), ▼ back to the ten before (on the first floor: from 1). Jumping by tens is all it does – no
+  display of the number laid between them (user feedback, 24 November 2026: jumping by tens is enough), nor single
+  steps or a number to pick. The scene is built anew there and the
   camera rides from where it was, like an elevator. Only a tap on an arrow jumps (`screenTap`), never a press
   elsewhere.
 - At 100 the child runs to the ledge, the roof comes down on the crane's rope, smoke puffs from the chimney, the flag

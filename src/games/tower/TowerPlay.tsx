@@ -31,7 +31,7 @@ import { useTimers } from "@/lib/timers";
 import { TWO_DIGIT_WORDS } from "../letters/twoDigits";
 import { lettersVoice, useLettersSay } from "../letters/voice";
 import { Backdrop, Beam, Flag, Hook, HOOK, HouseBlock, Puff, Roof, roofBox } from "./drawings";
-import { FLOORS, type Special, colorOf, floorOf, placeOf, specialOf } from "./floors";
+import { FLOORS, type Special, floorOf, placeOf, specialOf } from "./floors";
 import { Kid } from "./Kid";
 import {
   BEAM,
@@ -90,7 +90,7 @@ const worldFor = (l: HouseLayout, next: number) => (next > TOTAL ? whole(l) : ca
  * The Counting Tower (L-18), made new (user request, 24 November 2026): one house built from 1 to 100 without a break.
  * Each tap or key lowers the next block from the crane's hook into its place, the fox or bear child hops onto it and the
  * number is said; ten blocks make a floor across the screen, a beam is laid over it and the camera goes up to the next
- * ten, as in a jump-and-run. The elevator panel on the right shows the number and jumps a whole ten up or back. At a
+ * ten, as in a jump-and-run. The elevator panel on the right jumps a whole ten up or back. At a
  * hundred the roof goes on and the whole house is seen, then its trophy. The next number is in the address (`?seite=`)
  * and kept for the next visit.
  */
@@ -603,7 +603,6 @@ function HouseScene({ layout: l, start, ride, onPlaced, onJump, ending }: SceneP
         {(phase === "build" || phase === "beam") && (
           <ElevatorPanel
             l={l}
-            number={count}
             up={up}
             down={down}
             upLabel={t(JUMP_TEXTS.up)}
@@ -625,13 +624,13 @@ function HouseScene({ layout: l, start, ride, onPlaced, onJump, ending }: SceneP
 }
 
 /**
- * The elevator panel on the right: the number of blocks laid big in its display, and an arrow up and down that jump a
- * whole ten – up to the next floor, or back to the floor below – so grown-ups can go on at 11, 21 … at once (user
- * request, 24 November 2026). Only a tap on an arrow jumps, never a press elsewhere; a quick second tap changes nothing.
+ * The elevator panel on the right: an arrow up and down that jump a whole ten – up to the next floor, or back to the
+ * floor below – so grown-ups can go on at 11, 21 … at once (user request, 24 November 2026). Jumping by tens is all it
+ * does: no display of the number laid between the arrows (user feedback, 24 November 2026), the voice and the house
+ * count already. Only a tap on an arrow jumps, never a press elsewhere; a quick second tap changes nothing.
  */
 function ElevatorPanel({
   l,
-  number,
   up,
   down,
   upLabel,
@@ -639,7 +638,6 @@ function ElevatorPanel({
   onJump,
 }: {
   l: HouseLayout;
-  number: number;
   up?: number;
   down?: number;
   upLabel: string;
@@ -647,20 +645,7 @@ function ElevatorPanel({
   onJump: (to: number) => void;
 }) {
   const { left, width, middle } = l.panel;
-  const shown = useRef<HTMLSpanElement>(null);
-  const first = useRef(number);
-  // A new number pops up in the display; the one the scene starts with simply stands there.
-  useLayoutEffect(() => {
-    if (number === first.current) return;
-    shown.current?.animate(
-      [
-        { transform: "scale(0.6)", opacity: 0.4 },
-        { transform: "none", opacity: 1 },
-      ],
-      { duration: 260, easing: "ease-out" },
-    );
-  }, [number]);
-  const height = Math.min(2.3 * width, 0.86 * l.h);
+  const height = Math.min(2 * width, 0.86 * l.h);
   const arrow = (to: number | undefined, label: string, dir: "up" | "down") => (
     <button
       type="button"
@@ -689,13 +674,6 @@ function ElevatorPanel({
       onPointerDown={(e) => e.stopPropagation()}
     >
       {arrow(up, upLabel, "up")}
-      <div className="zt-display" style={{ fontSize: width * (number >= TOTAL ? 0.36 : 0.46) }}>
-        {number > 0 && (
-          <span ref={shown} className="zt-number" style={{ color: colorOf(number) }}>
-            {number}
-          </span>
-        )}
-      </div>
       {arrow(down, downLabel, "down")}
     </div>
   );
