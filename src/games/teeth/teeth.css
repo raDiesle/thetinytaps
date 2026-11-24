@@ -696,20 +696,26 @@
   }
 
   /* The two buttons side by side on top, the bar under them, the time at the bottom: beside a picture held sideways
-     the strip may be a little wider, and the bar gets the height. */
+     the strip may be a little wider, and the bar gets the height. It runs the whole height from just under the ✕ to
+     the bottom, the same gap (`--teeth-gap`) from the ✕'s corner, the picture's left edge and its bottom edge – inside
+     the book's paper margin (`--frame`), which once hid its left side on a tablet (user feedback, November 2026: on
+     tablets and phones it stood off the edge, short of the bottom, with uneven gaps). The margins undo
+     `.teeth-play`'s own padding (10 px top and bottom, 6 px left, or the safe area). */
   .teeth-controls {
     order: -1;
     flex-direction: column;
+    --teeth-gap: clamp(6px, 1.2vmin, 10px);
+    --teeth-edge: calc(var(--frame, 0px) + var(--teeth-gap));
     display: grid;
     grid-template-columns: auto auto;
     grid-template-rows: auto minmax(0, 1fr) auto;
     justify-items: center;
-    align-self: flex-start;
+    align-self: stretch;
     gap: clamp(5px, 1.2vmin, 10px) clamp(4px, 0.8vmin, 8px);
     width: auto;
-    height: calc(100% - var(--corner-clear, 0px));
-    max-height: 640px;
-    margin-top: var(--corner-clear, 0px);
+    margin: calc(var(--play-corner, 0px) + var(--teeth-gap) - max(10px, env(safe-area-inset-top))) 0
+      calc(max(var(--teeth-edge), env(safe-area-inset-bottom)) - max(10px, env(safe-area-inset-bottom)))
+      calc(max(var(--teeth-edge), env(safe-area-inset-left)) - max(6px, env(safe-area-inset-left)));
     padding: 6px;
     border-color: #3d304533;
     border-radius: 24px;

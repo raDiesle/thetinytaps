@@ -56,6 +56,19 @@ test("on a wide screen the controls stand at the side, with the bar running from
   expect(play).toContain('getComputedStyle(e.currentTarget).flexDirection === "column"');
 });
 
+// On tablets and phones the strip stood off the edge, its left side under the book's paper margin and short of the
+// bottom (user feedback, November 2026): it runs the whole height, one gap from the ✕, the left and the bottom edge.
+test("on a wide screen the strip runs the whole height, the same gap from the ✕, the picture's left and its bottom", () => {
+  const wide = css.slice(css.indexOf("@media (orientation: landscape) {\n  .teeth-play {"));
+  const rule = wide.slice(wide.indexOf(".teeth-controls {"), wide.indexOf("}", wide.indexOf(".teeth-controls {")));
+  expect(rule).not.toContain("max-height");
+  expect(rule).not.toMatch(/\bheight:/);
+  expect(rule).toContain("align-self: stretch;");
+  expect(rule).toContain("--teeth-edge: calc(var(--frame, 0px) + var(--teeth-gap));");
+  expect(rule).toMatch(/margin: calc\(var\(--play-corner, 0px\) \+ var\(--teeth-gap\)/);
+  expect(rule.match(/max\(var\(--teeth-edge\)/g)?.length).toBe(2);
+});
+
 test("the end's week, trophy and „Menü“ lie on a sheet sized by its own width, beside the head on a wide screen", () => {
   expect(css).toMatch(/\.teeth-end \{\s*container-type: inline-size;/);
   expect(css).toMatch(/@media \(orientation: landscape\) \{\s*\.teeth-end \{\s*width: min\(50%/);
