@@ -134,6 +134,10 @@ late in the video. A new thing shown beside the picture (a control, a chart, a b
   left most of the screen to an empty palate. On a wide screen nothing lies under or over the mouth: the controls stand
   as a slim strip along the left edge, the end's week, trophy and „Menü“ on a sheet at the right – never a row under the
   picture there, which took a fifth of a phone's height from the teeth. `jaw.test.ts` and `controls.test.ts` check.
+- That strip runs the whole height, from just under the ✕'s corner to the bottom, with one even gap (`--teeth-gap`) to
+  the ✕'s corner, the picture's left edge and its bottom edge – measured inside the book's paper margin (`--frame`),
+  never from the screen's edge, and never capped in height (user feedback, November 2026: on tablets and phones it stood
+  off the edge, its left side under the paper margin and short of the bottom). `controls.test.ts` checks.
 - What the child should see stays still long enough to be seen (at least a bar, 2.14 s) before it moves on; nothing whizzes across.
 - Every motion goes with the song (112 BPM): durations are beats (0.536 s), two beats or bars, and nothing loops faster than a beat (a tapped giggle may be quicker). Write new timings that way (`STROKE_S` in `brush.tsx`, the beat comment in `teeth.css`).
 - No words on the picture, ever – no heading („Süßes essen“, „Geschafft!“), no hint for grown-ups („Erbsengroß“, „Ausspucken“), no goodbye line (user feedback, November 2026): the picture, the song and the voice say it, the trophy handed over by `GameEnd` says „well done“ (no medal of its own: it was taken out for the trophy, user feedback, November 2026). The names of the prelude parts and the steps live in the progress bar's tooltips. `controls.test.ts` checks.
