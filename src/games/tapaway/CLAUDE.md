@@ -31,16 +31,20 @@ its address stays `/drauflos/`.
 - Never a storm all the same: the same key again only after `SAME_KEY_PAUSE_MS` (meanwhile a silent ripple), sparkles
   at most `MAX_SPARKLES`, and every limit kept in `tapaway.test.ts`.
 - Everything that moves is a small HTML layer animated by `transform` and `opacity` (`tapaway.css`, prefix `tw-`).
-- It is a category of its own with `toy: "keyboard"` in `games.ts` (no cover, no world, no book travel): the shelf draws
+- It is a category of its own with `toy: "poster"` in `games.ts` (no cover, no world, no book travel): the shelf draws
   it as `ShelfToy` in `Bookshelf.tsx`, first on the picture books' board (the trophy sign hangs at its right end and hid
   it there), `TOY_SPAN` picture books wide so the picture books keep at least 85 % of their size (`shelfLayout.test.ts`).
-  A tap presses it down with a knock and a note, then the game opens; ✕ and Esc lead back to the shelf.
-- **Its poster** (`ToyPoster`, user request, 24 November 2026): a paper poster on the back panel behind the keyboard,
-  its bottom at the keyboard's middle height, the game's name big on top and a picture from the game below, held by
-  three pieces of tape (top left, bottom left, bottom right) while the top right corner curls off the panel. It is
-  only paper on the wall (`aria-hidden`, not tapped – the keyboard is the way in), and must stay clear of the book
-  beside it and the board above (look at 844×390, 390×844, 1024×768 and 1920×1080). The title's size follows its
-  longest word (`--len`), so every language's name fits under the curl. The picture is
-  `src/components/bilder/plakat-<category>.webp`, made by `bun run previews plakat` (`POSTERS` in `tools/previews.ts`):
-  a firework, a letter and a digit with its shapes, played with fixed chance so it comes out the same each time – look
-  at it after every change to what the game draws.
+  A tap presses its poster back with a knock and a note, then the game opens; ✕ and Esc lead back to the shelf.
+- **Its poster** (`ToyPoster`, user request, 24 November 2026) is the whole thing on the shelf: the game's name big on
+  top and a picture from the game below, on paper held by three pieces of tape (top left, bottom left, bottom right)
+  while the top right corner curls off. It stands with its foot on the board and leans back against the back panel,
+  reaching only a little into the gap beside it. A toy keyboard stood in front of it first, the poster taped above it
+  onto the back panel: the keyboard looked like a till and the poster, drawn towards the shelf's middle by the
+  perspective, stood behind the book beside it (user feedback, 24 November 2026) – so nothing stands in front of it, and
+  it is never put on the back panel itself (`translateZ` back), where the perspective moves it behind its neighbour.
+  Anything on the shelf stands clear of the books beside it, measured with `getBoundingClientRect` in the page (the
+  poster's right edge against the next cover's left, about 20 px at 844×390, 1024×768, 1280×720 and 1920×1080, 390×844
+  upright); `css.test.ts` keeps the poster in its place. The title's size follows its longest word (`--len`), so every
+  language's name fits under the curl. The picture is `src/components/bilder/plakat-<category>.webp`, made by
+  `bun run previews plakat` (`POSTERS` in `tools/previews.ts`): a firework, a letter and a digit with its shapes,
+  played with fixed chance so it comes out the same each time – look at it after every change to what the game draws.

@@ -34,7 +34,7 @@ export type ShelfThing = "music" | "playtime" | "figure" | "language";
 
 /** In this order where they stand in a row (on top of an upright screen's shelf), the stickers at the right side. */
 /**
- * The toy keyboard's width among the picture books, in picture books (`Category.toy`, user request, 24 November 2026: a
+ * The width of a toy's poster among the picture books, in picture books (`Category.toy`, user request, 24 November 2026: a
  * little toy, smaller than a book). Every picture book has no room to spare on its board, so whatever the toy takes comes
  * off them: at this width they stay at least 85 % of their size without it (`shelfLayout.test.ts`).
  */
@@ -229,7 +229,7 @@ function split(count: number, rows: number): number[][] {
 /**
  * The places on two boards of a wide shelf: the everyday helpers' books (wider than a picture book) with the words
  * carved before them alone up top, the picture books together below, where a child's eye finds them side by side (user
- * decision, November 2026) – the toy keyboard among them (`Category.toy`). Evenly split where there are no such books or
+ * decision, November 2026) – the toy's poster among them (`Category.toy`). Evenly split where there are no such books or
  * the picture books would be too many for one board.
  */
 function boardsOf(spans: number[], rows: number): number[][] {

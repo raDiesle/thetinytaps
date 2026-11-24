@@ -195,3 +195,16 @@ test("app-wide z-index layers take a --z-… name defined in base.css", () => {
   }
   expect(wrong).toEqual([]);
 });
+
+// The poster of „Magic Keys“ on the shelf stood taped onto the back panel above a toy keyboard: the shelf's perspective
+// drew it towards the middle, behind the book beside it, and the keyboard looked like a till (user feedback, 24 November
+// 2026). It stands on the board in its own place now, nothing in front of it, and reaches only a little into the gap.
+test("the shelf's poster stands in its place, never back on the panel behind the book beside it", () => {
+  const css = readFileSync("src/styles/bookshelf-books.css", "utf8").replace(/\/\*[\s\S]*?\*\//g, "");
+  const rules = [...css.matchAll(/([^{}]*\.shelf-poster(?![\w-])[^{}]*)\{([^}]*)\}/g)].map(([, , body]) => body);
+  expect(rules.length).toBeGreaterThan(0);
+  for (const body of rules) expect(body).not.toMatch(/translateZ\(\s*calc\([^)]*-\s*[\d.]/);
+  const reach = css.match(/--pw:\s*calc\(var\(--bw\) \+ var\(--bh\) \* var\(--gap\) \* ([\d.]+)\)/);
+  expect(Number(reach?.[1])).toBeLessThanOrEqual(0.6);
+  expect(readFileSync("src/components/Bookshelf.tsx", "utf8")).not.toMatch(/ToyKeyboard|shelf-toy-body/);
+});

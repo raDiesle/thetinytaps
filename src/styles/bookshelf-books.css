@@ -821,10 +821,11 @@
 }
 
 /*
- * The toy keyboard (`ShelfToy`, `Category.toy`): a wooden toy standing among the picture books at the board's front edge,
- * narrower and lower than one of them (`TOY_SPAN`), leaning back against what stands behind it so its bright keys face the room. A tap
- * presses it down a little and lets it come up again (one transform of its body, an HTML element, never inside its svg).
- * The link itself stays unmoved, so the poster above it (`ToyPoster`) can hang on the back panel.
+ * A toy's place among the picture books (`ShelfToy`, `Category.toy`): its poster (`ToyPoster`) standing on the board,
+ * `TOY_SPAN` picture books wide, its foot on the board and its top leaning back against the back panel. It stands in
+ * the row's own plane, never on the back panel itself: there the shelf's perspective drew it towards the middle and
+ * behind the book beside it (user feedback, 24 November 2026). A tap presses it back a little (one transform of the
+ * poster, an HTML element).
  */
 .shelf-row > .shelf-toy {
   --bw: calc(var(--bh) * 0.82 * 0.6); /* `TOY_SPAN` picture books */
@@ -832,39 +833,12 @@
   flex: none;
   align-self: flex-end;
   width: var(--bw);
-  height: calc(var(--bw) * 100 / 120);
+  /* As tall as its poster (`--pw`), which reaches a third of the way into the gap on either side: as big as it can be,
+     still with clear room to the book beside it, which tips towards it. */
+  height: calc(var(--pw) * 1.3);
+  --pw: calc(var(--bw) + var(--bh) * var(--gap) * 0.6);
   transform-style: preserve-3d;
   -webkit-tap-highlight-color: transparent;
-}
-
-.shelf-toy-body {
-  position: absolute;
-  inset: 0;
-  transform-origin: 50% 100%;
-  transform: translateZ(calc(var(--d) * 0.22)) rotateX(14deg);
-  transition: transform 0.35s cubic-bezier(0.3, 0.7, 0.4, 1.2);
-}
-
-.shelf-toy-art {
-  position: absolute;
-  inset: 0;
-  width: 100%;
-  height: 100%;
-  overflow: visible;
-}
-
-.shelf-toy-shadow {
-  position: absolute;
-  inset: auto -6% -4% -6%;
-  height: 18%;
-  border-radius: 50%;
-  background: radial-gradient(closest-side, #00000059, #0000);
-}
-
-@media (hover: hover) {
-  .shelf-toy:hover > .shelf-toy-body {
-    transform: translateZ(calc(var(--d) * 0.3)) translateY(-4%) rotateX(6deg);
-  }
 }
 
 .shelf-row > .shelf-toy:focus-visible {
@@ -872,33 +846,30 @@
   outline-offset: 3px;
 }
 
-.shelf-toy.pressed > .shelf-toy-body {
-  transition-duration: 0.12s;
-  transform: translateZ(calc(var(--d) * 0.22)) translateY(3%) rotateX(22deg) scale(0.97);
-}
-
 /*
- * The poster above the toy keyboard (`ToyPoster`, user request, 24 November 2026): taped onto the back panel, its foot
- * half way up the keyboard and hidden behind it, wider than the keyboard and nearly as tall as a picture book – yet
- * clear of the book beside it (`BOOK_GAP`) and below the board above. Tape holds three corners; the fourth (top right)
- * curls away from the wood, its paper's back seen and its shadow on the panel. Still, like everything on the shelf.
+ * The poster: paper on a stiff back, leaning against the back panel from the board (`rotateX` from its foot), wider
+ * than nothing beside it and below the board above. Tape holds three corners; the fourth (top right) curls away, its
+ * paper's back seen. Still, like everything on the shelf.
  */
 .shelf-poster {
-  --pw: calc(var(--bw) * 1.75);
   --curl: calc(var(--pw) * 0.16);
   position: absolute;
-  bottom: 48%;
-  left: 50%;
-  width: var(--pw);
-  height: calc(var(--pw) * 1.24);
-  margin-left: calc(var(--pw) / -2);
-  /*
-   * On the back panel: the row stands `--d * 0.2` in front of it. Seen from the shelf's middle, the panel's things move
-   * towards it, so the poster – always left of the middle, first on its board – keeps a little to the left, clear of the
-   * book beside the keyboard.
-   */
-  transform: translateZ(calc(var(--d) * -0.78 + 2px)) translateX(calc(var(--bw) * -0.3)) rotate(-1.5deg);
+  inset: 0 calc((var(--bw) - var(--pw)) / 2);
+  transform-origin: 50% 100%;
+  transform: rotateX(9deg) rotate(-1deg);
   filter: drop-shadow(0 calc(var(--pw) * 0.02) calc(var(--pw) * 0.03) #2a170866);
+  transition: transform 0.35s cubic-bezier(0.3, 0.7, 0.4, 1.2);
+}
+
+@media (hover: hover) {
+  .shelf-toy:hover > .shelf-poster {
+    transform: translateZ(calc(var(--d) * 0.08)) rotateX(4deg) rotate(-1deg);
+  }
+}
+
+.shelf-toy.pressed > .shelf-poster {
+  transition-duration: 0.12s;
+  transform: rotateX(14deg) rotate(-1deg) scale(0.97);
 }
 
 .shelf-poster-paper {
