@@ -142,7 +142,6 @@ function chainLevel(id: (typeof KETTEN_LEVELS)[number]): Scenario {
   return {
     name: `ketten-${id}`,
     path: `/kettenreaktion/${id}/`,
-    storage: `localStorage.setItem("tinytaps.marbles.v1", JSON.stringify({ play: "watch" }))`,
     parts: [
       { label: "Anfang", before: [{ wait: 1500 }, ...start], ms: 10000, type },
       { label: "Mitte", before: middle, ms: 10000, type },
@@ -458,11 +457,10 @@ export const SCENARIOS: Scenario[] = [
   },
   { name: "kettenreaktion", path: "/kettenreaktion/", parts: [{ label: "Erstes Level", before: [START, { wait: 1500 }], ms: 10000, tap: TAPS }] },
   {
-    // The marble run's camera following three things down the wall (the barrier open, „Von selbst“): the picture that
+    // The marble run's camera following three things down the wall (the barrier always up): the picture that
     // moves most, and stuttered on phones while the camera was a changing viewBox.
     name: "kugelbahn",
     path: "/kettenreaktion/",
-    storage: `localStorage.setItem("tinytaps.marbles.v1", JSON.stringify({ play: "watch" }))`,
     parts: [
       {
         label: "Kamera folgt den Kugeln",

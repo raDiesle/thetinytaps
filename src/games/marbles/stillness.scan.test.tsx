@@ -60,7 +60,7 @@ test.skipIf(!process.env.KETTEN_SCAN)(
       const name = `${id[0].toUpperCase()}${id.slice(1)}Level`;
       const mod = await import(`./${name}`);
       const Level = mod[name] as FunctionComponent<LevelProps>;
-      const props: LevelProps = { sound: noop, say: noop, onDone: noop, onGoal: noop, watch: false };
+      const props: LevelProps = { sound: noop, say: noop, onDone: noop, onGoal: noop };
       const at = (T: number) => {
         g.__T = T;
         return renderToStaticMarkup(<Level {...props} />).match(/<[^>]+>/g) ?? [];

@@ -787,17 +787,9 @@ export function buildMachine() {
   };
   const cameraTarget = (t: number) => cameraOn(WORLD_W, focusX(t));
 
-  /** Where it could wait for the child's tap (R-03): the car the penguin bonked, the train behind the open gate, the bumped top. Only the train behind the open gate waits; the machine runs through the others. */
-  const stops = [
-    { at: tCar, x: CAR_MID0, y: TABLE.y - 40 },
-    { at: tTrain, x: TRAIN.front0 - TRAIN.loco / 2, y: FLOOR - 70, active: true },
-    { at: tGo, x: kreiselStart, y: FLOOR - 60 },
-  ];
-
   return {
     events,
     duration: tDone,
-    stops,
     swirl,
     carPath,
     loopIn,

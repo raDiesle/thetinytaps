@@ -557,17 +557,9 @@ export function buildNight() {
     return panCamera(t);
   };
 
-  /** Where it could wait for the child's tap (R-03): the star come down into the basket, the cuckoo out on its perch, the teddy under the risen moon. Only the cuckoo waits; the machine runs through the others. */
-  const stops = [
-    { at: tIn, x: landing.x, y: landing.y },
-    { at: tCall, x: BIRD.outX, y: BIRD.y, active: true },
-    { at: tYawn, x: TEDDY.x, y: TEDDY.y },
-  ];
-
   return {
     events: sorted(),
     duration: tDone,
-    stops,
     tPush,
     tIn,
     tSink,

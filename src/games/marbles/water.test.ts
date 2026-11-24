@@ -16,8 +16,6 @@ import {
   poseAt,
   SKY_TOP,
   STORK,
-  TAP_GATE,
-  gateWaits,
   waitSpot,
   WORLD_H,
   WORLD_W,
@@ -94,10 +92,6 @@ describe("Wasserbahn", () => {
     }
     const ends = stretches.flatMap((s, i) => s.events.filter((e) => e.done).map((e) => ({ i, at: e.at })));
     expect(ends).toEqual([{ i: stretches.length - 1, at: stretches[stretches.length - 1].duration }]);
-  });
-
-  test("only the start and the tower's gate wait for a tap", () => {
-    expect(stretches.map((_, i) => gateWaits(i))).toEqual(stretches.map((_, i) => i === 0 || i === TAP_GATE));
   });
 
   test("the stork holds the duck by the head all the way over the hill, and ends in its nest", () => {

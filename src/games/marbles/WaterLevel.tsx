@@ -46,7 +46,6 @@ import {
   type Bubble,
   type Pose,
   type StorkPose,
-  gateWaits,
 } from "./water";
 import "./water.css";
 import { PROD } from "@/lib/buildInfo";
@@ -80,9 +79,10 @@ interface Ripple {
 
 /**
  * „Wasserbahn“: a yellow rubber duck rides a water run down a sunny hillside.
- * It waits, all still, at the first lock gate and at one more on the way
- * (`gateWaits`) until the child taps (or presses a key) anywhere; the other
- * gates open by themselves. As a gate lifts, the water rushes through and
+ * It waits, all still, at the first lock gate until the child taps (or presses
+ * a key) anywhere; every other gate opens by itself once the duck has settled
+ * before it, so the run goes on to its end with no more taps (user request,
+ * 24 November 2026). As a gate lifts, the water rushes through and
  * carries it down to the next basin – past a water wheel ringing a bell and a
  * stork that flies it out of the reeds, a leaping fish, a turtle ferrying it
  * across its pond and a frog, down a twisty slide onto a geyser and through a
@@ -90,7 +90,7 @@ interface Ripple {
  * row. While it is on its way, a tap on the
  * water splashes a ripple and any other tap or key makes the duck quack and hop.
  */
-export function WaterLevel({ sound, say, onDone, watch }: LevelProps) {
+export function WaterLevel({ sound, say, onDone }: LevelProps) {
   const label = useLevelName("water");
   useEffect(() => loadRealSounds([playCroak, playFlush, playQuack, playSplash]), []);
   const water = useMemo(buildWater, []);
@@ -136,12 +136,12 @@ export function WaterLevel({ sound, say, onDone, watch }: LevelProps) {
       // The last stretch's clock runs on after the end, so the sparkles and the fountain's last drops fade away.
       clock.current = last ? clock.current + dt : Math.min(s.duration, clock.current + dt);
       fire();
-      // Settled: on to the next gate, where the duck waits for the tap only at the one gate that waits (`gateWaits`).
+      // Settled: on to the next gate, which opens by itself – only the first one waits for the child.
       if (clock.current >= s.duration && !last) {
         step.current++;
         clock.current = -1;
         fired.current = 0;
-        if (!gateWaits(step.current, watch)) open();
+        open();
       }
     }
     ripples.current = ripples.current.filter((r) => life.current - r.at < RIPPLE_S);
@@ -149,7 +149,7 @@ export function WaterLevel({ sound, say, onDone, watch }: LevelProps) {
     const cam = camera.current ?? target;
     const k = 1 - Math.exp(-dt * CAMERA_FOLLOW);
     camera.current = { x: cam.x + (target.x - cam.x) * k, y: cam.y + (target.y - cam.y) * k };
-    // Still while the duck waits at a gate and once the pool's fountain and sparkles are over after the end.
+    // Still while the duck waits at the first gate and once the pool's fountain and sparkles are over after the end.
     const s = current();
     const running = clock.current >= 0 && (step.current < stretches.length - 1 || clock.current < s.duration + SETTLE_S);
     return running || ripples.current.length > 0 || life.current - hopAt.current < HOP.s || gliding(cam.x, target.x) || gliding(cam.y, target.y);

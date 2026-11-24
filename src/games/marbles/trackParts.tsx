@@ -368,24 +368,22 @@ export function Switch({ angle }: { angle: number }) {
   );
 }
 
-/** Where the barrier's arm hangs from: just in front of the first waiting marble, high enough for every thing to pass under the lifted arm. */
-export const gatePivot = (): Pt => ({ x: GATE.x - 8, y: rowY(ROW2, GATE.x) - 100 });
+/** Where the barrier's arm hangs from, high enough for every thing to pass under the lifted arm. */
+const gatePivot = (): Pt => ({ x: GATE.x - 8, y: rowY(ROW2, GATE.x) - 100 });
 
 /**
  * The barrier before the funnel (K-02): a red-and-white arm hanging from a
- * round sign on the wall down onto the rail, swinging up to the left by `lift`
- * (0–1). The sign is red with a bar until the marbles can pass and green with a
- * tick while they can, and wobbles `rang` seconds after a tap; while things wait, a sunny
- * `glow` behind it marks it as what to tap.
+ * round green sign with a tick on the wall, always swung up to the left, so
+ * nothing waits behind it for a tap (user request, 24 November 2026); it
+ * wobbles `rang` seconds after a tap.
  */
-export function Gate({ lift, open, rang, glow }: { lift: number; open: boolean; rang: number; glow: boolean }) {
+export function Gate({ rang }: { rang: number }) {
   const p = gatePivot();
   const length = 118;
   return (
     <g>
       <rect x={GATE.x - 85} y={p.y - 80} width="95" height="210" fill="transparent" />
-      {glow && <circle cx={p.x} cy={p.y} r="54" fill="#fff3a6" stroke={STAR_GOLD} strokeWidth="7" />}
-      <g transform={`translate(${p.x} ${p.y}) rotate(${90 * lift + wobble(rang, 6, 20, 5)})`}>
+      <g transform={`translate(${p.x} ${p.y}) rotate(${90 + wobble(rang, 6, 20, 5)})`}>
         <rect x="-8" y="-4" width="16" height={length} rx="8" fill="#fff" stroke={INK} strokeWidth="3" />
         {[14, 46, 78].map((y) => (
           <rect key={y} x="-6.5" y={y} width="13" height="16" fill="#ff5d73" />
@@ -393,12 +391,8 @@ export function Gate({ lift, open, rang, glow }: { lift: number; open: boolean; 
         <rect x="-8" y="-4" width="16" height={length} rx="8" fill="none" stroke={INK} strokeWidth="3" />
       </g>
       <g transform={`translate(${p.x} ${p.y}) rotate(${wobble(rang, 14, 16, 3)})`}>
-        <circle r="30" fill={open ? "#3ec300" : "#ff5d73"} stroke={INK} strokeWidth="4" />
-        {open ? (
-          <path d="M-13 1 L-4 10 L14 -9" fill="none" stroke="#fff" strokeWidth="7" strokeLinecap="round" strokeLinejoin="round" />
-        ) : (
-          <rect x="-17" y="-5" width="34" height="10" rx="4" fill="#fff" />
-        )}
+        <circle r="30" fill="#3ec300" stroke={INK} strokeWidth="4" />
+        <path d="M-13 1 L-4 10 L14 -9" fill="none" stroke="#fff" strokeWidth="7" strokeLinecap="round" strokeLinejoin="round" />
       </g>
     </g>
   );

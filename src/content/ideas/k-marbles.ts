@@ -27,6 +27,8 @@ export const marblesIdeas: IdeaArea = {
       why: "Spannung aufbauen und selbst auflösen; das Kind bestimmt den großen Moment.",
       effort: "S",
       done: true,
+      partial:
+        "Gebaut, mit „Achtung, fertig – los!“. Seit dem 24. November 2026 bleibt die Schranke immer oben (Wunsch: nach dem ersten Tippen läuft jedes Level von selbst bis zum Ende); ein Tipp lässt nur ihre Glocke klingeln.",
     },
     {
       id: "K-03",

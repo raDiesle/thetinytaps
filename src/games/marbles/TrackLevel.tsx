@@ -49,6 +49,7 @@ import {
 import { loadRealSounds } from "@/lib/realSounds";
 import {
   BARS,
+  autoTake,
   BASKET_FULL,
   BASKET_SLOTS,
   buildRoutes,
@@ -101,7 +102,6 @@ import {
   FLAP_DOWN,
   FLAP_UP,
   Gate,
-  gatePivot,
   Hopper,
   inset,
   Loop,
@@ -144,14 +144,14 @@ const SEESAW_TAP_MS = 380;
 const GLITTER_MS = 900;
 /** An animal looks out over the tunnel's roof this long. */
 const PEEK_MS = 1700;
-/** „Achtung, fertig – los!“: the barrier's arm goes up over this long, with a note on each word, then the waiting marbles rush off (K-02). */
-const GO_MS = 1100;
-/** How fast the waiting marbles set off when the barrier is up. */
-const RUSH_SPEED = 420;
-/** The barrier comes down again this long after it went up, once no marble is under it. */
-const CLOSE_AFTER_MS = 1400;
-/** On its own („Von selbst“), the switch flips this long after a marble has taken a way (K-01). */
+/** The switch flips by itself this long after a marble has taken a way (K-01), so the next one takes the other. */
 const AUTO_FLIP_MS = 700;
+/**
+ * After the child's first tap the next thing leaves the shelf by itself this long after the one before, until enough are
+ * on their way to fill the basket or a tube: the round runs to its end with no more taps (user request, 24 November
+ * 2026), and the child may still let out more.
+ */
+const AUTO_RELEASE_MS = 2000;
 
 /**
  * What the magic tunnel does to a marble (K-06), in turn from a random start,
@@ -225,8 +225,6 @@ interface Marble {
   piece: Piece;
   /** The way it takes at the switch, taken when it got there. */
   way: Way;
-  /** It waits behind the closed barrier. */
-  waiting: boolean;
   /** Distance along the section. */
   s: number;
   v: number;
@@ -290,7 +288,7 @@ const never = (n: number) => Array.from({ length: n }, () => -Infinity);
  * The same run comes in other worlds too (K-18, `look`): colours, snow, space, a water
  * slide and a building site, each with its own wall, things, stretch down the lower wall and end.
  */
-function Run({ sound, say, onDone, onGoal, watch = false, look }: LevelProps & { look: TrackTheme }) {
+function Run({ sound, say, onDone, onGoal, look }: LevelProps & { look: TrackTheme }) {
   const label = useLevelName(look.level);
   // `t` is the time everywhere here, so the translation helper gets another name.
   const tr = useT();
@@ -358,15 +356,10 @@ function Run({ sound, say, onDone, onGoal, watch = false, look }: LevelProps & {
   /** The key held down just now, so its cap on the screen goes down too (the picture is drawn on every frame anyway). */
   const held = useRef<string | null>(null);
   const { touchOnly } = useDevice();
-  /**
-   * The barrier (K-02): when it was last told to go up, how far up its arm is
-   * (0 down, 1 up), whether marbles can pass, how far „Achtung, fertig – los!“
-   * has got (three notes, then 4 once the marbles are off), and when a finger
-   * last tapped it. With „Von selbst“ it stays up.
-   */
-  const gate = useRef({ openedAt: -Infinity, lift: watch ? 1 : 0, open: watch, step: 4, tapped: -Infinity });
-  /** The things waiting behind the barrier, the first one first. */
-  const queue = useRef<Marble[]>([]);
+  /** When a finger last tapped the barrier (K-02), which always stays up: nothing waits behind it for a tap. */
+  const gateTapped = useRef(-Infinity);
+  /** When the last thing left the shelf, for the next to follow by itself (`AUTO_RELEASE_MS`). */
+  const releasedAt = useRef(-Infinity);
   /** The switch (K-01): the way it is set to, its flap's angle, when a marble last knocked the flap, and when it flips by itself. */
   const way = useRef<Way>("right");
   const flap = useRef(FLAP_UP);
@@ -605,29 +598,10 @@ function Run({ sound, say, onDone, onGoal, watch = false, look }: LevelProps & {
     });
   };
 
-  /**
-   * A tap on the barrier (K-02): „Achtung, fertig – los!“ – its arm goes up and
-   * the waiting marbles rush off together. While it is up (always with „Von
-   * selbst“) a tap rings its little bell.
-   */
-  const openGate = (t: number) => {
-    const g = gate.current;
-    g.tapped = t;
-    if (g.open || g.step < 4) {
-      sound(playDing);
-      return;
-    }
-    g.openedAt = t;
-    g.step = 0;
-    say({
-      de: "Achtung, fertig – los!",
-      en: "Ready, steady, go!",
-      zh: "预备——出发！",
-      hi: "एक, दो, तीन – चलो!",
-      es: "¡A la una, a las dos y a las tres!",
-      ar: "استعداد، انطلاق!",
-      ru: "На старт, внимание, марш!",
-    });
+  /** A tap on the barrier (K-02), which stays up: it wobbles and rings its little bell. */
+  const ringGate = (t: number) => {
+    gateTapped.current = t;
+    sound(playDing);
   };
 
   /** A tap on the basket makes the things in it jump, one after the other. */
@@ -641,7 +615,7 @@ function Run({ sound, say, onDone, onGoal, watch = false, look }: LevelProps & {
     now.current = t;
     const onWheel = SLOTS.map(() => false);
     let onSeesaw = false;
-    stepGate(t, dt);
+    releaseNext(t);
     if (t >= flipAt.current) {
       flipAt.current = Infinity;
       flip();
@@ -658,16 +632,13 @@ function Run({ sound, say, onDone, onGoal, watch = false, look }: LevelProps & {
         }
         m.fly = null;
       }
-      if (m.waiting) continue;
       const kind = ROLLER[m.kind];
-      const before = m.s;
       const zone = zoneAt(routeOf(m), m.s);
       if (zone?.speed) m.v = zone.speed;
       else if (kind.float) m.v = ROLL.float;
       else m.v = rolled(m.v, pointAt(routeOf(m), m.s).slope, dt);
       m.s += m.v * kind.pace * dt;
       m.dist += m.v * kind.pace * dt;
-      waitAtGate(m, before, t);
       // Fire what it passed; at the end of a section go on to the next one, taking the part that is in the spot, or the way the switch is set to, now.
       for (;;) {
         const route = routeOf(m);
@@ -680,7 +651,7 @@ function Run({ sound, say, onDone, onGoal, watch = false, look }: LevelProps & {
         if (sec.kind === "spot") m.piece = build.current[sec.spot];
         else if (sec.kind === "switch") {
           m.way = way.current;
-          if (watch) flipAt.current = t + AUTO_FLIP_MS;
+          flipAt.current = t + AUTO_FLIP_MS;
         }
       }
       const route = routeOf(m);
@@ -719,9 +690,8 @@ function Run({ sound, say, onDone, onGoal, watch = false, look }: LevelProps & {
     tilt.current += (target - tilt.current) * Math.min(1, dt * (pushed ? 10 : 4));
     if (glitters.current.some((g) => t - g.at >= GLITTER_MS)) glitters.current = glitters.current.filter((g) => t - g.at < GLITTER_MS);
     const panning = follow(dt);
-    // Still while nothing is on the run (waiting things fidget), every part has swung back and the last tap's, key's or
-    // landing's wobble is over (`SETTLED_S`); once full, the end draws on, since some ends keep moving (the pool's fountains).
-    const g = gate.current;
+    // Still while nothing is on the run, every part has swung back and the last tap's, key's or landing's wobble is over
+    // (`SETTLED_S`); once full, the end draws on, since some ends keep moving (the pool's fountains).
     const lastStir = Math.max(stirred.current, ...cues.current, ...landed.current.map((l) => l.at + landMs));
     return (
       done.current ||
@@ -729,8 +699,6 @@ function Run({ sound, say, onDone, onGoal, watch = false, look }: LevelProps & {
       marbles.current.length > 0 ||
       pops.current.length > 0 ||
       glitters.current.length > 0 ||
-      g.step < 4 ||
-      gliding(g.lift * 1000, (g.open ? 1 : 0) * 1000) ||
       gliding(flap.current * 1000, (way.current === "left" ? FLAP_DOWN : FLAP_UP) * 1000) ||
       gliding(tilt.current * 1000, target * 1000) ||
       spots.current.some((spot) => Math.abs(spot.spin) > 0.001) ||
@@ -738,59 +706,12 @@ function Run({ sound, say, onDone, onGoal, watch = false, look }: LevelProps & {
     );
   });
 
-  /**
-   * While the barrier is down, a thing rolling up to it stops with its front at
-   * the barrier, or behind the last one waiting, „klick“. When the row would
-   * reach back to the turn above, the barrier goes up by itself.
-   */
-  const waitAtGate = (m: Marble, before: number, t: number) => {
-    const g = gate.current;
-    if (g.open || m.section !== routes.gate.section || before >= routes.gate.s) return;
-    const r = ROLLER[m.kind].r;
-    const ahead = queue.current[queue.current.length - 1];
-    const stop = ahead ? ahead.s - ROLLER[ahead.kind].r - r - 2 : routes.gate.s - r;
-    if (m.s < stop) return;
-    m.s = stop;
-    m.v = 0;
-    m.waiting = true;
-    queue.current.push(m);
-    sound(playClick);
-    if (stop - r < routes.gate.start + 2 * BALL_R) openGate(t);
-  };
-
-  /**
-   * The barrier: the three notes of „Achtung, fertig – los!“ while its arm goes
-   * up, then the waiting marbles rush off together and the little bell rings;
-   * a while later, once none is under it, it comes down again.
-   */
-  const stepGate = (t: number, dt: number) => {
-    const g = gate.current;
-    const k = (t - g.openedAt) / GO_MS;
-    while (g.step < 3 && k >= g.step / 3) {
-      const note = [0, 2, 4][g.step++];
-      sound(() => playCountNote(note));
-    }
-    if (g.step === 3 && k >= 1) {
-      g.step = 4;
-      g.open = true;
-      for (const m of queue.current) {
-        m.waiting = false;
-        m.v = RUSH_SPEED;
-      }
-      queue.current = [];
-      sound(() => {
-        playCountNote(7);
-        playDing();
-        playWhoosh();
-      });
-    }
-    const nearGate = marbles.current.some((m) => m.section === routes.gate.section && Math.abs(m.s - routes.gate.s) < 3 * BALL_R);
-    if (!watch && g.open && t - g.openedAt > GO_MS + CLOSE_AFTER_MS && !nearGate) {
-      g.open = false;
-      sound(() => playKnock(640));
-    }
-    const target = g.open ? 1 : g.step < 4 ? 1 - (1 - k) ** 2 : 0;
-    g.lift += (target - g.lift) * Math.min(1, dt * (target > g.lift ? 30 : 10));
+  /** After the child's first tap, the next thing leaves the shelf by itself every `AUTO_RELEASE_MS`, as `autoTake` says. */
+  const releaseNext = (t: number) => {
+    if (done.current || nextId.current === 0 || t - releasedAt.current < AUTO_RELEASE_MS) return;
+    const next = autoTake([...landed.current, ...marbles.current.filter((m) => m.kind !== "bubble")], look.sort);
+    if (next === "next") open();
+    else if (next !== null) take(next);
   };
 
   /**
@@ -802,9 +723,8 @@ function Run({ sound, say, onDone, onGoal, watch = false, look }: LevelProps & {
     const cam = camera.current;
     const el = box.current;
     if (el?.clientWidth) cam.h = Math.min(TRACK_H + TOP_ROOM, Math.max(VIEW_H, (VIEW_W * el.clientHeight) / el.clientWidth));
-    // Things waiting behind the barrier aren't followed: the camera stays up there with them and the shelf.
-    const ys = marbles.current.filter((m) => m.id >= followFrom.current && !m.waiting).map((m) => m.y);
-    let middle = landed.current.length && !lookingUp.current && !queue.current.length ? TRACK_H : -TOP_ROOM;
+    const ys = marbles.current.filter((m) => m.id >= followFrom.current).map((m) => m.y);
+    let middle = landed.current.length && !lookingUp.current ? TRACK_H : -TOP_ROOM;
     if (ys.length && !lookingUp.current) {
       const lowest = Math.max(...ys);
       middle = Math.max((Math.min(...ys) + lowest) / 2, lowest + LEAD_ROOM - cam.h / 2);
@@ -830,6 +750,7 @@ function Run({ sound, say, onDone, onGoal, watch = false, look }: LevelProps & {
     const id = nextId.current++;
     const start = from ?? HOPPER;
     lookingUp.current = false;
+    releasedAt.current = levelNow();
     marbles.current.push({
       id,
       kind,
@@ -842,7 +763,6 @@ function Run({ sound, say, onDone, onGoal, watch = false, look }: LevelProps & {
       section: 0,
       piece: build.current[0],
       way: way.current,
-      waiting: false,
       s: 0,
       v: 0,
       next: 0,
@@ -890,7 +810,7 @@ function Run({ sound, say, onDone, onGoal, watch = false, look }: LevelProps & {
       flip(e.key === "ArrowLeft" ? "left" : "right");
     } else if (e.key === "Enter" || e.key === "ArrowDown") {
       e.preventDefault();
-      openGate(levelNow());
+      ringGate(levelNow());
     } else if (place >= 0) take(place);
     else open();
   });
@@ -1046,20 +966,15 @@ function Run({ sound, say, onDone, onGoal, watch = false, look }: LevelProps & {
             <circle cx={SEESAW.cx} cy={SEESAW.cy} r="6" fill={INK} />
           </g>
 
-          {/* The barrier before the funnel: a tap lifts it (K-02) */}
+          {/* The barrier before the funnel, always up: a tap rings it (K-02) */}
           <g
             data-tap
             onPointerDown={(e) => {
               tapped(e);
-              openGate(levelNow());
+              ringGate(levelNow());
             }}
           >
-            <Gate
-              lift={gate.current.lift}
-              open={gate.current.open}
-              rang={age(gate.current.tapped)}
-              glow={!watch && queue.current.length > 0 && gate.current.step === 4}
-            />
+            <Gate rang={age(gateTapped.current)} />
           </g>
 
           {/* The switch at the end of row 3: a tap flips it (K-01) */}
@@ -1103,12 +1018,10 @@ function Run({ sound, say, onDone, onGoal, watch = false, look }: LevelProps & {
           {marbles.current.map((m) => {
             const k = (t - m.nudged) / NUDGE_MS;
             // Riding a chair or a bucket (`carry`), or shrinking into a wormhole and growing out of it (`scale`).
-            const zone = m.fly || m.waiting ? undefined : zoneAt(routeOf(m), m.s);
+            const zone = m.fly ? undefined : zoneAt(routeOf(m), m.s);
             const along = zone ? Math.min(1, Math.max(0, (m.s - zone.s0) / (zone.s1 - zone.s0))) : 0;
             const size = zone?.scale ? zone.scale[0] + (zone.scale[1] - zone.scale[0]) * along : 1;
             const Carrier = zone?.carry ? look.Carrier : undefined;
-            // Waiting behind the barrier, it can't keep still.
-            const fidget = m.waiting ? { x: 1.8 * Math.sin(t / 55 + m.id * 1.7), y: 3 * Math.abs(Math.sin(t / 120 + m.id)) } : { x: 0, y: 0 };
             return (
               <svg
                 key={m.id}
@@ -1118,7 +1031,7 @@ function Run({ sound, say, onDone, onGoal, watch = false, look }: LevelProps & {
                 style={{
                   width: 2 * MARBLE_PAD * unit,
                   height: 2 * MARBLE_PAD * unit,
-                  transform: `translate3d(${(m.x + fidget.x - MARBLE_PAD) * unit}px, ${(m.y - fidget.y + TOP_ROOM - MARBLE_PAD) * unit}px, 0)`,
+                  transform: `translate3d(${(m.x - MARBLE_PAD) * unit}px, ${(m.y + TOP_ROOM - MARBLE_PAD) * unit}px, 0)`,
                 }}
                 aria-hidden
                 onPointerDown={(e) => {
@@ -1134,7 +1047,7 @@ function Run({ sound, say, onDone, onGoal, watch = false, look }: LevelProps & {
                   look={m.look}
                   x={0}
                   y={0}
-                  spin={m.spin + fidget.x / 20 + (k >= 0 && k < 1 ? 4 * Math.PI * k : 0)}
+                  spin={m.spin + (k >= 0 && k < 1 ? 4 * Math.PI * k : 0)}
                   grow={Math.min(1, m.dist / runLength)}
                   scale={m.fly ? SHELF.scale - (SHELF.scale - 1) * Math.min(1, (t - m.fly.at) / FLY_MS) : size}
                 />
@@ -1198,10 +1111,6 @@ function Run({ sound, say, onDone, onGoal, watch = false, look }: LevelProps & {
       </TrackLook.Provider>
       {/* Before the first tap and after ⬆: the shared hint on the middle thing on the shelf says „tap me“ */}
       {(!started || lookingUp.current) && <TapHint key={`shelf${nextId.current}`} {...worldHint(at, SHELF_SPOT)} side="right" />}
-      {/* Until the barrier has first been lifted, the hint points at it from the left while things wait there */}
-      {!watch && queue.current.length > 0 && gate.current.openedAt === -Infinity && (
-        <TapHint key="gate" {...worldHint(at, { ...gatePivot(), r: 62 })} side="left" />
-      )}
       {/* Down the run, the ⬆ button in the bottom left corner takes the camera back up to the shelf */}
       {!done.current && !lookingUp.current && cam.y > UP_SHOWN_BELOW && (
         <button

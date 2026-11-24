@@ -17,8 +17,6 @@ export interface LevelProps {
    * trophy, given here already (user decision, November 2026). Levels without such a goal leave it to their end.
    */
   onGoal?: () => void;
-  /** Nothing waits for the child: what would wait for a tap goes on by itself (the start screen's choice: the marble run's barrier and switch, the machines' stops). */
-  watch?: boolean;
 }
 
 /** The picture's size; every level draws in these coordinates. */

@@ -1,6 +1,7 @@
 import { describe, expect, test } from "bun:test";
 import { BALL_R, type Pt } from "./path";
 import {
+  autoTake,
   BASKET,
   BASKET_FULL,
   BASKET_IN,
@@ -29,6 +30,7 @@ import {
   TRACK_W,
   TURNS,
 } from "./track";
+import { SORT_COLORS, TUBE_FULL } from "./colors";
 import { COLOR_END, STRETCHES } from "./trackStretches";
 
 // The run is many hand-placed numbers; these checks catch a marble that would
@@ -228,4 +230,34 @@ test("every world's stretch is its own", () => {
   const all = Object.values(STRETCHES);
   const shapes = all.map((st) => st.parts.map((p) => `${Math.round(p.pts[p.pts.length - 1].x)},${Math.round(p.pts[p.pts.length - 1].y)}`).join(" "));
   expect(new Set(shapes).size).toBe(all.length);
+});
+
+// After the child's first tap a round runs to its end by itself (user request, 24 November 2026): the shelf lets out
+// one thing after the other until enough are on their way to end it – and never more than it takes.
+describe("things leave the shelf by themselves", () => {
+  test("the basket: the next thing in turn until six are on their way", () => {
+    const lands: { color: string }[] = [];
+    while (autoTake(lands) === "next") lands.push({ color: "any" });
+    expect(lands.length).toBe(BASKET_FULL);
+  });
+
+  test("the colour run: each colour once, then one tube filled", () => {
+    const sort = { colors: SORT_COLORS.map((c) => c.fill), full: TUBE_FULL };
+    const lands: { color: string }[] = [];
+    for (let next = autoTake(lands, sort); next !== null; next = autoTake(lands, sort)) {
+      expect(typeof next).toBe("number");
+      lands.push({ color: sort.colors[next as number] });
+    }
+    expect(new Set(lands.slice(0, 3).map((l) => l.color)).size).toBe(3);
+    expect(lands.length).toBe(TUBE_FULL + sort.colors.length - 1);
+  });
+
+  test("what the child let out counts too", () => {
+    const sort = { colors: SORT_COLORS.map((c) => c.fill), full: TUBE_FULL };
+    const blue = sort.colors[2];
+    const lands = [...Array(TUBE_FULL - 1)].map(() => ({ color: blue }));
+    expect(autoTake(lands, sort)).toBe(0);
+    expect(autoTake([...lands, { color: blue }], sort)).toBeNull();
+    expect(autoTake([...Array(BASKET_FULL)].map(() => ({ color: blue })))).toBeNull();
+  });
 });

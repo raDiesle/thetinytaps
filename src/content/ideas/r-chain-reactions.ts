@@ -32,6 +32,8 @@ export const chainReactionIdeas: IdeaArea = {
       why: "Aus Zuschauen wird Mitmachen: Das Kind ist der Funke für jeden Teil.",
       effort: "M",
       done: true,
+      partial:
+        "Gebaut mit drei oder vier Stationen je Maschine, von denen nur eine wartete. Seit dem 24. November 2026 wieder ausgebaut (Wunsch: nach dem ersten Tippen läuft jedes Level von selbst bis zum Ende) – die Maschinen halten nirgends mehr, und die Wahl „Mitmachen“ über den Karten ist weg.",
     },
     {
       id: "R-04",

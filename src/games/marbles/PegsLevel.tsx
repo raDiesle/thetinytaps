@@ -57,6 +57,12 @@ import "./pegs.css";
 const MAX_FALLING = 12;
 /** After this many marbles have landed, the level ends. */
 const DONE_AFTER = 20;
+/**
+ * After the child's first marble the next one drops by itself, at a random place, this long after none falls any more,
+ * until all twenty are in: the board fills to its end with no more taps (user request, 24 November 2026). The child may
+ * still drop more on the way.
+ */
+const AUTO_DROP_MS = 400;
 /** Between the last marble landing and the party: every animal does its trick once more, one after the other. */
 const DONE_DELAY_MS = 3000;
 /** How far apart the animals start their tricks at the end. */
@@ -146,6 +152,8 @@ export function PegsLevel({ sound, onDone, onGoal }: LevelProps) {
   const box = useRef<HTMLDivElement>(null);
   const now = useRef(levelNow());
   const started = useRef(false);
+  /** Since when no marble falls (ms; Infinity while one does), for the next one to drop by itself (`AUTO_DROP_MS`). */
+  const quietSince = useRef(Infinity);
   const nextId = useRef(0);
   const falling = useRef<Drop[]>([]);
   const lying = useRef<Lying[]>([]);
@@ -268,6 +276,9 @@ export function PegsLevel({ sound, onDone, onGoal }: LevelProps) {
       still.push(d);
     }
     falling.current = still;
+    if (!started.current || still.length > 0 || nextId.current >= DONE_AFTER) quietSince.current = Infinity;
+    else if (quietSince.current === Infinity) quietSince.current = t;
+    else if (t - quietSince.current >= AUTO_DROP_MS) drop(clampDrop(BOARD.left + Math.random() * (BOARD.right - BOARD.left)));
     // Lying marbles roll the last bit to their place in the pile.
     let rolling = false;
     for (const m of lying.current) {

@@ -28,16 +28,10 @@ export interface MarbleSettings {
    * say "all", "both" or "machines"; they begin with the first.)
    */
   levels: MarbleLevel;
-  /**
-   * "join": the marble run's barrier and the machines' stops wait for the child's tap, and the switch stays where the child put it;
-   * "watch": the barrier stays open, the switch flips by itself after each marble and the machines run straight through, so nothing waits for a tap.
-   */
-  play: "join" | "watch";
 }
 
 export const DEFAULT_MARBLE_SETTINGS: MarbleSettings = {
   levels: "track",
-  play: "join",
 };
 
 export const MARBLE_SETTINGS_KEY = "tinytaps.marbles.v1";

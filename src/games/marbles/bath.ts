@@ -726,19 +726,9 @@ export function buildBath() {
   };
   const cameraTarget = (t: number) => cameraOn(WORLD_W, focusX(t));
 
-  /** Where it could wait for the child's tap (R-03): the mug with the brush in it, the duck on the brimful tub, the wound-up whale, the whale before the washing machine. Only the wound-up whale waits; the machine runs through the others. */
-  const whaleY = FLOOR - WHALE.feet - WHALE.h / 2;
-  const stops = [
-    { at: tTopple, x: MUG.x, y: MUG.bottom - MUG.h / 2 },
-    { at: tFull, ...duckAt(tFull).pt },
-    { at: tWake, x: WHALE.x, y: whaleY, active: true },
-    { at: tStop, x: WHALE.stop, y: whaleY },
-  ];
-
   return {
     events: sorted(),
     duration: tDone,
-    stops,
     tBlobLand,
     tInMug,
     tTopple,

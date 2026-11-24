@@ -169,6 +169,22 @@ export const BASKET_IN: Pt = { x: 1322, y: BASKET.rimY - 22 };
 /** Marbles in the basket that make it full. */
 export const BASKET_FULL = 6;
 
+/**
+ * What leaves the shelf next by itself, once the child has let out the first thing (user request, 24 November 2026:
+ * after the start a round runs to its end with no more taps). `lands` are the things that land, in or on their way:
+ * `"next"` takes the shelf's next thing in turn, a number the shelf place of that colour where the run sorts by colour
+ * (each colour once first, then the one furthest on, so a tube is full after about six), and `null` lets nothing out
+ * any more, since enough are on their way to end the round.
+ */
+export function autoTake(lands: { color: string }[], sort?: { colors: string[]; full: number }): "next" | number | null {
+  if (!sort) return lands.length < BASKET_FULL ? "next" : null;
+  const counts = sort.colors.map((c) => lands.filter((m) => m.color === c).length);
+  const most = Math.max(...counts);
+  if (most >= sort.full) return null;
+  const missing = counts.indexOf(0);
+  return missing >= 0 ? missing : counts.indexOf(most);
+}
+
 /* ---------- Things that roll (K-07) ---------- */
 
 /** Something that can roll down the run; with the shelf on, the child picks which. */
