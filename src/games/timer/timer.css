@@ -196,15 +196,9 @@
   }
 }
 
-/* Kerze: three candles burn one after another, each in its share of the time (--tm-i of --tm-of, set per candle): its
-   wax shrinks from the bottom up and its top with wick and flame goes down by as much. */
-.tm-wax-box,
-.tm-flame-box,
-.tm-puddle {
-  --tm-turn: calc(var(--tm-ms) / var(--tm-of));
-  --tm-from: calc(var(--tm-ms) * var(--tm-i) / var(--tm-of));
-}
-
+/* Kerze: six candles burn one after another, each lit by the fuse from the one before (`candlePlan` sets when it lights,
+   --tm-from, and how long it burns, --tm-turn, per candle): its wax shrinks from the bottom up and its top with wick and
+   flame goes down by as much. */
 .tm-wax {
   position: absolute;
   inset: 0;
@@ -223,15 +217,15 @@
 }
 
 .tm-flame-box {
-  /* The part that burns away, as a share of the candle's height (CANDLE: 570 high, 10 left in the puddle). */
-  --tm-burnt: 98.25%;
+  /* The part that burns away, as a share of the candle's height (CANDLE: 415 high, 10 left in the puddle). */
+  --tm-burnt: 97.59%;
   animation: tm-burn-top var(--tm-turn) linear var(--tm-from) both;
 }
 
 .tm-done .tm-wax,
 .tm-blow .tm-wax {
   animation: none;
-  transform: scaleY(0.0175);
+  transform: scaleY(0.0241);
 }
 
 .tm-done .tm-flame-box,
@@ -245,7 +239,7 @@
     transform: none;
   }
   to {
-    transform: scaleY(0.0175);
+    transform: scaleY(0.0241);
   }
 }
 
@@ -579,6 +573,71 @@
   to {
     transform: none;
   }
+}
+
+/* The fuse from one candle to the next (`Fuse`): the cord burns away from its start as the spark runs along it, in the
+   first moments of the next candle's share (--tm-fuse-at, --tm-fuse long), and its layer is gone once the spark is at
+   the wick. Only for those moments is its small svg painted again; the spark is a small layer moving by transform. */
+.tm-fuse-line {
+  stroke-dasharray: 1 2;
+  animation: tm-fuse-burn var(--tm-fuse) linear var(--tm-fuse-at) both;
+}
+
+.tm-fuse {
+  animation: tm-fuse-gone 0.2s linear calc(var(--tm-fuse-at) + var(--tm-fuse)) forwards;
+}
+
+@keyframes tm-fuse-burn {
+  from {
+    stroke-dashoffset: 0;
+  }
+  to {
+    stroke-dashoffset: -1;
+  }
+}
+
+@keyframes tm-fuse-gone {
+  to {
+    opacity: 0;
+  }
+}
+
+.tm-spark {
+  opacity: 0;
+  pointer-events: none;
+  animation: tm-spark-on var(--tm-fuse) linear var(--tm-fuse-at);
+}
+
+.tm-spark-go {
+  position: absolute;
+  inset: 0;
+  will-change: transform;
+  /* Its keyframes, tm-fuse-run, are written from the fuse's points (`fuseKeyframes`) and named on the element. */
+  animation-duration: var(--tm-fuse);
+  animation-timing-function: linear;
+  animation-delay: var(--tm-fuse-at);
+  animation-fill-mode: both;
+}
+
+.tm-spark-go svg {
+  display: block;
+  width: 100%;
+  height: 100%;
+}
+
+@keyframes tm-spark-on {
+  from,
+  to {
+    opacity: 1;
+  }
+}
+
+.tm-done .tm-fuse,
+.tm-blow .tm-fuse,
+.tm-done .tm-spark,
+.tm-blow .tm-spark {
+  animation: none;
+  opacity: 0;
 }
 
 /* Apfelbaum (H-45): the tree's year (`appleTimes`). The tree grows from a sapling a step a second; then the blossoms

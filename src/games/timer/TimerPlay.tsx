@@ -26,6 +26,7 @@ import {
   playCoin,
   playPlink,
   playPlop,
+  playSizzle,
   playTusch,
   playTwinkle,
   playWhoosh,
@@ -53,7 +54,7 @@ import { FlowerScene } from "./flower";
 import { appleTimes, haltMs, ladybugLaps, MAX_APPLES, pieceMoments, soonMs, TRAIN_PIECES, trainSteps } from "./pieces";
 import { PauseControls, RunClockProvider, usePausableClock, useRunClock } from "./pause";
 import { PizzaScene, SLICES } from "./pizza";
-import { CandleBackdrop, Candles, Hourglass, Layer, RAIL_Y, RailAhead, SandBackdrop, TRAIN, Train, TrainBackdrop, TrainStops } from "./scenes";
+import { CandleBackdrop, candlePlan, Candles, Hourglass, Layer, RAIL_Y, RailAhead, SandBackdrop, TRAIN, Train, TrainBackdrop, TrainStops } from "./scenes";
 import type { SwapToy, TimeShown, TimerPicture, TimerSettings, TurnCount } from "./settings";
 import { noteRoom, TimeShownChoice, TimeShownNote } from "./shown";
 import { SunsetScene } from "./sunset";
@@ -353,6 +354,11 @@ function TimerRun({
         .map((h) => h.land);
     if (picture === "train") return pieceMoments(total, TRAIN_PIECES, haltMs(total, TRAIN_PIECES));
     if (picture === "pizza") return pieceMoments(total, SLICES);
+    // A candle burnt down lights the fuse to the next one, which fizzes as the spark runs.
+    if (picture === "candle")
+      return candlePlan(total)
+        .slice(0, -1)
+        .map((c) => c.out);
     // Each toy landing in the box (H-118), the last one being the end's.
     if (picture === "tidy")
       return tidyTimes(total, MAX_TOYS)
@@ -430,6 +436,7 @@ function TimerRun({
           else if (picture === "boxes") (boxMoments(total, PER_BOX)[nextMoment.current - 1]?.lid ? playKnock : playClonk)();
           else if (picture === "blocks") playKnock(520);
           else if (picture === "tunnel") playCrack();
+          else if (picture === "candle") playSizzle();
           // A star caught: a bright note climbing the scale star by star; the leap off the moon whooshes.
           else if (picture === "jump") nextMoment.current === moments.length ? playWhoosh() : playCoin(nextMoment.current + 3);
           else if (picture === "disc" || picture === "jar") playPlink(nextMoment.current);
