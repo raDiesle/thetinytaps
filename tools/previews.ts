@@ -15,7 +15,7 @@ import { type Cdp, evaluate, launchChrome, open, siteUrl, sleep } from "./chrome
 //   bun run previews --no-build        picture the out/ that is there
 //   bun run previews --shots <dir>     also keep each whole window there, to see why a cut lies where it does
 //   bun run previews --video           the big pictures of the games the videos' outro shows (`VIDEO_GAMES`)
-//   bun run previews plakat            only the posters above the shelf's toys (`POSTERS`)
+//   bun run previews plakat            only the posters of the shelf's toys (`POSTERS`)
 //
 // Look at every new picture before committing it: a card whose game starts with a dark screen, a loading slip or a
 // story's first words gets a cut of its own in CUTS, or a later moment in WAIT.
@@ -121,7 +121,7 @@ const VIDEO_DIR = "src/video/outro/bilder";
 const VIDEO_SIZE = { width: 1200, height: 800 };
 
 /**
- * The posters above the shelf's toys (`ToyPoster` in Bookshelf.tsx, user request, 24 November 2026), by the file they
+ * The posters of the shelf's toys (`ToyPoster` in Bookshelf.tsx, user request, 24 November 2026), by the file they
  * go to: a big square picture of the game in the middle of play, in a window of `POSTER_WINDOW` cut to the play area's
  * square at its foot. „Magic Keys“ shows a firework, a number with as many shapes round it and a letter at once – what
  * the toy does, where a card's single moment would show only one of them.

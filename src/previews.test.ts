@@ -75,7 +75,7 @@ describe("menu pictures", () => {
   });
 
   test("every toy on the shelf has its poster picture, made by bun run previews", () => {
-    // The poster above the toy keyboard shows a picture from its game (user request, 24 November 2026).
+    // The poster on the shelf shows a picture from its game (user request, 24 November 2026).
     const toys = CATEGORIES.filter((category) => category.toy);
     expect(toys.length).toBeGreaterThan(0);
     for (const toy of toys) {

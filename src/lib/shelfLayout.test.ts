@@ -24,7 +24,7 @@ const CARVED = 1.4 + LEAN_CLEAR / BOOK_ASPECT;
 
 /** The home page's places as Bookshelf.tsx makes them: the everyday helpers with the carved words, four picture books. */
 const BOOKS_ONLY = [3.9 + CARVED, 1, 1, 1, 1];
-/** …and the toy keyboard after them (`TOY_SPAN`). */
+/** …and the toy's poster after them (`TOY_SPAN`). */
 const HOME = [...BOOKS_ONLY, TOY_SPAN];
 
 /** A phone on its side, upright, a tablet, a laptop, a big monitor (the room the shelf gets in each). */
@@ -208,9 +208,9 @@ describe("the bookshelf", () => {
     expect(below.bh ?? 0).toBeGreaterThan(plan.bookHeight * 1.15);
   });
 
-  // The toy keyboard stands on the picture books' board (user request, 24 November 2026), and every picture book is as big
+  // The toy's poster stands on the picture books' board (user request, 24 November 2026), and every picture book is as big
   // as that board allows: so the toy is small (`TOY_SPAN`), and the picture books keep most of their size beside it.
-  test.each(ROOMS)("the toy keyboard leaves the picture books at least 85 %% of their size, in a %i × %i room", (width, height) => {
+  test.each(ROOMS)("the toy's poster leaves the picture books at least 85 %% of their size, in a %i × %i room", (width, height) => {
     const sizes = (spans: number[]) => {
       const plan = planShelf(width, height, spans, OPTIONS(height));
       return plan.cells.filter((c) => c.books?.includes(1)).map((c) => c.bh ?? plan.bookHeight);
