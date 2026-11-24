@@ -59,7 +59,7 @@ import { deg, rad } from "./machineKit";
 import { MachineStage } from "./MachineStage";
 import { CabDriver, DARK_WOOD, INK, MARBLE_COLOR, MID_WOOD, Sparkles, WOOD } from "./scenery";
 import { BALL_R, type Pt } from "./path";
-import { BAR_COLORS, Ball, still } from "./parts";
+import { BAR_COLORS, Ball, type ScreenAt, Sprite, still } from "./parts";
 
 /** The sky behind the building site. */
 const SKY = "#bfe9ff";
@@ -107,14 +107,21 @@ export function BuildingLevel(props: LevelProps) {
   );
 
   return (
-    <MachineStage back={backdrop} machine={machine} level="building" start={{ x: MIXER.x + 6, y: MIXER.y, r: 96 }} {...props}>
+    <MachineStage
+      back={backdrop}
+      machine={machine}
+      level="building"
+      start={{ x: MIXER.x + 6, y: MIXER.y, r: 96 }}
+      over={(t, at) => <BeltMoving at={at} travel={machine.beltTravel(t)} phase={machine.cleatPhase} />}
+      {...props}
+    >
       {(t) => (
         <>
           {inMixer(t) && <Marble machine={machine} t={t} />}
           <Mixer angle={machine.drumAngle(t)} spin={machine.drumSpin(t)} />
           <SpiritLevel age={t - machine.tVial} />
-          <BeltMotor running={t >= 0} turned={machine.beltTravel(t)} />
-          <Belt machine={machine} travel={machine.beltTravel(t)} />
+          <BeltMotor running={t >= 0} />
+          <Belt />
           <Deck1 />
           <Board />
           <Deck2 />
@@ -429,19 +436,17 @@ const Chute = memo(function Chute() {
 
 /* ---------- Conveyor belt ---------- */
 
+/** The belt's motor box at its low end, its top left corner; its wheel turns at `x + 66`, `y + 30` (`BeltMoving`). */
+const MOTOR = { x: BELT.a.x - 112, y: FLOOR - 92 };
+
 /** The belt's motor box at its low end; the lamp shines while it runs. */
-const BeltMotor = still(function BeltMotor({ running, turned }: { running: boolean; turned: number }) {
-  const x = BELT.a.x - 112;
-  const y = FLOOR - 92;
+const BeltMotor = still(function BeltMotor({ running }: { running: boolean }) {
+  const { x, y } = MOTOR;
   return (
     <g>
       <line x1={x + 66} y1={y + 30} x2={BELT.a.x} y2={BELT.a.y} stroke="#3b3b4f" strokeWidth="6" />
       <rect x={x} y={y} width="84" height="92" rx="8" fill="#5a6b80" stroke={INK} strokeWidth="3.5" />
       <circle cx={x + 22} cy={y + 20} r="8" fill={running ? "#3ec300" : "#2c5a2c"} stroke={INK} strokeWidth="2" />
-      <g transform={`translate(${x + 66} ${y + 30}) rotate(${deg(turned / 12)})`}>
-        <circle r="13" fill="#d8d8e4" stroke={INK} strokeWidth="2.5" />
-        <line x1="-9" y1="0" x2="9" y2="0" stroke={INK} strokeWidth="2.5" />
-      </g>
       {[0, 1, 2].map((k) => (
         <line key={k} x1={x + 12} y1={y + 50 + k * 12} x2={x + 52} y2={y + 50 + k * 12} stroke="#3b4a5c" strokeWidth="4" strokeLinecap="round" />
       ))}
@@ -449,47 +454,22 @@ const BeltMotor = still(function BeltMotor({ running, turned }: { running: boole
   );
 });
 
-const Belt = still(function Belt({ machine, travel }: { machine: Building; travel: number }) {
-  const { a, b, r, gap } = BELT;
+/** Where a point `s` along the belt and `off` off its middle line lies, from end `p`. */
+const onBelt = (p: Pt, s: number, off: number): Pt => ({ x: p.x + s * BELT_U.x + off * BELT_N.x, y: p.y + s * BELT_U.y + off * BELT_N.y });
+
+/** The belt's frame, legs and band: everything of it that never moves. */
+const Belt = memo(function Belt() {
+  const { a, b, r } = BELT;
   const R = r + 2;
-  const at = (p: Pt, s: number, off: number): Pt => ({ x: p.x + s * BELT_U.x + off * BELT_N.x, y: p.y + s * BELT_U.y + off * BELT_N.y });
-  const p1 = at(a, 0, R);
-  const p2 = at(b, 0, R);
-  const p3 = at(b, 0, -R);
-  const p4 = at(a, 0, -R);
-  const loop = 2 * BELT_LEN + 2 * Math.PI * R;
-  const cleats = [];
-  for (let k = 0; k * gap < loop; k++) {
-    const s = (((machine.cleatPhase + k * gap + travel) % loop) + loop) % loop;
-    let base: Pt;
-    let dir: number;
-    if (s <= BELT_LEN) {
-      base = at(a, s, BELT_SKIN);
-      dir = 1;
-    } else if (s >= BELT_LEN + Math.PI * R && s <= 2 * BELT_LEN + Math.PI * R) {
-      base = at(b, -(s - BELT_LEN - Math.PI * R), -BELT_SKIN);
-      dir = -1;
-    } else continue;
-    const tip = { x: base.x + dir * 14 * BELT_N.x, y: base.y + dir * 14 * BELT_N.y };
-    cleats.push(
-      <g key={k}>
-        <line x1={base.x} y1={base.y} x2={tip.x} y2={tip.y} stroke={INK} strokeWidth="10" strokeLinecap="round" />
-        <line x1={base.x} y1={base.y} x2={tip.x} y2={tip.y} stroke={YELLOW} strokeWidth="5" strokeLinecap="round" />
-      </g>,
-    );
-  }
-  const roller = (p: Pt) => (
-    <g transform={`translate(${p.x} ${p.y}) rotate(${deg(travel / r)})`}>
-      <circle r={r - 2} fill="#d8d8e4" stroke={INK} strokeWidth="3" />
-      <line x1={-r + 6} y1="0" x2={r - 6} y2="0" stroke={INK} strokeWidth="3" />
-      <line x1="0" y1={-r + 6} x2="0" y2={r - 6} stroke={INK} strokeWidth="3" />
-    </g>
-  );
+  const p1 = onBelt(a, 0, R);
+  const p2 = onBelt(b, 0, R);
+  const p3 = onBelt(b, 0, -R);
+  const p4 = onBelt(a, 0, -R);
   return (
     <g>
       {/* Legs and the frame under the belt */}
       {[150, 330, 470].map((s) => {
-        const p = at(a, s, 0);
+        const p = onBelt(a, s, 0);
         return <rect key={s} x={p.x - 7} y={p.y} width="14" height={FLOOR - p.y} fill={STEEL} stroke={INK} strokeWidth="2.5" />;
       })}
       <line x1={a.x} y1={a.y} x2={b.x} y2={b.y} stroke="#6b7a8f" strokeWidth={2 * r - 8} strokeLinecap="round" />
@@ -499,12 +479,77 @@ const Belt = still(function Belt({ machine, travel }: { machine: Building; trave
         stroke="#3b3b4f"
         strokeWidth="8"
       />
-      {roller(a)}
-      {roller(b)}
-      {cleats}
     </g>
   );
 });
+
+/** A cleat, drawn along x round 0, 0 (`BeltMoving` turns it across the belt). */
+const Cleat = memo(function Cleat() {
+  return (
+    <g strokeLinecap="round">
+      <line x1="-7" y1="0" x2="7" y2="0" stroke={INK} strokeWidth="10" />
+      <line x1="-7" y1="0" x2="7" y2="0" stroke={YELLOW} strokeWidth="5" />
+    </g>
+  );
+});
+
+/** A roller of radius `r` with its cross, round 0, 0. */
+const BeltRoller = memo(function BeltRoller({ r }: { r: number }) {
+  return (
+    <g>
+      <circle r={r - 2} fill="#d8d8e4" stroke={INK} strokeWidth="3" />
+      <line x1={-r + 6} y1="0" x2={r - 6} y2="0" stroke={INK} strokeWidth="3" />
+      <line x1="0" y1={-r + 6} x2="0" y2={r - 6} stroke={INK} strokeWidth="3" />
+    </g>
+  );
+});
+
+/**
+ * What moves on the conveyor belt – its cleats, its two rollers and the motor's wheel – as sprites over the machine, each
+ * placed from `travel` (the belt's way so far), so a cleat still pushes the marble exactly. Drawn into the machine's svg,
+ * the cleats moving along the whole slanted belt rastered the band from its foot to its top, two fifths of the picture's
+ * height, in every frame (perf, November 2026: the Baustelle's start 48 screens a second, budget 30).
+ */
+function BeltMoving({ at, travel, phase }: { at: ScreenAt; travel: number; phase: number }) {
+  const { a, b, r, gap } = BELT;
+  const R = r + 2;
+  const loop = 2 * BELT_LEN + 2 * Math.PI * R;
+  const across = Math.atan2(BELT_N.y, BELT_N.x);
+  const cleats = [];
+  for (let k = 0; k * gap < loop; k++) {
+    const s = (((phase + k * gap + travel) % loop) + loop) % loop;
+    let base: Pt;
+    let dir: number;
+    if (s <= BELT_LEN) {
+      base = onBelt(a, s, BELT_SKIN);
+      dir = 1;
+    } else if (s >= BELT_LEN + Math.PI * R && s <= 2 * BELT_LEN + Math.PI * R) {
+      base = onBelt(b, -(s - BELT_LEN - Math.PI * R), -BELT_SKIN);
+      dir = -1;
+    } else continue;
+    // The cleat stands 14 out from the band; its sprite turns about its middle, 7 out.
+    cleats.push(
+      <Sprite key={k} at={at} x={base.x + dir * 7 * BELT_N.x} y={base.y + dir * 7 * BELT_N.y} pad={14} angle={across}>
+        <Cleat />
+      </Sprite>,
+    );
+  }
+  const roll = travel / r;
+  return (
+    <>
+      {[a, b].map((p) => (
+        <Sprite key={p.x} at={at} x={p.x} y={p.y} pad={r} angle={roll}>
+          <BeltRoller r={r} />
+        </Sprite>
+      ))}
+      {cleats}
+      <Sprite at={at} x={MOTOR.x + 66} y={MOTOR.y + 30} pad={15} angle={travel / 12}>
+        <circle r="13" fill="#d8d8e4" stroke={INK} strokeWidth="2.5" />
+        <line x1="-9" y1="0" x2="9" y2="0" stroke={INK} strokeWidth="2.5" />
+      </Sprite>
+    </>
+  );
+}
 
 /* ---------- Deck with the traffic cone, and the wrecking ball ---------- */
 

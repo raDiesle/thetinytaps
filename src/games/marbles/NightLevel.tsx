@@ -3,6 +3,7 @@ import { loadRecordings } from "@/lib/sfx";
 import { VIEW_H, type LevelProps } from "./level";
 import { deg, easeOut, lerp, seg, hump } from "./machineKit";
 import { MachineStage } from "./MachineStage";
+import { type ScreenAt, Sprite } from "./parts";
 import {
   BASKET,
   BEAM_TOP,
@@ -81,7 +82,14 @@ export function NightLevel(props: LevelProps) {
   const backdrop = useMemo(() => [{ content: <Room /> }], []);
 
   return (
-    <MachineStage back={backdrop} machine={night} level="night" start={{ x: CRANK.x - 10, y: CRANK.y + 5, r: 70 }} {...props}>
+    <MachineStage
+      back={backdrop}
+      machine={night}
+      level="night"
+      start={{ x: CRANK.x - 10, y: CRANK.y + 5, r: 70 }}
+      over={(t, at) => <RopeRunning at={at} run={night.wheelTurn(t) * ROPE.drive.r} dark={night.dark(t)} />}
+      {...props}
+    >
       {(t) => {
         const end = Math.min(t, night.duration);
         return (
@@ -819,37 +827,25 @@ function Pulley({ x, y, r, turn }: { x: number; y: number; r: number; turn: numb
   );
 }
 
+/** The rope's two strands: the upper from the drive pulley's top to the turning one's, the lower between their bottoms. */
+const STRANDS = [
+  { x1: ROPE.drive.x, y1: ROPE.drive.y - ROPE.drive.r, x2: ROPE.turn.x, y2: ROPE.turn.y - ROPE.turn.r, dir: 1 },
+  { x1: ROPE.drive.x, y1: ROPE.drive.y + ROPE.drive.r, x2: ROPE.turn.x, y2: ROPE.turn.y + ROPE.turn.r, dir: -1 },
+];
+
 /** The rope loop between the pulley on the wheel's axle and the one by the round window, and the little cable car on it. */
 function CableCar({ night, t }: { night: Night; t: number }) {
   const { drive, turn } = ROPE;
-  const run = night.wheelTurn(t) * drive.r;
   const grip = night.carAt(t);
-  const upper = { x1: drive.x, y1: drive.y - drive.r, x2: turn.x, y2: turn.y - turn.r };
-  const lower = { x1: drive.x, y1: drive.y + drive.r, x2: turn.x, y2: turn.y + turn.r };
-  // Little knots on the rope show it running: up on the upper strand, down on the lower one.
-  const knots = (s: { x1: number; y1: number; x2: number; y2: number }, dir: number) => {
-    const len = Math.hypot(s.x2 - s.x1, s.y2 - s.y1);
-    const gap = 160;
-    const off = (((dir * run) % gap) + gap) % gap;
-    const out: { x: number; y: number }[] = [];
-    for (let d = off + 40; d < len - 30; d += gap) out.push({ x: s.x1 + ((s.x2 - s.x1) * d) / len, y: s.y1 + ((s.y2 - s.y1) * d) / len });
-    return out;
-  };
   const cabinTop = grip.y + CAR.hanger;
   return (
     <g>
-      {/* The turning pulley's bracket on the wall */}
+      {/* The turning pulley's bracket on the wall; the pulley itself turns in `RopeRunning` */}
       <path d={`M${turn.x} ${turn.y} L${turn.x - 26} ${turn.y - 26}`} stroke={INK} strokeWidth="7" strokeLinecap="round" />
       <rect x={turn.x - 40} y={turn.y - 40} width="24" height="24" rx="4" fill={DARK_WOOD} stroke={INK} strokeWidth="3" />
       <Pulley x={drive.x} y={drive.y} r={drive.r} turn={night.wheelTurn(t)} />
-      <Pulley x={turn.x} y={turn.y} r={turn.r} turn={run / turn.r} />
-      {[upper, lower].map((s, i) => (
-        <g key={i}>
-          <line {...s} stroke={INK} strokeWidth="3" />
-          {knots(s, i === 0 ? 1 : -1).map((p, j) => (
-            <circle key={j} cx={p.x} cy={p.y} r="3.5" fill="#c0392b" />
-          ))}
-        </g>
+      {STRANDS.map(({ dir: _, ...s }, i) => (
+        <line key={i} {...s} stroke={INK} strokeWidth="3" />
       ))}
       {/* The car: grip on the rope, hanger, and a red cabin with a window and a roof */}
       <rect x={grip.x - 7} y={grip.y - 6} width="14" height="10" rx="3" fill="#5b4a6e" stroke={INK} strokeWidth="2.5" />
@@ -864,6 +860,43 @@ function CableCar({ night, t }: { night: Night; t: number }) {
         strokeLinejoin="round"
       />
     </g>
+  );
+}
+
+/**
+ * What runs on the cable car's rope – its little knots and the turning pulley by the window – as sprites over the room,
+ * placed from `run` (how far the rope has run), each with the room's darkness laid over it (`dark`, the veil's opacity),
+ * since a sprite lies over the veil. Drawn into the room's svg, knots running along both slanted strands rastered the
+ * band from the wheel up to the window in every frame (perf, November 2026: the middle 47 screens a second, budget 30).
+ */
+function RopeRunning({ at, run, dark }: { at: ScreenAt; run: number; dark: number }) {
+  const { turn } = ROPE;
+  // The veil laid over each thing's own shape only: over the sprite's whole square it would darken the room twice there.
+  const shade = (r: number) => dark > 0 && <circle r={r} fill={NIGHT} opacity={dark} />;
+  const knots = STRANDS.flatMap((s, i) => {
+    // Little knots on the rope show it running: up on the upper strand, down on the lower one.
+    const len = Math.hypot(s.x2 - s.x1, s.y2 - s.y1);
+    const gap = 160;
+    const off = (((s.dir * run) % gap) + gap) % gap;
+    const out = [];
+    for (let d = off + 40; d < len - 30; d += gap) {
+      out.push(
+        <Sprite key={`${i}-${Math.round((d - s.dir * run) / gap)}`} at={at} x={s.x1 + ((s.x2 - s.x1) * d) / len} y={s.y1 + ((s.y2 - s.y1) * d) / len} pad={5}>
+          <circle r="3.5" fill="#c0392b" />
+          {shade(3.5)}
+        </Sprite>,
+      );
+    }
+    return out;
+  });
+  return (
+    <>
+      {knots}
+      <Sprite at={at} x={turn.x} y={turn.y} pad={turn.r + 2} angle={run / turn.r}>
+        <Pulley x={0} y={0} r={turn.r} turn={0} />
+        {shade(turn.r + 1.75)}
+      </Sprite>
+    </>
   );
 }
 

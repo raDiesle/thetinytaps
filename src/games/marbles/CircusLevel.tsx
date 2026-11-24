@@ -52,7 +52,7 @@ import { beside, deg, lerp, rad, seg, svgLine } from "./machineKit";
 import { MachineStage } from "./MachineStage";
 import { Bunting, INK, MARBLE_COLOR } from "./scenery";
 import { BALL_R, type Pt } from "./path";
-import { BAR_COLORS, Ball, still } from "./parts";
+import { BAR_COLORS, Ball, type ScreenAt, Sprite, still } from "./parts";
 
 /** The tent's two stripe colours; the red one is the level's main colour. */
 const TENT_RED = "#e8505b";
@@ -81,14 +81,28 @@ export function CircusLevel(props: LevelProps) {
   const backdrop = useMemo(() => [{ content: <Tent stripes={`${ids}-stripes`} /> }], [ids]);
 
   return (
-    <MachineStage back={backdrop} machine={circus} level="circus" start={{ x: HAT.x, y: HAT.y - 46, r: 88 }} {...props}>
+    <MachineStage
+      back={backdrop}
+      machine={circus}
+      level="circus"
+      start={{ x: HAT.x, y: HAT.y - 46, r: 88 }}
+      over={(t, at) => <BallAndClown circus={circus} t={t} at={at} />}
+      {...props}
+    >
       {(t, seen) => {
         const uni = circus.unicycleAt(t);
         const clown = circus.clownAt(t);
         const marble = circus.marbleAt(t);
-        const ball = circus.bigBallAt(t);
-        // The hoop's flames flicker for ever: still while the hoop is off screen, so nothing changes there.
-        const flames = seen(HOOP.x - 200, HOOP.x + 200) ? t : 0;
+        // The paper flames flicker only round the bear's ride through (`FLICKER`), and stand still before and after, and
+        // they flicker in steps, `FLICKER.steps` a second, like paper shaken by hand: a flicker in every frame for as long
+        // as the hoop was on screen changed the ring's whole height 60 times a second, and the phone rastered that band
+        // each time (perf, November 2026: the circus's middle 44 screens a second, budget 30).
+        const step = Math.floor(t * FLICKER.steps) / FLICKER.steps;
+        const flicker = seen(HOOP.x - 200, HOOP.x + 200)
+          ? seg(step, circus.tHoop - FLICKER.before, circus.tHoop - FLICKER.before + 1) *
+            (1 - seg(step, circus.tHoop + FLICKER.after - 1, circus.tHoop + FLICKER.after))
+          : 0;
+        const flames = flicker > 0 ? step : 0;
         return (
           <>
             <Stage open={seg(t, circus.tShow, circus.tShow + 1.3)} />
@@ -111,17 +125,17 @@ export function CircusLevel(props: LevelProps) {
             <LionMarks circus={circus} t={t} />
             <HighWire />
             <Mast />
-            <Hoop t={flames} tPass={circus.tHoop} part="back" />
+            <Hoop t={flames} flicker={flicker} tPass={circus.tHoop} part="back" />
             <Net sag={circus.sagAt(t)} />
-            <BigBall at={ball.pt} spin={ball.spin} />
             <Striker circus={circus} t={t} />
-            <Clown at={clown.pt} turn={clown.turn} arms={clown.arms} stride={clown.stride} />
+            {/* In the cannon the clown lies behind its barrel; fired, it flies over everything (`BallAndClown`) */}
+            {t < circus.tFire && <Clown at={clown.pt} turn={clown.turn} arms={clown.arms} stride={clown.stride} />}
             <Cannon age={t - circus.tFire} />
             <Unicycle at={uni.pt} turned={uni.turned} lean={uni.lean} />
             <Ball color={MARBLE_COLOR} x={marble.pt.x} y={marble.pt.y} spin={marble.spin} />
             <Basket at={uni.pt} lean={uni.lean} />
             <Ribbon tassel={circus.tasselAt(t)} pulled={circus.pulledAt(t)} fired={t >= circus.tFire} />
-            <Hoop t={0} tPass={circus.tHoop} part="front" />
+            <Hoop t={0} flicker={0} tPass={circus.tHoop} part="front" />
             <TopHat />
             <Swing angle={circus.swingOf(t)} />
             <Parrot {...circus.parrotAt(t)} />
@@ -765,10 +779,16 @@ const HighWire = memo(function HighWire() {
 const FLAME_COLORS = ["#ff3b3b", "#ff8c42", "#ffd23f"];
 
 /**
+ * When and how the hoop's flames flicker: from `before` seconds before the bear rides through to `after` seconds after
+ * (fading in and out over the first and last), changing `steps` times a second.
+ */
+const FLICKER = { before: 5, after: 4.5, steps: 12 };
+
+/**
  * The ring of paper flames on its pole. The ring is drawn twice: its `back`
  * with the flames behind the unicycle, its `front` half over it.
  */
-const Hoop = still(function Hoop({ t, tPass, part }: { t: number; tPass: number; part: "back" | "front" }) {
+const Hoop = still(function Hoop({ t, flicker, tPass, part }: { t: number; flicker: number; tPass: number; part: "back" | "front" }) {
   const { x, y, rx, ry } = HOOP;
   if (part === "front") {
     const d = `M${x} ${y - ry} A${rx} ${ry} 0 0 1 ${x} ${y + ry}`;
@@ -790,7 +810,7 @@ const Hoop = still(function Hoop({ t, tPass, part }: { t: number; tPass: number;
         // Outward from the ring, but bent upwards like a flame.
         const out = deg(Math.atan2(Math.sin(a) / ry, Math.cos(a) / rx));
         const dir = lerp(out, -90, Math.sin(a) > 0 ? 0.35 : 0.55);
-        const flutter = 6 * Math.sin(t * 5 + i * 1.7) + wobble(t - tPass, 30, 16, 2) * (i % 2 ? 1 : -1);
+        const flutter = flicker * (6 * Math.sin(t * 5 + i * 1.7) + wobble(t - tPass, 30, 16, 2) * (i % 2 ? 1 : -1));
         const s = i % 3 === 0 ? 1.2 : 0.9;
         return (
           <path
@@ -1182,6 +1202,32 @@ function Spotlights({ on }: { on: number }) {
 }
 
 /* ---------- After the net: the big ball, the high striker, the balloons and the parrot ---------- */
+
+/**
+ * The big starry ball and, once fired from the cannon, the clown doll – the two big things moving longest in the ring –
+ * as sprites over the circus. Drawn into its svg, the clown treading the ball across the ring rastered the band from
+ * its hat to the floor in every frame (perf, November 2026: the middle 44 screens a second, budget 30).
+ */
+function BallAndClown({ circus, t, at }: { circus: Circus; t: number; at: ScreenAt }) {
+  const ball = circus.bigBallAt(t);
+  const clown = circus.clownAt(t);
+  return (
+    <>
+      <Sprite at={at} x={ball.pt.x} y={ball.pt.y} pad={BIG_BALL.r + 4}>
+        <BigBall at={ORIGIN} spin={ball.spin} />
+      </Sprite>
+      {t >= circus.tFire && (
+        <Sprite at={at} x={clown.pt.x} y={clown.pt.y} pad={CLOWN_PAD} angle={rad(clown.turn)}>
+          <Clown at={ORIGIN} turn={0} arms={clown.arms} stride={clown.stride} />
+        </Sprite>
+      )}
+    </>
+  );
+}
+
+const ORIGIN: Pt = { x: 0, y: 0 };
+/** How far the clown reaches from its middle, its hat's bobble included. */
+const CLOWN_PAD = 120;
 
 /** The big starry ball the clown treads along the ring, its middle `at`, turned `spin` radians. */
 function BigBall({ at, spin }: { at: Pt; spin: number }) {

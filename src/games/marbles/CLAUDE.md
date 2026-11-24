@@ -197,9 +197,23 @@ Then a second part past the tree (`PART2`, `acornAt`, `beeAt`, `kiteAt`; a pure 
   - Dashes flowing along a long line (a power cable's current, a hose's water, a conveyor belt) are `FlowingDashes`
     (`parts.tsx`) in `over`: strips of HTML whose dashes slide by a compositor animation of `transform` – never a
     `strokeDashoffset` moved by the clock in the machine's svg, which rasters the whole band the line spans in every
-    frame (the Raketenstart's current: 52 → 43 screens a second; the Baustelle, Garten, Badezimmer, Zirkus, Große Maschine
-    and Wasserbahn still flow that way, A-37). Their keyframes move by `translateX(100%)` of a strip one period wide,
-    never by a custom property, which the compositor can't run alone.
+    frame (the Raketenstart's current: 52 → 43 screens a second). Their keyframes move by `translateX(100%)` of a strip
+    one period wide, never by a custom property, which the compositor can't run alone. They suit only a flow nothing
+    else follows: a few short or thin ones still flow by `strokeDashoffset` (the garden's hose, the bath's air, the
+    Wasserbahn's streams under the duck, which `over` would lie on), and they cost little – measure before converting
+    one, since the big costs were elsewhere (24 November 2026: what moved big and long in the svg, below).
+  - **A big or long thing that moves while something else follows it** (a belt's cleats pushing a marble, a rope's
+    knots and its pulley, a ball a clown stands on) is a row of `Sprite`s in `over`, each placed from the machine's
+    clock like the drawing was – never a CSS animation, which would drift from what it pushes. The Baustelle's belt drawn
+    in the svg rastered the band from x 754 to 1300 in every frame, 48 screens a second; as sprites (`BeltMoving`) 14.
+    The still part (frame, band, legs) stays in the svg, `memo`, drawn once. Since `over` lies over the whole machine:
+    - over a darkened room (Gute Nacht's `dark`) each sprite carries a shade of its own shape in `NIGHT` at `dark`'s
+      opacity (`RopeRunning`'s `shade(r)`), never a square shade over its whole box;
+    - a thing that starts hidden behind a part of the svg (the clown in the cannon) is drawn in the svg until it comes
+      out (`tFire`) and only then as a sprite (`BallAndClown`).
+  - Decorative flicker (the Zirkus hoop's flames) changes a few times a second (`FLICKER.steps`, a stepped `t`), not
+    in every frame, and only round its moment (`seen` and a window round `tHoop`): 16 flame paths flickering in every
+    frame were most of the Zirkus's 44 screens a second (now 31).
   - `bun run perf ketten-<id>` (`KETTEN_LEVELS` in `tools/perfScenarios.ts`) measures each level's first seconds and
     its middle; run it for the level after changing what moves in it (`ketten-` runs all 21, about 15 minutes). A
     level the scenario keeps playing by keys (the Nagelbrett) must still be running at „Mitte“: at a key every 600 ms its
