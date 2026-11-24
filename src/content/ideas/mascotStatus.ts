@@ -494,8 +494,8 @@ export const MASCOT_STATUS: MascotStatusRow[] = [
   },
   {
     href: "/zaehlturm/",
-    note: "L-18: das Fuchs- oder Bärenkind („Junge / Mädchen“) klettert Klotz für Klotz auf den Turm und greift das Ziel – es ist das Spiel.",
-    tasks: [{ label: "Fuchs- oder Bärenkind klettert auf den Turm", work: "drawing", effort: "S", state: "done" }],
+    note: "L-18: das Fuchs- oder Bärenkind („Junge / Mädchen“) hüpft auf jeden neuen Klotz des Hauses, springt auf den Balken jedes vollen Stockwerks und winkt vom Dach – es ist das Spiel.",
+    tasks: [{ label: "Fuchs- oder Bärenkind baut das Haus mit", work: "drawing", effort: "S", state: "done" }],
   },
   {
     href: "/mitmachen/",

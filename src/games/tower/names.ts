@@ -1,50 +1,47 @@
 import type { EnglishFirst } from "@/lib/language";
 
-// „Counting Tower“ (idea L-18), a game of the book „Buchstaben & Zahlen“: its name, its line, its goals' names and what
-// grown-ups find behind ⚙️ stand here in its own folder, so its row in the language table answers for them. New, so
-// English first and English only until translations are asked for (root CLAUDE.md, Language) – German included.
+// „Counting Tower“ (idea L-18), a game of the book „Buchstaben & Zahlen“: its name, its line and the few words it has
+// stand here in its own folder, so its row in the language table answers for them. In all seven app languages.
 
 /** The game's name in the book's table of contents and in the browser tab. */
-export const TOWER_TITLE: EnglishFirst = { en: "Counting Tower" };
-
-/** Its line for grown-ups in the book's table of contents. */
-export const TOWER_BLURB: EnglishFirst = { en: "Block by block up to a hundred" };
-
-/** The count goes to a hundred, ten blocks a round. */
-export const TOTAL = 100;
-export const BLOCKS = 10;
-
-/**
- * What waits up there in each round of ten, from the morning meadow to the night sky: each with its own end picture and
- * its own trophy. The higher the numbers, the higher and later it gets, up to the moon at a hundred.
- */
-export type GoalId = "balloon" | "nest" | "plane" | "cloud" | "rainbow" | "kite" | "bird" | "hotair" | "owl" | "moon";
-
-/** The goals of the rounds in order: blocks 1–10 the balloon, 11–20 the nest … 91–100 the moon. */
-export const GOAL_ORDER: GoalId[] = ["balloon", "nest", "plane", "cloud", "rainbow", "kite", "bird", "hotair", "owl", "moon"];
-
-/** Each goal's name, for „Weiter“ and the plate under its trophy. */
-export const GOAL_NAMES: Record<GoalId, EnglishFirst> = {
-  balloon: { en: "The red balloon" },
-  nest: { en: "Back to the nest" },
-  plane: { en: "The paper plane" },
-  cloud: { en: "Onto a cloud" },
-  rainbow: { en: "Down the rainbow" },
-  kite: { en: "The kite" },
-  bird: { en: "On the big bird" },
-  hotair: { en: "The hot-air balloon" },
-  owl: { en: "The little owl" },
-  moon: { en: "Up to the moon" },
+export const TOWER_TITLE: EnglishFirst = {
+  en: "Counting Tower",
+  de: "Zähl-Turm",
+  zh: "数数塔",
+  hi: "गिनती की मीनार",
+  es: "Torre de contar",
+  ar: "برج العدّ",
+  ru: "Башня счёта",
 };
 
-/** „one hundred!“, the last number word, which the two-digit words don't have. */
-export const HUNDRED: EnglishFirst = { en: "one hundred!" };
+/** Its line for grown-ups in the book's table of contents. */
+export const TOWER_BLURB: EnglishFirst = {
+  en: "A house of a hundred blocks, ten on ten",
+  de: "Ein Haus bis hundert, Zehner auf Zehner",
+  zh: "十个一层，盖一座一百块的房子",
+  hi: "सौ ब्लॉक का घर, दस पर दस",
+  es: "Una casa de cien bloques, diez sobre diez",
+  ar: "بيت من مئة مكعب، عشرة فوق عشرة",
+  ru: "Дом из ста кубиков, десяток на десяток",
+};
 
-/** Behind ⚙️ while playing: start again from 1, or start at any number and count on from there (user request). */
-export const OPTION_TEXTS = {
-  intro: { en: "Hold ⚙️ to start again or at any number" },
-  group: { en: "Counting" },
-  startAt: { en: "Start at" },
-  again: { en: "Start again" },
-  fromOne: { en: "From 1" },
+/** The count goes to a hundred: ten floors of ten blocks. */
+export const TOTAL = 100;
+export const ROW = 10;
+
+/** „one hundred!“, the last number word, which the two-digit words don't have. */
+export const HUNDRED: EnglishFirst = {
+  en: "one hundred!",
+  de: "hundert!",
+  zh: "一百！",
+  hi: "सौ!",
+  es: "¡cien!",
+  ar: "مئة!",
+  ru: "сто!",
+};
+
+/** The elevator panel's arrows, read out only: a whole ten up, or back to the ten before. */
+export const JUMP_TEXTS = {
+  up: { en: "Next ten", de: "Nächster Zehner", zh: "下一个十", hi: "अगले दस", es: "Siguiente decena", ar: "العشرة التالية", ru: "Следующий десяток" },
+  down: { en: "Ten back", de: "Zehner zurück", zh: "退回十个", hi: "दस पीछे", es: "Decena anterior", ar: "العشرة السابقة", ru: "Десяток назад" },
 } satisfies Record<string, EnglishFirst>;
