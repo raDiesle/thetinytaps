@@ -53,7 +53,7 @@ import { appleCount, appleTimes, haltMs, ladybugLaps, MAX_STOPS, pieceCount, pie
 import { PauseControls, RunClockProvider, usePausableClock, useRunClock } from "./pause";
 import { PizzaScene, SLICES } from "./pizza";
 import { CandleBackdrop, Candles, Hourglass, Layer, RAIL_Y, RailAhead, SandBackdrop, TRAIN, Train, TrainBackdrop, TrainStops } from "./scenes";
-import type { SwapToy, TimeShown, TimerPicture, TimerSettings } from "./settings";
+import type { SwapToy, TimeShown, TimerPicture, TimerSettings, TurnCount } from "./settings";
 import { noteRoom, TimeShownChoice, TimeShownNote } from "./shown";
 import { SunsetScene } from "./sunset";
 import { SwapRun } from "./SwapPlay";
@@ -102,6 +102,7 @@ export function TimerPlay({
   settings,
   onPicture,
   onToy,
+  onKids,
   onShown,
   onBar,
 }: {
@@ -109,6 +110,8 @@ export function TimerPlay({
   onPicture: (picture: TimerPicture) => void;
   /** A grown-up picks another toy for „Abwechseln“ behind ⚙️. */
   onToy: (toy: SwapToy) => void;
+  /** A grown-up sets how many children take turns on the Kugelbahn behind ⚙️. */
+  onKids: (kids: TurnCount) => void;
   /** A grown-up has the time left shown in the picture, or not, behind ⚙️. */
   onShown: (shown: TimeShown) => void;
   /** A grown-up has the bar along the bottom shown, or not, behind ⚙️. */
@@ -120,7 +123,7 @@ export function TimerPlay({
     onPicture(picture);
     again();
   };
-  return <TimerStart key={run} settings={settings} onAgain={again} onPicture={pick} onToy={onToy} onShown={onShown} onBar={onBar} />;
+  return <TimerStart key={run} settings={settings} onAgain={again} onPicture={pick} onToy={onToy} onKids={onKids} onShown={onShown} onBar={onBar} />;
 }
 
 /**
@@ -132,6 +135,7 @@ function TimerStart({
   onAgain,
   onPicture,
   onToy,
+  onKids,
   onShown,
   onBar,
 }: {
@@ -139,6 +143,7 @@ function TimerStart({
   onAgain: () => void;
   onPicture: (picture: TimerPicture) => void;
   onToy: (toy: SwapToy) => void;
+  onKids: (kids: TurnCount) => void;
   onShown: (shown: TimeShown) => void;
   onBar: (bar: boolean) => void;
 }) {
@@ -189,6 +194,8 @@ function TimerStart({
         until={until}
         toy={settings.toy}
         onToy={onToy}
+        kids={settings.kids}
+        onKids={onKids}
         timeShown={settings.timeNote}
         onShown={onShown}
         bar={settings.bar}

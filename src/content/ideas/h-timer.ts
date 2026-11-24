@@ -371,6 +371,9 @@ export const timerIdeas: IdeaArea = {
       text: "Hinter ⚙️ „Wie viele Kinder?“ 2, 3 oder 4. Die Kissen stehen im Halbkreis um die Sanduhr, jedes mit seiner Farbe und Lampe, und das Spielzeug geht reihum. Wer schon dran war, bekommt ein kleines Häkchen auf sein Kissen, bis alle einmal dran waren.",
       why: "Geschwister sind oft mehr als zwei, und bei Besuch oder in der Kita streiten drei um dasselbe Bobbycar; reihum ist für Kinder ein vertrautes, gerechtes Prinzip.",
       effort: "M",
+      done: true,
+      partial:
+        "Gebaut zusammen mit H-117 als Bild „Kugelbahn“ (24. November 2026, Wunsch: „von Weitem klar, welches Kind dran ist, einstellbar von 2 bis 4 Kindern“), nicht mit Kissen um die Sanduhr: Hinter ⚙️ „Wie viele Kinder?“ 2, 3 oder 4; dann stehen so viele Becher nebeneinander – Fuchs, Bär, Hase (blau, lange Ohren), Frosch (grün, runde Augenbuckel), keine Gesichter. Statt eines Häkchens bleibt die Murmel, die in den Becher eines Kindes gefallen ist, darin liegen, bis alle einmal dran waren; dann sind die Becher wieder leer. „Wer ist dran?“ hinter ⚙️ nennt alle Kinder; wechselt die Zahl, geht es mit dem Kind weiter, das gerade dran ist, sonst mit dem ersten.",
     },
     {
       id: "H-116",
@@ -387,6 +390,9 @@ export const timerIdeas: IdeaArea = {
       text: "Eine Murmel (oder ein kleiner Zug) fährt während der ganzen Runde auf einer geschwungenen Bahn von der Seite des einen Kindes zur Seite des anderen und fällt dort in seinen Becher – dann ist es dran, und die Bahn kippt zurück. Man sieht jederzeit, wohin es geht und wie weit es noch ist.",
       why: "Ein Weg mit einem Ziel beim wartenden Kind zeigt Richtung und Rest der Zeit in einem Bild, wie der Zug zum Bahnhof, den Kinder im Timer schon kennen.",
       effort: "M",
+      done: true,
+      partial:
+        "Gebaut als Bild „Kugelbahn“ in der Gruppe Abwechseln, zusammen mit H-115 (24. November 2026, marbleRun.tsx). An der Wand des Kinderzimmers hängt eine hölzerne Kugelbahn: oben links ein Glas voller Murmeln, darunter vier Zickzack-Rampen mit runden Kurven und unten eine Schiene über den Bechern der Kinder. Die ganze Runde lang rollt eine Murmel gleichmäßig hinunter (sie dreht sich mindestens eine halbe Umdrehung pro Sekunde, so bewegt sich auch bei langen Runden sichtbar etwas, und klackt leise in jeder Kurve), die Klappe über dem Becher des nächsten Kindes steht offen, und am Ende der Runde fällt sie dort hinein – dann ist dieses Kind dran. Von Weitem: Der Streifen des Zimmers über dem Becher des Kindes, das dran ist, liegt im warmen Licht, alle anderen im selben dunklen Schatten wie bei Abwechseln, und die Leiste unten hat die Farbe dieses Kindes. Ein Tippen lässt den Becher aufleuchten, in den die Murmel rollt. Die Bahn kippt nicht zurück; jede Runde kommt eine neue Murmel in einer anderen Farbe aus dem Glas.",
     },
     // Aufräumen (user request, 21 November 2026): a timer made for tidying up, best at 5 minutes – ideas collected, the
     // best one (H-118) built, and the user's own idea of a fixed 5-minute tidy-up song (H-119) taken up.
