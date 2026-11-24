@@ -12,6 +12,8 @@ drops its next marble by itself once none falls (`AUTO_DROP_MS`). The child may 
 answers – but never has to. There is no choice for it either: „Mitmachen“ (👆 Kind tippt / 🔄 Von selbst) over the cards
 was taken out with this, and „Von selbst“ is how every level plays. A new level keeps to it: one tap to start, then it
 plays through; never a place that waits for the child, nor an option to bring one back (`track.test.ts`).
+Only the level's end waits: `GameEnd`'s „Weiter“ is never pressed for the child – the next level never starts by itself
+(user decision, 24 November 2026, asked when the levels began to run through).
 One ball in the goal is enough for a level's trophy (user decision, November 2026): where several balls are played (the
 marble runs' basket or tubes, the Nagelbrett's bins) the first one landing calls `LevelProps.onGoal`, which awards it at
 once; a new level with such a goal calls it too. Kettenreaktion's trophies hold a ball lying in their cup (`BALL_GAMES` in
