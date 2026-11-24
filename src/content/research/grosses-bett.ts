@@ -21,6 +21,7 @@ export const grossesBett: Research = {
     "Aus dem Familienbett: zuerst Mittagsschlaf im eigenen Bett, ein Erwachsener liegt daneben und rückt später weiter weg (Zero to Three); nicht drängen, das Kind darf nachts kommen (DAK, Graf & Seide). Schlaf lässt sich nicht erzwingen, Schreienlassen lehnt Renz-Polster ab, Schlaflernprogramme sind umstritten (BZgA). Im Buch zieht Bruno so in sein Zimmer, und ruft er, kommt jemand.",
     "Ängste ernst nehmen, nie „ist doch nur ein Traum“ – trösten, zuhören, bleiben (BZgA). Im Buch: Mama kommt sofort, hört zu und legt sich neben das Bett.",
     "Belohnungen für das Schlafen sind umstritten: Sleep Foundation und CDC raten zu Stickern, die AAP nur zu Lob, Graf & Seide nennen Belohnungssysteme eine Krücke, falsch wo Angst oder Nähebedürfnis dahinterstecken. Im Buch daher nur Lob und Stolz am Morgen; die Sternentafel (Belohnungstafel) bleibt die Entscheidung der Eltern.",
+    "Nachtrag 24. November 2026, ohne neue Lektüre: Für die zweite Geschichte des Buchs „Bett“, „Tapsi's Own Bed“ (H-148), nimmt die Familie die Entscheidung, die die Quellen offenlassen – das Kind soll aus dem Elternbett ins eigene (Wunsch der Nutzerin). Sie folgt den Schritten oben, die auch dafür gelten: vorher erzählen (Zero to Three, Sleep Foundation) und den Wunsch zu bleiben anhören, das Vertraute mitnehmen (ein Kissen, das nach Zuhause riecht, Hase, Pregnancy Birth and Baby), Nachtlicht und offene Tür (BZgA), zuerst Mittagsschlaf mit einem Erwachsenen daneben, der dann Abend für Abend weiter wegrückt (Zero to Three), dasselbe Abendritual (AAP), nachts ruhig und so oft wie nötig zurückbringen, ohne Strafe (AAP, Better Health), und kein Stickerplan (Graf & Seide). Was sie den Eltern lässt, die das Kommen erlauben (DAK, Graf & Seide): Mama wacht auf und nimmt Tapsi zuerst in den Arm, bevor sie zurückbringt, und das Morgenkuscheln im großen Bett bleibt.",
   ],
   topics: [],
   games: [],
@@ -31,7 +32,7 @@ export const grossesBett: Research = {
     },
     {
       title: "Eine Regel zum Elternbett",
-      why: "Die Quellen widersprechen sich (DAK und Graf & Seide: das Kind darf kommen; andere raten, es zurückzubringen). Das Buch zeigt Eltern, die nah sind und kommen, und lässt die Regel jeder Familie.",
+      why: "Die Quellen widersprechen sich (DAK und Graf & Seide: das Kind darf kommen; andere raten, es zurückzubringen). Die erste Geschichte zeigt Eltern, die nah sind und kommen, und lässt die Regel jeder Familie; die zweite (H-148, 24. November 2026) ist für die Familien, die sich fürs eigene Bett entschieden haben, und bleibt dabei sanft: zurückbringen nur ruhig und mit Umarmung, das Morgenkuscheln im großen Bett bleibt.",
     },
     {
       title: "Schreienlassen, Strafen, eine abgeschlossene Tür, sofort aus dem Zimmer gehen",
@@ -50,7 +51,7 @@ export const grossesBett: Research = {
       why: "Die AAP und die Sleep Foundation raten bei Kleinkindern von Hochbetten ab; in jedem Bild liegt das Kind sicher im Bett.",
     },
   ],
-  ideas: ["H-106"],
+  ideas: ["H-106", "H-148"],
   sources: [
     {
       label: "AAP HealthyChildren: Big Kid Beds – When to Make the Switch",

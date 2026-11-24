@@ -33,6 +33,7 @@ import { PACIFIER_STORY_RU as pacifierStory } from "@/games/pacifierstory/ru";
 import { KITA_STORY_RU as kitaStory } from "@/games/kitastory/ru";
 import { HAIR_STORY_RU as hairStory } from "@/games/hairstory/ru";
 import { HAIR_SHOWER_RU as hairShower } from "@/games/hairshower/ru";
+import { OWN_BED_RU as ownBed } from "@/games/ownbed/ru";
 import { CHILDMINDER_RU as childminder } from "@/games/childminder/ru";
 import { NIGHT_MILK_RU as nightMilk } from "@/games/nightmilk/ru";
 import { GOODBYE_MILK_RU as goodbyeMilk } from "@/games/milkgoodbye/ru";
@@ -86,6 +87,7 @@ export const TEXTS: LanguageTexts = {
   kitaStory,
   hairStory,
   hairShower,
+  ownBed,
   childminder,
   nightMilk,
   goodbyeMilk,

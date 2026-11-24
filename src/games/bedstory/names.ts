@@ -15,15 +15,29 @@ export const BED_STORY_TITLE: EnglishFirst = {
   ru: "Большая кровать Тапси",
 };
 
-/** The name of its book on the shelf, among the Alltagshelfer beside „Hair Washing“: what parents look for. */
+/**
+ * The name of its book on the shelf, among the Alltagshelfer beside „Hair Washing“: what parents look for. „Big Bed“
+ * until its second story, „Tapsi's Own Bed“ out of the parents' bed, made it a book about beds (user request, 24 November 2026).
+ */
 export const BED_STORY_BOOK: EnglishFirst = {
-  en: "Big Bed",
-  de: "Großes Bett",
-  zh: "大床",
-  hi: "बड़ा बिस्तर",
-  es: "Cama grande",
-  ar: "السرير الكبير",
-  ru: "Большая кровать",
+  en: "Bed",
+  de: "Bett",
+  zh: "床",
+  hi: "बिस्तर",
+  es: "Cama",
+  ar: "السرير",
+  ru: "Кровать",
+};
+
+/** What the story is about, on its line in the book's choice beside „Tapsi's Own Bed“. */
+export const BED_STORY_KIND: EnglishFirst = {
+  en: "From the cot",
+  de: "Aus dem Gitterbett",
+  zh: "从小床搬出来",
+  hi: "पालने से",
+  es: "De la cuna",
+  ar: "من السرير الصغير",
+  ru: "Из кроватки",
 };
 
 /** Its line for grown-ups. */

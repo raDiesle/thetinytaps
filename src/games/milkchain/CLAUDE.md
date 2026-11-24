@@ -26,7 +26,7 @@ Tapsi misses it, lays the head on Mama's breast and hears her heart, and Mama an
 - `MilkChainGame.tsx` is the book: one line per story and in it its versions (the long story whole and short
   here, „Mit Abschiedsfest“ from `src/games/milkgoodbye/story.ts`, „Nachts abstillen“ from `src/games/nightmilk/story.ts`),
   handed to `storyBook` and `StoryBookGame` of `src/components/StoryChoice.tsx` – the choice every chapter book opens on
-  since 23 November 2026 (Schnullerfee, Kita-Start, Haare waschen, Flasche abgewöhnen and Großes Bett too; a change there
+  since 23 November 2026 (Schnullerfee, Kita-Start, Haare waschen, Flasche abgewöhnen and Bett too; a change there
   reaches all). It opens on the choice (`?seite=inhalt`, `DevTag` `A0`): one big line per story – its
   picture, what it is for (`*_KIND`) and its title small under it where it differs – and a paper slip per version to start it („Ganze
   Geschichte“ / „Kurzfassung“, „Lesen“ where there is one), with its pictures and minutes small under its word

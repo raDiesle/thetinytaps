@@ -1,6 +1,7 @@
 import { TRANSLATION as fireRescue } from "@/games/adventure/stories/fireRescue/lines.de";
 import { HAIR_STORY_DE as hairStory } from "@/games/hairstory/de";
 import { HAIR_SHOWER_DE as hairShower } from "@/games/hairshower/de";
+import { OWN_BED_DE as ownBed } from "@/games/ownbed/de";
 import { CHILDMINDER_DE as childminder } from "@/games/childminder/de";
 import { NIGHT_MILK_DE as nightMilk } from "@/games/nightmilk/de";
 import { GOODBYE_MILK_DE as goodbyeMilk } from "@/games/milkgoodbye/de";
@@ -17,6 +18,7 @@ import type { LanguageTexts } from ".";
 export const TEXTS: LanguageTexts = {
   hairStory,
   hairShower,
+  ownBed,
   childminder,
   nightMilk,
   goodbyeMilk,

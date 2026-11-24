@@ -391,6 +391,13 @@ export const SEO_TEXTS: PageSeo[] = [
     text: "Eine Geschichte zum Vorlesen, Kapitel für Kapitel, wenn das Gitterbett zu klein wird und ein großes Bett kommt. Tapsi der Fuchs stößt beim Strecken mit den Füßen ans Ende und klettert über die Stäbe, und Papa ist gleich da. Mama schaut mit Tapsi ein Bilderbuch an und erzählt, dass das große Bett genau dort stehen wird, wo jetzt das Gitterbett steht, und dass der Kuschelhase, die kleine gelbe Decke und ihr Lied mitkommen. Tapsi sucht die blaue Bettwäsche aus, sagt dem Gitterbett Tschüss und danke, reicht Papa beim Aufbauen die Bretter und macht mit Mama das Bett. Ein kleines Gitter hält Tapsi im Bett, ein Nachtlicht in Mondform leuchtet, und das erste Schlafen im großen Bett ist ein Mittagsschlaf. Am Abend ist alles wie immer – Schlafanzug, Zähne, Geschichte, Lied –, und Papa verspricht nachzuschauen und kommt auch. Steht Tapsi nachts auf, bringt Papa Tapsi ruhig zurück, so oft es nötig ist. Mama sitzt beim Einschlafen auf einem Stühlchen am Bett und rückt jeden Abend ein Stück weiter zur Tür, und am Morgen freuen sich alle mit Tapsi. Danach zieht Tapsis Bärenfreund Bruno aus dem Bett der Eltern in sein eigenes, und nach einem bösen Traum kommt Mama sofort, hört zu und bleibt. Ohne Schimpfen, ohne Schreienlassen, ohne Stickerplan. Auf der ersten Seite steht, wie viele Bilder die Geschichte hat und wie lange sie ungefähr dauert, und gelesen wird immer von vorn; unter jedem Bild steht der Satz zum Vorlesen, und jedes Tippen blättert weiter.",
   },
   {
+    path: "/grosses-bett/eigenes-bett/",
+    title: "Im eigenen Bett schlafen – eine Geschichte",
+    description:
+      "Eine Vorlesegeschichte in Kapiteln aus dem Elternbett: Tapsi der Fuchs zieht ins eigene Bett, mit Hase, Mondlicht und Morgenkuscheln im großen Bett.",
+    text: "Eine Geschichte zum Vorlesen, Kapitel für Kapitel, für Familien, die möchten, dass ihr Kind im eigenen Bett schläft statt im Elternbett. Tapsi der Fuchs schläft zwischen Mama und Papa im großen Bett, dreht sich nachts und strampelt, und Papa liegt ganz am Rand. Mama erzählt Tapsi vorher, dass Tapsi bald im eigenen Bett schläft, im eigenen Zimmer, und als Tapsi sagt „Aber ich will bei euch schlafen!“, hört sie zu und nimmt Tapsi in den Arm: Wir sind immer ganz nah. Papa verspricht, dass es jeden Morgen Kuscheln im großen Bett gibt. Tapsi trägt das Kissen, das nach Zuhause riecht, ins neue Bett, der Kuschelhase sitzt darauf, ein Nachtlicht in Mondform leuchtet, und die Tür bleibt offen. Zuerst gibt es dort nur den Mittagsschlaf, und Mama liegt auf dem Teppich daneben. Am Abend ist alles wie immer – Schlafanzug, Zähne, Geschichte, Lied –, Papa liegt neben dem Bett und hält Tapsis Pfote und sitzt dann jeden Abend ein Stückchen weiter weg, bis er an der Tür summt. Kommt Tapsi nachts herüber, nimmt Mama Tapsi in den Arm und bringt Tapsi ruhig zurück, so oft es nötig ist, und bleibt, bis Tapsi schläft. Am Morgen klettert Tapsi stolz zum Kuscheln ins große Bett. Ohne Schimpfen, ohne Schreienlassen, ohne Stickerplan. Im Buch „Bett“ steht sie neben der Geschichte vom Gitterbett ins große Bett, jede mit der Zahl ihrer Bilder und ihrer ungefähren Dauer; unter jedem Bild steht der Satz zum Vorlesen, und jedes Tippen blättert weiter.",
+  },
+  {
     path: "/abstillen/",
     title: "Abstillen mit Geschichte – Tapsis Milchkette",
     description:
@@ -562,7 +569,8 @@ export const SEO_TEXTS: PageSeo[] = [
  * in the queue: its texts wait here like an unfinished game's, out of the search pages and `noindex` until it shows.
  */
 const WAITING_PATHS: string[] = [
-  // None now: the three second stories of 23 November 2026 were published once their pictures were made.
+  // „Tapsi's Own Bed“ (src/games/ownbed, 24 November 2026): its pictures wait in the queue (OWN_BED_PICTURE_QUEUE).
+  "/grosses-bett/eigenes-bett/",
 ];
 
 /** Every page that should be found: all but the games still being built (`Game.unfinished`), which no one is to find yet. */

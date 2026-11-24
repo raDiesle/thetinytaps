@@ -229,9 +229,22 @@ export const LANGUAGE_STATUS: LanguageStatusRow[] = [
   },
   {
     href: "/grosses-bett/",
-    note: 'Das Buch „Großes Bett“ mit „Tapsi\'s Big Bed“, einer Geschichte in Kapiteln (bedStory.ts, 21. November 2026), Englisch zuerst geschrieben (ChapterBook first="en"): Name, Satz fürs Regal (names.ts), Kapitel und Sätze; am 22. November 2026 in alle sechs anderen Sprachen übersetzt, Deutsch eingeschlossen (<Sprache>.ts im Ordner, geladen über texts-<Sprache>.ts). Tapsis Stimme liest jede Seite vor, Vorgelesen am 23. November 2026 von ElevenLabs gesprochen mit den Klonen von Tapsis Stimme im zweiten Konto: Englisch, Chinesisch, Hindi, Spanisch und Arabisch mit „Tapsi Coach (Klon)“, Deutsch mit „Tapsi Coach (Klon de)“, Russisch mit „Tapsi Coach (Klon ru)“, jede Geschichte ganz aus einer Stimme. Die Texte für Suchmaschinen sind in allen sieben Sprachen da.',
-    recorded: true,
-    languages: { de: "done", en: "done", zh: "done", hi: "done", es: "done", ar: "done", ru: "done" },
+    note: "Das Buch „Bett“ (bis 24. November 2026 „Großes Bett“) mit zwei Geschichten in Kapiteln, gewählt auf seiner ersten Seite (StoryChoice), die Tapsis Stimme vorliest; unten rechts über ▶ schaltet ein Lautsprecher sie für Erwachsene aus, die selbst vorlesen. Der Name des Buchs (names.ts) ist in allen sieben Sprachen da.",
+    parts: [
+      {
+        label: "🛏️ Tapsi's Big Bed",
+        recorded: true,
+        languages: { de: "done", en: "done", zh: "done", hi: "done", es: "done", ar: "done", ru: "done" },
+        note: 'Die Geschichte vom Gitterbett ins große Bett (bedStory.ts, 21. November 2026), Englisch zuerst geschrieben (ChapterBook first="en"): Titel, Satz fürs Regal (names.ts), Kapitel und Sätze; am 22. November 2026 in alle sechs anderen Sprachen übersetzt, Deutsch eingeschlossen (<Sprache>.ts im Ordner, geladen über texts-<Sprache>.ts). Vorgelesen am 23. November 2026 von ElevenLabs gesprochen mit den Klonen von Tapsis Stimme im zweiten Konto: Englisch, Chinesisch, Hindi, Spanisch und Arabisch mit „Tapsi Coach (Klon)“, Deutsch mit „Tapsi Coach (Klon de)“, Russisch mit „Tapsi Coach (Klon ru)“, die Geschichte ganz aus einer Stimme. Ihr Name in der Wahl („Aus dem Gitterbett“, BED_STORY_KIND) kam am 24. November 2026 in allen sieben Sprachen dazu. Die Texte für Suchmaschinen sind in allen sieben Sprachen da.',
+      },
+      {
+        label: "🌙 Tapsi's Own Bed",
+        recorded: true,
+        languages: { de: "text", en: "text", zh: "text", hi: "text", es: "text", ar: "text", ru: "text" },
+        note: 'Die zweite Geschichte aus dem Elternbett ins eigene Bett (H-148, ownBed.ts, /grosses-bett/eigenes-bett/, 24. November 2026), Englisch zuerst geschrieben (ChapterBook first="en") und am selben Tag in alle sechs anderen Sprachen übersetzt, Deutsch eingeschlossen: Titel und Name in der Wahl (names.ts), Kapitel und Sätze in <Sprache>.ts im Ordner, geladen über texts-<Sprache>.ts. Noch nicht vorgelesen: Tapsis Stimme nimmt sie erst auf, wenn es gewünscht wird (recordedLines.ts „grosses-bett-eigenes“, wie die erste Geschichte mit den Klonen im zweiten Konto, die Geschichte ganz aus einer Stimme). Die Texte für Suchmaschinen sind in allen sieben Sprachen da; die Seite bleibt auf noindex, bis die 21 Bilder aus der Warteschlange gemacht sind.',
+        files: ["src/games/ownbed/names.ts", "src/games/ownbed/story.ts", "src/games/ownbed/ownBed.ts", "src/games/ownbed/ownBedPictures.ts"],
+      },
+    ],
   },
   {
     href: "/zaehne/",

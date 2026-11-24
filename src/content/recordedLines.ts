@@ -138,6 +138,7 @@ export const RECORDED_GAMES: RecordedGame[] = [
   { name: "schnullerbaum", folder: "src/games/pacifiertree/stimme", lines: spoken("/schnullerfee/baum/", { first: "en" }) },
   { name: "flaeschchen", folder: "src/games/bottlestory/stimme", lines: spoken("/flaeschchen/", { first: "en" }) },
   { name: "grosses-bett", folder: "src/games/bedstory/stimme", lines: spoken("/grosses-bett/", { first: "en" }) },
+  { name: "grosses-bett-eigenes", folder: "src/games/ownbed/stimme", lines: spoken("/grosses-bett/eigenes-bett/", { first: "en" }) },
 ];
 
 /** The languages these games are recorded in: the app's. */

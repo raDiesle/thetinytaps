@@ -67,6 +67,7 @@ import { SHOWER_STORY } from "@/games/hairshower/hairShower";
 import { CHILDMINDER_STORY } from "@/games/childminder/childminder";
 import { BOTTLE_STORY } from "@/games/bottlestory/bottleStory";
 import { BED_STORY } from "@/games/bedstory/bedStory";
+import { OWN_BED_STORY } from "@/games/ownbed/ownBed";
 import { MILK_CHAIN } from "@/games/milkchain/milkChain";
 import { PACIFIER_STORY } from "@/games/pacifierstory/pacifierStory";
 import { DONE_SAY, TIDY_SAY } from "@/games/teeth/lines";
@@ -89,6 +90,7 @@ import hairShowerFiles from "../games/hairshower/stimme/en/*.mp3?glob";
 import childminderFiles from "../games/childminder/stimme/en/*.mp3?glob";
 import bottleFiles from "../games/bottlestory/stimme/en/*.mp3?glob";
 import bedFiles from "../games/bedstory/stimme/en/*.mp3?glob";
+import ownBedFiles from "../games/ownbed/stimme/en/*.mp3?glob";
 import milkChainFiles from "../games/milkchain/stimme/*.mp3?glob";
 import pacifierFiles from "../games/pacifierstory/stimme/*.mp3?glob";
 import animalsFiles from "../games/animals/stimme/*.mp3?glob";
@@ -381,6 +383,7 @@ const HAIR_SHOWER_TEXTS = byLanguage((texts) => texts.hairShower);
 const CHILDMINDER_TEXTS = byLanguage((texts) => texts.childminder);
 const BOTTLE_TEXTS = byLanguage((texts) => texts.bottleStory);
 const BED_TEXTS = byLanguage((texts) => texts.bedStory);
+const OWN_BED_TEXTS = byLanguage((texts) => texts.ownBed);
 
 /**
  * A chapter book read aloud (`ChapterBook`'s `voice`): each page's sentence, in `language` where it is translated, else
@@ -598,6 +601,7 @@ const RECORDED = new Set(
     childminderFiles,
     bottleFiles,
     bedFiles,
+    ownBedFiles,
   ].flatMap((files) => Object.keys(files).map((file) => file.slice(file.lastIndexOf("/") + 1, -4).replace(/^en-/, ""))),
 );
 
@@ -650,6 +654,7 @@ export function voiceLines(language: TargetLanguageId = "de"): VoiceGame[] {
     { href: "/kita/tagesmutter/", groups: chapterBook(CHILDMINDER_STORY, language, CHILDMINDER_TEXTS, "en") },
     { href: "/flaeschchen/", groups: chapterBook(BOTTLE_STORY, language, BOTTLE_TEXTS, "en") },
     { href: "/grosses-bett/", groups: chapterBook(BED_STORY, language, BED_TEXTS, "en") },
+    { href: "/grosses-bett/eigenes-bett/", groups: chapterBook(OWN_BED_STORY, language, OWN_BED_TEXTS, "en") },
     {
       href: "",
       groups: [

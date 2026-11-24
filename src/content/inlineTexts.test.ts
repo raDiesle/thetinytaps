@@ -47,7 +47,7 @@ const FOLDERS: Record<string, string[]> = {
   "/schnullerfee/": ["src/games/pacifierstory", "src/games/pacifiertree"],
   "/kita/": ["src/games/kitastory", "src/games/childminder"],
   "/haare-waschen/": ["src/games/hairstory", "src/games/hairshower"],
-  "/grosses-bett/": ["src/games/bedstory"],
+  "/grosses-bett/": ["src/games/bedstory", "src/games/ownbed"],
   "/haende-waschen/": ["src/games/handwash"],
   "/flaeschchen/": ["src/games/bottlestory"],
   // The night story is a volume of the book Abstillen, a part of its row with its own files.

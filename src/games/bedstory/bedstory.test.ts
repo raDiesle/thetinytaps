@@ -7,7 +7,7 @@ import { BED_STORY_ES } from "./es";
 import { BED_STORY_HI } from "./hi";
 import { BED_STORY_RU } from "./ru";
 import { BED_STORY_ZH } from "./zh";
-import { BED_STORY_BLURB, BED_STORY_BOOK, BED_STORY_TITLE } from "./names";
+import { BED_STORY_BLURB, BED_STORY_BOOK, BED_STORY_KIND, BED_STORY_TITLE } from "./names";
 
 /** Every translation of the story (user request, 22 November 2026). */
 const TRANSLATIONS = { de: BED_STORY_DE, zh: BED_STORY_ZH, hi: BED_STORY_HI, es: BED_STORY_ES, ar: BED_STORY_AR, ru: BED_STORY_RU };
@@ -144,7 +144,8 @@ describe("Tapsi's Big Bed", () => {
       expect(Object.keys(t.chapters).sort(), language).toEqual(BED_STORY.map((c) => c.id).sort());
       expect(Object.keys(t.pages).sort(), language).toEqual(BED_PAGES.map((p) => p.id).sort());
       for (const text of [...Object.values(t.chapters), ...Object.values(t.pages)]) expect(text.trim().length, language).toBeGreaterThan(0);
-      for (const names of [BED_STORY_TITLE, BED_STORY_BOOK, BED_STORY_BLURB]) expect(names[language as keyof typeof names], language).toBeTruthy();
+      for (const names of [BED_STORY_TITLE, BED_STORY_BOOK, BED_STORY_KIND, BED_STORY_BLURB])
+        expect(names[language as keyof typeof names], language).toBeTruthy();
     }
   });
 

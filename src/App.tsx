@@ -77,7 +77,7 @@ const HairStoryPage = page(
   "/haare-waschen/dusche/kurz/",
 );
 const BottleStoryPage = page(() => import("@/pages/BottleStoryPage"), "BottleStoryPage", "/flaeschchen/", "/flaeschchen/kurz/");
-const BedStoryPage = page(() => import("@/pages/BedStoryPage"), "BedStoryPage", "/grosses-bett/");
+const BedStoryPage = page(() => import("@/pages/BedStoryPage"), "BedStoryPage", "/grosses-bett/", "/grosses-bett/eigenes-bett/");
 const PottyPage = page(() => import("@/pages/PottyPage"), "PottyPage", "/toepfchen/");
 const RewardsPage = page(() => import("@/pages/RewardsPage"), "RewardsPage", "/belohnungstafel/");
 const PlannerPage = page(() => import("@/pages/RewardsPage"), "PlannerPage", "/tagesplan/");
@@ -153,6 +153,7 @@ export function App() {
           <Route path="flaeschchen" element={<BottleStoryPage />} />
           <Route path="flaeschchen/kurz" element={<BottleStoryPage />} />
           <Route path="grosses-bett" element={<BedStoryPage />} />
+          <Route path="grosses-bett/eigenes-bett" element={<BedStoryPage />} />
           <Route path="belohnungstafel" element={<RewardsPage />} />
           {/* The Tagesplan shares the Belohnungstafel's page; its own address opens it on a plan (and keeps its search entry). */}
           <Route path="tagesplan" element={<PlannerPage />} />

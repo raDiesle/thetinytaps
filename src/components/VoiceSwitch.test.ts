@@ -5,7 +5,7 @@ import { voiceLines } from "@/content/voiceLines";
 
 // The loudspeaker that switches a story's voice off stands only where a grown-up may want to tell the story in their
 // own words (user decisions, November 2026): Gefühle's „Alltagssituationen“ and the chapter books read aloud by
-// Tapsi's voice – Abstillen (with its night story and „Three More Sleeps“), Schnullerfee, Kita-Start, Hair Washing, Bottle to Cup and Big Bed. Never a pattern for other games (root CLAUDE.md).
+// Tapsi's voice – Abstillen (with its night story and „Three More Sleeps“), Schnullerfee, Kita-Start, Hair Washing, Bottle to Cup and Bed (both its stories). Never a pattern for other games (root CLAUDE.md).
 
 /** Every .ts and .tsx file under src, tests left out. */
 const SOURCES = [...new Bun.Glob("src/**/*.{ts,tsx}").scanSync()].filter((file) => !/\.test\.tsx?$/.test(file));
@@ -26,6 +26,7 @@ const BOOKS = [
   { file: "src/games/pacifierstory/PacifierStoryGame.tsx", href: "/schnullerfee/baum/", name: "schnullerbaum", folder: "src/games/pacifiertree/stimme" },
   { file: "src/games/bottlestory/BottleStoryGame.tsx", href: "/flaeschchen/", name: "flaeschchen", folder: "src/games/bottlestory/stimme" },
   { file: "src/games/bedstory/BedStoryGame.tsx", href: "/grosses-bett/", name: "grosses-bett", folder: "src/games/bedstory/stimme" },
+  { file: "src/games/bedstory/BedStoryGame.tsx", href: "/grosses-bett/eigenes-bett/", name: "grosses-bett-eigenes", folder: "src/games/ownbed/stimme" },
 ];
 
 describe("the voice switch", () => {

@@ -115,8 +115,11 @@ export const MASCOT_STATUS: MascotStatusRow[] = [
   },
   {
     href: "/grosses-bett/",
-    note: "Gemini-Bilder wie bei „Abstillen“: Tapsi, Mama und Papa Fuchs in derselben Wohnung, im Bett, das Tapsi in den anderen Büchern hat; dazu Bruno, Tapsis Bärenfreund aus „Kita-Start“, mit Mama und Papa Bär in ihrem Schlafzimmer und in Brunos Zimmer.",
-    tasks: [{ label: "Tapsi, Mama, Papa Fuchs und Brunos Bärenfamilie in den Bildern", work: "picture", pictures: 34, effort: "M" }],
+    note: "Gemini-Bilder wie bei „Abstillen“: Tapsi, Mama und Papa Fuchs in derselben Wohnung, im Bett, das Tapsi in den anderen Büchern hat; dazu Bruno, Tapsis Bärenfreund aus „Kita-Start“, mit Mama und Papa Bär in ihrem Schlafzimmer und in Brunos Zimmer. Die zweite Geschichte „Tapsi's Own Bed“ (H-148) spielt in derselben Wohnung, dazu im Schlafzimmer von Mama und Papa Fuchs.",
+    tasks: [
+      { label: "Tapsi, Mama, Papa Fuchs und Brunos Bärenfamilie in den Bildern", work: "picture", pictures: 34, effort: "M", state: "done" },
+      { label: "Tapsi, Mama und Papa Fuchs in „Tapsi's Own Bed“ (Bilder in der Warteschlange)", work: "picture", pictures: 21, effort: "M" },
+    ],
   },
   {
     href: "/zaehne/",

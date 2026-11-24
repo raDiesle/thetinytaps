@@ -11,6 +11,7 @@ import { NIGHT_PICTURE_QUEUE } from "@/games/nightmilk/nightMilkPictures";
 import { GOODBYE_PICTURE_QUEUE } from "@/games/milkgoodbye/goodbyeMilkPictures";
 import { TREE_PICTURE_QUEUE } from "@/games/pacifiertree/pacifierTreePictures";
 import { SHOWER_PICTURE_QUEUE } from "@/games/hairshower/hairShowerPictures";
+import { OWN_BED_PICTURE_QUEUE } from "@/games/ownbed/ownBedPictures";
 import { CHILDMINDER_PICTURE_QUEUE } from "@/games/childminder/childminderPictures";
 import { BOTTLE_PICTURE_QUEUE } from "@/games/bottlestory/bottleStoryPictures";
 import { BED_PICTURE_QUEUE } from "@/games/bedstory/bedStoryPictures";
@@ -103,6 +104,7 @@ export const PICTURE_QUEUE: QueuedPicture[] = [
   ...GOODBYE_PICTURE_QUEUE,
   ...TREE_PICTURE_QUEUE,
   ...SHOWER_PICTURE_QUEUE,
+  ...OWN_BED_PICTURE_QUEUE,
   ...CHILDMINDER_PICTURE_QUEUE,
   ...BOTTLE_PICTURE_QUEUE,
   ...CAUSE_PICTURE_QUEUE,

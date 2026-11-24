@@ -310,5 +310,16 @@ export const everydayHelpersIdeas: IdeaArea = {
       partial:
         "Gebaut am 23. November 2026 als „Tapsi Goes to Lotta's“ (src/games/childminder): 28 Seiten in sieben Kapiteln nach denselben Schritten wie die Kita-Geschichte, ganz unter /kita/tagesmutter/ und als Kurzfassung aus 13 eigenen Seiten unter /kita/tagesmutter/kurz/. Lotta ist eine Bärin, die in ihrer Wohnung auf ein paar Kinder aufpasst (Emil, ein Baby und ein größeres Mädchen): Besuch mit Papa vorher, Mama auf Lottas Sofa, „Ich gehe kurz hinaus“, Tapsi weint und Lotta tröstet, Apfel am großen Küchentisch, das Abschiedsritual mit dem Marienkäfer-Haken, „Ich hole dich nach dem Mittagsschlaf ab“ und Winken am Küchenfenster, dann mit dem Bollerwagen zum Spielplatz, Nudeln am Küchentisch und Mittagsschlaf im kleinen Bett bei Lotta. In der Wahl des Buchs heißen die beiden „In der Kita“ und „Bei der Tagesmutter“. Die offene Frage ist beantwortet (Recherche „kita-eingewoehnung“, Nachtrag): am 1. März 2026 waren 109 351 Kinder unter drei in der Kindertagespflege, rund jedes siebte betreute; wie oft gesucht wird, wurde nicht gemessen. Englisch zuerst, in alle sieben Sprachen übersetzt, Suchtexte in allen sieben. Die 28 Bilder warten in der Bilder-Warteschlange (Claude Cloud), bis dahin sehen Spieler die Geschichte nicht; Aufnahmen nur auf Wunsch.",
     },
+    {
+      id: "H-148",
+      emoji: "🌙",
+      title: "Bett: eine zweite Geschichte aus dem Elternbett ins eigene Bett",
+      text: "Das Buch „Großes Bett“ heißt „Bett“ und bekommt eine zweite Geschichte neben „Tapsi's Big Bed“, gewählt wie bei Abstillen (StoryChoice), mit eigener Adresse: Tapsi schläft bei Mama und Papa und soll ins eigene Bett im eigenen Zimmer. Vorher erzählen, den Wunsch zu bleiben anhören, das Morgenkuscheln im großen Bett bleibt, Mittagsschlaf zuerst, ein Erwachsener daneben, der Abend für Abend weiter wegrückt, nachts ruhig zurückbringen – sanft, ohne Schimpfen und ohne Belohnungsplan.",
+      why: "Wunsch der Nutzerin (24. November 2026). Die erste Geschichte erzählt den Auszug aus dem Elternbett nur kurz an Bruno; Familien, deren Kind bei ihnen schläft, finden im Buch sonst nichts für sich.",
+      effort: "M",
+      done: true,
+      partial:
+        "Gebaut am 24. November 2026 als „Tapsi's Own Bed“ (src/games/ownbed): 21 Seiten in acht Kapiteln nach den Schritten der Recherche „grosses-bett“ (Nachtrag), unter /grosses-bett/eigenes-bett/; das Buch heißt jetzt „Bett“ (die Adresse /grosses-bett/ bleibt), in der Wahl stehen „Aus dem Gitterbett“ und „Aus dem Elternbett“. Tapsi schläft zu dritt im großen Bett, es wird eng; Mama erzählt, Tapsi will lieber bleiben und wird gehört, Papa verspricht das Morgenkuscheln; Tapsi trägt das Kissen, das nach Zuhause riecht, ins eigene Bett, Hase und der Mond am Bett, die Tür bleibt offen; Mittagsschlaf zuerst mit Mama auf dem Teppich; abends wie immer, Papa liegt daneben und rückt jeden Abend weiter bis zur Tür; nachts kommt Tapsi herüber und Mama bringt Tapsi ruhig zurück, so oft es nötig ist; morgens Kuscheln im großen Bett. Englisch zuerst, in alle sieben Sprachen übersetzt, Suchtexte in allen sieben. Die 21 Bilder warten in der Bilder-Warteschlange (Claude Cloud), bis dahin sehen Spieler die Geschichte nicht; Aufnahmen nur auf Wunsch.",
+    },
   ],
 };

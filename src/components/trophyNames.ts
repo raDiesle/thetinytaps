@@ -64,6 +64,13 @@ const NAMERS: Record<string, () => Promise<Namer>> = {
         (level, language) =>
           level === "tagesmutter" ? pick(CHILDMINDER_TITLE, language) : undefined,
     ),
+  // The book Bett's second story, „Tapsi's Own Bed“ out of the parents' bed, gives a trophy of its own, level „eigenes-bett“.
+  "/grosses-bett/": () =>
+    import("@/games/ownbed/names").then(
+      ({ OWN_BED_TITLE }) =>
+        (level, language) =>
+          level === "eigenes-bett" ? pick(OWN_BED_TITLE, language) : undefined,
+    ),
   "/schnullerfee/": () =>
     import("@/games/pacifiertree/names").then(
       ({ TREE_TITLE }) =>

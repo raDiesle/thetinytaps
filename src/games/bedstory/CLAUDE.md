@@ -1,9 +1,10 @@
-# Tapsi's Big Bed
+# Bed („Tapsi's Big Bed“ and „Tapsi's Own Bed“)
 
 Route `/grosses-bett/` · idea H-106 · research „grosses-bett“.
 
-The book „Big Bed“ among the Alltagshelfer, right of „Hair Washing“ (`BED_STORY_BOOK`, a spine book of its own once
-published, playing at once): a story about moving from the cot into a bed of one's own, in chapters like „Abstillen“,
+The book „Bed“ (named „Big Bed“ until 24 November 2026, when its second story came; the address stays `/grosses-bett/`)
+among the Alltagshelfer, right of „Hair Washing“ (`BED_STORY_BOOK`, a spine book of its own, playing at once). Its first
+story, „Tapsi's Big Bed“ (line „From the cot“, `BED_STORY_KIND`), is about moving from the cot into a bed of one's own, in chapters like „Abstillen“,
 „Schnullerfee“, „Kita-Start“ and „Hair Washing“, read by a grown-up with the child in the days before the big bed comes
 and in its first evenings. Its pictures were all made on 21 November 2026, and it was published on the user's word on
 23 November 2026: on the shelf right of „Hair Washing“, in the sitemap and named in the home page's search text.
@@ -23,13 +24,15 @@ close and love Tapsi in the little bed and the big one.
 - `bedStory.ts`: the chapters and pages (`BED_STORY`) and the steps of the move as the guides give them (`BED_STEPS`).
 - `bedStoryPictures.ts`: the Gemini prompt of every page (place, light, cast and night clothes, bunny, blanket, chair,
   night light, boat pillow, a safe bed), as the picture queue takes them; a made picture goes on `MADE`.
-- `BedStoryGame.tsx` opens like „Abstillen“ on the choice (`StoryChoice.tsx`, `B0`): one line with its picture and a
-  „Lesen“ slip telling its pictures and minutes – never its chapters – and the story starts on its first page (user
-  request, 23 November 2026; it has no short version yet). It is read with the shared `ChapterBook` (`first="en"`, dev tags `B0`, `B<chapter>-<page>`). A change
+- `BedStoryGame.tsx` opens like „Abstillen“ on the choice (`StoryChoice.tsx`, `B0`): one line per story with its picture
+  and a „Lesen“ slip telling its pictures and minutes – never its chapters – and the story starts on its first page (user
+  request, 23 November 2026; neither has a short version yet). **The second story, „Tapsi's Own Bed“**, out of Mama and
+  Papa's bed into Tapsi's own (`src/games/ownbed`, its own `CLAUDE.md`; idea H-148, user request, 24 November 2026), has
+  the line „From Mama and Papa's bed“ at `/grosses-bett/eigenes-bett/`; `titleAt` gives the tab the story's title. It is read with the shared `ChapterBook` (`first="en"`, dev tags `B0`, `B<chapter>-<page>`). A change
   to how the book reads goes there, so all chapter books get it. Tapsi's voice reads each page (`voice`, from `stimme/`,
   listed in `recordedLines.ts` as `grosses-bett`, recorded only when the user asks), and the loudspeaker switches it off
   (`VoiceSwitch`); a page without its recording stays silent.
-- `names.ts`: the book's name on the shelf, the story's title and its blurb, in all seven languages.
+- `names.ts`: the book's name on the shelf, the story's title, its name in the choice and its blurb, in all seven languages.
 - `de.ts`, `zh.ts`, `hi.ts`, `es.ts`, `ar.ts`, `ru.ts`: the chapters and pages in the other languages (`StoryTranslation`,
   keyed by chapter and page id), loaded only with their language's texts (`texts-<lang>.ts`, `bedStory`) and read by
   `BedStoryGame.tsx` through `byLanguage`; never import them from game code (`texts.test.ts`).
@@ -50,7 +53,8 @@ close and love Tapsi in the little bed and the big one.
   is listened to, never „only a dream“ or „there are no monsters“; and there is no sticker chart or reward – the guides
   disagree on rewards for sleep, and Graf & Seide advise against them where fear or the wish for closeness is behind it,
   so the morning has praise and pride, nothing to earn (`bedstory.test.ts` checks the words). No rule about the
-  parents' bed either: the sources disagree, so the story shows parents who stay near and come. A grown-up is in every
+  parents' bed in this story: the sources disagree, so it shows parents who stay near and come; the second story is for
+  the families who have decided on the own bed, and stays as gentle (`src/games/ownbed/CLAUDE.md`). A grown-up is in every
   picture of the night but the two where Tapsi gets up or calls (checked). No clock, age or weekday; lines ≤ 110
   characters, in the present tense, ending in love.
 - The move is never tied to something else that changes (a sibling, Kita-Start, the potty): the guides advise against
