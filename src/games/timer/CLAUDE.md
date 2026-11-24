@@ -32,8 +32,8 @@ screen (November 2026; `timer.test.ts` checks). The Ameisenstraße (H-68) was
 taken out (user request, November 2026). The pictures:
 - „Zug zum Bahnhof“ 🚂: a little train rolls along a long track, from the little house at the left nearly across the
   picture, to the station with its clock, big red and white buffers and a chequered flag at the track's end (the goal,
-  seen from the start). From 2 minutes on a post with a bell stands by the track for every minute (`TrainStops`, at most `MAX_STOPS`); the train
-  halts there briefly and it chimes (H-45), with keyframes made for the run (`TrainStepKeyframes`, `--tm-roll`).
+  seen from the start). Five posts with a bell stand by the track at every length (`TrainStops`, `TRAIN_STOPS`; one a minute
+  until 24 November 2026, so a short run had none); the train halts there briefly and it chimes (H-45), with keyframes made for the run (`TrainStepKeyframes`, `--tm-roll`).
 - „Apfelbaum“ 🍎 (`apples.tsx`, H-45): an apple tree's year (`appleTimes`, `APPLE_YEAR`; user feedback, November
   2026: show more progress). The tree grows from a sapling a step a second (until 15 % of the time), then its blossoms
   open one after the other here and there over the crown (`bloomRank`, each in its own slot, until 30 %) while three
@@ -309,8 +309,8 @@ and the shared `Layer`, `Draw`, `LeftGlow`), `timer.css`, `content.ts`
   starting further up, fewer toys, a slip that only comes on a long share) nor add parts for a long one; what a step
   takes in fixed milliseconds is capped by its share (`Math.min(X_MS, share * …)`), so it shrinks with it. The counts
   are constants (`MAX_APPLES`, `MAX_TOYS`, `PER_BOX`, `MAX_BLOCKS`, `MAX_DIG`, `MAX_MOVES`), never worked out from the
-  time (`timer.test.ts` checks `TimerPlay`'s scenes). What counts real minutes or seconds keeps doing so: the train's
-  stop a minute, the ladybug's lap, the caterpillar's bite a second.
+  time (`timer.test.ts` checks `TimerPlay`'s scenes), the train's stops too (`TRAIN_STOPS`). What counts real minutes
+  or seconds keeps doing so: the ladybug's lap, the caterpillar's bite a second.
 - **A bar along the bottom** (user request, 22 November 2026, H-124; `bar.tsx`): under every picture a paper track
   over nearly the whole width fills from its start at the left to a little flag at the right, in the picture's own
   colour (`.tm-play[data-picture=…] .tm-bar`, a new picture adds its colours there; Abwechseln the colour of the child

@@ -1,4 +1,4 @@
-// Piece by piece instead of flowing (H-45): the apples fall one by one, the train halts at a little stop every minute.
+// Piece by piece instead of flowing (H-45): the apples fall one by one, the train halts at its little stops one by one.
 // A small child sees single things at once, where a flowing picture is hard to judge – and a long time still moves.
 
 /**
@@ -101,22 +101,23 @@ export function runSeconds(ms: number): number {
   return Math.max(1, Math.round(ms / 1000));
 }
 
-/** At most this many stretches between the train's stops, so the stops stand a finger apart on a phone. */
-export const MAX_STOPS = 12;
+/**
+ * The little stops with a bell along the track, at every length (user request, 24 November 2026: a time of any length
+ * plays the whole way, only faster or slower – before, a stop came once a minute, so under two minutes there was none).
+ */
+export const TRAIN_STOPS = 5;
 
-/** How many pieces a run of `ms` is cut into: one a minute, at least one, at most `max`. */
-export function pieceCount(ms: number, max: number): number {
-  return Math.max(1, Math.min(max, Math.round(ms / 60_000)));
-}
+/** The stretches of the train's way: one to each stop and the last to the station. */
+export const TRAIN_PIECES = TRAIN_STOPS + 1;
 
-/** How long the train stands at each stop before the minute is over (a short halt, then on it rolls). */
+/** How long the train stands at each stop before its stretch is over (a short halt, then on it rolls). */
 export function haltMs(total: number, pieces: number): number {
   return Math.min(3000, total / pieces / 4);
 }
 
 /**
  * The train's way piece by piece, as keyframes: `at` is a share of the run (0–1), `part` how far along the track the
- * train is then (0–1). It rolls each stretch, arrives at the stop `halt` ms before the stretch's minute is over, stands
+ * train is then (0–1). It rolls each stretch, arrives at the stop `halt` ms before the stretch is over, stands
  * there and rolls on; the last stop is the station, reached as the time is up.
  */
 export function trainSteps(total: number, pieces: number, halt: number): { at: number; part: number }[] {

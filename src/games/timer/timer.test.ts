@@ -91,11 +91,11 @@ import {
   MAX_APPLES,
   MAX_DOTS,
   MAX_MARKS,
-  MAX_STOPS,
   markUnit,
   marksLeft,
   percentMarks,
-  pieceCount,
+  TRAIN_PIECES,
+  TRAIN_STOPS,
   pieceMoments,
   runSeconds,
   soonMs,
@@ -134,7 +134,7 @@ describe("Timer", () => {
     const counts = [...code.matchAll(/<\w+Scene count=\{([^}]+)\}/g)].map((m) => m[1]);
     expect(counts.length).toBeGreaterThanOrEqual(6);
     for (const count of counts) expect(count, count).toMatch(/^[A-Z][A-Z_]*$/);
-    expect(code).not.toMatch(/\w+Count\(set\)|perBox\(/);
+    expect(code).not.toMatch(/\w+Count\(set\)|perBox\(|pieceCount\(/);
   });
 
   test("every picture has its own id, an emoji and a name, they stand in the order the user asked for and „Weiter“ goes round all but those of taking turns", () => {
@@ -303,12 +303,18 @@ describe("Timer", () => {
     expect(DISC.cy + DISC.face).toBeLessThanOrEqual(820);
   });
 
-  test("piece by piece: one a minute, at least one, never more than fit (H-45)", () => {
-    expect(pieceCount(60_000, MAX_APPLES)).toBe(1);
-    expect(pieceCount(5 * 60_000, MAX_APPLES)).toBe(5);
-    expect(pieceCount(20_000, MAX_APPLES)).toBe(1);
-    expect(pieceCount(3 * 3600_000, MAX_APPLES)).toBe(MAX_APPLES);
-    expect(pieceCount(30 * 60_000, MAX_STOPS)).toBe(MAX_STOPS);
+  test("piece by piece: the train halts at its five stops at every length, then reaches the station as the time is up (H-45)", () => {
+    // User request, 24 November 2026: before, a stop came once a minute, so under two minutes the train never halted.
+    expect(TRAIN_STOPS).toBe(5);
+    for (const total of [10_000, 60_000, 5 * 60_000, 3 * 3600_000]) {
+      const steps = trainSteps(total, TRAIN_PIECES, haltMs(total, TRAIN_PIECES));
+      // A halt at each stop (arriving and leaving at the same place), then the station at the end.
+      const halts = steps.filter((s, i) => i > 0 && steps[i - 1].part === s.part);
+      expect(halts).toHaveLength(TRAIN_STOPS);
+      expect(steps.at(-1)).toEqual({ at: 1, part: 1 });
+      for (let i = 1; i < steps.length; i++) expect(steps[i].at).toBeGreaterThan(steps[i - 1].at);
+      expect(pieceMoments(total, TRAIN_PIECES, haltMs(total, TRAIN_PIECES))).toHaveLength(TRAIN_STOPS);
+    }
     expect(pieceMoments(300_000, 5)).toEqual([60_000, 120_000, 180_000, 240_000]);
     expect(pieceMoments(300_000, 1)).toEqual([]);
   });

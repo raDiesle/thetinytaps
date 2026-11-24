@@ -39,7 +39,7 @@
 }
 
 /* Zug zum Bahnhof: the train rolls from its start to the buffers; at the end it stands there. */
-/* With a stop a minute (H-45) the stage names this run's keyframes in --tm-roll and --tm-shine (`TrainStepKeyframes`). */
+/* With its stops (H-45) the stage names this run's keyframes in --tm-roll and --tm-shine (`TrainStepKeyframes`). */
 .tm-train {
   animation: var(--tm-roll, tm-roll) var(--tm-ms) linear forwards;
 }
