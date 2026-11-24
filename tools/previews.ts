@@ -15,6 +15,7 @@ import { type Cdp, evaluate, launchChrome, open, siteUrl, sleep } from "./chrome
 //   bun run previews --no-build        picture the out/ that is there
 //   bun run previews --shots <dir>     also keep each whole window there, to see why a cut lies where it does
 //   bun run previews --video           the big pictures of the games the videos' outro shows (`VIDEO_GAMES`)
+//   bun run previews plakat            only the posters above the shelf's toys (`POSTERS`)
 //
 // Look at every new picture before committing it: a card whose game starts with a dark screen, a loading slip or a
 // story's first words gets a cut of its own in CUTS, or a later moment in WAIT.
@@ -118,6 +119,66 @@ const VIDEO_GAMES: Record<string, { href: string; hide?: string }> = {
 const VIDEO_DIR = "src/video/outro/bilder";
 /** The videos' pictures: 3 : 2 like the menus', as big as the outro shows them on its 1920 × 1080 canvas. */
 const VIDEO_SIZE = { width: 1200, height: 800 };
+
+/**
+ * The posters above the shelf's toys (`ToyPoster` in Bookshelf.tsx, user request, 24 November 2026), by the file they
+ * go to: a big square picture of the game in the middle of play, in a window of `POSTER_WINDOW` cut to the play area's
+ * square at its foot. „Magic Keys“ shows a firework, a number with as many shapes round it and a letter at once – what
+ * the toy does, where a card's single moment would show only one of them.
+ */
+const POSTERS: Record<string, { href: string; play: (cdp: Cdp) => Promise<void> }> = {
+  "src/components/bilder/plakat-drauflos.webp": {
+    href: "/drauflos/",
+    play: async (cdp) => {
+      // A key pressed with chance fixed for its first calls. The first surprise of a fresh bag is a firework when the
+      // shuffle's chance always says „stay“ (`SURPRISE_KINDS[0]`): two calls place it (`freeSpot`), fifteen shuffle,
+      // then its warm palette in two rings of round sparks. The four comes blue with yellow hearts round it.
+      const pressFixed = (key: string, code: string, fixed: number[]) =>
+        evaluate(
+          cdp,
+          `(() => {
+            const real = Math.random;
+            const fixed = ${JSON.stringify(fixed)};
+            Math.random = () => (fixed.length ? fixed.shift() : real());
+            window.dispatchEvent(new KeyboardEvent("keydown", { key: "${key}", code: "${code}", bubbles: true }));
+            Math.random = real;
+            return true;
+          })()`,
+        );
+      await pressFixed("-", "Minus", [0.45, 0.3, ...Array(15).fill(0.9999), 0, 0.25, 0]);
+      await sleep(250);
+      await pressFixed("4", "Digit4", [0.4, 0.9, 0.15]);
+      await sleep(250);
+      await press(cdp, "b");
+      await sleep(350);
+    },
+  },
+};
+/** The window a poster's game plays in: upright, so the play area's square holds everything at a big size. */
+const POSTER_WINDOW = { width: 600, height: 680 };
+/** A poster's picture in pixels: square, sharp on the shelf of a big screen. */
+const POSTER_SIZE = { width: 480, height: 480 };
+
+/** Pictures each poster of `POSTERS` that `wanted` asks for. */
+async function picturePosters(cdp: Cdp, base: string, wanted: (text: string) => boolean) {
+  for (const [file, { href, play }] of Object.entries(POSTERS).filter(([file, { href }]) => wanted(`${file} ${href}`))) {
+    console.log(`${href} (Plakat)`);
+    await cdp.send("Emulation.setDeviceMetricsOverride", { ...POSTER_WINDOW, deviceScaleFactor: SCREEN.scale, mobile: false });
+    await open(cdp, `${base}${href}`);
+    await sleep(2500);
+    await play(cdp);
+    await evaluate(cdp, HIDE_OVERLAYS);
+    const area = await evaluate<Area>(
+      cdp,
+      `(() => { const r = document.querySelector(".tw-play").getBoundingClientRect(); const side = Math.min(r.width, r.height) * 0.94; return { x: r.left + (r.width - side) / 2, y: r.bottom - side - r.width * 0.03, width: side, height: side }; })()`,
+    );
+    const shot = await cdp.send<{ data: string }>("Page.captureScreenshot", { format: "png", clip: { ...area, scale: 1 } });
+    if (shots) await Bun.write(join(shots, `${file.split("/").at(-1)?.replace(".webp", "")}.png`), Buffer.from(shot.data, "base64"));
+    await sharp(Buffer.from(shot.data, "base64")).resize(POSTER_SIZE.width, POSTER_SIZE.height).webp({ quality: 80 }).toFile(file);
+    console.log(`  ${file}`);
+    await cdp.send("Emulation.setDeviceMetricsOverride", { width: SCREEN.width, height: SCREEN.height, deviceScaleFactor: SCREEN.scale, mobile: false });
+  }
+}
 
 /** Where the tables of contents' pictures go: smaller in the line than on a card, so they are cut closer (`ZOOMED`). */
 const isBook = (file: string) => file.startsWith(BOOK_DIR);
@@ -595,6 +656,7 @@ try {
     await pictureMenu(cdp, site.url, menu);
   }
   if (!video) await pictureGirls(cdp, site.url, wanted);
+  if (!video) await picturePosters(cdp, site.url, wanted);
 } finally {
   stop();
   site.stop();

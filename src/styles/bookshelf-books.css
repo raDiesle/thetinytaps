@@ -823,7 +823,8 @@
 /*
  * The toy keyboard (`ShelfToy`, `Category.toy`): a wooden toy standing among the picture books at the board's front edge,
  * narrower and lower than one of them (`TOY_SPAN`), leaning back against what stands behind it so its bright keys face the room. A tap
- * presses it down a little and lets it come up again (one transform of the whole HTML element, never inside its svg).
+ * presses it down a little and lets it come up again (one transform of its body, an HTML element, never inside its svg).
+ * The link itself stays unmoved, so the poster above it (`ToyPoster`) can hang on the back panel.
  */
 .shelf-row > .shelf-toy {
   --bw: calc(var(--bh) * 0.82 * 0.6); /* `TOY_SPAN` picture books */
@@ -832,10 +833,16 @@
   align-self: flex-end;
   width: var(--bw);
   height: calc(var(--bw) * 100 / 120);
+  transform-style: preserve-3d;
+  -webkit-tap-highlight-color: transparent;
+}
+
+.shelf-toy-body {
+  position: absolute;
+  inset: 0;
   transform-origin: 50% 100%;
   transform: translateZ(calc(var(--d) * 0.22)) rotateX(14deg);
   transition: transform 0.35s cubic-bezier(0.3, 0.7, 0.4, 1.2);
-  -webkit-tap-highlight-color: transparent;
 }
 
 .shelf-toy-art {
@@ -855,7 +862,7 @@
 }
 
 @media (hover: hover) {
-  .shelf-row > .shelf-toy:hover {
+  .shelf-toy:hover > .shelf-toy-body {
     transform: translateZ(calc(var(--d) * 0.3)) translateY(-4%) rotateX(6deg);
   }
 }
@@ -865,7 +872,114 @@
   outline-offset: 3px;
 }
 
-.shelf-row > .shelf-toy.pressed {
+.shelf-toy.pressed > .shelf-toy-body {
   transition-duration: 0.12s;
   transform: translateZ(calc(var(--d) * 0.22)) translateY(3%) rotateX(22deg) scale(0.97);
+}
+
+/*
+ * The poster above the toy keyboard (`ToyPoster`, user request, 24 November 2026): taped onto the back panel, its foot
+ * half way up the keyboard and hidden behind it, wider than the keyboard and nearly as tall as a picture book – yet
+ * clear of the book beside it (`BOOK_GAP`) and below the board above. Tape holds three corners; the fourth (top right)
+ * curls away from the wood, its paper's back seen and its shadow on the panel. Still, like everything on the shelf.
+ */
+.shelf-poster {
+  --pw: calc(var(--bw) * 1.75);
+  --curl: calc(var(--pw) * 0.16);
+  position: absolute;
+  bottom: 48%;
+  left: 50%;
+  width: var(--pw);
+  height: calc(var(--pw) * 1.24);
+  margin-left: calc(var(--pw) / -2);
+  /*
+   * On the back panel: the row stands `--d * 0.2` in front of it. Seen from the shelf's middle, the panel's things move
+   * towards it, so the poster – always left of the middle, first on its board – keeps a little to the left, clear of the
+   * book beside the keyboard.
+   */
+  transform: translateZ(calc(var(--d) * -0.78 + 2px)) translateX(calc(var(--bw) * -0.3)) rotate(-1.5deg);
+  filter: drop-shadow(0 calc(var(--pw) * 0.02) calc(var(--pw) * 0.03) #2a170866);
+}
+
+.shelf-poster-paper {
+  position: absolute;
+  inset: 0;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 3%;
+  /* Its name starts below the curled corner, so no letter is folded away. */
+  padding: calc(var(--curl) * 0.75) 6% 0;
+  box-sizing: border-box;
+  background:
+    linear-gradient(115deg, #fff0 55%, #8a5a2a14 100%),
+    #fffaf0;
+  /* The top right corner folded away (`.shelf-poster-curl` is its back). */
+  clip-path: polygon(0 0, calc(100% - var(--curl)) 0, 100% var(--curl), 100% 100%, 0 100%);
+}
+
+.shelf-poster-title {
+  display: block;
+  width: 100%;
+  font-family: var(--font-rounded);
+  /* As big as its longest word lets it stand in the width (`--len`, its letters), never cut off. */
+  font-size: min(calc(var(--pw) * 0.15), calc(var(--pw) * 0.86 / (var(--len) * 0.6)));
+  font-weight: 800;
+  line-height: 1.05;
+  text-align: center;
+  text-wrap: balance;
+  color: #e8434b;
+  -webkit-text-stroke: 0.06em #5a3a1e;
+  paint-order: stroke fill;
+  text-shadow: 0 0.06em 0 #f7a21b;
+}
+
+.shelf-poster-picture {
+  display: block;
+  width: 100%;
+  aspect-ratio: 1;
+  object-fit: cover;
+  border-radius: calc(var(--pw) * 0.025);
+  box-shadow: 0 0 0 1px #5a3a1e33;
+}
+
+/* The curled corner: the poster's back, a triangle folded down over the corner, lighter where it bends towards the room. */
+.shelf-poster-curl {
+  position: absolute;
+  top: 0;
+  right: 0;
+  width: var(--curl);
+  height: var(--curl);
+  background: linear-gradient(225deg, #d8c7a4 0%, #f6ecd6 45%, #fffaf0 70%, #e2d3b4 100%);
+  clip-path: polygon(0 0, 100% 100%, 0 100%);
+  transform: translateZ(1px);
+}
+
+/* Tape: a short strip of clear film across a corner, its ends torn. */
+.shelf-poster-tape {
+  position: absolute;
+  width: calc(var(--pw) * 0.3);
+  height: calc(var(--pw) * 0.1);
+  margin: calc(var(--pw) * -0.05) calc(var(--pw) * -0.15);
+  background: #fffbe6a8;
+  box-shadow: 0 1px 2px #2a17082e;
+  clip-path: polygon(3% 8%, 97% 0, 100% 30%, 96% 55%, 100% 92%, 2% 100%, 0 70%, 4% 45%, 0 18%);
+}
+
+.shelf-poster-tape[data-corner="top-left"] {
+  top: 0;
+  left: 0;
+  transform: rotate(-38deg);
+}
+
+.shelf-poster-tape[data-corner="bottom-left"] {
+  bottom: 0;
+  left: 0;
+  transform: rotate(34deg);
+}
+
+.shelf-poster-tape[data-corner="bottom-right"] {
+  right: 0;
+  bottom: 0;
+  transform: rotate(-36deg);
 }

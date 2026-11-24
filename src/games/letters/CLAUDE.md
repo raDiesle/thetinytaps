@@ -119,7 +119,7 @@ the page before it.
   `ft-<kind>`: that is the class its own drawing animates, and once ran the snowflake's grow-and-fade on the whole
   surprise, so its small flakes never showed. Zählen and the other games keep their calm ripples: this
   is Frei tippen's own, never a pattern for other games' answers (root `CLAUDE.md`) – the one other game that opens
-  them is „Drauflos tippen“ (`src/games/tapaway/`), Frei tippen without its card, where the show is the whole game; a
+  them is „Zaubertasten“ (`src/games/tapaway/`), Frei tippen without its card, where the show is the whole game and several may stand at once (it passes looser `SurpriseLimits`; Frei tippen keeps `SURPRISE`); a
   change to `useSurprises` or `SurpriseLayer` is checked there too. A new kind goes into
   `ART_KINDS` (`SurpriseArt.tsx`) or `CANVAS_KINDS` (`surpriseCanvas.ts`), its classes and latest delay into the
   test's `CLASSES` and `LATEST_DELAY_MS`; in the dev server `__surprise("<kind>")` makes the next surprise that kind.

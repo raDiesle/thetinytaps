@@ -293,16 +293,24 @@ function createSurpriseStore(): SurpriseStore {
   };
 }
 
+/** How often and how many surprises may come: Frei tippen's `SURPRISE` by default. */
+export interface SurpriseLimits {
+  gapMs: number;
+  maxAtOnce: number;
+}
+
 /**
  * Surprises for Frei tippen: `spawn(x, y, size)` opens the next one at (x, y) in the layer's pixels, with its sound,
- * unless one came less than `SURPRISE.gapMs` ago or `SURPRISE.maxAtOnce` are on screen (then it returns false and the
- * game only ripples). Draw them with `<SurpriseLayer surprises={…} />`.
+ * unless one came less than `limits.gapMs` ago or `limits.maxAtOnce` are on screen (then it returns false and the
+ * game only ripples). Draw them with `<SurpriseLayer surprises={…} />`. Only „Magic Keys“, where the show is the
+ * whole game, passes looser limits of its own (`src/games/tapaway/CLAUDE.md`).
  */
-export function useSurprises() {
+export function useSurprises(limits: SurpriseLimits = SURPRISE) {
   const [store] = useState(createSurpriseStore);
   useEffect(() => () => store.dispose(), [store]);
   const { later } = useTimers();
-  const gate = useMemo(() => spaced(SURPRISE.gapMs), []);
+  const { gapMs, maxAtOnce } = limits;
+  const gate = useMemo(() => spaced(gapMs), [gapMs]);
   const extras = useMemo(() => spaced(EXTRA_SOUND_GAP_MS), []);
   const bag = useRef<SurpriseKind[]>([]);
   const last = useRef<{ kind?: SurpriseKind; thing?: GiftToy; baby?: EggBaby }>({});
@@ -322,7 +330,7 @@ export function useSurprises() {
 
   const spawn = useCallback(
     (x: number, y: number, size: number) => {
-      if (store.current().length >= SURPRISE.maxAtOnce || !gate.pass()) return false;
+      if (store.current().length >= maxAtOnce || !gate.pass()) return false;
       const kind = nextKind();
       const params = makeParams(kind, size, y);
       const extra = extras.pass();
@@ -410,7 +418,7 @@ export function useSurprises() {
       }
       return true;
     },
-    [store, gate, extras, nextKind, later],
+    [store, gate, maxAtOnce, extras, nextKind, later],
   );
 
   // For trying out one kind in the browser console: __surprise("comet"), then a key that opens a surprise.

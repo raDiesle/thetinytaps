@@ -53,6 +53,8 @@ interface ShelfBook {
   volumes?: ShelfBook[];
   /** A toy standing on the board instead of a book (`Category.toy`), as wide as a picture book. */
   toy?: "keyboard";
+  /** The poster from its game taped up above a toy (`bilder/plakat-<category>.webp`, made by `bun run previews`). */
+  poster?: string;
 }
 
 /** The cloths of the books standing spine out with a game's name, one after the other: bright, unlike the books only filling the shelf. */
@@ -134,6 +136,7 @@ for (const entry of SHELF) {
     cover: entry.game ? undefined : pictures[`cover-${c.id}.webp`],
     games: !entry.game && hasPage(c) ? c.games.map((g) => g.emoji) : undefined,
     toy: c.toy,
+    poster: c.toy ? pictures[`plakat-${c.id}.webp`] : undefined,
   };
   const volumes = (entry.game && shelfVolumes(entry.game))?.map(
     (v, i): ShelfBook => ({
@@ -748,8 +751,10 @@ const TOY_PRESS_MS = 260;
 /**
  * A toy standing on the board among the picture books instead of a book (`Category.toy`, user request, 24 November
  * 2026): a wooden toy keyboard with big bright keys, leaning back a little at the board's front edge, as wide as a
- * picture book and lower. It says without a word that here one presses keys. A tap presses it down with a click and a
- * note, and its game opens – no book comes out, no page turns, and the way back simply comes to the shelf again.
+ * picture book and lower. It says without a word that here one presses keys. Above it a poster from its game is taped
+ * onto the shelf's back panel (`ToyPoster`), its foot hidden behind the keyboard. A tap on either presses the keys down
+ * with a click and a note, and its game opens – no book comes out, no page turns, and the way back simply comes to the
+ * shelf again.
  */
 function ShelfToy({ book }: { book: ShelfBook }) {
   const t = useT();
@@ -777,9 +782,35 @@ function ShelfToy({ book }: { book: ShelfBook }) {
       {...loadOnIntent(book.href)}
       onClick={onClick}
     >
-      <span className="shelf-toy-shadow" />
-      <ToyKeyboard />
+      {book.poster && <ToyPoster title={t(book.title)} picture={book.poster} />}
+      <span className="shelf-toy-body">
+        <span className="shelf-toy-shadow" />
+        <ToyKeyboard />
+      </span>
     </Link>
+  );
+}
+
+/**
+ * The poster above the toy keyboard (user request, 24 November 2026): a big picture from the game – a firework, a
+ * number with its shapes, letters – under the game's name, on paper taped onto the back panel with tape at three
+ * corners. The fourth, top right, curls away from the wood, and its foot starts half way up the keyboard, behind it.
+ * All drawn still, in CSS (`.shelf-poster` in bookshelf-books.css).
+ */
+function ToyPoster({ title, picture }: { title: string; picture: string }) {
+  return (
+    <span className="shelf-poster" aria-hidden>
+      <span className="shelf-poster-paper">
+        <span className="shelf-poster-title" style={{ "--len": Math.max(...title.split(/\s+/).map((word) => [...word].length)) } as CSSProperties}>
+          {title}
+        </span>
+        <img className="shelf-poster-picture" src={picture} alt="" decoding="async" draggable={false} />
+      </span>
+      <span className="shelf-poster-curl" />
+      <span className="shelf-poster-tape" data-corner="top-left" />
+      <span className="shelf-poster-tape" data-corner="bottom-left" />
+      <span className="shelf-poster-tape" data-corner="bottom-right" />
+    </span>
   );
 }
 

@@ -220,12 +220,12 @@ export const lettersIdeas: IdeaArea = {
     {
       id: "L-24",
       emoji: "🎹",
-      title: "Drauflos tippen: Spielzeug-Tastatur im Regal",
+      title: "Zaubertasten (zuerst „Drauflos tippen“): Spielzeug-Tastatur im Regal",
       text: "Ein Spiel ohne Buch, als hölzerne Spielzeug-Tastatur neben den Bilderbüchern im Regal: jede Taste, jeder Tipp und jeder Klick bringt sofort etwas Buntes mit Ton – ein Buchstabe oder eine Zahl groß auf der Seite mit seinem Namen, sonst eine Überraschung aus „Frei tippen“ oder eine bunte Form, und die Maus zieht eine kurze Glitzerspur. Nichts zu finden, nichts zu lernen, keine Karte.",
       why: "Für das Drauflostippen kleiner Kinder auf Tastatur, Maus oder Bildschirm, wonach Eltern suchen: es passiert immer etwas, und nichts geht kaputt.",
       effort: "M",
       partial:
-        "Gebaut am 24. November 2026 (/drauflos/): ruhig gehalten wie jedes Spiel – höchstens fünf Buchstaben oder Formen und drei Überraschungen auf einmal, dieselbe Taste erst nach einer Pause wieder; kein Zähler, kein Ende.",
+        "Gebaut am 24. November 2026 (/drauflos/), noch am selben Tag „Zaubertasten“ getauft und mit einem Plakat aus dem Spiel über der Spielzeug-Tastatur im Regal, an drei Ecken mit Tesa festgeklebt, die vierte hebt sich ab. Schnell nacheinander gedrückt erscheint mehreres zugleich, jedes mit Platz neben den anderen (bis zu acht Buchstaben oder Formen und fünf Überraschungen); eine Zahl kommt mit genauso vielen Formen rundherum. Dieselbe Taste erst nach einer Pause wieder; kein Zähler, kein Ende.",
       done: true,
     },
   ],

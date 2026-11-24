@@ -8,19 +8,22 @@ import { playBlub, playBoing, playChimeNote, playPlop, playPop } from "@/lib/sfx
 import { repeatPause } from "@/lib/spacing";
 import { useTimers } from "@/lib/timers";
 import { talking } from "@/lib/voice";
-import { MIN_CHANGE_MS, SAME_KEY_PAUSE_MS } from "@/games/letters/pace";
+import { SAME_KEY_PAUSE_MS } from "@/games/letters/pace";
 import { useSoftTap } from "@/games/letters/softTap";
-import { SurpriseLayer, useSurprises } from "@/games/letters/Surprises";
+import { SurpriseLayer, type SurpriseLimits, useSurprises } from "@/games/letters/Surprises";
 import { lettersVoice } from "@/games/letters/voice";
+import { freeSpot, type Placed } from "./place";
 import { SHAPES, type ShapeKind, ShapeView } from "./shapes";
 import "./tapaway.css";
 
-// „Tap Away“: a toy for banging on the keyboard, the mouse or the screen – no card, nothing to learn or find, only
+// „Magic Keys“: a toy for banging on the keyboard, the mouse or the screen – no card, nothing to learn or find, only
 // cause and effect (user request, 24 November 2026, in the spirit of the keyboard smash toys parents search for). A
-// letter or digit key brings that letter big and bright somewhere on the page with its note and, where recorded, its
-// name; every other key and every tap or click opens one of Frei tippen's surprises right there, and where none may come
-// yet a bright shape pops up instead. A mouse moving leaves a short trail of sparkles. Never a storm: everything comes
-// at most so often and so many at once, and what can't come only ripples (see CLAUDE.md).
+// letter key brings that letter big and bright somewhere on the page with its note and, where recorded, its name; a
+// digit brings its number with as many little shapes round it; every other key and every tap or click opens one of
+// Frei tippen's surprises right there, and where none may come yet a bright shape pops up instead. A mouse moving
+// leaves a short trail of sparkles. Quick presses one after the other show several things at once, each beside the
+// others while there is room (`freeSpot`) – the one game where that is wanted (user request, 24 November 2026) – and
+// still within limits, so what can't come only ripples (see CLAUDE.md).
 
 /** A glyph's (letter's or digit's) size: this share of the play area's shorter side, within these limits in px. */
 const GLYPH_SHARE = 0.34;
@@ -35,10 +38,26 @@ const SURPRISE_SHARE = 0.42;
 const SURPRISE_MIN = 120;
 const SURPRISE_MAX = 360;
 
+/** A digit's number beside its shapes is this much smaller than a letter, so both fit where a letter would. */
+const COUNTED_SHARE = 0.72;
+/** A digit's shapes: each this share of the number's size, on a ring this far from its middle. */
+const THING_SHARE = 0.26;
+const RING_SHARE = 0.78;
+
+/** The shapes a digit counts: chunky ones, easy to tell apart and count (a thin moon was hard to see). */
+const COUNT_SHAPES = SHAPES.filter((s) => s !== "moon");
+
 /** How long a glyph or shape stays, in ms; `tw-pop` in tapaway.css runs exactly this long. */
 export const POP_MS = 2200;
 /** At most this many glyphs and shapes on the page at once; more presses only ripple. */
-export const MAX_POPS = 5;
+export const MAX_POPS = 8;
+/**
+ * A new glyph or shape comes at most this often: quick enough that a hand running over the keys sees several at once
+ * (user request, 24 November 2026), slower than a held-down hand's flood.
+ */
+export const POP_GAP_MS = 90;
+/** Surprises here come quicker and more at once than in Frei tippen, where they answer beside a card. */
+export const TAP_AWAY_SURPRISES: SurpriseLimits = { gapMs: 150, maxAtOnce: 5 };
 /** A mouse's sparkles: one at most this often while it moves, each living `SPARKLE_MS`, at most `MAX_SPARKLES` at once. */
 export const SPARKLE_GAP_MS = 60;
 export const SPARKLE_MS = 700;
@@ -49,9 +68,9 @@ const TOP_CLEAR = 72;
 /** Bright colours for glyphs and shapes, each readable with a white outline on the light page. */
 export const POP_COLORS = ["#ff4f6d", "#ff9f1c", "#2ec4b6", "#3a86ff", "#8338ec", "#ff5fb8", "#3ec300", "#ffbe0b"];
 
-/** One glyph or shape on the page. */
-type Pop = { id: number; x: number; y: number; size: number; color: string; turn: number } & (
-  | { kind: "glyph"; text: string }
+/** One glyph or shape on the page; `reach` is how far it and its shapes reach round its middle. */
+type Pop = { id: number; x: number; y: number; size: number; reach: number; color: string; turn: number } & (
+  | { kind: "glyph"; text: string; count?: { n: number; shape: ShapeKind; color: string } }
   | { kind: "shape"; shape: ShapeKind }
 );
 
@@ -65,11 +84,13 @@ export function TapAwayPlay() {
   const { touchOnly } = useDevice();
   const { effects, ripple } = useTapFeedback();
   const softTap = useSoftTap(ripple);
-  const { surprises, spawn } = useSurprises();
+  const { surprises, spawn } = useSurprises(TAP_AWAY_SURPRISES);
   const { later } = useTimers();
   const root = useRef<HTMLDivElement>(null);
   const sparkles = useRef<HTMLDivElement>(null);
   const [pops, setPops] = useState<Pop[]>([]);
+  /** What stands on the page now, to place the next one beside it. */
+  const shown = useRef<Pop[]>([]);
   const [started, setStarted] = useState(false);
   const live = useRef(0);
   const nextId = useRef(0);
@@ -94,29 +115,36 @@ export function TapAwayPlay() {
   /** A size for this share of the area's shorter side. */
   const sized = (box: DOMRect, share: number, min: number, max: number) => Math.max(min, Math.min(max, Math.min(box.width, box.height) * share));
 
-  /** A free place for something `size` big, inside the area and clear of the top corners' notes, in px in the area. */
-  const spot = (box: DOMRect, size: number, at?: { x: number; y: number }) => {
+  /**
+   * A place for something reaching `reach` round its middle, inside the area and clear of the top corners' notes, in px
+   * in the area: where the finger landed (`at`, client px), else beside what is already there while there is room.
+   */
+  const spot = (box: DOMRect, reach: number, at?: { x: number; y: number }) => {
     const clamp = (v: number, min: number, max: number) => Math.max(min, Math.min(Math.max(min, max), v));
-    const x = at ? at.x - box.left : rand(size * 0.6, box.width - size * 0.6);
-    const y = at ? at.y - box.top : rand(TOP_CLEAR + size * 0.6, box.height - size * 0.6);
-    return { x: clamp(x, size * 0.5, box.width - size * 0.5), y: clamp(y, TOP_CLEAR + size * 0.45, box.height - size * 0.5) };
+    if (!at) {
+      const taken: Placed[] = [...shown.current, ...surprises.current().map((s) => ({ x: s.x, y: s.y, reach: s.size * 0.45 }))];
+      return freeSpot({ width: box.width, height: box.height, top: TOP_CLEAR }, reach, taken);
+    }
+    return { x: clamp(at.x - box.left, reach, box.width - reach), y: clamp(at.y - box.top, TOP_CLEAR + reach * 0.9, box.height - reach) };
   };
 
   /** Puts a glyph or shape on the page for `POP_MS`; false when too soon or too many. */
   const pop = useCallback(
-    (make: (box: DOMRect) => Omit<Pop, "id" | "color" | "turn">) => {
+    (make: (box: DOMRect, color: string) => Omit<Pop, "id" | "color" | "turn">) => {
       const box = area();
       const now = performance.now();
-      if (!box || live.current >= MAX_POPS || now - lastPop.current < MIN_CHANGE_MS) return false;
+      if (!box || live.current >= MAX_POPS || now - lastPop.current < POP_GAP_MS) return false;
       lastPop.current = now;
       let color = pick(POP_COLORS);
       while (color === lastColor.current) color = pick(POP_COLORS);
       lastColor.current = color;
-      const item = { ...make(box), id: nextId.current++, color, turn: rand(-14, 14) } as Pop;
+      const item = { ...make(box, color), id: nextId.current++, color, turn: rand(-12, 12) } as Pop;
       live.current++;
+      shown.current = [...shown.current, item];
       setPops((list) => [...list, item]);
       later(() => {
         live.current--;
+        shown.current = shown.current.filter((p) => p.id !== item.id);
         setPops((list) => list.filter((p) => p.id !== item.id));
       }, POP_MS);
       return true;
@@ -130,7 +158,7 @@ export function TapAwayPlay() {
       const shape = pick(SHAPES);
       const done = pop((box) => {
         const size = sized(box, SHAPE_SHARE, SHAPE_MIN, SHAPE_MAX);
-        return { kind: "shape", shape, size, ...spot(box, size, at) };
+        return { kind: "shape", shape, size, reach: size / 2, ...spot(box, size / 2, at) };
       });
       if (done) pick([playPop, playPlop, playBoing, playBlub])();
       return done;
@@ -144,7 +172,7 @@ export function TapAwayPlay() {
       const box = area();
       if (box) {
         const size = sized(box, SURPRISE_SHARE, SURPRISE_MIN, SURPRISE_MAX);
-        const { x, y } = spot(box, size, at);
+        const { x, y } = spot(box, size / 2, at);
         if (spawn(x, y, size)) return;
       }
       if (!popShape(at)) softTap(at?.x, at?.y);
@@ -162,9 +190,15 @@ export function TapAwayPlay() {
       if (!name && digit === undefined) return surprise();
       // The same key again is shown and sounded only after its pause: meanwhile it ripples, silently.
       if (!repeats.pass(upper)) return softTap(undefined, undefined, true);
-      const done = pop((box) => {
-        const size = sized(box, GLYPH_SHARE, GLYPH_MIN, GLYPH_MAX);
-        return { kind: "glyph", text: digit === undefined ? upper : key, size, ...spot(box, size) };
+      const done = pop((box, color) => {
+        const full = sized(box, GLYPH_SHARE, GLYPH_MIN, GLYPH_MAX);
+        if (!digit) return { kind: "glyph", text: digit === undefined ? upper : key, size: full, reach: full / 2, ...spot(box, full / 2) };
+        // A digit: its number with as many shapes of one kind round it, in another colour, popping in one by one.
+        const size = full * COUNTED_SHARE;
+        const reach = size * (RING_SHARE + THING_SHARE / 2);
+        let thingColor = pick(POP_COLORS);
+        while (thingColor === color) thingColor = pick(POP_COLORS);
+        return { kind: "glyph", text: key, size, reach, count: { n: digit, shape: pick(COUNT_SHAPES), color: thingColor }, ...spot(box, reach) };
       });
       if (!done) return softTap();
       playChimeNote(name?.index ?? digit ?? 0);
@@ -255,6 +289,27 @@ const PopView = memo(function PopView({ pop }: { pop: Pop }) {
   return (
     <span className={`tw-pop ${pop.kind === "glyph" ? "tw-glyph" : "tw-shape"}`} style={style}>
       {pop.kind === "glyph" ? <span style={{ fontSize: pop.size * 0.86 }}>{pop.text}</span> : <ShapeView shape={pop.shape} color={pop.color} />}
+      {pop.kind === "glyph" && pop.count && <Counted size={pop.size} {...pop.count} />}
     </span>
   );
 });
+
+/** A digit's shapes: `n` of one kind on a ring round its number, from the top clockwise, popping in one after the other. */
+function Counted({ n, shape, color, size }: { n: number; shape: ShapeKind; color: string; size: number }) {
+  const thing = size * THING_SHARE;
+  return Array.from({ length: n }, (_, i) => {
+    const angle = -Math.PI / 2 + (i * 2 * Math.PI) / n;
+    const style = {
+      left: size / 2 + Math.cos(angle) * size * RING_SHARE - thing / 2,
+      top: size / 2 + Math.sin(angle) * size * RING_SHARE - thing / 2,
+      width: thing,
+      height: thing,
+      "--delay": `${120 + i * 70}ms`,
+    } as CSSProperties;
+    return (
+      <span key={i} className="tw-thing" style={style}>
+        <ShapeView shape={shape} color={color} />
+      </span>
+    );
+  });
+}
