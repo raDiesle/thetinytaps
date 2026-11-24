@@ -413,11 +413,65 @@
   }
 }
 
+/*
+ * On a phone (shorter side < 600 px) a line is only its picture and its name: the dots and the page number, a few
+ * pixels between a short name and the line's end, looked odd there and only took the picture's room (user feedback
+ * from Buchstaben & Zahlen, November 2026). The picture takes more of a flat line, the name stands centred in what is
+ * left, whole words on up to three lines (never „Mitma-chen“), and under a picture centred on up to two – never cut off,
+ in any language (look at the longest, Russian and Spanish, at 844×390 and 390×844).
+ */
 @media (max-width: 599.98px), (max-height: 599.98px) {
   .toc {
     --toc-top: 64px;
     --toc-bottom: max(40px, 12vh, var(--menu-floor));
     width: min(100% - 28px, 900px);
+  }
+
+  .toc-dots,
+  .toc-page {
+    display: none;
+  }
+
+  .toc-name {
+    align-items: center;
+    padding-inline: 4px;
+    text-align: center;
+  }
+
+  .toc-title {
+    hyphens: manual;
+  }
+
+  @container (min-aspect-ratio: 12 / 5) {
+    .toc-line {
+      --toc-pic-h: min(100cqh, 52cqw / 1.5);
+      padding-inline-end: 0;
+    }
+
+    .toc-name {
+      flex: 1 1 0;
+    }
+
+    .toc-title {
+      font-size: max(13px, min(20cqh, 6cqw));
+    }
+  }
+
+  @container (max-aspect-ratio: 12 / 5) {
+    .toc-line {
+      --toc-name-h: max(36px, 15cqw);
+      padding-bottom: 1cqw;
+    }
+
+    .toc-name {
+      flex-basis: 100%;
+    }
+
+    .toc-title {
+      font-size: max(13px, min(6cqw, 8cqh));
+      line-height: 1.1;
+      -webkit-line-clamp: 2;
+    }
   }
 }
 

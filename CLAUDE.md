@@ -960,7 +960,8 @@ src/lib/                 speech, sfx (synthesized + recorded sounds), storage, d
   decision, October 2026), the app's name „Fun for Both“ in its title, each category a picture book standing on it with its cover out;
   a category's page looks like its book's table of contents (`BookContents`, user feedback, October 2026): one line per
   game – its framed picture, its name, dots leading to its page number (the first game on page 1,
-  `gamePage`, user feedback, October 2026) – each line a soft wash of
+  `gamePage`, user feedback, October 2026; on a phone only picture and name, the name centred and never broken inside a
+  word – the dots and number squeezed beside a short name looked odd there, user feedback, November 2026) – each line a soft wash of
   its world's colour and all of it the tap, never cards. The lines stand side by side in columns and share the page's
   room (`contentsGrid`: up to three in a row, more in two rows, two columns upright), never one long column of flat
   lines, so the pictures are big (user request, November 2026); a tall line has its picture above the name, a flat one
