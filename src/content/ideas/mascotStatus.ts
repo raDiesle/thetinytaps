@@ -162,6 +162,19 @@ export const MASCOT_STATUS: MascotStatusRow[] = [
     tasks: [{ label: "Tapsi und Familie in den Aufgabenbildern", work: "picture", pictures: 130, effort: "L", state: "done" }],
   },
   {
+    href: "/drauflos/",
+    note: "Nur Buchstaben, Formen und die Überraschungen von „Frei tippen“ auf leerem Papier – kein Platz für Fuchs oder Bär, und das Spiel will so wenig wie möglich im Bild.",
+    tasks: [
+      {
+        label: "Fuchs oder Bär, der auf der Seite zuschaut oder mitklatscht",
+        work: "drawing",
+        effort: "S",
+        state: "removed",
+        note: "Nicht bauen: nur Deko neben dem, was das Kind selbst auslöst (Regel November 2026).",
+      },
+    ],
+  },
+  {
     href: "/bilder/",
     note: "Alles SVG. Viele Menschen: Fahrer, Erzieherin, Ärztin, Feuerwehr, Pilotin, Kassiererin, Bäckerin, Förster, Bauer, Mama, Papa, Oma, Opa. Fuchs und Bär gibt es als Tiere im Wald und im Winter, als Fahrer und Erwachsene in Rollen (auch Bauarbeiter, Astronauten, Rettungsschwimmerin) und als Überraschung im Versteck.",
     tasks: [

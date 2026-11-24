@@ -82,7 +82,8 @@ describe("home menu", () => {
 
   // The books on the shelf show a picture painted for them, not emojis (user decision, October 2026).
   test("every picture book on the shelf has a cover picture", () => {
-    for (const category of CATEGORIES.filter((c) => !c.apart)) expect(existsSync(`src/components/bilder/cover-${category.id}.webp`), category.id).toBe(true);
+    for (const category of CATEGORIES.filter((c) => !c.apart && !c.toy))
+      expect(existsSync(`src/components/bilder/cover-${category.id}.webp`), category.id).toBe(true);
   });
 
   // A book spine out carries a small picture from its own game on its label, never an emoji: the pictures look better
@@ -96,7 +97,7 @@ describe("home menu", () => {
   });
 
   test("every category has its world (backdrop, card colours, the picture on its card)", () => {
-    for (const category of CATEGORIES) expect(WORLDS as readonly string[], category.id).toContain(category.id);
+    for (const category of CATEGORIES.filter((c) => !c.toy)) expect(WORLDS as readonly string[], category.id).toContain(category.id);
   });
 
   test("every card has a short line for grown-ups that fits in two lines", () => {

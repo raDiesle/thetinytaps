@@ -13,6 +13,7 @@ import {
   TAKE_OUT,
   UNDER_SIGN,
   WORDS_BREATH,
+  TOY_SPAN,
 } from "./shelfLayout";
 
 /** The home page's places: the everyday helpers' books with the words carved before them, then three picture books. */
@@ -22,7 +23,9 @@ const BOOKS = [3, 1, 1, 1];
 const CARVED = 1.4 + LEAN_CLEAR / BOOK_ASPECT;
 
 /** The home page's places as Bookshelf.tsx makes them: the everyday helpers with the carved words, four picture books. */
-const HOME = [3.9 + CARVED, 1, 1, 1, 1];
+const BOOKS_ONLY = [3.9 + CARVED, 1, 1, 1, 1];
+/** …and the toy keyboard after them (`TOY_SPAN`). */
+const HOME = [...BOOKS_ONLY, TOY_SPAN];
 
 /** A phone on its side, upright, a tablet, a laptop, a big monitor (the room the shelf gets in each). */
 const ROOMS = [
@@ -199,10 +202,20 @@ describe("the bookshelf", () => {
   // With the home page's places (the everyday helpers and the words carved before them filling the top board, four
   // picture books below), the picture books on a laptop are clearly bigger than the full top board makes its books.
   test("the picture books below are bigger than the full top board makes its books, in a 1250 × 640 room", () => {
-    const plan = planShelf(1250, 640, HOME, OPTIONS(640));
+    const plan = planShelf(1250, 640, BOOKS_ONLY, OPTIONS(640));
     const [top, below] = plan.cells.filter((c) => c.books);
     expect(top.bh).toBeCloseTo(plan.bookHeight);
     expect(below.bh ?? 0).toBeGreaterThan(plan.bookHeight * 1.15);
+  });
+
+  // The toy keyboard stands on the picture books' board (user request, 24 November 2026), and every picture book is as big
+  // as that board allows: so the toy is small (`TOY_SPAN`), and the picture books keep most of their size beside it.
+  test.each(ROOMS)("the toy keyboard leaves the picture books at least 85 %% of their size, in a %i × %i room", (width, height) => {
+    const sizes = (spans: number[]) => {
+      const plan = planShelf(width, height, spans, OPTIONS(height));
+      return plan.cells.filter((c) => c.books?.includes(1)).map((c) => c.bh ?? plan.bookHeight);
+    };
+    expect(sizes(HOME)[0]).toBeGreaterThanOrEqual(sizes(BOOKS_ONLY)[0] * 0.85);
   });
 
   // On a tablet the sign beside the carved words took half the top board, and the everyday helpers' spines were too thin

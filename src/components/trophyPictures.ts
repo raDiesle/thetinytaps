@@ -46,7 +46,9 @@ export function trophyPicture(game: string, level: string, figure: Figure = "boy
  * „Wie geht's dir?“ borrows Gefühle's pictures, so it gets its one trophy only.
  */
 export function everyTrophy(): TrophyWon[] {
-  return CATEGORIES.flatMap((category) => category.games)
+  // A toy on the shelf (`Category.toy`) has no end, so no trophy.
+  return CATEGORIES.filter((category) => !category.toy)
+    .flatMap((category) => category.games)
     .filter((game) => !game.unfinished)
     .flatMap((game) => {
       const levels = game.href === "/wie-gehts-dir/" ? [] : Object.keys(LEVELS[game.href] ?? {}).map((file) => file.replace(/\.webp$/, ""));

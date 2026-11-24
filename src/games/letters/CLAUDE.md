@@ -118,7 +118,9 @@ the page before it.
   the test checks every surprise file); the letters' and numbers' pictures keep theirs. A surprise's wrapper names its kind as `data-kind`, never as a class
   `ft-<kind>`: that is the class its own drawing animates, and once ran the snowflake's grow-and-fade on the whole
   surprise, so its small flakes never showed. Zählen and the other games keep their calm ripples: this
-  is Frei tippen's own, never a pattern for other games' answers (root `CLAUDE.md`). A new kind goes into
+  is Frei tippen's own, never a pattern for other games' answers (root `CLAUDE.md`) – the one other game that opens
+  them is „Drauflos tippen“ (`src/games/tapaway/`), Frei tippen without its card, where the show is the whole game; a
+  change to `useSurprises` or `SurpriseLayer` is checked there too. A new kind goes into
   `ART_KINDS` (`SurpriseArt.tsx`) or `CANVAS_KINDS` (`surpriseCanvas.ts`), its classes and latest delay into the
   test's `CLASSES` and `LATEST_DELAY_MS`; in the dev server `__surprise("<kind>")` makes the next surprise that kind.
 - Choices show the plain value, not an example to decode: the word length is the number of letters (3, 4, 7).

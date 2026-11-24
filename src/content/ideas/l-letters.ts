@@ -217,5 +217,16 @@ export const lettersIdeas: IdeaArea = {
         "Als eigenes Spiel im Buch „Buchstaben & Zahlen“ (/gross-klein/, November 2026),, für alle spielbar; ohne Augen und ohne Kette zwischen den Buchstaben. Name, Zeile und die Frage „Wo ist das kleine …?“ übersetzt am 19. November 2026; die Frage ist nur auf Deutsch aufgenommen.",
       done: true,
     },
+    {
+      id: "L-24",
+      emoji: "🎹",
+      title: "Drauflos tippen: Spielzeug-Tastatur im Regal",
+      text: "Ein Spiel ohne Buch, als hölzerne Spielzeug-Tastatur neben den Bilderbüchern im Regal: jede Taste, jeder Tipp und jeder Klick bringt sofort etwas Buntes mit Ton – ein Buchstabe oder eine Zahl groß auf der Seite mit seinem Namen, sonst eine Überraschung aus „Frei tippen“ oder eine bunte Form, und die Maus zieht eine kurze Glitzerspur. Nichts zu finden, nichts zu lernen, keine Karte.",
+      why: "Für das Drauflostippen kleiner Kinder auf Tastatur, Maus oder Bildschirm, wonach Eltern suchen: es passiert immer etwas, und nichts geht kaputt.",
+      effort: "M",
+      partial:
+        "Gebaut am 24. November 2026 (/drauflos/): ruhig gehalten wie jedes Spiel – höchstens fünf Buchstaben oder Formen und drei Überraschungen auf einmal, dieselbe Taste erst nach einer Pause wieder; kein Zähler, kein Ende.",
+      done: true,
+    },
   ],
 };

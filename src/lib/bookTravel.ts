@@ -39,6 +39,8 @@ const still = () => matchMedia("(prefers-reduced-motion: reduce)").matches;
  */
 export function shelfBookOf(pathname: string): string | undefined {
   const entry = shelfEntryOf(pathname);
+  // A toy on the shelf (`Category.toy`) is no book to close: the way back from its game just goes to the shelf.
+  if (entry?.category.toy) return undefined;
   const path = pathname.endsWith("/") ? pathname : `${pathname}/`;
   // The longest address that fits: a volume may stand at an address below another's („/abstillen/nachts/“).
   const volume = (entry?.game && shelfVolumes(entry.game))?.filter((v) => path.startsWith(v.href)).sort((a, b) => b.href.length - a.href.length)[0];

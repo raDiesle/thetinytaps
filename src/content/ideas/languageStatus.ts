@@ -331,6 +331,12 @@ export const LANGUAGE_STATUS: LanguageStatusRow[] = [
     ],
   },
   {
+    href: "/drauflos/",
+    recorded: true,
+    languages: { de: "done", en: "done", zh: "done", hi: "done", es: "done", ar: "done", ru: "done" },
+    note: "Neu (24. November 2026, L-24), englisch zuerst und gleich in alle sieben Sprachen übersetzt: Name, Zeile, die Aufforderung vor dem ersten Druck („Drück irgendeine Taste!“ / „Tipp irgendwohin!“) und die Texte für Suchmaschinen. Gesprochen werden nur die Buchstabennamen, aus den Aufnahmen von „Buchstaben & Zahlen“ in jeder Sprache; sonst nur Töne.",
+  },
+  {
     href: "/bilder/",
     note: "Viele Namen und Sätze je Bild; jede Sprache in <Sprache>.ts jeder Szene (ru.ts, en.ts …), Satzbau in phrases.ts.",
     parts: [

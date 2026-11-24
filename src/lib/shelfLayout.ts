@@ -33,6 +33,13 @@ export const DAILY_TALL = 1.4;
 export type ShelfThing = "music" | "playtime" | "figure" | "language";
 
 /** In this order where they stand in a row (on top of an upright screen's shelf), the stickers at the right side. */
+/**
+ * The toy keyboard's width among the picture books, in picture books (`Category.toy`, user request, 24 November 2026: a
+ * little toy, smaller than a book). Every picture book has no room to spare on its board, so whatever the toy takes comes
+ * off them: at this width they stay at least 85 % of their size without it (`shelfLayout.test.ts`).
+ */
+export const TOY_SPAN = 0.6;
+
 export const SHELF_THINGS: ShelfThing[] = ["music", "playtime", "language", "figure"];
 
 /**
@@ -222,12 +229,13 @@ function split(count: number, rows: number): number[][] {
 /**
  * The places on two boards of a wide shelf: the everyday helpers' books (wider than a picture book) with the words
  * carved before them alone up top, the picture books together below, where a child's eye finds them side by side (user
- * decision, November 2026). Evenly split where there are no such books or the picture books would be too many for one board.
+ * decision, November 2026) – the toy keyboard among them (`Category.toy`). Evenly split where there are no such books or
+ * the picture books would be too many for one board.
  */
 function boardsOf(spans: number[], rows: number): number[][] {
   const wide = spans.flatMap((s, i) => (s > 1 ? [i] : []));
   const rest = spans.flatMap((s, i) => (s > 1 ? [] : [i]));
-  if (rows !== 2 || !wide.length || !rest.length || rest.length > 4) return split(spans.length, rows);
+  if (rows !== 2 || !wide.length || !rest.length || rest.length > 5) return split(spans.length, rows);
   return [wide, rest];
 }
 
@@ -239,7 +247,12 @@ function boardsOf(spans: number[], rows: number): number[][] {
 function uprightBoards(spans: number[]): number[][] {
   const wide = spans.flatMap((s, i) => (s > 1 ? [[i]] : []));
   const rest = spans.flatMap((s, i) => (s > 1 ? [] : [i]));
-  const pairs = Array.from({ length: Math.ceil(rest.length / 2) }, (_, r) => rest.slice(2 * r, 2 * r + 2));
+  // A small toy (`TOY_SPAN`) stands before the last pair rather than alone on a board of its own, which took a board's
+  // height from every picture book – at the board's left, since the trophy sign hangs at its right end.
+  const books = rest.filter((i) => spans[i] >= 1);
+  const pairs = Array.from({ length: Math.ceil(books.length / 2) }, (_, r) => books.slice(2 * r, 2 * r + 2));
+  const toys = rest.filter((i) => spans[i] < 1);
+  if (toys.length) pairs.length ? pairs[pairs.length - 1].unshift(...toys) : pairs.push(toys);
   return [...wide, ...pairs];
 }
 
