@@ -31,7 +31,7 @@ export const AGAIN_OR_NEXT: Localized = {
   es: "¿Otra vez o siguiente?",
   ar: "مرة أخرى أم التالي؟",
 };
-/** „Weiter“, read out on its button (its picture or the drawn play sign shows no word). */
+/** „Weiter“, read out on its button (its picture and the drawn arrow show no word). */
 const NEXT: Localized = { de: "Weiter", ru: "Дальше", en: "Next", zh: "下一个", hi: "आगे", es: "Siguiente", ar: "التالي" };
 /** The same where there is no „Weiter“ (one story only, Aufs Töpfchen). */
 export const AGAIN_ONLY: Localized = { de: "Nochmal?", ru: "Ещё раз?", en: "Again?", zh: "再来一次？", hi: "फिर से?", es: "¿Otra vez?", ar: "مرة أخرى؟" };
@@ -111,8 +111,10 @@ interface GameEndProps {
  * „Geschafft!“, then on its board beside them (`AWARD_MS`). Nothing else stands beside
  * them: a fox or bear family cheering there (D-12) was only decoration a child wanted to tap, and was taken out again
  * (user feedback, November 2026). No emoji and no words, since children don't read (user feedback and request, November 2026): „Nochmal“
- * is the drawn round arrow on a paper slip, „Weiter“ the next level's picture taped on (`next.picture`) or, where the
- * game has none, the drawn play sign on a big painted label. The way back is
+ * is the drawn round arrow on a paper slip, „Weiter“ the next level's picture taped on (`next.picture`) with the drawn
+ * arrow pointing on in it or, where the game has none, that arrow alone on a big painted label. Over the picture's foot
+ * „Weiter“ stands at the far right, „Nochmal“ just left of it and the trophy in the bottom left, so the middle of the
+ * picture stays free (user request, November 2026). The way back is
  * no button here but the page's corner in the top left, as in every menu – the ✕, or the book's ribbon where the game
  * goes back onto the shelf (GameShell, told by `useEndShown`; a „Menü“ button was one way back too many, user feedback,
  * November 2026). Only Zähne putzen and Aufs Töpfchen, played once and done, show „Menü“ instead of „Nochmal“ (`menu`),
@@ -224,7 +226,7 @@ export function GameEnd({ onAgain, menu = false, next, delayMs = 0, corners = fa
 
   if (!shown) return null;
 
-  // „Weiter“ is the next level's picture where the game hands one over, else the drawn play sign (children don't read).
+  // „Weiter“ is the next level's picture where the game hands one over, else the drawn arrow alone (children don't read).
   const pictured = Boolean(next?.picture || next?.art);
 
   // Pointer down, not click: it reacts right away, and the game underneath doesn't get the tap.
@@ -321,12 +323,20 @@ export function GameEnd({ onAgain, menu = false, next, delayMs = 0, corners = fa
           aria-label={[t(NEXT), next.name].filter(Boolean).join(": ")}
           {...press("weiter", next.onNext)}
         >
-          {next.picture ? (
-            <img className="game-end-next-picture" src={next.picture} alt="" draggable={false} />
-          ) : next.art ? (
-            <span className="game-end-next-picture game-end-next-art">{next.art}</span>
+          {pictured ? (
+            // On the picture, the drawn arrow pointing on, so it reads as „on to this one“ (user request, November 2026).
+            <span className="game-end-next-frame">
+              {next.picture ? (
+                <img className="game-end-next-picture" src={next.picture} alt="" draggable={false} />
+              ) : (
+                <span className="game-end-next-picture game-end-next-art">{next.art}</span>
+              )}
+              <span className="game-end-next-badge">
+                <ControlIcon kind="next" />
+              </span>
+            </span>
           ) : (
-            <ControlIcon kind="play" className="game-end-next-arrow" />
+            <ControlIcon kind="next" className="game-end-next-arrow" />
           )}
           {showNext && next.name && <span className="game-end-next-name">{next.name}</span>}
         </button>

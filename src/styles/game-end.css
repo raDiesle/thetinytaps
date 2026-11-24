@@ -23,17 +23,18 @@
 }
 
 /*
- * Over the picture's foot the trophy stands apart from the buttons, in the bottom left corner, where there is room
- * (user request, 23 November 2026: beside „Weiter“ it crowded the buttons): the end spans the picture's width, its
- * buttons in the middle columns and the trophy in the first. Where the room beside the buttons is narrower than the
- * trophy, that column only takes the trophy's width and the buttons move right beside it. Only the buttons and the
- * trophy take taps: the rest of the strip lets them through to the picture.
+ * Over the picture's foot the trophy stands apart from the buttons, in the bottom left corner (user request, 23
+ * November 2026: beside „Weiter“ it crowded the buttons), and the buttons in the bottom right, „Weiter“ at the far right
+ * (user request, November 2026: in the middle they covered the picture): the end spans the picture's width with the
+ * free room between them. Only the buttons and the trophy take taps: the rest of the strip lets them through to the
+ * picture.
  */
 .game-end:not(.inline, .corners) {
   left: max(16px, env(safe-area-inset-left));
   right: max(16px, env(safe-area-inset-right));
   display: grid;
-  grid-template-columns: 1fr auto auto 1fr;
+  grid-template-columns: auto 1fr auto auto;
+  align-items: end;
   column-gap: clamp(12px, 3vw, 36px);
   translate: none;
   pointer-events: none;
@@ -44,12 +45,15 @@
   justify-self: start;
 }
 
+/* „Nochmal“ just left of „Weiter“, level with the middle of its picture. */
 .game-end:not(.inline, .corners) > .game-end-small {
-  grid-column: 2;
+  grid-column: 3;
+  align-self: center;
 }
 
+/* „Weiter“ at the far right, where a finger goes on as a page is turned (user request, November 2026). */
 .game-end:not(.inline, .corners) > .game-end-button.next {
-  grid-column: 3;
+  grid-column: 4;
 }
 
 .game-end:not(.inline, .corners) > :not(.game-end-prize) {
@@ -130,6 +134,44 @@
   border-radius: 8px;
   object-fit: cover;
   pointer-events: none;
+}
+
+/* The drawn arrow on the picture, pointing on (user request, November 2026): a round painted label near its right
+   edge, white arrow on the world's colour, as „Weiter“ without a picture is painted, so it is seen on any picture. Sized
+   by the picture (its frame), never past its edge, also where the next one's name stands under it. */
+.game-end-next-frame {
+  position: relative;
+  display: block;
+}
+
+.game-end-next-badge {
+  position: absolute;
+  top: 50%;
+  right: 7%;
+  display: grid;
+  place-items: center;
+  height: 46%;
+  aspect-ratio: 1;
+  translate: 0 -50%;
+  border: 2.5px solid var(--ink);
+  border-radius: 50%;
+  background: color-mix(in srgb, var(--accent) 92%, var(--paper));
+  box-shadow: 0 3px 6px -2px #2a180c80;
+  pointer-events: none;
+}
+
+.game-end-next-badge svg {
+  display: block;
+  width: 70%;
+  height: 70%;
+  /* A touch right of the middle, so the arrow sits in the round as an arrow does, its head bigger than its tail. */
+  translate: 4% 0;
+}
+
+.game-end-next-badge path {
+  fill: #fff;
+  stroke: var(--ink);
+  stroke-width: 2.5px;
 }
 
 /* A drawn picture of what comes (`next.art`: the Timer's card, the Counting Tower's goal) in the same frame. */
@@ -385,7 +427,7 @@
   font-size: clamp(1.1rem, 3vw, 1.6rem);
 }
 
-/* „Weiter“ without a picture of what comes (a game whose levels have none): the drawn ▶ on its painted label. */
+/* „Weiter“ without a picture of what comes (a game whose levels have none): the drawn arrow on its painted label. */
 .game-end-button.next.arrow {
   padding: 0.12em 0.5em;
 }
