@@ -104,6 +104,35 @@ function poseFor(anchor: BrushAnchor, surface: Surface, tooth: ToothId): Pose {
   return { at: anchor.at, u: across(forward, into), b: into };
 }
 
+/** Half the head's length along the handle, its width across and its depth from its back to the bristles' tips, tufts included, in brush units (`BOXES`). */
+const HEAD_HALF = { u: 23.5, w: 11.5, b: 9.5 };
+
+/**
+ * Which way a monster the brush catches is squeezed out on the screen, and how far the head reaches from its middle
+ * that way: across the head where it is thinnest on the screen, so the squeezed monster shows on both sides of the
+ * brush even though the brush lies in front of it (user request, November 2026). `angle` in degrees (clockwise on the
+ * screen), `reach` in the projector's units.
+ */
+export function squeezeOut(anchor: BrushAnchor, surface: Surface, tooth: ToothId, project: Projector): { angle: number; reach: number } {
+  const pose = poseFor(anchor, surface, tooth);
+  const from = project.point(pose.at);
+  const onScreen = (v: Vec3, length: number) => {
+    const q = project.point(add(pose.at, scale(v, length * SIZE)));
+    return { x: q.x - from.x, y: q.y - from.y };
+  };
+  const along = onScreen(pose.u, HEAD_HALF.u);
+  const across = onScreen(cross(pose.u, pose.b), HEAD_HALF.w);
+  const deep = onScreen(pose.b, HEAD_HALF.b);
+  // The head is a box: how far its outline on the screen reaches each way, tried every 15°.
+  let best = { angle: 0, reach: Infinity };
+  for (let angle = 0; angle < 180; angle += 15) {
+    const d = { x: Math.cos((angle * Math.PI) / 180), y: Math.sin((angle * Math.PI) / 180) };
+    const reach = [along, across, deep].reduce((sum, v) => sum + Math.abs(v.x * d.x + v.y * d.y), 0);
+    if (reach < best.reach) best = { angle, reach };
+  }
+  return best;
+}
+
 /** One stroke, circle or wipe takes two beats of the song (112 BPM), calm enough to follow along; `.brush-move` in teeth.css. */
 const STROKE_S = 120 / 112;
 

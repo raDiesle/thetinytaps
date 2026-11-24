@@ -35,7 +35,7 @@ import {
   viewedLips,
 } from "./jaw";
 import { BROW, Ear, EyeBall, EyeLid, eyeOpening, FACE, HAIR, Hair, HEAD_UNITS, type HeadMap, INK, Iris, LASHES, LIP, Nose, SkinGradient } from "./face";
-import { Brush, lerp3, type BrushAnchor } from "./brush";
+import { Brush, lerp3, squeezeOut, type BrushAnchor } from "./brush";
 import type { Motion } from "./steps";
 import { faceKey } from "./stains";
 
@@ -668,6 +668,7 @@ export function Mouth({ view, zone, monsters, dirty, brush, happy, dazzled, acti
     // The ones being brushed move, so each lies in a layer of its own (Sprite), placed on the screen.
     const spot = m.waiting ? { x: at.x, y: at.y, scale: MONSTER_SIZE * project.zoom } : onScreen(at, MONSTER_SIZE * project.zoom);
     const lean = leanOn(jaw.direction(face.normal), facing);
+    const squeeze = m.gone && !m.waiting ? squeezedBy(squeezeOut(anchorAt(m, m.surface), m.surface, m.tooth, jaw), lean, MONSTER_SIZE * project.zoom) : null;
     return (
       <PlacedMonster
         key={m.id}
@@ -682,6 +683,8 @@ export function Mouth({ view, zone, monsters, dirty, brush, happy, dazzled, acti
         active={!m.waiting}
         still={m.waiting}
         gone={m.gone}
+        squeezeAngle={squeeze?.angle ?? 0}
+        squeezeBy={squeeze?.by ?? 1}
         scared={m.scared}
         tickled={m.tickled}
         blinkMs={m.blinkMs}
@@ -963,6 +966,8 @@ const PlacedMonster = memo(function PlacedMonster({
   scale,
   lean,
   sprite,
+  squeezeAngle,
+  squeezeBy,
   onTickle,
   ...monster
 }: {
@@ -974,6 +979,9 @@ const PlacedMonster = memo(function PlacedMonster({
   /** How it lies flat on its tooth's face (`leanOn`): a matrix's first four numbers, or "" facing us. */
   lean: string;
   sprite: boolean;
+  /** Caught by the brush (`gone`): which way it is squeezed out in its sprite, in degrees, and how far (`squeezedBy`). */
+  squeezeAngle: number;
+  squeezeBy: number;
   onTickle: (id: number) => void;
 } & Omit<Parameters<typeof Monster>[0], "onTickle">) {
   // While the head turns only the place changes: the monster itself is kept, so React doesn't draw it again.
@@ -1003,7 +1011,18 @@ const PlacedMonster = memo(function PlacedMonster({
         className={`monster-sprite${gone ? " gone" : ""}${scared ? " scared" : ""}${tickled ? " tickled" : ""}`}
       >
         {active && <div className="sprite-glow" />}
-        <div className="sprite-body">
+        <div
+          className="sprite-body"
+          style={
+            gone
+              ? ({
+                  "--squeeze-a": `${squeezeAngle}deg`,
+                  "--squeeze-k": squeezeBy,
+                  "--squeeze-s": round(1 / Math.sqrt(squeezeBy), 100),
+                } as CSSProperties)
+              : undefined
+          }
+        >
           <svg viewBox={spriteBox(MONSTER_REACH)}>{drawn}</svg>
         </div>
         {gone && <MonsterDust color={color} />}
@@ -1011,6 +1030,32 @@ const PlacedMonster = memo(function PlacedMonster({
     );
   return <g transform={`translate(${x} ${y}) scale(${scale})${lean && ` matrix(${lean} 0 0)`}`}>{drawn}</g>;
 });
+
+/** How far a monster reaches from its middle across, in its own units (`Monster`, about 30 wide). */
+const MONSTER_HALF = 15;
+/** How far a squeezed monster shows past the brush's head on each side, in its own half-widths. */
+const SQUEEZE_PAST = 1;
+
+/**
+ * How a monster the brush catches is squeezed: so flat under the head that it bulges out past the head's edges on
+ * both sides, where the head is thinnest on the screen (`squeezeOut`) – the brush lies in front of it, and only so is
+ * it seen that the brush has caught it (user request, November 2026). The squeeze is done inside the sprite, under its
+ * lean (`leanOn`), so the screen's direction is turned back through the lean first. `size` is how big one of the
+ * monster's units is in the picture; `angle` in degrees in the sprite, `by` how much longer it gets that way.
+ */
+export function squeezedBy(head: { angle: number; reach: number }, lean: string, size: number): { angle: number; by: number } {
+  const a = (head.angle * Math.PI) / 180;
+  let d = { x: Math.cos(a), y: Math.sin(a) };
+  if (lean) {
+    const [m11, m12, m21, m22] = lean.split(" ").map(Number);
+    // CSS matrix(a, b, c, d): x' = a x + c y, y' = b x + d y; solved for the sprite's own direction.
+    const det = m11 * m22 - m21 * m12 || 1;
+    d = { x: (m22 * d.x - m21 * d.y) / det, y: (-m12 * d.x + m11 * d.y) / det };
+  }
+  const stretch = Math.hypot(d.x, d.y);
+  const by = Math.min(3.4, Math.max(1.8, (head.reach / (MONSTER_HALF * size) + SQUEEZE_PAST) * stretch));
+  return { angle: Math.round((Math.atan2(d.y, d.x) * 180) / Math.PI / 5) * 5, by: round(by) };
+}
 
 /**
  * A monster lies on its tooth's face, not upright in front of it (user feedback, November 2026: on the teeth seen from
@@ -1069,7 +1114,8 @@ function MonsterDust({ color }: { color: string }) {
               "--dy": `${d.dy}%`,
               "--size": `${d.size}%`,
               "--grain": color,
-              animationDelay: `${(d.delay * 0.536).toFixed(3)}s`,
+              // After the beat it is held squeezed under the brush.
+              animationDelay: `${((1 + d.delay) * 0.536).toFixed(3)}s`,
             } as CSSProperties
           }
         />
