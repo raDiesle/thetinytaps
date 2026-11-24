@@ -57,7 +57,8 @@ describe("trophies", () => {
   });
 
   test("every game's trophy has a picture in its medallion", () => {
-    for (const game of CATEGORIES.flatMap((category) => category.games)) {
+    // A toy on the shelf (`Category.toy`) has no end, so no trophy.
+    for (const game of CATEGORIES.filter((category) => !category.toy).flatMap((category) => category.games)) {
       if (game.unfinished) continue;
       expect(trophyPicture(game.href, ""), game.href).toBeTruthy();
     }
@@ -155,7 +156,7 @@ describe("trophies", () => {
     const all = everyTrophy();
     const keys = all.map((trophy) => `${trophy.game}#${trophy.level}`);
     expect(new Set(keys).size).toBe(keys.length);
-    for (const game of CATEGORIES.flatMap((category) => category.games)) {
+    for (const game of CATEGORIES.filter((category) => !category.toy).flatMap((category) => category.games)) {
       if (!game.unfinished)
         expect(
           all.some((trophy) => trophy.game === game.href),

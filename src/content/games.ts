@@ -8,6 +8,7 @@ import { KITA_STORY_BLURB, KITA_STORY_BOOK } from "@/games/kitastory/names";
 import { HAIR_STORY_BLURB, HAIR_STORY_BOOK } from "@/games/hairstory/names";
 import { BED_STORY_BLURB, BED_STORY_BOOK } from "@/games/bedstory/names";
 import { HANDWASH_BLURB, HANDWASH_TITLE } from "@/games/handwash/names";
+import { TAP_AWAY_BLURB, TAP_AWAY_TITLE } from "@/games/tapaway/names";
 import {
   CASE_BLURB,
   CASE_TITLE,
@@ -74,6 +75,12 @@ export interface Category {
    * spine carrying its game's name, and open their game directly. The category has no page and no book of its own.
    */
   apart?: boolean;
+  /**
+   * A toy standing on the shelf instead of a book (user request, 24 November 2026): its one game is opened by tapping the
+   * toy – a wooden toy keyboard for „Tap Away“ (`ShelfToy` in Bookshelf.tsx) –, with no book to take out, no cover and
+   * no page of its own; its way back is the shelf.
+   */
+  toy?: "keyboard";
 }
 
 /** The home menu: the books on the shelf, one per category, then its games – the book's pages (on `/spiele/<id>/`). */
@@ -276,6 +283,17 @@ export const CATEGORIES: Category[] = [
         },
       },
     ],
+  },
+  {
+    // „Tap Away“ (user request, 24 November 2026): a toy for banging on keys, mouse or screen, in no book – it stands
+    // as a wooden toy keyboard (`toy`) first on the picture books' board, at its left: at its right end the trophy sign
+    // hangs, which hid it.
+    id: "drauflos",
+    emoji: "🎹",
+    title: TAP_AWAY_TITLE,
+    blurb: TAP_AWAY_BLURB,
+    toy: "keyboard",
+    games: [{ href: "/drauflos/", emoji: "🎹", title: TAP_AWAY_TITLE, blurb: TAP_AWAY_BLURB }],
   },
   {
     id: "lebendige-welten",

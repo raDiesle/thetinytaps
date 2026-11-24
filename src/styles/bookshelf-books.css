@@ -819,3 +819,53 @@
 :root[lang="zh"] .shelf-daily-title {
   --per-letter: 0.95;
 }
+
+/*
+ * The toy keyboard (`ShelfToy`, `Category.toy`): a wooden toy standing among the picture books at the board's front edge,
+ * narrower and lower than one of them (`TOY_SPAN`), leaning back against what stands behind it so its bright keys face the room. A tap
+ * presses it down a little and lets it come up again (one transform of the whole HTML element, never inside its svg).
+ */
+.shelf-row > .shelf-toy {
+  --bw: calc(var(--bh) * 0.82 * 0.6); /* `TOY_SPAN` picture books */
+  position: relative;
+  flex: none;
+  align-self: flex-end;
+  width: var(--bw);
+  height: calc(var(--bw) * 100 / 120);
+  transform-origin: 50% 100%;
+  transform: translateZ(calc(var(--d) * 0.22)) rotateX(14deg);
+  transition: transform 0.35s cubic-bezier(0.3, 0.7, 0.4, 1.2);
+  -webkit-tap-highlight-color: transparent;
+}
+
+.shelf-toy-art {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  overflow: visible;
+}
+
+.shelf-toy-shadow {
+  position: absolute;
+  inset: auto -6% -4% -6%;
+  height: 18%;
+  border-radius: 50%;
+  background: radial-gradient(closest-side, #00000059, #0000);
+}
+
+@media (hover: hover) {
+  .shelf-row > .shelf-toy:hover {
+    transform: translateZ(calc(var(--d) * 0.3)) translateY(-4%) rotateX(6deg);
+  }
+}
+
+.shelf-row > .shelf-toy:focus-visible {
+  outline: 4px solid var(--ocean);
+  outline-offset: 3px;
+}
+
+.shelf-row > .shelf-toy.pressed {
+  transition-duration: 0.12s;
+  transform: translateZ(calc(var(--d) * 0.22)) translateY(3%) rotateX(22deg) scale(0.97);
+}

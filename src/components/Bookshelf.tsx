@@ -9,8 +9,8 @@ import { bookIdOf, CATEGORIES, hasPage, SHELF, shelfVolumes } from "@/content/ga
 import { takeOutBook } from "@/lib/bookTravel";
 import { type Localized, type Texts, useAppLanguage, useT } from "@/lib/language";
 import { LEARNING_GAMES } from "@/lib/sharedTexts";
-import { loadOnIntent } from "@/lib/preloadPages";
-import { playKnock } from "@/lib/sfx";
+import { loadOnIntent, pageCodeSoon } from "@/lib/preloadPages";
+import { playChimeNote, playKnock } from "@/lib/sfx";
 import {
   BOOK_ASPECT,
   BOOK_GAP,
@@ -22,6 +22,7 @@ import {
   type ShelfLayout,
   type ShelfRect,
   type ShelfThing,
+  TOY_SPAN,
 } from "@/lib/shelfLayout";
 import pictures from "./bilder/*.webp?glob";
 
@@ -50,6 +51,8 @@ interface ShelfBook {
   spine?: string;
   /** A game standing as several books tied together with a ribbon (`Game.volumes`): those books, spine out. */
   volumes?: ShelfBook[];
+  /** A toy standing on the board instead of a book (`Category.toy`), as wide as a picture book. */
+  toy?: "keyboard";
 }
 
 /** The cloths of the books standing spine out with a game's name, one after the other: bright, unlike the books only filling the shelf. */
@@ -111,7 +114,7 @@ const CARVING_SHRINK = 0.8;
 const dailySpan = (carving: Carving | undefined) => DAILY_SPAN + (carving?.span ?? 0);
 
 /** Each place's width in picture books' widths, for the shelf's plan. */
-const spansFor = (carving: Carving | undefined) => PLACES.map((place) => (place[0].colour ? dailySpan(carving) : 1));
+const spansFor = (carving: Carving | undefined) => PLACES.map((place) => (place[0].colour ? dailySpan(carving) : place[0].toy ? TOY_SPAN : 1));
 
 /**
  * The shelf's places, each standing where a picture book can: a picture book, or the books of a category whose games
@@ -130,6 +133,7 @@ for (const entry of SHELF) {
     emoji: entry.game?.emoji ?? c.emoji,
     cover: entry.game ? undefined : pictures[`cover-${c.id}.webp`],
     games: !entry.game && hasPage(c) ? c.games.map((g) => g.emoji) : undefined,
+    toy: c.toy,
   };
   const volumes = (entry.game && shelfVolumes(entry.game))?.map(
     (v, i): ShelfBook => ({
@@ -334,6 +338,8 @@ export function Bookshelf({ secretProps, legal }: { secretProps: HTMLAttributes<
                     {cell.books?.map((b) =>
                       PLACES[b][0].colour ? (
                         <DailyGroup key={PLACES[b][0].id} books={PLACES[b]} carving={plan.carving} take={take} />
+                      ) : PLACES[b][0].toy ? (
+                        <ShelfToy key={PLACES[b][0].id} book={PLACES[b][0]} />
                       ) : (
                         <Book key={PLACES[b][0].id} book={PLACES[b][0]} onClick={take(PLACES[b][0])} />
                       ),
@@ -733,6 +739,102 @@ function Book({ book, onClick }: { book: ShelfBook; onClick: (e: MouseEvent<HTML
       <span className="shelf-book-shadow" />
       <BookFaces book={book} />
     </Link>
+  );
+}
+
+/** How long the toy keyboard's keys go down before its game opens, in ms (`shelf-toy-press` in bookshelf-books.css). */
+const TOY_PRESS_MS = 260;
+
+/**
+ * A toy standing on the board among the picture books instead of a book (`Category.toy`, user request, 24 November
+ * 2026): a wooden toy keyboard with big bright keys, leaning back a little at the board's front edge, as wide as a
+ * picture book and lower. It says without a word that here one presses keys. A tap presses it down with a click and a
+ * note, and its game opens – no book comes out, no page turns, and the way back simply comes to the shelf again.
+ */
+function ShelfToy({ book }: { book: ShelfBook }) {
+  const t = useT();
+  const navigate = useNavigate();
+  const onClick = (e: MouseEvent<HTMLAnchorElement>) => {
+    if (e.metaKey || e.ctrlKey || e.shiftKey) return;
+    e.preventDefault();
+    const toy = e.currentTarget;
+    if (toy.classList.contains("pressed")) return;
+    toy.classList.add("pressed");
+    playKnock(900);
+    playChimeNote(Math.floor(Math.random() * 8));
+    // The game's code was asked for as the finger landed; the keys go down meanwhile, and it opens once both are done.
+    const code = pageCodeSoon(book.href);
+    window.setTimeout(() => void code.finally(() => navigate(book.href)), TOY_PRESS_MS);
+  };
+  return (
+    <Link
+      to={book.href}
+      className="shelf-toy"
+      data-toy={book.toy}
+      data-tap
+      aria-label={t(book.title)}
+      title={t(book.blurb)}
+      {...loadOnIntent(book.href)}
+      onClick={onClick}
+    >
+      <span className="shelf-toy-shadow" />
+      <ToyKeyboard />
+    </Link>
+  );
+}
+
+/** The colours of the toy keyboard's keys, bright as building blocks. */
+const TOY_KEYS = ["#e8434b", "#f7a21b", "#ffd23f", "#3fae49", "#2f8fd8", "#8a5bd6", "#e8559c"];
+
+/** The toy keyboard: a wooden case tipped towards the room, three rows of chunky keys and a long space bar. */
+function ToyKeyboard() {
+  // The case's top is narrower at the back (y 6) than at the front (y 84): every key's corners follow that slope.
+  const across = (y: number, u: number) => 60 + (u - 60) * (0.84 + (0.16 * (y - 6)) / 78);
+  const key = (y: number, h: number, u0: number, u1: number) =>
+    `M${across(y, u0)} ${y} H${across(y, u1)} L${across(y + h, u1)} ${y + h} H${across(y + h, u0)} Z`;
+  const rows = [
+    { y: 14, n: 6 },
+    { y: 34, n: 6 },
+    { y: 54, n: 5 },
+  ];
+  return (
+    <svg className="shelf-toy-art" viewBox="0 0 120 100" aria-hidden>
+      {/* The case: its top, then its front edge below, darker, with the wood's grain. */}
+      <path
+        d="M14 6 Q10 6 9 10 L2 80 Q2 86 8 86 H112 Q118 86 118 80 L111 10 Q110 6 106 6 Z"
+        fill="#c98a4f"
+        stroke="#5a3a1e"
+        strokeWidth="2.5"
+        strokeLinejoin="round"
+      />
+      <path
+        d="M2 80 Q2 86 8 86 H112 Q118 86 118 80 V90 Q118 98 110 98 H10 Q2 98 2 90 Z"
+        fill="#8f5a2c"
+        stroke="#5a3a1e"
+        strokeWidth="2.5"
+        strokeLinejoin="round"
+      />
+      <path d="M16 11 C44 9 78 13 104 10 M8 92 C40 94 80 90 112 93" fill="none" stroke="#b07440" strokeWidth="1.4" />
+      {rows.flatMap((row, r) => {
+        // Every key 16 wide; the row of five sits half a key in, as on a real keyboard.
+        const width = 16;
+        const x0 = 12 + (6 - row.n) * 8;
+        return Array.from({ length: row.n }, (_, i) => {
+          const u0 = x0 + i * width + 1;
+          const u1 = u0 + width - 2.6;
+          const color = TOY_KEYS[(r * 3 + i) % TOY_KEYS.length];
+          return (
+            <g key={`${r}-${i}`}>
+              <path d={key(row.y + 3, 15, u0, u1)} fill="#00000040" />
+              <path d={key(row.y, 15, u0, u1)} fill={color} stroke="#5a3a1e" strokeWidth="1.6" strokeLinejoin="round" />
+              <path d={key(row.y + 2, 3.5, u0 + 2.5, u1 - 4)} fill="#ffffff70" />
+            </g>
+          );
+        });
+      })}
+      <path d={key(74, 9, 32, 88)} fill="#00000040" transform="translate(0 2.5)" />
+      <path d={key(72, 9, 32, 88)} fill="#fff4dc" stroke="#5a3a1e" strokeWidth="1.6" strokeLinejoin="round" />
+    </svg>
   );
 }
 

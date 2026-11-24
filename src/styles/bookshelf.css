@@ -833,7 +833,7 @@
   pointer-events: none;
 }
 
-.shelf-box :is(.shelf-book, .shelf-daily, .room-thing, .shelf-spines > .shelf-spine, .shelf-lying) {
+.shelf-box :is(.shelf-book, .shelf-toy, .shelf-daily, .room-thing, .shelf-spines > .shelf-spine, .shelf-lying) {
   pointer-events: auto;
 }
 

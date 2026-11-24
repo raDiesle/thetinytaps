@@ -412,7 +412,8 @@ In a fresh worktree run `bun install` first.
   `celebrate` is left only to a grown-ups' chart filled (Belohnungstafel, Tagesplan). The one place where a key or tap
   is meant to set off a show is Frei tippen, where keys without a letter, number or job, and taps beside the card, open
   a surprise (a firework, a present, an egg hatching, user request, November 2026) – one at a time, never a storm, and
-  never copied into another game's answers (`src/games/letters/CLAUDE.md`). `tapFeedback.test.ts` keeps it
+  never copied into another game's answers (`src/games/letters/CLAUDE.md`) – and „Drauflos tippen“, its copy without
+  the card standing as a toy keyboard on the shelf, where every press is such a show (`src/games/tapaway/CLAUDE.md`). `tapFeedback.test.ts` keeps it
   calm, `calmAnswers.test.ts` keeps answers still and `celebrate` out of the games.
 - No wrong answers, no error sounds, nothing to read: pictures, sounds and voice. That means no words in the picture
   for a sound or a call either – no floating „Mäh!“, „Brumm!“, „Krah!“, no „Danke!“ or „Bäh!“ bubble (removed, user

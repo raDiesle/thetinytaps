@@ -6,7 +6,9 @@ import { putBookBack, shelfBookOf } from "./bookTravel";
 // finds it – the category's page and each of its games. A game standing apart has a book of its own; one still being
 // built (`Game.unfinished`) has none, as it is not on the shelf.
 test("every category's page and every game finds its book on the shelf", () => {
-  for (const category of CATEGORIES) {
+  // A toy (`Category.toy`) is no book: its game goes back to the shelf with no book to close.
+  for (const game of CATEGORIES.filter((c) => c.toy).flatMap((c) => c.games)) expect(shelfBookOf(game.href), game.href).toBeUndefined();
+  for (const category of CATEGORIES.filter((c) => !c.toy)) {
     if (!category.apart) expect(shelfBookOf(categoryHref(category))).toBe(category.id);
     for (const game of category.games.filter((g) => g.unfinished === true)) expect(shelfBookOf(game.href), game.href).toBeUndefined();
     for (const game of listedGames(category)) {
@@ -66,7 +68,7 @@ test("a way back that fails still goes back and leaves the next book free to tra
   };
   Object.assign(globalThis, { document: page, matchMedia: () => ({ matches: false }) });
   try {
-    const from = categoryHref(CATEGORIES.find((c) => !c.apart) ?? CATEGORIES[0]);
+    const from = categoryHref(CATEGORIES.find((c) => !c.apart && !c.toy) ?? CATEGORIES[0]);
     let went = 0;
     for (const round of [1, 2]) {
       expect(() => putBookBack(from, () => went++)).not.toThrow();

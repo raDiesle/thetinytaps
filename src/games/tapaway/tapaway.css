@@ -1,0 +1,112 @@
+/* „Tap Away“: the whole page is the toy. Everything that moves is a small HTML layer moved by transform and opacity. */
+
+.tw-play {
+  position: absolute;
+  inset: 0;
+  overflow: hidden;
+  background: #fff7e6;
+  touch-action: none;
+  user-select: none;
+  -webkit-user-select: none;
+}
+
+/* Before the first press: one line saying what to do, still. */
+.tw-welcome {
+  position: absolute;
+  inset: 0;
+  display: grid;
+  place-items: center;
+  margin: 0;
+  padding: 0 24px;
+  text-align: center;
+  font-family: var(--font-rounded);
+  font-size: clamp(2rem, 6vw, 4rem);
+  font-weight: 700;
+  color: var(--ink);
+  pointer-events: none;
+}
+
+.tw-pops,
+.tw-sparkles {
+  position: absolute;
+  inset: 0;
+  pointer-events: none;
+}
+
+/* A glyph or shape: pops in, stays, then floats up and fades – within `POP_MS` (`--life`). */
+.tw-pop {
+  position: absolute;
+  display: grid;
+  place-items: center;
+  will-change: transform, opacity;
+  animation: tw-pop var(--life) ease-out both;
+}
+
+.tw-pop > svg {
+  width: 100%;
+  height: 100%;
+}
+
+.tw-glyph > span {
+  font-family: var(--font-rounded);
+  font-weight: 700;
+  line-height: 1;
+  color: var(--c);
+  -webkit-text-stroke: 0.035em #fff;
+  paint-order: stroke fill;
+  text-shadow: 0 0.04em 0 #5a3a2a55;
+}
+
+@keyframes tw-pop {
+  0% {
+    transform: scale(0.2) rotate(calc(var(--turn) * -2));
+    opacity: 0;
+  }
+  14% {
+    transform: scale(1.12) rotate(var(--turn));
+    opacity: 1;
+  }
+  24% {
+    transform: scale(1) rotate(var(--turn));
+  }
+  70% {
+    transform: scale(1) rotate(var(--turn));
+    opacity: 1;
+  }
+  100% {
+    transform: translateY(-40%) scale(0.85) rotate(var(--turn));
+    opacity: 0;
+  }
+}
+
+/* A mouse's sparkle: a tiny star of light that drifts down and fades. */
+.tw-sparkle {
+  position: absolute;
+  width: 14px;
+  height: 14px;
+  margin: -7px 0 0 -7px;
+  background: var(--c);
+  clip-path: polygon(50% 0, 62% 38%, 100% 50%, 62% 62%, 50% 100%, 38% 62%, 0 50%, 38% 38%);
+  animation: tw-sparkle 0.7s ease-out forwards;
+}
+
+@keyframes tw-sparkle {
+  from {
+    transform: scale(1);
+    opacity: 1;
+  }
+  to {
+    transform: translate(var(--dx), var(--dy)) scale(0.3) rotate(90deg);
+    opacity: 0;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .tw-pop {
+    animation-timing-function: steps(1, end);
+  }
+
+  .tw-sparkle {
+    display: none;
+  }
+}
