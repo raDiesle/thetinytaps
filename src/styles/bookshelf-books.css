@@ -911,9 +911,7 @@
   /* Its name starts below the curled corner, so no letter is folded away. */
   padding: calc(var(--curl) * 0.75) 6% 0;
   box-sizing: border-box;
-  background:
-    linear-gradient(115deg, #fff0 55%, #8a5a2a14 100%),
-    #fffaf0;
+  background: linear-gradient(115deg, #fff0 55%, #8a5a2a14 100%), #fffaf0;
   /* The top right corner folded away (`.shelf-poster-curl` is its back). */
   clip-path: polygon(0 0, calc(100% - var(--curl)) 0, 100% var(--curl), 100% 100%, 0 100%);
 }
