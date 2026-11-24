@@ -1,19 +1,12 @@
 // Piece by piece instead of flowing (H-45): the apples fall one by one, the train halts at a little stop every minute.
 // A small child sees single things at once, where a flowing picture is hard to judge – and a long time still moves.
 
-/** At most this many apples hang on the tree: each lies in the cart on its own, and the cart's heap holds this many. */
-export const MAX_APPLES = 20;
-
-/** At least this many apples, even for a few seconds: the tree is always full. */
-export const MIN_APPLES = 6;
-
 /**
- * How many apples hang on the tree for a run of `ms` (user feedback, November 2026): always a lot, also for a short
- * time – then they fall more often, one every few seconds for a minute, rather than a few apples one a minute.
+ * How many apples hang on the tree, for a run of any length: each lies in the cart on its own, and the cart's heap holds
+ * this many. A shorter or longer run harvests all of them, only faster or slower (user request, 24 November 2026: a
+ * length never leaves out part of the picture's story).
  */
-export function appleCount(ms: number): number {
-  return Math.max(MIN_APPLES, Math.min(MAX_APPLES, Math.round(ms / 5000)));
-}
+export const MAX_APPLES = 20;
 
 /**
  * The Apfelbaum's year as shares of the run (user feedback, November 2026: the timer should show more progress): the

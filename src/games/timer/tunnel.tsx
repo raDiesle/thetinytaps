@@ -41,16 +41,11 @@ export function spotKind(k: number): DigKind {
   return r >= HILL[c] - 2 ? "dirt" : "stone";
 }
 
-/** How many blocks the tunnel has: five minutes dig all of them, one every 15 seconds. */
+/**
+ * How many blocks the tunnel has, all dug in a run of any length: five minutes one every 15 seconds, a shorter or longer
+ * run only faster or slower – never starting with part of the tunnel already dug (user request, 24 November 2026).
+ */
 export const MAX_DIG = SPOTS.length;
-
-/** The fewest blocks a run digs: a short time starts with the first part of the tunnel already dug. */
-export const MIN_DIG = 8;
-
-/** How many blocks are dug in a run of `ms`. */
-export function digCount(ms: number): number {
-  return Math.max(MIN_DIG, Math.min(MAX_DIG, Math.round(ms / 15_000)));
-}
 
 /** A tunnel place's top left corner on the stage. */
 export function spotCorner(k: number): { x: number; y: number } {

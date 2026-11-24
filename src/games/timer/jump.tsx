@@ -133,14 +133,11 @@ export const SPOTS: readonly { x: number; y: number; by?: MoveKind; via?: readon
   { ...MOON_TOP, by: "jet", via: ORBIT, slow: 2.5 },
 ];
 
-/** How many moves the whole way has: five minutes take all of them, one about every 10 seconds. */
+/**
+ * How many moves the whole way has, all made in a run of any length: five minutes one about every 10 seconds, a shorter
+ * or longer run only faster or slower – never starting further up (user request, 24 November 2026).
+ */
 export const MAX_MOVES = SPOTS.length - 1;
-
-/** The fewest moves a run makes: a short time starts further up. */
-export const MIN_MOVES = 5;
-
-/** The time a move gets at least: a shorter run starts further up rather than hurrying. */
-export const MIN_UNIT = 1500;
 
 /**
  * The share of the time the way down from the moon takes (user feedback, 23 November 2026: the jump into the cake was
@@ -151,11 +148,6 @@ export const DIVE_SHARE = 0.2;
 
 /** How long the way down takes in a run of `total` ms. */
 export const diveMs = (total: number) => total * DIVE_SHARE;
-
-/** How many moves a run of `ms` makes. */
-export function moveCount(ms: number): number {
-  return Math.max(MIN_MOVES, Math.min(MAX_MOVES, Math.floor((ms - diveMs(ms)) / MIN_UNIT)));
-}
 
 /** The points of move `k`'s way, from its spot over any `via` to the next spot: one leap from each to the next when it hops. */
 export function wayOf(k: number): { x: number; y: number }[] {
@@ -532,6 +524,9 @@ export function gearLooks(first: number, moves: RunMove[], dive: Dive): Record<G
     { at: dive.release, css: "opacity: 1; transform: none", ease: "ease-in" },
     { at: Math.min(dive.land, dive.release + FADE * 3), css: "opacity: 0; transform: translateY(-70%)" },
   ];
+  // They float away within the jetpack's first move, however short a run makes it.
+  const jet = moves.find((m) => m.k === JETPACK_FROM);
+  const letGo = Math.min(FADE * 4, jet ? (jet.land - jet.start) * 0.8 : FADE * 4);
   return {
     // The balloons from the skyscraper's roof to the highest cloud, let go there: they float up and away.
     balloons: {
@@ -539,6 +534,7 @@ export function gearLooks(first: number, moves: RunMove[], dive: Dive): Record<G
         gone: "opacity: 0; transform: translateY(-60%)",
         shown: "opacity: 1; transform: none",
         come: swap,
+        go: letGo,
       }),
       end: 0,
     },

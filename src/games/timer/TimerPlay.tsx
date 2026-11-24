@@ -38,10 +38,10 @@ import { hush } from "@/lib/voice";
 import { useTimers } from "@/lib/timers";
 import { useWakeLock } from "@/lib/wakeLock";
 import { AppleScene } from "./apples";
-import { BlocksScene, blockCount, blocksPlan } from "./blocks";
-import { BoxesScene, boxesPlan, perBox } from "./boxes";
-import { TunnelScene, digCount, tunnelPlan } from "./tunnel";
-import { JumpScene, jumpPlan, moveCount } from "./jump";
+import { BlocksScene, blocksPlan, MAX_BLOCKS } from "./blocks";
+import { BoxesScene, boxesPlan, PER_BOX } from "./boxes";
+import { MAX_DIG, TunnelScene, tunnelPlan } from "./tunnel";
+import { JumpScene, jumpPlan, MAX_MOVES } from "./jump";
 import { FINAL_NOTES, FinalLight, finalMs, TimeBar, TimeBarChoice } from "./bar";
 import { CaterpillarScene } from "./caterpillar";
 import { ClockScene } from "./clock";
@@ -49,7 +49,7 @@ import { isTurns, nextPicture, OTHER_TIME, PICTURES, tomorrowAt } from "./conten
 import { TimerCardArt } from "./cardArt";
 import { DiscScene } from "./disc";
 import { FlowerScene } from "./flower";
-import { appleCount, appleTimes, haltMs, ladybugLaps, MAX_STOPS, pieceCount, pieceMoments, soonMs, trainSteps } from "./pieces";
+import { appleTimes, haltMs, ladybugLaps, MAX_APPLES, MAX_STOPS, pieceCount, pieceMoments, soonMs, trainSteps } from "./pieces";
 import { PauseControls, RunClockProvider, usePausableClock, useRunClock } from "./pause";
 import { PizzaScene, SLICES } from "./pizza";
 import { CandleBackdrop, Candles, Hourglass, Layer, RAIL_Y, RailAhead, SandBackdrop, TRAIN, Train, TrainBackdrop, TrainStops } from "./scenes";
@@ -57,7 +57,7 @@ import type { SwapToy, TimeShown, TimerPicture, TimerSettings } from "./settings
 import { noteRoom, TimeShownChoice, TimeShownNote } from "./shown";
 import { SunsetScene } from "./sunset";
 import { SwapRun } from "./SwapPlay";
-import { TidyScene, tidyTimes, toyCount } from "./tidy";
+import { MAX_TOYS, TidyScene, tidyTimes } from "./tidy";
 import { clockOn, digits, ownTimeMs } from "./time";
 import { PICTURE_LINES, SOON_LINE, type TimedPicture, timerLoad, timerSay } from "./voice";
 
@@ -145,7 +145,7 @@ function TimerStart({
   const t = useT();
   const leave = useLeaveGame();
   const [total, setTotal] = useState(() => planMs(settings));
-  // The pieces (apples, the train's stops) come from the time set, also when `?sekunden=` shortens the run, so a
+  // The train's stops and the ladybug's dots come from the time set, also when `?sekunden=` shortens the run, so a
   // five-minute run can be watched in a few seconds while developing.
   const [minutes] = useState(() => planMs(settings, 0));
   const until = settings.useOwn && settings.own?.kind === "until" ? settings.own.at : undefined;
@@ -338,41 +338,40 @@ function TimerRun({
   useEffect(() => hush, []);
 
   // Piece by piece (H-45): many apples landing in the cart, a stop on the track a minute – each with its plop or its bell.
-  const apples = appleCount(set);
   const stops = pieceCount(set, MAX_STOPS);
   const moments = useMemo(() => {
     if (picture === "apple")
-      return appleTimes(total, apples)
+      return appleTimes(total, MAX_APPLES)
         .harvest.slice(0, -1)
         .map((h) => h.land);
     if (picture === "train" && stops > 1) return pieceMoments(total, stops, haltMs(total, stops));
     if (picture === "pizza") return pieceMoments(total, SLICES);
     // Each toy landing in the box (H-118), the last one being the end's.
     if (picture === "tidy")
-      return tidyTimes(total, toyCount(set))
+      return tidyTimes(total, MAX_TOYS)
         .slice(0, -1)
         .map((t) => t.land);
     // Five Boxes (H-120): each toy landing in its box, and each lid shutting but the last, whose shutting is the end.
-    if (picture === "boxes") return boxMoments(total, perBox(set)).map((m) => m.at);
+    if (picture === "boxes") return boxMoments(total, PER_BOX).map((m) => m.at);
     // The block house (H-125): each block landing on its place, the last one being the end's.
     if (picture === "blocks")
-      return blocksPlan(total, blockCount(set))
+      return blocksPlan(total, MAX_BLOCKS)
         .blocks.slice(0, -1)
         .map((b) => b.land);
     // The treasure tunnel (H-126): each block crumbling away, the last one being the end's.
     if (picture === "tunnel")
-      return tunnelPlan(total, digCount(set))
+      return tunnelPlan(total, MAX_DIG)
         .blocks.slice(0, -1)
         .map((b) => b.gone);
     // Up to the Moon (H-127): each star caught on the way, then the leap off the moon (always the last).
     if (picture === "jump") {
-      const plan = jumpPlan(total, moveCount(set));
+      const plan = jumpPlan(total, MAX_MOVES);
       return [...plan.moves.map((m) => m.star), plan.dive.start];
     }
     // The ladybug leaves a dot as it is back at the top (H-67).
     if (picture === "disc") return pieceMoments(total, ladybugLaps(set).dots);
     return [];
-  }, [picture, total, set, apples, stops]);
+  }, [picture, total, set, stops]);
   const nextMoment = useRef(0);
   const soonRang = useRef(false);
   const finalOn = useRef(false);
@@ -415,7 +414,7 @@ function TimerRun({
           if (picture === "apple") playPlop();
           else if (picture === "pizza") playMunch();
           else if (picture === "tidy") playClonk();
-          else if (picture === "boxes") (boxMoments(total, perBox(set))[nextMoment.current - 1]?.lid ? playKnock : playClonk)();
+          else if (picture === "boxes") (boxMoments(total, PER_BOX)[nextMoment.current - 1]?.lid ? playKnock : playClonk)();
           else if (picture === "blocks") playKnock(520);
           else if (picture === "tunnel") playCrack();
           // A star caught: a bright note climbing the scale star by star; the leap off the moon whooshes.
@@ -504,7 +503,7 @@ function TimerRun({
       if (picture === "train") playWhistle();
       else if (picture === "sand") playTwinkle();
       // The leaves rustle; once the blossoms are out, the bees buzz.
-      else if (picture === "apple") (now() - (endsAt - total) < appleTimes(total, apples).grown ? playLeaves : playBuzz)();
+      else if (picture === "apple") (now() - (endsAt - total) < appleTimes(total, MAX_APPLES).grown ? playLeaves : playBuzz)();
       else if (picture === "caterpillar" || picture === "pizza") playMunch();
       else if (picture === "flower") playDrops();
       // The snooze bar is pressed down.
@@ -522,7 +521,7 @@ function TimerRun({
       else if (picture === "jump") playBoing();
       else playChimeNote(Math.floor(Math.random() * 8));
     },
-    [phase, picture, ripple, glow, now, endsAt, total, apples],
+    [phase, picture, ripple, glow, now, endsAt, total],
   );
 
   useEffect(() => {
@@ -627,7 +626,6 @@ export function SceneParts({
   /** A menu's card: the picture at this moment, with nothing that counts on by itself. */
   still?: boolean;
 }) {
-  const apples = appleCount(set);
   const stops = pieceCount(set, MAX_STOPS);
   const stepped = picture === "train" && stops > 1;
   return (
@@ -643,15 +641,15 @@ export function SceneParts({
           </Layer>
         </>
       )}
-      {picture === "apple" && <AppleScene count={apples} total={total} glow={poke} />}
+      {picture === "apple" && <AppleScene count={MAX_APPLES} total={total} glow={poke} />}
       {picture === "caterpillar" && <CaterpillarScene glow={poke} startedAt={startedAt} total={total} done={phase === "done"} still={still} />}
       {picture === "disc" && <DiscScene glow={poke} total={total} set={set} />}
       {picture === "pizza" && <PizzaScene glow={poke} />}
-      {picture === "tidy" && <TidyScene count={toyCount(set)} total={total} glow={poke} />}
-      {picture === "boxes" && <BoxesScene count={perBox(set)} total={total} glow={poke} />}
-      {picture === "blocks" && <BlocksScene count={blockCount(set)} total={total} glow={poke} />}
-      {picture === "tunnel" && <TunnelScene count={digCount(set)} total={total} glow={poke} />}
-      {picture === "jump" && <JumpScene count={moveCount(set)} total={total} glow={poke} />}
+      {picture === "tidy" && <TidyScene count={MAX_TOYS} total={total} glow={poke} />}
+      {picture === "boxes" && <BoxesScene count={PER_BOX} total={total} glow={poke} />}
+      {picture === "blocks" && <BlocksScene count={MAX_BLOCKS} total={total} glow={poke} />}
+      {picture === "tunnel" && <TunnelScene count={MAX_DIG} total={total} glow={poke} />}
+      {picture === "jump" && <JumpScene count={MAX_MOVES} total={total} glow={poke} />}
       {picture === "clock" && <ClockScene glow={poke} endsAt={startedAt + total} total={total} running={phase === "running"} still={still} />}
       {picture === "flower" && <FlowerScene glow={poke} total={total} />}
       {picture === "sunset" && <SunsetScene glow={poke} />}

@@ -38,16 +38,11 @@ export const SLOTS: readonly { c: number; r: number; kind: BlockKind }[] = [
   { c: 2, r: 5, kind: "roof" },
 ];
 
-/** How many blocks the house has: five minutes build all of them, one every 15 seconds. */
+/**
+ * How many blocks the house has, all carried in a run of any length: five minutes one every 15 seconds, a shorter or
+ * longer run only faster or slower – never starting with part of the house already standing (user request, 24 November 2026).
+ */
 export const MAX_BLOCKS = SLOTS.length;
-
-/** The fewest blocks a run moves: a short time starts with the lower part of the house already standing. */
-export const MIN_BLOCKS = 8;
-
-/** How many blocks the beam carries into the house in a run of `ms`. */
-export function blockCount(ms: number): number {
-  return Math.max(MIN_BLOCKS, Math.min(MAX_BLOCKS, Math.round(ms / 15_000)));
-}
 
 /** The openings in the walls, as places of the grid: the door (two rows high) and the two windows. */
 export const DOOR = { c: 2, r: 0, h: 2 } as const;
@@ -98,10 +93,14 @@ export const OVER_PLACE = 110;
 /** Each block's share of the time, in parts: the beam turns onto it, lifts it, carries it over, lowers it. */
 export const PHASES = { aim: 0.07, lift: 0.3, lower: 0.8 } as const;
 
-/** How far a block slips down when the beam lets go for a moment, how long it falls, and from what share it does. */
+/**
+ * How far a block slips down when the beam lets go for a moment, and how long it falls at most. A short run's blocks
+ * slip too, only quicker (user request, 24 November 2026: a shorter time never leaves a part out): the fall takes at
+ * most `SLIP_SHARE` of the block's share (`slipMs`), and the beam's flicker round it shrinks with it (`slipAt`).
+ */
 export const SLIP = 60;
 export const SLIP_FALL_MS = 380;
-const DROP_FROM_MS = 6000;
+const SLIP_SHARE = 0.06;
 
 /** The gentle bob of a floating block, one up and down this long. */
 export const BOB_MS = 2000;
@@ -135,6 +134,12 @@ export function phaseTimes(b: MovingBlock) {
   };
 }
 
+/** How long a block that slips falls before the beam catches it. */
+export const slipMs = (b: MovingBlock) => Math.min(SLIP_FALL_MS, (b.land - b.start) * SLIP_SHARE);
+
+/** A moment of the slip, given as ms after it starts on a slip of the full `SLIP_FALL_MS`, scaled to this block's slip. */
+const slipAt = (b: MovingBlock, ms: number) => (b.drop ?? 0) + (ms * slipMs(b)) / SLIP_FALL_MS;
+
 /** How long the beam takes to catch a block that slipped and lift it back up. */
 export const catchMs = (b: MovingBlock) => Math.min(1400, (b.land - b.start) * 0.15);
 
@@ -142,7 +147,7 @@ export const catchMs = (b: MovingBlock) => Math.min(1400, (b.land - b.start) * 0
  * Works out a run of `total` ms moving `count` blocks: the house's first places beyond those stand from the start
  * (`built`), and each block moved has the same share of the time, all of it on its way – the beam turns onto it, lifts
  * it out of the jumble, carries it over floating and lowers it onto its place, landing at the end of its share, the
- * last as the time is up. Every third block slips once on its way where its share is long enough.
+ * last as the time is up. Every third block slips once on its way, in a run of any length.
  */
 export function blocksPlan(total: number, count: number): { built: number; blocks: MovingBlock[] } {
   const built = MAX_BLOCKS - count;
@@ -164,7 +169,7 @@ export function blocksPlan(total: number, count: number): { built: number; block
       start,
       land: (i + 1) * unit,
       // Halfway across, while it floats.
-      drop: i % 3 === 1 && unit >= DROP_FROM_MS ? start + unit * 0.5 : undefined,
+      drop: i % 3 === 1 ? start + unit * 0.5 : undefined,
     });
   }
   return { built, blocks };
@@ -215,8 +220,9 @@ export function blockPose(b: MovingBlock, t: number): Pose {
   if (b.drop === undefined || t < b.drop) return wayPose(b, t);
   const fell = t - b.drop;
   const there = wayPose(b, b.drop);
-  if (fell <= SLIP_FALL_MS) return { ...there, y: there.y + SLIP * (fell / SLIP_FALL_MS) ** 2, held: false };
-  const w = (fell - SLIP_FALL_MS) / catchMs(b);
+  const slip = slipMs(b);
+  if (fell <= slip) return { ...there, y: there.y + SLIP * (fell / slip) ** 2, held: false };
+  const w = (fell - slip) / catchMs(b);
   if (w >= 1) return wayPose(b, t);
   const back = wayPose(b, t);
   const k = smooth(w);
@@ -231,7 +237,7 @@ function poseTimes(b: MovingBlock): number[] {
   const p = phaseTimes(b);
   const steps = (a: number, z: number, n: number) => Array.from({ length: n + 1 }, (_, i) => a + ((z - a) * i) / n);
   const times = [...steps(b.start, p.lift, 4), ...steps(p.lift, p.carry, 8), ...steps(p.carry, p.lower, 18), ...steps(p.lower, b.land, 8)];
-  if (b.drop !== undefined) times.push(...steps(b.drop, b.drop + SLIP_FALL_MS, 6), ...steps(b.drop + SLIP_FALL_MS, b.drop + SLIP_FALL_MS + catchMs(b), 8));
+  if (b.drop !== undefined) times.push(...steps(b.drop, b.drop + slipMs(b), 6), ...steps(b.drop + slipMs(b), b.drop + slipMs(b) + catchMs(b), 8));
   return [...new Set(times)].sort((a, c) => a - c);
 }
 
@@ -288,11 +294,11 @@ export function beamShades(blocks: MovingBlock[]): Shade[] {
     if (b.drop !== undefined)
       shades.push(
         { at: b.drop, o: 1 },
-        { at: b.drop + 40, o: 0.2 },
-        { at: b.drop + 80, o: 0.8 },
-        { at: b.drop + 120, o: 0 },
-        { at: b.drop + SLIP_FALL_MS, o: 0 },
-        { at: b.drop + SLIP_FALL_MS + 80, o: 1 },
+        { at: slipAt(b, 40), o: 0.2 },
+        { at: slipAt(b, 80), o: 0.8 },
+        { at: slipAt(b, 120), o: 0 },
+        { at: slipAt(b, SLIP_FALL_MS), o: 0 },
+        { at: slipAt(b, SLIP_FALL_MS + 80), o: 1 },
       );
   const end = blocks[blocks.length - 1].land;
   shades.push({ at: end, o: 1 }, { at: end + 500, o: 0 });
@@ -308,7 +314,7 @@ function auraShades(b: MovingBlock): Shade[] {
     { at: held, o: 1 },
   ];
   if (b.drop !== undefined)
-    shades.push({ at: b.drop + 60, o: 1 }, { at: b.drop + 120, o: 0 }, { at: b.drop + SLIP_FALL_MS, o: 0 }, { at: b.drop + SLIP_FALL_MS + 80, o: 1 });
+    shades.push({ at: slipAt(b, 60), o: 1 }, { at: slipAt(b, 120), o: 0 }, { at: slipAt(b, SLIP_FALL_MS), o: 0 }, { at: slipAt(b, SLIP_FALL_MS + 80), o: 1 });
   shades.push({ at: b.land - 1, o: 1 }, { at: b.land + 300, o: 0 });
   return shades;
 }
