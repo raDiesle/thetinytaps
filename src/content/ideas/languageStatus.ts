@@ -660,7 +660,7 @@ export const LANGUAGE_STATUS: LanguageStatusRow[] = [
     href: "/zaehlturm/",
     recorded: true,
     languages: { en: "partial", de: "partial", zh: "partial", hi: "partial", es: "partial", ar: "partial", ru: "partial" },
-    note: "Neu (21. November 2026, L-18), englisch zuerst: Name, Zeile im Inhaltsverzeichnis, die Namen der zehn Ziele (für „Weiter“ und die Pokale) und die Texte hinter ⚙️ („Start at“, „From 1“) nur auf Englisch, bis Übersetzungen gewünscht sind. Gezählt wird mit den Zahlwörtern eins bis neun aus den Aufnahmen von „Buchstaben & Zahlen“, in jeder Sprache; 10 bis 99 sind die englischen zweistelligen Zahlwörter von „Buchstaben & Zahlen“ und „one hundred!“ eigenes Englisch, alle noch nicht aufgenommen – bis dahin bleiben diese Klötze still. Die Texte für Suchmaschinen gibt es in allen sieben Sprachen.",
+    note: "Neu gebaut am 24. November 2026 als ein Haus von 1 bis 100 (L-18): Name, Zeile im Inhaltsverzeichnis und die vorgelesenen Namen der Fahrstuhl-Pfeile („Next ten“, „Ten back“) in allen sieben Sprachen, sonst hat das Spiel keine Worte. Gezählt wird mit den Zahlwörtern eins bis neun aus den Aufnahmen von „Buchstaben & Zahlen“, in jeder Sprache; 10 bis 99 gibt es nur als englische zweistellige Zahlwörter von „Buchstaben & Zahlen“ („twenty-three!“), „hundert!“ in allen sieben Sprachen – alle noch nicht aufgenommen, bis dahin bleiben diese Klötze still. Die Texte für Suchmaschinen gibt es in allen sieben Sprachen.",
   },
   {
     href: "/mitmachen/",

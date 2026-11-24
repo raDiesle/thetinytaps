@@ -288,7 +288,8 @@ In a fresh worktree run `bun install` first.
 - Container units (`cqw`, `cqh`) measure the nearest container *above* the element: on the container itself (its own
   padding, gap) they measure the next one up, often the whole window, so size only a container's children with them.
 - CSS is global and each game's CSS arrives only when the game is opened: prefix
-  classes and `@keyframes` by game or scene (`el-`, `bs-`); never style another
+  classes and `@keyframes` by game or scene (`el-`, `bs-`), a prefix no other game has (the Counting Tower and
+  Zaubertasten both used `tw-`; `css.test.ts` now fails on a prefixed class two games style); never style another
   game's classes. A game using another game's parts imports that CSS itself. Keyframes a game borrows
   (`pop-in`, `wiggle`, `bob`, …) live in `src/styles/animations.css`, which every page loads – never use
   keyframes from another game's CSS (`css.test.ts` checks it). Game sheets arrive in any order (the shelf preloads

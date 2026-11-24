@@ -1,36 +1,41 @@
-/* Counting Tower (L-18): every class and keyframe prefixed `tw-`. Everything that moves is a small HTML layer of its own,
-   moved by its transform (element.animate in TowerPlay); the backdrop is one still svg drawn once. */
+/* Counting Tower (L-18): every class prefixed `zt-`. The world (backdrop, house, child, hook) is one tall layer the
+   camera moves by its transform; everything that moves inside it is a small HTML layer of its own, moved by its
+   transform (element.animate in TowerPlay). The backdrop is one still svg drawn once. Nothing idles. */
 
-.tw-play {
+.zt-play {
   position: absolute;
   inset: 0;
   overflow: hidden;
   container-type: size;
 }
 
-.tw-scene {
+.zt-scene {
   position: absolute;
   inset: 0;
+  overflow: hidden;
   touch-action: manipulation;
   user-select: none;
   -webkit-user-select: none;
 }
 
-.tw-backdrop {
+/* The tall world, its top left at the screen's top left; the camera is its transform. */
+.zt-world {
   position: absolute;
-  inset: 0;
-  width: 100%;
-  height: 100%;
+  left: 0;
+  top: 0;
+  transform-origin: 0 0;
+  will-change: transform;
+  pointer-events: none;
+}
+
+.zt-backdrop {
+  position: absolute;
+  top: 0;
   display: block;
 }
 
-/* Layers placed by a transform from the stage's top left corner. */
-.tw-goal,
-.tw-star,
-.tw-leaf,
-.tw-block,
-.tw-kid,
-.tw-waiting {
+/* Layers placed in the world by a transform (or left/top) from its top left corner. */
+.zt-layer {
   position: absolute;
   left: 0;
   top: 0;
@@ -38,146 +43,138 @@
   pointer-events: none;
 }
 
-.tw-goal svg,
-.tw-star svg,
-.tw-leaf svg,
-.tw-block svg,
-.tw-waiting svg,
-.tw-mother svg,
-.tw-baby svg {
+.zt-art {
   display: block;
   width: 100%;
   height: 100%;
-}
-
-.tw-goal-balloon svg,
-.tw-goal-kite svg {
   overflow: visible;
 }
 
-/* The big bird faces where it will fly with the child: to the right. */
-.tw-goal-bird svg {
-  transform: scaleX(-1);
-}
-
-/* The tower's own layer, as wide as the tower and its sway, swaying from its foot. */
-.tw-tower {
+.zt-block {
   position: absolute;
-  top: 0;
-  will-change: transform;
-  pointer-events: none;
 }
 
-.tw-rock {
-  width: 100%;
-  height: 100%;
-}
-
-.tw-mother,
-.tw-baby {
-  position: absolute;
-  will-change: transform;
-}
-
-/* The block waiting on the meadow: the thing to tap (the whole stage takes the tap, this marks where it goes). */
-.tw-waiting {
-  pointer-events: auto;
-  filter: drop-shadow(0 0.25em 0.3em rgb(0 0 0 / 0.18));
-}
-
-/* The stars by the moon: dim until the tower comes near, then lit, one by one. */
-.tw-star {
-  opacity: 0.25;
-  transition: opacity 0.6s ease-out;
-}
-
-.tw-star.tw-lit {
-  opacity: 1;
-}
-
-/* The big number of blocks on the tower, in the colour of the block just put on. */
-.tw-digit {
-  position: absolute;
-  /* `translate`, not `transform`: the entrance's scale must not undo the centring. */
-  translate: -50% -50%;
-  font-family: var(--font-rounded);
-  font-weight: 900;
-  line-height: 1;
-  -webkit-text-stroke: 0.035em #3b2a1a;
-  paint-order: stroke fill;
-  text-shadow: 0 0.04em 0 rgb(59 42 26 / 0.35);
-  pointer-events: none;
-  animation: pop-in 0.35s ease-out;
-}
-
-/* The next goal on „Weiter“ at a round's end (`GoalCard`): its sky and meadow filling the frame, the goal big in it. */
-.tw-goal-card {
+.zt-block > .zt-art {
   position: absolute;
   inset: 0;
-  display: grid;
-  place-items: center;
+}
+
+/* The opening of a special block (a window, a door), its moving part clipped by it. */
+.zt-hole {
+  position: absolute;
   overflow: hidden;
 }
 
-.tw-goal-card-thing {
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  justify-content: center;
-  height: 78%;
-  width: 80%;
-}
-
-.tw-goal-card-thing svg {
-  display: block;
-  flex: 1 1 0;
-  min-height: 0;
-  max-width: 100%;
-  overflow: visible;
-}
-
-/* The mother sits on her home: the home wide below, she smaller on top. */
-.tw-goal-card-nest svg:first-child,
-.tw-goal-card-owl svg:first-child {
-  flex-grow: 1.1;
-  margin-bottom: -12%;
-}
-
-.tw-goal-card-plane svg,
-.tw-goal-card-cloud svg,
-.tw-goal-card-rainbow svg {
-  flex: none;
+.zt-actor {
   width: 100%;
-  height: auto;
+  height: 100%;
 }
 
-.tw-goal-card-bird svg {
-  transform: scaleX(-1);
+.zt-actor > svg {
+  display: block;
+  width: 100%;
+  height: 100%;
 }
 
-.tw-goal-card-stars {
+/* The door swings open on its hinges on the left, the flowers grow from their box. */
+.zt-actor-door {
+  transform-origin: 0 50%;
+}
+
+.zt-actor-flowers {
+  transform-origin: 50% 100%;
+}
+
+.zt-kid > * {
+  width: 100%;
+  height: 100%;
+}
+
+/* The crane's hook with the next block on it, the rope going up out of the picture. */
+.zt-hook-art {
   position: absolute;
+  left: 0;
+  width: 100%;
+}
+
+.zt-hook-block {
   inset: 0;
 }
 
-.tw-goal-card-stars svg {
+.zt-rope {
   position: absolute;
-  width: 12%;
+  background: #5c4630;
+  border-radius: 2px;
 }
 
-.tw-goal-card-stars svg:nth-child(1) {
-  left: 8%;
-  top: 10%;
+.zt-puff {
+  opacity: 0;
 }
 
-.tw-goal-card-stars svg:nth-child(2) {
-  left: 78%;
-  top: 6%;
-  width: 9%;
+/* The elevator panel on the right: a brass plate with an arrow up, the number in its display and an arrow down. */
+.zt-panel {
+  position: absolute;
+  z-index: 2;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: space-between;
+  box-sizing: border-box;
+  border-radius: 18px;
+  background: linear-gradient(160deg, #f1d28a, #c9993f 60%, #a87a2c);
+  border: 3px solid #6b4a1c;
+  box-shadow:
+    0 6px 14px rgb(40 25 10 / 0.35),
+    inset 0 2px 0 rgb(255 255 255 / 0.45);
 }
 
-.tw-goal-card-stars svg:nth-child(3) {
-  left: 16%;
-  top: 52%;
-  width: 8%;
+.zt-display {
+  display: grid;
+  place-items: center;
+  width: 100%;
+  aspect-ratio: 1;
+  border-radius: 12px;
+  background: #1d2433;
+  border: 3px solid #6b4a1c;
+  box-shadow: inset 0 3px 8px rgb(0 0 0 / 0.6);
+  font-family: var(--font-rounded);
+  font-weight: 900;
+  line-height: 1;
+}
+
+.zt-number {
+  display: block;
+  text-shadow: 0 0 0.18em currentColor;
+}
+
+.zt-jump {
+  width: 86%;
+  aspect-ratio: 1;
+  padding: 0;
+  border: none;
+  background: none;
+  cursor: pointer;
+}
+
+.zt-jump svg {
+  display: block;
+  width: 100%;
+  height: 100%;
+}
+
+.zt-jump circle {
+  fill: #fff6df;
+  stroke: #6b4a1c;
+  stroke-width: 6;
+}
+
+.zt-jump path {
+  fill: #e8590c;
+  stroke: #6b4a1c;
+  stroke-width: 4;
+  stroke-linejoin: round;
+}
+
+.zt-jump:disabled {
+  visibility: hidden;
 }

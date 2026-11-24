@@ -1,33 +1,152 @@
-import { memo } from "react";
+import { type CSSProperties, memo, type ReactNode } from "react";
 import { MASCOT_INK as INK } from "@/components/Mascot";
-import { BAND, type Point, RAINBOW, type TowerLayout, goalPlace, leafPile, treeAt } from "./layout";
-import type { GoalId } from "./names";
+import { FLOORS, type Pattern, type Special, colorOf, floorOf, specialOf } from "./floors";
+import { EAVE, type HouseLayout, ROOF, floorBottom, roofTop } from "./layout";
+import { ROW } from "./names";
 
-// The Counting Tower's drawings: each a small svg on an HTML layer of its own, so what moves (a block flying, the
-// balloon bobbing, the child) moves as a layer and the sky behind it is never painted again (root CLAUDE.md, phones).
+// The Counting Tower's drawings. The sky, meadow and trees are one big svg drawn once (`Backdrop`); every block, beam,
+// the roof and the crane's hook is a small svg on an HTML layer of its own, and what moves in a block as it lands (a
+// light going on, the cat coming up, the door opening) is a still smaller layer inside it – so a phone only ever moves
+// layers and never paints the big picture again (root CLAUDE.md, phones).
 
-/** The blocks' colours, bottom to top in each ten: a rainbow, and every tenth gold. */
-export const BLOCK_COLORS = ["#ff6b6b", "#ff922b", "#ffd43b", "#8ce99a", "#38d9a9", "#4dabf7", "#748ffc", "#b197fc", "#f783ac", "#fcc419"];
-
-/** One wooden toy block, 180 × 100, its number painted on its front. */
-export const Block = memo(function Block({ n }: { n: number }) {
-  const color = BLOCK_COLORS[(n - 1) % BLOCK_COLORS.length];
-  const gold = n % 10 === 0;
+/** A plate with a number on it, for the specials (the plain blocks carry theirs big). */
+function Plate({ n, y = 68, h = 28 }: { n: number; y?: number; h?: number }) {
   return (
-    <svg viewBox="0 0 180 100" aria-hidden>
-      <rect x="4" y="4" width="172" height="92" rx="14" fill={color} stroke={INK} strokeWidth="5" />
-      {/* Light on its top edge, shade along its foot, and the wood's grain: a toy block, not a flat box. */}
-      <path d="M18 14 H162" stroke="#fff" strokeWidth="7" strokeLinecap="round" opacity="0.45" />
-      <path d="M12 84 Q90 92 168 84" stroke={INK} strokeWidth="6" fill="none" opacity="0.14" strokeLinecap="round" />
-      <path d="M24 34 Q40 30 52 36 M128 70 Q142 64 156 70" stroke={INK} strokeWidth="3" fill="none" opacity="0.18" strokeLinecap="round" />
-      {gold && <path d="M30 50 l5 -10 l5 10 l-5 10 Z M140 50 l5 -10 l5 10 l-5 10 Z" fill="#fff" opacity="0.8" />}
+    <>
+      <rect x="20" y={y} width="60" height={h} rx="8" fill="#fffaf0" stroke={INK} strokeWidth="3.5" />
+      <text x="50" y={y + h / 2 + 1} textAnchor="middle" dominantBaseline="central" fontSize={h * 0.92} fontWeight="900" fontFamily="inherit" fill={INK}>
+        {n}
+      </text>
+    </>
+  );
+}
+
+/** The light on a block's top edge and the shade along its foot, so it looks like a wooden toy block, not a flat box. */
+function Shading() {
+  return (
+    <>
+      <path d="M14 10 H86" stroke="#fff" strokeWidth="5" strokeLinecap="round" opacity="0.45" />
+      <path d="M10 90 Q50 96 90 90" stroke={INK} strokeWidth="5" fill="none" opacity="0.14" strokeLinecap="round" />
+    </>
+  );
+}
+
+/** A small star of five points round (cx, cy). */
+const starPath = (cx: number, cy: number, r: number) =>
+  `${Array.from({ length: 10 }, (_, i) => {
+    const a = (Math.PI / 5) * i - Math.PI / 2;
+    const d = i % 2 ? r * 0.45 : r;
+    return `${i ? "L" : "M"}${(cx + d * Math.cos(a)).toFixed(1)} ${(cy + d * Math.sin(a)).toFixed(1)}`;
+  }).join(" ")} Z`;
+
+/** A small heart round (cx, cy). */
+const heartPath = (cx: number, cy: number, r: number) =>
+  `M${cx} ${cy + r * 0.9} C${cx - r * 1.6} ${cy - r * 0.2} ${cx - r * 0.7} ${cy - r * 1.4} ${cx} ${cy - r * 0.5} C${cx + r * 0.7} ${cy - r * 1.4} ${cx + r * 1.6} ${cy - r * 0.2} ${cx} ${cy + r * 0.9} Z`;
+
+/** What a floor paints on its plain blocks, in white or ink over the block's colour. */
+function PatternArt({ pattern, n }: { pattern: Pattern; n: number }) {
+  const odd = n % 2 === 1;
+  switch (pattern) {
+    case "bricks":
+      return (
+        <g stroke="#fff" strokeWidth="3" opacity="0.4" fill="none">
+          <path d="M6 34 H94 M6 66 H94" />
+          <path d={odd ? "M50 6 V34 M28 34 V66 M72 34 V66 M50 66 V94" : "M30 6 V34 M70 6 V34 M50 34 V66 M30 66 V94 M70 66 V94"} />
+        </g>
+      );
+    case "dots":
+      return (
+        <g fill="#fff" opacity="0.45">
+          {[
+            [20, 22],
+            [78, 26],
+            [16, 76],
+            [82, 80],
+            [50, 14],
+            [50, 88],
+          ].map(([x, y]) => (
+            <circle key={`${x} ${y}`} cx={x} cy={y} r="5" />
+          ))}
+        </g>
+      );
+    case "stones":
+      return (
+        <g fill="none" stroke={INK} strokeWidth="3" opacity="0.2">
+          <path d="M8 30 Q20 18 36 24 Q44 32 34 40 Q18 44 8 36 Z" />
+          <path d="M64 12 Q80 8 90 18 Q92 30 80 32 Q66 30 64 12 Z" />
+          <path d="M70 66 Q84 60 92 72 Q90 88 76 88 Q64 82 70 66 Z" />
+          <path d="M10 70 Q22 62 30 74 Q28 88 16 90 Q6 84 10 70 Z" />
+        </g>
+      );
+    case "stripes":
+      return (
+        <g stroke="#fff" strokeWidth="7" opacity="0.35">
+          <path d="M-10 40 L40 -10 M-10 80 L80 -10 M20 110 L110 20 M60 110 L110 60" />
+        </g>
+      );
+    case "stars":
+      return (
+        <g fill="#fff" opacity="0.5">
+          <path d={starPath(20, 22, 9)} />
+          <path d={starPath(80, 20, 7)} />
+          <path d={starPath(18, 80, 7)} />
+          <path d={starPath(82, 78, 9)} />
+        </g>
+      );
+    case "planks":
+      return (
+        <g stroke={INK} strokeWidth="3" opacity="0.22" fill={INK}>
+          <path d="M34 6 V94 M66 6 V94" fill="none" />
+          <circle cx="20" cy="14" r="2.5" stroke="none" />
+          <circle cx="50" cy="86" r="2.5" stroke="none" />
+          <circle cx="80" cy="14" r="2.5" stroke="none" />
+        </g>
+      );
+    case "logs":
+      return (
+        <g stroke={INK} strokeWidth="3" fill="none" opacity="0.25">
+          <path d="M6 33 Q50 38 94 33 M6 66 Q50 71 94 66" />
+          <path d="M20 18 Q34 14 46 20 M56 52 Q70 48 82 54 M22 82 Q34 78 44 84" />
+        </g>
+      );
+    case "hearts":
+      return (
+        <g fill="#fff" opacity="0.5">
+          <path d={heartPath(20, 22, 8)} />
+          <path d={heartPath(80, 22, 6)} />
+          <path d={heartPath(20, 80, 6)} />
+          <path d={heartPath(80, 80, 8)} />
+        </g>
+      );
+    case "glass":
+      return (
+        <g stroke="#fff" fill="none">
+          <path d="M18 40 L40 18 M18 56 L56 18" strokeWidth="5" opacity="0.7" strokeLinecap="round" />
+          <path d="M60 84 L84 60" strokeWidth="4" opacity="0.5" strokeLinecap="round" />
+        </g>
+      );
+    case "rainbow":
+      return null;
+  }
+}
+
+/** A plain block of its floor: its colour, the floor's pattern and its number big on its front; each ten's last sparkles. */
+function PlainBlock({ n }: { n: number }) {
+  const { pattern } = FLOORS[floorOf(n)];
+  return (
+    <svg className="zt-art" viewBox="0 0 100 100" aria-hidden>
+      <rect x="3" y="3" width="94" height="94" rx="11" fill={colorOf(n)} />
+      <PatternArt pattern={pattern} n={n} />
+      <Shading />
+      {n % ROW === 0 && <path d="M14 50 l5 -10 l5 10 l-5 10 Z M76 50 l5 -10 l5 10 l-5 10 Z" fill="#fff" opacity="0.85" />}
+      <rect x="3" y="3" width="94" height="94" rx="11" fill="none" stroke={INK} strokeWidth="4.5" />
       <text
-        x="90"
+        x="50"
         y="52"
         textAnchor="middle"
         dominantBaseline="central"
-        fontSize="68"
-        fontWeight="800"
+        fontSize={n >= 100 ? 40 : 54}
+        fontWeight="900"
         fontFamily="inherit"
         fill="#fff"
         stroke={INK}
@@ -39,428 +158,387 @@ export const Block = memo(function Block({ n }: { n: number }) {
       </text>
     </svg>
   );
-});
+}
 
-/**
- * The red balloon with its string hanging down `hang` and `aside` (in its own box's units: 100 wide, 120 tall plus the
- * string), so the string's end waits just above where the child's paw will reach.
- */
-export const Balloon = memo(function Balloon({ hang, aside = 0 }: { hang: number; aside?: number }) {
-  const end = { x: 50 + aside, y: 120 + hang };
-  return (
-    <svg viewBox={`0 0 100 ${120 + hang}`} overflow="visible" aria-hidden>
-      <path
-        d={`M50 112 C${50 + aside * 0.1} ${126 + hang * 0.35} ${50 + aside * 0.75} ${120 + hang * 0.55} ${end.x} ${end.y}`}
-        stroke={INK}
-        strokeWidth="2.5"
-        fill="none"
-      />
-      <path d="M50 6 C78 6 94 30 94 54 C94 82 72 104 50 106 C28 104 6 82 6 54 C6 30 22 6 50 6 Z" fill="#fa5252" stroke={INK} strokeWidth="4" />
-      <path d="M44 106 L56 106 L52 114 L48 114 Z" fill="#e03131" stroke={INK} strokeWidth="3" strokeLinejoin="round" />
-      <ellipse cx="32" cy="34" rx="9" ry="15" fill="#fff" opacity="0.55" transform="rotate(28 32 34)" />
-      <circle cx="28" cy="56" r="3.5" fill="#fff" opacity="0.45" />
-    </svg>
-  );
-});
-
-/** The kite, 100 × 120 plus its string down `hang` and `aside` to where the child's paw will be, with a bowed tail. */
-export const Kite = memo(function Kite({ hang, aside = 0 }: { hang: number; aside?: number }) {
-  const end = { x: 50 + aside, y: 120 + hang };
-  return (
-    <svg viewBox={`0 0 100 ${120 + hang}`} overflow="visible" aria-hidden>
-      <path
-        d={`M50 104 C${50 + aside * 0.2} ${120 + hang * 0.3} ${50 + aside * 0.7} ${110 + hang * 0.7} ${end.x} ${end.y}`}
-        stroke={INK}
-        strokeWidth="2.5"
-        fill="none"
-      />
-      <path d="M50 104 Q66 112 58 120 Q48 128 62 136" stroke={INK} strokeWidth="2.5" fill="none" />
-      <path d="M56 118 l8 -4 l0 8 Z M54 132 l8 -4 l0 8 Z" fill="#f06595" stroke={INK} strokeWidth="2" strokeLinejoin="round" />
-      <path d="M50 6 L88 46 L50 104 L12 46 Z" fill="#fcc419" stroke={INK} strokeWidth="4" strokeLinejoin="round" />
-      <path d="M50 6 L50 104 M12 46 L88 46" stroke={INK} strokeWidth="2.5" opacity="0.5" />
-      <path d="M50 6 L88 46 L50 46 Z M12 46 L50 104 L50 46 Z" fill="#4dabf7" />
-      <path d="M50 6 L88 46 L50 104 L12 46 Z" fill="none" stroke={INK} strokeWidth="4" strokeLinejoin="round" />
-    </svg>
-  );
-});
-
-/** A folded paper plane, 100 × 60, nose to the right. */
-export const Plane = memo(function Plane() {
-  return (
-    <svg viewBox="0 0 100 60" aria-hidden>
-      <path d="M4 22 L96 30 L30 56 Z" fill="#e7f5ff" stroke={INK} strokeWidth="3.5" strokeLinejoin="round" />
-      <path d="M4 22 L96 30 L36 34 Z" fill="#fff" stroke={INK} strokeWidth="3.5" strokeLinejoin="round" />
-      <path d="M36 34 L30 56" stroke={INK} strokeWidth="2.5" opacity="0.6" />
-      <path d="M4 22 L60 4 L96 30" fill="#d0ebff" stroke={INK} strokeWidth="3" strokeLinejoin="round" opacity="0.9" />
-    </svg>
-  );
-});
-
-/** A big soft cloud to stand on, 200 × 100, with a sleepy face that wakes as the child comes near. */
-export const CloudSeat = memo(function CloudSeat({ awake }: { awake: boolean }) {
-  return (
-    <svg viewBox="0 0 200 100" aria-hidden>
-      <path
-        d="M24 86 C4 86 2 58 24 56 C20 30 52 22 66 38 C72 12 116 6 126 32 C140 16 176 24 172 52 C198 54 198 86 174 86 Z"
-        fill="#fff"
-        stroke={INK}
-        strokeWidth="4"
-        strokeLinejoin="round"
-      />
-      <path d="M40 80 Q100 92 164 80" stroke="#d0ebff" strokeWidth="8" fill="none" strokeLinecap="round" />
-      {awake ? (
-        <>
-          <circle cx="84" cy="58" r="5" fill={INK} />
-          <circle cx="116" cy="58" r="5" fill={INK} />
-        </>
-      ) : (
-        <path d="M78 58 Q84 63 90 58 M110 58 Q116 63 122 58" stroke={INK} strokeWidth="3.5" fill="none" strokeLinecap="round" />
-      )}
-      <path d="M92 70 Q100 76 108 70" stroke={INK} strokeWidth="3.5" fill="none" strokeLinecap="round" />
-      <circle cx="70" cy="68" r="6" fill="#ffc9c9" opacity="0.7" />
-      <circle cx="130" cy="68" r="6" fill="#ffc9c9" opacity="0.7" />
-    </svg>
-  );
-});
-
-/**
- * The rainbow from the tower's top down to the meadow, drawn in its box's own pixels: `bands` of its six shown (it comes
- * band by band as the tower nears it), the slide's top edge from `from` over `bend` to `to`, a puff of cloud at its foot.
- */
-export const Rainbow = memo(function Rainbow({
-  w,
-  h,
-  from,
-  bend,
-  to,
-  b,
-  bands,
-}: {
+/** Where a special's moving part lies in its block (in the block's 100 × 100), and whether it is cut round. */
+interface ActorBox {
+  x: number;
+  y: number;
   w: number;
   h: number;
-  from: Point;
-  bend: Point;
-  to: Point;
-  b: number;
-  bands: number;
-}) {
-  const band = BAND * b;
-  return (
-    <svg viewBox={`0 0 ${w} ${h}`} width={w} height={h} overflow="visible" aria-hidden>
-      {RAINBOW.map((color, i) => (
-        <path
-          key={color}
-          d={`M${from.x} ${from.y + (i + 0.5) * band} Q${bend.x} ${bend.y + (i + 0.5) * band} ${to.x} ${to.y + (i + 0.5) * band}`}
-          stroke={color}
-          strokeWidth={band * 1.04}
-          fill="none"
-          opacity={i < bands ? 1 : 0.18}
-        />
-      ))}
-      <path d={`M${from.x} ${from.y} Q${bend.x} ${bend.y} ${to.x} ${to.y}`} stroke={INK} strokeWidth={Math.max(1.5, 0.06 * b)} fill="none" opacity="0.5" />
-      <g fill="#fff" stroke={INK} strokeWidth={Math.max(1.5, 0.05 * b)}>
-        <ellipse cx={to.x} cy={h - 0.25 * b} rx={0.9 * b} ry={0.38 * b} />
-        <ellipse cx={to.x - 0.4 * b} cy={h - 0.45 * b} rx={0.45 * b} ry={0.32 * b} />
-        <ellipse cx={to.x + 0.35 * b} cy={h - 0.5 * b} rx={0.5 * b} ry={0.36 * b} />
-      </g>
-    </svg>
-  );
-});
+  round?: boolean;
+}
 
-/** The hot-air balloon, 100 × 150: a striped envelope, ropes, and a basket whose floor is at 140. */
-export const HotAir = memo(function HotAir() {
-  return (
-    <svg viewBox="0 0 100 150" aria-hidden>
-      <path d="M30 96 L36 116 M70 96 L64 116" stroke={INK} strokeWidth="2.5" />
-      <path d="M50 4 C82 4 98 28 96 52 C94 74 76 88 68 98 L32 98 C24 88 6 74 4 52 C2 28 18 4 50 4 Z" fill="#ff8787" stroke={INK} strokeWidth="4" />
-      <path d="M50 4 C38 20 34 60 40 98 L60 98 C66 60 62 20 50 4 Z" fill="#ffe066" stroke={INK} strokeWidth="3" />
-      <path d="M50 4 C24 14 14 50 24 84 L32 98 C26 70 30 28 50 4 Z M50 4 C76 14 86 50 76 84 L68 98 C74 70 70 28 50 4 Z" fill="#74c0fc" opacity="0.85" />
-      <ellipse cx="30" cy="30" rx="6" ry="12" fill="#fff" opacity="0.5" transform="rotate(25 30 30)" />
-      <rect x="30" y="114" width="40" height="30" rx="5" fill="#c08040" stroke={INK} strokeWidth="4" />
-      <path d="M32 124 H68 M32 134 H68 M42 116 V142 M58 116 V142" stroke="#8a5a2b" strokeWidth="2.5" />
-    </svg>
-  );
-});
+/** The window's opening in a block: the light, the cat, the dog and the flowers live in it. */
+const WINDOW: ActorBox = { x: 22, y: 12, w: 56, h: 48 };
 
-/** An owl, 100 × 90, facing left: the mother, brown, or `baby`, grey and fluffy. */
-export const Owl = memo(function Owl({ baby = false }: { baby?: boolean }) {
-  const body = baby ? "#ced4da" : "#a0703c";
-  const belly = baby ? "#f1f3f5" : "#e6c79c";
-  return (
-    <svg viewBox="0 0 100 90" aria-hidden>
-      <path d="M22 26 L18 6 L36 18 Z M78 26 L82 6 L64 18 Z" fill={body} stroke={INK} strokeWidth="3.5" strokeLinejoin="round" />
-      <ellipse cx="50" cy="52" rx="34" ry="34" fill={body} stroke={INK} strokeWidth="4" />
-      <ellipse cx="50" cy="64" rx="20" ry="18" fill={belly} />
-      <circle cx="36" cy="40" r="12" fill="#fff" stroke={INK} strokeWidth="3" />
-      <circle cx="64" cy="40" r="12" fill="#fff" stroke={INK} strokeWidth="3" />
-      <circle cx="35" cy="41" r="5.5" fill={INK} />
-      <circle cx="63" cy="41" r="5.5" fill={INK} />
-      <circle cx="33.5" cy="39.5" r="1.8" fill="#fff" />
-      <circle cx="61.5" cy="39.5" r="1.8" fill="#fff" />
-      <path d="M46 50 L50 58 L54 50 Z" fill="#fab005" stroke={INK} strokeWidth="2.5" strokeLinejoin="round" />
-    </svg>
-  );
-});
-
-/** The owl's home at the branch's end, 120 × 60: a hollow stump with its dark hole facing the tower. */
-export const Hollow = memo(function Hollow() {
-  return (
-    <svg viewBox="0 0 120 60" aria-hidden>
-      <path d="M10 8 Q60 0 110 8 L106 56 Q60 62 14 56 Z" fill="#9c6b3c" stroke={INK} strokeWidth="4" strokeLinejoin="round" />
-      <ellipse cx="60" cy="10" rx="48" ry="7" fill="#3b2a1a" />
-      <path d="M24 26 Q34 30 30 44 M90 22 Q84 34 92 46" stroke="#6b4423" strokeWidth="3" fill="none" strokeLinecap="round" />
-    </svg>
-  );
-});
-
-/** The nest of twigs, 120 × 60, open at the top. */
-export const Nest = memo(function Nest() {
-  return (
-    <svg viewBox="0 0 120 60" aria-hidden>
-      <path d="M6 18 Q60 36 114 18 Q112 54 60 56 Q8 54 6 18 Z" fill="#a8743a" stroke={INK} strokeWidth="4" strokeLinejoin="round" />
-      <path
-        d="M14 26 Q40 40 70 32 M24 40 Q60 50 100 30 M12 20 Q30 30 44 26 M78 26 Q96 28 108 20"
-        stroke="#6b4423"
-        strokeWidth="3"
-        fill="none"
-        strokeLinecap="round"
-      />
-    </svg>
-  );
-});
-
-/** A little bird, 100 × 80 facing left, blue: the mother, or `baby`, yellow and round with a tuft. */
-export const Bird = memo(function Bird({ baby = false }: { baby?: boolean }) {
-  const body = baby ? "#ffd43b" : "#4dabf7";
-  const wing = baby ? "#fab005" : "#1c7ed6";
-  return (
-    <svg viewBox="0 0 100 80" aria-hidden>
-      {!baby && <path d="M74 44 L98 34 L94 52 Z" fill={wing} stroke={INK} strokeWidth="3.5" strokeLinejoin="round" />}
-      <ellipse cx="54" cy="50" rx={baby ? 32 : 36} ry={baby ? 27 : 24} fill={body} stroke={INK} strokeWidth="4" />
-      <circle cx="34" cy={baby ? 34 : 30} r={baby ? 20 : 19} fill={body} stroke={INK} strokeWidth="4" />
-      <path d="M58 48 Q72 40 82 52 Q70 64 58 56 Z" fill={wing} stroke={INK} strokeWidth="3.5" strokeLinejoin="round" />
-      <path d={`M16 ${baby ? 34 : 30} L2 ${baby ? 38 : 34} L16 ${baby ? 42 : 38} Z`} fill="#ff922b" stroke={INK} strokeWidth="3" strokeLinejoin="round" />
-      <circle cx="28" cy={baby ? 30 : 26} r="4.5" fill={INK} />
-      <circle cx="26.5" cy={baby ? 28.5 : 24.5} r="1.6" fill="#fff" />
-      {baby && <path d="M34 15 Q36 4 42 8 M38 15 Q44 6 48 12" stroke={INK} strokeWidth="3" fill="none" strokeLinecap="round" />}
-      {!baby && <path d="M40 18 Q46 18 50 22" stroke="#fff" strokeWidth="3" opacity="0.6" fill="none" strokeLinecap="round" />}
-    </svg>
-  );
-});
-
-/** The crescent moon, 100 × 100, its hollow on the left; it sleeps until the child comes near, then opens its eye. */
-export const Moon = memo(function Moon({ awake }: { awake: boolean }) {
-  return (
-    <svg viewBox="0 0 100 100" aria-hidden>
-      <path
-        d="M58 4 C84 10 98 32 96 54 C94 80 72 98 46 96 C30 95 18 88 10 78 C40 82 62 62 62 38 C62 24 60 12 58 4 Z"
-        fill="#ffe066"
-        stroke={INK}
-        strokeWidth="4"
-        strokeLinejoin="round"
-      />
-      <path d="M74 20 C84 30 88 44 86 56" stroke="#fff" strokeWidth="4" opacity="0.5" fill="none" strokeLinecap="round" />
-      {awake ? (
-        <>
-          <circle cx="76" cy="46" r="5" fill={INK} />
-          <circle cx="74.5" cy="44.5" r="1.8" fill="#fff" />
-        </>
-      ) : (
-        <path d="M70 46 Q76 51 82 46" stroke={INK} strokeWidth="3.5" fill="none" strokeLinecap="round" />
-      )}
-      <path d="M68 64 Q74 70 82 64" stroke={INK} strokeWidth="3.5" fill="none" strokeLinecap="round" />
-      <circle cx="84" cy="58" r="4" fill="#ff8787" opacity="0.5" />
-    </svg>
-  );
-});
-
-/** A star near the moon, 40 × 40, that lights up as the tower comes near. */
-export const Star = memo(function Star() {
-  return (
-    <svg viewBox="0 0 40 40" aria-hidden>
-      <path
-        d="M20 2 L25 15 L38 15 L27.5 23 L31.5 37 L20 28.5 L8.5 37 L12.5 23 L2 15 L15 15 Z"
-        fill="#fff3bf"
-        stroke={INK}
-        strokeWidth="2.5"
-        strokeLinejoin="round"
-      />
-    </svg>
-  );
-});
-
-/** A leaf blown up from the pile, 30 × 20. */
-export const Leaf = memo(function Leaf({ color }: { color: string }) {
-  return (
-    <svg viewBox="0 0 30 20" aria-hidden>
-      <path d="M2 10 Q14 -2 28 10 Q14 22 2 10 Z" fill={color} stroke={INK} strokeWidth="2" />
-    </svg>
-  );
-});
-
-/** The sky's colours of each goal: the morning meadow, the day getting on, sunset, dusk and night by the moon. */
-const SKY: Record<GoalId, { top: string; low: string; grass: string; grassDark: string }> = {
-  balloon: { top: "#a5d8ff", low: "#e7f5ff", grass: "#8ce99a", grassDark: "#51cf66" },
-  nest: { top: "#99e9f2", low: "#f3fcf0", grass: "#a9e34b", grassDark: "#74b816" },
-  plane: { top: "#74c0fc", low: "#e7f5ff", grass: "#8ce99a", grassDark: "#40c057" },
-  cloud: { top: "#4dabf7", low: "#d0ebff", grass: "#69db7c", grassDark: "#37b24d" },
-  rainbow: { top: "#9fb7d1", low: "#eef3f8", grass: "#69db7c", grassDark: "#2f9e44" },
-  kite: { top: "#91a7ff", low: "#edf2ff", grass: "#94d82d", grassDark: "#66a80f" },
-  bird: { top: "#ffd8a8", low: "#fff4e6", grass: "#a9e34b", grassDark: "#74b816" },
-  hotair: { top: "#ff8787", low: "#ffd43b", grass: "#82c91e", grassDark: "#5c940d" },
-  owl: { top: "#5f3dc4", low: "#e599f7", grass: "#4c8c5b", grassDark: "#2b6b3c" },
-  moon: { top: "#1b2a5a", low: "#3b4f8f", grass: "#2f6b45", grassDark: "#1f5133" },
+/** Each special's moving part. */
+const ACTOR: Record<Special, ActorBox> = {
+  window: WINDOW,
+  cat: WINDOW,
+  dog: WINDOW,
+  flowers: { x: 18, y: 30, w: 64, h: 34 },
+  door: { x: 27, y: 33, w: 46, h: 64 },
+  birdhouse: { x: 38, y: 32, w: 24, h: 24, round: true },
+  fish: { x: 25, y: 11, w: 50, h: 50, round: true },
+  heart: { x: 0, y: 0, w: 100, h: 66 },
+  star: { x: 0, y: 0, w: 100, h: 66 },
 };
 
-/** Where stars shine: from dusk on. */
-const STARRY: GoalId[] = ["owl", "moon"];
-/** Where the tree stands: its branch holds the nest, later the owl's hollow. */
-const TREE: GoalId[] = ["nest", "owl"];
+/** The block behind a special: its colour, the opening or the thing on it. */
+function SpecialBack({ n, special }: { n: number; special: Special }) {
+  const color = colorOf(n);
+  const hole = (fill: string) => <rect x={WINDOW.x} y={WINDOW.y} width={WINDOW.w} height={WINDOW.h} rx="6" fill={fill} />;
+  return (
+    <svg className="zt-art" viewBox="0 0 100 100" aria-hidden>
+      <rect x="3" y="3" width="94" height="94" rx="11" fill={color} />
+      <Shading />
+      {special === "window" && hole("#3b4a78")}
+      {(special === "cat" || special === "dog" || special === "flowers") && hole("#ffe8a3")}
+      {special === "door" && <path d="M27 97 V52 Q27 33 50 33 Q73 33 73 52 V97 Z" fill="#ffd8a8" />}
+      {special === "birdhouse" && (
+        <>
+          <path d="M28 64 V34 L50 18 L72 34 V64 Z" fill="#f1d7a4" stroke={INK} strokeWidth="3.5" strokeLinejoin="round" />
+          <circle cx="50" cy="44" r="11" fill="#3b2a1a" />
+        </>
+      )}
+      {special === "fish" && (
+        <>
+          <circle cx="50" cy="36" r="25" fill="#74c0fc" />
+          <circle cx="36" cy="26" r="3" fill="#fff" opacity="0.7" />
+          <circle cx="40" cy="18" r="2" fill="#fff" opacity="0.7" />
+        </>
+      )}
+      {special === "heart" && <path d={heartPath(50, 36, 20)} fill="#5a3d6b" />}
+      {special === "star" && <path d={starPath(50, 35, 28)} fill="#3b4a78" />}
+    </svg>
+  );
+}
 
-/** The leaf pile's leaves: autumn colours. */
-export const LEAF_COLORS = ["#ff922b", "#fa5252", "#fcc419", "#e8590c", "#f08c00"];
+/** A special's moving part, drawn in its own box (`ACTOR`), in the state it ends in once landed. */
+function SpecialActor({ special }: { special: Special }) {
+  const { w, h } = ACTOR[special];
+  const art = (children: ReactNode) => (
+    <svg className="zt-art" viewBox={`0 0 ${w} ${h}`} aria-hidden>
+      {children}
+    </svg>
+  );
+  switch (special) {
+    case "window":
+      return art(
+        <>
+          <rect width={w} height={h} fill="#ffe066" />
+          <ellipse cx={w / 2} cy={h * 0.45} rx={w * 0.4} ry={h * 0.35} fill="#fff7d6" />
+        </>,
+      );
+    case "cat":
+      return art(
+        <g stroke={INK} strokeWidth="2.5" strokeLinejoin="round">
+          <path d="M12 48 V22 L16 8 L24 18 H32 L40 8 L44 22 V48 Z" fill="#f59f00" />
+          <path d="M18 30 h4 M34 30 h4" stroke="none" />
+          <circle cx="21" cy="28" r="2.6" fill={INK} stroke="none" />
+          <circle cx="35" cy="28" r="2.6" fill={INK} stroke="none" />
+          <path d="M26 33 L28 35.5 L30 33 Z" fill="#e8590c" />
+          <path d="M28 36 Q25 39 23 37 M28 36 Q31 39 33 37" fill="none" strokeWidth="1.8" />
+          <path d="M8 33 H18 M8 37 H18 M38 33 H48 M38 37 H48" strokeWidth="1.4" />
+        </g>,
+      );
+    case "dog":
+      return art(
+        <g stroke={INK} strokeWidth="2.5" strokeLinejoin="round">
+          <path d="M14 48 V24 Q14 10 28 10 Q42 10 42 24 V48 Z" fill="#d9a066" />
+          <path d="M14 14 Q4 18 8 34 Q14 34 16 24 Z M42 14 Q52 18 48 34 Q42 34 40 24 Z" fill="#8b5a2b" />
+          <circle cx="22" cy="24" r="2.6" fill={INK} stroke="none" />
+          <circle cx="34" cy="24" r="2.6" fill={INK} stroke="none" />
+          <ellipse cx="28" cy="32" rx="4.5" ry="3.2" fill={INK} />
+          <path d="M28 35 V38 M24 38 Q28 44 32 38" fill="#ff8787" strokeWidth="2" />
+        </g>,
+      );
+    case "flowers":
+      return art(
+        <g stroke={INK} strokeWidth="2">
+          {[12, 26, 40, 54].map((x, i) => (
+            <g key={x}>
+              <path d={`M${x} ${h} V${12 + (i % 2) * 6}`} stroke="#2f9e44" strokeWidth="3" />
+              <circle cx={x} cy={10 + (i % 2) * 6} r="6.5" fill={["#ff6b6b", "#ffd43b", "#f783ac", "#748ffc"][i]} />
+              <circle cx={x} cy={10 + (i % 2) * 6} r="2.4" fill="#fff3bf" strokeWidth="1" />
+            </g>
+          ))}
+        </g>,
+      );
+    case "door":
+      return art(
+        <>
+          <path d={`M0 ${h} V19 Q0 0 ${w / 2} 0 Q${w} 0 ${w} 19 V${h} Z`} fill="#1c7ed6" stroke={INK} strokeWidth="3" />
+          <rect x="8" y="16" width={w - 16} height="18" rx="4" fill="#4dabf7" stroke={INK} strokeWidth="2" />
+          <rect x="8" y="40" width={w - 16} height="18" rx="4" fill="#4dabf7" stroke={INK} strokeWidth="2" />
+          <circle cx={w - 9} cy="44" r="3.5" fill="#fcc419" stroke={INK} strokeWidth="1.5" />
+        </>,
+      );
+    case "birdhouse":
+      return art(
+        <g stroke={INK} strokeWidth="2">
+          <circle cx="12" cy="14" r="9" fill="#ffd43b" />
+          <path d="M19 13 L24 15 L19 17 Z" fill="#ff922b" />
+          <circle cx="14" cy="11" r="1.8" fill={INK} stroke="none" />
+        </g>,
+      );
+    case "fish":
+      return art(
+        <g stroke={INK} strokeWidth="2.2" strokeLinejoin="round">
+          <path d="M10 25 Q22 12 34 25 Q22 38 10 25 Z" fill="#ff922b" />
+          <path d="M33 25 L44 17 L44 33 Z" fill="#ff922b" />
+          <circle cx="17" cy="23" r="1.8" fill={INK} stroke="none" />
+        </g>,
+      );
+    case "heart":
+      return art(<path d={heartPath(50, 36, 20)} fill="#ff8fab" />);
+    case "star":
+      return art(<path d={starPath(50, 35, 28)} fill="#ffe066" />);
+  }
+}
+
+/** What lies over a special's moving part: the window's frame and bars, the flower box, the door's frame, the plate. */
+function SpecialFront({ n, special }: { n: number; special: Special }) {
+  const frame = (bars: boolean) => (
+    <>
+      <rect x={WINDOW.x} y={WINDOW.y} width={WINDOW.w} height={WINDOW.h} rx="6" fill="none" stroke="#fffaf0" strokeWidth="5" />
+      {bars && <path d={`M50 ${WINDOW.y} V${WINDOW.y + WINDOW.h} M${WINDOW.x} 36 H${WINDOW.x + WINDOW.w}`} stroke="#fffaf0" strokeWidth="4" />}
+      <rect x={WINDOW.x - 3} y={WINDOW.y} width={WINDOW.w + 6} height={WINDOW.h} rx="6" fill="none" stroke={INK} strokeWidth="2.5" />
+      <rect x="16" y="59" width="68" height="6" rx="3" fill="#fffaf0" stroke={INK} strokeWidth="2.5" />
+    </>
+  );
+  return (
+    <svg className="zt-art" viewBox="0 0 100 100" aria-hidden>
+      {special === "window" && (
+        <>
+          {frame(true)}
+          <path d="M24 14 Q30 26 24 38 Z M76 14 Q70 26 76 38 Z" fill="#f783ac" stroke={INK} strokeWidth="1.5" />
+        </>
+      )}
+      {(special === "cat" || special === "dog") && frame(false)}
+      {special === "flowers" && (
+        <>
+          {frame(true)}
+          <rect x="16" y="56" width="68" height="12" rx="3" fill="#c0703a" stroke={INK} strokeWidth="2.5" />
+        </>
+      )}
+      {special === "door" && (
+        <>
+          <path d="M27 97 V52 Q27 33 50 33 Q73 33 73 52 V97" fill="none" stroke={INK} strokeWidth="3.5" />
+          <rect x="20" y="91" width="60" height="7" rx="2" fill="#ced4da" stroke={INK} strokeWidth="2.5" />
+        </>
+      )}
+      {special === "birdhouse" && (
+        <>
+          <path d="M22 36 L50 14 L78 36" fill="none" stroke="#e03131" strokeWidth="7" strokeLinecap="round" strokeLinejoin="round" />
+          <path d="M50 58 V66" stroke={INK} strokeWidth="3" />
+        </>
+      )}
+      {special === "fish" && <circle cx="50" cy="36" r="25" fill="none" stroke="#f6c453" strokeWidth="6" />}
+      {special === "heart" && <path d={heartPath(50, 36, 20)} fill="none" stroke="#fffaf0" strokeWidth="4.5" />}
+      {special === "star" && <path d={starPath(50, 35, 28)} fill="none" stroke="#fffaf0" strokeWidth="4" strokeLinejoin="round" />}
+      <rect x="3" y="3" width="94" height="94" rx="11" fill="none" stroke={INK} strokeWidth="4.5" />
+      {special === "door" ? <Plate n={n} y={5} h={24} /> : <Plate n={n} />}
+    </svg>
+  );
+}
 
 /**
- * The still picture behind it all, drawn once per screen size: sky, clouds or stars, the meadow, and for the nest the
- * tree with its branch and the leaf pile at its foot. Nothing in it moves.
+ * One block of the house, numbered: a plain block of its floor, or one of the house's specials – the door, a window, the
+ * cat … – whose moving part (`.zt-actor`) the game moves once as it lands.
  */
-export const Backdrop = memo(function Backdrop({ layout: l, goal }: { layout: TowerLayout; goal: GoalId }) {
-  const sky = SKY[goal];
-  const { w, h, b, ground } = l;
-  const id = `tw-sky-${goal}`;
+export const HouseBlock = memo(function HouseBlock({ n }: { n: number }) {
+  const special = specialOf(n);
+  if (!special) return <PlainBlock n={n} />;
+  const box = ACTOR[special];
+  const style: CSSProperties = {
+    left: `${box.x}%`,
+    top: `${box.y}%`,
+    width: `${box.w}%`,
+    height: `${box.h}%`,
+    borderRadius: box.round ? "50%" : undefined,
+  };
   return (
-    <svg className="tw-backdrop" viewBox={`0 0 ${w} ${h}`} width={w} height={h} aria-hidden>
-      <defs>
-        <linearGradient id={id} x1="0" y1="0" x2="0" y2="1">
-          <stop offset="0" stopColor={sky.top} />
-          <stop offset="1" stopColor={sky.low} />
-        </linearGradient>
-      </defs>
-      <rect width={w} height={h} fill={`url(#${id})`} />
-      {STARRY.includes(goal) ? <NightStars l={l} faint={goal !== "moon"} /> : <Clouds l={l} />}
-      {TREE.includes(goal) && <Tree l={l} />}
+    <>
+      <SpecialBack n={n} special={special} />
+      <div className="zt-hole" style={style}>
+        <div className={`zt-actor zt-actor-${special}`}>
+          <SpecialActor special={special} />
+        </div>
+      </div>
+      <SpecialFront n={n} special={special} />
+    </>
+  );
+});
+
+/** The wooden beam laid over a full floor, `w` × `h` pixels, with its grain and a bolt over every block. */
+export const Beam = memo(function Beam({ w, h, s, color }: { w: number; h: number; s: number; color: string }) {
+  const bolts = Math.floor(w / s);
+  return (
+    <svg className="zt-art" viewBox={`0 0 ${w} ${h}`} aria-hidden>
+      <rect x="1.5" y="1.5" width={w - 3} height={h - 3} rx={h * 0.35} fill={color} stroke={INK} strokeWidth="3" />
+      <path d={`M${h} ${h * 0.32} H${w - h}`} stroke="#fff" strokeWidth={h * 0.14} strokeLinecap="round" opacity="0.45" />
       <path
-        d={`M0 ${ground - 0.15 * b} Q${w * 0.3} ${ground - 0.45 * b} ${w * 0.6} ${ground - 0.2 * b} T${w} ${ground - 0.3 * b} V${h} H0 Z`}
-        fill={sky.grass}
+        d={`M${w * 0.2} ${h * 0.62} Q${w * 0.3} ${h * 0.5} ${w * 0.42} ${h * 0.64} M${w * 0.6} ${h * 0.6} Q${w * 0.72} ${h * 0.5} ${w * 0.84} ${h * 0.62}`}
+        stroke={INK}
+        strokeWidth="2"
+        fill="none"
+        opacity="0.25"
       />
-      <path d={`M0 ${ground + 0.25 * b} Q${w * 0.5} ${ground + 0.05 * b} ${w} ${ground + 0.3 * b} V${h} H0 Z`} fill={sky.grassDark} opacity="0.6" />
-      {TREE.includes(goal) && <LeafPile l={l} />}
+      {Array.from({ length: bolts }, (_, i) => (
+        <circle key={i} cx={(i + 0.5) * (w / bolts)} cy={h / 2} r={h * 0.12} fill="#fff" stroke={INK} strokeWidth="1.5" opacity="0.8" />
+      ))}
     </svg>
   );
 });
 
-/** A few soft clouds high up, clear of the digit. */
-function Clouds({ l }: { l: TowerLayout }) {
-  const { w, b } = l;
-  const cloud = (cx: number, cy: number, s: number) => (
-    <g transform={`translate(${cx} ${cy}) scale(${s})`} fill="#fff" opacity="0.9">
+/** The crane's hook with its pulley and the two straps holding a block, `1` block wide and `HOOK` blocks high. */
+export const HOOK = 0.7;
+export const Hook = memo(function Hook() {
+  return (
+    <svg className="zt-art" viewBox="0 0 100 70" aria-hidden>
+      <path d="M50 34 L10 70 M50 34 L90 70" stroke="#5c4a3a" strokeWidth="3" />
+      <rect x="36" y="0" width="28" height="22" rx="5" fill="#fab005" stroke={INK} strokeWidth="3" />
+      <circle cx="50" cy="11" r="5" fill="#fff3bf" stroke={INK} strokeWidth="2" />
+      <path d="M50 22 V28 Q50 38 42 36" stroke={INK} strokeWidth="4" fill="none" strokeLinecap="round" />
+    </svg>
+  );
+});
+
+/** The roof put on at a hundred: red tiles, a round window in its gable and the chimney. `w` × `h` pixels. */
+export const Roof = memo(function Roof({ w, h }: { w: number; h: number }) {
+  const rows = 4;
+  return (
+    <svg className="zt-art" viewBox={`0 0 ${w} ${h}`} overflow="visible" aria-hidden>
+      {/* The chimney behind the slope: it stands at about three quarters, its top above the slope. */}
+      <rect x={w * 0.7} y={h * 0.18} width={w * 0.07} height={h * 0.5} fill="#c92a2a" stroke={INK} strokeWidth="3" />
+      <rect x={w * 0.69} y={h * 0.14} width={w * 0.09} height={h * 0.08} rx="3" fill="#868e96" stroke={INK} strokeWidth="3" />
+      <path d={`M2 ${h - 2} L${w / 2} 3 L${w - 2} ${h - 2} Z`} fill="#fa5252" stroke={INK} strokeWidth="4" strokeLinejoin="round" />
+      {Array.from({ length: rows }, (_, i) => {
+        const y = h * ((i + 1) / (rows + 1)) + h * 0.12;
+        const half = (w / 2) * (y / h);
+        return <path key={i} d={`M${w / 2 - half + 8} ${y} H${w / 2 + half - 8}`} stroke="#c92a2a" strokeWidth="3" opacity="0.7" />;
+      })}
+      <circle cx={w / 2} cy={h * 0.58} r={h * 0.15} fill="#ffe066" stroke="#fffaf0" strokeWidth="5" />
+      <circle cx={w / 2} cy={h * 0.58} r={h * 0.15} fill="none" stroke={INK} strokeWidth="2.5" />
+      <path d={`M${w / 2} ${h * 0.43} V${h * 0.73} M${w / 2 - h * 0.15} ${h * 0.58} H${w / 2 + h * 0.15}`} stroke="#fffaf0" strokeWidth="3.5" />
+      <path d={`M0 ${h - 4} H${w}`} stroke="#fffaf0" strokeWidth="5" opacity="0.6" />
+    </svg>
+  );
+});
+
+/** The flag raised on the roof's ridge at a hundred: its pole and a pennant, 40 × 100. */
+export const Flag = memo(function Flag() {
+  return (
+    <svg className="zt-art" viewBox="0 0 40 100" aria-hidden>
+      <path d="M6 4 V100" stroke={INK} strokeWidth="4" strokeLinecap="round" />
+      <path d="M8 6 L38 18 L8 32 Z" fill="#fcc419" stroke={INK} strokeWidth="3" strokeLinejoin="round" />
+    </svg>
+  );
+});
+
+/** A puff of smoke from the chimney. */
+export const Puff = memo(function Puff() {
+  return (
+    <svg className="zt-art" viewBox="0 0 60 44" aria-hidden>
+      <path d="M12 38 Q2 38 4 28 Q4 18 16 20 Q18 6 32 8 Q46 4 48 18 Q58 20 56 30 Q56 40 44 38 Z" fill="#f1f3f5" stroke="#adb5bd" strokeWidth="2.5" />
+    </svg>
+  );
+});
+
+/** The sky's colours from the top of the world (night over the roof) down to the meadow (a bright day). */
+const SKY = ["#141b45", "#26306e", "#5b4b9a", "#f08c7a", "#ffc9a0", "#a5d8ff", "#d3f0ff"];
+
+/**
+ * The world behind the house, drawn once: the sky going from day at the meadow over the evening to the night with its
+ * stars and the moon above the roof, clouds on the way up, the meadow with the path to the door and two trees. It
+ * reaches far past the screen on every side, so the whole house zoomed out at the end still stands in it.
+ */
+export const Backdrop = memo(function Backdrop({ layout: l }: { layout: HouseLayout }) {
+  const { w, h, s, ground } = l;
+  const left = -1.5 * w;
+  const width = 4 * w;
+  const height = l.worldH + 3 * h;
+  const roof = roofTop(l);
+  const r0 = roof / ground;
+  const stops = [0, r0 * 0.55, r0, r0 + (1 - r0) * 0.22, r0 + (1 - r0) * 0.5, r0 + (1 - r0) * 0.78, 1];
+  const stars = Array.from({ length: 70 }, (_, i) => ({
+    x: left + ((i * 0.618034) % 1) * width,
+    y: ((i * 0.381966 * 1.7) % 1) * (roof + 2 * l.floorH),
+    r: i % 5 === 0 ? 2.6 : 1.5,
+  }));
+  const cloud = (cx: number, cy: number, k: number, fill: string) => (
+    <g key={`${cx} ${cy}`} transform={`translate(${cx} ${cy}) scale(${(k * s) / 40})`} fill={fill} opacity="0.92">
       <ellipse cx="0" cy="0" rx="40" ry="18" />
       <ellipse cx="-22" cy="-8" rx="20" ry="16" />
       <ellipse cx="14" cy="-14" rx="24" ry="20" />
     </g>
   );
-  return (
-    <>
-      {cloud(w * 0.14, 2.6 * b, b / 34)}
-      {cloud(w * 0.66, 1.6 * b, b / 40)}
-      {cloud(w * 0.9, 4.4 * b, b / 30)}
-    </>
-  );
-}
-
-/** Small stars all over the night sky, always the same. */
-function NightStars({ l, faint }: { l: TowerLayout; faint: boolean }) {
-  const { w, ground } = l;
-  const dots = Array.from({ length: 34 }, (_, i) => {
-    const x = ((i * 0.618034) % 1) * w;
-    const y = ((i * 0.381966 * 1.7) % 1) * ground * 0.85;
-    return <circle key={i} cx={x} cy={y} r={i % 5 === 0 ? 2.4 : 1.4} fill="#fff" opacity={(i % 3 === 0 ? 0.9 : 0.55) * (faint ? 0.5 : 1)} />;
-  });
-  return <>{dots}</>;
-}
-
-/** The tree holding the nest: its trunk right of the tower, a branch reaching over to the nest, a round crown. */
-function Tree({ l }: { l: TowerLayout }) {
-  const { b, ground } = l;
-  const { trunk, top } = treeAt(l);
-  const nest = goalPlace(l, "nest");
-  const branchY = nest.at.y + 0.3 * nest.size * 0.5;
-  const tw = 0.7 * b;
-  return (
-    <g stroke={INK} strokeWidth={Math.max(2, b * 0.09)} strokeLinejoin="round">
-      <ellipse cx={trunk + 0.4 * b} cy={top - 0.6 * b} rx={2.6 * b} ry={2.2 * b} fill="#69a83a" />
-      <ellipse cx={trunk + 1.6 * b} cy={top + 0.6 * b} rx={1.6 * b} ry={1.4 * b} fill="#82c341" />
-      <path
-        d={`M${trunk - tw / 2} ${ground} C${trunk - tw / 2} ${ground - 4 * b} ${trunk - tw * 0.4} ${top + 2 * b} ${trunk - tw * 0.35} ${top} L${trunk + tw * 0.35} ${top} C${trunk + tw * 0.4} ${top + 2 * b} ${trunk + tw / 2} ${ground - 4 * b} ${trunk + tw / 2} ${ground} Z`}
-        fill="#9c6b3c"
-      />
-      <path
-        d={`M${trunk - tw * 0.3} ${branchY - 1.1 * b} Q${trunk - 1.4 * b} ${branchY - 0.2 * b} ${nest.at.x - 0.2 * b} ${branchY} L${nest.at.x - 0.1 * b} ${branchY + 0.28 * b} Q${trunk - 1.2 * b} ${branchY + 0.25 * b} ${trunk - tw * 0.3} ${branchY - 0.5 * b} Z`}
-        fill="#9c6b3c"
-      />
-      <ellipse cx={trunk - 0.9 * b} cy={top - 1.4 * b} rx={1.8 * b} ry={1.5 * b} fill="#82c341" />
-      <path d={`M${trunk} ${ground - 2 * b} q${0.15 * b} ${-0.6 * b} 0 ${-1.2 * b}`} fill="none" opacity="0.35" />
+  const at = (f: number) => floorBottom(l, f);
+  const right = l.x0 + (ROW + 0.2) * s;
+  const tree = (x: number, k: number) => (
+    <g key={x} transform={`translate(${x} ${ground}) scale(${(k * s) / 100})`}>
+      <path d="M-9 0 V-90 H9 V0 Z" fill="#8b5a2b" stroke={INK} strokeWidth="4" />
+      <circle cx="0" cy="-130" r="58" fill="#51cf66" stroke={INK} strokeWidth="4" />
+      <circle cx="-26" cy="-148" r="12" fill="#ff6b6b" />
+      <circle cx="22" cy="-112" r="10" fill="#ff6b6b" />
     </g>
   );
-}
-
-/** The heap of autumn leaves at the tree's foot, soft to land in. */
-function LeafPile({ l }: { l: TowerLayout }) {
-  const { b } = l;
-  const at = leafPile(l);
-  const leaves = Array.from({ length: 14 }, (_, i) => {
-    const x = at.x + (((i * 0.618) % 1) - 0.5) * 2.1 * b;
-    const y = at.y - 0.15 * b - ((i * 0.37) % 1) * 0.55 * b * (1 - Math.abs(x - at.x) / (1.4 * b));
-    return (
-      <ellipse key={i} cx={x} cy={y} rx={0.22 * b} ry={0.12 * b} fill={LEAF_COLORS[i % LEAF_COLORS.length]} transform={`rotate(${(i * 47) % 180} ${x} ${y})`} />
-    );
-  });
+  const door = l.x0 + 4.5 * s;
   return (
-    <g stroke={INK} strokeWidth={Math.max(1.2, b * 0.04)}>
-      <path d={`M${at.x - 1.3 * b} ${at.y + 0.1 * b} Q${at.x} ${at.y - 1.3 * b} ${at.x + 1.3 * b} ${at.y + 0.1 * b} Z`} fill="#e8590c" />
-      {leaves}
-    </g>
-  );
-}
-
-/**
- * The next round's goal as a still card, for „Weiter“ at a round's end (`GameEnd`'s `next.art`; user request, 23
- * November 2026: „Weiter“ shows what comes next in every game): its sky and meadow, the goal big in the middle – the
- * nest and the owl's hollow with their mother on them, the moon awake among a few stars.
- */
-export const GoalCard = memo(function GoalCard({ goal }: { goal: GoalId }) {
-  const sky = SKY[goal];
-  return (
-    <span className="tw-goal-card" style={{ background: `linear-gradient(${sky.top}, ${sky.low} 74%, ${sky.grass} 74%, ${sky.grassDark})` }}>
-      {STARRY.includes(goal) && (
-        <span className="tw-goal-card-stars">
-          <Star />
-          <Star />
-          <Star />
-        </span>
-      )}
-      <span className={`tw-goal-card-thing tw-goal-card-${goal}`}>
-        {goal === "balloon" && <Balloon hang={24} />}
-        {goal === "kite" && <Kite hang={24} aside={-12} />}
-        {goal === "plane" && <Plane />}
-        {goal === "cloud" && <CloudSeat awake />}
-        {goal === "rainbow" && <Rainbow w={150} h={100} from={{ x: 8, y: 30 }} bend={{ x: 70, y: -10 }} to={{ x: 140, y: 62 }} b={36} bands={RAINBOW.length} />}
-        {goal === "bird" && <Bird />}
-        {goal === "hotair" && <HotAir />}
-        {goal === "nest" && (
-          <>
-            <Bird />
-            <Nest />
-          </>
-        )}
-        {goal === "owl" && (
-          <>
-            <Owl />
-            <Hollow />
-          </>
-        )}
-        {goal === "moon" && <Moon awake />}
-      </span>
-    </span>
+    <svg className="zt-backdrop" viewBox={`${left} 0 ${width} ${height}`} style={{ left, width, height }} aria-hidden>
+      <defs>
+        <linearGradient id="zt-sky" gradientUnits="userSpaceOnUse" x1="0" y1="0" x2="0" y2={ground}>
+          {SKY.map((color, i) => (
+            <stop key={color} offset={stops[i]} stopColor={color} />
+          ))}
+        </linearGradient>
+      </defs>
+      <rect x={left} y="0" width={width} height={height} fill="url(#zt-sky)" />
+      {stars.map((p, i) => (
+        <circle key={i} cx={p.x} cy={p.y} r={p.r} fill="#fff" opacity={p.y < roof ? 0.9 : 0.45} />
+      ))}
+      {/* The moon, right above the roof's chimney side. */}
+      <g transform={`translate(${l.x0 + 8.6 * s} ${roof - 0.25 * h})`}>
+        <circle r={0.75 * s} fill="#fff3bf" stroke="#ffe066" strokeWidth="3" />
+        <circle cx={-0.25 * s} cy={-0.15 * s} r={0.13 * s} fill="#ffe8a3" />
+        <circle cx={0.2 * s} cy={0.25 * s} r={0.18 * s} fill="#ffe8a3" />
+      </g>
+      {cloud(l.x0 - 0.4 * s, at(2) + 0.3 * l.floorH, 1.2, "#fff")}
+      {cloud(right + 0.2 * s, at(4), 1.1, "#fff")}
+      {cloud(l.x0 + 0.6 * s, at(6) - 0.2 * l.floorH, 1, "#fff4e6")}
+      {cloud(right - 0.6 * s, at(8), 1.2, "#ffe3e3")}
+      {cloud(left + 0.3 * width, at(3), 1.6, "#fff")}
+      {cloud(left + 0.75 * width, at(5), 1.5, "#fff")}
+      {tree(l.beamLeft - 1.6 * s, 1.6)}
+      {tree(right + 2.2 * s, 1.9)}
+      {/* The meadow, rolling far to both sides. */}
+      <path
+        d={`M${left} ${ground - 0.05 * s} Q${left + width * 0.25} ${ground - 0.5 * s} ${left + width * 0.5} ${ground - 0.08 * s} T${left + width} ${ground - 0.2 * s} V${height} H${left} Z`}
+        fill="#8ce99a"
+      />
+      <path
+        d={`M${left} ${ground + 0.5 * s} Q${left + width * 0.5} ${ground + 0.2 * s} ${left + width} ${ground + 0.6 * s} V${height} H${left} Z`}
+        fill="#69db7c"
+      />
+      {/* The path to the front door, the house's footing. */}
+      <path d={`M${door - 0.3 * s} ${ground} L${door + 0.3 * s} ${ground} L${door + 0.9 * s} ${height} L${door - 0.9 * s} ${height} Z`} fill="#f1d7a4" />
+      <rect x={l.beamLeft} y={ground - 1} width={right - l.beamLeft} height={0.22 * s} rx="4" fill="#adb5bd" stroke={INK} strokeWidth="3" />
+      {[-0.9, 1.3, 2.4, 6.8, 8.2, 11.2].map((d, i) => (
+        <g key={d} transform={`translate(${l.x0 + d * s} ${ground + (0.45 + (i % 2) * 0.2) * s})`}>
+          <path d={`M0 0 V${-0.2 * s}`} stroke="#2f9e44" strokeWidth="3" />
+          <circle cy={-0.24 * s} r={0.08 * s} fill={["#ff6b6b", "#ffd43b", "#f783ac", "#748ffc", "#ff922b", "#fff"][i]} stroke={INK} strokeWidth="1.5" />
+        </g>
+      ))}
+    </svg>
   );
 });
+
+/** The roof's box in world pixels: over the floors with its eaves, its foot on the top beam. */
+export function roofBox(l: HouseLayout) {
+  const left = l.x0 - EAVE * l.s;
+  const width = (ROW + 2 * EAVE) * l.s;
+  const height = ROOF * l.s;
+  return { left, top: roofTop(l), width, height };
+}

@@ -21,6 +21,26 @@ test("keyframe names are unique across all CSS files", () => {
   expect(twice).toEqual([]);
 });
 
+// A game's prefixed class (`zt-play`, `tw-play`) is styled by that game alone: the Counting Tower and Zaubertasten both
+// had `.tw-play`, and since the shelf preloads every game's CSS, each laid its rules over the other's (November 2026).
+// Plain state words (`.on`, `.done`) only ever go with a prefixed class and may repeat; so may the shared components'
+// own classes a game restyles inside its own root.
+const SHARED_CLASSES = new Set(["game-end", "game-end-button", "nudge-0", "nudge-1"]);
+
+test("no two games style the same prefixed class", () => {
+  const games = new Map<string, Set<string>>();
+  for (const file of cssFiles.filter((f) => f.startsWith(join("src", "games")))) {
+    const game = file.split(/[\\/]/)[2];
+    const css = readFileSync(file, "utf8").replace(/\/\*[\s\S]*?\*\//g, "");
+    for (const [, name] of css.matchAll(/\.([a-zA-Z][\w-]*-[\w-]+)/g)) {
+      if (SHARED_CLASSES.has(name)) continue;
+      games.set(name, new Set([...(games.get(name) ?? []), game]));
+    }
+  }
+  const twice = [...games].filter(([, where]) => where.size > 1).map(([name, where]) => `${name}: ${[...where].join(", ")}`);
+  expect(twice).toEqual([]);
+});
+
 // Words in an `animation` shorthand that are not keyframe names.
 const animationKeywords = new Set(
   "none infinite linear ease ease-in ease-out ease-in-out step-start step-end forwards backwards both normal reverse alternate alternate-reverse running paused inherit initial unset".split(
