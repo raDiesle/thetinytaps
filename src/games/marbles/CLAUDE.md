@@ -148,7 +148,10 @@ Then a second part past the tree (`PART2`, `acornAt`, `beeAt`, `kiteAt`; a pure 
   it waited for the first tap, at a stop and behind the end): `useFrames`' step runs every frame and returns whether
   the picture changes – its clock running, a camera still `gliding`, a wobble, flash or sparkle younger than `SETTLE_S`
   (the marble run's parts: `SETTLED_S`, and any tap or key stirs it) – and the frame where things come to rest is drawn
-  last (`frameTicker`, `frames.test.ts`). A new thing that changes with time or with a tap counts itself in its level's
+  last (`frameTicker`, `frames.test.ts`). It is drawn at most every `MIN_DRAW_MS` (`level.ts`): a 120 or 144 Hz screen
+  draws every second frame, so a fast gaming phone does no more drawing than a 60 Hz one – at 120 Hz each drawing and
+  its raster came twice as often, and the game stuttered now and then on a gaming phone (user feedback, 24 November
+  2026); never take the cap out to make motion smoother, nor time anything by drawn frames. A new thing that changes with time or with a tap counts itself in its level's
   step, or it freezes. Machines and the runs draw on after their end, since some ends keep moving (the good-night
   machine's „z z z“, the pool's fountains).
 - **What changes in a frame is painted and rastered again, as wide as the screen** (perf of every level, November
@@ -191,6 +194,12 @@ Then a second part past the tree (`PART2`, `acornAt`, `beeAt`, `kiteAt`; a pure 
   - A long thing sweeping across the world (the Licht-Kette's lighthouse beam) is never drawn into a world-sized svg,
     where each frame rasters the whole band it crosses: it is a few small sprites in `over`, a band stretched by
     `scaleX`, its spot and its glare each moved by a transform (`LighthouseBeam`).
+  - Dashes flowing along a long line (a power cable's current, a hose's water, a conveyor belt) are `FlowingDashes`
+    (`parts.tsx`) in `over`: strips of HTML whose dashes slide by a compositor animation of `transform` – never a
+    `strokeDashoffset` moved by the clock in the machine's svg, which rasters the whole band the line spans in every
+    frame (the Raketenstart's current: 52 → 43 screens a second; the Baustelle, Garten, Badezimmer, Zirkus, Große Maschine
+    and Wasserbahn still flow that way, A-37). Their keyframes move by `translateX(100%)` of a strip one period wide,
+    never by a custom property, which the compositor can't run alone.
   - `bun run perf ketten-<id>` (`KETTEN_LEVELS` in `tools/perfScenarios.ts`) measures each level's first seconds and
     its middle; run it for the level after changing what moves in it (`ketten-` runs all 21, about 15 minutes). A
     level the scenario keeps playing by keys (the Nagelbrett) must still be running at „Mitte“: at a key every 600 ms its

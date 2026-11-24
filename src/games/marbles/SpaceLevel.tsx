@@ -54,7 +54,7 @@ import {
   type Space,
 } from "./space";
 import { BALL_R, type Pt } from "./path";
-import { BAR_COLORS, Ball, still } from "./parts";
+import { BAR_COLORS, Ball, FlowingDashes, type ScreenAt, still } from "./parts";
 
 const SKY_TOP = "#0d1446";
 const SKY_LOW = "#2b3a88";
@@ -90,6 +90,7 @@ export function SpaceLevel(props: LevelProps) {
       level="space"
       start={{ x: DISH.x, y: DISH.y - 6, r: 96 }}
       back={(t) => sky.map((l, i) => (i === 0 || t < 0 ? l : { ...l, className: `${l.className} ${t >= space.tLift ? "party" : "on"}` }))}
+      over={(t, at) => <Current space={space} t={t} at={at} />}
       {...props}
     >
       {(t) => {
@@ -611,21 +612,48 @@ function Buggy({ turned, bob }: { turned: number; bob: number }) {
 
 const jibLow = TRUSS.jibY + TRUSS.jibH;
 
+/** The power cable from the switch up the mast and along under the beam to the magnet's clamp. */
+const CABLE: Pt[] = [
+  { x: LEVER.x + 34, y: FLOOR - 14 },
+  { x: LEVER.x + 60, y: FLOOR - 4 },
+  { x: TRUSS.x - TRUSS.w / 2 - 8, y: FLOOR - 4 },
+  { x: TRUSS.x - TRUSS.w / 2 - 8, y: jibLow + 8 },
+  { x: MAGNET.x - 26, y: jibLow + 8 },
+  { x: MAGNET.x - 8, y: jibLow + 22 },
+];
+/** Where the magnet's own cable ends, above the magnet. */
+const MAGNET_DROP = MAGNET.y - 56;
+
+/**
+ * The current flowing in both cables while the magnet is on, after the tap: white dashes sliding towards the magnet, as
+ * HTML layers over the machine (`FlowingDashes`), since drawn in the machine's svg they rastered most of the picture's
+ * height in every frame.
+ */
+function Current({ space, t, at }: { space: Space; t: number; at: ScreenAt }) {
+  if (t < 0 || t >= space.tOff) return null;
+  const flow = { at, dash: 4, gap: 26, speed: 90, width: 3, color: "#fff" };
+  return (
+    <>
+      <FlowingDashes {...flow} pts={CABLE} />
+      <FlowingDashes
+        {...flow}
+        pts={[
+          { x: MAGNET.x, y: jibLow + 16 },
+          { x: MAGNET.x, y: MAGNET_DROP },
+        ]}
+      />
+    </>
+  );
+}
+
 /** The space-station truss: a mast with a round module on top, a long beam with solar wings, the power cable and the magnet. */
 function StationTruss({ space, t }: { space: Space; t: number }) {
   const { x, w, jibY, jib0, jib1 } = TRUSS;
   const on = t < space.tOff;
   const n = Math.round((jib1 - jib0) / 44);
   const zig = Array.from({ length: n + 1 }, (_, i) => ({ x: jib0 + ((jib1 - jib0) * i) / n, y: i % 2 ? jibLow : jibY }));
-  const cable = [
-    { x: LEVER.x + 34, y: FLOOR - 14 },
-    { x: LEVER.x + 60, y: FLOOR - 4 },
-    { x: x - w / 2 - 8, y: FLOOR - 4 },
-    { x: x - w / 2 - 8, y: jibLow + 8 },
-    { x: MAGNET.x - 26, y: jibLow + 8 },
-    { x: MAGNET.x - 8, y: jibLow + 22 },
-  ];
-  const drop = MAGNET.y - 56;
+  const cable = CABLE;
+  const drop = MAGNET_DROP;
   const module = { x0: x - 80, x1: x + 80, top: jibY - 74 };
   const panels = [
     { x0: jib0 + 30, x1: x - 110 },
@@ -676,7 +704,6 @@ function StationTruss({ space, t }: { space: Space; t: number }) {
       {/* The power cable from the switch to the magnet */}
       <path d={svgLine(cable)} fill="none" stroke={INK} strokeWidth="8" strokeLinejoin="round" />
       <path d={svgLine(cable)} fill="none" stroke={on ? "#ffd23f" : "#9a8a50"} strokeWidth="4" strokeLinejoin="round" />
-      {on && t >= 0 && <path d={svgLine(cable)} fill="none" stroke="#fff" strokeWidth="3" strokeDasharray="4 26" strokeDashoffset={-t * 90} />}
       {/* The clamp and the magnet's cable */}
       <path
         d={`M${MAGNET.x - 20} ${jibLow - 2} L${MAGNET.x + 20} ${jibLow - 2} L${MAGNET.x + 10} ${jibLow + 18} L${MAGNET.x - 10} ${jibLow + 18} Z`}
@@ -687,9 +714,6 @@ function StationTruss({ space, t }: { space: Space; t: number }) {
       />
       <line x1={MAGNET.x} y1={jibLow + 16} x2={MAGNET.x} y2={drop} stroke={INK} strokeWidth="8" />
       <line x1={MAGNET.x} y1={jibLow + 16} x2={MAGNET.x} y2={drop} stroke={on ? "#ffd23f" : "#9a8a50"} strokeWidth="4" />
-      {on && t >= 0 && (
-        <line x1={MAGNET.x} y1={jibLow + 16} x2={MAGNET.x} y2={drop} stroke="#fff" strokeWidth="3" strokeDasharray="4 26" strokeDashoffset={-t * 90} />
-      )}
       <Magnet on={on} t={t} />
     </g>
   );

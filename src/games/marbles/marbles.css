@@ -236,6 +236,38 @@
   animation-play-state: paused !important;
 }
 
+/*
+ * Dashes flowing along a straight piece of a cable (`FlowingDashes` in parts.tsx): the strip is placed by a transform,
+ * its dashes slide one period by a compositor-only animation, so nothing is painted again while they flow.
+ */
+.marble-flow {
+  position: absolute;
+  top: 0;
+  left: 0;
+  overflow: hidden;
+  transform-origin: 0 0;
+  will-change: transform;
+  pointer-events: none;
+}
+
+.marble-flow-dashes {
+  position: absolute;
+  top: 0;
+  height: 100%;
+  will-change: transform;
+  animation: marble-flow linear infinite;
+}
+
+.marble-flow-dashes > div {
+  height: 100%;
+}
+
+@keyframes marble-flow {
+  to {
+    transform: translateX(100%);
+  }
+}
+
 /* A small thing moving on its own as a layer of its own (`Sprite` in parts.tsx), placed by a transform. */
 .marble-sprite {
   position: absolute;

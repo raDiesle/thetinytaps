@@ -105,19 +105,38 @@ export const wobble = (age: number, amp: number, freq: number, damp: number) => 
 export const gliding = (from: number, to: number) => Math.abs(to - from) > 0.1;
 
 /**
+ * The least time between two drawings of a level, in ms: a screen of 60 or 90 Hz draws every frame, one of 120 or 144 Hz
+ * (a gaming phone) every second one, so a level is drawn at most about 60–72 times a second. Each drawing renders the
+ * level's svg again and has the phone paint and raster what changed, and at 120 Hz that work doubled – a fast gaming
+ * phone stuttered now and then where a 60 Hz one did not (user feedback, November 2026). Motion stays even, since every
+ * second frame of a 120 Hz screen is drawn.
+ */
+export const MIN_DRAW_MS = 10;
+
+/**
  * One frame of `useFrames`: steps the level and says whether to draw it again. The first step returning `false`
  * (nothing moves after it) is still drawn, so the picture shows where things came to rest, and then nothing until a
- * step moves again. `dt` is capped, so a tab coming back from the background doesn't jump.
+ * step moves again. A level is drawn at most every `MIN_DRAW_MS`; a change in a frame left out is drawn with the next.
+ * `dt` is capped, so a tab coming back from the background doesn't jump.
  */
 export function frameTicker(step: (dt: number, now: number) => boolean, draw: () => void, start: number) {
   let last = start;
   let moved = true;
+  /** Something changed since the last drawing. */
+  let owed = true;
+  let drawn = Number.NEGATIVE_INFINITY;
   return (now: number) => {
     const dt = Math.min(0.05, (now - last) / 1000);
     last = now;
     const moving = step(dt, now);
-    if (moving || moved) draw();
+    if (moving || moved) owed = true;
     moved = moving;
+    // A frame timestamp may come a hair early; half a millisecond of slack keeps a 90 Hz screen (11.1 ms) on every frame.
+    if (owed && now - drawn >= MIN_DRAW_MS - 0.5) {
+      owed = false;
+      drawn = now;
+      draw();
+    }
   };
 }
 

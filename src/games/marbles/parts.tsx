@@ -71,6 +71,62 @@ export function Sprite({ at, x, y, pad, angle = 0, children }: { at: ScreenAt; x
 }
 
 /**
+ * Dashes flowing along a line of straight pieces (a power cable's current), the way `strokeDasharray` with a
+ * `strokeDashoffset` moved by the clock would draw them, but as HTML layers: each piece is a narrow strip placed and
+ * turned by a transform, and its dashes slide by a CSS animation of `transform`, which the compositor runs alone. The
+ * Raketenstart's current drawn into the machine's svg changed a cable reaching over two thirds of the picture's height in
+ * every frame, and a phone rastered that whole band 60 times a second (perf, November 2026: 52 screens a second, budget
+ * 30). Lies over the machine (`MachineStage`'s `over`); `pts` and every length in world units, `speed` in units a second.
+ */
+export function FlowingDashes({
+  at,
+  pts,
+  dash,
+  gap,
+  speed,
+  width,
+  color,
+}: {
+  at: ScreenAt;
+  pts: Pt[];
+  dash: number;
+  gap: number;
+  speed: number;
+  width: number;
+  color: string;
+}) {
+  const period = dash + gap;
+  let along = 0;
+  return pts.slice(1).map((b, i) => {
+    const a = pts[i];
+    const len = Math.hypot(b.x - a.x, b.y - a.y);
+    const start = along;
+    along += len;
+    const p = at(a.x, a.y);
+    return (
+      <div
+        key={i}
+        className="marble-flow"
+        style={{
+          width: len,
+          height: width,
+          transform: `translate3d(${p.x}px, ${p.y}px, 0) rotate(${Math.atan2(b.y - a.y, b.x - a.x)}rad) scale(${p.k}) translateY(${-width / 2}px)`,
+        }}
+        aria-hidden
+      >
+        {/* One period wide, so sliding it by its own width moves the dashes one period on (a `translateX(100%)` the
+            compositor runs; a custom property in the keyframes had the main thread restyle it in every frame). It starts
+            one period left of the strip, so the slide never shows the dashes' end, shifted by the length before it, so
+            they run on round a corner. */}
+        <div className="marble-flow-dashes" style={{ left: -period - (start % period), width: period, animationDuration: `${period / speed}s` }}>
+          <div style={{ width: len + 2 * period, background: `repeating-linear-gradient(90deg, ${color} 0 ${dash}px, transparent ${dash}px ${period}px)` }} />
+        </div>
+      </div>
+    );
+  });
+}
+
+/**
  * `memo` for a drawn part whose props are numbers, strings or flat objects of them: skipped by React while they stay the
  * same (objects compared by their contents, functions ignored). A part drawn again in every frame though nothing about
  * it changed cost an old phone's main thread its time (Kettenreaktion's levels draw 60 times a second while they run);
