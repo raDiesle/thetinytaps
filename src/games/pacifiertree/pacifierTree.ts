@@ -175,7 +175,7 @@ export const TREE_STORY: TreeChapter[] = [
         light: "tag",
         cast: ["tapsi", "mama", "papa"],
         picture:
-          "Tapsi stands under the big old tree and looks up in wonder at the many pacifiers hanging on ribbons from its branches, the three own pacifiers still in both paws; Mama and Papa stand close behind Tapsi.",
+          "Tapsi stands right under the low branches of the big old tree, head tipped far back, and looks up in wonder at the many pacifiers hanging on ribbons above, the three own pacifiers still in both paws; Mama and Papa stand close behind Tapsi, everyone off the path and under the tree.",
       },
       {
         id: "rot",

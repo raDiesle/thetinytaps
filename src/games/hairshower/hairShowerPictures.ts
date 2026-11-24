@@ -5,8 +5,8 @@ import { type Cast, type Light, type Place, SHOWER_PAGES, type ShowerPage } from
 // (`/bild-erzeugen`, made in a Claude cloud session: Zscaler blocks Gemini on the Mac). Tapsi's home is the one of the
 // other chapter books: the living room and Tapsi's room are drawn from the same pictures as „Tapsi and the Foam Crown“'s.
 // The shower room is new – a bathroom with a shower and no tub, for the families this story is for: drawn once from the
-// fox family on the first page there (`FIRST`), and every other shower page from that one, so the shower stays the same
-// – the queue holds those pages back until it is made. Plain data, no picture imports. A made picture goes on `MADE`,
+// fox family on the first page there (`FIRST`), one page with Tapsi in the shower from that (`SHOWER_REF`) and every
+// other shower page from that one, so the shower stays the same – the queue holds those pages back until it is made. Plain data, no picture imports. A made picture goes on `MADE`,
 // so it leaves the queue; the prompts stay here.
 
 const DIR = "src/games/hairshower/bilder";
@@ -17,8 +17,15 @@ export const pictureFile = (id: string) => `${DIR}/dusche-${id}.webp`;
 /** The fox family as the app draws it: Papa with glasses in green, Mama with a flower in yellow, the child in light blue. */
 const FAMILY = "src/components/bilder/buch-fuechse.webp";
 
-/** The shower room's first page, drawn from the family's picture; every other shower page is drawn from it. */
+/** The shower room's first page, drawn from the family's picture. */
 export const FIRST = "papa-fuesse";
+
+/**
+ * The shower page every other shower page is drawn from: Tapsi sitting on the mat in the shower and Papa kneeling beside
+ * it, as on nearly every page. Drawn from the first page, where Papa sits on the shower's edge, ten of eleven pictures
+ * kept a Papa there too – a second Papa, a floating head, his tail left lying in front, Tapsi put out on the bath mat.
+ */
+export const SHOWER_REF = "zehen";
 
 /**
  * The picture every page of a place is drawn from, and who was where in it: a page drawn from it keeps them there unless
@@ -36,8 +43,8 @@ const PLACES: Record<Place, { ref: string; was: string; shows: Cast[] }> = {
     shows: ["tapsi"],
   },
   dusche: {
-    ref: pictureFile(FIRST),
-    was: "Papa sits on the shower's edge with his feet in the shower and Tapsi stands outside holding the shower head",
+    ref: pictureFile(SHOWER_REF),
+    was: "Tapsi sits on the soft mat in the shower and Papa kneels on the round bath mat beside the shower holding the shower head low",
     shows: ["tapsi", "papa"],
   },
 };
@@ -70,7 +77,7 @@ function castOf(page: ShowerPage): string {
   const who: Record<Cast, string> = {
     tapsi: `Tapsi, a small fox toddler with orange fur and a white muzzle, in ${tapsiWears(page)}`,
     mama: `Mama, a grown-up fox woman with a small red flower behind one ear, in a yellow sweater${page.place === "dusche" ? " with the sleeves pushed up" : ""} and brown trousers`,
-    papa: `Papa, a grown-up fox man with round glasses, in a green sweater${page.place === "dusche" ? " with the sleeves pushed up" : ""} and brown trousers`,
+    papa: `Papa, a grown-up fox man with round glasses, in a green sweater${page.place === "dusche" ? " with the sleeves pushed up" : ""} (green like a fir tree, never orange: Gemini once made it orange in the shower) and brown trousers`,
   };
   const n = page.cast.length;
   const both =
@@ -130,7 +137,7 @@ export function promptOf(page: ShowerPage): string {
       ? [SHOWER_ROOM, "Draw the foxes like the fox family in the reference picture: the same fur and faces, in the clothes said here."]
       : [
           "Redraw this exact place from the reference picture: keep it exactly as it is – the same walls, tiles, window, furniture and objects at the same places, the same camera framing (no zoom, no shift), the same colours and line style. Only the characters, their poses, the things they hold and the light change, and who is there.",
-          `In that reference picture ${place.was}: that was another moment. Draw each character only where this page says, and leave every other place empty – no second fox, no fox tail left lying on the floor or the furniture.`,
+          `In that reference picture ${place.was}: that was another moment. Draw each character only where this page says, and leave every other place empty – where someone was in the reference and this page puts them elsewhere, that spot is empty now: no second fox, no floating head, no fox tail left lying on the floor or the furniture.`,
           absent(page),
         ];
   parts.push(LIGHT[page.light], castOf(page), ...thingsOf(page), `Now this happens: ${page.picture}`);
@@ -144,7 +151,7 @@ export function promptOf(page: ShowerPage): string {
  * a picture, and the book's choice a story without one, only until then).
  */
 const AFTER =
-  "Look at every picture: count the foxes (only the page's cast, each once, no stray tail) and look at every face; no bathtub anywhere; Tapsi in the shower sits on the mat in swim shorts, never stands; the water never comes from above or over Tapsi's face; one shower head, one washcloth, one shampoo; the shower room the same on every shower page. Once all twenty pages are made: add each id to MADE in src/games/hairshower/hairShowerPictures.ts; take /haare-waschen/dusche/ and /haare-waschen/dusche/kurz/ out of WAITING_PATHS in src/content/seo.ts; name the second story in the search texts of /haare-waschen/ (seo.ts and its six seo.<language>.ts) and in HAIR_STORY_BLURB of src/games/hairstory/names.ts, in all seven languages; mark it published in the language row's note (languageStatus.ts) and in src/games/hairshower/CLAUDE.md; run bun run previews /haare-waschen/ and look at the choice at 844×390 and 1024×768.";
+  "Look at every picture: count the foxes (only the page's cast, each once, no stray tail) and look at every face; no bathtub anywhere; Tapsi in the shower sits on the mat in swim shorts, never stands; the water never comes from above or over Tapsi's face; one shower head, one washcloth, one shampoo; the shower room the same on every shower page. Once all twenty pages are made: add each id to MADE in src/games/hairshower/hairShowerPictures.ts; take /haare-waschen/dusche/ and /haare-waschen/dusche/kurz/ out of WAITING_PATHS in src/content/seo.ts; name the second story in the search texts of /haare-waschen/ (seo.ts and its six seo.<language>.ts) and in HAIR_STORY_BLURB of src/games/hairstory/names.ts, in all seven languages; mark it published in the language row's note (languageStatus.ts) and in src/games/hairshower/CLAUDE.md; look at the book's choice of stories in the built site at 844×390 and 1024×768.";
 
 /** The queue entry of a page's picture. */
 export function showerPicture(page: ShowerPage): QueuedPicture {
@@ -156,7 +163,7 @@ export function showerPicture(page: ShowerPage): QueuedPicture {
     aspect: "4:3",
     size: "1200x900",
     quality: 70,
-    ref: [page.id === FIRST ? FAMILY : PLACES[page.place].ref],
+    ref: [page.id === FIRST ? FAMILY : page.id === SHOWER_REF ? pictureFile(FIRST) : PLACES[page.place].ref],
     alone: "story picture",
     date: "2026-11-23",
     after: AFTER,
@@ -164,7 +171,28 @@ export function showerPicture(page: ShowerPage): QueuedPicture {
 }
 
 /** The pages whose pictures are made (`bilder/dusche-<id>.webp`); the others wait in the queue. */
-const MADE = new Set<string>([]);
+const MADE = new Set<string>([
+  "aus",
+  "becher",
+  "einwickeln",
+  "fisch",
+  "hase",
+  "jetzt",
+  "laut",
+  "leise",
+  "lieb",
+  "matte",
+  "papa-fuesse",
+  "sagen",
+  "sand",
+  "schaum",
+  "selbst",
+  "spritzer",
+  "spuelen",
+  "stolz",
+  "trocknen",
+  "zehen",
+]);
 
 /** Every picture of the story still to make. */
 export const SHOWER_PICTURE_QUEUE: QueuedPicture[] = SHOWER_PAGES.filter((p) => !MADE.has(p.id)).map(showerPicture);

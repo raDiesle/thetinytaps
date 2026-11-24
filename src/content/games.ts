@@ -184,13 +184,12 @@ export const CATEGORIES: Category[] = [
       {
         // The book „Big Bed“ beside „Hair Washing“ (idea H-106, 21 November 2026): „Tapsi's Big Bed“, a story in
         // chapters along the steps the guides give for moving a small child from the cot into a bed of its own
-        // (src/games/bedstory), English first. Still being built until its Gemini pictures are made (they wait in the
-        // picture queue, made by a Claude cloud session): players never see a picture that isn't made yet.
+        // (src/games/bedstory), English first. Its pictures were made on 21 November 2026, and it was published on the
+        // user's word on 23 November 2026.
         href: "/grosses-bett/",
         emoji: "🛏️",
         title: BED_STORY_BOOK,
         blurb: BED_STORY_BLURB,
-        unfinished: true,
       },
       {
         href: "/zaehne/",

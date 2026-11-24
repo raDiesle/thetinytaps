@@ -14,7 +14,7 @@
 export const ACCOUNT_KEYS = {
   /** Creator: Tapsi's own voice (`stimme.json`) lives only here. */
   first: "ELEVENLABS_API_KEY",
-  /** Starter, 3 requests at once: only the clones of Tapsi (`bun run voice clone`). */
+  /** Creator since November 2026 (`--parallel 2` stays): only the clones of Tapsi (`bun run voice clone`). */
   second: "ELEVENLABS_API_KEY_2",
 } as const;
 

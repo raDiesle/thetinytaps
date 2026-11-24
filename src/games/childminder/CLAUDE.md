@@ -27,8 +27,8 @@ table, the nap in a little bed at Lotta's), and right after the nap Mama is ther
 - `names.ts`: its title and its name in the book's choice („At a childminder's“ / „Bei der Tagesmutter“).
 - The book itself (`KitaStoryGame.tsx`) holds its `BookStory` (level `tagesmutter`, code `T`, short `Tk`).
 
-**Not published yet**: until its 28 pictures are made (picture queue, Claude Cloud), players don't see it, and its two
-addresses are in `WAITING_PATHS` (`seo.ts`). The queue entries' `after` says what to do then.
+**Published with its 28 pictures** (made with Gemini on 23 November 2026 in a Claude cloud session), named in the search
+texts of `/kita/` and in `KITA_STORY_BLURB`.
 
 ## Rules
 
@@ -46,3 +46,6 @@ addresses are in `WAITING_PATHS` (`seo.ts`). The queue entries' `after` says wha
 - Pictures follow the Kita story's lessons (`/bild-erzeugen`, `src/games/kitastory/CLAUDE.md`): each new place drawn once
   from the families (`PLACES.first`), every other page there from it; Lotta and Emil from the page they first came in
   (`PEOPLE`); every prompt names who of its reference is not there (`absent`, checked); the waving page is seen from inside.
+  Where a place's reference has someone standing where a page wants nobody, Gemini keeps a figure there (Papa on the
+  hall's doormat, Mama at the kitchen table's end, a second Lotta): draw that page from another page of the place whose
+  people stand where it wants them (`DRAWN_FROM`: the slippers from „kuss“, lunch from „winken“).

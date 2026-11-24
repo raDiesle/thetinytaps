@@ -282,7 +282,8 @@ async function stories() {
       found.push({
         name: `${entry.name}/${language}`,
         language,
-        folder: join(dir, "stimme", language),
+        // German goes into stimme/ itself, also as the translation of a story written English first (voice.ts, voice.test.ts).
+        folder: language === "de" ? join(dir, "stimme") : join(dir, "stimme", language),
         lines: spokenLines(opening, lines, TRANSLATION.defaultTurn),
       });
     }

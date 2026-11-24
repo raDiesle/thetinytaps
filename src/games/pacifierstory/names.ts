@@ -27,13 +27,13 @@ export const PACIFIER_STORY_BOOK: Localized = {
 
 /** Its line for grown-ups. */
 export const PACIFIER_STORY_BLURB: Localized = {
-  de: "Tschüss, Schnuller – in Kapiteln",
-  en: "Bye-bye, pacifier – in chapters",
-  zh: "再见，奶嘴——分章节",
-  hi: "टाटा, चुसनी – अध्यायों में",
-  es: "Adiós, chupete, por capítulos",
-  ar: "وداعًا يا لهاية، في فصول",
-  ru: "Пока, пустышка, по главам",
+  de: "Mit Fee oder Schnullerbaum – in Kapiteln",
+  en: "Fairy or pacifier tree – in chapters",
+  zh: "仙子或奶嘴树——分章节",
+  hi: "परी या चुसनी का पेड़ – अध्यायों में",
+  es: "Con hada o en el árbol, por capítulos",
+  ar: "مع الجنّية أو عند الشجرة، في فصول",
+  ru: "С феей или у дерева, по главам",
 };
 
 /**

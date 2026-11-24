@@ -22,19 +22,5 @@ export const symbol = (folder: "potty" | "teeth", id: string, use: string, what:
   date: DATE,
 });
 
-/** The symbols waiting to be made (all sixteen of the first set were made on 21 November 2026). */
-export const SYMBOL_PICTURE_QUEUE: QueuedPicture[] = [
-  // Zähne putzen's bar marks each phase of the routine (user feedback, 21 November 2026).
-  symbol(
-    "teeth",
-    "zahnpasta",
-    "Zähne putzen: Leiste, Abschnitt Zahnbürste holen und Zahnpasta drauf",
-    "A small toothpaste tube lying slightly tilted, white with a blue and a red stripe, its round cap off, a small dab of white and blue striped toothpaste coming out of its opening.",
-  ),
-  symbol(
-    "teeth",
-    "becher",
-    "Zähne putzen: Leiste, Abschnitt Zahnbürste ausspülen und weglegen",
-    "A round light-blue plastic cup with a clean child's toothbrush standing in it, head up, green rubber grip, white and light-blue bristles, two small water drops on the bristles.",
-  ),
-];
+/** The symbols waiting to be made (the first sixteen made on 21 November 2026, Zähne putzen's tube and cup on 23 November 2026). */
+export const SYMBOL_PICTURE_QUEUE: QueuedPicture[] = [];

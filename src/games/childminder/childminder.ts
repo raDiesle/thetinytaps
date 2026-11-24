@@ -299,7 +299,7 @@ export const CHILDMINDER_STORY: ChildminderChapter[] = [
         light: "mittag",
         cast: ["tapsi", "lotta", "emil", "kinder"],
         picture:
-          "Tapsi, Emil and the bigger girl sit on small chairs at the long kitchen table and eat noodles from colourful plates, and the baby in the high chair has a few noodles in its paws; Lotta sits at the table with them and laughs.",
+          "Tapsi, Emil and the bigger girl sit on small chairs at the long kitchen table and eat noodles from colourful plates, and the baby in the high chair has a few noodles in its paws; Lotta sits at the table with them and laughs; nobody stands at the window.",
       },
       {
         id: "schlafen",

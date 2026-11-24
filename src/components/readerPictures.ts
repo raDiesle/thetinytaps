@@ -16,19 +16,4 @@ export const READER_FILES: Record<Family, string[]> = {
 };
 
 /** Readers' pictures to draw (again): until one is made its side shows the parents. */
-export const READER_PICTURE_QUEUE: QueuedPicture[] = [
-  {
-    // The first one was cut off by its frame at the bottom and on the right: the cardigan and the legs ended in
-    // straight lines in every menu (user feedback, 13 November 2026).
-    id: "buch-oma-baer",
-    file: "src/components/bilder/buch-oma-baer.webp",
-    use: "Oma Bär liest dem Bärenkind vor, unten rechts in den Menüs (neu: das erste war unten und rechts abgeschnitten)",
-    prompt:
-      "Grandma Bear sits on the ground and reads a picture book with her little bear grandchild, both looking like the bears of the reference picture (only their look, fur colour and clothes style). Grandma keeps the same warm brown fur, with only a little grey on top of her head; round glasses, a lilac cardigan over a white blouse, dark blue skirt. The little bear in his light-blue T-shirt and dark blue-purple trousers sits beside her, laughing and pointing at the book, which shows only simple shapes. The whole of both figures fits in the picture with empty room on every side – heads, ears, elbows, legs and feet included: nothing touches or crosses the picture's edges. No white outline, sticker edge or halo round them – their dark plum ink line is their outer edge, as in the reference picture.",
-    aspect: "1:1",
-    size: "640",
-    transparent: true,
-    ref: ["src/components/bilder/buch-baeren.webp"],
-    date: "2026-11-13",
-  },
-];
+export const READER_PICTURE_QUEUE: QueuedPicture[] = [];

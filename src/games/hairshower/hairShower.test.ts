@@ -4,7 +4,7 @@ import { HAIR_SHOWER_AR } from "./ar";
 import { HAIR_SHOWER_DE } from "./de";
 import { HAIR_SHOWER_ES } from "./es";
 import { SHOWER_PAGES, SHOWER_STEPS, SHOWER_STORY } from "./hairShower";
-import { FIRST, IN_THE_SHOWER, SHOWER_PICTURE_QUEUE, showerPicture } from "./hairShowerPictures";
+import { FIRST, IN_THE_SHOWER, SHOWER_REF, SHOWER_PICTURE_QUEUE, showerPicture } from "./hairShowerPictures";
 import { HAIR_SHOWER_HI } from "./hi";
 import { HAIR_SHOWER_RU } from "./ru";
 import { HAIR_SHOWER_ZH } from "./zh";
@@ -70,11 +70,12 @@ describe("Tapsi and the Warm Rain", () => {
     for (const page of SHOWER_PAGES) expect(page.text, page.id).not.toMatch(/\b\d|o'clock|years? old|Monday|Tuesday|Wednesday|Thursday|Friday|Saturday|Sunday/);
   });
 
-  test("every picture is drawn from one reference, the shower's from its first page, so the shower stays the same", () => {
+  test("every picture is drawn from one reference, the shower's from one page with Tapsi in it, so the shower stays the same", () => {
     for (const page of SHOWER_PAGES) {
       const refs = showerPicture(page).ref ?? [];
       expect(refs.length, page.id).toBe(1);
-      if (page.place === "dusche" && page.id !== FIRST) expect(refs[0], page.id).toBe(`src/games/hairshower/bilder/dusche-${FIRST}.webp`);
+      if (page.place === "dusche" && page.id !== FIRST)
+        expect(refs[0], page.id).toBe(`src/games/hairshower/bilder/dusche-${page.id === SHOWER_REF ? FIRST : SHOWER_REF}.webp`);
     }
     expect(SHOWER_PAGES.find((p) => p.place === "dusche")?.id).toBe(FIRST);
     expect(SHOWER_PICTURE_QUEUE.length).toBeLessThanOrEqual(SHOWER_PAGES.length);

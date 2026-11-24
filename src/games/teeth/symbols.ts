@@ -5,8 +5,8 @@ import symbolFiles from "./bilder/symbole/*.webp?glob";
 // the routine (user feedback, November 2026: a sweet at the start and a tooth at the end said nothing of what each part
 // is): a sweet on eating sweets, a toothpaste tube on getting the brush ready, the toothbrush riding along the brushing's
 // frame to a shining clean tooth, and the brush back in its cup on putting it away. Painted with Gemini as one set with
-// Aufs Töpfchen's (`src/games/potty/symbolPictures.ts`). The strip never shows an emoji instead (`CLAUDE.md`): until a
-// picture is made, its place shows a drawn stand-in where there is one (`barSymbols.tsx`), else stays empty.
+// Aufs Töpfchen's (`src/games/potty/symbolPictures.ts`; all five made by 23 November 2026). The strip never shows an
+// emoji instead (`CLAUDE.md`): a picture not made yet leaves its place empty.
 
 const symbols = pictureFolder(symbolFiles);
 

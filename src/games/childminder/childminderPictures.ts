@@ -102,10 +102,11 @@ const GROUP_SIZE: Partial<Record<Cast, number>> = { kinder: 2 };
 function castOf(page: ChildminderPage): string {
   const who: Record<Cast, string> = {
     tapsi: `Tapsi, a small fox toddler with orange fur and a white muzzle, in ${page.picture.includes("pyjamas") ? "light-blue pyjamas with small yellow stars" : /Tapsi in a jacket/.test(page.picture) ? "a yellow rain jacket over a light-blue T-shirt and light-blue trousers" : "a light-blue T-shirt and light-blue trousers"}`,
-    mama: `Mama, a grown-up fox woman with a small red flower behind one ear, in ${page.picture.includes("coat") ? "a red coat over a yellow sweater, and brown trousers" : "a yellow sweater and brown trousers"}`,
+    // Kneeling where Lotta knelt in the hall's reference, Mama came back as a bear (tm-haken).
+    mama: `Mama, a grown-up fox woman with orange fur and a white muzzle like Tapsi's (a fox, never a bear, never brown fur), with a small red flower behind one ear, in ${page.picture.includes("coat") ? "a red coat over a yellow sweater, and brown trousers" : "a yellow sweater and brown trousers"}`,
     papa: "Papa, a grown-up fox man with round glasses, in a green sweater and brown trousers",
     lotta:
-      "Lotta, the childminder, a grown-up bear woman with warm chestnut-brown fur and round ears, in a mustard-yellow knitted cardigan over a white-and-red striped shirt and dark-green trousers, a red scarf tied in her hair-tuft, with only a tiny round bear tail, never a long bushy one",
+      "Lotta, the childminder, a grown-up bear woman with warm chestnut-brown fur and round ears, in a mustard-yellow knitted cardigan over a white-and-red striped shirt and dark-green trousers, a red scarf tied in her hair-tuft, with only a tiny round bear tail, never a long bushy one; she wears this cardigan and scarf on every page, never a plain shirt or dress (tm-hand lost them once)",
     emil: "Emil, Tapsi's friend, a small bear toddler as tall as Tapsi with sandy-blond fur, in a teal T-shirt and red dungarees, with only a tiny round bear tail",
     kinder:
       "two more small children Lotta looks after, each with only a tiny round bear tail: a bear baby with cream-coloured fur in a pale-green romper, smaller than Tapsi, and a bigger bear girl a head taller than Tapsi with dark-brown fur in a lilac dress",
@@ -135,9 +136,22 @@ function thingsOf(page: ChildminderPage): string[] {
 const END =
   "Everyone's face shows plainly what they feel, friendly and warm. The illustration fills the whole picture edge to edge (full bleed): no border, no frame, no white margin, no rounded corners, no vignette. No speech bubbles. No text, no letters, no numbers, also not on signs or doors.";
 
+/**
+ * Pages drawn from another page of their place than its first, and who was where in that one: drawn from „besuch“, where
+ * Papa stands on the doormat and Lotta kneels, the slipper page came back with Mama as a bear, then with Papa, then
+ * with two Mamas – „kuss“ already has Mama kneeling with Tapsi in the hall. Pick a page whose people stand where this
+ * page wants nobody, or where this page wants them.
+ */
+const DRAWN_FROM: Partial<Record<string, { page: string; was: string }>> = {
+  haken: { page: "kuss", was: "Mama in her coat kneels on the floor of the hall and hugs Tapsi" },
+  // Drawn from „essen“, where Mama sits at the table's end, lunch came back with a fox in Lotta's clothes there, then
+  // with two Lottas: „winken“ shows the kitchen with the table empty.
+  mittag: { page: "winken", was: "Lotta holds Tapsi up on her arm at the kitchen window and Mama stands outside on the pavement" },
+};
+
 /** The page a place's reference picture is, if it is one of this story's. */
 const refPage = (page: ChildminderPage) => {
-  const first = PLACES[page.place].first;
+  const first = DRAWN_FROM[page.id]?.page ?? PLACES[page.place].first;
   return first && first !== page.id ? CHILDMINDER_PAGES.find((p) => p.id === first) : undefined;
 };
 
@@ -148,8 +162,10 @@ const borrowed = (page: ChildminderPage) =>
 /** How the characters are named where a prompt says who is not there. */
 const NAMED: Record<Cast, string> = {
   tapsi: "Tapsi",
-  mama: "Mama (the grown-up fox woman)",
-  papa: "Papa (the grown-up fox man)",
+  // Named only as „the grown-up fox woman“, Mama's legs and tail stayed at the kitchen table's end (tm-mittag).
+  mama: "Mama (the grown-up fox woman with a red flower behind one ear, in a yellow sweater and brown trousers)",
+  // Named only as „the grown-up fox man“, Papa stayed standing on the hall's doormat of the reference (tm-haken).
+  papa: "Papa (the grown-up fox man with round glasses and a green sweater)",
   lotta: "Lotta (the grown-up bear)",
   emil: "Emil",
   kinder: "the bear baby and the bigger bear girl",
@@ -170,6 +186,8 @@ function absent(page: ChildminderPage): string {
 /** The place's own reference of a page: its place's first picture, or the families' pictures for that first picture. */
 function ownRefs(page: ChildminderPage): string[] {
   const place = PLACES[page.place];
+  const from = DRAWN_FROM[page.id];
+  if (from) return [pictureFile(from.page)];
   if (place.first !== page.id) return [place.ref];
   return page.cast.some(isBear) ? [FAMILY, BEARS] : [FAMILY];
 }
@@ -189,7 +207,7 @@ export function promptOf(page: ChildminderPage): string {
         ]
       : [
           "Redraw this exact place from the first reference picture: keep it exactly as it is – the same walls, windows, furniture and objects at the same places, the same camera framing (no zoom, no shift), the same colours and line style. Only the characters, their poses, the things they hold and the light change, and who is there.",
-          `In that reference picture ${place.was}: that was another moment. Draw each character only where this page says, and leave every other place empty – no second fox or bear, no fox tail left lying on the floor or the furniture.`,
+          `In that reference picture ${DRAWN_FROM[page.id]?.was ?? place.was}: that was another moment. Draw each character only where this page says, and leave every other place empty – where someone was in the reference and this page puts them elsewhere, that spot is empty now (Lotta once came back twice, kneeling as in the reference and in the doorway): no second fox or bear, no fox tail left lying on the floor or the furniture.`,
           absent(page),
         ];
   const ORDINAL = ["first", "second", "third", "fourth"];
@@ -208,7 +226,7 @@ export function promptOf(page: ChildminderPage): string {
  * a picture, and the book's choice a story without one, only until then).
  */
 const AFTER =
-  "Look at every picture: count the characters (only the page's cast, each once, „kinder“ are two: the baby and the bigger girl; no stray tail, bears with a tiny round tail) and look at every face; Lotta's flat is plainly a family's flat, never a daycare centre; one handcart, one high chair, one backpack, one yellow jacket; each place the same on every page drawn from it; the waving page is seen from inside with Mama small outside. Once all twenty-eight pages are made: add each id to MADE in src/games/childminder/childminderPictures.ts; take /kita/tagesmutter/ and /kita/tagesmutter/kurz/ out of WAITING_PATHS in src/content/seo.ts; name the second story in the search texts of /kita/ (seo.ts and its six seo.<language>.ts) and in KITA_STORY_BLURB of src/games/kitastory/names.ts, in all seven languages; mark it published in the language row's note (languageStatus.ts) and in src/games/childminder/CLAUDE.md; run bun run previews /kita/ and look at the choice at 844×390 and 1024×768.";
+  "Look at every picture: count the characters (only the page's cast, each once, „kinder“ are two: the baby and the bigger girl; no stray tail, bears with a tiny round tail) and look at every face; Lotta's flat is plainly a family's flat, never a daycare centre; one handcart, one high chair, one backpack, one yellow jacket; each place the same on every page drawn from it; the waving page is seen from inside with Mama small outside. Once all twenty-eight pages are made: add each id to MADE in src/games/childminder/childminderPictures.ts; take /kita/tagesmutter/ and /kita/tagesmutter/kurz/ out of WAITING_PATHS in src/content/seo.ts; name the second story in the search texts of /kita/ (seo.ts and its six seo.<language>.ts) and in KITA_STORY_BLURB of src/games/kitastory/names.ts, in all seven languages; mark it published in the language row's note (languageStatus.ts) and in src/games/childminder/CLAUDE.md; look at the book's choice of stories in the built site at 844×390 and 1024×768.";
 
 /** The queue entry of a page's picture. */
 export function childminderPicture(page: ChildminderPage): QueuedPicture {
@@ -228,7 +246,36 @@ export function childminderPicture(page: ChildminderPage): QueuedPicture {
 }
 
 /** The pages whose pictures are made (`bilder/tm-<id>.webp`); the others wait in the queue. */
-const MADE = new Set<string>([]);
+const MADE = new Set<string>([
+  "ankommen",
+  "aufwachen",
+  "besuch",
+  "da",
+  "erzaehlen",
+  "erzaehlt",
+  "essen",
+  "haken",
+  "hand",
+  "heim",
+  "kuss",
+  "laenger",
+  "lieb",
+  "mittag",
+  "packen",
+  "sagen",
+  "sand",
+  "schlafen",
+  "sofa",
+  "traurig",
+  "wagen",
+  "wann",
+  "weg",
+  "weinen",
+  "wieder",
+  "winken",
+  "zug",
+  "zuhause",
+]);
 
 /** Every picture of the story still to make. */
 export const CHILDMINDER_PICTURE_QUEUE: QueuedPicture[] = CHILDMINDER_PAGES.filter((p) => !MADE.has(p.id)).map(childminderPicture);

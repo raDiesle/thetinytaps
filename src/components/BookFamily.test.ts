@@ -27,21 +27,30 @@ test("the readers change from visit to visit, the two sides never alike", () => 
 // at the top, and every menu showed his head sliced; Oma Bär's legs ended flat at the bottom and her cardigan on the
 // right, since the bottom was allowed to touch (user feedback, November 2026). So no edge may be reached, and at the top
 // and the sides the outermost row or column is only the tip of a rounded line (at most 19 pixels in the good ones) – a
-// long straight run there is a cut the trim moved off the edge (31 on Oma Bär's cardigan). Feet on the ground may run
+// long straight run there is a cut the trim moved off the edge (31 on Oma Bär's cardigan). Such a cut shows the fill
+// colour at the edge; a long run that is all dark ink is the outline itself running nearly straight there (29 pixels of
+// the new Oma Bär's rounded cardigan, November 2026), so only a run with fill colour counts. Feet on the ground may run
 // flat a little longer at the bottom.
 test("no reader's picture is cut off at any side", async () => {
   for (const file of Object.values(READER_FILES).flat()) {
     if (!existsSync(path(file))) continue;
     const { data, info } = await sharp(path(file)).ensureAlpha().raw().toBuffer({ resolveWithObject: true });
     const { width: w, height: h } = info;
-    const opaque = (x: number, y: number) => data[(y * w + x) * 4 + 3] > 128;
-    const column = (x: number) => Array.from({ length: h }, (_, y) => opaque(x, y)).filter(Boolean).length;
-    const row = (y: number) => Array.from({ length: w }, (_, x) => opaque(x, y)).filter(Boolean).length;
-    const columns = Array.from({ length: w }, (_, x) => column(x));
-    const rows = Array.from({ length: h }, (_, y) => row(y));
-    const first = (counts: number[]) => counts.find((n) => n > 0) ?? 0;
-    const edges = { top: rows[0], bottom: rows[h - 1], left: columns[0], right: columns[w - 1] };
-    const straight = Math.max(first(rows), first(columns), first([...columns].reverse()));
+    const at = (x: number, y: number) => (y * w + x) * 4;
+    const opaque = (x: number, y: number) => data[at(x, y) + 3] > 128;
+    /** Dark enough to be the plum-brown outline, not a fill colour. */
+    const ink = (x: number, y: number) => 0.299 * data[at(x, y)] + 0.587 * data[at(x, y) + 1] + 0.114 * data[at(x, y) + 2] < 110;
+    /** How many pixels of a row or column are opaque, and how many of those are not ink. */
+    const line = (points: [number, number][]) => {
+      const solid = points.filter(([x, y]) => opaque(x, y));
+      return { solid: solid.length, fill: solid.filter(([x, y]) => !ink(x, y)).length };
+    };
+    const columns = Array.from({ length: w }, (_, x) => line(Array.from({ length: h }, (_, y) => [x, y])));
+    const rows = Array.from({ length: h }, (_, y) => line(Array.from({ length: w }, (_, x) => [x, y])));
+    const first = (lines: { solid: number; fill: number }[]) => lines.find((l) => l.solid > 0) ?? { solid: 0, fill: 0 };
+    const edges = { top: rows[0].solid, bottom: rows[h - 1].solid, left: columns[0].solid, right: columns[w - 1].solid };
+    const cut = (l: { solid: number; fill: number }) => (l.fill > 0 ? l.solid : 0);
+    const straight = Math.max(cut(first(rows)), cut(first(columns)), cut(first([...columns].reverse())));
     expect({ file, edges, straight: straight < 25 }).toEqual({ file, edges: { top: 0, bottom: 0, left: 0, right: 0 }, straight: true });
   }
 });

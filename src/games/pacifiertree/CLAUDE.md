@@ -29,11 +29,11 @@ love Tapsi with a pacifier and without one.
 
 ## Rules
 
-- **Waiting for its twenty pictures** (queued 23 November 2026, made only in a Claude cloud session): until then players
-  don't see it (`ChapterBook`'s `withPictures`, the choice leaves a story without pictures out), and both addresses are in
-  `WAITING_PATHS` (`seo.ts`: `noindex`, out of the sitemap). What to do once they are made stands in the pictures' `after`:
-  `MADE`, out of `WAITING_PATHS`, name the story in the search texts of `/schnullerfee/` and in `PACIFIER_STORY_BLURB`,
-  this file, `bun run previews /schnullerfee/`.
+- **Published with its twenty pictures** (made with Gemini on 23 November 2026 in a Claude cloud session), named in the
+  search texts of `/schnullerfee/` and in `PACIFIER_STORY_BLURB`. A page redrawn later keeps to the same references, and
+  a new page with a picture leaves players without it only until its picture is made. Gemini's mistakes here: a fourth
+  pacifier or the others on a windowsill (say „never a fourth“), Papa's sweater navy, pacifiers left in Tapsi's paws once
+  they hang in the tree (`thingsOf` says the paws are empty), and more pacifiers in Papa's paws on the walk.
 - **Written English first, translated into all seven languages** (checked in `pacifierTree.test.ts`: every chapter and
   page, Tapsi in each language's script, the pacifier named, no Latin letters in Russian, Chinese, Hindi or Arabic). A
   changed page changes its line in every language in the same commit. Tapsi is masculine in Russian, Hindi and Arabic,
