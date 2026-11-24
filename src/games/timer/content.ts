@@ -6,6 +6,7 @@ import { TUNNEL_NAME } from "./tunnelNames";
 import { JUMP_NAME } from "./jumpNames";
 import { JAR_NAME } from "./jarNames";
 import { MARBLE_NAME } from "./marbleNames";
+import { RACE_NAME } from "./raceNames";
 import { TIDY_NAME } from "./tidyNames";
 
 /** The game's name, on its start screen, its spine on the shelf and in the browser tab. */
@@ -95,6 +96,8 @@ export const PICTURES: { id: TimerPicture; emoji: string; name: Texts }[] = [
   { id: "seesaw", emoji: "⚖️", name: { en: "Seesaw", de: "Wippe", zh: "跷跷板", hi: "सी-सॉ", es: "Balancín", ar: "أرجوحة التوازن", ru: "Качели-балансир" } },
   // The Kugelbahn (H-117 with H-115, 24 November 2026): two to four children, a marble rolling into the next one's cup.
   { id: "marblerun", emoji: "🎱", name: MARBLE_NAME },
+  // The Rennstrecke (user request, 24 November 2026): the fox and the bear child drive a lap of an eight in turns.
+  { id: "race", emoji: "🏎️", name: RACE_NAME },
 ];
 
 /**
@@ -112,7 +115,7 @@ export const SWAP_NOTE: Localized = {
 };
 
 /** Whether a picture is one of taking turns, running on without end (`TurnPicture`). */
-export const isTurns = (id: TimerPicture): id is TurnPicture => id === "swap" || id === "seesaw" || id === "marblerun";
+export const isTurns = (id: TimerPicture): id is TurnPicture => id === "swap" || id === "seesaw" || id === "marblerun" || id === "race";
 
 /** The pictures that run until the time is up, in their order: all but those of taking turns. */
 export const TIMED_PICTURES = PICTURES.filter((p) => !isTurns(p.id));

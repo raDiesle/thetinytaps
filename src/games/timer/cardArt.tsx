@@ -1,5 +1,6 @@
 import { memo, useLayoutEffect, useRef, useState } from "react";
 import { MARBLE_COLORS, MarbleScene } from "./marbleRun";
+import { RaceScene } from "./race";
 import { DEFAULT_TIMER_SETTINGS, type SwapToy, type TimerPicture, type TurnCount } from "./settings";
 import { SAW, Seesaw, SeesawBackdrop, SeesawStand, SeesawSun } from "./seesaw";
 import { SwapBackdrop, SwapCushions, SwapHourglass, SwapLight, SwapShade, TURN_CHILDREN, Toy } from "./swap";
@@ -22,7 +23,7 @@ const MIDDLE = 0.5;
  * car's basket between the treehouse and the skyscraper's window; the Marble Jar's middle has a marble just landed, so
  * its card shows the next one bouncing down the nails.
  */
-const LATER: Partial<Record<TimerPicture, number>> = { sunset: 0.68, seesaw: 0.25, blocks: 0.53, jump: 0.23, jar: 0.509 };
+const LATER: Partial<Record<TimerPicture, number>> = { sunset: 0.68, seesaw: 0.25, blocks: 0.53, jump: 0.23, jar: 0.509, race: 0.82 };
 
 /**
  * Stops a card's drawing `at` ms into its run: every animation in it is put at that moment, its look there written into
@@ -85,6 +86,18 @@ export const TimerCardArt = memo(function TimerCardArt({
           <SwapShade kind="bear" on edge={SAW.x} />
           <SeesawStand />
           <Seesaw holder="fox" running first="fox" turnMs={CARD_MS} startedAt={startedAt + at} round={0} />
+        </span>
+      ) : picture === "race" ? (
+        <span className="tm-stage">
+          <RaceScene
+            holder="fox"
+            other="bear"
+            turn={{ name: "tm-race-card", startedAt: startedAt + at, ms: CARD_MS, handover: false }}
+            done={false}
+            poke={0}
+            elapsed={at}
+            quiet
+          />
         </span>
       ) : picture === "marblerun" ? (
         <span className="tm-stage">

@@ -130,6 +130,12 @@ export const LANGUAGE_STATUS: LanguageStatusRow[] = [
         note: "Das Bild „Kugelbahn“ in der Gruppe Abwechseln (H-117 mit H-115, marbleRun.tsx, 24. November 2026): zwei bis vier Kinder wechseln sich ab, eine Murmel rollt die ganze Runde lang in den Becher des nächsten Kindes. Englisch zuerst geschrieben und gleich in alle Sprachen übersetzt (marbleNames.ts): sein Name „Marble Run“ („Kugelbahn“), hinter ⚙️ „Wie viele Kinder?“ und die Namen des Hasen- und des Froschkinds, und die zwei neuen Sätze „Tauschen! Jetzt ist das Hasenkind dran.“ und „… das Froschkind dran.“. Diese zwei Sätze warten noch auf ihre Aufnahme (bis dahin still); Fuchs- und Bärenkind sagen die schon aufgenommenen Sätze von Abwechseln. Die Texte für Suchmaschinen nennen es in allen sieben Sprachen.",
         files: ["src/games/timer/marbleNames.ts"],
       },
+      {
+        label: "🏎️ Rennstrecke",
+        languages: { de: "done", en: "done", zh: "done", hi: "done", es: "done", ar: "done", ru: "done" },
+        note: "Das Bild „Rennstrecke“ in der Gruppe Abwechseln (race.tsx, 24. November 2026): Fuchskind und Bärenkind fahren abwechselnd eine Runde im Kart auf einer Achterstrecke mit Brücke. Nur sein Name („Race Track“, Tooltip und Vorlesen) ist neuer Text, englisch zuerst und gleich in alle Sprachen übersetzt (raceNames.ts). Es sagt dieselben Sätze wie Abwechseln, die schon aufgenommen sind. Die Texte für Suchmaschinen nennen es in allen sieben Sprachen.",
+        files: ["src/games/timer/raceNames.ts"],
+      },
     ],
   },
   {

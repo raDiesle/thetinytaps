@@ -562,5 +562,16 @@ export const timerIdeas: IdeaArea = {
       partial:
         "Gebaut am 24. November 2026 als Bild „Marble Jar“ („Kugelglas“, jar.tsx): Ein Glasrohr über einem Nagelbrett mit fünf Reihen Nägeln, darunter zwei schräge Trichterbretter und ein Einmachglas mit roter Schleife um den Hals. Alle fünf Sekunden öffnet eine kleine Klappe am Rohr, eine Murmel fällt, prallt Reihe für Reihe von einem Nagel nach links oder rechts ab, rollt den Trichter hinunter, fällt durch den Hals und rollt auf ihren Platz – das Glas füllt sich vom Boden her, Reihe für Reihe, mit 60 Plätzen. Bei jeder Länge fallen alle 60 ins leere Glas, bei 5 Minuten alle fünf Sekunden eine, bei kürzeren Zeiten nur schneller; die letzte landet genau, wenn die Zeit um ist. Die Murmel, die als Nächste dran ist, wackelt einmal pro Sekunde auf der Klappe. Jede Murmel macht beim Landen ein helles Plink (mit Abstand), am Ende klingt ein Glockenspiel; ein Tippen lässt den Platz, der im Glas noch frei ist, aufleuchten. Name und zwei Sätze Englisch zuerst und gleich in alle sieben Sprachen übersetzt (jarNames.ts); die Aufnahmen folgen auf Wunsch.",
     },
+    {
+      id: "H-150",
+      emoji: "🏎️",
+      title: "Rennstrecke: Fuchs- und Bärenkind fahren abwechselnd eine Runde",
+      text: "Abwechseln als Autorennen: eine große Rennstrecke in Form einer Acht, die weit in den Hintergrund reicht, mit Start und Ziel. Das Kind, das dran ist, fährt eine Runde – so lang wie seine Zeit –, an der Ziellinie steigt es aus und das andere Tier steigt ein und fährt weiter. Mit vielen Effekten und Einzelheiten, etwa wie auf einer Formel-1-Strecke.",
+      why: "Ein Rennen kennen Kinder vom Bobbycar und aus Bilderbüchern; das Kart, das die ganze Runde lang unterwegs ist, zeigt, wie viel von der eigenen Zeit schon gefahren ist, und das wartende Kind sieht es auf seine Ziellinie zukommen.",
+      effort: "L",
+      done: true,
+      partial:
+        "Gebaut am 24. November 2026 als Bild „Rennstrecke“ in der Gruppe Abwechseln (race.tsx): eine Achterstrecke in Perspektive, deren hintere Schleife weit in den Hintergrund reicht, mit Brücke über der Kreuzung, rot-weißen Randsteinen, Reifenstapeln, Tribünen und einer Großbildleinwand, die das Gesicht des Kinds zeigt, das gerade fährt. Fuchskind und Bärenkind fahren abwechselnd ein Kart, jeweils eine ganze Runde so lang wie die Zeit: Die Startampel schaltet Rot, Gelb, Grün, das Kart rollt los, ruckelt und pufft, die gefahrene Strecke färbt sich in der Farbe des Kinds, und in den letzten Sekunden winkt die Zielflagge. An der Ziellinie hüpft das Kind aus dem Kart auf seine Matte und das wartende hüpft hinein. Ein Tippen lässt den Rest der Runde aufleuchten. Es sagt dieselben Sätze wie Abwechseln. Nur sein Name ist neuer Text, Englisch zuerst und gleich in alle sieben Sprachen übersetzt (raceNames.ts).",
+    },
   ],
 };

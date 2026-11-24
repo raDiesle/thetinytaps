@@ -147,17 +147,18 @@ describe("Timer", () => {
       expect(pick(p.name, firstLanguage(p.name)).trim()).not.toBe("");
     }
     // The order the user asked for (November 2026): Rote Scheibe, Sanduhr, Kerze, Apfelbaum, Blume, Pizza, Wecker, and
-    // Abwechseln, the Wippe (H-109) and the Kugelbahn (H-117) last, in a group of their own. Tennis (H-71) stood there
+    // Abwechseln, the Wippe (H-109), the Kugelbahn (H-117) and the Rennstrecke last, in a group of their own. Tennis (H-71) stood there
     // and was taken out (user request, 21 November 2026: poorly done).
     expect(PICTURES.slice(0, 7).map((p) => p.id)).toEqual(["disc", "sand", "candle", "apple", "flower", "pizza", "clock"]);
-    expect(PICTURES.slice(-3).map((p) => p.id)).toEqual(["swap", "seesaw", "marblerun"]);
+    expect(PICTURES.slice(-4).map((p) => p.id)).toEqual(["swap", "seesaw", "marblerun", "race"]);
     expect(PICTURES.map((p) => p.id as string)).not.toContain("tennis");
     expect(DEFAULT_TIMER_SETTINGS.picture).toBe(PICTURES[0].id);
     // Taking turns runs without end, so „Weiter“ never leads into it.
     expect(TIMED_PICTURES.map((p) => p.id)).not.toContain("swap");
     expect(TIMED_PICTURES.map((p) => p.id)).not.toContain("seesaw");
     expect(TIMED_PICTURES.map((p) => p.id)).not.toContain("marblerun");
-    expect(TIMED_PICTURES).toHaveLength(PICTURES.length - 3);
+    expect(TIMED_PICTURES.map((p) => p.id)).not.toContain("race");
+    expect(TIMED_PICTURES).toHaveLength(PICTURES.length - 4);
     const seen = new Set<string>();
     let id = TIMED_PICTURES[0].id;
     for (let i = 0; i < TIMED_PICTURES.length; i++) {
@@ -169,6 +170,7 @@ describe("Timer", () => {
     expect(nextPicture("swap")).toBe(TIMED_PICTURES[0].id);
     expect(nextPicture("seesaw")).toBe(TIMED_PICTURES[0].id);
     expect(nextPicture("marblerun")).toBe(TIMED_PICTURES[0].id);
+    expect(nextPicture("race")).toBe(TIMED_PICTURES[0].id);
   });
 
   test("the alarm clock shows the time left on a screen whose digits never shift, starting on the time set and ending on 0:00", () => {
@@ -1267,10 +1269,11 @@ describe("Timer", () => {
   // hose, blowing out the candle, taking turns) looked odd, and were taken out of every picture. The pictures tell
   // their story by themselves; Abwechseln's children are the real ones, their places two cushions.
   // The one exception is Up to the Moon's fox (`jumpFox.tsx`): it is the figure doing the run, swimming, hopping and
-  // riding, never one standing by (user request, 23 November 2026), drawn with the shared head.
+  // riding, never one standing by (user request, 23 November 2026), drawn with the shared head – and the Rennstrecke's
+  // two children (`race.tsx`, 24 November 2026), who are the drivers taking turns at the wheel, never standing by.
   test("no timer picture draws a fox or bear figure", async () => {
     for await (const file of new Bun.Glob("src/games/timer/*.tsx").scan(".")) {
-      if (file.endsWith("jumpFox.tsx")) continue;
+      if (file.endsWith("jumpFox.tsx") || file.endsWith("race.tsx")) continue;
       const code = await Bun.file(file).text();
       expect(/<Mascot(Head)?[\s/>]|MASCOT_COLORS\.\w+\.paw/.test(code) ? `${file} draws a fox or bear` : file).toBe(file);
     }

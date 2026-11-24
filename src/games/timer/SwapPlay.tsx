@@ -16,6 +16,7 @@ import { PauseControls, RunClockProvider, usePausableClock } from "./pause";
 import { noteRoom, TimeShownChoice, TimeShownNote } from "./shown";
 import { SAW, Seesaw, SeesawBackdrop, SeesawGoal, SeesawStand, SeesawSun } from "./seesaw";
 import { MARBLE_COLORS, MarbleScene } from "./marbleRun";
+import { RaceScene } from "./race";
 import { KIDS_LABEL, MORE_KID_NAMES } from "./marbleNames";
 import { type Holder, SWAP_TOYS, TURN_CHILDREN, type TurnChild, SwapBackdrop, SwapCushions, SwapHourglass, SwapLight, SwapShade, Toy } from "./swap";
 import { TimeLeft } from "./TimerPlay";
@@ -83,7 +84,10 @@ function turnAt(turns: Turns, turnMs: number, now: number) {
  * seat sinks the whole turn long, as a chick walks over to it, until it touches down; then the chick turns round and
  * walks back to the other seat, now up high. The Kugelbahn (`picture` "marblerun", H-117 with H-115) takes turns among
  * two to four children (`kids`, behind ⚙️): the whole turn long a marble rolls down the run into the cup of the child
- * whose turn comes next, and the cups of those who had theirs in this round keep their marbles.
+ * whose turn comes next, and the cups of those who had theirs in this round keep their marbles. The Rennstrecke
+ * (`picture` "race", H-150) has the fox and the bear child take turns at the wheel of a kart: the start light counts
+ * down, the one whose turn it is drives one whole lap of a figure-eight track as long as the turn, and at the line it
+ * hops out and the other hops in.
  */
 export function SwapRun({
   picture,
@@ -140,6 +144,7 @@ export function SwapRun({
   const [round, setRound] = useState(0);
   const seesaw = picture === "seesaw";
   const marble = picture === "marblerun";
+  const race = picture === "race";
   const children = useMemo(() => turnChildren(picture, kids), [picture, kids]);
   const count = children.length;
   /** Counts the page coming back into view, so the rolling marble is drawn anew where it really is. */
@@ -170,10 +175,10 @@ export function SwapRun({
       setRound((n) => n + 1);
       setHop((n) => n + 1);
       if (marble) startTimers.current.push(setTimeout(() => playKnock(1100), after));
-      else if (!seesaw) playWhoosh();
+      else if (!seesaw && !race) playWhoosh();
       startTimers.current.push(setTimeout(playChime, seesaw ? 0 : 700));
     },
-    [seesaw, marble, now],
+    [seesaw, marble, race, now],
   );
 
   // The first child's turn starts as soon as the page lies still: the toy hops onto its cushion (on the seesaw, whose
@@ -181,14 +186,14 @@ export function SwapRun({
   useEffect(() => {
     if (endsAt !== undefined && now() >= endsAt) return;
     const cancel = afterPageMotion(() => {
-      begin(0, seesaw ? 0 : marble ? DROP_MS : HOP_MS);
+      begin(0, seesaw || race ? 0 : marble ? DROP_MS : HOP_MS);
       say(BEGINS[FIRST_TURN], true);
     });
     return () => {
       cancel();
       for (const timer of startTimers.current) clearTimeout(timer);
     };
-  }, [begin, endsAt, say, seesaw, marble, now]);
+  }, [begin, endsAt, say, seesaw, marble, race, now]);
 
   // The turn, checked at least every second and again when the page comes back (timers sleep in the background);
   // paused, not at all.
@@ -233,10 +238,10 @@ export function SwapRun({
     if (holderNow.current) say(TURN_TO[holderNow.current]);
     if (seesaw) playKnock(320);
     else if (marble) playKnock(1100);
-    else playWhoosh();
+    else if (!race) playWhoosh();
     const timer = setTimeout(playChime, 700);
     return () => clearTimeout(timer);
-  }, [turn, say, seesaw, marble]);
+  }, [turn, say, seesaw, marble, race]);
   // At the clock time set, the end is plain like every timer's: children cheer, then the trophy with the end's buttons.
   useEffect(() => {
     if (!done) return;
@@ -326,6 +331,17 @@ export function SwapRun({
             />
             {done && <div className="tm-done-light" />}
           </div>
+        ) : race ? (
+          <div className={`tm-stage ${done ? "tm-done" : "tm-running"}`}>
+            <RaceScene
+              holder={shown as Holder}
+              other={children[(shownIndex + 1) % count] as Holder}
+              turn={ticking ? { name: `tm-race-${round}-${turn}-${wake}`, startedAt: turnStart, ms: turnMs, handover: turn > 0 } : null}
+              done={done}
+              poke={poke}
+            />
+            {done && <div className="tm-done-light" />}
+          </div>
         ) : marble ? (
           <div className={`tm-stage ${done ? "tm-done" : "tm-running"}`}>
             <MarbleScene
@@ -384,7 +400,7 @@ export function SwapRun({
       </div>
       <PlayOptions>
         <SettingsGroup title={t(SWAP_NAME)}>
-          {!seesaw && !marble && (
+          {!seesaw && !marble && !race && (
             <Choice
               label={t({ de: "Spielzeug", en: "Toy", zh: "玩具", hi: "खिलौना", es: "Juguete", ar: "اللعبة", ru: "Игрушка" })}
               value={toy}
@@ -421,7 +437,7 @@ export function SwapRun({
             // Starts that child's turn anew, with a full hourglass (or a new round's first marble): for who begins, or
             // to set it right.
             onChange={(first: TurnChild) => {
-              begin(children.indexOf(first), seesaw ? 0 : marble ? DROP_MS : 0);
+              begin(children.indexOf(first), marble ? DROP_MS : 0);
               say(TURN_TO[first]);
             }}
             options={children.map((kind) => ({ value: kind, label: t(KID_NAMES[kind]) }))}

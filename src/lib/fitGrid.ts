@@ -10,9 +10,10 @@ const MIN_WIDTH_PHONE = 100;
 /**
  * Cards that are a picture with no words on them (the Timer's) need no room for a title: the picture alone must be big
  * enough to know it, so they may be narrower – with its sixteenth timed picture, the Marble Jar, the Timer's cards fit
- * a tablet's screen only in seven columns, 118 px each (November 2026).
+ * a tablet's screen only in seven columns, 118 px each (November 2026), and with the Rennstrecke, the fourth way of
+ * taking turns beside them two by two, only in eight, about 100 px each (24 November 2026) – as narrow as a phone's card.
  */
-const MIN_PICTURE_WIDTH = 110;
+const MIN_PICTURE_WIDTH = 100;
 /** Cards never grow taller than this, however much room there is. */
 const MAX_ROW = 220;
 /** Cards look best about this much wider than tall. */

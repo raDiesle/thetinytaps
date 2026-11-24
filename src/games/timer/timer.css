@@ -1663,6 +1663,167 @@
   display: none;
 }
 
+/* Rennstrecke (race.tsx): the track lies in layers stacked in depth – the ground, a kart under the bridge, the bridge,
+   a kart on or beyond it, the start light and the children, a kart in front of them, a child hopping – and the kart's
+   keyframes switch its layer as it goes (`z-index` in steps). The kart is one small layer on its way, its wheels and
+   its top each turned by keyframes inside the ground's squash (`.tm-race-flat`), the top lifted over the wheels. The
+   driver bobs and the exhaust puffs at their own pace, so even a long, slow lap plainly moves. */
+.tm-race-ground,
+.tm-race-face,
+.tm-race-on-ground {
+  z-index: 1;
+}
+
+.tm-race-bridge,
+.tm-race-on-deck {
+  z-index: 3;
+}
+
+.tm-race-post,
+.tm-race-lamp,
+.tm-race-flag,
+.tm-race-kid {
+  z-index: 5;
+}
+
+.tm-race-face {
+  opacity: 0;
+  transition: opacity 0.6s ease-out;
+}
+
+.tm-race-face.tm-on {
+  opacity: 1;
+}
+
+.tm-race-trail {
+  opacity: 0.7;
+}
+
+/* A tap lights the way still to go for a moment (H-51). */
+.tm-race-ahead {
+  opacity: 0;
+  will-change: opacity;
+  animation: tm-left 1.6s ease-out;
+}
+
+.tm-race-kart {
+  transform-origin: 50% 60%;
+  will-change: transform;
+}
+
+.tm-race-kid {
+  transform-origin: 50% 100%;
+  will-change: transform;
+}
+
+.tm-race-flat {
+  position: absolute;
+  left: 0;
+  top: 20%;
+  width: 100%;
+  height: 80%;
+  transform: scaleY(0.55);
+}
+
+.tm-race-spin,
+.tm-race-rumble {
+  position: absolute;
+  inset: 0;
+}
+
+.tm-race-spin {
+  will-change: transform;
+}
+
+.tm-race-spin svg,
+.tm-race-driver svg {
+  display: block;
+  width: 100%;
+  height: 100%;
+}
+
+.tm-race-rumble {
+  animation: tm-race-rumble 0.24s linear infinite;
+}
+
+@keyframes tm-race-rumble {
+  50% {
+    transform: translate(-0.6%, 0.5%);
+  }
+}
+
+.tm-race-puff {
+  position: absolute;
+  left: 2%;
+  top: 38%;
+  width: 11%;
+  height: 11%;
+  border-radius: 50%;
+  background: #e9ecef;
+  box-shadow: 0 0 0 2px rgb(59 42 32 / 0.35);
+  opacity: 0;
+  animation: tm-race-puff 0.8s linear infinite;
+}
+
+.tm-race-puff.tm-late {
+  top: 51%;
+  animation-delay: -0.4s;
+}
+
+@keyframes tm-race-puff {
+  from {
+    opacity: 0.85;
+    transform: scale(0.4);
+  }
+  to {
+    opacity: 0;
+    transform: translateX(-130%) scale(1.7);
+  }
+}
+
+.tm-race-seat {
+  position: absolute;
+  left: 25%;
+  top: 6.67%;
+  width: 50%;
+  height: 50%;
+}
+
+.tm-race-driver {
+  width: 100%;
+  height: 100%;
+  animation: tm-race-bob 0.5s ease-in-out infinite alternate;
+}
+
+@keyframes tm-race-bob {
+  to {
+    transform: translateY(2.5%) rotate(-1.5deg);
+  }
+}
+
+.tm-race-lamp {
+  will-change: opacity;
+}
+
+.tm-race-flag {
+  transform-origin: 4% 100%;
+  will-change: transform;
+}
+
+.tm-done .tm-race-rumble,
+.tm-done .tm-race-driver,
+.tm-still-kart .tm-race-rumble {
+  animation: none;
+}
+
+.tm-done .tm-race-ahead {
+  display: none;
+}
+
+.tm-play[data-picture="race"] .tm-done-light {
+  z-index: 9;
+}
+
 .tm-toy {
   transition: transform 1.2s ease-in-out;
 }

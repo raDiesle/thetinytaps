@@ -28,9 +28,10 @@ export type TimerPicture =
 
 /**
  * The pictures of taking turns, which run on without end: the toy between two cushions, the seesaw carrying it
- * (H-109; Tennis, H-71, was taken out), and the Kugelbahn, whose marble rolls into the next child's cup (H-117).
+ * (H-109; Tennis, H-71, was taken out), the Kugelbahn, whose marble rolls into the next child's cup (H-117), and the
+ * Rennstrecke, a lap of a race track for each child's turn.
  */
-export type TurnPicture = "swap" | "seesaw" | "marblerun";
+export type TurnPicture = "swap" | "seesaw" | "marblerun" | "race";
 
 /** How many children take turns on the Kugelbahn (H-115), chosen behind ⚙️. */
 export type TurnCount = 2 | 3 | 4;
