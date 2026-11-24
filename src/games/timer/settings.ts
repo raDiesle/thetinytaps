@@ -3,8 +3,9 @@ import type { OwnTime } from "./time";
 /**
  * What runs down while the child watches: a train going to the station, an apple tree harvested into a cart, an hourglass, a
  * caterpillar eating a leaf, a flower growing (H-53), a candle, the sunrise (H-54), a red disc, a pizza eaten slice by slice (H-47), a children's
- * digital alarm clock counting down (H-70), a jar filling with marbles from a pegboard (H-149) – or „Abwechseln“ (H-52), two children taking
- * turns with a toy, turn after turn, or the same on a seesaw (H-109).
+ * digital alarm clock counting down (H-70), a jar filling with marbles from a pegboard (H-149) – or „Abwechseln“ (H-52),
+ * two children taking turns with a toy, turn after turn, the same on a seesaw (H-109), or two to four children on a
+ * marble run (H-117).
  */
 export type TimerPicture =
   | "train"
@@ -26,10 +27,13 @@ export type TimerPicture =
   | TurnPicture;
 
 /**
- * The pictures of taking turns, which run on without end: the toy between two cushions, and the seesaw carrying it
- * (H-109; Tennis, H-71, was taken out).
+ * The pictures of taking turns, which run on without end: the toy between two cushions, the seesaw carrying it
+ * (H-109; Tennis, H-71, was taken out), and the Kugelbahn, whose marble rolls into the next child's cup (H-117).
  */
-export type TurnPicture = "swap" | "seesaw";
+export type TurnPicture = "swap" | "seesaw" | "marblerun";
+
+/** How many children take turns on the Kugelbahn (H-115), chosen behind ⚙️. */
+export type TurnCount = 2 | 3 | 4;
 
 /** The toy the two children take turns with in „Abwechseln“, picked behind ⚙️. */
 export type SwapToy = "bobbycar" | "doll" | "ball";
@@ -55,6 +59,8 @@ export interface TimerSettings {
   useOwn: boolean;
   /** The toy in „Abwechseln“ (H-52). */
   toy: SwapToy;
+  /** How many children take turns on the Kugelbahn (H-115). */
+  kids: TurnCount;
   /**
    * The time left in the picture's corner, chosen behind ⚙️ while it runs. Named anew whenever the default changes
    * (`shown`, then `showTime` held the old default for everyone who had played before), so the new one reaches them too.
@@ -70,6 +76,7 @@ export const DEFAULT_TIMER_SETTINGS: TimerSettings = {
   own: null,
   useOwn: false,
   toy: "bobbycar",
+  kids: 2,
   timeNote: "digits",
   bar: true,
 };

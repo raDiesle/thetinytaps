@@ -1,8 +1,8 @@
 import { memo, useLayoutEffect, useRef, useState } from "react";
-import { pieceCount, MAX_STOPS } from "./pieces";
-import { DEFAULT_TIMER_SETTINGS, type SwapToy, type TimerPicture } from "./settings";
+import { MARBLE_COLORS, MarbleScene } from "./marbleRun";
+import { DEFAULT_TIMER_SETTINGS, type SwapToy, type TimerPicture, type TurnCount } from "./settings";
 import { SAW, Seesaw, SeesawBackdrop, SeesawStand, SeesawSun } from "./seesaw";
-import { SwapBackdrop, SwapCushions, SwapHourglass, SwapLight, SwapShade, Toy } from "./swap";
+import { SwapBackdrop, SwapCushions, SwapHourglass, SwapLight, SwapShade, TURN_CHILDREN, Toy } from "./swap";
 import { SceneParts, stageStyle } from "./TimerPlay";
 
 /**
@@ -50,9 +50,19 @@ function holdAt(card: HTMLElement | null, at: number) {
  * full of apples with the cart under them, the train halfway to the station, the leaf half eaten. It is the very drawing
  * of a run (`SceneParts`, started `MIDDLE` of it ago – `LATER` for a few), stopped at that moment by `holdAt`. „Abwechseln“ shows the fox
  * child's lamp on, the toy on its cushion and the hourglass half run; the Wippe the fox child's side in the sun, its seat
- * on its way down with the chick walking over to it.
+ * on its way down with the chick walking over to it; the Kugelbahn the fox child's strip lit, a marble in its cup and the
+ * next one halfway down the run to the bear child's cup, with as many cups as children set (`kids`, else three, so a
+ * card standing alone shows it is for more than two).
  */
-export const TimerCardArt = memo(function TimerCardArt({ picture, toy = DEFAULT_TIMER_SETTINGS.toy }: { picture: TimerPicture; toy?: SwapToy }) {
+export const TimerCardArt = memo(function TimerCardArt({
+  picture,
+  toy = DEFAULT_TIMER_SETTINGS.toy,
+  kids = 3,
+}: {
+  picture: TimerPicture;
+  toy?: SwapToy;
+  kids?: TurnCount;
+}) {
   const at = CARD_MS * (LATER[picture] ?? MIDDLE);
   const [startedAt] = useState(() => Date.now() - at);
   const card = useRef<HTMLSpanElement>(null);
@@ -76,8 +86,20 @@ export const TimerCardArt = memo(function TimerCardArt({ picture, toy = DEFAULT_
           <SeesawStand />
           <Seesaw holder="fox" running first="fox" turnMs={CARD_MS} startedAt={startedAt + at} round={0} />
         </span>
+      ) : picture === "marblerun" ? (
+        <span className="tm-stage">
+          <MarbleScene
+            kids={TURN_CHILDREN.slice(0, kids)}
+            lit={TURN_CHILDREN.slice(0, kids).map((_, i) => i === 0)}
+            held={TURN_CHILDREN.slice(0, kids).map((_, i) => (i === 0 ? MARBLE_COLORS[0] : null))}
+            open={1}
+            rolling={{ name: `tm-mr-card-${kids}`, to: 1, startedAt: startedAt + at, ms: CARD_MS, color: MARBLE_COLORS[1] }}
+            poke={0}
+            quiet
+          />
+        </span>
       ) : (
-        <span className="tm-stage" style={stageStyle(picture, CARD_MS, pieceCount(CARD_MS, MAX_STOPS))}>
+        <span className="tm-stage" style={stageStyle(picture, CARD_MS)}>
           <SceneParts picture={picture} phase="running" total={CARD_MS} set={CARD_MS} poke={0} startedAt={startedAt} still />
         </span>
       )}

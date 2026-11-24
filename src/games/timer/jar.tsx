@@ -9,7 +9,7 @@ import { Draw, INK, Layer, LeftGlow, STAGE_H, STAGE_W } from "./scenes";
 // inwards, the jar fills; the last marble lands as the time is up and the jar is full. The marbles still waiting in the
 // tube step down one by one, the one on the latch wiggling once a second while it waits (H-63). Each marble is two
 // small layers (across, and up and down) on keyframes written for the run (`JarKeyframes`), so React draws nothing per
-// frame; a shorter run starts with the jar's lower rows already filled (`marbleCount`), so the jar is full at every end.
+// frame. Every run drops all `MAX_MARBLES` into the empty jar, a shorter one only quicker.
 
 /** A marble's radius and a nail's, in stage units; a marble touches a nail at their sum. */
 export const MARBLE_R = 20;
@@ -73,18 +73,11 @@ export const SLOTS: readonly { x: number; y: number }[] = Array.from({ length: R
   return order.map((j) => ({ x: MIDDLE + (j - (count - 1) / 2) * 2 * MARBLE_R, y }));
 }).flat();
 
-/** A full jar, and the fewest marbles that fall in a run. */
-export const MAX_MARBLES = SLOTS.length;
-export const MIN_MARBLES = 20;
-
 /**
- * How many marbles fall in a run of `ms`: one every five seconds, so five minutes fill the whole jar, at least
- * `MIN_MARBLES` (a short run's come quicker, never fewer), at most a full jar. The places they don't take are filled
- * from the start.
+ * A full jar: every run drops all of them into the empty jar, at every length (user request, 24 November 2026: every
+ * length plays the whole story, only faster or slower) – five minutes one every five seconds.
  */
-export function marbleCount(ms: number): number {
-  return Math.max(MIN_MARBLES, Math.min(MAX_MARBLES, Math.round(ms / 5000)));
-}
+export const MAX_MARBLES = SLOTS.length;
 
 /** The marbles' colours, taken in turn three apart, so two marbles side by side in the jar never share one. */
 const COLORS = ["#ff4d4d", "#ffd23f", "#3a86ff", "#51cf66", "#cc5de8", "#ff922b", "#22b8cf"];
@@ -175,12 +168,14 @@ export const LONGEST_WAY = Math.max(...SLOTS.map((slot) => wayOf(slot, () => 0, 
 /**
  * Works out a run of `total` ms with `count` marbles: the jar's places they don't take are filled from the start, the
  * others fall one after the other with even room between their releases, the last landing as the time is up. A run
- * shorter than two marbles' ways goes at a quicker pace.
+ * shorter than ten marbles' ways goes at a quicker pace. The Timer always passes `MAX_MARBLES`.
  */
 export function jarPlan(total: number, count: number): { marbles: JarMarble[]; latch: Latch | null; prefilled: number; pace: number } {
   const n = Math.max(1, Math.min(MAX_MARBLES, count));
   const prefilled = MAX_MARBLES - n;
-  const pace = Math.min(1, total / (2 * LONGEST_WAY));
+  // A marble's way takes at most a tenth of the run, so a short run's marbles go quicker and only a few fly at once
+  // (at ten seconds about six; at its even pace there were 38).
+  const pace = Math.min(1, total / (10 * LONGEST_WAY));
   const random = seeded(total * 7 + n);
   const ways = SLOTS.slice(prefilled).map((slot) => wayOf(slot, random, pace));
   const lead = Math.min(1000, total * 0.05);

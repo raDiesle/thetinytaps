@@ -22,16 +22,11 @@ export const TOY_PLACES: { x: number; y: number }[] = [
   ...[300, 410, 520, 630, 740, 850, 960].map((x) => ({ x, y: 680 })),
 ].sort((a, b) => a.x - b.x);
 
-/** At least this many toys, also for a few seconds, so the floor is always full of them. */
-export const MIN_TOYS = 6;
-
-/** At most this many: one on every place. Five minutes gets them all, one every 20 seconds. */
+/**
+ * How many toys lie on the floor, for a run of any length: one on every place. Five minutes tidies one every 20 seconds;
+ * a shorter or longer run tidies all of them, only faster or slower (user request, 24 November 2026).
+ */
 export const MAX_TOYS = TOY_PLACES.length;
-
-/** How many toys lie on the floor for a run of `ms`: one every 20 seconds, at least `MIN_TOYS`, at most `MAX_TOYS`. */
-export function toyCount(ms: number): number {
-  return Math.max(MIN_TOYS, Math.min(MAX_TOYS, Math.round(ms / 20_000)));
-}
 
 /** The toys there are, each drawn on its own (`ToyArt`). */
 export const TOY_KINDS = ["block", "ball", "car", "duck", "rings", "drum", "book", "top"] as const;

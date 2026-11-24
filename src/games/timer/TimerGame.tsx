@@ -40,7 +40,7 @@ export function TimerGame() {
     title: t(p.name),
     note: isTurns(p.id) ? t(SWAP_NOTE) : undefined,
     kind: isTurns(p.id) ? t(SWAP_NAME) : undefined,
-    art: <TimerCardArt picture={p.id} toy={settings.toy} />,
+    art: <TimerCardArt picture={p.id} toy={settings.toy} kids={settings.kids} />,
   }));
   // A picture kept from before may since have been taken out („Eimer“, „Kuchen“): then the first one is marked.
   const picture = PICTURES.some((p) => p.id === settings.picture) ? settings.picture : DEFAULT_TIMER_SETTINGS.picture;
@@ -107,6 +107,7 @@ export function TimerGame() {
         settings={{ ...settings, picture, seconds, useOwn }}
         onPicture={(picture) => update({ picture })}
         onToy={(toy) => update({ toy })}
+        onKids={(kids) => update({ kids })}
         onShown={(timeNote) => update({ timeNote })}
         onBar={(bar) => update({ bar })}
       />

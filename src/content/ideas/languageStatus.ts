@@ -123,6 +123,13 @@ export const LANGUAGE_STATUS: LanguageStatusRow[] = [
         note: "Das Bild, in dem Murmeln über ein Nagelbrett wie in der Kettenreaktion hüpfen und ein Glas füllen (H-149, jar.tsx, 24. November 2026), Englisch zuerst geschrieben und gleich in alle Sprachen übersetzt: sein Name „Marble Jar“ („Kugelglas“) und seine zwei Sätze am Anfang und am Ende (jarNames.ts). Die Aufnahmen fehlen noch und werden nur auf Wunsch gemacht; bis dahin bleiben beide Sätze still. Die Texte für Suchmaschinen nennen es in allen sieben Sprachen.",
         files: ["src/games/timer/jarNames.ts"],
       },
+      {
+        label: "🎱 Marble Run",
+        recorded: true,
+        languages: { de: "text", en: "text", zh: "text", hi: "text", es: "text", ar: "text", ru: "text" },
+        note: "Das Bild „Kugelbahn“ in der Gruppe Abwechseln (H-117 mit H-115, marbleRun.tsx, 24. November 2026): zwei bis vier Kinder wechseln sich ab, eine Murmel rollt die ganze Runde lang in den Becher des nächsten Kindes. Englisch zuerst geschrieben und gleich in alle Sprachen übersetzt (marbleNames.ts): sein Name „Marble Run“ („Kugelbahn“), hinter ⚙️ „Wie viele Kinder?“ und die Namen des Hasen- und des Froschkinds, und die zwei neuen Sätze „Tauschen! Jetzt ist das Hasenkind dran.“ und „… das Froschkind dran.“. Diese zwei Sätze warten noch auf ihre Aufnahme (bis dahin still); Fuchs- und Bärenkind sagen die schon aufgenommenen Sätze von Abwechseln. Die Texte für Suchmaschinen nennen es in allen sieben Sprachen.",
+        files: ["src/games/timer/marbleNames.ts"],
+      },
     ],
   },
   {

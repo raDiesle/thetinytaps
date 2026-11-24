@@ -371,6 +371,9 @@ export const timerIdeas: IdeaArea = {
       text: "Hinter ⚙️ „Wie viele Kinder?“ 2, 3 oder 4. Die Kissen stehen im Halbkreis um die Sanduhr, jedes mit seiner Farbe und Lampe, und das Spielzeug geht reihum. Wer schon dran war, bekommt ein kleines Häkchen auf sein Kissen, bis alle einmal dran waren.",
       why: "Geschwister sind oft mehr als zwei, und bei Besuch oder in der Kita streiten drei um dasselbe Bobbycar; reihum ist für Kinder ein vertrautes, gerechtes Prinzip.",
       effort: "M",
+      done: true,
+      partial:
+        "Gebaut zusammen mit H-117 als Bild „Kugelbahn“ (24. November 2026, Wunsch: „von Weitem klar, welches Kind dran ist, einstellbar von 2 bis 4 Kindern“), nicht mit Kissen um die Sanduhr: Hinter ⚙️ „Wie viele Kinder?“ 2, 3 oder 4; dann stehen so viele Becher nebeneinander – Fuchs, Bär, Hase (blau, lange Ohren), Frosch (grün, runde Augenbuckel), keine Gesichter. Statt eines Häkchens bleibt die Murmel, die in den Becher eines Kindes gefallen ist, darin liegen, bis alle einmal dran waren; dann sind die Becher wieder leer. „Wer ist dran?“ hinter ⚙️ nennt alle Kinder; wechselt die Zahl, geht es mit dem Kind weiter, das gerade dran ist, sonst mit dem ersten.",
     },
     {
       id: "H-116",
@@ -387,6 +390,9 @@ export const timerIdeas: IdeaArea = {
       text: "Eine Murmel (oder ein kleiner Zug) fährt während der ganzen Runde auf einer geschwungenen Bahn von der Seite des einen Kindes zur Seite des anderen und fällt dort in seinen Becher – dann ist es dran, und die Bahn kippt zurück. Man sieht jederzeit, wohin es geht und wie weit es noch ist.",
       why: "Ein Weg mit einem Ziel beim wartenden Kind zeigt Richtung und Rest der Zeit in einem Bild, wie der Zug zum Bahnhof, den Kinder im Timer schon kennen.",
       effort: "M",
+      done: true,
+      partial:
+        "Gebaut als Bild „Kugelbahn“ in der Gruppe Abwechseln, zusammen mit H-115 (24. November 2026, marbleRun.tsx). An der Wand des Kinderzimmers hängt eine hölzerne Kugelbahn: oben links ein Glas voller Murmeln, darunter vier Zickzack-Rampen mit runden Kurven und unten eine Schiene über den Bechern der Kinder. Die ganze Runde lang rollt eine Murmel gleichmäßig hinunter (sie dreht sich mindestens eine halbe Umdrehung pro Sekunde, so bewegt sich auch bei langen Runden sichtbar etwas, und klackt leise in jeder Kurve), die Klappe über dem Becher des nächsten Kindes steht offen, und am Ende der Runde fällt sie dort hinein – dann ist dieses Kind dran. Von Weitem: Der Streifen des Zimmers über dem Becher des Kindes, das dran ist, liegt im warmen Licht, alle anderen im selben dunklen Schatten wie bei Abwechseln, und die Leiste unten hat die Farbe dieses Kindes. Ein Tippen lässt den Becher aufleuchten, in den die Murmel rollt. Die Bahn kippt nicht zurück; jede Runde kommt eine neue Murmel in einer anderen Farbe aus dem Glas.",
     },
     // Aufräumen (user request, 21 November 2026): a timer made for tidying up, best at 5 minutes – ideas collected, the
     // best one (H-118) built, and the user's own idea of a fixed 5-minute tidy-up song (H-119) taken up.
@@ -554,7 +560,7 @@ export const timerIdeas: IdeaArea = {
       effort: "M",
       done: true,
       partial:
-        "Gebaut am 24. November 2026 als Bild „Marble Jar“ („Kugelglas“, jar.tsx): Ein Glasrohr über einem Nagelbrett mit fünf Reihen Nägeln, darunter zwei schräge Trichterbretter und ein Einmachglas mit roter Schleife um den Hals. Alle fünf Sekunden öffnet eine kleine Klappe am Rohr, eine Murmel fällt, prallt Reihe für Reihe von einem Nagel nach links oder rechts ab, rollt den Trichter hinunter, fällt durch den Hals und rollt auf ihren Platz – das Glas füllt sich vom Boden her, Reihe für Reihe, mit 60 Plätzen. Bei 5 Minuten fallen alle 60, bei kürzeren Zeiten mindestens 20 (die übrigen liegen schon im Glas), die letzte landet genau, wenn die Zeit um ist. Die Murmel, die als Nächste dran ist, wackelt einmal pro Sekunde auf der Klappe. Jede Murmel macht beim Landen ein helles Plink (mit Abstand), am Ende klingt ein Glockenspiel; ein Tippen lässt den Platz, der im Glas noch frei ist, aufleuchten. Name und zwei Sätze Englisch zuerst und gleich in alle sieben Sprachen übersetzt (jarNames.ts); die Aufnahmen folgen auf Wunsch.",
+        "Gebaut am 24. November 2026 als Bild „Marble Jar“ („Kugelglas“, jar.tsx): Ein Glasrohr über einem Nagelbrett mit fünf Reihen Nägeln, darunter zwei schräge Trichterbretter und ein Einmachglas mit roter Schleife um den Hals. Alle fünf Sekunden öffnet eine kleine Klappe am Rohr, eine Murmel fällt, prallt Reihe für Reihe von einem Nagel nach links oder rechts ab, rollt den Trichter hinunter, fällt durch den Hals und rollt auf ihren Platz – das Glas füllt sich vom Boden her, Reihe für Reihe, mit 60 Plätzen. Bei jeder Länge fallen alle 60 ins leere Glas, bei 5 Minuten alle fünf Sekunden eine, bei kürzeren Zeiten nur schneller; die letzte landet genau, wenn die Zeit um ist. Die Murmel, die als Nächste dran ist, wackelt einmal pro Sekunde auf der Klappe. Jede Murmel macht beim Landen ein helles Plink (mit Abstand), am Ende klingt ein Glockenspiel; ein Tippen lässt den Platz, der im Glas noch frei ist, aufleuchten. Name und zwei Sätze Englisch zuerst und gleich in alle sieben Sprachen übersetzt (jarNames.ts); die Aufnahmen folgen auf Wunsch.",
     },
   ],
 };

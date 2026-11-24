@@ -9,8 +9,8 @@ const MIN_WIDTH = 140;
 const MIN_WIDTH_PHONE = 100;
 /**
  * Cards that are a picture with no words on them (the Timer's) need no room for a title: the picture alone must be big
- * enough to know it, so they may be narrower – with its sixteenth picture, the Marble Jar, the Timer's cards fit a
- * tablet's screen only in seven columns, 118 px each (November 2026).
+ * enough to know it, so they may be narrower – with its sixteenth timed picture, the Marble Jar, the Timer's cards fit
+ * a tablet's screen only in seven columns, 118 px each (November 2026).
  */
 const MIN_PICTURE_WIDTH = 110;
 /** Cards never grow taller than this, however much room there is. */
