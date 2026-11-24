@@ -247,7 +247,7 @@ export function Train({ puff }: { puff: number }) {
 }
 
 /**
- * The little stops along the track, one a minute (H-45): a post with a bell just ahead of where the train's front halts,
+ * The little stops along the track (H-45, `TRAIN_STOPS`): a post with a bell just ahead of where the train's front halts,
  * so the child sees how many stretches are left. The last stop is the station itself, so `pieces - 1` posts.
  */
 export const TrainStops = memo(function TrainStops({ pieces }: { pieces: number }) {

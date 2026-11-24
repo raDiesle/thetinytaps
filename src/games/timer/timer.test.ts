@@ -91,18 +91,19 @@ import {
   MAX_APPLES,
   MAX_DOTS,
   MAX_MARKS,
-  MAX_STOPS,
   markUnit,
   marksLeft,
   percentMarks,
-  pieceCount,
+  TRAIN_PIECES,
+  TRAIN_STOPS,
   pieceMoments,
   runSeconds,
   soonMs,
   trainSteps,
 } from "./pieces";
 import { bulbBelow, CANDLE, FLAME_H, GLASS, HOURGLASS_BOX, PLATE, SAND_FLOOR, STAGE_H, STAGE_W, TRAIN } from "./scenes";
-import { FIRST_TURN } from "./SwapPlay";
+import { FIRST_TURN, heldMarbles, turnChildren } from "./SwapPlay";
+import { CUP_W, CUP_XS, MARBLE_COLORS, MARBLE_R, marblePlan, RAMPS, REST_Y } from "./marbleRun";
 import { PLANK_BOX, SAW, SAW_GROUND, SAW_TILT, SEAT_CUSHION_W, TYRE_TOP, TYRE_X, WALKER } from "./seesaw";
 import { LAMP, SWAP_FLOOR, SWAP_SEATS, TOY } from "./swap";
 import { DEFAULT_TIMER_SETTINGS, TIMER_SECONDS } from "./settings";
@@ -134,7 +135,7 @@ describe("Timer", () => {
     const counts = [...code.matchAll(/<\w+Scene count=\{([^}]+)\}/g)].map((m) => m[1]);
     expect(counts.length).toBeGreaterThanOrEqual(6);
     for (const count of counts) expect(count, count).toMatch(/^[A-Z][A-Z_]*$/);
-    expect(code).not.toMatch(/\w+Count\(set\)|perBox\(/);
+    expect(code).not.toMatch(/\w+Count\(set\)|perBox\(|pieceCount\(/);
   });
 
   test("every picture has its own id, an emoji and a name, they stand in the order the user asked for and „Weiter“ goes round all but those of taking turns", () => {
@@ -145,16 +146,17 @@ describe("Timer", () => {
       expect(pick(p.name, firstLanguage(p.name)).trim()).not.toBe("");
     }
     // The order the user asked for (November 2026): Rote Scheibe, Sanduhr, Kerze, Apfelbaum, Blume, Pizza, Wecker, and
-    // Abwechseln and the Wippe (H-109) last, in a group of their own. Tennis (H-71) stood there and was taken out (user
-    // request, 21 November 2026: poorly done).
+    // Abwechseln, the Wippe (H-109) and the Kugelbahn (H-117) last, in a group of their own. Tennis (H-71) stood there
+    // and was taken out (user request, 21 November 2026: poorly done).
     expect(PICTURES.slice(0, 7).map((p) => p.id)).toEqual(["disc", "sand", "candle", "apple", "flower", "pizza", "clock"]);
-    expect(PICTURES.slice(-2).map((p) => p.id)).toEqual(["swap", "seesaw"]);
+    expect(PICTURES.slice(-3).map((p) => p.id)).toEqual(["swap", "seesaw", "marblerun"]);
     expect(PICTURES.map((p) => p.id as string)).not.toContain("tennis");
     expect(DEFAULT_TIMER_SETTINGS.picture).toBe(PICTURES[0].id);
     // Taking turns runs without end, so „Weiter“ never leads into it.
     expect(TIMED_PICTURES.map((p) => p.id)).not.toContain("swap");
     expect(TIMED_PICTURES.map((p) => p.id)).not.toContain("seesaw");
-    expect(TIMED_PICTURES).toHaveLength(PICTURES.length - 2);
+    expect(TIMED_PICTURES.map((p) => p.id)).not.toContain("marblerun");
+    expect(TIMED_PICTURES).toHaveLength(PICTURES.length - 3);
     const seen = new Set<string>();
     let id = TIMED_PICTURES[0].id;
     for (let i = 0; i < TIMED_PICTURES.length; i++) {
@@ -165,6 +167,7 @@ describe("Timer", () => {
     expect(id).toBe(TIMED_PICTURES[0].id);
     expect(nextPicture("swap")).toBe(TIMED_PICTURES[0].id);
     expect(nextPicture("seesaw")).toBe(TIMED_PICTURES[0].id);
+    expect(nextPicture("marblerun")).toBe(TIMED_PICTURES[0].id);
   });
 
   test("the alarm clock shows the time left on a screen whose digits never shift, starting on the time set and ending on 0:00", () => {
@@ -303,12 +306,18 @@ describe("Timer", () => {
     expect(DISC.cy + DISC.face).toBeLessThanOrEqual(820);
   });
 
-  test("piece by piece: one a minute, at least one, never more than fit (H-45)", () => {
-    expect(pieceCount(60_000, MAX_APPLES)).toBe(1);
-    expect(pieceCount(5 * 60_000, MAX_APPLES)).toBe(5);
-    expect(pieceCount(20_000, MAX_APPLES)).toBe(1);
-    expect(pieceCount(3 * 3600_000, MAX_APPLES)).toBe(MAX_APPLES);
-    expect(pieceCount(30 * 60_000, MAX_STOPS)).toBe(MAX_STOPS);
+  test("piece by piece: the train halts at its five stops at every length, then reaches the station as the time is up (H-45)", () => {
+    // User request, 24 November 2026: before, a stop came once a minute, so under two minutes the train never halted.
+    expect(TRAIN_STOPS).toBe(5);
+    for (const total of [10_000, 60_000, 5 * 60_000, 3 * 3600_000]) {
+      const steps = trainSteps(total, TRAIN_PIECES, haltMs(total, TRAIN_PIECES));
+      // A halt at each stop (arriving and leaving at the same place), then the station at the end.
+      const halts = steps.filter((s, i) => i > 0 && steps[i - 1].part === s.part);
+      expect(halts).toHaveLength(TRAIN_STOPS);
+      expect(steps.at(-1)).toEqual({ at: 1, part: 1 });
+      for (let i = 1; i < steps.length; i++) expect(steps[i].at).toBeGreaterThan(steps[i - 1].at);
+      expect(pieceMoments(total, TRAIN_PIECES, haltMs(total, TRAIN_PIECES))).toHaveLength(TRAIN_STOPS);
+    }
     expect(pieceMoments(300_000, 5)).toEqual([60_000, 120_000, 180_000, 240_000]);
     expect(pieceMoments(300_000, 1)).toEqual([]);
   });
@@ -1263,6 +1272,59 @@ describe("Timer", () => {
     expect(FIRST_TURN).toBe("fox");
     const play = await Bun.file("src/games/timer/SwapPlay.tsx").text();
     expect(play).not.toMatch(/Math\.random|DRAW_STEPS|WHO_BEGINS/);
+  });
+
+  // Kugelbahn (H-117 with H-115): the marble's way stays in what every screen shows, ends in the cup of the child whose
+  // turn comes next for two to four children, and its frames come in time order, the fall into the cup last and quick.
+  test("the Kugelbahn's marble rolls down the run into every child's cup, the whole turn long", () => {
+    const RIGHT = 1340;
+    for (const count of [2, 3, 4] as const) {
+      const xs = CUP_XS[count];
+      expect(xs).toHaveLength(count);
+      for (let i = 1; i < count; i++) expect(xs[i] - xs[i - 1]).toBeGreaterThanOrEqual(CUP_W[count] + 40);
+      expect(xs[0] - CUP_W[count] / 2).toBeGreaterThanOrEqual(220);
+      expect(xs[count - 1] + CUP_W[count] / 2).toBeLessThanOrEqual(RIGHT + 30);
+      for (let to = 0; to < count; to++) {
+        for (const ms of [10_000, 300_000]) {
+          const { frames, bends } = marblePlan(count, to, ms);
+          for (const f of frames) {
+            expect(f.x - MARBLE_R).toBeGreaterThanOrEqual(235);
+            expect(f.x + MARBLE_R).toBeLessThanOrEqual(RIGHT);
+            expect(f.y - MARBLE_R).toBeGreaterThanOrEqual(80);
+            expect(f.y + MARBLE_R).toBeLessThanOrEqual(820);
+          }
+          for (let k = 1; k < frames.length; k++) expect(frames[k].at).toBeGreaterThanOrEqual(frames[k - 1].at);
+          const last = frames[frames.length - 1];
+          expect(last.at).toBe(ms);
+          expect(last.x).toBe(xs[to]);
+          expect(last.y).toBe(REST_Y);
+          // The fall is quick, the rolling takes the rest: the marble is still on the rails a moment before the end.
+          expect(ms - frames[frames.length - 2].at).toBeLessThanOrEqual(601);
+          expect(bends).toHaveLength(RAMPS - 1);
+          // Even a long turn spins the marble at least half a turn a second, all the way down the rails.
+          for (let k = 1; k < frames.length - 1; k++) {
+            const seconds = (frames[k].at - frames[k - 1].at) / 1000;
+            expect(Math.abs(frames[k].turn - frames[k - 1].turn)).toBeGreaterThanOrEqual(seconds * 180 * 0.99);
+          }
+        }
+      }
+    }
+  });
+
+  // H-115: a marble lies in the cup of every child who had a turn in this round, the cups empty again as a new round starts.
+  test("the Kugelbahn's cups keep a marble for each child who had its turn in the round", () => {
+    const has = (held: (string | null)[]) => held.map((c) => c !== null);
+    expect(has(heldMarbles(0, 0, 3))).toEqual([true, false, false]);
+    expect(has(heldMarbles(0, 1, 3))).toEqual([true, true, false]);
+    expect(has(heldMarbles(0, 2, 3))).toEqual([true, true, true]);
+    expect(has(heldMarbles(0, 3, 3))).toEqual([true, false, false]);
+    expect(has(heldMarbles(2, 0, 4))).toEqual([false, false, true, false]);
+    expect(has(heldMarbles(2, 2, 4))).toEqual([true, false, true, true]);
+    // The marble landing in a cup keeps its colour there: the one rolling in turn k has turn k + 1's.
+    expect(heldMarbles(0, 1, 2)[1]).toBe(MARBLE_COLORS[1]);
+    expect(turnChildren("marblerun", 4)).toEqual(["fox", "bear", "rabbit", "frog"]);
+    expect(turnChildren("marblerun", 3)).toEqual(["fox", "bear", "rabbit"]);
+    expect(turnChildren("swap", 4)).toEqual(["fox", "bear"]);
   });
 
   // The book's paper margin and the ⚙️ note lie over the stage's right edge (x 1400 at 4:3): a figure standing to 1380

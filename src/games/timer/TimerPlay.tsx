@@ -49,11 +49,11 @@ import { isTurns, nextPicture, OTHER_TIME, PICTURES, tomorrowAt } from "./conten
 import { TimerCardArt } from "./cardArt";
 import { DiscScene } from "./disc";
 import { FlowerScene } from "./flower";
-import { appleTimes, haltMs, ladybugLaps, MAX_APPLES, MAX_STOPS, pieceCount, pieceMoments, soonMs, trainSteps } from "./pieces";
+import { appleTimes, haltMs, ladybugLaps, MAX_APPLES, pieceMoments, soonMs, TRAIN_PIECES, trainSteps } from "./pieces";
 import { PauseControls, RunClockProvider, usePausableClock, useRunClock } from "./pause";
 import { PizzaScene, SLICES } from "./pizza";
 import { CandleBackdrop, Candles, Hourglass, Layer, RAIL_Y, RailAhead, SandBackdrop, TRAIN, Train, TrainBackdrop, TrainStops } from "./scenes";
-import type { SwapToy, TimeShown, TimerPicture, TimerSettings } from "./settings";
+import type { SwapToy, TimeShown, TimerPicture, TimerSettings, TurnCount } from "./settings";
 import { noteRoom, TimeShownChoice, TimeShownNote } from "./shown";
 import { SunsetScene } from "./sunset";
 import { SwapRun } from "./SwapPlay";
@@ -102,6 +102,7 @@ export function TimerPlay({
   settings,
   onPicture,
   onToy,
+  onKids,
   onShown,
   onBar,
 }: {
@@ -109,6 +110,8 @@ export function TimerPlay({
   onPicture: (picture: TimerPicture) => void;
   /** A grown-up picks another toy for „Abwechseln“ behind ⚙️. */
   onToy: (toy: SwapToy) => void;
+  /** A grown-up sets how many children take turns on the Kugelbahn behind ⚙️. */
+  onKids: (kids: TurnCount) => void;
   /** A grown-up has the time left shown in the picture, or not, behind ⚙️. */
   onShown: (shown: TimeShown) => void;
   /** A grown-up has the bar along the bottom shown, or not, behind ⚙️. */
@@ -120,7 +123,7 @@ export function TimerPlay({
     onPicture(picture);
     again();
   };
-  return <TimerStart key={run} settings={settings} onAgain={again} onPicture={pick} onToy={onToy} onShown={onShown} onBar={onBar} />;
+  return <TimerStart key={run} settings={settings} onAgain={again} onPicture={pick} onToy={onToy} onKids={onKids} onShown={onShown} onBar={onBar} />;
 }
 
 /**
@@ -132,6 +135,7 @@ function TimerStart({
   onAgain,
   onPicture,
   onToy,
+  onKids,
   onShown,
   onBar,
 }: {
@@ -139,13 +143,14 @@ function TimerStart({
   onAgain: () => void;
   onPicture: (picture: TimerPicture) => void;
   onToy: (toy: SwapToy) => void;
+  onKids: (kids: TurnCount) => void;
   onShown: (shown: TimeShown) => void;
   onBar: (bar: boolean) => void;
 }) {
   const t = useT();
   const leave = useLeaveGame();
   const [total, setTotal] = useState(() => planMs(settings));
-  // The train's stops and the ladybug's dots come from the time set, also when `?sekunden=` shortens the run, so a
+  // The ladybug's dots come from the time set, also when `?sekunden=` shortens the run, so a
   // five-minute run can be watched in a few seconds while developing.
   const [minutes] = useState(() => planMs(settings, 0));
   const until = settings.useOwn && settings.own?.kind === "until" ? settings.own.at : undefined;
@@ -189,6 +194,8 @@ function TimerStart({
         until={until}
         toy={settings.toy}
         onToy={onToy}
+        kids={settings.kids}
+        onKids={onKids}
         timeShown={settings.timeNote}
         onShown={onShown}
         bar={settings.bar}
@@ -337,14 +344,13 @@ function TimerRun({
   }, [lines, language, say]);
   useEffect(() => hush, []);
 
-  // Piece by piece (H-45): many apples landing in the cart, a stop on the track a minute – each with its plop or its bell.
-  const stops = pieceCount(set, MAX_STOPS);
+  // Piece by piece (H-45): many apples landing in the cart, the train's stops on the track – each with its plop or its bell.
   const moments = useMemo(() => {
     if (picture === "apple")
       return appleTimes(total, MAX_APPLES)
         .harvest.slice(0, -1)
         .map((h) => h.land);
-    if (picture === "train" && stops > 1) return pieceMoments(total, stops, haltMs(total, stops));
+    if (picture === "train") return pieceMoments(total, TRAIN_PIECES, haltMs(total, TRAIN_PIECES));
     if (picture === "pizza") return pieceMoments(total, SLICES);
     // Each toy landing in the box (H-118), the last one being the end's.
     if (picture === "tidy")
@@ -371,7 +377,7 @@ function TimerRun({
     // The ladybug leaves a dot as it is back at the top (H-67).
     if (picture === "disc") return pieceMoments(total, ladybugLaps(set).dots);
     return [];
-  }, [picture, total, set, stops]);
+  }, [picture, total, set]);
   const nextMoment = useRef(0);
   const soonRang = useRef(false);
   const finalOn = useRef(false);
@@ -555,7 +561,7 @@ function TimerRun({
         role="img"
         aria-label={name ? t(name) : undefined}
       >
-        <div className={`tm-stage tm-${phase}${far ? " tm-far" : ""}`} style={stageStyle(picture, total, stops)}>
+        <div className={`tm-stage tm-${phase}${far ? " tm-far" : ""}`} style={stageStyle(picture, total)}>
           <SceneParts picture={picture} phase={phase} total={total} set={set} poke={poke} startedAt={endsAt - total} />
           {phase === "done" && <div className="tm-done-light" />}
         </div>
@@ -594,8 +600,8 @@ function boxMoments(total: number, count: number): { at: number; lid: boolean }[
 }
 
 /** The stage's lengths for the CSS: the run's, its seconds, the train's way, and the train's own keyframes when it halts. */
-export function stageStyle(picture: TimerPicture, total: number, stops: number) {
-  const stepped = picture === "train" && stops > 1;
+export function stageStyle(picture: TimerPicture, total: number) {
+  const stepped = picture === "train";
   return {
     "--tm-ms": `${total}ms`,
     "--tm-train": `${((TRAIN.stop - TRAIN.w - TRAIN.x) / TRAIN.w) * 100}%`,
@@ -626,15 +632,13 @@ export function SceneParts({
   /** A menu's card: the picture at this moment, with nothing that counts on by itself. */
   still?: boolean;
 }) {
-  const stops = pieceCount(set, MAX_STOPS);
-  const stepped = picture === "train" && stops > 1;
   return (
     <>
       {picture === "train" && (
         <>
           <TrainBackdrop />
-          {stepped && <TrainStepKeyframes total={total} stops={stops} />}
-          {stepped && <TrainStops pieces={stops} />}
+          <TrainStepKeyframes total={total} stops={TRAIN_PIECES} />
+          <TrainStops pieces={TRAIN_PIECES} />
           <RailAhead glow={poke} />
           <Layer x={TRAIN.x} y={RAIL_Y - TRAIN.h + 6} w={TRAIN.w} h={TRAIN.h} className="tm-train tm-move">
             <Train puff={poke} />

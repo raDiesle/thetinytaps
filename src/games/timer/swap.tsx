@@ -19,6 +19,15 @@ const INK = "#3b2a20";
 /** Who has the toy: the fox child (left) or the bear child (right). */
 export type Holder = "fox" | "bear";
 
+/**
+ * The children taking turns on the Kugelbahn (H-115, two to four), left to right in the order of their turns: the fox's
+ * and the bear's as in Abwechseln, then a rabbit's and a frog's – each a cup in its own colour with its animal's ears.
+ */
+export type TurnChild = Holder | "rabbit" | "frog";
+
+/** Every child that can take turns, in their order; two to four of them play, from the first. */
+export const TURN_CHILDREN: readonly TurnChild[] = ["fox", "bear", "rabbit", "frog"];
+
 /** The floor the cushions and the hourglass stand on: the Sanduhr's. */
 export const SWAP_FLOOR = SAND_FLOOR;
 
