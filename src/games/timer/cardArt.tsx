@@ -1,5 +1,4 @@
 import { memo, useLayoutEffect, useRef, useState } from "react";
-import { pieceCount, MAX_STOPS } from "./pieces";
 import { MARBLE_COLORS, MarbleScene } from "./marbleRun";
 import { DEFAULT_TIMER_SETTINGS, type SwapToy, type TimerPicture, type TurnCount } from "./settings";
 import { SAW, Seesaw, SeesawBackdrop, SeesawStand, SeesawSun } from "./seesaw";
@@ -99,7 +98,7 @@ export const TimerCardArt = memo(function TimerCardArt({
           />
         </span>
       ) : (
-        <span className="tm-stage" style={stageStyle(picture, CARD_MS, pieceCount(CARD_MS, MAX_STOPS))}>
+        <span className="tm-stage" style={stageStyle(picture, CARD_MS)}>
           <SceneParts picture={picture} phase="running" total={CARD_MS} set={CARD_MS} poke={0} startedAt={startedAt} still />
         </span>
       )}

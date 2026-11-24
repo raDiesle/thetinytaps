@@ -45,14 +45,11 @@ export const TOY = 84;
 /** How big a toy lies in its box, so four fit side by side and its top shows in the opening. */
 export const IN_BOX = 0.55;
 
-/** The fewest and most toys of each sort. Five minutes takes three of each, one every 20 seconds. */
-export const MIN_PER_BOX = 2;
-export const MAX_PER_BOX = 4;
-
-/** How many toys of each sort for a run of `ms`: one every 20 seconds, at least `MIN_PER_BOX`, at most `MAX_PER_BOX`. */
-export function perBox(ms: number): number {
-  return Math.max(MIN_PER_BOX, Math.min(MAX_PER_BOX, Math.round(ms / (BOX_COUNT * 20_000))));
-}
+/**
+ * How many toys of each sort, for a run of any length: five minutes takes one every 20 seconds; a shorter or longer run
+ * puts all of them away, only faster or slower (user request, 24 November 2026).
+ */
+export const PER_BOX = 3;
 
 /**
  * Where box `k`'s toys lie on the floor in front of it, nearest the box first: two at the back, then one or two at the
