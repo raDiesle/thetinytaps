@@ -37,16 +37,24 @@ import {
 import { BROW, Ear, EyeBall, EyeLid, eyeOpening, FACE, HAIR, Hair, HEAD_UNITS, type HeadMap, INK, Iris, LASHES, LIP, Nose, SkinGradient } from "./face";
 import { Brush, lerp3, type BrushAnchor } from "./brush";
 import type { Motion } from "./steps";
+import { faceKey } from "./stains";
 
 // A child's face in a mirror, close up. The mouth is a small 3D model (see
 // jaw.ts), so the picture can turn and tilt to show exactly where to brush.
 
 export { INK, SKIN } from "./face";
-const TOOTH_FILLS: Record<FaceKind, string> = { outer: "#fffdf6", top: "#fbeed0", inner: "#f2e6d2", side: "#e6d8bd" };
+export const TOOTH_FILLS: Record<FaceKind, string> = { outer: "#fffdf6", top: "#fcf3dd", inner: "#f5ede0", side: "#e6d8bd" };
+/**
+ * A face not brushed yet is a little yellow, with grey-yellow plaque along the gum (in the fissure on a chewing surface)
+ * and a few grey spots (`StainedFace`); brushed it turns white (user request, November 2026). Soft, a picture book's
+ * stain, never brown or rotten.
+ */
+export const STAIN_FILLS: Record<FaceKind, string> = { outer: "#f3e3b3", top: "#ead59b", inner: "#e6d4a6", side: "#e6d8bd" };
+/** The stain's plaque and spots, the story's (origin.tsx) too. */
+export const STAIN = { plaque: "#dcc27c", plaqueOpacity: 0.75, spot: "#b9b09c", spotOpacity: 0.5 };
 const GUM_FILLS: Record<FaceKind, string> = { outer: "#ff8fab", top: "#ffa6bc", inner: "#f27c9c", side: "#ff8fab" };
 /** The gum's edge round each tooth. */
 const GUM_RIM = "#e2577c";
-const ZONE_FILL = "#fff2a8";
 /** The inside of the cheeks and lips round the teeth: the gum runs into it, so nothing dark shows between gum and lips. */
 const CHEEK_INSIDE = "#f27e9c";
 /** The dark of the mouth behind the teeth, seen only between the rows of an open mouth. */
@@ -221,6 +229,8 @@ interface MouthProps {
   /** The surfaces being brushed now. */
   zone: { surface: Surface; teeth: ToothId[] } | null;
   monsters: MonsterSpot[];
+  /** The faces not brushed yet (`faceKey`): stained, and white once brushed. */
+  dirty: readonly string[];
   /** The brush goes from stop to stop; `at` is how far, 1.5 is half way from the second to the third. */
   brush: { stops: { tooth: ToothId; spot: number }[]; at: number; surface: Surface; motion: Motion } | null;
   /** All clean: the teeth shine and the eyes smile. */
@@ -231,7 +241,7 @@ interface MouthProps {
   action: MouthAction | null;
   /**
    * The head turns or the mouth opens or closes: the picture is drawn anew in every frame, so the glow on the teeth
-   * to brush waits until it holds still (the yellow of those teeth shows the way meanwhile).
+   * to brush waits until it holds still (their monsters show the way meanwhile).
    */
   gliding: boolean;
   /** Where the glide is going, and how far it has come (0 to 1, eased like the view): the corners of the mouth follow it. */
@@ -297,30 +307,90 @@ function smoothPart(points: { x: number; y: number }[], from: number, count: num
 
 const facePath = (face: Face, project: Project, radius = 3) => roundedPath(face.points.map(project.point), radius);
 
-/** A tooth's crown: the faces that show, with the light on its front and the groove on a molar; `zone` the face to brush. */
-function Crown({ tooth: t, project, zone }: { tooth: MouthModel["teeth"][number]; project: Project; zone?: Surface }) {
+/** The faces of a crown that show: slivers of the sides between teeth only add clutter. */
+const shownFaces = (t: MouthModel["teeth"][number], project: Project) =>
+  t.faces.filter((f) => project.facing(f.normal) > (f.kind === "side" ? 0.3 : MIN_FACING));
+/** How round a face's corners are drawn. */
+const faceRadius = (f: Face) => (f.kind === "outer" ? 7 : 3);
+
+/**
+ * A tooth's crown: the faces that show, with the groove on a molar; `dirty` the faces not brushed yet, which are
+ * stained. The light on its front shows only once that face is clean: a brushed tooth gains its shine.
+ */
+function Crown({ tooth: t, project, dirty }: { tooth: MouthModel["teeth"][number]; project: Project; dirty?: ReadonlySet<FaceKind> }) {
   const p = project.point;
   return (
     <>
-      {t.faces
-        // Slivers of the sides between teeth only add clutter.
-        .filter((f) => project.facing(f.normal) > (f.kind === "side" ? 0.3 : MIN_FACING))
-        .map((f, j) => (
-          <path
-            key={j}
-            d={facePath(f, project, f.kind === "outer" ? 7 : 3)}
-            fill={f.kind === zone ? ZONE_FILL : TOOTH_FILLS[f.kind]}
-            stroke={INK}
-            strokeWidth={2.2}
-            strokeLinejoin="round"
-          />
-        ))}
-      {project.facing(surfaceFace(t.faces, "outer").normal) > 0.55 && (
+      {shownFaces(t, project).map((f, j) =>
+        dirty?.has(f.kind) ? (
+          <StainedFace key={j} face={f} project={project} seed={seedOf(t.id)} />
+        ) : (
+          <path key={j} d={facePath(f, project, faceRadius(f))} fill={TOOTH_FILLS[f.kind]} stroke={INK} strokeWidth={2.2} strokeLinejoin="round" />
+        ),
+      )}
+      {!dirty?.has("outer") && project.facing(surfaceFace(t.faces, "outer").normal) > 0.55 && (
         <path d={`M${fmt(p(t.shine[0]))} L${fmt(p(t.shine[1]))}`} stroke="#fff" strokeWidth={4} strokeLinecap="round" opacity={0.9} />
       )}
-      {t.groove && project.facing(surfaceFace(t.faces, "top").normal) > 0.25 && (
-        <path d={`M${t.groove.map((g) => fmt(p(g))).join(" L")}`} fill="none" stroke="#d9c49a" strokeWidth={2} strokeLinecap="round" />
-      )}
+      {t.groove && project.facing(surfaceFace(t.faces, "top").normal) > 0.25 && <Groove tooth={t} project={project} />}
+    </>
+  );
+}
+
+/** The groove along a molar's chewing surface. */
+function Groove({ tooth: t, project }: { tooth: MouthModel["teeth"][number]; project: Project }) {
+  return <path d={`M${t.groove!.map((g) => fmt(project.point(g))).join(" L")}`} fill="none" stroke="#d9c49a" strokeWidth={2} strokeLinecap="round" />;
+}
+
+/** A number of its own for each tooth, so the stains differ from tooth to tooth but stay where they are. */
+const seedOf = (id: ToothId) => id.n + (id.side === "left" ? 0 : 5) + (id.jaw === "upper" ? 0 : 10);
+
+/**
+ * A point on a face: `u` along the tooth from one end (0) to the other (1), `v` from its first long edge (0: the biting
+ * edge, on a chewing surface the cheek side) to its second (1: the gum, or the tongue side).
+ */
+function onFace(face: Face, u: number, v: number): Vec3 {
+  const n = face.points.length;
+  const half = n / 2;
+  const x = Math.min(1, Math.max(0, u)) * (half - 1);
+  const i = Math.min(half - 2, Math.floor(x));
+  const k = x - i;
+  const a = lerp3(face.points[i], face.points[i + 1], k);
+  const b = lerp3(face.points[n - 1 - i], face.points[n - 2 - i], k);
+  return lerp3(a, b, v);
+}
+
+/** A closed shape on a face from points given as (u, v), in the face's own perspective. */
+const facePatch = (face: Face, project: Project, uv: [number, number][]) => `M${uv.map(([u, v]) => fmt(project.point(onFace(face, u, v)))).join(" L")} Z`;
+
+/** A round spot on a face, (u, v) its middle and (ru, rv) how far it reaches. */
+const faceSpot = (face: Face, project: Project, u: number, v: number, ru: number, rv: number) =>
+  facePatch(
+    face,
+    project,
+    Array.from({ length: 10 }, (_, i): [number, number] => [u + ru * Math.cos((i * Math.PI) / 5), v + rv * Math.sin((i * Math.PI) / 5)]),
+  );
+
+/**
+ * A face not brushed yet: a little yellow, grey-yellow plaque where a real tooth gathers it – along the gum, or in the
+ * fissure of a chewing surface – and two soft grey spots, each tooth's a little different (`seed`).
+ */
+function StainedFace({ face, project, seed }: { face: Face; project: Project; seed: number }) {
+  const d = facePath(face, project, faceRadius(face));
+  const wave = (u: number, by: number) => by * Math.sin(u * Math.PI * 3 + seed);
+  const us = Array.from({ length: 9 }, (_, i) => 0.04 + (0.92 * i) / 8);
+  // Along the gum a wavy band; on a chewing surface a patch along the middle, where the groove is.
+  const plaque: [number, number][] =
+    face.kind === "top"
+      ? [...us.map((u): [number, number] => [u, 0.36 + wave(u, 0.06)]), ...[...us].reverse().map((u): [number, number] => [u, 0.64 + wave(u + 0.4, 0.06)])]
+      : [...us.map((u): [number, number] => [u, 0.6 + wave(u, 0.08)]), [0.96, 1], [0.04, 1]];
+  const at = (k: number) => 0.2 + ((seed * 0.37 + k) % 1) * 0.6;
+  return (
+    <>
+      <path d={d} fill={STAIN_FILLS[face.kind]} />
+      <path d={facePatch(face, project, plaque)} fill={STAIN.plaque} opacity={STAIN.plaqueOpacity} />
+      <path d={faceSpot(face, project, at(0), face.kind === "top" ? 0.25 : 0.32, 0.1, 0.12)} fill={STAIN.spot} opacity={STAIN.spotOpacity} />
+      <path d={faceSpot(face, project, at(0.5), face.kind === "top" ? 0.72 : 0.5, 0.07, 0.09)} fill={STAIN.spot} opacity={STAIN.spotOpacity * 0.8} />
+      <path d={d} fill="none" stroke={INK} strokeWidth={2.2} strokeLinejoin="round" />
     </>
   );
 }
@@ -419,7 +489,7 @@ const jawOrder = (view: View): Jaw[] => {
   return view.pitch >= 0 ? ["lower", "upper"] : ["upper", "lower"];
 };
 
-export function Mouth({ view, zone, monsters, brush, happy, dazzled, action, gliding, glide, free, onTickle }: MouthProps) {
+export function Mouth({ view, zone, monsters, dirty, brush, happy, dazzled, action, gliding, glide, free, onTickle }: MouthProps) {
   const pictureLabel = useT()({
     de: "Ein Kindergesicht im Spiegel beim Zähneputzen",
     en: "A child's face in the mirror while brushing teeth",
@@ -517,32 +587,42 @@ export function Mouth({ view, zone, monsters, brush, happy, dazzled, action, gli
     [happy, teethByKey, all],
   );
 
-  // The face and the teeth change only while the head turns or the mouth opens: built once for each view,
-  // not again with every tick of the clock (hundreds of paths, too slow for a phone five times a second).
-  const zoneSurface = zone?.surface;
-  const zoneTeeth = zone?.teeth;
+  // The teeth in the order the still picture draws them: jaw by jaw, far teeth first.
+  const painted = useMemo(
+    () =>
+      jawOrder(view).flatMap((jaw) => {
+        const project = all[jaw];
+        const p = project.point;
+        return model.teeth
+          .filter((t) => t.id.jaw === jaw)
+          .sort((a, b) => p(a.center).depth - p(b.center).depth)
+          .map((t) => ({ tooth: t, gum: gumsByKey.get(t.key)!, project }));
+      }),
+    [view, all, model, gumsByKey],
+  );
+
+  // The faces being brushed now turn white in layers of their own (`ToothStain`), so the still picture draws them
+  // white already and stays the same while they are brushed; while the head glides they are stained in it like the rest.
+  const layered = zone !== null && !gliding;
+  const zoneFaces = useMemo(() => new Set(zone?.teeth.map((id) => faceKey(id, zone.surface))), [zone?.teeth, zone?.surface]);
+  const stillDirty = dirty.filter((k) => !(layered && zoneFaces.has(k))).join(" ");
+
+  // The face and the teeth change only while the head turns or the mouth opens, or a step's teeth are done: built once
+  // for each, not again with every tick of the clock (hundreds of paths, too slow for a phone five times a second).
   const still = useMemo(() => {
-    const zoneKeys = new Set(zoneTeeth?.map(toothKey));
-    const jawParts = jawOrder(view).map((jaw) => {
-      const project = all[jaw];
-      const p = project.point;
-      const teeth = model.teeth.filter((t) => t.id.jaw === jaw).sort((a, b) => p(a.center).depth - p(b.center).depth);
-      return (
-        <g key={jaw}>
-          {teeth.map((t) => {
-            // Far teeth first; each one stands in its own piece of gum: the gum's top under it, its walls over its foot.
-            const gum = gumsByKey.get(t.key)!;
-            return (
-              <g key={t.key}>
-                <GumFaces gum={gum} project={project} top />
-                <Crown tooth={t} project={project} zone={zoneKeys.has(t.key) ? zoneSurface : undefined} />
-                <GumFaces gum={gum} project={project} top={false} />
-              </g>
-            );
-          })}
-        </g>
-      );
-    });
+    const dirtyBy = new Map<string, Set<FaceKind>>();
+    for (const k of stillDirty.split(" ").filter(Boolean)) {
+      const [tooth, surface] = k.split(":");
+      dirtyBy.set(tooth, (dirtyBy.get(tooth) ?? new Set()).add(surface as Surface));
+    }
+    // Far teeth first; each one stands in its own piece of gum: the gum's top under it, its walls over its foot.
+    const jawParts = painted.map(({ tooth: t, gum, project }) => (
+      <g key={t.key}>
+        <GumFaces gum={gum} project={project} top />
+        <Crown tooth={t} project={project} dirty={dirtyBy.get(t.key)} />
+        <GumFaces gum={gum} project={project} top={false} />
+      </g>
+    ));
 
     const tongueUp = all.lower.facing([0, 1, 0.2]) > 0.05;
     const palateDown = all.upper.facing([0, -1, 0.2]) > 0.05;
@@ -558,7 +638,20 @@ export function Mouth({ view, zone, monsters, brush, happy, dazzled, action, gli
         </g>
       </>
     );
-  }, [view, all, model, gumsByKey, lipPoints, lipsPath, zoneSurface, zoneTeeth, happy]);
+  }, [view, all, model, painted, lipPoints, lipsPath, stillDirty, happy]);
+
+  // The stains on the teeth being brushed now, each a small layer of its own over the still picture that fades away
+  // as its tooth's monsters are brushed off: a fade inside the picture's svg would have the phone paint the screen
+  // anew in every frame of it. Each holds only what the still picture draws over that face (`StainGeometry`).
+  const stains = useMemo(
+    () => (layered && zone ? zone.teeth.flatMap((id) => stainGeometry(painted, id, zone.surface)) : []),
+    [layered, zone?.teeth, zone?.surface, painted],
+  );
+  // A face shows its fading stain and its glint only once it was seen stained: a step jumped to half way through
+  // starts with its brushed teeth white.
+  const seenDirty = useRef(new Set<string>());
+  for (const k of dirty) if (zoneFaces.has(k)) seenDirty.current.add(k);
+  const shownStains = stains.filter((g) => seenDirty.current.has(g.key));
 
   const placed = (m: MonsterSpot) => {
     const face = toothFace(m.tooth, m.surface);
@@ -653,6 +746,25 @@ export function Mouth({ view, zone, monsters, brush, happy, dazzled, action, gli
         </g>
       </svg>
 
+      {shownStains.length > 0 && (
+        <div className="mouth-stains">
+          {shownStains.map((g) => {
+            const at = onScreen(g.box, 1);
+            return (
+              <ToothStain
+                key={g.key}
+                geometry={g}
+                x={round(at.x)}
+                y={round(at.y)}
+                width={round(g.box.width / unit)}
+                height={round(g.box.height / unit)}
+                clean={!dirty.includes(g.key)}
+              />
+            );
+          })}
+        </div>
+      )}
+
       {zone && !gliding && (
         <svg className="mouth mouth-moving zone-glow" viewBox={viewBox} aria-hidden>
           <defs>
@@ -744,6 +856,21 @@ export function Mouth({ view, zone, monsters, brush, happy, dazzled, action, gli
         {action && <LipArrows action={action} lips={lipPoints} zoom={project.zoom} onScreen={onScreen} />}
         {/* A last sugar monster peeks in, dazzled by the clean teeth, and puts on sunglasses: no sugar left for it. */}
         {dazzled && <DazzledMonster screen={screen} />}
+        {/* A tooth just brushed white sparkles once. */}
+        {shownStains
+          .filter((g) => !dirty.includes(g.key))
+          .map((g) => {
+            const at = onScreen(g.glint, GLINT_SIZE * BRUSHED_GLINT);
+            return (
+              <Sprite key={g.key} spot={{ x: round(at.x), y: round(at.y), scale: round(at.scale, 1000) }} reach={GLINT_REACH} className="tooth-glint brushed">
+                <div>
+                  <svg viewBox={spriteBox(GLINT_REACH)} aria-hidden>
+                    <Glint />
+                  </svg>
+                </div>
+              </Sprite>
+            );
+          })}
         {/* All clean: glints of light flash on the teeth in turn, each a small layer of its own. */}
         {!gliding &&
           glints.map((g) => {
@@ -1046,6 +1173,154 @@ function Glint() {
     </>
   );
 }
+
+/** A glint on a tooth just brushed is a little smaller than the end's. */
+const BRUSHED_GLINT = 0.8;
+
+/** What a stain layer of one face needs, in picture units: where it lies and what the still picture draws over it. */
+interface StainGeometry {
+  key: string;
+  face: Face;
+  tooth: MouthModel["teeth"][number];
+  project: Project;
+  seed: number;
+  /** The layer's place, a little bigger than the face for its outline. */
+  box: Box;
+  /** Where the face sparkles once it is clean: near its biting edge, clear of its monster's middle. */
+  glint: { x: number; y: number };
+  /**
+   * The outlines of what the still picture draws over the face – its crown's later faces, its gum's walls, the teeth
+   * drawn after it that reach into its box – as plain shapes (`cut`, filled with their outline) and gum rims (`rims`,
+   * lines): the stain's mask cuts them out in black, with no filter to turn the drawn things black.
+   */
+  cut: string[];
+  rims: string[];
+}
+
+/** The outlines of a tooth's gum (its top or walls, `top`) and their rims, as the still picture draws them. */
+function gumOutlines(gum: MouthModel["gums"][number], project: Project, top: boolean) {
+  const cut = gum.faces.filter((f) => (f.kind === "top") === top && project.facing(f.normal) > MIN_FACING).map((f) => facePath(f, project));
+  const rims = top
+    ? []
+    : (["outer", "inner"] as const)
+        .filter((kind) => project.facing(surfaceFace(gum.faces, kind).normal) > MIN_FACING)
+        .map((kind) => `M${gum.rims[kind].map((r) => fmt(project.point(r))).join(" L")}`);
+  return { cut, rims };
+}
+
+/** The box round points in picture units, `pad` more each way. */
+function boxAround(points: { x: number; y: number }[], pad: number): Box {
+  const xs = points.map((p) => p.x);
+  const ys = points.map((p) => p.y);
+  const x = Math.floor(Math.min(...xs) - pad);
+  const y = Math.floor(Math.min(...ys) - pad);
+  return { x, y, width: Math.ceil(Math.max(...xs) + pad) - x, height: Math.ceil(Math.max(...ys) + pad) - y };
+}
+
+const overlaps = (a: Box, b: Box) => a.x < b.x + b.width && b.x < a.x + a.width && a.y < b.y + b.height && b.y < a.y + a.height;
+
+/** The stain layer of a tooth's face being brushed now, or none where that face is turned away. */
+function stainGeometry(
+  painted: { tooth: MouthModel["teeth"][number]; gum: MouthModel["gums"][number]; project: Project }[],
+  id: ToothId,
+  surface: Surface,
+): StainGeometry[] {
+  const i = painted.findIndex((p) => p.tooth.key === toothKey(id));
+  if (i < 0) return [];
+  const { tooth, gum, project } = painted[i];
+  const shown = shownFaces(tooth, project);
+  const face = shown.find((f) => f.kind === surface);
+  if (!face) return [];
+  const box = boxAround(face.points.map(project.point), 3);
+  const reach = (t: MouthModel["teeth"][number], g: MouthModel["gums"][number], at: Project) =>
+    boxAround(
+      [...t.faces, ...g.faces].flatMap((f) => f.points.map(at.point)),
+      3,
+    );
+  const own = shown.slice(shown.indexOf(face) + 1).map((f) => facePath(f, project, faceRadius(f)));
+  const walls = gumOutlines(gum, project, false);
+  const after = painted
+    .slice(i + 1)
+    .filter((p) => overlaps(box, reach(p.tooth, p.gum, p.project)))
+    .map((p) => {
+      const [top, sides] = [gumOutlines(p.gum, p.project, true), gumOutlines(p.gum, p.project, false)];
+      const crown = shownFaces(p.tooth, p.project).map((f) => facePath(f, p.project, faceRadius(f)));
+      return { cut: [...top.cut, ...crown, ...sides.cut], rims: sides.rims };
+    });
+  return [
+    {
+      key: faceKey(id, surface),
+      face,
+      tooth,
+      project,
+      seed: seedOf(id),
+      box,
+      glint: project.point(onFace(face, 0.32, 0.28)),
+      cut: [...own, ...walls.cut, ...after.flatMap((a) => a.cut)],
+      rims: [...walls.rims, ...after.flatMap((a) => a.rims)],
+    },
+  ];
+}
+
+/**
+ * The stain on a face being brushed, in a small layer of its own over the still picture (which draws that face white
+ * already): it fades away as the tooth's monsters are brushed off (`clean`), moving only its opacity. The still picture
+ * draws other things over the face (its gum's walls, nearer teeth, the other row): they are masked out of the stain,
+ * so it lies exactly where the face shows.
+ */
+const ToothStain = memo(function ToothStain({
+  geometry: g,
+  x,
+  y,
+  width,
+  height,
+  clean,
+}: {
+  geometry: StainGeometry;
+  x: number;
+  y: number;
+  width: number;
+  height: number;
+  clean: boolean;
+}) {
+  const { box } = g;
+  const id = `stain-${g.key.replace(/[^a-z0-9-]/gi, "-")}`;
+  const d = facePath(g.face, g.project, faceRadius(g.face));
+  // The drawing never changes while the layer lives, only the layer's place and opacity.
+  const drawing = useMemo(
+    () => (
+      <svg viewBox={`${box.x} ${box.y} ${box.width} ${box.height}`} aria-hidden>
+        <defs>
+          {/* Everything the still picture draws over the face is cut out of the stain in plain black: no filter, which
+              had an old phone paint each layer anew and doubled the paint while brushing (`bun run perf zaehne`). */}
+          <mask id={`${id}-mask`} maskUnits="userSpaceOnUse" x={box.x} y={box.y} width={box.width} height={box.height}>
+            <path d={d} fill="#fff" stroke="#fff" strokeWidth={2.2} strokeLinejoin="round" />
+            <g fill="#000" stroke="#000" strokeWidth={2.2} strokeLinejoin="round">
+              {g.cut.map((c, j) => (
+                <path key={j} d={c} />
+              ))}
+            </g>
+            <g fill="none" stroke="#000" strokeWidth={2.4} strokeLinecap="round" strokeLinejoin="round">
+              {g.rims.map((c, j) => (
+                <path key={j} d={c} />
+              ))}
+            </g>
+          </mask>
+        </defs>
+        <g mask={`url(#${id}-mask)`}>
+          <StainedFace face={g.face} project={g.project} seed={g.seed} />
+          {g.face.kind === "top" && g.tooth.groove && g.project.facing(g.face.normal) > 0.25 && <Groove tooth={g.tooth} project={g.project} />}
+        </g>
+      </svg>
+    ),
+    [g],
+  );
+  return (
+    <div className={`tooth-stain${clean ? " clean" : ""}`} style={{ width, height, transform: `translate(${x}px, ${y}px)` }}>
+      {drawing}
+    </div>
+  );
+});
 
 /** A rectangle as a path, to cut a shape out of it (evenodd). */
 const rectPath = ({ x, y, width, height }: { x: number; y: number; width: number; height: number }) => `M${x} ${y} H${x + width} V${y + height} H${x} Z`;

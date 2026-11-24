@@ -364,6 +364,64 @@
   }
 }
 
+/* Stained teeth turn white as they are brushed (mouth.tsx, `ToothStain`, user request, November 2026): the stain on
+   each face being brushed lies in a small layer of its own over the still picture, which draws the face white
+   already, and fades away in a beat once the brush has taken its monsters off – a beat, since the step's last tooth is
+   done only a moment before the head turns on. Then the tooth sparkles once, a little glint coming up and going over
+   four beats, as calm as the end's. Only the layers' opacity and transform change. */
+.mouth-stains {
+  position: absolute;
+  inset: 0;
+  pointer-events: none;
+}
+
+.tooth-stain {
+  position: absolute;
+  left: 50%;
+  top: 50%;
+  will-change: opacity;
+}
+
+.tooth-stain > svg {
+  display: block;
+  width: 100%;
+  height: 100%;
+}
+
+.tooth-stain.clean {
+  animation: teeth-stain-clear 0.536s ease-in-out forwards;
+}
+
+@keyframes teeth-stain-clear {
+  to {
+    opacity: 0;
+  }
+}
+
+.tooth-glint.brushed > div {
+  animation: teeth-glint-once 2.14s ease-in-out 0.27s both;
+}
+
+@keyframes teeth-glint-once {
+  0% {
+    opacity: 0;
+    transform: scale(0.2) rotate(-25deg);
+  }
+  30% {
+    opacity: 0.85;
+    transform: scale(1) rotate(0deg);
+  }
+  100% {
+    opacity: 0;
+    transform: scale(0.4) rotate(12deg);
+  }
+}
+
+.teeth-play.paused .tooth-stain.clean,
+.teeth-play.paused .tooth-glint.brushed > div {
+  animation-play-state: paused;
+}
+
 /* The end's surprise (mouth.tsx, DazzledMonster), eight beats as long as the cheer: three beats while the head glides
    to its grin, the monster rises at the mirror's bottom edge in two, squints, the sunglasses drop onto its nose in one,
    and at the end it sinks back. Body and glasses are layers of their own moved by transform. */
@@ -879,10 +937,14 @@
     animation: none;
   }
 
-  /* The glints stand still, lit. */
+  /* The glints stand still, lit; a tooth just brushed shows none. */
   .tooth-glint > div {
     opacity: 0.85;
     animation: none;
+  }
+
+  .tooth-glint.brushed {
+    display: none;
   }
 }
 
@@ -1177,6 +1239,18 @@
 @keyframes teeth-origin-crumb-gone {
   to {
     transform: scale(0);
+    opacity: 0;
+  }
+}
+
+/* While the monsters grow, the sugar stains the teeth: the stained teeth fade in over six beats, as the first monster
+   comes, by their layer's opacity (origin.tsx, `StainedTeeth`). */
+.origin.at-grow .origin-stain {
+  animation: teeth-origin-stain 3.21s ease-in-out 0.6s backwards;
+}
+
+@keyframes teeth-origin-stain {
+  from {
     opacity: 0;
   }
 }

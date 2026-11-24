@@ -335,7 +335,10 @@ In a fresh worktree run `bun install` first.
   the stretch begins with the first moving frame, and the wait from the finger landing is a number of its own with its
   own limit („tap to lift“, about 0.3 s on the old phone) – never one stretch judging both by chance. A new game,
   or a new part that moves a lot, gets a scenario there; run it after changing what moves, and after changing a page a scenario taps through (the home page's cards became a bookshelf and its menu scenario failed until the weekly run; `bun run perf <name>`,
-  `--profile` names the functions that cost, `--shots` shows what was measured). A stretch after one that taps everything starts wherever those taps left the game: start it
+  `--profile` names the functions that cost, `--shots` shows what was measured). A stretch's numbers swing with where it
+  falls in a game's own clock (Zähne putzen's „Putzen: Los!“ passed and failed on the same code, November 2026): before
+  blaming a change, measure `main` the same way on the same day, and `--trace` (paint per element in the trace) tells
+  which layer is painted how often. A stretch after one that taps everything starts wherever those taps left the game: start it
   from a reload (`{ eval: "location.reload()" }`, a wait, then the fullscreen question's `.screen-hint-button`), as
   „wie-gehts-dir“ does – its second stretch waited for a screen it never reached, and nobody saw it until it was run. The build ships React's production code
   (`PRODUCTION` in `tools/appPlugin.ts`, checked in `buildTools.test.ts`): without it every game ran several times slower.

@@ -8,7 +8,7 @@ import type { Daytime } from "@/lib/days";
 import { clothesOf, PyjamaPattern, topFill } from "./clothes";
 import { PICTURE } from "./jaw";
 import { BROW, Ear, EyeBall, EyeLid, eyeOpening, FACE, HAIR, Hair, type HeadMap, INK, Iris, LASHES, LIP, Nose, SKIN_SHADE, SkinGradient } from "./face";
-import { fitBox, FrameStroke, Monster, screenFrame, useRoom, type Box } from "./mouth";
+import { fitBox, FrameStroke, Monster, screenFrame, STAIN, STAIN_FILLS, useRoom, type Box } from "./mouth";
 import { Piece, pictureSpace } from "./piece";
 
 // Before anything else, a short story of where the sugar monsters come from:
@@ -153,6 +153,55 @@ const GUM_PATHS = {
   upper: `${edgePath(GUM_EDGE.upper)} L${MOUTH.right} ${MOUTH.top - 20} L${MOUTH.left} ${MOUTH.top - 20} Z`,
   lower: `${edgePath(GUM_EDGE.lower)} L${MOUTH.right} ${MOUTH.top + MOUTH.depth + 20} L${MOUTH.left} ${MOUTH.top + MOUTH.depth + 20} Z`,
 };
+
+/**
+ * The teeth stained by the sugar, as the mirror shows them before the brushing (`StainedFace` in mouth.tsx): a little
+ * yellow, grey-yellow plaque along the gum and a grey spot or two. Drawn over the mouth's own teeth, so the gum and the
+ * lips go over them again as in the mouth below.
+ */
+function StainedTeeth() {
+  const teeth = [
+    ...UPPER.map((x, i) => ({ x, y: MOUTH.top - 14, gum: topAt(x) + gumDepth(x, UPPER), upper: true, i })),
+    ...LOWER.map((x, i) => ({ x, y: bottomAt(x) - 28, gum: bottomAt(x) - gumDepth(x, LOWER), upper: false, i })),
+  ];
+  const half = TOOTH_W / 2;
+  return (
+    <>
+      <defs>
+        <clipPath id="origin-stain">
+          <path d={MOUTH_PATH} />
+        </clipPath>
+      </defs>
+      <g clipPath="url(#origin-stain)">
+        {teeth.map(({ x, y, gum, upper, i }) => {
+          // The plaque reaches a little past the gum's edge, a wavy band along it; the spot sits nearer the biting edge.
+          const band = upper ? { from: y, to: gum + 6 + (i % 2) * 2 } : { from: gum - 6 - (i % 2) * 2, to: y + 42 };
+          const spotY = upper ? gum + 13 + (i % 3) * 2 : gum - 13 - (i % 3) * 2;
+          return (
+            <g key={`${upper}-${i}`}>
+              <rect x={x - half} y={y} width={TOOTH_W} height={42} rx={8} fill={STAIN_FILLS.outer} stroke={INK} strokeWidth={2.5} />
+              <path
+                d={`M${x - half + 1.5} ${band.from} V${band.to} Q${x - half / 2} ${band.to + (upper ? 2.5 : -2.5)} ${x} ${band.to} T${x + half - 1.5} ${band.to} V${band.from} Z`}
+                fill={STAIN.plaque}
+                opacity={STAIN.plaqueOpacity}
+              />
+              <ellipse cx={x + (i % 2 ? 4 : -4)} cy={spotY} rx={3.4} ry={2.6} fill={STAIN.spot} opacity={STAIN.spotOpacity} />
+            </g>
+          );
+        })}
+        {(["upper", "lower"] as const).map((jaw) => (
+          <g key={jaw}>
+            <path d={GUM_PATHS[jaw]} fill="#ff8fab" />
+            <path d={edgePath(GUM_EDGE[jaw])} fill="none" stroke="#e2577c" strokeWidth={3} strokeLinejoin="round" />
+          </g>
+        ))}
+      </g>
+      <path d={MOUTH_PATH} fill="none" stroke={INK} strokeWidth={11} strokeLinejoin="round" />
+      <path d={MOUTH_PATH} fill="none" stroke={LIP} strokeWidth={6} strokeLinejoin="round" />
+      <path d="M196 340 Q220 345 244 340" fill="none" stroke="#fff" strokeWidth={3} strokeLinecap="round" opacity={0.55} />
+    </>
+  );
+}
 
 /** Tickle ids of the monsters here start above the mirror's (step × 100 + order in TeethPlay). */
 const FIRST_ID = 1000;
@@ -670,6 +719,13 @@ export function Origin({
             style={{ transformOrigin: `${MID - MOUTH_AREA.x}px ${MOUTH.top + 6 - MOUTH_AREA.y}px`, ...(sweets ? CHEWING : undefined) }}
             over={
               <>
+                {/* While the monsters grow the sugar stains the teeth yellow and grey, as the mirror shows them before
+                    the brushing: a layer of its own over the mouth that fades in by its opacity. */}
+                {part === "grow" && (
+                  <Piece area={MOUTH_AREA} within={MOUTH_AREA} className="origin-stain">
+                    <StainedTeeth />
+                  </Piece>
+                )}
                 {/* Sugar crumbs: they show once the mouth opens after its sweet, and in the grow part each becomes a monster. */}
                 {CRUMBS.map((c, i) => {
                   const { x, y } = crumbAt(c);

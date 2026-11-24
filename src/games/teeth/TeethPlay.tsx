@@ -18,6 +18,7 @@ import { type Daytime, daytimeOf } from "@/lib/days";
 import { addBrushing, daytimeText, loadWeek, saveWeek, type WeekLog } from "./daytime";
 import { lerpView, type ToothId, type View } from "./jaw";
 import { Mouth, type MonsterSpot, type MouthAction } from "./mouth";
+import { dirtyFaces } from "./stains";
 import { SUNG_LANGUAGES, songEndMs, sungSteps, useBrushingMusic, useSongLoad } from "./music";
 import type { Cue } from "./cues";
 import { DONE_SAY, type Prelude, PRELUDE_TEXTS, TIDY_SAY } from "./lines";
@@ -604,6 +605,8 @@ export function TeethPlay({ settings, video }: { settings: TeethSettings; video?
   const brushAt = inStep.find((m) => !isGone(m));
   const stepDone = step ? (brushed - stepStarts[phase]) / stepLength(phase) : 0;
   const brushStop = Math.max(0, Math.min(inStep.length - 1, stepDone * inStep.length - 0.6));
+  // Every face a step brushes is stained until the brush has taken all of its monsters off: then it turns white.
+  const dirty = dirtyFaces(phase, monsters, isGone);
   // Every monster on a tooth not brushed yet, there from the start; the picture shows those whose side of the tooth faces out.
   const spots: MonsterSpot[] = monsters
     .filter((m) => m.step >= phase)
@@ -646,6 +649,7 @@ export function TeethPlay({ settings, video }: { settings: TeethSettings; video?
               view={view}
               zone={step && { surface: step.surface, teeth: step.teeth }}
               monsters={spots}
+              dirty={dirty}
               brush={step && { stops: inStep.map((m) => ({ tooth: m.tooth, spot: m.spot })), at: brushStop, surface: step.surface, motion: step.motion }}
               happy={done}
               dazzled={ending === "cheer"}

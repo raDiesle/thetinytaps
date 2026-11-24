@@ -219,6 +219,20 @@ late in the video. A new thing shown beside the picture (a control, a chart, a b
   (stars twinkling on the teeth looked out of place) and never an emoji. The end shows the whole laughing head, never only the lips, and the surprise is a sugar monster that
   peeks in at the mirror's edge, dazzled by the clean teeth, and puts on sunglasses – never on the teeth themselves, which are
   clean now.
+- The teeth start a little yellow and grey and turn white as they are brushed, tooth by tooth, each sparkling once
+  (user request, November 2026). In the story the sugar stains them while the monsters grow (`StainedTeeth`, a `Piece`
+  fading in by its opacity, `teeth-origin-stain`); in the mirror every face a step brushes is stained until the brush
+  has taken all of its monsters off (`dirtyFaces` in `stains.ts`): a soft yellow, grey-yellow plaque along the gum (on a
+  chewing surface in its fissure) and two grey spots (`StainedFace`, `STAIN_FILLS`, `STAIN`) – a picture book's stain,
+  never brown or rotten – and a stained front has no light on it, so a brushed tooth gains its shine. The still picture
+  draws the faces being brushed now white already (only while the head holds still: gliding they are stained in it
+  like the rest), and each one's stain lies over it in a small HTML layer of its own the size of that face
+  (`ToothStain`, `.tooth-stain`), with everything the still picture draws over that face (its gum's walls, nearer teeth,
+  the other row) masked out of it by their outlines in plain black, worked out once (`StainGeometry.cut`, `rims`) – never
+  by drawing those things again through a filter that turns them black; once clean it fades in a beat by its opacity and a smaller glint flashes on it once
+  (`.tooth-glint.brushed`, `teeth-glint-once`). Never fade a stain inside the mirror's svg nor rebuild the still picture
+  as each tooth is done (`stains.test.ts`). The yellow fill that once marked the teeth to brush is gone: the stain and
+  the monsters mark them while the head turns, the gold frame once it holds still.
 - The story's teeth stand close, neighbours nearly touching (`TOOTH_W`, `UPPER`): gaps between them looked like teeth
   lost (November 2026).
 - Animate only with keyframes this game defines (`teeth-…`) or the shared ones in `src/styles/animations.css` (`pop-in` …); another game's keyframes only exist after that game was opened (`css.test.ts` checks).
