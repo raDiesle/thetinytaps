@@ -3,7 +3,7 @@ import { expect, test } from "bun:test";
 // The end buttons once showed 🔁, the next level's emoji and ▶ as text, which the user found ugly (November 2026), then
 // words – which children don't read (user request, 22 November 2026, first for Kettenreaktion, then every game): „Nochmal“
 // is the drawn round arrow, „Weiter“ the next level's picture where the game has one (its menu card's cut), else the
-// drawn ▶; only „Menü“ keeps its word beside the shelf label.
+// drawn arrow pointing on; only „Menü“ keeps its word beside the shelf label.
 test("the end of a level shows the drawn arrow and the next level's picture, never a word or an emoji", async () => {
   const source = await Bun.file("src/components/GameEnd.tsx").text();
   expect(source).not.toMatch(/\p{Extended_Pictographic}|[▶►→]/u);
@@ -12,7 +12,25 @@ test("the end of a level shows the drawn arrow and the next level's picture, nev
   expect(source).toContain('<ControlIcon kind="again" className="game-end-again-arrow" />');
   expect(source).not.toMatch(/: t\(AGAIN\)\}/);
   expect(source).toMatch(/<img className="game-end-next-picture" src=\{next\.picture\}/);
-  expect(source).toContain('<ControlIcon kind="play" className="game-end-next-arrow" />');
+  expect(source).toContain('<ControlIcon kind="next" className="game-end-next-arrow" />');
+});
+
+// In the middle of the picture's foot the buttons covered the picture, and the next level's picture alone didn't say
+// „on“ (user request, November 2026): „Weiter“ stands at the far right with the drawn arrow pointing on in its picture,
+// „Nochmal“ just left of it, the trophy in the bottom left and the room between them free.
+test("„Weiter“ stands at the far right with the drawn arrow in its picture", async () => {
+  const source = await Bun.file("src/components/GameEnd.tsx").text();
+  const frame = source.match(/<span className="game-end-next-frame">[\s\S]*?\n {12}<\/span>/)?.[0] ?? "";
+  expect(frame).toContain('<span className="game-end-next-badge">');
+  expect(frame).toContain('<ControlIcon kind="next" />');
+  const css = await Bun.file("src/styles/game-end.css").text();
+  const rule = (selector: string) => css.match(new RegExp(`${selector.replace(/[.()>]/g, "\\$&")} \\{([^}]*)\\}`))?.[1] ?? "";
+  expect(rule(".game-end:not(.inline, .corners)")).toMatch(/grid-template-columns: auto 1fr auto auto;/);
+  expect(rule(".game-end:not(.inline, .corners) > .game-end-prize")).toMatch(/grid-column: 1;/);
+  expect(rule(".game-end:not(.inline, .corners) > .game-end-small")).toMatch(/grid-column: 3;/);
+  expect(rule(".game-end:not(.inline, .corners) > .game-end-button.next")).toMatch(/grid-column: 4;/);
+  expect(rule(".game-end-next-frame")).toMatch(/position: relative;/);
+  expect(rule(".game-end-next-badge")).toMatch(/position: absolute;/);
 });
 
 // „Weiter“ shows what comes next in every game (user request, 23 November 2026, first for the Timer, whose „Weiter“

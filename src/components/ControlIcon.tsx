@@ -3,12 +3,15 @@ const INK = "#2a1e5c";
 
 /**
  * The drawn signs on a game's play controls (Zähne putzen, Aufs Töpfchen), never emoji (⏸️ ▶️ looked poor, user
- * feedback, November 2026): two round bars to pause, a round triangle to go on, an arrow turning round to start again.
+ * feedback, November 2026): two round bars to pause, a round triangle to go on, an arrow turning round to start again,
+ * and an arrow pointing right on to the next (a level's end, `GameEnd`): a straight shaft and an even head.
  */
-export function ControlIcon({ kind, className }: { kind: "pause" | "play" | "again"; className?: string }) {
+export function ControlIcon({ kind, className }: { kind: "pause" | "play" | "again" | "next"; className?: string }) {
   return (
     <svg className={className} viewBox="0 0 40 40" aria-hidden>
-      {kind === "pause" ? (
+      {kind === "next" ? (
+        <path d="M7 16 H20.5 V8.5 L34 20 L20.5 31.5 V24 H7 Z" fill={INK} stroke={INK} strokeWidth={2.5} strokeLinejoin="round" />
+      ) : kind === "pause" ? (
         <g fill={INK}>
           <rect x={10} y={9} width={7.5} height={22} rx={3} />
           <rect x={22.5} y={9} width={7.5} height={22} rx={3} />
