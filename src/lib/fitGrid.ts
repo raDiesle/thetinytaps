@@ -7,6 +7,12 @@ const MIN_ROW = 100;
 const MIN_ROW_PHONE = 64;
 const MIN_WIDTH = 140;
 const MIN_WIDTH_PHONE = 100;
+/**
+ * Cards that are a picture with no words on them (the Timer's) need no room for a title: the picture alone must be big
+ * enough to know it, so they may be narrower – with its sixteenth picture, the Marble Jar, the Timer's cards fit a
+ * tablet's screen only in seven columns, 118 px each (November 2026).
+ */
+const MIN_PICTURE_WIDTH = 110;
 /** Cards never grow taller than this, however much room there is. */
 const MAX_ROW = 220;
 /** Cards look best about this much wider than tall. */
@@ -24,7 +30,8 @@ const LABEL_PHONE = 0;
 const BOTTOM = 32;
 const BOTTOM_PHONE = 12;
 
-interface Fit {
+/** How a menu's cards are laid out: columns, the height of a row, and columns left free (see `packGroups`). */
+export interface Fit {
   columns: number;
   row: number;
   /** Columns a group of several rows leaves free at its right for the one-row groups after it (see `packGroups`). */
@@ -78,9 +85,9 @@ export function packGroups(sizes: number[], columns: number, reserve = 0): { pla
  * Columns and row height that give `count` cards the most room; with `groups` (their sizes) every group keeps together.
  * `aspect` is how much wider than tall the cards look best, when it isn't the usual (cards that are a picture).
  */
-function bestFit(count: number, width: number, height: number, phone: boolean, groups?: number[], aspect?: number): Fit | null {
+export function bestFit(count: number, width: number, height: number, phone: boolean, groups?: number[], aspect?: number): Fit | null {
   const minRow = phone ? MIN_ROW_PHONE : MIN_ROW;
-  const minWidth = phone ? MIN_WIDTH_PHONE : MIN_WIDTH;
+  const minWidth = phone ? MIN_WIDTH_PHONE : aspect ? MIN_PICTURE_WIDTH : MIN_WIDTH;
   const gap = phone ? GAP_PHONE : GAP;
   let best: Fit | null = null;
   let bestSize = 0;

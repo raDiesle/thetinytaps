@@ -19,9 +19,10 @@ const MIDDLE = 0.5;
  * the middle and its sun not yet risen, and the Wippe lies nearly level there, so its card shows the fox child's seat
  * still well up; the Block House's middle has a block just landed, so its card shows the next one carried by the beam;
  * Up to the Moon's middle is the lift in the skyscraper's side with sky round it, so its card shows the fox in the cable
- * car's basket between the treehouse and the skyscraper's window.
+ * car's basket between the treehouse and the skyscraper's window; the Marble Jar's middle has a marble just landed, so
+ * its card shows the next one bouncing down the nails.
  */
-const LATER: Partial<Record<TimerPicture, number>> = { sunset: 0.68, seesaw: 0.25, blocks: 0.53, jump: 0.23 };
+const LATER: Partial<Record<TimerPicture, number>> = { sunset: 0.68, seesaw: 0.25, blocks: 0.53, jump: 0.23, jar: 0.509 };
 
 /**
  * Stops a card's drawing `at` ms into its run: every animation in it is put at that moment, its look there written into

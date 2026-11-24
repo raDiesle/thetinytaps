@@ -98,6 +98,7 @@ import {
 import { BOX_COUNT, BOXES, boxesPlan, boxLeft, boxSlot, floorPlaces, IN_BOX, LID_H, MAX_PER_BOX, MIN_PER_BOX, OPENING, perBox, TOY as BOX_TOY } from "./boxes";
 import { BITE_R, BUTTERFLY, biteSpot, bodyFront, frontAfter, LEAF, LEAF_FLOOR, leafLeft, leafShape, leafSpan, planBites, REACH } from "./caterpillar";
 import { DISC, DOTS, dotAt } from "./disc";
+import { BOARD, FUNNEL, funnelY, JAR, jarPlan, MARBLE_R, MAX_MARBLES, MIN_MARBLES, marbleCount, NAIL_R, NAILS, SLOTS as JAR_SLOTS, TUBE } from "./jar";
 import { PICTURE_LINES, SOON_LINE, TURN_LINES, timerSaid } from "./voice";
 import { BLOOM, FLOWER_FLOOR, GROWN_AT, HOLDER, SPOUT, SPROUT, SPROUT_SIZE, STAKE, STALK, TAP } from "./flower";
 import { PIZZA, PIZZA_FLOOR, slice, SLICES, SLICE_SECONDS, TOPPINGS } from "./pizza";
@@ -1214,6 +1215,73 @@ describe("Timer", () => {
       "hop",
     ])
       expect(css, part).toMatch(new RegExp(`\\.tm-done \\.tm-${part}[,\\s{]`));
+  });
+
+  test("Marble Jar: a marble every five seconds, at least twenty, the last landing as the time is up (H-149)", () => {
+    expect(marbleCount(5 * 60_000)).toBe(MAX_MARBLES);
+    expect(marbleCount(10_000)).toBe(MIN_MARBLES);
+    expect(marbleCount(60 * 60_000)).toBe(MAX_MARBLES);
+    for (const total of [10_000, 30_000, 60_000, 3 * 60_000, 5 * 60_000, 10 * 60_000, 3 * 3_600_000]) {
+      const { marbles, prefilled } = jarPlan(total, marbleCount(total));
+      expect(marbles.length + prefilled, `${total}`).toBe(MAX_MARBLES);
+      expect(marbles.at(-1)?.land, `${total}`).toBeCloseTo(total, 3);
+      for (let i = 1; i < marbles.length; i++) {
+        expect(marbles[i].release, `${total}`).toBeGreaterThan(marbles[i - 1].release);
+        // From half a minute on they land in turn; in ten seconds two neighbours in a row may swap, but a marble
+        // never lands above one still on its way below it.
+        if (total >= 30_000) expect(marbles[i].land, `${total}`).toBeGreaterThan(marbles[i - 1].land);
+        for (const below of marbles.slice(0, i)) if (below.to.y > marbles[i].to.y + 1) expect(marbles[i].land, `${total}`).toBeGreaterThan(below.land);
+      }
+      // Each falls on its own place, the jar filling from its floor up.
+      expect(new Set(marbles.map((m) => m.slot)).size).toBe(marbles.length);
+      expect(marbles.map((m) => m.slot)).toEqual(marbles.map((_, i) => prefilled + i));
+    }
+  });
+
+  test("Marble Jar: every marble lies inside the jar on its own place, and every bounce sits on a nail (H-149)", () => {
+    for (const [i, slot] of JAR_SLOTS.entries()) {
+      expect(slot.x - MARBLE_R).toBeGreaterThanOrEqual(JAR.left);
+      expect(slot.x + MARBLE_R).toBeLessThanOrEqual(JAR.right);
+      expect(slot.y + MARBLE_R).toBeLessThanOrEqual(JAR.floor + 0.01);
+      for (const other of JAR_SLOTS.slice(i + 1)) expect(Math.hypot(slot.x - other.x, slot.y - other.y)).toBeGreaterThanOrEqual(2 * MARBLE_R - 0.01);
+    }
+    // The highest row lies under the jar's shoulders, wide enough for its marbles to pass the neck.
+    expect(Math.min(...JAR_SLOTS.map((s) => s.y)) - MARBLE_R).toBeGreaterThan(JAR.lip + 60);
+    expect(JAR.neckRight - JAR.neckLeft).toBeGreaterThan(4 * MARBLE_R);
+    const { marbles } = jarPlan(5 * 60_000, MAX_MARBLES);
+    for (const m of marbles) {
+      for (const hit of m.impacts) {
+        const touch = Math.min(...NAILS.map((n) => Math.hypot(n.x - hit.x, n.y - hit.y)));
+        expect(touch).toBeCloseTo(MARBLE_R + NAIL_R, 3);
+      }
+      // Across and up or down, it stays where a tablet's 4:3 cut shows it.
+      for (const step of m.across) {
+        expect(step.v - MARBLE_R).toBeGreaterThanOrEqual(235);
+        expect(step.v + MARBLE_R).toBeLessThanOrEqual(RIGHT_EDGE);
+      }
+    }
+    // The board holds every nail, the funnel slopes down to the jar's neck from both sides, and the tube's gate stands
+    // above the first row.
+    for (const n of NAILS) {
+      expect(n.x - NAIL_R).toBeGreaterThan(BOARD.x);
+      expect(n.x + NAIL_R).toBeLessThan(BOARD.x + BOARD.w);
+    }
+    expect(funnelY(FUNNEL.from.x)).toBeLessThan(funnelY(FUNNEL.to.x));
+    expect(funnelY(1600 - FUNNEL.from.x)).toBeCloseTo(funnelY(FUNNEL.from.x), 3);
+    expect(FUNNEL.to.x).toBeLessThanOrEqual(JAR.neckLeft + MARBLE_R * 2);
+    expect(TUBE.gate).toBeLessThan(Math.min(...NAILS.map((n) => n.y)) - MARBLE_R - NAIL_R);
+    // A phone on its side with the bar shows the stage from about y 120: the latch and the marble on it stay below that.
+    expect(TUBE.gate - MARBLE_R).toBeGreaterThanOrEqual(120);
+    expect(BOARD.x).toBeGreaterThanOrEqual(235);
+    expect(BOARD.x + BOARD.w).toBeLessThanOrEqual(RIGHT_EDGE);
+    expect(JAR.floor).toBeLessThanOrEqual(820);
+  });
+
+  test("Marble Jar: marbles, latch and what is left are layers on CSS animations that snap to their place at the end, with no clip path (H-149)", async () => {
+    const code = await Bun.file(new URL("./jar.tsx", import.meta.url)).text();
+    expect(code).not.toMatch(/clip-?[pP]ath/);
+    const css = await Bun.file(new URL("./timer.css", import.meta.url)).text();
+    for (const part of ["jar-x", "jar-y", "jar-latch", "jar-left"]) expect(css, part).toMatch(new RegExp(`\\.tm-done \\.tm-${part}[,\\s{]`));
   });
 
   // User feedback, November 2026: the drawn fox and bear children in the timer's pictures (holding the basket and the

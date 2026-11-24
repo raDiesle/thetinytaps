@@ -22,11 +22,13 @@ request, November 2026; the middle rather than the end, user feedback, November 
 `GameMode.art`): the very drawing of a run (`SceneParts`), cut as for 5 minutes and started half of it ago, every
 animation in it put at that moment and then stopped (`holdAt`, `.tm-card-art.tm-still`), so the menu stands still. The cards come as wide as
 the picture (`ART_ASPECT`). Names are only read out and their tooltip. They stand in the order the user chose (November
-2026, `PICTURES`): Rote Scheibe, Sanduhr, Kerze, Apfelbaum, Blume, Pizza, Wecker, then Tidy Up, Five Boxes, Block House, Treasure Tunnel, Up to the Moon and the others, on one frame with
-no name; after all of them Abwechseln is a category of its own, named on its frame (`GameMode.kind`): its two children
+2026, `PICTURES`): Rote Scheibe, Sanduhr, Kerze, Apfelbaum, Blume, Pizza, Wecker, then Tidy Up, Five Boxes, Block House, Treasure Tunnel, Up to the Moon and the others, the Marble Jar last, on one
+frame with no name; after all of them Abwechseln is a category of its own, named on its frame (`GameMode.kind`): its two children
 with the toy, the lamps and the hourglass, then the Wippe, and that they run on without end is said in their tooltip (`SWAP_NOTE`). Where there is
 room, its frame stands beside the pictures' rather than in a row of its own below (`packGroups`' `reserve`), so all
-cards still fit on one screen. The row of lengths stands in the menu's head (`levelInHead`), on a phone on its side
+cards still fit on one screen (with the Marble Jar's sixteenth picture on a tablet only in seven columns, which a
+picture card may take: `MIN_PICTURE_WIDTH` in `src/lib/fitGrid.ts`; on a phone on its side the menu scrolls, as it did
+before). The row of lengths stands in the menu's head (`levelInHead`), on a phone on its side
 beside the ribbon: under the head it left the cards too little room there, and the Abwechseln group fell below the
 screen (November 2026; `timer.test.ts` checks). The Ameisenstraße (H-68) was
 taken out (user request, November 2026). The pictures:
@@ -229,6 +231,25 @@ taken out (user request, November 2026). The pictures:
   long way is told by changing what the figure does on it (swim, hop, ride, float, fly) rather than by more of the
   same. A picture that is too simple or does not make sense (the Road Rug, whose car drove on while toys hopped off its
   road into a box, H-122) is taken out rather than kept.
+- „Marble Jar“ 🫙 (`jar.tsx`, H-149, user request, 24 November 2026: a glass filling with marbles like Kettenreaktion's
+  pegboard): a glass tube at the top holds a row of coloured marbles on a little latch (`TUBE`, `QUEUE`), under it a
+  wooden board with five rows of nails (`NAIL_ROWS`, `NAILS`, `BOARD`), two slanting funnel boards (`FUNNEL`,
+  `funnelY`) and a big preserving jar with a red ribbon round its neck (`JAR`, `JAR_PATH`). Each marble in turn drops
+  from the latch, bounces off one nail in every row to the left or the right (a seeded walk, each bounce touching its
+  nail, `wayOf`), rolls down the funnel to the middle, falls through the neck and rolls onto its place: the jar fills
+  from its floor up, row by row, each row from its edges inwards (`SLOTS`, nine and eight in turn, 60 places). One
+  marble every five seconds, so five minutes fill the whole jar; a shorter run drops at least `MIN_MARBLES` and starts
+  with the lower places filled (`marbleCount`), and a run shorter than two ways goes at a quicker pace (`jarPlan`'s
+  `pace`). The releases are evenly spaced so the last lands as the time is up; behind it the others step down the tube,
+  the latch opens for each (only where they come a second or more apart, else it stays open), and the one waiting on
+  it wiggles once a second (`.tm-hop-wait`). Each marble is two layers on keyframes written for the run – across, and up
+  and down with the falling and bouncing eases (`tm-jar-x-<i>`, `tm-jar-y-<i>`, `stepsRule`). A landing plinks (spaced),
+  the end chimes; a tap plinks and lights the room still free in the jar (`StillToFill`, a box shrinking from the
+  jar's shoulders to the marbles' top). Its card shows a marble bouncing down the nails (`LATER`, 0.509). Its name and
+  lines (`jarNames.ts`) were written English first and translated into every app language at once; their recordings
+  wait. Board, jar and every marble's way stay within x 235–1340, and the latch with the marble on it within what a
+  phone on its side shows (y ≥ 120 with the bar: the first try had them cut off at the top; the tube's queue above may
+  go off the screen there; `timer.test.ts` checks).
 - „Abwechseln“ 🔁 (H-52): two children take turns with a toy. The time set is one turn. Its hourglass is the
   Sanduhr's own (`Hourglass` in `scenes.tsx`, user request, November 2026: one drawing, never a second one built
   beside it), standing between two floor cushions (`SWAP_SEATS`, the same way left and right of it): the fox child's
@@ -287,7 +308,7 @@ Files: `TimerGame.tsx` (start screen: cards, minutes and the own time's slip), `
 run: working out its length, the question when a clock time is past, the clock, the phases `running` →
 `blow` (candle only) → `done`, taps, the end, the sounds of the pieces), `pieces.ts` (how a run is cut into pieces, the
 train's halts, where the apples hang; tested), `SwapPlay.tsx` and `swap.tsx` („Abwechseln“: its turns, and its room,
-lamps, cushions and toys), `seesaw.tsx` (the Wippe's playground, plank, stand and chick), `apples.tsx`, `caterpillar.tsx`, `clock.tsx`, `disc.tsx`, `flower.tsx`, `sunset.tsx`, `pizza.tsx`, `tidy.tsx`, `boxes.tsx`, `blocks.tsx`, `tunnel.tsx`, `jump.tsx` (one picture each, `jumpFox.tsx` its fox's poses; `tidyNames.ts`, `boxesNames.ts`, `blocksNames.ts`, `tunnelNames.ts` and `jumpNames.ts` their texts), `hop.tsx` (a toy hopping
+lamps, cushions and toys), `seesaw.tsx` (the Wippe's playground, plank, stand and chick), `apples.tsx`, `caterpillar.tsx`, `clock.tsx`, `disc.tsx`, `flower.tsx`, `sunset.tsx`, `pizza.tsx`, `tidy.tsx`, `boxes.tsx`, `blocks.tsx`, `tunnel.tsx`, `jump.tsx`, `jar.tsx` (one picture each, `jumpFox.tsx` its fox's poses; `tidyNames.ts`, `boxesNames.ts`, `blocksNames.ts`, `tunnelNames.ts`, `jumpNames.ts` and `jarNames.ts` their texts), `hop.tsx` (a toy hopping
 into its box, shared), `pause.tsx` (the run's clock, pause and start over), `keyframes.ts` (keyframes written for a run), `shown.tsx`
 („Zeit im Bild“: its choice, the note with digits or tally marks), `scenes.tsx` (the other drawings
 and the shared `Layer`, `Draw`, `LeftGlow`), `timer.css`, `content.ts`
@@ -388,7 +409,8 @@ and the shared `Layer`, `Draw`, `LeftGlow`), `timer.css`, `content.ts`
 - **One drawing for one thing**: a thing two pictures show (the hourglass) is one component both use, never copied and
   drawn again with its own sizes (user request, November 2026; `timer.test.ts` checks the hourglass).
 - **The cards' order is the user's** (November 2026: Rote Scheibe, Sanduhr, Kerze, Apfelbaum, Blume, Pizza, then the
-  Wecker, then Tidy Up, Five Boxes, Block House, Treasure Tunnel and Up to the Moon; Abwechseln last): keep it when adding a picture (a new one goes after these, before Abwechseln, unless the
+  Wecker, then Tidy Up, Five Boxes, Block House, Treasure Tunnel and Up to the Moon, the Zug, Raupe and Sonnenaufgang, then
+  the Marble Jar; Abwechseln last): keep it when adding a picture (a new one goes after these, before Abwechseln, unless the
   user says otherwise), and add it to the perf scenarios' list in `tools/perfScenarios.ts`, which taps each card by its
   name (`timer.test.ts` checks the order). Abwechseln is another thing to do than the pictures that run until the time
   is up – taking turns without end – so it stands in a group of its own after them (`GameMode.kind`, user request,

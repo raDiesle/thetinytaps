@@ -116,6 +116,13 @@ export const LANGUAGE_STATUS: LanguageStatusRow[] = [
         note: "Das dritte Spiel-Video-Bild und das erste, das keine Klötzchenwelt ist: ein Jump'n'Run nach oben, in dem ein kleiner Hüpfer vom Grund eines Sees bis zum Mond schwimmt, hüpft, klettert und fliegt und am Ende in eine Torte springt (H-127, jump.tsx; am 23. November 2026 neu gebaut statt „Hop to the Flag“), Englisch zuerst geschrieben und gleich in alle Sprachen übersetzt: sein Name „Up to the Moon“ („Hoch bis zum Mond“) und seine zwei Sätze am Anfang und am Ende (jumpNames.ts). Beide Sätze am 23. November 2026 von ElevenLabs gesprochen mit den Klonen von Tapsis Stimme im zweiten Konto: Englisch, Chinesisch, Hindi, Spanisch und Arabisch mit „Tapsi Coach (Klon)“, Deutsch mit „Tapsi Coach (Klon de)“, Russisch mit „Tapsi Coach (Klon ru)“ – beide Sätze eines Bildes aus einer Stimme, wie bei den anderen Bildern. Die Texte für Suchmaschinen nennen es in allen sieben Sprachen.",
         files: ["src/games/timer/jumpNames.ts"],
       },
+      {
+        label: "🫙 Marble Jar",
+        languages: { de: "text", en: "text", zh: "text", hi: "text", es: "text", ar: "text", ru: "text" },
+        recorded: true,
+        note: "Das Bild, in dem Murmeln über ein Nagelbrett wie in der Kettenreaktion hüpfen und ein Glas füllen (H-149, jar.tsx, 24. November 2026), Englisch zuerst geschrieben und gleich in alle Sprachen übersetzt: sein Name „Marble Jar“ („Kugelglas“) und seine zwei Sätze am Anfang und am Ende (jarNames.ts). Die Aufnahmen fehlen noch und werden nur auf Wunsch gemacht; bis dahin bleiben beide Sätze still. Die Texte für Suchmaschinen nennen es in allen sieben Sprachen.",
+        files: ["src/games/timer/jarNames.ts"],
+      },
     ],
   },
   {

@@ -2480,6 +2480,60 @@
   transform: var(--tm-end);
 }
 
+/* Marble Jar (H-149, jar.tsx): each marble is two layers on keyframes written for the run – across, and up and down –
+   from its place in the tube over the nails and the funnel into its place in the jar; the one on the latch wiggles
+   once a second while it waits (`.tm-hop-wait`). The latch turns down on its hinge for each marble, and the room still
+   to fill shrinks up to the jar's shoulders over the run. At the end each marble lies in its place. */
+.tm-jar-x,
+.tm-jar-y {
+  will-change: transform;
+  animation: var(--tm-anim) var(--tm-ms) linear both;
+}
+
+.tm-jar-y {
+  position: absolute;
+  inset: 0;
+}
+
+.tm-jar-latch {
+  transform-origin: 9% 50%;
+  animation: var(--tm-anim) var(--tm-ms) linear both;
+}
+
+.tm-jar-latch-open {
+  animation: none;
+  transform: rotate(80deg);
+}
+
+.tm-jar-left {
+  transform-origin: 50% 0;
+  animation: tm-jar-fill var(--tm-ms) linear both;
+}
+
+@keyframes tm-jar-fill {
+  to {
+    transform: scaleY(0);
+  }
+}
+
+.tm-jar-left .tm-left-glow {
+  inset: 0;
+  border-radius: 18%;
+  background: radial-gradient(closest-side, rgb(255 246 190 / 0.9), rgb(255 230 140 / 0.5) 70%, transparent);
+}
+
+.tm-done .tm-jar-x,
+.tm-done .tm-jar-y,
+.tm-done .tm-jar-latch,
+.tm-done .tm-jar-left {
+  animation: none;
+  transform: var(--tm-end);
+}
+
+.tm-done .tm-jar-left {
+  visibility: hidden;
+}
+
 /* The block house (H-125, blocks.tsx): its blocks stack in a box of their own (`isolation`), so their z-indices never
    reach past the picture to the end's light. Each carried block lies in a full-size box whose z-index steps from its
    row in the jumble to its place in the house as the beam lifts it (keyframes written for the run). */
@@ -3376,6 +3430,12 @@
   --tm-bar-a: #d0bfff;
   --tm-bar-b: #9775fa;
   --tm-bar-flag: #fcc419;
+}
+
+.tm-play[data-picture="jar"] .tm-bar {
+  --tm-bar-a: #a5d8ff;
+  --tm-bar-b: #3a86ff;
+  --tm-bar-flag: #e03131;
 }
 
 .tm-play[data-picture="blocks"] .tm-bar {

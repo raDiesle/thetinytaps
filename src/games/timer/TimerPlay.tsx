@@ -42,6 +42,7 @@ import { BlocksScene, blockCount, blocksPlan } from "./blocks";
 import { BoxesScene, boxesPlan, perBox } from "./boxes";
 import { TunnelScene, digCount, tunnelPlan } from "./tunnel";
 import { JumpScene, jumpPlan, moveCount } from "./jump";
+import { JarScene, jarPlan, marbleCount } from "./jar";
 import { FINAL_NOTES, FinalLight, finalMs, TimeBar, TimeBarChoice } from "./bar";
 import { CaterpillarScene } from "./caterpillar";
 import { ClockScene } from "./clock";
@@ -369,6 +370,12 @@ function TimerRun({
       const plan = jumpPlan(total, moveCount(set));
       return [...plan.moves.map((m) => m.star), plan.dive.start];
     }
+    // Marble Jar (H-149): each marble landing in its place in the jar, the last one being the end's.
+    if (picture === "jar")
+      return jarPlan(total, marbleCount(set))
+        .marbles.slice(0, -1)
+        .map((m) => m.land)
+        .sort((a, b) => a - b);
     // The ladybug leaves a dot as it is back at the top (H-67).
     if (picture === "disc") return pieceMoments(total, ladybugLaps(set).dots);
     return [];
@@ -420,7 +427,7 @@ function TimerRun({
           else if (picture === "tunnel") playCrack();
           // A star caught: a bright note climbing the scale star by star; the leap off the moon whooshes.
           else if (picture === "jump") nextMoment.current === moments.length ? playWhoosh() : playCoin(nextMoment.current + 3);
-          else if (picture === "disc") playPlink(nextMoment.current);
+          else if (picture === "disc" || picture === "jar") playPlink(nextMoment.current);
           else playDing();
         }
       }
@@ -476,6 +483,7 @@ function TimerRun({
       else if (picture === "blocks") playChime();
       else if (picture === "tunnel") playTwinkle();
       else if (picture === "jump") playPlop();
+      else if (picture === "jar") playChime();
       say(lines.end, true);
       // The time is up, plain to see and hear (user feedback, November 2026): children cheer, the picture
       // lights up warmly, then the friendly tune – and the trophy with the end's buttons, nothing rising (user decision).
@@ -520,6 +528,8 @@ function TimerRun({
       else if (picture === "tunnel") playKnock(1200);
       // The hopper's springy boing.
       else if (picture === "jump") playBoing();
+      // The marbles waiting in the tube clink.
+      else if (picture === "jar") playPlink(Math.floor(Math.random() * 8));
       else playChimeNote(Math.floor(Math.random() * 8));
     },
     [phase, picture, ripple, glow, now, endsAt, total, apples],
@@ -652,6 +662,7 @@ export function SceneParts({
       {picture === "blocks" && <BlocksScene count={blockCount(set)} total={total} glow={poke} />}
       {picture === "tunnel" && <TunnelScene count={digCount(set)} total={total} glow={poke} />}
       {picture === "jump" && <JumpScene count={moveCount(set)} total={total} glow={poke} />}
+      {picture === "jar" && <JarScene count={marbleCount(set)} total={total} glow={poke} />}
       {picture === "clock" && <ClockScene glow={poke} endsAt={startedAt + total} total={total} running={phase === "running"} still={still} />}
       {picture === "flower" && <FlowerScene glow={poke} total={total} />}
       {picture === "sunset" && <SunsetScene glow={poke} />}

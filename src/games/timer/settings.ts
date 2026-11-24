@@ -3,7 +3,7 @@ import type { OwnTime } from "./time";
 /**
  * What runs down while the child watches: a train going to the station, an apple tree harvested into a cart, an hourglass, a
  * caterpillar eating a leaf, a flower growing (H-53), a candle, the sunrise (H-54), a red disc, a pizza eaten slice by slice (H-47), a children's
- * digital alarm clock counting down (H-70) – or „Abwechseln“ (H-52), two children taking
+ * digital alarm clock counting down (H-70), a jar filling with marbles from a pegboard (H-149) – or „Abwechseln“ (H-52), two children taking
  * turns with a toy, turn after turn, or the same on a seesaw (H-109).
  */
 export type TimerPicture =
@@ -22,6 +22,7 @@ export type TimerPicture =
   | "blocks"
   | "tunnel"
   | "jump"
+  | "jar"
   | TurnPicture;
 
 /**

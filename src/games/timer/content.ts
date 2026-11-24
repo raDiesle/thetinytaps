@@ -4,6 +4,7 @@ import { BLOCKS_NAME } from "./blocksNames";
 import { BOXES_NAME } from "./boxesNames";
 import { TUNNEL_NAME } from "./tunnelNames";
 import { JUMP_NAME } from "./jumpNames";
+import { JAR_NAME } from "./jarNames";
 import { TIDY_NAME } from "./tidyNames";
 
 /** The game's name, on its start screen, its spine on the shelf and in the browser tab. */
@@ -85,6 +86,8 @@ export const PICTURES: { id: TimerPicture; emoji: string; name: Texts }[] = [
     // still finds it. The old translations meant a sunset and were dropped; translated anew on 10 November 2026.
     name: { de: "Sonnenaufgang", en: "Sunrise", zh: "日出", hi: "सूर्योदय", es: "Amanecer", ar: "شروق الشمس", ru: "Восход" },
   },
+  // Marble Jar (H-149, 24 November 2026): marbles bounce down a pegboard like Kettenreaktion's and fill a glass jar.
+  { id: "jar", emoji: "🫙", name: JAR_NAME },
   { id: "swap", emoji: "🔁", name: SWAP_NAME },
   // Tennis (H-71) stood here and was taken out again (user request, 21 November 2026: poorly done). In its place the
   // seesaw (H-109), the best of the better ideas H-108 to H-117: written English first, translated on 22 November 2026.

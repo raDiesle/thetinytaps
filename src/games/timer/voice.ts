@@ -7,6 +7,7 @@ import { BLOCKS_LINES } from "./blocksNames";
 import { BOXES_LINES } from "./boxesNames";
 import { TUNNEL_LINES } from "./tunnelNames";
 import { JUMP_LINES } from "./jumpNames";
+import { JAR_LINES } from "./jarNames";
 import { TIDY_LINES } from "./tidyNames";
 import voiceFiles from "./stimme/**/*.mp3?glob";
 
@@ -241,6 +242,7 @@ export const PICTURE_LINES: Record<TimedPicture, { start: Texts; end: Texts }> =
   blocks: BLOCKS_LINES,
   tunnel: TUNNEL_LINES,
   jump: JUMP_LINES,
+  jar: JAR_LINES,
 };
 
 /** Said with the bell a while before the end (H-49). */

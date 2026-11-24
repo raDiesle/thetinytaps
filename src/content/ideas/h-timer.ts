@@ -543,5 +543,18 @@ export const timerIdeas: IdeaArea = {
       why: "Große Geschwister und Eltern finden die Spiel-Bilder so auf einen Blick, und sie unterscheiden sich von den ruhigen Bildern wie Sanduhr und Kerze.",
       effort: "S",
     },
+    // User request, 24 November 2026: „ein neuer Timer, bei dem sich ein Glas mit Kugeln füllt (wie das Brett bei
+    // Kettenreaktion)“.
+    {
+      id: "H-149",
+      emoji: "🫙",
+      title: "Kugelglas: Murmeln hüpfen übers Nagelbrett ins Glas",
+      text: "Ein Timer-Bild wie das Nagelbrett der Kettenreaktion: Oben wartet eine Reihe bunter Murmeln in einem Glasrohr, eine nach der anderen fällt heraus, springt von Nagel zu Nagel über ein Holzbrett, rollt auf einem Trichter zur Mitte und fällt in ein großes Einmachglas, das sich Reihe für Reihe füllt. Ist das Glas voll, ist die Zeit um.",
+      why: "Ein Glas, das sich füllt, sieht ein Kind von Weitem: wie viel schon drin ist und wie viel noch fehlt. Jede Murmel ist ein kleines Ereignis mit Klang, und das Hüpfen über die Nägel ist spannend anzusehen, ohne dass etwas schiefgeht.",
+      effort: "M",
+      done: true,
+      partial:
+        "Gebaut am 24. November 2026 als Bild „Marble Jar“ („Kugelglas“, jar.tsx): Ein Glasrohr über einem Nagelbrett mit fünf Reihen Nägeln, darunter zwei schräge Trichterbretter und ein Einmachglas mit roter Schleife um den Hals. Alle fünf Sekunden öffnet eine kleine Klappe am Rohr, eine Murmel fällt, prallt Reihe für Reihe von einem Nagel nach links oder rechts ab, rollt den Trichter hinunter, fällt durch den Hals und rollt auf ihren Platz – das Glas füllt sich vom Boden her, Reihe für Reihe, mit 60 Plätzen. Bei 5 Minuten fallen alle 60, bei kürzeren Zeiten mindestens 20 (die übrigen liegen schon im Glas), die letzte landet genau, wenn die Zeit um ist. Die Murmel, die als Nächste dran ist, wackelt einmal pro Sekunde auf der Klappe. Jede Murmel macht beim Landen ein helles Plink (mit Abstand), am Ende klingt ein Glockenspiel; ein Tippen lässt den Platz, der im Glas noch frei ist, aufleuchten. Name und zwei Sätze Englisch zuerst und gleich in alle sieben Sprachen übersetzt (jarNames.ts); die Aufnahmen folgen auf Wunsch.",
+    },
   ],
 };
