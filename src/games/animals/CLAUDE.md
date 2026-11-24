@@ -13,7 +13,7 @@ turns in a fixed order (`KIND_ORDER` in `levels.ts`), starting with the easiest 
 2. Was gibt uns das Tier? (Z-01): tap (or, with a mouse, drag) what the animal gives us to it – cow and milk, hen, duck and goose and egg, bee
    and honey, sheep and llama and wool, goat and cheese (`gives`, drawn in `gifts.tsx`). It flies to the animal's side
    and the animal makes it anew there (`.ap-made`): the glass fills with milk, the jar with honey, the egg drops into
-   the nest, the ball of wool rolls out, the cheese drops onto its board. A wrong gift: the animal shakes its head and
+   the nest, the ball of wool rolls out in front of a knitted jumper and trousers, the cheese drops onto its board. A wrong gift: the animal shakes its head and
    the one it comes from pops up behind the plate (`giverOf`: the gift's best-known giver, `Gift.giver`).
 3. Wer wohnt wo? (N-09): tap the animal's home (or, with a mouse, drag the animal into it). Besides the farm's and the wood's homes
    there are the beaver lodge, the anthill, the sea, the desert, the jungle, the savanna and the bamboo forest, and since
@@ -133,6 +133,9 @@ An animal makes its real sound (a CC0 recording from `src/lib/sounds/`, `real(na
     every giver's list. The animal that pops up after a wrong gift is the one the gift names (`Gift.giver`), its
     best-known giver (the hen's egg, not the duck's or the goose's; the cow's cheese, though the goat is asked for it)
     – never simply the first in `ANIMALS`, so a new giver of an existing gift changes nothing there.
+  - A gift a child doesn't know at a glance is drawn with what we make of it behind it, offset, so the picture says what
+    it is: the ball of wool alone wasn't recognised, so a knitted jumper and trousers stand behind it (user feedback,
+    November 2026; `gifts.tsx`). Only the gift itself moves when it is made; what stands behind it stays still.
   - Homes the same way: every animal with a home lists in `alsoLives` the other homes it lives in too (the rabbit's hutch, the bear's ice as an „Eisbär“, the fish's pond), `wrongHomes()` leaves them out and `content.test.ts` checks the list and that three wrong homes are left. A new home means going through every animal's list. Every home has at least one animal with it as its `home` (the first one peeks out on a wrong pick), the animal at `spot`/`fit` stays inside the drawing (`content.test.ts`), and landscapes that look alike to a child never count as a wrong choice for each other's animals: they are a group in `HOME_LOOKALIKES` (`homes.tsx`: Teich, Meer, Fluss and Korallenriff; Savanne and Wüste; Dschungel, Bambuswald and Wald), and an animal living in one lists all of its group (`content.test.ts`). A new home that looks like another joins that group. A new home is drawn so it doesn't look like an old one, or it joins its group (a beach or terrarium was left out, too close to sea and desert).
   - A picture counts by what it shows, not only by its name (🌾 „Heu“ shows grain, so birds and hens list it in `alsoEats`), and an animal a child knows from a famous picture book counts what it eats there (the Raupe Nimmersatt's fruit, cheese and sausage); a bear of any kind counts honey. A food shared by several animals is written the same for each (`content.test.ts`).
   - Sounds the same way: animals whose calls a child can't tell apart (growls and roars, grunts, bleats, neighs and

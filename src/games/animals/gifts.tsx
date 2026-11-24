@@ -2,8 +2,8 @@ import type { ReactNode } from "react";
 
 // What animals give us, for "Was gibt uns das Tier?" (Z-01). Each one is drawn in a 100 × 100 box, standing on its
 // bottom edge. The parts with an `ap-gift-…` class move while the animal makes it (`.ap-made` in animals.css): the
-// milk and the honey rise in their glass, the egg drops into the nest, the ball of wool rolls out, the cheese drops onto
-// its board.
+// milk and the honey rise in their glass, the egg drops into the nest, the ball of wool rolls out in front of the jumper
+// and trousers made from it, the cheese drops onto its board.
 
 export type GiftId = "milch" | "ei" | "honig" | "wolle" | "kaese";
 
@@ -67,14 +67,39 @@ const honig = (
   </>
 );
 
+// A ball of wool alone was hard to recognise (user feedback, November 2026), so a knitted jumper and trousers stand
+// behind it, offset to the upper left and right: what wool becomes tells what it is. Only the ball rolls in.
+const KNIT = ["M26 20 l3 4 l3 -4", "M36 20 l3 4 l3 -4", "M24 32 l3 4 l3 -4", "M34 32 l3 4 l3 -4", "M28 42 l3 4 l3 -4", "M38 42 l3 4 l3 -4"];
 const wolle = (
-  <g className="ap-gift-ball">
-    <path d="M78 82 Q90 90 98 80" stroke="#b99766" strokeWidth="4" strokeLinecap="round" fill="none" />
-    <circle cx="50" cy="60" r="36" fill="#f3e3c3" stroke={OUTLINE} strokeWidth="3" />
-    {["M22 44 Q50 34 78 50", "M16 62 Q48 50 84 70", "M24 82 Q52 66 80 84", "M38 26 Q30 60 44 94", "M62 26 Q74 60 60 95"].map((d) => (
-      <path key={d} d={d} stroke="#b99766" strokeWidth="3.5" strokeLinecap="round" fill="none" />
-    ))}
-  </g>
+  <>
+    <g>
+      <path d="M62 12 H94 L97 58 H82 L78 26 L74 58 H59 Z" fill="#5b8fd1" stroke={OUTLINE} strokeWidth="3" strokeLinejoin="round" />
+      <path d="M78 14 V26" stroke="#3f6fae" strokeWidth="2.5" strokeLinecap="round" />
+      <rect x="61" y="5" width="34" height="8" rx="2" fill="#3f6fae" stroke={OUTLINE} strokeWidth="3" />
+    </g>
+    <g>
+      <path
+        d="M18 12 L28 9 Q33 16 38 9 L48 12 L61 31 L52 37 L46 29 V56 H20 V29 L14 37 L5 31 Z"
+        fill="#e07a5f"
+        stroke={OUTLINE}
+        strokeWidth="3"
+        strokeLinejoin="round"
+      />
+      <path d="M20.5 50 H45.5 M7.5 33 L15 38 M58.5 33 L51 38" stroke="#b8553d" strokeWidth="3" strokeLinecap="round" />
+      {KNIT.map((d) => (
+        <path key={d} d={d} stroke="#f4b29f" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" fill="none" />
+      ))}
+    </g>
+    <g className="ap-gift-ball">
+      <g transform="translate(54 69) scale(0.8) translate(-50 -60)">
+        <path d="M78 82 Q90 90 98 80" stroke="#b99766" strokeWidth="5" strokeLinecap="round" fill="none" />
+        <circle cx="50" cy="60" r="36" fill="#f3e3c3" stroke={OUTLINE} strokeWidth="3.75" />
+        {["M22 44 Q50 34 78 50", "M16 62 Q48 50 84 70", "M24 82 Q52 66 80 84", "M38 26 Q30 60 44 94", "M62 26 Q74 60 60 95"].map((d) => (
+          <path key={d} d={d} stroke="#b99766" strokeWidth="4.4" strokeLinecap="round" fill="none" />
+        ))}
+      </g>
+    </g>
+  </>
 );
 
 // A wedge of cheese with its holes, on a round wooden board; the wedge drops onto the board.
