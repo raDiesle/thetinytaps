@@ -132,21 +132,19 @@ test("the end's buttons and its trophy answer without a pointer too", async () =
 });
 
 // It wasn't clear the landed trophy can be tapped, it was small and its count hard to read (user feedback, November
-// 2026): the shared ring and hand point at it (stopped at their first stage, never darkening „Weiter“), and its count
-// stands on a light plate big enough to read. Then the trophy at nearly half the screen with a golden glow was too loud
-// (user feedback, November 2026): it is a quarter of the screen's height and the hint its quiet form – only a small
-// hand, no ring round it (asked for again), no glow and no waves – still showing it can be tapped.
-test("the landed trophy is quiet but plainly tappable, and its count is easy to read", async () => {
+// 2026): its count stands on a light plate big enough to read. Then the trophy at nearly half the screen with a golden
+// glow was too loud (user feedback, November 2026): it is a quarter of the screen's height. A small hand pointing at it
+// went again (user request, 24 November 2026): a soft, still golden rim round its outline marks it as a bonus won instead.
+test("the landed trophy is quiet but plainly a bonus, and its count is easy to read", async () => {
   const end = await Bun.file("src/components/GameEnd.tsx").text();
-  expect(end).toMatch(/\{landed && trophySize && [^}]*<TrophyHint \{\.\.\.trophySize\} \/>\}/);
-  expect(end).toMatch(/<TapHint\b[^>]*\bupTo=\{1\}[^>]*\bquiet\b/);
+  expect(end).not.toContain("TapHint");
   const css = await Bun.file("src/styles/game-end.css").text();
   const height = Number(css.match(/\.game-end \{[^}]*--trophy-h: clamp\((\d+)px, (\d+)vh/)?.[2]);
   expect(height).toBeGreaterThanOrEqual(20);
   expect(height).toBeLessThanOrEqual(30);
-  const hint = await Bun.file("src/components/TapHint.tsx").text();
-  expect(hint).toContain('{!quiet && <div className="tap-hint-glow" />}');
-  expect(hint).toContain('{!quiet && <div className="tap-hint-ring" />}');
+  const art = css.match(/\.game-end-trophy-art \{[^}]*\}/)?.[0] ?? "";
+  expect(art).toMatch(/filter: drop-shadow\(0 0 [^)]*#fff[^)]*\) drop-shadow\(0 0 [^)]*#ffd/);
+  expect(art).not.toContain("animation");
   const trophy = await Bun.file("src/components/Trophy.tsx").text();
   const plate = trophy.match(/function Plate[\s\S]*?\n\}/)?.[0] ?? "";
   expect(Number(plate.match(/fontSize="([\d.]+)"/)?.[1])).toBeGreaterThanOrEqual(14);

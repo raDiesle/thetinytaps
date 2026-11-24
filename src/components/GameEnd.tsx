@@ -12,7 +12,6 @@ import { screenTap } from "@/lib/tapGuard";
 import { awardTrophy, gameOfPath, trophyKey, useTrophies } from "@/lib/trophies";
 import { museumHref, TROPHY_ROOM } from "@/lib/museum";
 import { recordedVoice } from "@/lib/voice";
-import { TapHint } from "@/components/TapHint";
 import { Trophy } from "@/components/Trophy";
 import { ControlIcon } from "@/components/ControlIcon";
 import endFiles from "./stimme/**/*.mp3?glob";
@@ -183,21 +182,6 @@ export function GameEnd({ onAgain, menu = false, next, delayMs = 0, corners = fa
     return () => clearTimeout(timer);
   }, [shown, landed, hasTrophy]);
 
-  // Landed, the trophy is plainly something to tap (user feedback, November 2026: nobody saw it opens the trophy room):
-  // the shared ring and pointing hand round it, measured from its box (untransformed, so it fits on its board) – in
-  // their quiet form, only a small hand – no ring, no glow (user feedback, November 2026: the trophy at the end was
-  // too loud, then the ring round it too). It stops at the hand tapping and never darkens the rest, since „Weiter“ beside it is the choice most want.
-  const [trophySize, setTrophySize] = useState<TrophyBox>();
-  useLayoutEffect(() => {
-    const trophy = trophyRef.current;
-    if (!landed || !trophy) return;
-    const measure = () => setTrophySize({ width: trophy.offsetWidth, height: trophy.offsetHeight, room: trophy.getBoundingClientRect() });
-    measure();
-    const observer = new ResizeObserver(measure);
-    observer.observe(trophy);
-    return () => observer.disconnect();
-  }, [landed]);
-
   // With the last game of a game limit, the game says good night instead (GameShell).
   useEffect(() => {
     if (shown && counts) gameEnded();
@@ -285,7 +269,6 @@ export function GameEnd({ onAgain, menu = false, next, delayMs = 0, corners = fa
             })}
           >
             <Trophy game={game} level={level} wins={wins} className="game-end-trophy-art" />
-            {landed && trophySize && trophySize.height > 0 && <TrophyHint {...trophySize} />}
             {!landed && (
               <span className="game-end-done">
                 {t({ de: "Geschafft!", ru: "Готово!", en: "All done!", zh: "完成啦！", hi: "हो गया!", es: "¡Listo!", ar: "انتهينا!" })}
@@ -342,27 +325,5 @@ export function GameEnd({ onAgain, menu = false, next, delayMs = 0, corners = fa
         </button>
       )}
     </div>
-  );
-}
-
-/** The landed trophy's own size, untransformed, and where it lies on the screen. */
-type TrophyBox = { width: number; height: number; room: DOMRect };
-
-/**
- * The hand pointing at the landed trophy: a box reaching out round it, so `TapHint`, which keeps within its box,
- * shows them whole. The hand lies to the left (the buttons stand to its right), or above it where the trophy stands
- * too close to the screen's left edge for the whole hand – on a phone it stands right at the edge.
- */
-function TrophyHint({ width, height, room }: TrophyBox) {
-  // No ring is drawn (`quiet`), so `r` only puts the fingertip just beside the trophy's cup.
-  const r = height * 0.4;
-  const hand = Math.max(44, Math.min(96, height * 0.5));
-  const side = room.left + width / 2 - r - hand * 1.1 >= 0 ? "left" : "above";
-  const [left, top] = [Math.round(width * 1.6), Math.round(height * 0.9)];
-  const style: CSSProperties = { top: -top, left: -left, width: width + 2 * left, height: height + 2 * top };
-  return (
-    <span className="game-end-trophy-hint" style={style} aria-hidden>
-      <TapHint x={left + width / 2} y={top + height * 0.52} r={r} side={side} size={hand} upTo={1} quiet />
-    </span>
   );
 }

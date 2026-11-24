@@ -28,41 +28,20 @@ type HintStyle = CSSProperties & Record<`--${string}`, string>;
  * at it, the longer the child waits the clearer (`TAP_HINT_STAGES_MS`). An HTML layer laid over the picture: `x`, `y`
  * and `r` are in pixels of the nearest positioned parent (the picture's box), so the rings and the hand move as layers
  * of their own and the picture under them is never painted again. Taps go through it. Mount it anew (a `key`) for a new
- * spot, so it starts calm again; `hand={false}` leaves the hand out until the first stage. `upTo` stops it at an earlier
- * stage, where the spot is one choice beside others and must not darken them (the trophy beside „Weiter“, GameEnd).
- * `quiet` is its calm form for a thing that may be tapped but is no step of the game (the trophy at a level's end): the
- * hand alone, no ring, no golden glow and no rings going out when it taps (user feedback, November 2026).
+ * spot, so it starts calm again; `hand={false}` leaves the hand out until the first stage.
  */
-export function TapHint({
-  x,
-  y,
-  r,
-  side = "below",
-  hand = true,
-  size,
-  upTo = TAP_HINT_STAGES_MS.length,
-  quiet = false,
-}: {
-  x: number;
-  y: number;
-  r: number;
-  side?: HintSide;
-  hand?: boolean;
-  size?: number;
-  upTo?: number;
-  quiet?: boolean;
-}) {
+export function TapHint({ x, y, r, side = "below", hand = true, size }: { x: number; y: number; r: number; side?: HintSide; hand?: boolean; size?: number }) {
   const [stage, setStage] = useState(0);
   useEffect(() => {
     let timers: number[] = [];
     const cancel = afterPageMotion(() => {
-      timers = TAP_HINT_STAGES_MS.slice(0, upTo).map((ms, i) => window.setTimeout(() => setStage(i + 1), ms));
+      timers = TAP_HINT_STAGES_MS.map((ms, i) => window.setTimeout(() => setStage(i + 1), ms));
     });
     return () => {
       cancel();
       for (const timer of timers) clearTimeout(timer);
     };
-  }, [upTo]);
+  }, []);
 
   const dir = SIDE[side];
   const len = Math.hypot(dir.x, dir.y);
@@ -84,12 +63,12 @@ export function TapHint({
     "--grow-y": `${uy * r * 0.18}px`,
   };
   return (
-    <div className={`tap-hint stage-${stage}${quiet ? " quiet" : ""}`} style={style} aria-hidden>
+    <div className={`tap-hint stage-${stage}`} style={style} aria-hidden>
       <div className="tap-hint-dim" />
       <div className="tap-hint-spot">
-        {!quiet && <div className="tap-hint-glow" />}
-        {!quiet && <div className="tap-hint-ring" />}
-        {stage > 0 && !quiet && <div className="tap-hint-wave" />}
+        <div className="tap-hint-glow" />
+        <div className="tap-hint-ring" />
+        {stage > 0 && <div className="tap-hint-wave" />}
       </div>
       {(hand || stage > 0) && (
         <div className="tap-hint-hand">

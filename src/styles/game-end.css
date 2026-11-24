@@ -268,8 +268,9 @@
   display: block;
   width: 100%;
   height: 100%;
-  /* Lifted off the picture, so it is seen on a busy one too. */
-  filter: drop-shadow(0 3px 6px #2a180c66);
+  /* A soft golden rim round its outline, like a bonus won in a game, and lifted off the picture, so it is seen on a busy
+     one too (user request, 24 November 2026, when the hand pointing at it went). Still: never pulsing or shining across. */
+  filter: drop-shadow(0 0 2px #fffbe6) drop-shadow(0 0 7px #ffd24aee) drop-shadow(0 3px 6px #2a180c66);
 }
 
 /* While it is handed over a tap on it puts it on its board at once (GameEnd). */
@@ -375,12 +376,6 @@
 .game-end.landed .game-end-trophy {
   pointer-events: auto;
   cursor: pointer;
-}
-
-/* The hand pointing at it once it landed (GameEnd's TrophyHint): taps go through to the trophy. */
-.game-end-trophy-hint {
-  position: absolute;
-  pointer-events: none;
 }
 
 .game-end.inline {
