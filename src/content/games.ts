@@ -77,7 +77,7 @@ export interface Category {
   apart?: boolean;
   /**
    * A toy standing on the shelf instead of a book (user request, 24 November 2026): its one game is opened by tapping the
-   * toy – a poster from „Magic Keys“ standing on the board (`ShelfToy` in Bookshelf.tsx; a toy keyboard in front of it
+   * toy – a poster from „Magic Keys“ stuck on the back panel over the board (`ShelfToy` in Bookshelf.tsx; a toy keyboard in front of it
    * looked like a till and was taken out, user feedback, 24 November 2026) –, with no book to take out, no cover and no
    * page of its own; its way back is the shelf.
    */

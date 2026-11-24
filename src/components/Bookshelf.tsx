@@ -1,4 +1,14 @@
-import { type CSSProperties, type HTMLAttributes, type MouseEvent, type PointerEvent, type ReactNode, useLayoutEffect, useRef, useState } from "react";
+import {
+  type CSSProperties,
+  type HTMLAttributes,
+  type MouseEvent,
+  type PointerEvent,
+  type ReactNode,
+  type RefObject,
+  useLayoutEffect,
+  useRef,
+  useState,
+} from "react";
 import { Link, useNavigate } from "react-router";
 import { FullscreenButton } from "@/components/FullscreenButton";
 import { Logo } from "@/components/Logo";
@@ -749,16 +759,23 @@ function Book({ book, onClick }: { book: ShelfBook; onClick: (e: MouseEvent<HTML
 const TOY_PRESS_MS = 260;
 
 /**
+ * How wide the poster looks against its place (`TOY_SPAN`): a little into the gap on either side, as big as it can be
+ * and still clear of the book beside it.
+ */
+const POSTER_REACH = 1.5;
+
+/**
  * A toy's place on the board among the picture books instead of a book (`Category.toy`, user request, 24 November
- * 2026): a big poster from its game (`ToyPoster`), standing on the board and leaning back against the shelf's back
- * panel, as wide as its place (`TOY_SPAN`) – never behind the book beside it, and its foot on the board, not hanging
- * above something standing in front of it (a toy keyboard stood there first and looked like a till; it was taken out,
- * user feedback, 24 November 2026). A tap presses the poster back with a knock and a note, and its game opens – no book
- * comes out, no page turns, and the way back simply comes to the shelf again.
+ * 2026): a big poster from its game (`ToyPoster`), stuck flat onto the shelf's back panel with its foot on the board –
+ * never leaning, never behind the book beside it, and nothing standing in front of it (a toy keyboard stood there first
+ * and looked like a till; it was taken out, user feedback, 24 November 2026). A tap presses the poster with a knock and a
+ * note, and its game opens – no book comes out, no page turns, and the way back simply comes to the shelf again.
  */
 function ShelfToy({ book }: { book: ShelfBook }) {
   const t = useT();
   const navigate = useNavigate();
+  const link = useRef<HTMLAnchorElement>(null);
+  usePosterPlace(link);
   const onClick = (e: MouseEvent<HTMLAnchorElement>) => {
     if (e.metaKey || e.ctrlKey || e.shiftKey) return;
     e.preventDefault();
@@ -767,12 +784,13 @@ function ShelfToy({ book }: { book: ShelfBook }) {
     toy.classList.add("pressed");
     playKnock(560);
     playChimeNote(Math.floor(Math.random() * 8));
-    // The game's code was asked for as the finger landed; the poster goes back meanwhile, and it opens once both are done.
+    // The game's code was asked for as the finger landed; the poster is pressed meanwhile, and it opens once both are done.
     const code = pageCodeSoon(book.href);
     window.setTimeout(() => void code.finally(() => navigate(book.href)), TOY_PRESS_MS);
   };
   return (
     <Link
+      ref={link}
       to={book.href}
       className="shelf-toy"
       data-toy={book.toy}
@@ -782,9 +800,44 @@ function ShelfToy({ book }: { book: ShelfBook }) {
       {...loadOnIntent(book.href)}
       onClick={onClick}
     >
+      <span className="shelf-poster-spot" />
       <ToyPoster title={t(book.title)} picture={book.poster} />
     </Link>
   );
+}
+
+/**
+ * Keeps the poster on the back panel over its own place. The shelf's perspective draws everything on the panel towards
+ * the middle of the shelf and makes it smaller, so a poster laid out in its place was seen behind the book beside it
+ * (user feedback, 24 November 2026). `.shelf-poster-spot` is the place moved back onto the panel, unseen: measured
+ * against the place itself (the link, standing in the row), it tells how far the panel moves and shrinks it there, and
+ * the poster is moved back over its place and grown by that much (`--poster-x`, `--poster-k`), its foot staying where
+ * the board meets the panel.
+ */
+function usePosterPlace(link: RefObject<HTMLAnchorElement | null>) {
+  useLayoutEffect(() => {
+    const place = link.current;
+    const spot = place?.querySelector<HTMLElement>(".shelf-poster-spot");
+    if (!place || !spot) return;
+    const measure = () => {
+      const seen = place.getBoundingClientRect();
+      const back = spot.getBoundingClientRect();
+      if (!back.width || !spot.offsetWidth) return;
+      // How much one px moved on the panel is seen, and how far the panel's version of the place lies from the place.
+      const shrink = back.width / spot.offsetWidth;
+      const x = (seen.left + seen.width / 2 - (back.left + back.width / 2)) / shrink;
+      place.style.setProperty("--poster-x", `${x.toFixed(1)}px`);
+      place.style.setProperty("--poster-k", ((seen.width / back.width) * POSTER_REACH).toFixed(3));
+    };
+    measure();
+    const observer = new ResizeObserver(measure);
+    observer.observe(place);
+    window.addEventListener("resize", measure);
+    return () => {
+      observer.disconnect();
+      window.removeEventListener("resize", measure);
+    };
+  }, [link]);
 }
 
 /**

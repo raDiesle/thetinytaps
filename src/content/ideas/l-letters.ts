@@ -225,7 +225,7 @@ export const lettersIdeas: IdeaArea = {
       why: "Für das Drauflostippen kleiner Kinder auf Tastatur, Maus oder Bildschirm, wonach Eltern suchen: es passiert immer etwas, und nichts geht kaputt.",
       effort: "M",
       partial:
-        "Gebaut am 24. November 2026 (/drauflos/), noch am selben Tag „Zaubertasten“ getauft und mit einem Plakat aus dem Spiel über der Spielzeug-Tastatur im Regal, an drei Ecken mit Tesa festgeklebt, die vierte hebt sich ab. Schnell nacheinander gedrückt erscheint mehreres zugleich, jedes mit Platz neben den anderen (bis zu acht Buchstaben oder Formen und fünf Überraschungen); eine Zahl kommt mit genauso vielen Formen rundherum. Dieselbe Taste erst nach einer Pause wieder; kein Zähler, kein Ende. Ebenfalls am 24. November wurde die Spielzeug-Tastatur wieder entfernt (sie sah aus wie eine Kasse): Jetzt steht nur das Plakat auf dem Brett, an die Rückwand gelehnt und frei vom Buch daneben, und ein Tipp darauf öffnet das Spiel.",
+        "Gebaut am 24. November 2026 (/drauflos/), noch am selben Tag „Zaubertasten“ getauft und mit einem Plakat aus dem Spiel über der Spielzeug-Tastatur im Regal, an drei Ecken mit Tesa festgeklebt, die vierte hebt sich ab. Schnell nacheinander gedrückt erscheint mehreres zugleich, jedes mit Platz neben den anderen (bis zu acht Buchstaben oder Formen und fünf Überraschungen); eine Zahl kommt mit genauso vielen Formen rundherum. Dieselbe Taste erst nach einer Pause wieder; kein Zähler, kein Ende. Ebenfalls am 24. November wurde die Spielzeug-Tastatur wieder entfernt (sie sah aus wie eine Kasse): Jetzt klebt nur das Plakat flach an der Rückwand, unten auf dem Brett und frei vom Buch daneben, und ein Tipp darauf öffnet das Spiel.",
       done: true,
     },
   ],

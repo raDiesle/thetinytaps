@@ -821,22 +821,18 @@
 }
 
 /*
- * A toy's place among the picture books (`ShelfToy`, `Category.toy`): its poster (`ToyPoster`) standing on the board,
- * `TOY_SPAN` picture books wide, its foot on the board and its top leaning back against the back panel. It stands in
- * the row's own plane, never on the back panel itself: there the shelf's perspective drew it towards the middle and
- * behind the book beside it (user feedback, 24 November 2026). A tap presses it back a little (one transform of the
- * poster, an HTML element).
+ * A toy's place among the picture books (`ShelfToy`, `Category.toy`): `TOY_SPAN` picture books wide, as tall as its
+ * poster (`ToyPoster`), which is stuck flat onto the back panel with its foot on the board (user feedback, 24 November
+ * 2026: never leaning, nothing in front of it). The place itself stays in the row, unseen, and is what is tapped.
  */
 .shelf-row > .shelf-toy {
   --bw: calc(var(--bh) * 0.82 * 0.6); /* `TOY_SPAN` picture books */
+  --pw: var(--bw);
   position: relative;
   flex: none;
   align-self: flex-end;
   width: var(--bw);
-  /* As tall as its poster (`--pw`), which reaches a third of the way into the gap on either side: as big as it can be,
-     still with clear room to the book beside it, which tips towards it. */
   height: calc(var(--pw) * 1.3);
-  --pw: calc(var(--bw) + var(--bh) * var(--gap) * 0.6);
   transform-style: preserve-3d;
   -webkit-tap-highlight-color: transparent;
 }
@@ -846,30 +842,36 @@
   outline-offset: 3px;
 }
 
+/* The depth of the back panel, seen from the row (`.shelf-back` stands at `--d` behind the shelf's front, the row at a fifth of it). */
+.shelf-poster-spot,
+.shelf-poster {
+  position: absolute;
+  inset: 0;
+  transform-origin: 50% 100%;
+}
+
+.shelf-poster-spot {
+  visibility: hidden;
+  transform: translateZ(calc(var(--d) * -0.8 + 2px));
+}
+
 /*
- * The poster: paper on a stiff back, leaning against the back panel from the board (`rotateX` from its foot), wider
- * than nothing beside it and below the board above. Tape holds three corners; the fourth (top right) curls away, its
- * paper's back seen. Still, like everything on the shelf.
+ * The poster: paper stuck flat onto the back panel, its foot where the board meets it. Seen on the panel it would lie
+ * smaller and nearer the shelf's middle – behind the book beside it –, so `usePosterPlace` moves it back over its place
+ * and grows it (`--poster-x`, `--poster-k`). Tape holds three corners; the fourth (top right) curls away, its paper's
+ * back seen. Still, like everything on the shelf.
  */
 .shelf-poster {
   --curl: calc(var(--pw) * 0.16);
-  position: absolute;
-  inset: 0 calc((var(--bw) - var(--pw)) / 2);
-  transform-origin: 50% 100%;
-  transform: rotateX(9deg) rotate(-1deg);
-  filter: drop-shadow(0 calc(var(--pw) * 0.02) calc(var(--pw) * 0.03) #2a170866);
-  transition: transform 0.35s cubic-bezier(0.3, 0.7, 0.4, 1.2);
+  transform: translateZ(calc(var(--d) * -0.8 + 2px)) translateX(var(--poster-x, 0px)) scale(var(--poster-k, 1));
+  filter: drop-shadow(0 calc(var(--pw) * 0.015) calc(var(--pw) * 0.02) #2a170866);
 }
 
-@media (hover: hover) {
-  .shelf-toy:hover > .shelf-poster {
-    transform: translateZ(calc(var(--d) * 0.08)) rotateX(4deg) rotate(-1deg);
-  }
-}
-
+/* A tap presses it flat against the panel for a moment, a little smaller (no transition otherwise: placing it after the
+   first measure must not slide it in). */
 .shelf-toy.pressed > .shelf-poster {
-  transition-duration: 0.12s;
-  transform: rotateX(14deg) rotate(-1deg) scale(0.97);
+  transition: transform 0.12s ease-out;
+  transform: translateZ(calc(var(--d) * -0.8 + 2px)) translateX(var(--poster-x, 0px)) scale(calc(var(--poster-k, 1) * 0.96));
 }
 
 .shelf-poster-paper {
