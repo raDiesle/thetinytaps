@@ -6,7 +6,7 @@ import { playCrunch, playGiggle, playMunch, playRecorded, playRustle, playYum } 
 import type { Cue } from "./cues";
 import type { Daytime } from "@/lib/days";
 import { clothesOf, PyjamaPattern, topFill } from "./clothes";
-import { PICTURE } from "./jaw";
+import { PICTURE, TOOTH_ARCS } from "./jaw";
 import { BROW, Ear, EyeBall, EyeLid, eyeOpening, FACE, HAIR, Hair, type HeadMap, INK, Iris, LASHES, LIP, Nose, SKIN_SHADE, SkinGradient } from "./face";
 import { fitBox, FrameStroke, Monster, screenFrame, STAIN, STAIN_FILLS, useRoom, type Box } from "./mouth";
 import { Piece, pictureSpace } from "./piece";
@@ -30,10 +30,50 @@ export type OriginPart = "sweets" | "grow";
 export const ORIGIN_MS: Record<OriginPart, number> = { sweets: 9600, grow: 6000 };
 
 const { width: W } = PICTURE;
-/** What has to fit between heading and controls: the head, with the corners the sweets appear in; the screen shows more sky round it. */
-const FOCUS: Box = { x: 40, y: 34, width: 360, height: 340 };
-/** Where the camera ends up while the monsters grow: the mouth with them, as big as the free room allows. */
-const MOUTH_FOCUS: Box = { x: 110, y: 226, width: 220, height: 132 };
+/**
+ * How the story is framed before the camera moves in on the mouth: what has to fit between heading and controls (the
+ * screen shows more sky round it), where the sweets appear, the arc the sun or the moon crosses and where the morning's
+ * sun comes up. On a screen not much wider than tall the whole head fits with the sweets in the corners above it; on a
+ * wide one (a phone on its side) the face from the brows to the chin, the sweets beside it at eye level, so the face and
+ * its mouth show bigger (user feedback, November 2026: the mouth should show bigger).
+ */
+interface Framing {
+  focus: Box;
+  sweets: { x: number; y: number }[];
+  /** The top of the sun's or moon's arc, and how far below it lies the point it turns round. */
+  arc: { top: number; radius: number };
+  sunrise: { x: number; y: number };
+}
+const HEAD_FRAMING: Framing = {
+  focus: { x: 40, y: 34, width: 360, height: 340 },
+  sweets: [
+    { x: 372, y: 78 },
+    { x: 68, y: 78 },
+    { x: 372, y: 78 },
+  ],
+  arc: { top: 10, radius: 550 },
+  sunrise: { x: 72, y: 72 },
+};
+const FACE_FRAMING: Framing = {
+  focus: { x: -40, y: 112, width: 520, height: 270 },
+  sweets: [
+    { x: 432, y: 212 },
+    { x: 8, y: 212 },
+    { x: 432, y: 212 },
+  ],
+  // Starts in the top left corner, above the sweet that comes there, and passes behind the hair to the right.
+  arc: { top: 59, radius: 383 },
+  sunrise: { x: 2, y: 150 },
+};
+/** Both framings, for the tests. */
+export const FRAMINGS = { head: HEAD_FRAMING, face: FACE_FRAMING };
+/** The face's framing where it shows the picture clearly bigger than the head's, else the head's. */
+function framingFor(room: Parameters<typeof fitBox>[0]) {
+  const [face, head] = [fitBox(room, FACE_FRAMING.focus), fitBox(room, HEAD_FRAMING.focus)];
+  return face.unit * 1.05 < head.unit ? { framing: FACE_FRAMING, ...face } : { framing: HEAD_FRAMING, ...head };
+}
+/** Where the camera ends up while the monsters grow: the lips round the mouth with them, as big as the free room allows. */
+const MOUTH_FOCUS: Box = { x: 114, y: 234, width: 212, height: 118 };
 const HEAD = { x: W / 2, y: 215, r: 165 };
 /** Where the teeth stand in the mouth: from left to right, and from the top edge down to the bottom's lowest point. */
 export const MOUTH = { left: 124, right: 316, top: 258, depth: 80 };
@@ -123,20 +163,47 @@ const BOTTOM_ROUND = BOTTOM_EDGE.slice(24, 72);
 const bottomAt = (x: number) => edgeAt(BOTTOM_ROUND, x);
 /** The top edge of the mouth above x (it sags a little in the middle). */
 const topAt = (x: number) => edgeAt(TOP_EDGE, x);
-/** Wide enough that neighbouring teeth nearly touch: with gaps between them the story's child looked to have lost teeth. */
-const TOOTH_W = 26.5;
-/** Six small teeth along the top, four along the round bottom, a child's milk teeth. */
-const UPPER = [0, 1, 2, 3, 4, 5].map((i) => MID + (i - 2.5) * 27);
-const LOWER = [0, 1, 2, 3].map((i) => MID + (i - 1.5) * 27.5);
-const upperX = (i: number) => UPPER[i];
-const lowerX = (i: number) => LOWER[i];
+/** A tooth of the story seen from the front: its middle across, how wide it shows and how long it is. */
+interface StoryTooth {
+  x: number;
+  width: number;
+  /** As a share of a front tooth's length. */
+  length: number;
+}
+/** How long a front tooth is drawn, from inside the gum to its biting edge; the others by their share (`length`). */
+const TOOTH_LENGTH = 42;
+/** Half the width of each row's arch seen from the front: the lower row stands inside the upper one, as in a real mouth. */
+const ARCH_HALF = { upper: 92, lower: 76 };
+/**
+ * A row's ten milk teeth, left to right: a child has twenty, ten in each row (user feedback, November 2026: six above
+ * and four below were too few). Each stands where the mirror's arch puts it (`TOOTH_ARCS` in jaw.ts), seen from the
+ * front, so the teeth narrow towards the corners as the row curves away – neighbours nearly touching (with gaps between
+ * them the child looked to have lost teeth) – and the molars are a little shorter, as the mirror's are.
+ */
+function rowOf(half: number): StoryTooth[] {
+  const rad = (deg: number) => (deg * Math.PI) / 180;
+  const side = TOOTH_ARCS.map(({ from, to, height }) => {
+    const [a, b] = [half * Math.sin(rad(from)), half * Math.sin(rad(to))];
+    return { x: (a + b) / 2, width: b - a, length: height / TOOTH_ARCS[0].height };
+  });
+  return [...[...side].reverse().map((t) => ({ ...t, x: MID - t.x })), ...side.map((t) => ({ ...t, x: MID + t.x }))];
+}
+export const STORY_TEETH = { upper: rowOf(ARCH_HALF.upper), lower: rowOf(ARCH_HALF.lower) };
+const UPPER = STORY_TEETH.upper;
+const LOWER = STORY_TEETH.lower;
+/** Where a tooth's rectangle lies: an upper one hangs from the mouth's top, a lower one stands on its round bottom. */
+function toothRect({ x, width, length }: StoryTooth, upper: boolean) {
+  const height = TOOTH_LENGTH * length;
+  const y = upper ? MOUTH.top - 14 : bottomAt(x) - 28 * length;
+  return { x: x - width / 2, y, width, height, rx: Math.min(8, width * 0.35) };
+}
 
 /**
  * How far the gum reaches from the mouth's edge at x: furthest between the teeth and arching back over the middle of
  * each one, so the teeth grow out of it like in the mirror (jaw.ts).
  */
-function gumDepth(x: number, teeth: number[]) {
-  const d = Math.min(...teeth.map((t) => Math.abs(x - t))) / (TOOTH_W / 2);
+function gumDepth(x: number, teeth: StoryTooth[]) {
+  const d = Math.min(...teeth.map((t) => Math.abs(x - t.x) / (t.width / 2)));
   return d >= 1 ? 11 : 5 + 6 * d ** 2;
 }
 
@@ -161,10 +228,9 @@ const GUM_PATHS = {
  */
 function StainedTeeth() {
   const teeth = [
-    ...UPPER.map((x, i) => ({ x, y: MOUTH.top - 14, gum: topAt(x) + gumDepth(x, UPPER), upper: true, i })),
-    ...LOWER.map((x, i) => ({ x, y: bottomAt(x) - 28, gum: bottomAt(x) - gumDepth(x, LOWER), upper: false, i })),
+    ...UPPER.map((tooth, i) => ({ ...toothRect(tooth, true), gum: topAt(tooth.x) + gumDepth(tooth.x, UPPER), upper: true, i })),
+    ...LOWER.map((tooth, i) => ({ ...toothRect(tooth, false), gum: bottomAt(tooth.x) - gumDepth(tooth.x, LOWER), upper: false, i })),
   ];
-  const half = TOOTH_W / 2;
   return (
     <>
       <defs>
@@ -173,19 +239,23 @@ function StainedTeeth() {
         </clipPath>
       </defs>
       <g clipPath="url(#origin-stain)">
-        {teeth.map(({ x, y, gum, upper, i }) => {
+        {teeth.map(({ x: left, y, width, height, rx, gum, upper, i }) => {
           // The plaque reaches a little past the gum's edge, a wavy band along it; the spot sits nearer the biting edge.
-          const band = upper ? { from: y, to: gum + 6 + (i % 2) * 2 } : { from: gum - 6 - (i % 2) * 2, to: y + 42 };
+          const band = upper ? { from: y, to: gum + 6 + (i % 2) * 2 } : { from: gum - 6 - (i % 2) * 2, to: y + height };
           const spotY = upper ? gum + 13 + (i % 3) * 2 : gum - 13 - (i % 3) * 2;
+          const half = width / 2;
+          const x = left + half;
+          // The spot only on teeth wide enough to hold it: the molars at the corners show only a narrow side.
+          const spot = width > 14;
           return (
             <g key={`${upper}-${i}`}>
-              <rect x={x - half} y={y} width={TOOTH_W} height={42} rx={8} fill={STAIN_FILLS.outer} stroke={INK} strokeWidth={2.5} />
+              <rect x={left} y={y} width={width} height={height} rx={rx} fill={STAIN_FILLS.outer} stroke={INK} strokeWidth={2.5} />
               <path
                 d={`M${x - half + 1.5} ${band.from} V${band.to} Q${x - half / 2} ${band.to + (upper ? 2.5 : -2.5)} ${x} ${band.to} T${x + half - 1.5} ${band.to} V${band.from} Z`}
                 fill={STAIN.plaque}
                 opacity={STAIN.plaqueOpacity}
               />
-              <ellipse cx={x + (i % 2 ? 4 : -4)} cy={spotY} rx={3.4} ry={2.6} fill={STAIN.spot} opacity={STAIN.spotOpacity} />
+              {spot && <ellipse cx={x + (i % 2 ? 0.15 : -0.15) * width} cy={spotY} rx={3.2} ry={2.5} fill={STAIN.spot} opacity={STAIN.spotOpacity} />}
             </g>
           );
         })}
@@ -290,27 +360,20 @@ const DELIGHT = perSweet(
   APPEAR_MS,
 );
 
-/** Where each sweet first appears: in the top corners, beside the head. */
-const SWEET_FROM = [
-  { x: 372, y: 78 },
-  { x: 68, y: 78 },
-  { x: 372, y: 78 },
-];
-
 /** A crumb of each sweet on two teeth, in its colour; in the grow part each becomes a monster of that colour. */
 const CRUMBS = [
-  { tooth: 1, upper: true, sweet: 0, color: "#ff7bd0" },
-  { tooth: 2, upper: false, sweet: 0, color: "#ff7bd0" },
-  { tooth: 4, upper: true, sweet: 1, color: "#ff9f43" },
-  { tooth: 0, upper: false, sweet: 1, color: "#ff9f43" },
-  { tooth: 3, upper: true, sweet: 2, color: "#b388ff" },
-  { tooth: 3, upper: false, sweet: 2, color: "#8bd346" },
+  { tooth: 2, upper: true, sweet: 0, color: "#ff7bd0" },
+  { tooth: 5, upper: false, sweet: 0, color: "#ff7bd0" },
+  { tooth: 7, upper: true, sweet: 1, color: "#ff9f43" },
+  { tooth: 2, upper: false, sweet: 1, color: "#ff9f43" },
+  { tooth: 5, upper: true, sweet: 2, color: "#b388ff" },
+  { tooth: 7, upper: false, sweet: 2, color: "#8bd346" },
 ];
 
 /** A tooth's place in the picture, where a crumb lies and its monster grows. */
 function crumbAt(c: (typeof CRUMBS)[number]) {
-  if (c.upper) return { x: upperX(c.tooth), y: MOUTH.top + 15 };
-  const x = lowerX(c.tooth);
+  if (c.upper) return { x: UPPER[c.tooth].x, y: MOUTH.top + 15 };
+  const { x } = LOWER[c.tooth];
   return { x, y: bottomAt(x) - 18 };
 }
 
@@ -387,7 +450,7 @@ const SWEETS = [Lollipop, Bonbon, Cupcake];
  * only once they are closed over the chewing (`HAPPY_EYES`), so they never jump while seen.
  */
 const LOOK = perSweet(
-  SWEET_FROM.map((from) => (from.x > W / 2 ? "teeth-origin-look-right" : "teeth-origin-look-left")),
+  HEAD_FRAMING.sweets.map((from) => (from.x > W / 2 ? "teeth-origin-look-right" : "teeth-origin-look-left")),
   SHOW_MS + 600,
   APPEAR_MS,
 );
@@ -451,23 +514,24 @@ const SKY: Record<Daytime, [string, string, string]> = {
   morning: ["#a49be6", "#2d2a6e", "#ffe0b0"],
 };
 
-/** Where the sun or the moon stands at the top of its arc, which turns round the point below it (`.origin-sky-body`). */
-const SKY_BODY_AREA: Box = { x: W / 2 - 40, y: -30, width: 100, height: 72 };
-
-/** The sun, or the moon with a star, that crosses the sky while the monsters grow. */
-function SkyBody({ daytime }: { daytime: Daytime }) {
+/** The sun, or the moon with a star, that crosses the sky while the monsters grow: it stands at the top of its arc
+ * (`arc.top`) and turns round the point `arc.radius` below it (`.origin-sky-body`). */
+function SkyBody({ daytime, arc }: { daytime: Daytime; arc: Framing["arc"] }) {
+  const area: Box = { x: W / 2 - 40, y: arc.top - 40, width: 100, height: 72 };
   return (
-    <Piece area={SKY_BODY_AREA} className="origin-sky-body" style={{ transformOrigin: `${W / 2 - SKY_BODY_AREA.x}px ${560 - SKY_BODY_AREA.y}px` }}>
-      {daytime === "evening" ? (
-        <circle cx={W / 2} cy={10} r={30} fill="#ffd23f" stroke={INK} strokeWidth={4} />
-      ) : (
-        <>
-          <path d={`M${W / 2 + 6} -18 a30 30 0 1 0 24 48 a25 25 0 1 1 -24 -48 Z`} fill="#ffe680" stroke={INK} strokeWidth={4} />
-          <g transform={`translate(${W / 2 + 40} -20) scale(0.14)`}>
-            <path d={STAR_PATH} fill="#fff6c2" />
-          </g>
-        </>
-      )}
+    <Piece area={area} className="origin-sky-body" style={{ transformOrigin: `${W / 2 - area.x}px ${arc.top + arc.radius - area.y}px` }}>
+      <g transform={`translate(0 ${arc.top - 10})`}>
+        {daytime === "evening" ? (
+          <circle cx={W / 2} cy={10} r={30} fill="#ffd23f" stroke={INK} strokeWidth={4} />
+        ) : (
+          <>
+            <path d={`M${W / 2 + 6} -18 a30 30 0 1 0 24 48 a25 25 0 1 1 -24 -48 Z`} fill="#ffe680" stroke={INK} strokeWidth={4} />
+            <g transform={`translate(${W / 2 + 40} -20) scale(0.14)`}>
+              <path d={STAR_PATH} fill="#fff6c2" />
+            </g>
+          </>
+        )}
+      </g>
     </Piece>
   );
 }
@@ -544,7 +608,7 @@ export function Origin({
   const t = useT();
   const scene = useRef<HTMLDivElement>(null);
   const room = useRoom(scene, free);
-  const { box, unit } = fitBox(room, FOCUS);
+  const { framing, box, unit } = framingFor(room);
   const frame = screenFrame(box, unit);
   const bottom = box.y + box.height;
   const sweets = part === "sweets";
@@ -596,11 +660,11 @@ export function Origin({
         <div className="teeth-space" style={space}>
           {/* In the morning the night ends with the sun coming up beside the head. */}
           {daytime === "morning" && part === "grow" && (
-            <Piece area={{ x: 42, y: 42, width: 60, height: 60 }} className="origin-sunrise">
-              <circle cx={72} cy={72} r={26} fill="#ffd23f" stroke={INK} strokeWidth={4} />
+            <Piece area={{ x: framing.sunrise.x - 30, y: framing.sunrise.y - 30, width: 60, height: 60 }} className="origin-sunrise">
+              <circle cx={framing.sunrise.x} cy={framing.sunrise.y} r={26} fill="#ffd23f" stroke={INK} strokeWidth={4} />
             </Piece>
           )}
-          <SkyBody daytime={daytime} />
+          <SkyBody daytime={daytime} arc={framing.arc} />
         </div>
 
         <svg className="origin-picture" viewBox={viewBox} role="img" aria-label={label}>
@@ -785,11 +849,11 @@ export function Origin({
               <ellipse cx={MID} cy={MOUTH.top + MOUTH.depth - 28} rx={52} ry={20} fill="#ff7088" />
               <path d={`M${MID} ${MOUTH.top + MOUTH.depth - 42} V${MOUTH.top + MOUTH.depth - 24}`} stroke="#e2577c" strokeWidth={3} strokeLinecap="round" />
               <g fill="#fffdf6" stroke={INK} strokeWidth={2.5}>
-                {[0, 1, 2, 3, 4, 5].map((i) => (
-                  <rect key={`u${i}`} x={upperX(i) - TOOTH_W / 2} y={MOUTH.top - 14} width={TOOTH_W} height={42} rx={8} />
+                {UPPER.map((tooth, i) => (
+                  <rect key={`u${i}`} {...toothRect(tooth, true)} />
                 ))}
-                {[0, 1, 2, 3].map((i) => (
-                  <rect key={`l${i}`} x={lowerX(i) - TOOTH_W / 2} y={bottomAt(lowerX(i)) - 28} width={TOOTH_W} height={42} rx={8} />
+                {LOWER.map((tooth, i) => (
+                  <rect key={`l${i}`} {...toothRect(tooth, false)} />
                 ))}
               </g>
               {/* The gum over the teeth's roots, with a darker edge where they come out of it. */}
@@ -834,11 +898,11 @@ export function Origin({
                 style={
                   {
                     "--arrive": `${ARRIVE_MS[i]}ms`,
-                    "--sx": `${SWEET_FROM[i].x}px`,
-                    "--sy": `${SWEET_FROM[i].y}px`,
+                    "--sx": `${framing.sweets[i].x}px`,
+                    "--sy": `${framing.sweets[i].y}px`,
                     "--bx": `${BITE.x}px`,
                     "--by": `${BITE.y}px`,
-                    "--tilt": `${SWEET_FROM[i].x > W / 2 ? -18 : 18}deg`,
+                    "--tilt": `${framing.sweets[i].x > W / 2 ? -18 : 18}deg`,
                   } as CSSProperties
                 }
                 over={

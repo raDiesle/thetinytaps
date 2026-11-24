@@ -68,6 +68,8 @@ const TEETH = [
   { from: 61, to: 80, height: 23, depth: 30, edge: 0.7 },
 ];
 export const TEETH_PER_SIDE = TEETH.length;
+/** Where each tooth stands along the arch (degrees from the middle) and how tall it is, front tooth first: the story's teeth come from it too. */
+export const TOOTH_ARCS = TEETH.map(({ from, to, height }) => ({ from, to, height }));
 
 /** How deep each tooth's chewing surface is, front tooth first, in model units. */
 export const CHEWING_DEPTHS = TEETH.map((t) => t.depth * t.edge);
