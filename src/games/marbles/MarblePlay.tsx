@@ -118,7 +118,7 @@ export function MarblePlay({ settings }: { settings: MarbleSettings }) {
     <div className={`marble-play${party ? " party" : ""}${isPaused ? " paused" : ""}`} data-level={level.id} onPointerDown={onPointerDown}>
       {/* The paper with the paw track while the level's code still loads – never a dark screen. */}
       <Suspense fallback={<PageLoading />}>
-        <PlayedLevel key={round} entry={level} sound={play} say={say} onDone={onDone} onGoal={onGoal} watch={settings.play === "watch"} />
+        <PlayedLevel key={round} entry={level} sound={play} say={say} onDone={onDone} onGoal={onGoal} />
       </Suspense>
       {/* Pause at any moment of a level, and from there skip it; not during the party or at the end. */}
       {!party && !ended && <PauseVeil next={nextPicture} nextName={nextName} onSkip={skip} />}

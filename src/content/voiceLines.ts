@@ -170,18 +170,6 @@ export const INLINE_LINES: Record<string, InlineLine[]> = {
       file: "src/games/marbles/SneezeLevel.tsx",
     },
     {
-      text: "Achtung, fertig – los!",
-      translations: {
-        en: "Ready, steady, go!",
-        zh: "预备——出发！",
-        hi: "एक, दो, तीन – चलो!",
-        es: "¡A la una, a las dos y a las tres!",
-        ar: "استعداد، انطلاق!",
-        ru: "На старт, внимание, марш!",
-      },
-      file: "src/games/marbles/TrackLevel.tsx",
-    },
-    {
       text: "Der Schneemann ist fertig!",
       translations: {
         en: "The snowman is ready!",

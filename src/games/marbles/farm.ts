@@ -717,18 +717,9 @@ export function buildFarm() {
   };
   const cameraTarget = (t: number) => cameraOn(WORLD_W, focusX(t));
 
-  /** Where it could wait for the child's tap (R-03): the cow with the wool at her nose, the goat ready to charge, the hen on the tractor's mudguard by the horn, the donkey with all three ducks on his back. Only the goat ready to charge waits; the machine runs through the others. */
-  const stops = [
-    { at: tNose, x: COW.x - 180, y: FLOOR - 100 },
-    { at: tCharge1, x: ground.x, y: FLOOR - 80, active: true },
-    { at: tOnGuard, x: TRACTOR.x + GUARD_SPOT.dx + 30, y: TRACTOR.guard - 50 },
-    { at: tLand(DUCKS - 1), x: DONKEY.x, y: FLOOR + DONKEY.back.y },
-  ];
-
   return {
     events: sorted(),
     duration: tDone,
-    stops,
     tCrow,
     tPigWake,
     tSplash,

@@ -362,11 +362,6 @@ export const LANGUAGE_STATUS: LanguageStatusRow[] = [
         note: "Auch Schneebahn, Weltraumbahn, Wasserrutsche und Baustellen-Bahn (übersetzt am 3. November 2026). Deutsch von ElevenLabs gesprochen (Tapsis Stimme, 3. November 2026). Die anderen Sprachen außer Russisch von ElevenLabs gesprochen am 7./8. November 2026; Russisch fehlt noch (die Credits des Monats waren aufgebraucht) und bleibt bis dahin stumm. Russisch am 12. November 2026 von ElevenLabs gesprochen mit dem Klon von Tapsis Stimme aus ihren russischen Aufnahmen („Tapsi Coach (Klon ru)“, zweites Konto).",
       },
       {
-        label: "👆 „Mitmachen“ über den Karten",
-        languages: { de: "done", en: "done", zh: "done", hi: "done", es: "done", ar: "done", ru: "done" },
-        note: "Hieß „Schranke und Weiche“ und gilt seit R-03 (3. November 2026) auch für die Stationen der Maschinen; der neue Name übersetzt am 5. November 2026.",
-      },
-      {
         label: "🎨 Farbenbahn",
         recorded: true,
         languages: { de: "done", en: "done", zh: "done", hi: "done", es: "done", ar: "done", ru: "done" },

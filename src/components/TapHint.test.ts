@@ -14,11 +14,7 @@ describe("TapHint", () => {
   });
 
   test("the games that use it point with its drawn hand, never with an emoji finger", () => {
-    const files = [
-      ...new Glob("src/games/marbles/*.tsx").scanSync("."),
-      ...new Glob("src/games/elevator/film/*.tsx").scanSync("."),
-      // The start screen's choice „👆 Kind tippt“ is a label, not a hint.
-    ].filter((file) => !file.endsWith("MarbleGame.tsx"));
+    const files = [...new Glob("src/games/marbles/*.tsx").scanSync("."), ...new Glob("src/games/elevator/film/*.tsx").scanSync(".")];
     expect(files.length).toBeGreaterThan(10);
     const fingers = files.filter((file) => /[👆👇👈👉☝]/u.test(readFileSync(file, "utf8")));
     expect(fingers).toEqual([]);
