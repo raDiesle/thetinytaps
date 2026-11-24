@@ -21,9 +21,11 @@ const MIDDLE = 0.5;
  * still well up; the Block House's middle has a block just landed, so its card shows the next one carried by the beam;
  * Up to the Moon's middle is the lift in the skyscraper's side with sky round it, so its card shows the fox in the cable
  * car's basket between the treehouse and the skyscraper's window; the Marble Jar's middle has a marble just landed, so
- * its card shows the next one bouncing down the nails.
+ * its card shows the next one bouncing down the nails; the Kerze's middle has a candle just burnt down, so its card shows
+ * the spark running along the fuse to the next one; the Rennstrecke's middle has the kart far off on the back loop, so
+ * its card shows the fox child's kart crossing the bridge.
  */
-const LATER: Partial<Record<TimerPicture, number>> = { sunset: 0.68, seesaw: 0.25, blocks: 0.53, jump: 0.23, jar: 0.509, race: 0.82 };
+const LATER: Partial<Record<TimerPicture, number>> = { sunset: 0.68, seesaw: 0.25, blocks: 0.53, jump: 0.23, jar: 0.509, candle: 0.506, race: 0.82 };
 
 /**
  * Stops a card's drawing `at` ms into its run: every animation in it is put at that moment, its look there written into

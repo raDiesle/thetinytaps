@@ -102,7 +102,23 @@ import {
   soonMs,
   trainSteps,
 } from "./pieces";
-import { bulbBelow, CANDLE, FLAME_H, GLASS, HOURGLASS_BOX, PLATE, SAND_FLOOR, STAGE_H, STAGE_W, TRAIN } from "./scenes";
+import {
+  bulbBelow,
+  CANDLE,
+  candlePlan,
+  FLAME_H,
+  FUSE,
+  FUSE_AT,
+  FUSE_MS,
+  GLASS,
+  HOURGLASS_BOX,
+  PLATE,
+  SAND_FLOOR,
+  STAGE_H,
+  STAGE_W,
+  TABLE,
+  TRAIN,
+} from "./scenes";
 import { FIRST_TURN, heldMarbles, turnChildren } from "./SwapPlay";
 import { CUP_W, CUP_XS, MARBLE_COLORS, MARBLE_R, marblePlan, RAMPS, REST_Y } from "./marbleRun";
 import { PLANK_BOX, SAW, SAW_GROUND, SAW_TILT, SEAT_CUSHION_W, TYRE_TOP, TYRE_X, WALKER } from "./seesaw";
@@ -243,13 +259,48 @@ describe("Timer", () => {
     expect(SAND_FLOOR).toBeLessThanOrEqual(810);
     // Tall, so the heap is seen growing (user feedback, November 2026).
     expect(GLASS.bottom - GLASS.top).toBeGreaterThanOrEqual(590);
-    expect(CANDLE.base).toBeLessThanOrEqual(820);
-    // Tall candles, their flames still on the screen; three of them burning one after the other.
-    expect(CANDLE.top - FLAME_H).toBeGreaterThanOrEqual(80);
-    expect(CANDLE.base - CANDLE.top).toBeGreaterThanOrEqual(500);
-    expect(CANDLE.xs.length).toBeGreaterThanOrEqual(3);
+    // The candles stand on a table seen whole above the bar on a phone on its side (user request, 24 November 2026:
+    // at 785 the table lay under the bar and they seemed to stand on nothing): its top and front edge above y 760.
+    expect(CANDLE.base).toBeLessThanOrEqual(TABLE.front - 30);
+    expect(TABLE.edge).toBeLessThanOrEqual(760);
+    // Tall candles, their flames still on that screen (from y 121 there with the bar); six burning one after the other.
+    expect(CANDLE.top - FLAME_H).toBeGreaterThanOrEqual(110);
+    expect(CANDLE.base - CANDLE.top).toBeGreaterThanOrEqual(400);
+    expect(CANDLE.xs.length).toBeGreaterThanOrEqual(6);
     expect(CANDLE.xs[0] - CANDLE.w / 2).toBeGreaterThanOrEqual(200);
+    expect(CANDLE.xs[CANDLE.xs.length - 1] + CANDLE.w / 2).toBeLessThanOrEqual(RIGHT_EDGE);
+    // The table's legs stand within a tablet's 4:3 cut, so it is plainly a table there too.
+    expect(TABLE.left + 24).toBeGreaterThanOrEqual(240);
+    expect(TABLE.right - 24).toBeLessThanOrEqual(1360);
     expect(STAGE_H).toBe(900);
+  });
+
+  test("Kerze: each candle burnt down lights the fuse to the next, whose spark lights it (user request, 24 November 2026)", () => {
+    for (const total of [10_000, 5 * 60_000, 3 * 3_600_000]) {
+      const plan = candlePlan(total);
+      expect(plan).toHaveLength(CANDLE.xs.length);
+      expect(plan[0].light).toBe(0);
+      expect(plan[plan.length - 1].out).toBeCloseTo(total);
+      for (let i = 1; i < plan.length; i++) {
+        // The spark sets off as the candle before goes out, and the candle lights as it reaches the wick.
+        expect(plan[i].fuseAt).toBeCloseTo(plan[i - 1].out);
+        expect(plan[i].light).toBeCloseTo(plan[i].fuseAt + plan[i].fuse);
+        expect(plan[i].fuse).toBeGreaterThan(0);
+        expect(plan[i].fuse).toBeLessThanOrEqual(FUSE_MS);
+        // Every length plays it all, the fuse only quicker: it never takes most of a candle's share.
+        expect(plan[i].fuse).toBeLessThanOrEqual((plan[i].out - plan[i].fuseAt) / 4 + 1);
+      }
+    }
+    // The fuse runs from beside one candle's stub, over the table, to the next candle's wick.
+    const [start, end] = [FUSE[0], FUSE[FUSE.length - 1]];
+    const step = CANDLE.xs[1] - CANDLE.xs[0];
+    expect(Math.abs(start[0])).toBeLessThanOrEqual(CANDLE.w / 2);
+    expect(start[1]).toBeGreaterThanOrEqual(CANDLE.base - CANDLE.stub - 4);
+    expect(Math.abs(end[0] - step)).toBeLessThanOrEqual(10);
+    expect(end[1]).toBeLessThan(CANDLE.top);
+    expect(Math.max(...FUSE.map(([, y]) => y))).toBeLessThan(TABLE.front);
+    expect(FUSE_AT[0]).toBe(0);
+    expect(FUSE_AT[FUSE_AT.length - 1]).toBeCloseTo(1);
   });
 
   test("the CSS burns the candle all the way down before its flame goes out, and its smoke rises for seconds", async () => {

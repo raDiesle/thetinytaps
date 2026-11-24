@@ -69,10 +69,20 @@ taken out (user request, November 2026). The pictures:
   of the time, and grows as a whole as it rises (`SPROUT_SIZE` to full: stalk thicker, leaves bigger, the lower leaves
   bigger than the upper ones); then its flower grows from small to big round the bud, all petals at once, until the
   end. It fills up instead of running out, for waiting for something good.
-- „Kerze“ 🕯️: three tall candles on the table burn down one after the other (`CANDLE.xs`, each a third of the time,
-  `--tm-i`/`--tm-of`), each burning all the way down into its puddle and only then going out, its smoke (`Smoke`: a
-  wisp curling up, soft puffs rising one after another) lingering for several seconds as the next lights; at the end the last one goes out with a puff
-  too (`blow`).
+- „Kerze“ 🕯️: six tall candles in six wax colours (`WAX`) stand in brass dishes on a wooden table seen a little from
+  above – its top, front edge and legs, the floor behind them (`TABLE`) – and burn down one after the other, linked like
+  a chain reaction (user request, 24 November 2026: three were too few, the table lay under the bar so they seemed to
+  stand on nothing, and it wasn't plain that one leads to the next): a fuse (`FUSE`, `Fuse`) runs from beside each
+  candle's stub over its dish's rim, across the table in a little dip and up the next candle's side to its wick. Each
+  candle has a sixth of the time (`candlePlan`): it burns all the way down into its puddle and only then goes out, its
+  last flame lights the fuse, and a spark (`.tm-spark`, a small layer riding `tm-fuse-run`, keyframes written once from
+  the fuse's points by length, `FUSE_AT`) runs along it with a sizzle while the cord burns away behind it
+  (`stroke-dashoffset` of the fuse's own small svg, only for those moments) and leaves a line of ash on the table; the
+  next candle lights as the spark reaches its wick. The spark takes the first moments of that candle's share
+  (`FUSE_MS`, at most `FUSE_SHARE` of it, so a short run is only quicker). The smoke of the one gone out (`Smoke`: a
+  wisp curling up, soft puffs rising one after another) lingers for several seconds meanwhile; at the end the last one
+  goes out with a puff too (`blow`). The window that stood at the right went for the six candles; a quiet wallpaper
+  pattern stays. Its card shows the spark on its way (`LATER`, 0.506).
 - „Sonnenaufgang“ 🌅 (`sunset.tsx`, id `sunset`, H-54; „Sonnenuntergang“ until the moon came first, November 2026): one round hill, its meadow full of flowers drawn as coloured dots
   (`FLOWERS`), and a big moon exactly in the picture's middle. First the moon goes down behind the hill (gone at
   `MOON_SET_AT`) while the stars go out one by one (`STARS`, each at its share of the time), the night's sky and then the
@@ -366,7 +376,7 @@ and the shared `Layer`, `Draw`, `LeftGlow`), `timer.css`, `content.ts`
   can see from the sofa – a bite, a crumb, an apple, a slice – not only a tiny wobble. Pieces come many, also for a
   short time (they come more often then, never fewer), the way to go is long (the train across the picture, the stalk
   nearly to the top), and a goal shows from the start (the flag, the ribbon). What is cut into pieces
-  over the time gets enough of them (24 slices, three candles one after the other, petals opening after the stalk has
+  over the time gets enough of them (24 slices, six candles one after the other, petals opening after the stalk has
   grown). Many pieces mean many moments: their sounds are spaced (`PIECE_SOUND_GAP_MS`), never a din.
 - **Every length plays the whole story, only faster or slower** (user request, 24 November 2026): a picture's run is
   the same at 10 seconds as at 3 hours – every block, toy, apple, move and step of it, in the same order – and the
@@ -424,6 +434,13 @@ and the shared `Layer`, `Draw`, `LeftGlow`), `timer.css`, `content.ts`
   user feedback, November 2026). A new picture is one whole small story a child knows from life, and shows nothing
   beside it: what runs down stands big where the eye goes first, and things only standing by (a windmill and a little
   house beside the moon and the sun) come out (user feedback, November 2026).
+- **Things that run out one after the other show how one leads to the next** (user request on the Kerze, 24 November
+  2026: „ähnlich wie bei Kettenreaktion“): a thing that ends sets off the next one visibly – a fuse from candle to
+  candle whose spark lights the next wick – never a next one starting by itself with nothing between them; the link
+  lies there from the first second, so the child sees the whole chain still to come.
+- **What a thing stands on is seen** (user request on the Kerze, 24 November 2026: the table lay under the bar): the
+  table, floor or shelf under what runs down shows whole above the bar on a phone on its side (about y 120–770 of the
+  stage there), its edge and legs too, so nothing seems to float (`timer.test.ts` checks the table).
 - **What runs out runs out wholly before it ends** (user feedback, November 2026): a candle burns down to its puddle
   before its flame goes out (`CANDLE.stub` a thin rim, the going out after its turn, never before), and what follows
   an ending (the smoke) lingers slow and soft for seconds, never a puff gone at once. `timer.test.ts` checks the candle.

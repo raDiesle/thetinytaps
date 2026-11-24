@@ -532,25 +532,139 @@ export function Hourglass({ running, glow = 0, className, style }: { running: bo
 }
 
 // ---------------------------------------------------------------------------------------------------------------
-// Kerze: three tall candles on the table burn down one after another (user feedback, November 2026: taller, and
-// several, so more of the time shows); each burns all the way down into its puddle on the holder, and only then goes
-// out, its smoke rising slowly for a few seconds while the next lights up (user feedback, November 2026: they went out
-// with a good piece still standing, and the puff was gone at once). At the end the last one goes out with a puff too. Each candle burns in its third of the
-// time: the same animations as one candle, each with a third of the time as duration and its turn as delay.
+// Kerze: six tall candles stand side by side on a table and burn down one after another, linked like a chain reaction
+// (user request, 24 November 2026: more candles, the table seen, and plain to see how one leads to the next): from
+// each candle's dish a fuse runs across the table, over the next one's dish and up its side to its wick. Each candle
+// burns all the way down into its puddle and only then goes out (user feedback, November 2026: they went out with a
+// good piece still standing), its last flame lights the fuse, a spark runs along it – the cord burning away behind it,
+// leaving a thin line of ash on the table – and lights the next candle's wick, while the smoke of the one gone out
+// rises slowly for a few seconds. At the end the last one goes out with a puff. Every candle has its sixth of the time
+// (`candlePlan`); the fuse takes the first moments of the next one's share.
 
-/** The candles when new: their middles, width, top and the table they stand on; at the end only a thin `stub` of each is left in its puddle. */
-export const CANDLE = { xs: [600, 800, 1000], w: 110, top: 215, base: 785, stub: 10 } as const;
+/** The candles when new: their middles, width, top and where they stand on the table; at the end only a thin `stub` of each is left in its puddle. */
+export const CANDLE = { xs: [325, 515, 705, 895, 1085, 1275], w: 96, top: 240, base: 655, stub: 10 } as const;
 
 /** How tall the flame stands above a candle's top, so the first candle's flame stays on every screen. */
 export const FLAME_H = 130;
+
+/** The table the candles stand on, seen a little from above: its top's back and front edge, its front's lower edge, its ends and legs. */
+export const TABLE = { back: 600, front: 700, edge: 732, left: 228, right: 1372, inset: 30, leg: 52 } as const;
+
+/** How long the spark runs along a fuse at most, and never more than this share of a candle's time (a short run is only quicker). */
+export const FUSE_MS = 3500;
+export const FUSE_SHARE = 0.25;
+
+/** When candle `i` lights, when it is burnt down and goes out, and when the spark on the fuse into it sets off (`fuse` ms long; none for the first). */
+export interface CandleTurn {
+  light: number;
+  out: number;
+  fuseAt: number;
+  fuse: number;
+}
+
+/**
+ * Each candle's moments in a run of `total` ms: its share starts as the one before goes out, the spark runs the fuse
+ * in its first moments, and it burns from the moment the spark reaches its wick to the end of its share. The first is
+ * lit from the start.
+ */
+export function candlePlan(total: number): CandleTurn[] {
+  const count = CANDLE.xs.length;
+  const share = total / count;
+  const fuse = Math.min(FUSE_MS, share * FUSE_SHARE);
+  return CANDLE.xs.map((_, i) => {
+    const start = share * i;
+    const lit = i === 0 ? 0 : fuse;
+    return { light: start + lit, out: start + share, fuseAt: start, fuse: i === 0 ? 0 : fuse };
+  });
+}
 
 /** The candle burning at `share` (0–1) of the time, counted from 0. */
 export function candleAt(share: number): number {
   return Math.min(CANDLE.xs.length - 1, Math.max(0, Math.floor(share * CANDLE.xs.length)));
 }
 
-/** A cosy evening room with a window and the table with the candles' holders; drawn once. */
+/** Points of a quadratic curve from `a` over `c` to `b`, without `a`. */
+function curve(a: readonly [number, number], c: readonly [number, number], b: readonly [number, number], steps: number): [number, number][] {
+  return Array.from({ length: steps }, (_, k) => {
+    const t = (k + 1) / steps;
+    const u = 1 - t;
+    return [u * u * a[0] + 2 * u * t * c[0] + t * t * b[0], u * u * a[1] + 2 * u * t * c[1] + t * t * b[1]] as [number, number];
+  });
+}
+
+/** How far apart the candles stand. */
+const STEP = CANDLE.xs[1] - CANDLE.xs[0];
+
+/**
+ * The fuse from one candle to the next, in stage units counted from the first candle's middle: from beside its stub
+ * in its dish over the dish's rim, across the table in a little dip towards the front, over the next dish's rim, up
+ * that candle's side and over its top to its wick. Every fuse is the same, moved by `STEP`.
+ */
+export const FUSE: readonly [number, number][] = (() => {
+  const { base, top, w } = CANDLE;
+  const side = STEP - w / 2 + 4;
+  const rimOut: [number, number][] = [
+    [34, base - 8],
+    [50, base - 6],
+    [62, base - 1],
+    [70, base + 6],
+    [75, base + 16],
+  ];
+  const across = curve([75, base + 16], [STEP / 2, base + 56], [STEP - 75, base + 16], 10);
+  const rimIn: [number, number][] = [
+    [STEP - 70, base + 6],
+    [STEP - 62, base - 1],
+    [side, base - 8],
+  ];
+  const up: [number, number][] = [
+    [side, (base + top) / 2],
+    [side, top + 16],
+  ];
+  const over = curve([side, top + 16], [side, top - 8], [STEP - 5, top - 16], 6);
+  return [...rimOut, ...across, ...rimIn, ...up, ...over];
+})();
+
+/** How far along the fuse each of its points lies, as a share of its whole length (0 at its start, 1 at the wick). */
+export const FUSE_AT: readonly number[] = (() => {
+  const lengths = FUSE.map((p, k) => (k === 0 ? 0 : Math.hypot(p[0] - FUSE[k - 1][0], p[1] - FUSE[k - 1][1])));
+  const sums = lengths.map((_, k) => lengths.slice(0, k + 1).reduce((x, y) => x + y, 0));
+  const all = sums[sums.length - 1];
+  return sums.map((s) => s / all);
+})();
+
+/** The fuse's box on the stage, counted from a candle's middle and the stage's top. */
+const FUSE_BOX = { x: 0, y: CANDLE.top - 40, w: STEP + 10, h: CANDLE.base + 70 - (CANDLE.top - 40) } as const;
+
+/** The spark's box, round the point it is at. */
+const SPARK = 100;
+
+/** A path through the fuse's points within its box; `onTable` only the part lying on the table, where its ash stays. */
+function fusePath(onTable = false): string {
+  const points = onTable ? FUSE.filter(([, y]) => y >= CANDLE.base + 6) : FUSE;
+  return points.map(([x, y], k) => `${k ? "L" : "M"}${(x - FUSE_BOX.x).toFixed(1)} ${(y - FUSE_BOX.y).toFixed(1)}`).join(" ");
+}
+
+/**
+ * The spark's way along the fuse as keyframes, from its start to the wick, at an even pace by length (as the cord
+ * burns away behind it), growing and shrinking a little from point to point so it fizzles.
+ */
+export function fuseKeyframes(): string {
+  const [x0, y0] = FUSE[0];
+  const steps = FUSE.map(([x, y], k) => {
+    const at = (FUSE_AT[k] * 100).toFixed(3);
+    const dx = (((x - x0) / SPARK) * 100).toFixed(2);
+    const dy = (((y - y0) / SPARK) * 100).toFixed(2);
+    return `${at}% { transform: translate(${dx}%, ${dy}%) scale(${k % 2 ? 1.25 : 0.9}); }`;
+  });
+  return `@keyframes tm-fuse-run {${steps.join(" ")}}`;
+}
+
+/** The spark's keyframes, the same for every fuse and run. */
+const FUSE_RUN = fuseKeyframes();
+
+/** A cosy evening room with a quiet wallpaper, and the table with the candles' holders; drawn once. */
 export const CandleBackdrop = memo(function CandleBackdrop() {
+  const { back, front, edge, left, right, inset, leg } = TABLE;
   return (
     <Layer x={0} y={0} w={STAGE_W} h={STAGE_H} className="tm-back">
       <Draw w={STAGE_W} h={STAGE_H}>
@@ -559,37 +673,52 @@ export const CandleBackdrop = memo(function CandleBackdrop() {
             <stop offset="0" stopColor="#5c4b8a" />
             <stop offset="1" stopColor="#2b2d5c" />
           </radialGradient>
+          <pattern id="tm-paper" width="120" height="120" patternUnits="userSpaceOnUse">
+            <path d="M60 18 l8 12 l-8 12 l-8 -12 Z M0 78 l8 12 l-8 12 l-8 -12 Z M120 78 l8 12 l-8 12 l-8 -12 Z" fill="#ffffff" opacity="0.06" />
+          </pattern>
+          <linearGradient id="tm-table-top" x1="0" y1="0" x2="0" y2="1">
+            <stop offset="0" stopColor="#9c6834" />
+            <stop offset="1" stopColor="#c08850" />
+          </linearGradient>
         </defs>
         <rect width={STAGE_W} height={STAGE_H} fill="url(#tm-room)" />
-        <rect x="1110" y="150" width="220" height="240" rx="12" fill="#1c2a5a" stroke="#c9a46b" strokeWidth="14" />
-        <path d="M1220 150 V390 M1110 270 H1330" stroke="#c9a46b" strokeWidth="10" />
-        <circle cx="1170" cy="215" r="32" fill="#fff3bf" />
-        <circle cx="1186" cy="205" r="28" fill="#1c2a5a" />
-        {[
-          [1280, 200],
-          [1295, 330],
-          [1150, 340],
-        ].map(([cx, cy]) => (
-          <circle key={cx} cx={cx} cy={cy} r="5" fill="#fff3bf" />
+        <rect width={STAGE_W} height={STAGE_H} fill="url(#tm-paper)" />
+        {/* The floor and its skirting board, behind the table's legs. */}
+        <rect x="0" y="820" width={STAGE_W} height="80" fill="#4a2f1a" />
+        <rect x="0" y="806" width={STAGE_W} height="16" fill="#6b4526" />
+        <path d="M0 852 H1600 M0 880 H1600" stroke="#3a2412" strokeWidth="3" />
+        {/* The back legs, darker, then the front legs. */}
+        {[left + inset + 26, right - inset - 26 - leg].map((x) => (
+          <rect key={x} x={x} y={edge - 10} width={leg - 8} height={STAGE_H} fill="#5e3b1c" stroke={INK} strokeWidth="5" />
         ))}
-        {/* The window's sill. */}
-        <rect x="1094" y="388" width="252" height="22" rx="6" fill="#c9a46b" />
-        <rect x="0" y={CANDLE.base + 10} width={STAGE_W} height={STAGE_H} fill="#8a5a2b" />
-        <rect x="0" y={CANDLE.base + 10} width={STAGE_W} height="16" fill="#a8743f" />
+        {[left + 24, right - 24 - leg].map((x) => (
+          <rect key={x} x={x} y={edge - 10} width={leg} height={STAGE_H} fill="#7a4f26" stroke={INK} strokeWidth="5" />
+        ))}
+        {/* Under the top a band of shadow, then the top seen from above and its front edge. */}
+        <rect x={left + 10} y={edge} width={right - left - 20} height="22" fill="#000" opacity="0.25" />
         <path
-          d={`M0 ${CANDLE.base + 52} C300 ${CANDLE.base + 44} 600 ${CANDLE.base + 60} 900 ${CANDLE.base + 50} S1400 ${CANDLE.base + 46} 1600 ${CANDLE.base + 54} M120 ${CANDLE.base + 82} C420 ${CANDLE.base + 74} 760 ${CANDLE.base + 90} 1500 ${CANDLE.base + 80}`}
-          fill="none"
-          stroke="#74491f"
-          strokeWidth="4"
+          d={`M${left + inset} ${back} H${right - inset} L${right} ${front} H${left} Z`}
+          fill="url(#tm-table-top)"
+          stroke={INK}
+          strokeWidth="5"
+          strokeLinejoin="round"
         />
-        {/* Each holder a brass dish with a rim and a little handle ring at its side. */}
+        <path
+          d={`M${left + 90} ${back + 26} C560 ${back + 20} 820 ${back + 34} 1100 ${back + 24} S1260 ${back + 22} ${right - 60} ${back + 30} M${left + 30} ${back + 62} C520 ${back + 56} 820 ${back + 72} ${right - 30} ${back + 64}`}
+          fill="none"
+          stroke="#8a5a2b"
+          strokeWidth="4"
+          opacity="0.7"
+        />
+        <rect x={left} y={front} width={right - left} height={edge - front} fill="#8a5a2b" stroke={INK} strokeWidth="5" strokeLinejoin="round" />
+        <path d={`M${left + 6} ${front + 6} H${right - 6}`} stroke="#b47a42" strokeWidth="4" />
+        {/* Each holder a brass dish with a rim, its shadow on the table. */}
         {CANDLE.xs.map((cx) => (
           <g key={cx}>
-            <ellipse cx={cx + 70} cy={CANDLE.base + 36} rx="18" ry="11" fill="none" stroke={INK} strokeWidth="11" />
-            <ellipse cx={cx + 70} cy={CANDLE.base + 36} rx="18" ry="11" fill="none" stroke="#e6b44c" strokeWidth="5" />
-            <ellipse cx={cx} cy={CANDLE.base + 16} rx="92" ry="18" fill="#b8862a" stroke={INK} strokeWidth="5" />
-            <ellipse cx={cx} cy={CANDLE.base + 8} rx="92" ry="18" fill="#e6b44c" stroke={INK} strokeWidth="5" />
-            <ellipse cx={cx} cy={CANDLE.base + 8} rx="74" ry="12" fill="none" stroke="#f7d779" strokeWidth="4" />
+            <ellipse cx={cx + 6} cy={CANDLE.base + 26} rx="80" ry="12" fill="#000" opacity="0.22" />
+            <ellipse cx={cx} cy={CANDLE.base + 16} rx="70" ry="15" fill="#b8862a" stroke={INK} strokeWidth="5" />
+            <ellipse cx={cx} cy={CANDLE.base + 8} rx="70" ry="15" fill="#e6b44c" stroke={INK} strokeWidth="5" />
+            <ellipse cx={cx} cy={CANDLE.base + 8} rx="56" ry="10" fill="none" stroke="#f7d779" strokeWidth="4" />
           </g>
         ))}
       </Draw>
@@ -597,12 +726,64 @@ export const CandleBackdrop = memo(function CandleBackdrop() {
   );
 });
 
-/** The animation timing of candle `i` for the CSS: its turn (`--tm-i`) among `--tm-of` candles. */
-function turn(i: number): CSSProperties {
+/**
+ * The fuse into candle `i` (from the one before): a cord with a dark outline lying over the dishes, the table and the
+ * candle's side, burning away from its start as the spark runs along it (`--tm-fuse-at`, `--tm-fuse`), a thin line of
+ * ash staying on the table; the spark is a small glowing layer of its own riding its way (`tm-fuse-run`).
+ */
+function Fuse({ i, turn }: { i: number; turn: CandleTurn }) {
+  const x = CANDLE.xs[i - 1];
+  const timing = { "--tm-fuse-at": `${turn.fuseAt}ms`, "--tm-fuse": `${turn.fuse}ms` } as CSSProperties;
+  const line = fusePath();
+  const [sx, sy] = FUSE[0];
+  return (
+    <>
+      <Layer x={x + FUSE_BOX.x} y={FUSE_BOX.y} w={FUSE_BOX.w} h={FUSE_BOX.h}>
+        <svg viewBox={`0 0 ${FUSE_BOX.w} ${FUSE_BOX.h}`} preserveAspectRatio="none">
+          <path
+            d={fusePath(true)}
+            fill="none"
+            stroke="#2b2320"
+            strokeWidth="5"
+            strokeLinecap="round"
+            strokeLinejoin="round"
+            strokeDasharray="3 9"
+            opacity="0.7"
+          />
+        </svg>
+      </Layer>
+      <Layer x={x + FUSE_BOX.x} y={FUSE_BOX.y} w={FUSE_BOX.w} h={FUSE_BOX.h} className="tm-fuse" style={timing}>
+        <svg viewBox={`0 0 ${FUSE_BOX.w} ${FUSE_BOX.h}`} preserveAspectRatio="none">
+          <path className="tm-fuse-line" d={line} pathLength={1} fill="none" stroke={INK} strokeWidth="16" strokeLinecap="round" strokeLinejoin="round" />
+          <path className="tm-fuse-line" d={line} pathLength={1} fill="none" stroke="#fff1d6" strokeWidth="8" strokeLinecap="round" strokeLinejoin="round" />
+        </svg>
+      </Layer>
+      <Layer x={x + sx - SPARK / 2} y={sy - SPARK / 2} w={SPARK} h={SPARK} className="tm-spark" style={timing}>
+        <div className="tm-spark-go" style={{ animationName: "tm-fuse-run" }}>
+          <svg viewBox="-32 -32 64 64">
+            <circle r="31" fill="#ffd43b" opacity="0.3" />
+            <circle r="20" fill="#ffe066" opacity="0.5" />
+            <path
+              d="M0 -26 L5 -6 L24 -10 L8 3 L18 22 L0 10 L-18 22 L-8 3 L-24 -10 L-5 -6 Z"
+              fill="#ffe066"
+              stroke="#ff922b"
+              strokeWidth="3"
+              strokeLinejoin="round"
+            />
+            <circle r="7" fill="#fff9db" />
+          </svg>
+        </div>
+      </Layer>
+    </>
+  );
+}
+
+/** The animation timing of candle `i` for the CSS: when it lights (`--tm-from`) and how long it burns (`--tm-turn`), with its wax colours. */
+function timing(i: number, turn: CandleTurn): CSSProperties {
   const wax = WAX[i % WAX.length];
   return {
-    "--tm-i": i,
-    "--tm-of": CANDLE.xs.length,
+    "--tm-from": `${turn.light}ms`,
+    "--tm-turn": `${turn.out - turn.light}ms`,
     "--tm-wax-side": wax.side,
     "--tm-wax-light": wax.light,
     "--tm-wax-top": wax.top,
@@ -610,11 +791,14 @@ function turn(i: number): CSSProperties {
   } as CSSProperties;
 }
 
-/** Each candle's wax: its shaded sides, its lit middle, its top and what runs down (drop and puddle) – pink, blue, yellow. */
+/** Each candle's wax: its shaded sides, its lit middle, its top and what runs down (drop and puddle) – pink, blue, yellow, green, lilac, orange. */
 const WAX = [
   { side: "#ffc9c9", light: "#fff0f0", top: "#ffe3e3", run: "#ffb3c1" },
   { side: "#a5d8ff", light: "#eef7ff", top: "#d0ebff", run: "#8cc8f5" },
   { side: "#ffe066", light: "#fffbe0", top: "#fff3bf", run: "#ffd43b" },
+  { side: "#b2f2bb", light: "#f0fff2", top: "#d3f9d8", run: "#8ce99a" },
+  { side: "#d0bfff", light: "#f6f2ff", top: "#e5dbff", run: "#b197fc" },
+  { side: "#ffc078", light: "#fff4e6", top: "#ffd8a8", run: "#ffa94d" },
 ] as const;
 
 /**
@@ -624,22 +808,22 @@ const WAX = [
  * last, goes out once it is burnt down, with a slow curl of smoke. `out` puts the last one's flame out; `flare` keys the flame flaring
  * up at a tap; `glow` lights the wax still to burn (H-51), given only to the candles not yet burnt.
  */
-function Candle({ i, out, flare, glow }: { i: number; out: boolean; flare: number; glow: number }) {
+function Candle({ i, turn, out, flare, glow }: { i: number; turn: CandleTurn; out: boolean; flare: number; glow: number }) {
   const cx = CANDLE.xs[i];
   const w = CANDLE.w;
   const h = CANDLE.base - CANDLE.top;
   const last = i === CANDLE.xs.length - 1;
   return (
     <>
-      <Layer x={cx - 90} y={CANDLE.base - 14} w={180} h={28} style={turn(i)}>
+      <Layer x={cx - 66} y={CANDLE.base - 12} w={132} h={26} style={timing(i, turn)}>
         <div className="tm-puddle tm-move" />
       </Layer>
-      <Layer x={cx - w / 2} y={CANDLE.top} w={w} h={h} className="tm-wax-box" style={turn(i)}>
+      <Layer x={cx - w / 2} y={CANDLE.top} w={w} h={h} className="tm-wax-box" style={timing(i, turn)}>
         <div className="tm-wax tm-move">
           <LeftGlow n={glow} />
         </div>
       </Layer>
-      <Layer x={cx - w / 2} y={CANDLE.top} w={w} h={h} className="tm-flame-box tm-move" style={turn(i)}>
+      <Layer x={cx - w / 2} y={CANDLE.top} w={w} h={h} className="tm-flame-box tm-move" style={timing(i, turn)}>
         <svg viewBox={`0 0 ${w} ${h}`} preserveAspectRatio="none">
           <ellipse cx={w / 2} cy="0" rx={w / 2 - 2} ry="13" style={{ fill: "var(--tm-wax-top)" }} stroke={INK} strokeWidth="4" />
           <path d={`M${w / 2} 0 V-22`} stroke={INK} strokeWidth="5" strokeLinecap="round" />
@@ -697,17 +881,20 @@ function Smoke({ puff }: { puff?: boolean }) {
 }
 
 /**
- * The three candles. The one burning while a tap comes is worked out from the clock, so its wax and those after it
- * light up, never the stubs already burnt.
+ * The candles and the fuses between them. The one burning while a tap comes is worked out from the clock, so its wax
+ * and those after it light up, never the stubs already burnt. The spark's way is written once (`fuseKeyframes`).
  */
 export function Candles({ out, flare, glow, startedAt, total }: { out: boolean; flare: number; glow: number; startedAt: number; total: number }) {
   const clock = useRunClock();
   const now = glow ? candleAt((clock.now() - startedAt) / total) : 0;
+  const plan = candlePlan(total);
   return (
     <>
-      {CANDLE.xs.map((_, i) => (
-        <Candle key={i} i={i} out={out} flare={i === now ? flare : 0} glow={i >= now ? glow : 0} />
+      <style>{FUSE_RUN}</style>
+      {plan.map((turn, i) => (
+        <Candle key={i} i={i} turn={turn} out={out} flare={i === now ? flare : 0} glow={i >= now ? glow : 0} />
       ))}
+      {plan.map((turn, i) => (i === 0 ? null : <Fuse key={i} i={i} turn={turn} />))}
     </>
   );
 }
