@@ -131,8 +131,9 @@ const POSTERS: Record<string, { href: string; play: (cdp: Cdp) => Promise<void> 
     href: "/drauflos/",
     play: async (cdp) => {
       // A key pressed with chance fixed for its first calls. The first surprise of a fresh bag is a firework when the
-      // shuffle's chance always says „stay“ (`SURPRISE_KINDS[0]`): two calls place it (`freeSpot`), fifteen shuffle,
-      // then its warm palette in two rings of round sparks. The four comes blue with yellow hearts round it.
+      // shuffle's chance always says „stay“ (`SURPRISE_KINDS[0]`): two calls place it (`freeSpot`), one fewer than there
+      // are kinds shuffle (21 for 22 kinds – a new kind needs one more here, or the poster shows another surprise), then
+      // its warm palette in two rings of round sparks. The four comes blue with yellow hearts round it.
       const pressFixed = (key: string, code: string, fixed: number[]) =>
         evaluate(
           cdp,
@@ -145,7 +146,7 @@ const POSTERS: Record<string, { href: string; play: (cdp: Cdp) => Promise<void> 
             return true;
           })()`,
         );
-      await pressFixed("-", "Minus", [0.45, 0.3, ...Array(15).fill(0.9999), 0, 0.25, 0]);
+      await pressFixed("-", "Minus", [0.45, 0.3, ...Array(21).fill(0.9999), 0, 0.25, 0]);
       await sleep(250);
       await pressFixed("4", "Digit4", [0.4, 0.9, 0.15]);
       await sleep(250);
