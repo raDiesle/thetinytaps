@@ -192,14 +192,16 @@ test("no start screen has an „Über das Spiel“", () => {
 });
 
 // User feedback, October 2026: the animal families stand at the bottom of a menu's page, never in its top row beside
-// the title, where they were too small and in the way; the page keeps room for them under its cards.
+// the title, where they were too small and in the way. On a phone or tablet the page keeps no room for them: the cards
+// take all the room and may lie over them (user decision, 25 November 2026).
 test("the families stand at the bottom of a menu's page, not in its head", () => {
   expect(read("src/components/MenuTop.tsx")).not.toContain("BookFamil");
   expect(read("src/components/Sky.tsx")).toContain("<BookFamilies />");
   const family = cssRules().filter((r) => r.selector === ":root .book-family");
   expect(family.length).toBeGreaterThan(0);
   for (const rule of family) expect(rule.body).toMatch(/bottom:/);
-  expect(read("src/lib/fitGrid.ts")).toContain("--menu-floor");
+  expect(read("src/lib/fitGrid.ts")).not.toContain("--menu-floor");
+  expect(read("src/styles/book.css")).not.toContain("--menu-floor");
 });
 
 // User feedback, October 2026: headings carry no emoji („Lebendige Welten“, never „🌳 Lebendige Welten“). MenuHead takes

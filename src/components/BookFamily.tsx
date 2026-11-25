@@ -38,9 +38,9 @@ function readerOf(family: Family, n = visitNumber()): string | undefined {
 
 /**
  * Both families at the bottom of a menu's page (Sky), the foxes in the left corner and the bears in the
- * right, so grown-ups see the book is to be read with the child: below the cards, in the room the page keeps free for
- * them (`--menu-floor`, `book.css`), or on a wide page's margins beside the cards. Never in the top row, beside the
- * title (user feedback, October 2026). Lazy, so a screen that hides them never downloads them.
+ * right, so grown-ups see the book is to be read with the child: behind the cards on a phone or tablet, which may lie
+ * over them (user decision, 25 November 2026), or on a wide page's margins beside the cards. Never in the top row,
+ * beside the title (user feedback, October 2026). Lazy, so a screen that hides them never downloads them.
  */
 export function BookFamilies() {
   return (

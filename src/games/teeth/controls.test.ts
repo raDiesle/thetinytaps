@@ -66,7 +66,18 @@ test("on a wide screen the strip runs the whole height, the same gap from the �
   expect(rule).toContain("align-self: stretch;");
   expect(rule).toContain("--teeth-edge: calc(var(--frame, 0px) + var(--teeth-gap));");
   expect(rule).toMatch(/margin: calc\(var\(--play-corner, 0px\) \+ var\(--teeth-gap\)/);
-  expect(rule.match(/max\(var\(--teeth-edge\)/g)?.length).toBe(2);
+  expect(rule.match(/max\(var\(--teeth-edge\)/g)?.length).toBe(1);
+  // On the left it lies at the paper margin even beside a camera's cut-out (user feedback, November 2026).
+  expect(rule).toContain("calc(var(--teeth-edge) - max(6px, env(safe-area-inset-left)))");
+});
+
+// The brushing's steps were 8 px on a phone, hard to tap (user feedback, November 2026): beside the picture a phase
+// takes only its symbol's height and the steps get the rest of the strip, however long each lasts.
+test("on a wide screen the brushing's steps get the strip's free height", () => {
+  const wide = css.slice(css.indexOf("@media (orientation: landscape) {\n  .teeth-play {"));
+  expect(wide).toMatch(/\.teeth-tile \{\s*flex: none;\s*height: calc\(var\(--symbol\) \+ 4px\);/);
+  expect(wide).toMatch(/\.teeth-brushing \{\s*flex: 1 1 0;/);
+  expect(css).toMatch(/\.teeth-brushing \{\s*flex: 12 1 /);
 });
 
 test("the end's week, trophy and „Menü“ lie on a sheet sized by its own width, beside the head on a wide screen", () => {

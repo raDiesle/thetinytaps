@@ -350,7 +350,9 @@ const noseY = () => HEAD_MIDDLE[1] - (10 / 165) * HEAD_RADIUS;
 
 /**
  * The face's outline in a profile, from the top of the head down to its bottom: the middle line of the face with its
- * nose, running in onto the lips' ends and straight from the upper lip's end to the lower one's, in front of the teeth. Whatever lies beyond it is the far side of the head and is not seen.
+ * nose, running in onto the lips' ends: two runs of equal length, down to the upper lip's end and on from the lower
+ * one's. Whatever lies beyond it (and beyond the straight way between the lips' ends, in front of the teeth) is the far
+ * side of the head and is not seen; the outline itself is never drawn across the mouth (`profileOutline` in `mouth.tsx`).
  */
 export function profileLine(lips: Vec3[]): Vec3[] {
   const ends = lips.filter((p) => Math.abs(p[0]) < 1e-6);

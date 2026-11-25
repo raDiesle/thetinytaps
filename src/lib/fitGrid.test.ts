@@ -103,4 +103,13 @@ describe("cards with a preview picture", () => {
     // No rule lays the picture over the card (the name once lay on Kettenreaktion's pictures).
     expect(css).not.toMatch(/\.picture-card[^{]*\.with-picture\s*\{[^}]*position:\s*absolute/);
   });
+
+  test("a table of contents shrinks its names alike rather than letting a long one push its line off the page", () => {
+    // Bewegungsabenteuer on a phone on its side reached past the screen's edge once the lines grew (November 2026).
+    const css = readFileSync("src/styles/book.css", "utf8").replace(/\/\*[\s\S]*?\*\//g, "");
+    expect(css.match(/\n\.toc-title \{([^}]*)\}/)?.[1]).toContain("max-width: 100%");
+    expect(css.match(/\n\.toc-line \{([^}]*)\}/)?.[1]).toContain("min-width: 0");
+    for (const size of css.matchAll(/\.toc-title \{[^}]*font-size:([^;]*);/g)) expect(size[1]).toContain("var(--name-fit, 1)");
+    expect(readFileSync("src/components/BookContents.tsx", "utf8")).toContain('fitNames(list, ".toc-title")');
+  });
 });

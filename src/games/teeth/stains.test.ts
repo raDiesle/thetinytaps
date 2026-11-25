@@ -54,12 +54,9 @@ test("a stained face is plainly darker and yellower than a clean one, never brow
 
 // The stain on the teeth being brushed fades in a layer of its own: a fade inside the mirror's svg would have the phone
 // paint the screen anew in every frame of it (CLAUDE.md, phones must keep up).
-test("the stain of a tooth being brushed fades as an HTML layer of its own, and its glint flashes once", () => {
+test("the stain of a tooth being brushed fades as an HTML layer of its own", () => {
   expect(mouth).toMatch(/<div className=\{`tooth-stain\$\{clean \? " clean" : ""\}`\}/);
   expect(css).toMatch(/\.tooth-stain\.clean \{\s*animation: teeth-stain-clear [^;]*forwards;/);
-  const once = css.match(/\.tooth-glint\.brushed > div \{\s*animation: ([^;]+);/)?.[1] ?? "";
-  expect(once).toContain("teeth-glint-once");
-  expect(once).not.toContain("infinite");
   // The mask cuts out what lies over the face by its outlines in black: no filter, which costs a phone paint.
   const stain = mouth.slice(mouth.indexOf("const ToothStain"));
   expect(stain).not.toContain("<filter");
@@ -70,4 +67,27 @@ test("the stain of a tooth being brushed fades as an HTML layer of its own, and 
 test("in the story the sugar stains the teeth while the monsters grow, as a layer of its own", () => {
   expect(origin).toMatch(/part === "grow" && \(\s*<Piece [^>]*className="origin-stain"/);
   expect(css).toMatch(/\.origin\.at-grow \.origin-stain \{\s*animation: teeth-origin-stain /);
+});
+
+// A brushed tooth's one big glint flashed while the brush still lay on it, so only the step's last tooth seemed to
+// sparkle (user feedback, November 2026): every brushed face of the view sparkles with small, faint glints, only once
+// the brush has reached the next tooth, after a beat's pause, and goes on sparkling softly.
+test("brushed teeth sparkle small and softly, only once the brush has moved on", () => {
+  expect(mouth).toMatch(/const sparkling = stains\.filter\(\(g\) => !dirty\.includes\(g\.key\) && brush !== null && brushLeft\(brush, g\.tooth\.id\)\);/);
+  expect(mouth).toMatch(/function brushLeft[\s\S]*?brush\.at >= last \+ 1/);
+  expect(Number(mouth.match(/const SPARKLE_SIZE = ([\d.]+);/)?.[1])).toBeLessThanOrEqual(0.35);
+  expect(mouth).toMatch(/sparkles: \[project\.point\(onFace\([^)]*\)\), project\.point\(onFace\([^)]*\)\)\]/);
+  const sparkle = css.match(/\.tooth-glint\.brushed > div \{\s*animation: ([^;]+);/)?.[1] ?? "";
+  expect(sparkle).toMatch(/^teeth-sparkle [\d.]+s ease-in-out calc\(0\.536s \+ var\(--turn\) \* [\d.]+s\) infinite$/);
+  const peak = Math.max(...[...(css.match(/@keyframes teeth-sparkle \{[\s\S]*?\n\}/)?.[0] ?? "").matchAll(/opacity: ([\d.]+)/g)].map((m) => Number(m[1])));
+  expect(peak).toBeLessThanOrEqual(0.75);
+});
+
+// Brushed teeth are a beautiful white (user feedback, November 2026), never cream.
+test("a clean tooth's front is pure white and its other faces a cool white", () => {
+  expect(TOOTH_FILLS.outer).toBe("#ffffff");
+  for (const kind of ["top", "inner", "side"] as const) {
+    const [r, g, b] = [1, 3, 5].map((i) => Number.parseInt(TOOTH_FILLS[kind].slice(i, i + 2), 16));
+    expect({ kind, cool: b >= r && b >= g }).toEqual({ kind, cool: true });
+  }
 });
