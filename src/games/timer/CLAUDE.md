@@ -500,7 +500,7 @@ and the shared `Layer`, `Draw`, `LeftGlow`), `timer.css`, `content.ts`
 - **Every picture of taking turns plays with two to four children** (user request, 25 November 2026): one count for
   all of them (`kids`, two by default, behind ⚙️ while playing), the children always the first of `TURN_CHILDREN`, and
   their names or photos on their places (`players`). A new picture of taking turns takes `kids` and `players` too, keeps
-  all four places within x 200–1340 and fair (`timer.test.ts` checks the cushions), and the menu's group says „(bis 4)“.
+  all four places within x 245–1340 (a tablet's 4:3 cut, where three children's first cushion was cut off) and fair (`timer.test.ts` checks the cushions), and the menu's group says „(bis 4)“.
 - **One drawing for one thing**: a thing two pictures show (the hourglass) is one component both use, never copied and
   drawn again with its own sizes (user request, November 2026; `timer.test.ts` checks the hourglass).
 - **The cards' order is the user's** (November 2026, last changed 25 November 2026: Rote Scheibe, Sanduhr, Apfelbaum,

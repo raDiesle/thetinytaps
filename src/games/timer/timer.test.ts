@@ -1247,7 +1247,9 @@ describe("Timer", () => {
       const g = glassBox(glass);
       const half = w / 2;
       expect(xs).toHaveLength(count);
-      expect(xs[0] - half, `${count}`).toBeGreaterThanOrEqual(200);
+      // A tablet's 4:3 cut shows the stage from about x 243 (merged with main's stage that covers the screen; the fox's
+      // cushion with three children reached to 210 and was cut off there).
+      expect(xs[0] - half, `${count}`).toBeGreaterThanOrEqual(245);
       expect(xs[count - 1] + half, `${count}`).toBeLessThanOrEqual(RIGHT);
       // Left to right in the order of the turns, never touching each other nor reaching under the hourglass.
       for (let i = 1; i < count; i++) expect(xs[i] - xs[i - 1], `${count}`).toBeGreaterThanOrEqual(w + 10);

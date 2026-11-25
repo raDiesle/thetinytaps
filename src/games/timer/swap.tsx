@@ -59,7 +59,7 @@ export const SWAP_FLOOR = SAND_FLOOR;
  */
 export function swapPlaces(count: TurnCount) {
   if (count === 2) return { xs: [390, 1210], w: 250, glass: 1 };
-  if (count === 3) return { xs: [315, 535, 1175], w: 210, glass: 0.7 };
+  if (count === 3) return { xs: [345, 553, 1175], w: 196, glass: 0.7 };
   return { xs: [355, 568, 1032, 1245], w: 190, glass: 0.6 };
 }
 
