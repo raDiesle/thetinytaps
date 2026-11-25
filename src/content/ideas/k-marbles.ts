@@ -108,6 +108,9 @@ export const marblesIdeas: IdeaArea = {
       text: "Die Xylophon-Stäbe sind so gestimmt, dass jede Kugel die nächste Zeile eines bekannten Liedes spielt („Alle meine Entchen“, „Hänschen klein“). Viele Kugeln hintereinander ergeben das ganze Lied, am Ende tanzen alle Teile der Bahn.",
       why: "Das Kind erkennt das Lied und will „noch eine, damit es weitergeht“.",
       effort: "S",
+      partial:
+        "Die acht Stäbe von Reihe 1 spielen auf jeder Kugelbahn ein Lied: Jedes Ding, das darüber rollt, spielt die nächste Zeile, gleichmäßig im Takt (dort rollt es mit fester Geschwindigkeit). Auf Deutsch „Alle meine Entchen“, in allen anderen Sprachen „Twinkle, Twinkle, Little Star“ (小星星, „Estrellita“). Die nächste Kugel kommt von selbst erst, wenn die Zeile davor fast fertig ist, sodass die Zeilen ohne Überlappen aufeinander folgen. Nach der letzten Zeile schwingt, wackelt und leuchtet jedes Teil der Bahn einmal mit einem leisen Glitzerklang. Eine Runde dauert dadurch etwa 60–64 statt 56–60 Sekunden.",
+      done: true,
     },
     {
       id: "K-12",
