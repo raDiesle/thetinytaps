@@ -1811,88 +1811,85 @@
   object-fit: cover;
 }
 
-/* A card sized by its grid row: the picture takes every bit of height its name leaves. */
-@container (min-height: 130px) {
-  :root .game-list.fit .game-card:has(> .with-picture) {
-    gap: 2cqh;
-    padding: 10px 10px 3cqh;
-  }
-
-  :root .game-list.fit .game-emoji.with-picture {
-    flex: 1 1 0;
-    width: auto;
-    max-width: 100%;
-    min-height: 0;
-  }
-}
-
-/* A flat fitted card: the picture beside the name, as tall as the card. */
-@container (max-height: 129.98px) {
-  :root .game-list.fit .game-emoji.with-picture {
-    width: auto;
-    max-width: 50cqw;
-    height: calc(100cqh - 12px);
-  }
-}
-
-/* Too narrow for picture and name side by side: the picture above a small name, as big as the rest leaves. */
-@container (max-height: 129.98px) and (max-width: 179.98px) {
-  :root .game-list.fit .game-emoji.with-picture {
-    flex: 1 1 0;
-    max-width: 100%;
-    height: auto;
-    min-height: 0;
-  }
-}
-
-/* A phone's scrolling list of flat cards: the picture beside the name. */
-@media (max-width: 599.98px), (max-height: 599.98px) {
-  :root .game-list:not(.fit) .game-emoji.with-picture {
-    width: 96px;
-    height: 64px;
-  }
-}
-
 /*
- * `GameShell labelOnPicture` (Kettenreaktion): the picture fills the whole card and the name lies on it in a small
- * paper box, readable over any picture (user request, November 2026).
+ * A card with a preview picture (`pictureCard`), in every menu alike and at every size: the framed picture on top, as
+ * wide as the card, and the name in one line under it – never broken, never beside a small picture and never on it
+ * (user feedback, 25 November 2026, from Lebendige Welten's menus). `useFitGrid` picks the grid that makes the pictures
+ * biggest and shrinks all names of the menu alike (`--name-fit`) until the longest fits; past that it ends in „…“.
  */
-/* Above every flat or upright card layout of the menus, whatever their sizes. */
-:root .mode-list .game-card.mode-card.picture-card {
+:root .game-card.picture-card {
+  --pic-pad: 8px;
   flex-direction: column;
-  justify-content: flex-end;
+  justify-content: flex-start;
   align-items: center;
   gap: 0;
-  min-height: 0;
-  padding: 7px;
+  padding: var(--pic-pad) var(--pic-pad) 0;
   text-align: center;
 }
 
-:root .mode-list:not(.fit) .game-card.mode-card.picture-card {
+:root .game-card.picture-card::before {
+  width: min(72px, 42%);
+}
+
+:root .game-card.picture-card > .game-emoji.with-picture {
+  flex: none;
+  width: 100%;
+  max-width: none;
   height: auto;
   aspect-ratio: 3 / 2;
 }
 
-:root .mode-list .game-card.mode-card.picture-card > .game-emoji.with-picture {
-  position: absolute;
-  inset: 7px;
-  width: auto;
-  max-width: none;
-  height: auto;
-  aspect-ratio: auto;
+:root .game-card.picture-card > .game-title {
+  display: block;
+  max-width: 100%;
+  padding: 0.15em 2px 0.3em;
+  overflow: hidden;
+  font-size: calc(var(--name-size, 1.3rem) * var(--name-fit, 1));
+  line-height: 1.2;
+  white-space: nowrap;
+  text-overflow: ellipsis;
+  hyphens: none;
+  overflow-wrap: normal;
 }
 
-:root .mode-list .game-card.mode-card.picture-card > .game-title {
-  position: relative;
-  max-width: calc(100% - 16px);
-  margin: 0 auto 2px;
-  padding: 1px 8px 2px;
-  border: 1.5px solid #3d304566;
-  border-radius: 6px 9px 7px 10px / 9px 6px 10px 7px;
-  background: color-mix(in srgb, var(--paper) 92%, #0000);
-  box-shadow: 0 2px 5px -2px #3d304566;
-  font-size: clamp(0.7rem, min(9cqh, 6.5cqw), 1.15rem);
-  line-height: 1.1;
+/* A line for grown-ups under the name breaks as it likes; the name above it stays one line. */
+:root .game-card.picture-card .game-note {
+  white-space: normal;
+}
+
+/*
+ * Fitted to the screen: the card is exactly as big as its picture and name need in its grid cell (the cell is the
+ * size container, 2px of border on each side), so no empty paper is left beside or under the picture; `bestFit`'s
+ * `pictureWidth` reckons alike. Every card of such a menu is as big, also one whose picture is still waiting.
+ */
+:root .game-list.fit.picture-list .game-card {
+  --pic-pad: 8px;
+  /* The name's line: a share of the card's height (`NAME_SHARE` in fitGrid.ts). */
+  --name-room: clamp(16px, 17cqh, 34px);
+  --name-size: calc(var(--name-room) / 1.5);
+  --pic-w: min(calc(100cqw - 2 * var(--pic-pad) - 4px), calc((100cqh - 8px - 2 * var(--pic-pad) - var(--name-room)) * 1.5));
+  align-self: center;
+  width: calc(var(--pic-w) + 2 * var(--pic-pad) + 4px);
+  height: calc(var(--pic-w) / 1.5 + var(--name-room) + 2 * var(--pic-pad) + 4px);
+  padding-bottom: 0;
+}
+
+:root .game-list.fit .game-card.picture-card > .game-title {
+  height: calc(var(--name-room) + var(--pic-pad));
+  padding: 0 2px;
+  line-height: calc(var(--name-room) + var(--pic-pad));
+}
+
+:root .game-list.fit .game-card.picture-card .game-note {
+  display: none;
+}
+
+/* A phone's scrolling list (when not all fit): the same cards, several side by side. */
+@media (max-width: 599.98px), (max-height: 599.98px) {
+  :root .game-list:not(.fit) .game-card.picture-card {
+    --pic-pad: 6px;
+    --name-size: 0.95rem;
+  }
 }
 
 @media (hover: hover) {

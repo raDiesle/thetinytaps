@@ -13,7 +13,8 @@
   position: absolute;
   inset: 0;
   overflow: hidden;
-  touch-action: manipulation;
+  /* The scene is swiped along the house by hand: the browser neither scrolls nor zooms it. */
+  touch-action: none;
   user-select: none;
   -webkit-user-select: none;
 }
@@ -59,30 +60,14 @@
   inset: 0;
 }
 
-/* The opening of a special block (a window, a door), its moving part clipped by it. */
-.zt-hole {
+/* A block's dressing behind and in front of its face, each a layer of its own that comes as the block lands. */
+.zt-dress {
   position: absolute;
-  overflow: hidden;
+  inset: 0;
 }
 
-.zt-actor {
-  width: 100%;
-  height: 100%;
-}
-
-.zt-actor > svg {
-  display: block;
-  width: 100%;
-  height: 100%;
-}
-
-/* The door swings open on its hinges on the left, the flowers grow from their box. */
-.zt-actor-door {
-  transform-origin: 0 50%;
-}
-
-.zt-actor-flowers {
-  transform-origin: 50% 100%;
+.zt-dress > .zt-art {
+  overflow: visible;
 }
 
 .zt-kid > * {
@@ -111,51 +96,46 @@
   opacity: 0;
 }
 
-/* The elevator panel on the right: a brass plate with an arrow up and an arrow down, nothing between them. */
-.zt-panel {
+/* The small plus beside the next row, quiet: a grown-up's way on to the next ten. */
+.zt-add {
   position: absolute;
-  z-index: 2;
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  justify-content: space-between;
-  box-sizing: border-box;
-  border-radius: 18px;
-  background: linear-gradient(160deg, #f1d28a, #c9993f 60%, #a87a2c);
-  border: 3px solid #6b4a1c;
-  box-shadow:
-    0 6px 14px rgb(40 25 10 / 0.35),
-    inset 0 2px 0 rgb(255 255 255 / 0.45);
-}
-
-.zt-jump {
-  width: 86%;
-  aspect-ratio: 1;
+  left: 0;
+  top: 0;
   padding: 0;
   border: none;
   background: none;
   cursor: pointer;
+  pointer-events: auto;
+  opacity: 0.55;
 }
 
-.zt-jump svg {
+.zt-add:hover,
+.zt-add:focus-visible {
+  opacity: 0.9;
+}
+
+.zt-add svg {
   display: block;
   width: 100%;
   height: 100%;
 }
 
-.zt-jump circle {
-  fill: #fff6df;
-  stroke: #6b4a1c;
-  stroke-width: 6;
+/* White with a thin dark edge, so it is found on the day's light sky as on the night's, and stays quiet on both. */
+.zt-add circle {
+  fill: rgb(255 255 255 / 0.3);
+  stroke: rgb(74 44 51 / 0.55);
+  stroke-width: 2;
+  stroke-dasharray: 4 3;
 }
 
-.zt-jump path {
-  fill: #e8590c;
-  stroke: #6b4a1c;
+.zt-add .zt-add-edge {
+  stroke: rgb(74 44 51 / 0.55);
+  stroke-width: 7;
+  stroke-linecap: round;
+}
+
+.zt-add .zt-add-cross {
+  stroke: #fff;
   stroke-width: 4;
-  stroke-linejoin: round;
-}
-
-.zt-jump:disabled {
-  visibility: hidden;
+  stroke-linecap: round;
 }

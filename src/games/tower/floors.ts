@@ -1,19 +1,44 @@
 import { ROW, TOTAL } from "./names";
 
 // The house's ten floors, one for each ten (user request, 24 November 2026: every new ten should look new and more
-// interesting, not every block the same – a door or a window built in between the numbers). Each floor has its own
-// colours, its own pattern on the plain blocks and its own beam laid on top when it is full; a few of its blocks are
-// something of the house that answers as it lands, each with its own sound.
+// interesting). Each floor has its own colours, its own pattern on its blocks and its own beam laid on top when it is
+// full, so the tens are seen at a glance. And no block looks like another (user feedback, 25 November 2026): each wears
+// a dressing of its own – ears, headphones, spikes, a crown, wheels … – round its number, never over it.
 
-/** What is painted on a floor's plain blocks. */
+/** What is painted on a floor's blocks. */
 export type Pattern = "bricks" | "dots" | "stones" | "stripes" | "stars" | "planks" | "logs" | "hearts" | "glass" | "rainbow";
 
 /**
- * A block that is part of the house rather than a plain block: the front door, a window whose light goes on, an animal
- * looking out, flowers growing in their box … Each shows its number on a small plate and does its thing once as it
- * lands; afterwards it stays as it ended (the light on, the cat in the window).
+ * What a block wears round its number: something on its top, at its sides or its foot, its outline or what fills it
+ * behind the number (water the number swims in). Never anything over the number nor a smaller number: every number
+ * stands alike, the same size and place on every block (user feedback, 25 November 2026: the windows and the door
+ * shrank their numbers onto little plates). Each comes as its block lands, with its own sound where it has one.
  */
-export type Special = "door" | "window" | "cat" | "dog" | "birdhouse" | "flowers" | "fish" | "heart" | "star";
+export const DRESSINGS = [
+  "cat",
+  "headphones",
+  "crown",
+  "wheels",
+  "spikes",
+  "flowers",
+  "water",
+  "antennae",
+  "bowtie",
+  "bunny",
+  "cake",
+  "shoes",
+  "wings",
+  "propeller",
+  "gift",
+  "frog",
+  "lights",
+  "dino",
+  "bear",
+  "nest",
+] as const;
+
+/** One of the blocks' dressings. */
+export type Dressing = (typeof DRESSINGS)[number];
 
 /** One floor of the house: the ten numbers from `first + 1` to `first + 10`. */
 export interface Floor {
@@ -22,28 +47,28 @@ export interface Floor {
   pattern: Pattern;
   /** The wooden beam laid over the floor when its ten are full. */
   beam: string;
-  /** The floor's special blocks, by their place in the row (1 to 10). */
-  specials: Partial<Record<number, Special>>;
 }
 
 /** The floors from the ground up: 1–10, 11–20 … 91–100. */
 export const FLOORS: Floor[] = [
-  { colors: ["#f0643c", "#e8553a"], pattern: "bricks", beam: "#ffd43b", specials: { 2: "window", 5: "door", 8: "window" } },
-  { colors: ["#4dabf7", "#3bc9db"], pattern: "dots", beam: "#ff6b6b", specials: { 2: "flowers", 5: "cat", 9: "window" } },
-  { colors: ["#69db7c", "#8ce99a"], pattern: "stones", beam: "#ff922b", specials: { 3: "birdhouse", 6: "fish", 9: "window" } },
-  { colors: ["#ffd43b", "#fcc419"], pattern: "stripes", beam: "#4dabf7", specials: { 2: "window", 5: "dog", 8: "flowers" } },
-  { colors: ["#9775fa", "#b197fc"], pattern: "stars", beam: "#51cf66", specials: { 4: "heart", 7: "star" } },
-  { colors: ["#ffa94d", "#ff922b"], pattern: "planks", beam: "#cc5de8", specials: { 2: "cat", 5: "window", 8: "birdhouse" } },
-  { colors: ["#c08552", "#a9714b"], pattern: "logs", beam: "#f783ac", specials: { 3: "fish", 6: "window", 9: "flowers" } },
-  { colors: ["#f783ac", "#faa2c1"], pattern: "hearts", beam: "#20c997", specials: { 2: "heart", 5: "dog", 8: "window" } },
-  { colors: ["#a5d8ff", "#99e9f2"], pattern: "glass", beam: "#fab005", specials: { 2: "star", 5: "window", 8: "cat" } },
+  { colors: ["#f0643c", "#e8553a"], pattern: "bricks", beam: "#ffd43b" },
+  { colors: ["#4dabf7", "#3bc9db"], pattern: "dots", beam: "#ff6b6b" },
+  { colors: ["#69db7c", "#8ce99a"], pattern: "stones", beam: "#ff922b" },
+  { colors: ["#ffd43b", "#fcc419"], pattern: "stripes", beam: "#4dabf7" },
+  { colors: ["#9775fa", "#b197fc"], pattern: "stars", beam: "#51cf66" },
+  { colors: ["#ffa94d", "#ff922b"], pattern: "planks", beam: "#cc5de8" },
+  { colors: ["#c08552", "#a9714b"], pattern: "logs", beam: "#f783ac" },
+  { colors: ["#f783ac", "#faa2c1"], pattern: "hearts", beam: "#20c997" },
+  { colors: ["#a5d8ff", "#99e9f2"], pattern: "glass", beam: "#fab005" },
   {
     colors: ["#ff6b6b", "#ff922b", "#ffd43b", "#8ce99a", "#38d9a9", "#4dabf7", "#748ffc", "#b197fc", "#f783ac", "#fcc419"],
     pattern: "rainbow",
     beam: "#e8590c",
-    specials: { 3: "window", 6: "flowers", 9: "heart" },
   },
 ];
+
+/** How far the dressings move on from one floor to the next, so a block never wears what the one under it wears. */
+const FLOOR_SHIFT = 7;
 
 /** The floor of number `n` (0 for 1–10 … 9 for 91–100). */
 export const floorOf = (n: number) => Math.floor((Math.min(Math.max(n, 1), TOTAL) - 1) / ROW);
@@ -51,8 +76,8 @@ export const floorOf = (n: number) => Math.floor((Math.min(Math.max(n, 1), TOTAL
 /** Number `n`'s place in its row, 1 to 10. */
 export const placeOf = (n: number) => ((n - 1) % ROW) + 1;
 
-/** What number `n` is: a plain block or one of the house's specials. */
-export const specialOf = (n: number): Special | undefined => FLOORS[floorOf(n)].specials[placeOf(n)];
+/** What number `n`'s block wears: the ten of a floor all different, and each unlike its neighbours and the one below. */
+export const dressingOf = (n: number): Dressing => DRESSINGS[(placeOf(n) - 1 + floorOf(n) * FLOOR_SHIFT) % DRESSINGS.length];
 
 /** The colour of number `n`'s block. */
 export function colorOf(n: number): string {

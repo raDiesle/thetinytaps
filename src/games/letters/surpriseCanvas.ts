@@ -1,18 +1,18 @@
 // Frei tippen's canvas surprises (user request, November 2026: more effects drawn by the app itself, not emojis, and
-// fireworks of many kinds). Each is a small canvas only as big as its sparks fly, drawn by its own animation frame
+// fireworks of many kinds; more fireworks for Zaubertasten, 25 November 2026). Each is a small canvas only as big as its sparks fly, drawn by its own animation frame
 // loop – never by React – which stops by itself once the effect is over. Everything is in the surprise's CSS pixels
 // with (0, 0) at the spot; `size` is the surprise's size there.
 
 import { pick, shuffle } from "@/lib/random";
 
 /** The kinds drawn on a canvas. */
-export const CANVAS_KINDS = ["skyrocket", "fountain", "swirl", "sparkler"] as const;
+export const CANVAS_KINDS = ["skyrocket", "fountain", "swirl", "sparkler", "wheel", "starburst"] as const;
 
 /** One kind drawn on a canvas. */
 export type CanvasKind = (typeof CANVAS_KINDS)[number];
 
 /** The bursts a skyrocket can have, each a firework of its own kind. */
-export const ROCKET_BURSTS = ["chrysanthemum", "palm", "crossette", "glitter", "saturn", "double"] as const;
+export const ROCKET_BURSTS = ["chrysanthemum", "palm", "crossette", "glitter", "saturn", "double", "willow", "strobe", "smiley", "rings"] as const;
 
 /** The figures a sparkler can draw in the air. */
 export const SPARKLER_FIGURES = ["heart", "spiral", "loop", "star", "wave"] as const;
@@ -22,10 +22,12 @@ export type CanvasParams =
   | { kind: "skyrocket"; burst: (typeof ROCKET_BURSTS)[number]; colors: string[]; second: string; startX: number }
   | { kind: "fountain"; colors: string[]; lean: number }
   | { kind: "swirl"; colors: string[]; arms: number; turn: 1 | -1 }
-  | { kind: "sparkler"; figure: (typeof SPARKLER_FIGURES)[number]; colors: string[]; flip: 1 | -1 };
+  | { kind: "sparkler"; figure: (typeof SPARKLER_FIGURES)[number]; colors: string[]; flip: 1 | -1 }
+  | { kind: "wheel"; colors: string[]; arms: number; turn: 1 | -1 }
+  | { kind: "starburst"; colors: string[]; second: string[] };
 
 /** How long each canvas kind runs, in seconds; its surprise stays a little longer (`SURPRISE.lifeMs`). */
-export const CANVAS_SECONDS: Record<CanvasKind, number> = { skyrocket: 2.7, fountain: 2.5, swirl: 2.4, sparkler: 2.8 };
+export const CANVAS_SECONDS: Record<CanvasKind, number> = { skyrocket: 2.7, fountain: 2.5, swirl: 2.4, sparkler: 2.8, wheel: 2.5, starburst: 2.1 };
 
 /** The canvas's side, in surprise sizes: room for every spark of every kind. */
 export const CANVAS_BOX = 2.6;
@@ -62,6 +64,10 @@ export function canvasParams(kind: CanvasKind): CanvasParams {
       return { kind, colors, arms: pick([3, 4, 5]), turn: pick([1, -1] as const) };
     case "sparkler":
       return { kind, figure: pick(SPARKLER_FIGURES), colors, flip: pick([1, -1] as const) };
+    case "wheel":
+      return { kind, colors: Math.random() < 0.4 ? FIRE : colors, arms: pick([3, 4, 6]), turn: pick([1, -1] as const) };
+    case "starburst":
+      return { kind, colors, second: shuffle(COLOR_SETS).find((c) => c !== colors) ?? colors };
   }
 }
 
@@ -88,6 +94,8 @@ type Spark = {
   onAge?: (spark: Spark, dt: number) => void;
   /** Glitter twinkles softly instead of fading evenly. */
   twinkle?: number;
+  /** A strobe star blinks on and off, from this phase. */
+  blink?: number;
 };
 
 /** A canvas surprise running: `step` moves it on (false once it is over), `draw` paints the present moment. */
@@ -130,6 +138,36 @@ export function canvasEffect(p: CanvasParams, size: number): CanvasEffect {
       });
     }
   };
+
+  /**
+   * Sparks that fly out from the spot and stop on a figure: each point is where its spark comes to rest, in surprise
+   * sizes. A spark keeping `drag` of its speed each second travels `speed / -ln(drag)` in all, so its speed is set to
+   * land it there.
+   */
+  const figure = (points: [number, number][], color: string, opts: Partial<Spark> = {}) => {
+    const drag = 0.05;
+    const reach = -Math.log(drag);
+    for (const [px, py] of points)
+      add({
+        x: 0,
+        y: 0,
+        vx: px * size * reach,
+        vy: py * size * reach,
+        life: 1.5,
+        width: size * 0.034,
+        color,
+        gravity: size * 0.06,
+        drag,
+        trail: 0.06,
+        ...opts,
+      });
+  };
+  /** `n` points on an arc of radius `r` round (cx, cy), from angle `from` to `to`. */
+  const arc = (n: number, cx: number, cy: number, r: number, from: number, to: number): [number, number][] =>
+    Array.from({ length: n }, (_, i) => {
+      const a = from + ((to - from) * i) / Math.max(1, n - 1);
+      return [cx + Math.cos(a) * r, cy + Math.sin(a) * r];
+    });
 
   // ---------- skyrocket: a rocket climbs to the spot and bursts in one of several kinds ----------
   const rocketTime = 0.55;
@@ -223,8 +261,55 @@ export function canvasEffect(p: CanvasParams, size: number): CanvasEffect {
         ring(18, 0.5, b, { trail: 0.1, life: 1.2 });
         ring(36, 1.2, a, { trail: 0.14, gravity: size * 0.15 }, 0.28, rand(-0.5, 0.5));
         break;
+      case "willow":
+        // Golden sparks with long tails that hang down like a weeping willow's branches.
+        ring(30, 0.8, "#ffc300", { late: "#ff8c00", gravity: size * 0.85, drag: 0.22, life: 1.9, trail: 0.32, width: size * 0.028 });
+        break;
+      case "strobe":
+        // White stars that blink on and off as they fall, round a small core of colour.
+        ring(30, 1.0, "#ffffff", { life: 1.6, trail: 0.04, gravity: size * 0.3, onAge: (s) => (s.blink ??= rand(0, Math.PI * 2)) });
+        ring(14, 0.45, a, { life: 1.0, trail: 0.1 });
+        break;
+      case "smiley":
+        // A laughing face: its round, two eyes and a smile.
+        figure(arc(28, 0, 0, 0.62, 0, Math.PI * 2 * (27 / 28)), "#ffc300");
+        figure(arc(4, -0.22, -0.18, 0.06, 0, Math.PI * 1.5), a);
+        figure(arc(4, 0.22, -0.18, 0.06, 0, Math.PI * 1.5), a);
+        figure(arc(11, 0, 0.02, 0.36, Math.PI * 0.18, Math.PI * 0.82), a);
+        break;
+      case "rings": {
+        // Two rings crossing, like the paths round an atom.
+        const tilt = rand(-0.3, 0.3);
+        ring(28, 1.1, a, { trail: 0.12, gravity: size * 0.12 }, 0.3, tilt + 0.75);
+        ring(28, 1.1, b, { trail: 0.12, gravity: size * 0.12 }, 0.3, tilt - 0.75);
+        break;
+      }
     }
   };
+
+  // ---------- starburst: a bang right at the spot, its stars crackling into glitter as they go out ----------
+  let starburstRing = false;
+  const crackle = (s: Spark) => {
+    if (s.age < s.life) return;
+    for (let k = 0; k < 3; k++) {
+      const ang = rand(0, Math.PI * 2);
+      add({
+        x: s.x,
+        y: s.y,
+        vx: Math.cos(ang) * size * 0.25,
+        vy: Math.sin(ang) * size * 0.25,
+        life: rand(0.15, 0.3),
+        width: size * 0.018,
+        color: "#fff3b0",
+        gravity: size * 0.2,
+        trail: 0.04,
+      });
+    }
+  };
+
+  // ---------- wheel: a catherine wheel spinning at the spot, spraying sparks off its arms ----------
+  const wheelTime = 1.9;
+  const wheelRadius = 0.2;
 
   // ---------- fountain: a cone of sparks spraying up from below the spot ----------
   const fountainBase = { x: 0, y: size * 0.4 };
@@ -376,6 +461,51 @@ export function canvasEffect(p: CanvasParams, size: number): CanvasEffect {
             }
           } else head = undefined;
           break;
+        case "starburst":
+          if (!head && t < 0.1) {
+            // The bang: a flash and a ring of stars, then a second, smaller ring of another colour inside it.
+            head = { x: 0, y: 0, color: "#fff3b0", r: size * 0.06 };
+            glows.push({ x: 0, y: 0, r: size * 0.6, color: p.colors[0], alpha: 1 });
+            ring(36, 1.05, p.colors[0], { late: p.colors[1], life: rand(1.0, 1.2), trail: 0.12, onAge: crackle });
+          } else if (t > 0.1) head = undefined;
+          if (!starburstRing && t > 0.3) {
+            starburstRing = true;
+            if (p.kind === "starburst") ring(18, 0.55, p.second[0], { late: p.second[1], life: 0.9, trail: 0.1 });
+          }
+          break;
+        case "wheel":
+          if (t < wheelTime) {
+            // It speeds up as it starts and slows down at the end, as a real one does when it burns out.
+            const speed = Math.min(1, t / 0.4) * Math.min(1, (wheelTime - t) / 0.5);
+            const spin = (t * 7 + t * t * 2) * p.turn;
+            head = { x: 0, y: 0, color: p.colors[0], r: size * 0.05 };
+            const n = Math.round(dt * 150 * Math.max(0.3, speed) + Math.random());
+            for (let i = 0; i < n; i++) {
+              const arm = Math.floor(Math.random() * p.arms);
+              const ang = spin + (arm / p.arms) * Math.PI * 2;
+              const r = size * wheelRadius;
+              // Sparks leave the arm's end backwards along the turn, and a little outwards.
+              const back = ang - (Math.PI / 2) * p.turn;
+              const v = rand(0.45, 0.75) * size;
+              add({
+                x: Math.cos(ang) * r,
+                y: Math.sin(ang) * r,
+                vx: Math.cos(back) * v + Math.cos(ang) * v * 0.3,
+                vy: Math.sin(back) * v + Math.sin(ang) * v * 0.3,
+                life: rand(0.35, 0.6),
+                width: size * 0.026,
+                color: p.colors[arm % p.colors.length],
+                late: "#ffc300",
+                gravity: size * 0.6,
+                drag: 0.4,
+                trail: 0.06,
+              });
+            }
+          } else if (head) {
+            head = undefined;
+            ring(20, 0.6, p.colors[1] ?? p.colors[0], { life: 0.6, trail: 0.05, gravity: size * 0.3 });
+          }
+          break;
       }
 
       for (let i = sparks.length - 1; i >= 0; i--) {
@@ -424,6 +554,7 @@ export function canvasEffect(p: CanvasParams, size: number): CanvasEffect {
         const f = s.age / s.life;
         let alpha = f < 0.7 ? 1 : 1 - (f - 0.7) / 0.3;
         if (s.twinkle !== undefined) alpha *= 0.55 + 0.45 * Math.sin(s.age * 14 + s.twinkle);
+        if (s.blink !== undefined && s.age > 0.3 && Math.sin(s.age * 26 + s.blink) < 0) alpha *= 0.12;
         ctx.globalAlpha = Math.max(0, alpha) * fadeAll;
         const color = s.late && f > 0.5 ? s.late : s.color;
         ctx.strokeStyle = color;

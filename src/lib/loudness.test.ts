@@ -1,7 +1,7 @@
 import { describe, expect, test } from "bun:test";
 import { readdirSync, readFileSync, statSync } from "node:fs";
-import { join } from "node:path";
-import { DUCK, EFFECTS_GAIN, songGain, VOICE_LUFS } from "./loudness";
+import { basename, join } from "node:path";
+import { BACKGROUND_GAIN, DUCK, EFFECTS_GAIN, songGain, VOICE_LUFS } from "./loudness";
 
 /** Every source file under `dir`, tests left out. */
 const sources = (dir: string): string[] =>
@@ -23,6 +23,18 @@ describe("loudness", () => {
   test("sounds are only a little quieter than voice and music (user feedback, November 2026)", () => {
     expect(EFFECTS_GAIN).toBeLessThan(1);
     expect(EFFECTS_GAIN).toBeGreaterThanOrEqual(0.8);
+  });
+
+  test("the background song plays clearly under voice and sounds, yet stays heard (user request, 25 November 2026)", () => {
+    const db = 20 * Math.log10(BACKGROUND_GAIN);
+    expect(db).toBeLessThan(-4);
+    expect(db).toBeGreaterThan(-10);
+    expect(BACKGROUND_GAIN).toBeLessThan(EFFECTS_GAIN);
+  });
+
+  test("only the shared background song is lowered, never a game's own song", () => {
+    const users = files.filter(({ code }) => /\bBACKGROUND_GAIN\b/.test(code)).map(({ path }) => basename(path));
+    expect(users.sort()).toEqual(["backgroundMusic.ts", "loudness.ts"]);
   });
 
   test("a song dips under the voice, but stays heard", () => {

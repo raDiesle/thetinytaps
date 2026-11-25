@@ -178,7 +178,9 @@ and returns `{ fade, stop }`. Build a small hook like `useBrushingMusic` in
   `fade` to a low volume; `VOLUME = songGain(<measured LUFS>)` and ducked `VOLUME * DUCK` (`src/lib/loudness.ts`):
   measure the converted MP3 with `ffmpeg -i <file> -af ebur128 -f null -` (the „I:“ line), so the song plays as loud
   as the voice – never a volume picked by ear (a background song at 0.25 played 12 dB under the voice and was too
-  quiet on a phone at full volume, user feedback, November 2026; `loudness.test.ts` checks);
+  quiet on a phone at full volume, user feedback, November 2026; `loudness.test.ts` checks); only the shared
+  background song is lowered further, by `BACKGROUND_GAIN` (about −6 dB, user request, 25 November 2026), never a
+  game's own song;
 - `useNoBackgroundMusic()` in the game's Play component, so the shared background
   song (`src/lib/backgroundMusic.ts`) stops while the game's own one plays;
 - background music plays only while `music` in the common settings is on (switch
