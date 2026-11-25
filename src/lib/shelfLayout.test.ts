@@ -342,7 +342,7 @@ test("the rail of a group's sign leaves a toy among its books out", () => {
 
 // The words carved before the everyday helpers read plainly (user feedback, 25 November 2026): the app's rounded
 // letters, upright, and the light behind them bright over all their lines, not fading out under the first ones – it
-// lies close round the words (`.shelf-carving-text`), its full brightness reaching past their middle (`shelfGlow.test.ts`
+// lies close round the words (`.shelf-carving-text`), evenly over their whole box (`shelfGlow.test.ts`
 // keeps it clear of the compartment's edges).
 test("the carved words are set plainly and lie wholly in the light", () => {
   const books = readFileSync(new URL("../styles/bookshelf-books.css", import.meta.url), "utf8");
@@ -350,6 +350,7 @@ test("the carved words are set plainly and lie wholly in the light", () => {
   expect(carving).toContain("font-family: var(--font-rounded)");
   expect(books).not.toMatch(/\.shelf-carving[^{]*\{[^}]*font-style: italic/);
   const light = books.match(/\.shelf-carving-text::before \{([^}]*)\}/)?.[1] ?? "";
-  const bright = light.match(/radial-gradient\(closest-side, #[0-9a-f]{6}f\w, #[0-9a-f]{6}f\w (\d+)%/)?.[1];
-  expect(Number(bright)).toBeGreaterThanOrEqual(60);
+  // One even light over the words' whole box, blurred at its rim – never a gradient fading out over the lines.
+  expect(light).toMatch(/inset: -/);
+  expect(light).toMatch(/background: #[0-9a-f]{6}[c-f]\w;/);
 });

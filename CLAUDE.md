@@ -1048,8 +1048,9 @@ src/lib/                 speech, sfx (synthesized + recorded sounds), storage, d
   (`ABOVE_GAIN`), since under it they stand lower, and with a breath of room left beside the words (`WORDS_BREATH`;
   user feedback, November 2026: beside the sign on a tablet the spines were too thin for their pictures) – and the books spine out keep clear of the wall with the stickers (`STICKERS_ROOM`), the foxes on its o stay on the screen (`shelfLayout.test.ts`), and the books spine out fill only the
   board's right end (`data-leads`). A brighter, still light lies close round the carved words only (`.shelf-carving-text`)
-  so they stand out – over every line of the words, never fading out before their last one, yet never over the whole
-  compartment, where it reached the post and was cut off (user feedback, 25 November 2026; `shelfGlow.test.ts`) – and
+  so they stand out – evenly over every line of the words, never fading out before their last one, and soft at its rim
+  (a blurred rounded box: an ellipse round the words ended hard), yet never over the whole compartment, where it reached
+  the post and was cut off (user feedback, 25 November 2026; `shelfGlow.test.ts`) – and
   the words are set in the app's clear rounded letters, upright and of some weight, never a small italic serif (user
   feedback, 25 November 2026: the sentence under „Für Groß & Klein“ was hard to read and lay half in the dark) –, and
   the plan takes the sign's measured width (`SIGN_EMS`), never a wide guess, since every px it reserves comes
