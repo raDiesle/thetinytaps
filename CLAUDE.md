@@ -880,9 +880,12 @@ src/lib/                 speech, sfx (synthesized + recorded sounds), storage, d
   menus into a game and back; `src/lib/backgroundMusic.ts`), on by default, "🎵 Musik" on the home page turns it off
   for all games and then no song is downloaded. A game with its own music (or a microphone)
   calls `useNoBackgroundMusic()` while it needs quiet, and the song goes on where it stopped afterwards;
-  song files are named `musik-*.mp3`, see `/musik-erzeugen`. Music and voice play equally loud, sounds only a little
-  quieter (user feedback, November 2026: the song played 12 dB under the voice and was too quiet on a phone at full
-  volume): a song's volume is `songGain(<its measured LUFS>)`, effects are scaled by `EFFECTS_GAIN`, and everything
+  song files are named `musik-*.mp3`, see `/musik-erzeugen`. Voice plays loudest, sounds only a little
+  quieter (`EFFECTS_GAIN`), and the shared background song about 6 dB under the voice (`BACKGROUND_GAIN`; user request,
+  25 November 2026: at the voice's loudness it distracted and words were hard to follow – while 12 dB under, early in
+  November, was too quiet on a phone at full volume), while a song that is the game itself (the Zahnputzlied, the
+  potty's waiting song) stays as loud as the voice: a song's volume is `songGain(<its measured LUFS>)`, the background
+  song's times `BACKGROUND_GAIN`, and everything
   goes through the one limiter `speaker()` (`src/lib/loudness.ts`, `src/lib/sfx/core.ts`; `loudness.test.ts`). A game that runs along its own song (its steps follow it)
   starts loading it on its start screen and waits for it before the part that follows the song, showing how far it is
   when it is late – never switch a song in or decode it mid-play, that makes the picture stutter on phones. The shared options (`useCommonSettings`) are one
