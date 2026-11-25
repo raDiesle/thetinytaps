@@ -205,9 +205,9 @@
   fill: #c9ab8a;
 }
 
-/* The hourglass: the play time. */
+/* The hourglass: the play time – smaller than its compartment allows (user request, 25 November 2026: it was too big). */
 .room-hourglass svg {
-  height: min(calc(var(--ch) * 0.7), calc(var(--cw) * 0.72 / 0.64));
+  height: min(calc(var(--ch) * 0.52), calc(var(--cw) * 0.58 / 0.64));
   width: auto;
 }
 
@@ -887,8 +887,8 @@
  * 2026): a brighter light, as of a lamp above them, falling from the top. Still, like the other.
  */
 .shelf-light.lead {
-  scale: 1.15 1;
-  background: radial-gradient(closest-side at 50% 40%, #fff6dafa, #ffe6a8c0 50%, #ffd78f40 80%, #0000);
+  scale: 1.2 1;
+  background: radial-gradient(farthest-side at 50% 58%, #fff6dafa, #fff0cdf0 62%, #ffe6a8a0 84%, #0000);
 }
 
 /* ----- A compartment: a box going back from its opening, lit from the front ----- */
@@ -986,6 +986,21 @@
 
 .shelf-cell.language .room-globe svg {
   height: min(calc(var(--ch) * 0.8), calc(var(--cw) * 0.86 / 0.75));
+}
+
+/*
+ * On a wide shelf the trophy room's sign stands at the right of the speaker's compartment (`trophySignAt`), so the
+ * speaker moves to its left, beside it, and is as wide as the room the sign leaves (user request, 25 November 2026).
+ * The sign comes before the shelf's box in the page and is only there once a trophy is won.
+ */
+.room-scene[data-plan="wide"] .shelf-trophy-sign ~ .shelf-box .shelf-cell.music .shelf-thing {
+  justify-content: flex-start;
+  /* The depth draws it left, towards the room's middle: so it starts a little further in. */
+  padding-left: calc(var(--cw) * 0.07);
+}
+
+.room-scene[data-plan="wide"] .shelf-trophy-sign ~ .shelf-box .shelf-cell.music .room-speaker svg {
+  height: min(calc(var(--ch) * 0.5), calc(var(--cw) * 0.4 / 0.72));
 }
 
 /* ----- The front of the frame: the planks between compartments, the posts, the top board, the plinth ----- */

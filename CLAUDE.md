@@ -468,12 +468,14 @@ In a fresh worktree run `bun install` first.
   bouncing. They stand in the trophy room, a page of its own at `/pokale/` (`TrophyMuseum`, user request, November
   2026), never in the bookshelf (between its books a trophy stood as if in the wall) nor in a popup: reached by a little
   wooden board in 3D (grain, bevelled edges, its thickness seen below and right of it) with a big golden cup on it,
-  sitting right in the bottom right corner of the picture books' compartment (the second board on a wide shelf) – its
+  sitting right in the bottom right corner of a compartment – on a wide shelf the loudspeaker's, at the bottom of the
+  right column, with the loudspeaker moved to its left beside it and both sized by that narrow compartment (user
+  request, 25 November 2026; `trophySignAt`), on an upright one the picture books' lowest – its
   foot on the board, its right edge against the post, never hanging in the air above the board – held by three nails in
   its corners (the top two and the bottom left; user request, November 2026: the paper sign hanging there looked flat
-  and loose) and reaching left over the books spine out (`TrophySign`, only once a trophy is won;
+  and loose) (`TrophySign`, only once a trophy is won;
   user feedback, November 2026: a small sign with a cup in a doorway above the loudspeaker was hardly recognised – it is
-  sized by the books, `--trophy-sign`, and is the one thing on the shelf that moves by itself: two small glints flash on
+  sized by the books or its compartment, `--trophy-sign`, and is the one thing on the shelf that moves by itself: two small glints flash on
   the cup now and then, gently, as a trophy does in a game, each a tiny layer of its own, never a glow or a bounce) – a tap
   turns the eye to the right, a wall comes round with a door, it opens and one walks in – and by a tap on the trophy
   landed beside a level's end buttons, which opens the room at that trophy shown big. Inside it is a little museum in
@@ -648,7 +650,8 @@ A game may give it before its end where reaching the goal once is enough (Ketten
   first and the last (`GroupSign`; a label from four drafts – bookend, sign, paper band – user decision, November 2026,
   made of wood so it looks mounted; the small sign alone was hardly seen, nor that it named every book on the board, so
   it grew and got the rail, user feedback, November 2026), and the picture books standing together on one board just so
-  by „Lernspiele“ on the board under them (`labelOf`); such a sign hangs only a little below its board, never over a
+  by „Lernspiele“ on the board under them (`labelOf`), its rail only under the picture books – a toy standing among
+  them (Zaubertasten's poster) is no learning game and stays outside it (`groupWidth`, user feedback, 25 November 2026); such a sign hangs only a little below its board, never over a
   book on the board below (measure it at 844×390, where it comes closest). Before the helpers words carved into the back panel tell grown-ups in short what
   the shelf is for – „Für Groß & Klein“ – then that it is the first step into the digital world taken together, with
   learning games and little helpers for the day – and nothing else: no „Alles kostenlos.“, no „Seite an Seite“, no „die die Kommunikation fördern“, no „von Eltern für Eltern“ (each tried and
@@ -996,8 +999,11 @@ src/lib/                 speech, sfx (synthesized + recorded sounds), storage, d
   things one finds on a bookshelf, standing in its own narrow compartments beside the books, never buttons and never
   loose around the room (`RoomOptions.tsx`, user feedback, October 2026), on a wide screen all in one column at the
   shelf's right, one compartment over the other (`SIDE_COLUMN`, user decision, November 2026): on top, in the tallest,
-  the hourglass (play time, the most needed), below it a wooden loudspeaker (music, one tap), at the bottom a globe with
-  the 🌐 lines and the language's name on its foot (the language – never a light switch); stickers of the fox girl and
+  the hourglass (play time, the most needed, yet small in its compartment – user request, 25 November 2026: it was too
+  big), below it a globe with the 🌐 lines and the language's name on its foot (the language – never a light switch), at
+  the bottom a wooden loudspeaker (music, one tap) with the trophy sign beside it (user request, 25 November 2026); the
+  column is narrow (`SIDE_SHARE`, at most 150 px: at 12 % of the room its compartments were too wide, user request,
+  25 November 2026); stickers of the fox girl and
   the bear boy (the figure) are stuck on the right wall of the big compartment on top, beside the everyday helpers,
   where they are seen better than in a narrow one (user feedback, November 2026; on an upright screen on the shelf's
   right inner side), and no books spine out stand against that wall to hide them. „Wer spielt?“ stands small on that same wall
@@ -1008,7 +1014,7 @@ src/lib/                 speech, sfx (synthesized + recorded sounds), storage, d
   „i“ book in the shelf was replaced by it, user feedback, November 2026); their text stays in the page unseen while
   closed (`MenuButton keep`) so search engines read it (`RoomNotes`). Installing the app and the offline copy are not
   among those texts, where grown-ups didn't find them, but behind a little sign „Offline spielen“ hanging on two short
-  chains from the shelf's underside below the globe, between its right legs and clear of the Impressum on the floor
+  chains from the shelf's underside below the right column, between its right legs and clear of the Impressum on the floor
   (`RoomOffline`, user request, November 2026) – on an upright screen too, where the shelf stands on legs as well, never
   in its top compartment (user feedback, November 2026). On an upright screen the picture books stand two side by side on
   each board below the helpers' board, never one book on each board (user feedback, November 2026; `uprightBoards`). Browsers show how to leave fullscreen over the
@@ -1031,7 +1037,9 @@ src/lib/                 speech, sfx (synthesized + recorded sounds), storage, d
   (`ABOVE_GAIN`), since under it they stand lower, and with a breath of room left beside the words (`WORDS_BREATH`;
   user feedback, November 2026: beside the sign on a tablet the spines were too thin for their pictures) – and the books spine out keep clear of the wall with the stickers (`STICKERS_ROOM`), the foxes on its o stay on the screen (`shelfLayout.test.ts`), and the books spine out fill only the
   board's right end (`data-leads`). A brighter, still light falls on sign and words (`.shelf-light.lead`) so they stand
-  out, and the plan takes the sign's measured width (`SIGN_EMS`), never a wide guess, since every px it reserves comes
+  out – over every line of the words, never fading out before their last one – and the words are set in the app's clear
+  rounded letters, upright and of some weight, never a small italic serif (user feedback, 25 November 2026: the sentence
+  under „Für Groß & Klein“ was hard to read and lay half in the dark) –, and the plan takes the sign's measured width (`SIGN_EMS`), never a wide guess, since every px it reserves comes
   off the books. Upright, the words stand before the helpers too. On an upright screen it
   hangs above the shelf, never touching it. A new option becomes such a thing in the shelf too (`SHELF_THINGS`); their
   menus open outside the shelf's 3D (`MenuButton` portals them), since a transform would hold them in. The wall's picture (`bilder/buch-cover.webp`,
