@@ -341,7 +341,7 @@ taken out (user request, November 2026). The pictures:
   first, in every app language); it says Abwechseln's lines. The two children are the figures doing the run, the one
   exception to „no fox or bear figure“ besides Up to the Moon (see the rules).
   At the end the picture's own sound, then children cheer (the `cheer` recording) while a warm light spreads over the
-  picture (`.tm-done-light`), a friendly tune after it, then `GameEnd` with the picture's trophy (nothing rises, the trophy replaced it, user decision, November 2026) with „Nochmal“ and „Weiter“ (the next picture,
+  picture (`.tm-done-light`) and the whole picture turns golden in a glowing frame (`TimeUp`, see the rules), a friendly tune after it, then `GameEnd` with the picture's trophy (nothing rises, the trophy replaced it, user decision, November 2026) with „Nochmal“ and „Weiter“ (the next picture,
   the same minutes, `nextPicture`; „Weiter“ shows that picture's card, `TimerCardArt` as `next.art`, user request, 23
   November 2026). Every tap or key during the run answers (steam and a whistle, twinkling, the flame
   flaring) with a warm light where it was, and what is still left lights up softly for a moment (H-51, „Wie lange
@@ -429,6 +429,14 @@ and the shared `Layer`, `Draw`, `LeftGlow`), `timer.css`, `content.ts`
   new thing standing beside it (see „A picture makes sense as it is“). Still drawings stay `memo`, painted once.
 - **The end is plain to see and hear**: the picture's own last step, then children cheering, a warm light over the
   picture and the trophy at the end – for every picture, Abwechseln's clock time too. Never a storm of confetti.
+- **That the time is up shows from across the room** (user request, 25 November 2026: „deutlich auch von weiter weg“,
+  „alle Farben sollten sich ändern im Bild und/oder ein Rahmen außenrum“): the moment it is up (the candle's last puff
+  included) `TimeUp` (`bar.tsx`) turns every colour of the picture golden – a `color` and a light `multiply` blend over
+  the stage, so a colourful apple tree and a dark candle room alike become one gold – and a thick light-golden frame
+  lights up inside the book's paper margin (`--frame`, which hid a frame at the screen's edge) and breathes slowly
+  (`opacity` only, still under reduced motion) until the end is left. One sign for every timer, mounted by `TimerPlay`
+  and `SwapPlay` alike, never a picture's own: a new kind of run mounts it too (`timer.test.ts`). The note, the
+  trophy and the end's buttons lie above it in their own colours, so „Weiter“'s next picture stands out of the gold.
 - **A picture makes sense as it is**: where something comes from and why it happens is plain (the water from a tap and a
   hose, never an endless can; no boat in a bucket, no flower opening for no reason – Eimer and Kuchen were taken out,
   user feedback, November 2026). A new picture is one whole small story a child knows from life, and shows nothing

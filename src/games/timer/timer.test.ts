@@ -213,6 +213,17 @@ describe("Timer", () => {
     }
   });
 
+  test("the time being up shows from across the room in every timer: the whole picture turns golden in a breathing frame (user request, 25 November 2026)", async () => {
+    for (const run of ["TimerPlay.tsx", "SwapPlay.tsx"]) {
+      const code = await Bun.file(`${import.meta.dir}/${run}`).text();
+      expect(code, run).toMatch(/\{(phase !== "running"|done) && <TimeUp \/>\}/);
+    }
+    const css = await Bun.file(`${import.meta.dir}/timer.css`).text();
+    // Every colour changes, and the frame lies inside the book's paper margin, which hid one at the screen's edge.
+    expect(css).toMatch(/\.tm-up-tint \{[^}]*mix-blend-mode: color;/);
+    expect(css).toMatch(/\.tm-up-frame \{[^}]*inset: var\(--frame, 0px\);[^}]*tm-up-breathe/);
+  });
+
   test("the removed pictures stay removed (user feedback, November 2026: Eimer and Kuchen made no sense)", () => {
     const ids: string[] = PICTURES.map((p) => p.id);
     expect(ids).not.toContain("bucket");

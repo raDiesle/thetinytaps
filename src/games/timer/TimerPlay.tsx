@@ -44,7 +44,7 @@ import { BoxesScene, boxesPlan, PER_BOX } from "./boxes";
 import { MAX_DIG, TunnelScene, tunnelPlan } from "./tunnel";
 import { JumpScene, jumpPlan, MAX_MOVES } from "./jump";
 import { JarScene, jarPlan, MAX_MARBLES } from "./jar";
-import { FINAL_NOTES, FinalLight, finalMs, TimeBar, TimeBarChoice } from "./bar";
+import { FINAL_NOTES, FinalLight, finalMs, TimeBar, TimeBarChoice, TimeUp } from "./bar";
 import { CaterpillarScene } from "./caterpillar";
 import { ClockScene } from "./clock";
 import { isTurns, nextPicture, OTHER_TIME, PICTURES, tomorrowAt } from "./content";
@@ -583,6 +583,7 @@ function TimerRun({
           {phase === "done" && <div className="tm-done-light" />}
         </div>
         {final && <FinalLight endsAt={endsAt} />}
+        {phase !== "running" && <TimeUp />}
         {bar && <TimeBar startedAt={endsAt - total} total={total} soon={soon} final={final && phase === "running"} glow={poke} done={phase !== "running"} />}
         {/* The alarm clock shows the time left on its own screen, so it needs no note in the corner; once the time is up the note stays at 0:00. */}
         <TimeShownNote shown={alarm ? "off" : shown} endsAt={endsAt} total={total} up={phase !== "running"} />

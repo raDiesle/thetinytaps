@@ -2475,6 +2475,70 @@
   }
 }
 
+/* The time is up, seen from across the room (`TimeUp`, user request, 25 November 2026): every colour of the picture
+   turns golden by one still tint, and a thick golden frame lights up round the screen and breathes slowly while the
+   end is shown – two layers, the frame animated by `opacity` only. Under the corner's note and the end's buttons. */
+.tm-up-tint,
+.tm-up-warm,
+.tm-up-frame {
+  position: absolute;
+  inset: 0;
+  z-index: 1;
+  pointer-events: none;
+  opacity: 0;
+  will-change: opacity;
+  animation: tm-up-in 0.9s ease-out forwards;
+}
+
+/* Every colour takes the gold's hue, and the light ones (a white dial, a pale wall) turn golden too. */
+.tm-up-tint {
+  background: #ffae1f;
+  mix-blend-mode: color;
+}
+
+.tm-up-warm {
+  background: #ffd47a;
+  mix-blend-mode: multiply;
+}
+
+/* Inside the book's paper margin (`--frame`), which would hide it. */
+.tm-up-frame {
+  --tm-up-band: clamp(16px, 5vmin, 44px);
+  inset: var(--frame, 0px);
+  border: var(--tm-up-band) solid #ffd84a;
+  border-radius: calc(var(--tm-up-band) * 0.5);
+  /* Lighter than the tinted picture, so it stands out of it: a bright line inside and light glowing inwards. */
+  box-shadow:
+    0 0 0 2px #e07b00,
+    inset 0 0 0 3px #fff8dc,
+    inset 0 0 calc(var(--tm-up-band) * 2) calc(var(--tm-up-band) * 0.5) rgb(255 228 120 / 0.85);
+  animation:
+    tm-up-in 0.9s ease-out forwards,
+    tm-up-breathe 2.4s ease-in-out 0.9s infinite;
+}
+
+@keyframes tm-up-in {
+  to {
+    opacity: 1;
+  }
+}
+
+@keyframes tm-up-breathe {
+  0%,
+  100% {
+    opacity: 1;
+  }
+  50% {
+    opacity: 0.55;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .tm-up-frame {
+    animation: tm-up-in 0.9s ease-out forwards;
+  }
+}
+
 /* „Zeit im Bild“: the time left as tally marks (the default) or digits on a small paper note in the bottom right corner.
    Taps go through it to the picture. */
 .tm-shown {
