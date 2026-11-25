@@ -12,6 +12,8 @@ import { type Board, boardSame, boardShift, fourWeeks, isTemplateTitle, parseCel
 import { BoardScreen } from "./BoardScreen";
 import { useBoardTitle } from "./BoardSheet";
 import { Certificate, CERTIFICATE } from "./Certificate";
+import { photoKeysOf } from "./chartPhoto";
+import { keepOnlyPhotos } from "./photoStore";
 import { type ChartType, MARK_BY_ID, PLAN_TEMPLATES, type PlanTemplate, type Template, TEMPLATES } from "./catalog";
 import { Editor } from "./Editor";
 import { TemplateGallery } from "./Gallery";
@@ -136,6 +138,15 @@ export function RewardsGame({ type: routeType = "board" }: { type?: PageKind }) 
     const most = step ? Math.max(1, starsOf(step)) : 1;
     if ((log[planId]?.[key] ?? 0) < most) setLog({ ...log, [planId]: { ...log[planId], [key]: most } });
   }, []);
+
+  // The photos of the child kept on this device belong to the charts: one taken off a chart, of a chart deleted, or
+  // chosen in a wizard left without making the chart goes once nothing is being made – not before, so ↶ can still
+  // bring a photo back while the chart is changed.
+  const photoKeys = [...photoKeysOf([...boards.boards, ...allPlans])].sort().join(" ");
+  const making = !!wizard || designing;
+  useEffect(() => {
+    if (!making) keepOnlyPhotos(new Set(photoKeys.split(" ").filter(Boolean)));
+  }, [photoKeys, making]);
 
   // Another board, plan or view starts at today again.
   const shownId = type === "board" ? `${board?.id}|${board?.kind}` : `${plan?.id}|${plan?.view}`;

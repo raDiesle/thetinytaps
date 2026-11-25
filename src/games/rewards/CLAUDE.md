@@ -72,6 +72,26 @@ editor's buttons all start on the left (user feedback, November 2026). No note e
 buttons say it (the note with an arrow went, user feedback, November 2026). Opened on a template from the
 gallery it starts on that template. While the wizard is open nothing on top or below belongs to the chart behind it.
 
+**A photo of the child** (user request, November 2026) goes on any board or plan, every Zeitraum: while the chart is
+made a pale ＋ place with a drawn portrait stands beside the heading's sign (`ChildPhoto`, `data-edit="add-photo"`), and
+a tap on it opens the file picker (`accept="image/*"`) – the one way in. Once there the photo is a print with a white
+rim, a little askew, held by a strip of tape, still (no animation), greyed with the rest in the grey print; it carries
+⚙️ and 🗑️ like a card, and ⚙️ (or a tap on it) opens its window: its place – **oben links** (default), **oben rechts**
+or **neben der Überschrift** (`PhotoPlace`, each a small drawn sheet) – and „Anderes Foto wählen“. Nothing else, never a
+second way to do what the sheet does. In a corner the photo makes the head as tall as itself (`photoHead`,
+`.rw-head-portrait-*`), so the cards are set out below it and never lie under it; beside the heading it is small and
+sits in the title's line. The place is data on the chart (`Board.photo`, `Plan.photo`, optional, so old charts need
+nothing), so screen, editor and both A4 orientations draw it from the same sheet, and a later export can too. No
+bottom corners: the sheets' feet hold the reward, the goal and the Zähler. **The photo never leaves the device**: it is
+read with its EXIF orientation, shrunk to `PHOTO_MAX_SIDE` and re-encoded as JPEG in a canvas (which drops EXIF: place,
+camera, time), kept in IndexedDB by a random key (`photoStore.ts`, the one file that touches IndexedDB), and shown by an
+object URL – never in a URL or address, `localStorage`, a log, `track()` or a picture prompt (`chartPhoto.test.ts`
+checks the sources). 🗑️ takes it from the chart (↶ brings it back while the editor is open); `RewardsGame` deletes every
+stored photo no saved chart names, but only while neither the wizard nor „Gestalten“ is open, so undo still finds it –
+deleting a chart, 🗑️ on the photo or „Abbrechen“ in the wizard deletes the file. A Zeitraum keeps the photo
+(`draftInSpan`). The Datenschutzerklärung names it (IndexedDB, `tracking.test.ts`). Its classes are `rw-portrait*`:
+`rw-photo*` belongs to the photo prints (`PhotoPrint`).
+
 The page is one tall page of the book that carries everything and scrolls with it (user feedback,
 November 2026): `<Sky />` lies in the page's box (`position: absolute`), not fixed to the window, the text for search
 engines is on it too, and the content keeps inside its paper margin. The wizard is printed on the page, no card laid on
@@ -120,6 +140,11 @@ targets) – keep it that way.
   (`tinytaps.rewards.stars.v1`), so changing a board never loses them. The first board has the fixed id `erste`, so
   its stars stay before anything was saved.
 - `SheetTitle.tsx` – the heading of a board and a plan alike, typed on the sheet, with its sign (`titleMarkOf`).
+- `chartPhoto.ts` – the photo of the child on a chart as data (`ChartPhoto` on `Board.photo` and `Plan.photo`: its
+  key, `place`, frame `ratio`), its places (`PHOTO_PLACES`), the size it is shrunk to and its keys, pure functions;
+  `photoStore.ts` – the photos themselves in IndexedDB (`tinytaps-photos`), shrunk and re-encoded first
+  (`shrinkPhoto`), `keepOnlyPhotos`; `ChildPhoto.tsx` – the photo on the sheet (or its pale ＋ place while the chart
+  is made) and `photoHead`, the head's room for it (below).
 - `BoardSheet.tsx` – the sheet itself, used for screen and print alike: week grid, a month as calendar, table or
   four week blocks (`MonthCalendar`, `MonthTable`, `MonthBlocks`), day cards or a snaking path
   (`snakeLayout`) to the reward, and the goal below. Sized in container units (`cq*`), so it fits any box.

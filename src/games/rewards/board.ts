@@ -3,6 +3,7 @@ import { dayKey, weekOf } from "@/lib/days";
 import { type BoardKind, type LinkedGame, REWARD_BY_ID, type Slot, SLOTS, TASK_BY_ID, type Template } from "./catalog";
 import type { TargetLanguageId } from "@/content/targetLanguages";
 import { type Localized, pick } from "@/lib/language";
+import type { ChartPhoto } from "./chartPhoto";
 
 // A board as the grown-up made it, and the stars on it. Everything here is plain
 // data and pure functions, so the screen, the print and the tests share them.
@@ -43,6 +44,8 @@ export interface Board {
   title: string;
   /** The sign before the heading: a mark's id, `NO_TITLE_MARK` for none; missing: the board's own mark. */
   titleMark?: string;
+  /** The photo of the child on the sheet and where it sits (`chartPhoto.ts`); missing: none. The picture itself stays in `photoStore`. */
+  photo?: ChartPhoto;
   tasks: BoardTask[];
   /** Weekdays of a week or month board, 0 = Monday. */
   days: number[];

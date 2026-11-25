@@ -32,6 +32,9 @@ import {
   NO_TITLE_MARK,
 } from "./board";
 import { BoardSheet, SCREEN_LOOK, useRewardLabel, useTaskLabel } from "./BoardSheet";
+import { type ChartPhoto, DEFAULT_PHOTO_PLACE, newPhotoKey, PHOTO_PLACES, photoPlaceOf } from "./chartPhoto";
+import { PHOTO_NAME, PHOTO_PLACE_NAMES, PhotoPlacePic } from "./ChildPhoto";
+import { putPhoto, shrinkPhoto } from "./photoStore";
 import {
   ACTIVITIES,
   type BoardKind,
@@ -143,11 +146,11 @@ export function defaultDraft(language: TargetLanguageId): Draft {
 const rewardOf = (draft: Draft): BoardReward | null => (draft.type === "board" ? draft.board.reward : (draft.plan.reward ?? null));
 
 /**
- * A draft in another span, in the wizard: the span's first Vorlage, keeping the child's name, the colours, the reward
- * and the Zähler – a board counts a star a field, so a plan made from one counts one a card.
+ * A draft in another span, in the wizard: the span's first Vorlage, keeping the child's name and photo, the colours,
+ * the reward and the Zähler – a board counts a star a field, so a plan made from one counts one a card.
  */
 export function draftInSpan(span: Span, from: Draft, language: TargetLanguageId): Draft {
-  const { childName, theme } = from.type === "board" ? from.board : from.plan;
+  const { childName, theme, photo } = from.type === "board" ? from.board : from.plan;
   const reward = rewardOf(from);
   // The Tageszeiten and their signs go along: „Ganzer Tag“ stays the whole day in every span (user feedback, November 2026).
   const parts = from.type === "board" ? boardDayParts(from.board) : dayPartsOf(from.plan);
@@ -156,7 +159,7 @@ export function draftInSpan(span: Span, from: Draft, language: TargetLanguageId)
     const template = PLAN_TEMPLATES.find((tpl) => tpl.view === span.id) ?? PLAN_TEMPLATES[0];
     // A Countdown counts nights, not stars: its card has no Zähler (the reward stays kept for a span that counts).
     const stars = span.id === "countdown" ? 0 : from.type === "plan" ? counterOf(from.plan) : 1;
-    const made = { ...planFromTemplate(template, language), childName, theme };
+    const made = { ...planFromTemplate(template, language), childName, theme, photo };
     // A week that counts stars is a reward chart's week: the same tasks every day, a row each (`WeekStars`), not the
     // Kita's Wochenplan, whose days differ.
     const week = span.id === "week" && stars > 0 ? rewardWeek(made) : made;
@@ -164,7 +167,7 @@ export function draftInSpan(span: Span, from: Draft, language: TargetLanguageId)
     return { type: "plan", plan: { ...withCounter(inParts, stars), reward } };
   }
   const template = TEMPLATES.find((tpl) => tpl.kind === span.id) ?? TEMPLATES[0];
-  const board = { ...boardFromTemplate(template, language), id: newId(), childName, theme, reward };
+  const board = { ...boardFromTemplate(template, language), id: newId(), childName, theme, reward, photo };
   return { type: "board", board: span.id === "collect" ? board : { ...withBoardDayParts(board, parts), signs } };
 }
 
@@ -186,7 +189,8 @@ type Editing =
   | { what: "task"; id: string }
   | { what: "add-task" }
   | { what: "big-day" }
-  | { what: "night" };
+  | { what: "night" }
+  | { what: "photo" };
 
 /** The names of a month board's looks. */
 const MONTH_LOOK_NAMES: Record<MonthLook, Localized> = {
@@ -197,6 +201,10 @@ const MONTH_LOOK_NAMES: Record<MonthLook, Localized> = {
 
 /** „Zeitraum“: what time the chart covers. */
 const SPAN: Localized = { de: "Zeitraum", en: "Time span", zh: "时间范围", hi: "समय-अवधि", es: "Periodo", ar: "المدة", ru: "Период" };
+
+/** A draft with another photo of the child, or none. */
+const withChartPhoto = (draft: Draft, photo: ChartPhoto | undefined): Draft =>
+  draft.type === "board" ? { type: "board", board: { ...draft.board, photo } } : { type: "plan", plan: { ...draft.plan, photo } };
 
 /** The chart itself of a draft: what changes when anything on it changes (the draft around it is made anew on every render). */
 const chartOf = (draft: Draft): Board | Plan => (draft.type === "board" ? draft.board : draft.plan);
@@ -306,6 +314,32 @@ export function ChartEditor({
   const { canUndo, canRedo, back, forward } = useDraftHistory(draft, onChange);
   const setPlan = (next: Plan) => onChange({ type: "plan", plan: next });
   const setBoard = (next: Board) => onChange({ type: "board", board: next });
+  // The child's photo: a file chosen on this device, made small and kept only here (`photoStore`), the chart holding its key.
+  const filePicker = useRef<HTMLInputElement>(null);
+  const latest = useRef(draft);
+  latest.current = draft;
+  const pickPhoto = () => filePicker.current?.click();
+  const takePhoto = async (file: File | undefined) => {
+    if (!file) return;
+    const made = await shrinkPhoto(file);
+    const key = newPhotoKey();
+    if (!made || !(await putPhoto(key, made.blob))) {
+      window.alert(
+        t({
+          en: "This photo could not be used. Please choose another one.",
+          de: "Dieses Foto ließ sich nicht verwenden. Bitte wählen Sie ein anderes.",
+          zh: "这张照片无法使用。请选择另一张。",
+          hi: "यह फ़ोटो इस्तेमाल नहीं हो सकी। कृपया कोई दूसरी चुनें।",
+          es: "Esta foto no se ha podido usar. Elija otra, por favor.",
+          ar: "تعذّر استخدام هذه الصورة. يُرجى اختيار صورة أخرى.",
+          ru: "Не удалось использовать это фото. Пожалуйста, выберите другое.",
+        }),
+      );
+      return;
+    }
+    const now = latest.current;
+    onChange(withChartPhoto(now, { key, place: chartOf(now).photo?.place ?? DEFAULT_PHOTO_PLACE, ratio: Math.round(made.ratio * 1000) / 1000 }));
+  };
 
   useEffect(() => {
     const el = box.current;
@@ -348,6 +382,9 @@ export function ChartEditor({
       const own = collectWays(draft.board)[Number(way)];
       if (own) setBoard(withWayGoal(draft.board, own.index, own.goal + Number(by)));
     } else if (edit === "title-mark") setEditing({ what: "title-mark" });
+    else if (edit === "add-photo") pickPhoto();
+    else if (edit === "photo") setEditing({ what: "photo" });
+    else if (edit === "delete-photo") onChange(withChartPhoto(draft, undefined));
     else if (edit === "add")
       setEditing(draft.type === "board" ? { what: "add-task" } : { what: "add", part: part as Slot | undefined, day: dayId, every: all });
     else if (edit === "reward") setEditing({ what: "reward", way: way === undefined ? undefined : Number(way) });
@@ -829,6 +866,32 @@ export function ChartEditor({
       )}
       {editing && editing.what === "reward" && <RewardDialog draft={draft} way={editing.way} day={day} onChange={onChange} onClose={() => setEditing(null)} />}
       {editing && editing.what === "title-mark" && <TitleMarkDialog draft={draft} onChange={onChange} onClose={() => setEditing(null)} />}
+      {editing && editing.what === "photo" && (
+        <PhotoDialog
+          draft={draft}
+          onChange={onChange}
+          onReplace={() => {
+            setEditing(null);
+            pickPhoto();
+          }}
+          onClose={() => setEditing(null)}
+        />
+      )}
+      {/* A photo is chosen on this device (a phone offers its camera or gallery) and never leaves it. */}
+      <input
+        ref={filePicker}
+        type="file"
+        accept="image/*"
+        hidden
+        tabIndex={-1}
+        aria-hidden
+        onChange={(event) => {
+          const input = event.currentTarget;
+          takePhoto(input.files?.[0]).finally(() => {
+            input.value = "";
+          });
+        }}
+      />
       {editing && plan && editing.what === "big-day" && <BigDayDialog plan={plan} onChange={setPlan} onClose={() => setEditing(null)} />}
       {editing && plan && editing.what === "night" && <NightDialog plan={plan} onChange={setPlan} onClose={() => setEditing(null)} />}
       {editing && draft.type === "board" && (editing.what === "task" || editing.what === "add-task") && (
@@ -1422,6 +1485,64 @@ function TitleMarkDialog({ draft, onChange, onClose }: { draft: Draft; onChange:
         {MARKS.map((mark) => (
           <Pick key={mark.id} selected={current === mark.id} onClick={() => set(mark.id)} emoji={<MarkPic mark={mark} />} label={t(mark.label)} />
         ))}
+      </div>
+    </EditDialog>
+  );
+}
+
+/**
+ * The photo of the child tapped (or its ⚙️): where it sits on the sheet, or another photo in its place – its 🗑️ is on
+ * the sheet, never here as well.
+ */
+function PhotoDialog({ draft, onChange, onReplace, onClose }: { draft: Draft; onChange: (draft: Draft) => void; onReplace: () => void; onClose: () => void }) {
+  const t = useT();
+  const photo = chartOf(draft).photo;
+  if (!photo) return null;
+  const place = photoPlaceOf(photo);
+  return (
+    <EditDialog title={t(PHOTO_NAME)} onClose={onClose}>
+      <div
+        className="rw-picks rw-picks-tiles rw-portrait-places"
+        role="group"
+        aria-label={t({ en: "Where it sits", de: "Wo es sitzt", zh: "位置", hi: "कहाँ रहे", es: "Dónde va", ar: "مكانها", ru: "Где расположить" })}
+      >
+        {PHOTO_PLACES.map((id) => (
+          <Pick
+            key={id}
+            selected={id === place}
+            onClick={() => {
+              onChange(withChartPhoto(draft, { ...photo, place: id }));
+              onClose();
+            }}
+            emoji={<PhotoPlacePic place={id} />}
+            label={t(PHOTO_PLACE_NAMES[id])}
+          />
+        ))}
+      </div>
+      <div className="rw-edit-row rw-portrait-row">
+        <button type="button" className="rw-portrait-replace" onClick={onReplace}>
+          <span aria-hidden>🖼️</span>{" "}
+          {t({
+            en: "Choose another photo",
+            de: "Anderes Foto wählen",
+            zh: "选择另一张照片",
+            hi: "दूसरी फ़ोटो चुनें",
+            es: "Elegir otra foto",
+            ar: "اختيار صورة أخرى",
+            ru: "Выбрать другое фото",
+          })}
+        </button>
+        <span className="rw-portrait-note">
+          {t({
+            en: "The photo stays on this device and is never sent.",
+            de: "Das Foto bleibt auf diesem Gerät und wird nie verschickt.",
+            zh: "照片只保存在本设备上，绝不会发送出去。",
+            hi: "फ़ोटो इसी डिवाइस पर रहती है और कभी भेजी नहीं जाती।",
+            es: "La foto se queda en este dispositivo y nunca se envía.",
+            ar: "تبقى الصورة على هذا الجهاز ولا تُرسَل أبدًا.",
+            ru: "Фото остаётся на этом устройстве и никуда не отправляется.",
+          })}
+        </span>
       </div>
     </EditDialog>
   );
