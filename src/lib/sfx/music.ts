@@ -37,6 +37,15 @@ export function playClimbNote(i: number, volume = 0.18) {
   note({ from: steps[i % steps.length] * 2 ** Math.floor(i / steps.length), duration: 0.35, type: "triangle", volume });
 }
 
+/**
+ * A xylophone bar struck at `freq` that rings `seconds` (a held note rings longer): the marble run's song (K-11).
+ * Something heavy strikes it two octaves lower, long and dull, like `playDeepNote`.
+ */
+export function playSongNote(freq: number, seconds: number, deep = false) {
+  if (deep) note({ from: freq / 4, duration: Math.max(0.7, seconds), type: "triangle", volume: 0.4, lowpass: 700 });
+  else note({ from: freq, duration: Math.max(0.35, seconds), type: "triangle", volume: 0.2 });
+}
+
 /** "Dong" – the i-th note struck by something heavy: two octaves lower, long and dull. */
 export function playDeepNote(i: number) {
   note({ from: PENTATONIC[i % PENTATONIC.length] / 4, duration: 0.7, type: "triangle", volume: 0.4, lowpass: 700 });

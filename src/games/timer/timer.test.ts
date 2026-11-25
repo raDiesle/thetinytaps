@@ -80,7 +80,7 @@ import { DISC, DOTS, dotAt } from "./disc";
 import { BOARD, FUNNEL, funnelY, JAR, jarPlan, MARBLE_R as JAR_MARBLE_R, MAX_MARBLES, NAIL_R, NAILS, SLOTS as JAR_SLOTS, TUBE } from "./jar";
 import { PICTURE_LINES, SOON_LINE, TURN_LINES, timerSaid } from "./voice";
 import { BLOOM, FLOWER_FLOOR, GROWN_AT, HOLDER, SPOUT, SPROUT, SPROUT_SIZE, STAKE, STALK, TAP } from "./flower";
-import { PIZZA, PIZZA_FLOOR, slice, SLICES, SLICE_SECONDS, TOPPINGS } from "./pizza";
+import { PIZZA, PIZZA_FLOOR, slice, SLICES, SLICE_SECONDS, STEAM, STEAM_SPOTS, TOPPINGS } from "./pizza";
 import { FINAL_MS, FINAL_NOTES, finalMs } from "./bar";
 import { FLOWERS, MOON, MOON_SET_AT, ridgeAt, SKY_CUT, STARS, SUN, SUN_FROM } from "./sunset";
 import {
@@ -211,6 +211,17 @@ describe("Timer", () => {
       expect(box.x).toBeGreaterThan(CLOCK.x);
       expect(box.x + box.w).toBeLessThan(CLOCK.x + CLOCK.w);
     }
+  });
+
+  test("the time being up shows from across the room in every timer: the whole picture turns golden in a breathing frame (user request, 25 November 2026)", async () => {
+    for (const run of ["TimerPlay.tsx", "SwapPlay.tsx"]) {
+      const code = await Bun.file(`${import.meta.dir}/${run}`).text();
+      expect(code, run).toMatch(/\{(phase !== "running"|done) && <TimeUp \/>\}/);
+    }
+    const css = await Bun.file(`${import.meta.dir}/timer.css`).text();
+    // Every colour changes, and the frame lies inside the book's paper margin, which hid one at the screen's edge.
+    expect(css).toMatch(/\.tm-up-tint \{[^}]*mix-blend-mode: color;/);
+    expect(css).toMatch(/\.tm-up-frame \{[^}]*inset: var\(--frame, 0px\);[^}]*tm-up-breathe/);
   });
 
   test("the removed pictures stay removed (user feedback, November 2026: Eimer and Kuchen made no sense)", () => {
@@ -1588,7 +1599,7 @@ describe("the bar along the bottom and the last moments", () => {
     expect(DEFAULT_TIMER_SETTINGS.bar).toBe(true);
   });
 
-  test("the bar and the last moments' light move only by transform and opacity, and the stage still covers the screen", async () => {
+  test("the bar and the last moments' light move only by transform and opacity, and the stage still reaches the screen's bottom", async () => {
     const css = await Bun.file(new URL("./timer.css", import.meta.url)).text();
     const frames = [...css.matchAll(/@keyframes (tm-bar-[\w-]+|tm-final-light) \{([\s\S]*?)\n\}/g)];
     expect(frames.length).toBeGreaterThanOrEqual(6);
@@ -1598,7 +1609,55 @@ describe("the bar along the bottom and the last moments", () => {
     }
     // Moved up into the room above the bar, the stage must still reach the screen's bottom edge (a dark strip showed).
     const stage = css.slice(css.indexOf(".tm-with-bar .tm-stage {"), css.indexOf("}", css.indexOf(".tm-with-bar .tm-stage {")));
-    expect(stage).toContain("100cqh + var(--tm-bar-room)");
+    expect(stage).toContain("--tm-room: var(--tm-bar-room)");
+    const base = css.slice(css.indexOf(".tm-stage {"), css.indexOf("}", css.indexOf(".tm-stage {")));
+    expect(base).toContain("100cqh + var(--tm-room)");
+    expect(base).toMatch(/top: max\(.*100% - var\(--tm-stage-w\) \* 9 \/ 32\)/);
+  });
+
+  test("on a phone on its side the stage shrinks until y 80–820 fit above the bar, the backdrop going on beside it", async () => {
+    // Covering a screen wider than 16:9, the stage cut the hourglass's and the red disc's tops off (user feedback,
+    // 25 November 2026): it is never wider than lets y 80–820 (740 units) fit into the height left above the bar.
+    const css = await Bun.file(new URL("./timer.css", import.meta.url)).text();
+    const base = css.slice(css.indexOf(".tm-stage {"), css.indexOf("}", css.indexOf(".tm-stage {")));
+    expect(base).toContain("--tm-fit: calc((100cqh - var(--tm-room)) * 1600 / 740)");
+    expect(base).toContain("min(var(--tm-cover), var(--tm-fit))");
+    // So every picture's full-stage backdrop goes on past the stage's edges (`bleed`, `Bleed`), or a bare strip shows.
+    const files = [...new Bun.Glob("*.tsx").scanSync(new URL(".", import.meta.url).pathname)];
+    let backdrops = 0;
+    for (const file of files) {
+      const code = await Bun.file(new URL(`./${file}`, import.meta.url)).text();
+      for (const m of code.matchAll(/<Layer x=\{0\} y=\{0\} w=\{STAGE_W\} h=\{STAGE_H\} className="tm-back">/g)) {
+        backdrops++;
+        const next = code.slice(m.index, m.index + 400);
+        expect(/<Draw w=\{STAGE_W\} h=\{STAGE_H\} bleed>|<Bleed>/.test(next), `${file}: backdrop without bleed`).toBe(true);
+      }
+    }
+    expect(backdrops).toBeGreaterThanOrEqual(18);
+  });
+
+  // User feedback, November 2026: one puff from the middle every second looked the same for an hour.
+  test("the pizza's steam rises at another place each second, in other looks and sizes", () => {
+    // Every second of a round one place steams, each place once.
+    expect(STEAM.map((s) => s.beat).sort((a, b) => a - b)).toEqual(Array.from({ length: STEAM_SPOTS }, (_, i) => i));
+    const byBeat = [...STEAM].sort((a, b) => a.beat - b.beat);
+    byBeat.forEach((s, i) => {
+      const next = byBeat[(i + 1) % byBeat.length];
+      const p = { x: Math.sin(s.angle) * s.radius, y: Math.cos(s.angle) * s.radius };
+      const q = { x: Math.sin(next.angle) * next.radius, y: Math.cos(next.angle) * next.radius };
+      // It jumps across the pizza, never to the place beside it.
+      expect(Math.hypot(p.x - q.x, p.y - q.y)).toBeGreaterThan(PIZZA.r * 0.45);
+    });
+    // And each second looks different from the second before, over both rounds and round the turn.
+    const looks = [...byBeat.map((s) => s.kinds[0]), ...byBeat.map((s) => s.kinds[1])];
+    looks.forEach((look, i) => expect(look).not.toBe(looks[(i + 1) % looks.length]));
+    expect(new Set(STEAM.flatMap((s) => s.kinds)).size).toBe(4);
+    expect(new Set(STEAM.map((s) => s.size)).size).toBe(STEAM_SPOTS);
+    for (const s of STEAM) {
+      expect(s.kinds[0]).not.toBe(s.kinds[1]);
+      // It rises from the cheese, never from the crust's edge.
+      expect(s.radius).toBeLessThanOrEqual(PIZZA.r * 0.75);
+    }
   });
 
   test("the pizza's toppings lie on the cheese, inside the tomato ring and the crust", () => {

@@ -7,7 +7,8 @@ Twenty-one levels in turn, each about a minute long, beginning with the one pick
 **After the tap that starts it, every level runs to its end by itself** (user request, 24 November 2026: „alle Level
 sollen von selbst durchlaufen, nur am Anfang sind Klicks nötig“): nothing on the way waits for another tap – no machine
 holds at a stop, the Wasserbahn's gates after the first open by themselves, the marble runs' barrier stays up, their
-switch flips itself and their shelf lets out the next thing every `AUTO_RELEASE_MS` (`autoTake`), and the Nagelbrett
+switch flips itself and their shelf lets out the next thing every `AUTO_RELEASE_MS` once the one before has played its
+line of the song (`autoTake`, `SONG_HANDOVER`), and the Nagelbrett
 drops its next marble by itself once none falls (`AUTO_DROP_MS`). The child may still join in everywhere – every tap
 answers – but never has to. There is no choice for it either: „Mitmachen“ (👆 Kind tippt / 🔄 Von selbst) over the cards
 was taken out with this, and „Von selbst“ is how every level plays. A new level keeps to it: one tap to start, then it
@@ -48,12 +49,12 @@ Before → after the rebuild of 22 November 2026, in seconds:
 | Hatschi-Kette (`sneeze`)      | 25–26            | 57.9–58.4         | `plannedSeconds`, every row of animals (`sneeze.test.ts`)                                             |
 | Wasserbahn (`water`)          | 29.0             | 59.0              | sum of its stretches, the child tapping at once (`water.test.ts`)                                     |
 | Nagelbrett (`pegs`)           | ~30 (10 marbles) | 61.0 (20 marbles) | seeded simulation of 30 rounds, one marble at a time (a tap a second: 13.0 → 24.7); no test bounds it |
-| Klingende Kugelbahn (`track`) | ~35.6            | 57.8              | whole round simulated in `track.test.ts`                                                              |
-| Farbenbahn (`colortrack`)     | ~35.6            | 57.6              | as above                                                                                              |
-| Schneebahn (`snowtrack`)      | ~35.6            | 56.2              | as above                                                                                              |
-| Weltraumbahn (`spacetrack`)   | ~35.6            | 59.0              | as above                                                                                              |
-| Wasserrutsche (`slidetrack`)  | ~35.6            | 59.9              | as above                                                                                              |
-| Baustellen-Bahn (`sitetrack`) | ~35.6            | 56.7              | as above                                                                                              |
+| Klingende Kugelbahn (`track`) | ~35.6            | 61.9              | whole round simulated in `track.test.ts` (+4 s on 25 November 2026 for the song, K-11)                |
+| Farbenbahn (`colortrack`)     | ~35.6            | 61.7              | as above                                                                                              |
+| Schneebahn (`snowtrack`)      | ~35.6            | 60.3              | as above                                                                                              |
+| Weltraumbahn (`spacetrack`)   | ~35.6            | 63.1              | as above                                                                                              |
+| Wasserrutsche (`slidetrack`)  | ~35.6            | 64.0              | as above                                                                                              |
+| Baustellen-Bahn (`sitetrack`) | ~35.6            | 60.8              | as above                                                                                              |
 
 ## Pause and skip
 
@@ -283,11 +284,27 @@ trampoline, bell, funnel by default), passes under the barrier, rides the seesaw
 hops over three drums, knocks five chimes and plays a whole scale on the second xylophone; then it runs the wooden run's lower wall (helix tower, step lifter,
 tipping troughs, see Every run's lower wall) and drops into the basket.
 A full basket raises the flag and ends the level (the round arrow / the next level's picture; any key goes on). After the first thing the shelf lets out the next by
-itself every two seconds until enough are on their way to fill the basket (`autoTake`). A first marble alone takes about
-45 s, the whole round about 58 s. Tapping a spot swaps its part (bell, trampoline, funnel, paddle wheel), always.
+itself two seconds after the one before, once that one has played its line of the song (see Kugel-Lied), until enough are
+on their way to fill the basket (`autoTake`). A first marble alone takes about 46 s, the whole round about 62 s. Tapping a spot swaps its part (bell, trampoline, funnel, paddle wheel), always.
 On a computer a yellow space-bar button sits at the bottom in the middle, and Space rebuilds the run to the next
 of all its builds, counting like a car's mileage: the first spot takes its next part, and each time it is back at the first
 part the next spot moves on too (`rebuildNext`).
+
+„Kugel-Lied“ (K-11, `song.ts`, in every world of the run): the eight bars of row 1 – four on 1a, four on 1b after the
+first spot – play a song, one line per thing: the first thing to reach bar 0 takes line 1, the next line 2, and so on
+round the song (`singBar`). Each bar strikes the line's next beat (`songBeat`): a note that rings on through the held
+beats after it, or on a held beat only the bar lights up. Over those bars a thing rolls at the even `SONG_SPEED` (times
+its `pace`), so the beat is steady at a little under a quarter of a second (rolling downhill it was 0.15 s, too fast for
+a tune); the iron ball plays its line two octaves deeper and slower, the tennis ball still hops. The shelf lets out the
+next thing by itself only once the one before has struck bar `SONG_HANDOVER`, so its line starts on the beat after the
+last one ends – let out every two seconds, lines sounded half into each other. When the song's last line is through,
+every part of the run sways, swings or flashes once at the same moment with a soft twinkle (`dance`), nothing rising.
+German children hear „Alle meine Entchen“ (five lines), every other app language „Twinkle, Twinkle, Little Star“ (six
+lines; 小星星, „Estrellita“, the alphabet song), both traditional tunes; a tap on a bar still plays the bar's own note.
+- A song's line has exactly eight beats, one per bar, and starts on a note (`song.test.ts`); a new song for a language
+  goes into `songFor`, written in the eight-beat grid with `null` for held beats.
+- Anything that slows row 1 or changes what lies between the shelf and bar 0 changes when the next line comes: check it
+  in `track.test.ts`, whose round must stay 55–65 s.
 
 „Was rollt denn da?“ (K-07, always on): a shelf over the first row holds
 three of five things (marble, tennis ball, iron ball, apple, soap bubble; `ROLLER` in `track.ts`); tapping one flies it into

@@ -51,20 +51,24 @@ its address stays `/drauflos/`.
   A tap presses its poster back with a knock and a note, then the game opens; ✕ and Esc lead back to the shelf.
 - **Its poster** (`ToyPoster`, user request, 24 November 2026) is the whole thing on the shelf: the game's name big on
   top and a picture from the game below, on paper held by three pieces of tape (top left, bottom left, bottom right)
-  while the top right corner curls off. It is stuck **flat on the back panel, in the middle between the two boards and
-  clear of both** – never leaning from the board (user feedback, 24 November 2026: „ganz hinten an der Wand, nicht
-  schräg“), and never with its foot on the board, where the board's front hid its lower tape and it looked cut off
-  (user feedback, 25 November 2026: „Abstand von den Regalbrettern“): `usePosterPlace` lifts it into the middle of the
-  compartment's panel as seen (`--poster-y`) and keeps it no taller than `POSTER_ROOM` of it, its tape included in that
-  room (about 20 px clear above and below at 844×390, 40 at 1280×720). Nothing
+  while the top right corner curls off. It is stuck **flat on the back panel, in the middle between the two boards,
+  clear of them, of the left wall and of the book beside it – its tape whole too** – never leaning from the board (user
+  feedback, 24 November 2026: „ganz hinten an der Wand, nicht schräg“), never with its foot on the board, where the
+  board's front hid its lower tape, and never against the wall, which hid its left tape (user feedback, 25 November
+  2026: „Abstand von den Regalbrettern“, „Abstand vom Brett links, das Klebeband darf nicht abgeschnitten sein“).
+  `usePosterPlace` fits it, with `POSTER_MARGIN` of its width round the paper on every side (the tape reaches about
+  0.15 of it past each corner), into the compartment's panel as seen (`.shelf-cell-shade`, below the board above's
+  front edge) and left of the next book, shrinking it where it must, and hangs it in the middle between the boards
+  (`--poster-y`); it measures again when the compartment changes and a frame after a resize, since the shelf plans its
+  boards anew then. Measure the tape's own boxes against the wall, the boards and the book, not only the paper's (at
+  844×390 about 5–7 px clear on every side). Nothing
   stands in front of it (a toy keyboard did first and looked like a till, user feedback, 24 November 2026). On the panel
   the shelf's perspective draws a thing towards the shelf's middle and makes it smaller, so laid out in its place the
   poster was seen behind the book beside it: `usePosterPlace` measures an unseen copy of the place on the panel
   (`.shelf-poster-spot`) against the place itself and moves and grows the poster back over it (`--poster-x`,
   `--poster-k`, `POSTER_REACH`) – never a fixed shift in CSS, which was right on one screen only. Anything on the shelf
-  stands clear of the books beside it, measured with `getBoundingClientRect` in the page (the poster's right edge
-  against the next cover's left: 16–23 px at 844×390, 390×844, 1024×768, 1280×720 and 1920×1080, also after a book went
-  back onto the shelf); `css.test.ts` keeps the poster in its place. The title's size follows its longest word (`--len`), so every
+  stands clear of the books beside it, measured with `getBoundingClientRect` in the page (the tape's boxes against the
+  next cover's left: 5–8 px at 844×390, 390×844, 1024×768, 1280×720 and 1920×1080, the paper's edge about 20 px); `css.test.ts` keeps the poster in its place. The title's size follows its longest word (`--len`), so every
   language's name fits under the curl. The picture is `src/components/bilder/plakat-<category>.webp`, made by
   `bun run previews plakat` (`POSTERS` in `tools/previews.ts`): a firework, a letter and a digit with its shapes,
   played with fixed chance so it comes out the same each time – look at it after every change to what the game draws.

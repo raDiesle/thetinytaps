@@ -85,7 +85,7 @@ export const GardenBackdrop = memo(function GardenBackdrop() {
   const hose = `M${TAP.x + 46} ${TAP.y + 16} C${TAP.x + 50} ${FLOWER_FLOOR + 10} ${TAP.x + 140} ${FLOWER_FLOOR + 14} ${TAP.x + 200} ${FLOWER_FLOOR - 4} S${HOLDER.x - 40} ${HOLDER.y + 50} ${HOLDER.x} ${HOLDER.y}`;
   return (
     <Layer x={0} y={0} w={STAGE_W} h={STAGE_H} className="tm-back">
-      <Draw w={STAGE_W} h={STAGE_H}>
+      <Draw w={STAGE_W} h={STAGE_H} bleed>
         <defs>
           <linearGradient id="tm-garden-sky" x1="0" y1="0" x2="0" y2="1">
             <stop offset="0" stopColor="#a5dcff" />
