@@ -19,7 +19,9 @@ its address stays `/drauflos/`.
   plop (`shapes.tsx`, drawn, never emoji), else only ripples. Fireworks come three times as often as the other kinds
   (`TAP_AWAY_SURPRISES.bag`, `FIREWORK_KINDS`), over half of all surprises.
 - Every letter, digit and shape bursts onto the page with a small ring of sparks flying out (`POP_SPARKS` streaks,
-  `.tw-burst`), a little firework with every press. Each surprise is one thing aimed at that spot – one
+  `.tw-burst`), a little firework with every press. The streaks stand still inside one layer that grows out and fades,
+  and lets go of its layer once over (fill `backwards`): one layer per streak, held for the letter's whole stay, kept up to
+  a hundred layers on the page and put letters alone at 42 % of an old phone's main thread (November 2026). Each surprise is one thing aimed at that spot – one
   balloon, one flower, one ball, bubbles round it rather than rising away (user feedback, 25 November 2026; the rule
   stands with the surprises in `src/games/letters/CLAUDE.md`): several things at once come from several presses,
   never from one.
@@ -46,10 +48,12 @@ its address stays `/drauflos/`.
   at most `MAX_SPARKLES`, and every limit kept in `tapaway.test.ts`.
 - Presses that only ripple share one ripple when they land within `RIPPLE_GAP_MS` of each other (a palm on the keys,
   several fingers at once): each ripple is two rings, each a layer, and both hands smashing kept about 18 rings on the
-  page, which alone took a fifth of an old phone's main thread (November 2026: „Mit beiden Händen“ in `bun run perf
-  zaubertasten` went from about 66 % busy to 52 %, over the budget of 60 % before). A child's single taps still each get
-  theirs. The more there is on the page at once, the dearer each frame's commit of all its layers (the canvas surprises
-  draw in every frame): a new thing that comes often counts its layers against that stretch.
+  page, which alone took a fifth of an old phone's main thread. A child's single taps still each get theirs.
+- **Count the layers** (November 2026, `bun run perf zaubertasten`): every element animated by itself is a layer while
+  it runs (and while `will-change` or a forward fill holds it), and the canvas fireworks draw in every frame, so each
+  frame's commit carries all of them – the more on the page at once, the dearer every frame. Something that comes with
+  every press (a burst, a ring) is one layer, and lets go of it when done. With the shared ripples and the burst as one
+  layer, both hands smashing went from 81 % busy (budget 60 %) to about 49 %, letters from 42 % to about 22 %.
 - `bun run perf zaubertasten` measures letters, surprises, taps and both hands at once with a fixed chance
   (`FIXED_CHANCE`), since the random kinds of surprises alone swung a stretch by over ten points; still run it a few
   times before and after a change, and compare the averages.
