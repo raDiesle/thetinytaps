@@ -1430,6 +1430,168 @@
   font-weight: 600;
 }
 
+/* ---------- The photo of the child (`ChildPhoto`): the same on screen, on paper and while the chart is made ---------- */
+
+/* A photo in a corner makes the head as tall as itself, so the cards below make room for it and never lie under it. */
+.rw-head.rw-head-portrait-top-left,
+.rw-head.rw-head-portrait-top-right {
+  flex-wrap: nowrap;
+  align-items: center;
+}
+
+/* A print with a white rim, a little askew, held by a strip of tape – still, nothing moves. */
+.rw-portrait {
+  --rw-portrait-h: 19cqmin;
+  --rw-act: clamp(22px, 4.4cqmin, 32px);
+  position: relative;
+  box-sizing: border-box;
+  display: inline-block;
+  flex: none;
+  height: var(--rw-portrait-h);
+  aspect-ratio: var(--rw-portrait-ratio, 0.8);
+  margin: 0.8cqmin 1.2cqmin 0.4cqmin 0.4cqmin;
+  padding: calc(var(--rw-portrait-h) * 0.05);
+  border-radius: 0.4cqmin;
+  background: #fff;
+  box-shadow: 0 0.3cqmin 0.9cqmin rgb(0 0 0 / 25%);
+  rotate: -2.5deg;
+}
+
+.rw-portrait-top-right {
+  order: 9;
+  margin: 0.8cqmin 0.4cqmin 0.4cqmin 1.2cqmin;
+  rotate: 2.5deg;
+}
+
+/* Beside the heading it is small, about two lines of it high, so the head hardly grows. */
+.rw-portrait-title {
+  --rw-portrait-h: 12cqmin;
+  margin: 0.6cqmin 0.4cqmin 0.2cqmin;
+  rotate: -3deg;
+}
+
+.rw-portrait-print {
+  display: block;
+  width: 100%;
+  height: 100%;
+  overflow: hidden;
+  background: #ece8df;
+}
+
+.rw-portrait-img {
+  display: block;
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+}
+
+.rw-portrait-tape {
+  position: absolute;
+  top: calc(var(--rw-portrait-h) * -0.06);
+  left: 50%;
+  width: 44%;
+  height: calc(var(--rw-portrait-h) * 0.13);
+  translate: -50% 0;
+  rotate: 4deg;
+  background: rgb(250 236 170 / 82%);
+  box-shadow: 0 0.1cqmin 0.4cqmin rgb(0 0 0 / 22%);
+}
+
+/* On a black-and-white print the photo is grey too, and so is its tape. */
+.rw-grey .rw-portrait-img {
+  filter: grayscale(1);
+}
+
+.rw-grey .rw-portrait-tape {
+  background: rgb(225 225 225 / 85%);
+}
+
+.rw-portrait > .rw-act {
+  top: calc(var(--rw-act) * -0.35);
+}
+
+.rw-portrait > .rw-act-left {
+  left: calc(var(--rw-act) * -0.35);
+}
+
+.rw-portrait > .rw-act-right {
+  right: calc(var(--rw-act) * -0.35);
+}
+
+.rw-portrait:has(> .rw-act-delete:hover) {
+  outline: max(2px, 0.5cqmin) dashed #c62828;
+  outline-offset: 2px;
+}
+
+.rw-portrait:has(> .rw-act-delete:hover) .rw-portrait-img {
+  opacity: 0.6;
+}
+
+/* Without a photo, while the chart is made: a pale place for one beside the heading's sign, never on paper. */
+.rw-portrait-add {
+  display: inline-grid;
+  flex: none;
+  place-items: center;
+  width: 1.15em;
+  height: 1.15em;
+  padding: 0.08em;
+  box-sizing: border-box;
+  border: max(2px, 0.35cqmin) dashed color-mix(in srgb, var(--rw-ink) 55%, transparent);
+  border-radius: 0.2em;
+  color: color-mix(in srgb, var(--rw-ink) 60%, transparent);
+  font-size: 5.4cqmin;
+}
+
+.rw-portrait-add > svg {
+  width: 100%;
+  height: 100%;
+  fill: none;
+  stroke: currentColor;
+  stroke-width: 1.8;
+  stroke-linecap: round;
+  stroke-linejoin: round;
+}
+
+.rw-portrait-add:hover,
+.rw-portrait-add:focus-visible {
+  background: var(--rw-main);
+  color: var(--rw-ink);
+}
+
+/* The photo's window: the places as small sheets, then another photo and the note that it stays on this device. */
+.rw-portrait-place-pic {
+  display: block;
+  width: 2.1em;
+  height: 1.6em;
+  color: var(--ink, #222);
+}
+
+.rw-portrait-row {
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 8px 16px;
+}
+
+.rw-portrait-replace {
+  padding: 8px 16px;
+  border: 2px solid var(--ink, #222);
+  border-radius: 999px;
+  background: #fff;
+  font: inherit;
+  font-weight: 700;
+  cursor: pointer;
+}
+
+.rw-portrait-replace:hover,
+.rw-portrait-replace:focus-visible {
+  background: var(--sunshine, #ffd84d);
+}
+
+.rw-portrait-note {
+  font-size: 0.9rem;
+  opacity: 0.8;
+}
+
 .rw-body {
   display: flex;
   flex: 1;

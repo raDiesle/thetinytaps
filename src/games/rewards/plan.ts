@@ -5,6 +5,7 @@ import { type BoardReward, cellKey, type LinkedDays, newId, type StarLog, weekda
 import { type LinkedGame, type PlanTemplate, type PlanView, type Slot, STEP_BY_ID } from "./catalog";
 import { type DayParts, type DaySignSet, PARTS_OF } from "./daySigns";
 import { ritualOf } from "./rituals";
+import type { ChartPhoto } from "./chartPhoto";
 
 // A Tagesplan (a picture schedule, „Strukturtafel“): the steps of each day in their order, and which of today's
 // are done. Plain data and pure functions like board.ts; the ticks share its star log, keyed by plan id.
@@ -43,6 +44,8 @@ export interface Plan {
   title: string;
   /** The sign before the heading: a mark's id; missing or `NO_TITLE_MARK`: none. */
   titleMark?: string;
+  /** The photo of the child on the sheet and where it sits (`chartPhoto.ts`); missing: none. The picture itself stays in `photoStore`. */
+  photo?: ChartPhoto;
   /** Seven lists of steps, Monday first; with `same` only the first one, for every day. */
   days: PlanStep[][];
   /** Every day the same steps (a morning routine), or each weekday its own (a week with Kita). */
