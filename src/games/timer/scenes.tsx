@@ -2,7 +2,7 @@ import { memo, useId, type CSSProperties, type ReactNode } from "react";
 import { useRunClock } from "./pause";
 
 // Everything is drawn on a stage of STAGE_W × STAGE_H that covers the screen (`.tm-stage`): what matters stays within
-// x 200–1400 (cut off at 4:3) and y 80–820 (cut off on a phone on its side). What moves is an HTML layer of its own
+// x 200–1400 (cut off at 4:3) and y 80–820 (all a phone on its side shows, the backdrop going on beside it, `Bleed`). What moves is an HTML layer of its own
 // (`Layer`), moved by a CSS animation as long as the timer, so the big still drawing behind it is never painted again.
 
 /** The stage's size in its own units. */
@@ -49,12 +49,69 @@ export function LeftGlow({ n }: { n: number }) {
   return n > 0 ? <div key={n} className="tm-left-glow" /> : null;
 }
 
-/** An SVG filling its layer, in the layer's own units. */
-export function Draw({ w, h, children }: { w: number; h: number; children: ReactNode }) {
+/**
+ * An SVG filling its layer, in the layer's own units. A backdrop covering the whole stage passes `bleed`, so it goes on
+ * past the stage's sides (`Bleed`).
+ */
+export function Draw({ w, h, bleed, children }: { w: number; h: number; bleed?: boolean; children: ReactNode }) {
   return (
     <svg viewBox={`0 0 ${w} ${h}`} preserveAspectRatio="none">
-      {children}
+      {bleed ? <Bleed>{children}</Bleed> : children}
     </svg>
+  );
+}
+
+/** The edge band `Bleed` mirrors back and forth, and how many bands it lays beside each edge, in stage units. */
+const BAND = 80;
+const BANDS = 8;
+/** How far a band reaches under the drawing at the edge, so no hairline shows between them. */
+const SEAM = 2;
+
+/**
+ * A backdrop going on past the stage's left and right edges: the outermost `BAND` of it, mirrored back and forth as
+ * far as `BANDS` of them reach, like a wall, sky or floor going on. On a phone on its side the stage is narrower than
+ * the screen (`.tm-stage`: it shrinks until y 80–820 fit above the bar – a stage as wide as the screen cut the
+ * hourglass's and the red disc's tops off, user feedback, 25 November 2026), and these bands fill the strips beside it.
+ * Only a narrow band, never the whole drawing mirrored: that brought a second crane post and half a house into the
+ * strips. Each band is a pattern's tile (a tile cuts its drawing off by itself – never a clip path, which drops out while
+ * the page turns), its edges crisp so no hairline shows between two; the svg lets them out (`.tm-layer > svg`), `.tm-play` cuts them at the screen. Drawn once with the
+ * backdrop, so they cost nothing while it runs.
+ */
+export function Bleed({ children }: { children: ReactNode }) {
+  const id = `tm-bleed-${useId().replace(/[^\w-]/g, "")}`;
+  // The band at each edge as it is, and mirrored; `x` is where in the drawing the band starts.
+  const tiles = [
+    { key: "l", x: 0, mirror: false },
+    { key: "lm", x: 0, mirror: true },
+    { key: "r", x: STAGE_W - BAND, mirror: false },
+    { key: "rm", x: STAGE_W - BAND, mirror: true },
+  ];
+  // Beside the edge the band comes mirrored, beyond it as it is, and so on.
+  const bands = Array.from({ length: BANDS }, (_, k) => [
+    { key: `l${k}`, x: -(k + 1) * BAND, tile: k % 2 ? "l" : "lm", seam: k === 0 },
+    { key: `r${k}`, x: STAGE_W + k * BAND, tile: k % 2 ? "r" : "rm", seam: k === 0 },
+  ]).flat();
+  return (
+    <>
+      <defs>
+        {tiles.map((t) => (
+          <pattern key={t.key} id={`${id}-${t.key}`} patternUnits="userSpaceOnUse" width={BAND} height={STAGE_H}>
+            <use href={`#${id}`} transform={t.mirror ? `matrix(-1 0 0 1 ${t.x + BAND} 0)` : `translate(${-t.x} 0)`} />
+          </pattern>
+        ))}
+      </defs>
+      {bands.map((b) => (
+        <rect
+          key={b.key}
+          x={b.x < 0 ? b.x : b.x - (b.seam ? SEAM : 0)}
+          width={BAND + (b.seam ? SEAM : 0)}
+          height={STAGE_H}
+          fill={`url(#${id}-${b.tile})`}
+          shapeRendering="crispEdges"
+        />
+      ))}
+      <g id={id}>{children}</g>
+    </>
   );
 }
 
@@ -86,7 +143,7 @@ const STATION = { x: 1080, w: 250, top: 430 } as const;
 export const TrainBackdrop = memo(function TrainBackdrop() {
   return (
     <Layer x={0} y={0} w={STAGE_W} h={STAGE_H} className="tm-back">
-      <Draw w={STAGE_W} h={STAGE_H}>
+      <Draw w={STAGE_W} h={STAGE_H} bleed>
         <defs>
           <linearGradient id="tm-sky" x1="0" y1="0" x2="0" y2="1">
             <stop offset="0" stopColor="#8fd3ff" />
@@ -356,7 +413,7 @@ function bulbPath(top: number, bottom: number, upsideDown: boolean) {
 export const SandBackdrop = memo(function SandBackdrop() {
   return (
     <Layer x={0} y={0} w={STAGE_W} h={STAGE_H} className="tm-back">
-      <Draw w={STAGE_W} h={STAGE_H}>
+      <Draw w={STAGE_W} h={STAGE_H} bleed>
         <defs>
           {/* A soft striped wallpaper with little flowers between the stripes. */}
           <pattern id="tm-sand-wall" width="120" height="120" patternUnits="userSpaceOnUse">
@@ -667,7 +724,7 @@ export const CandleBackdrop = memo(function CandleBackdrop() {
   const { back, front, edge, left, right, inset, leg } = TABLE;
   return (
     <Layer x={0} y={0} w={STAGE_W} h={STAGE_H} className="tm-back">
-      <Draw w={STAGE_W} h={STAGE_H}>
+      <Draw w={STAGE_W} h={STAGE_H} bleed>
         <defs>
           <radialGradient id="tm-room" cx="0.51" cy="0.4" r="0.7">
             <stop offset="0" stopColor="#5c4b8a" />

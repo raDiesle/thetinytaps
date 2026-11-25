@@ -45,7 +45,7 @@ export function slice(i: number) {
 const Kitchen = memo(function Kitchen() {
   return (
     <Layer x={0} y={0} w={STAGE_W} h={STAGE_H} className="tm-back">
-      <Draw w={STAGE_W} h={STAGE_H}>
+      <Draw w={STAGE_W} h={STAGE_H} bleed>
         <defs>
           <pattern id="tm-cloth" width="80" height="80" patternUnits="userSpaceOnUse">
             <rect width="80" height="80" fill="#fff" />

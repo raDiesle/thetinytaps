@@ -532,7 +532,12 @@ and the shared `Layer`, `Draw`, `LeftGlow`), `timer.css`, `content.ts`
 - **Phones keep up**: everything that moves is an HTML layer of its own (`Layer`), moved by one CSS animation as long
   as the timer (`--tm-ms` on the stage), never React drawing per frame; the backdrops are `memo` and drawn once. The
   stage is 1600 × 900 covering the screen: keep what matters within x 200–1400 and y 80–820, and a figure's right edge within 1340 – the book's paper margin and the ⚙️ note lie over the right edge, and a fox standing to 1380 was cut
-  off there (`RIGHT` in `timer.test.ts`). Many small things that go off together (a caught star's ring and sparkles)
+  off there (`RIGHT` in `timer.test.ts`). On a screen wider than 16:9 (a phone on its side) the stage never covers it
+  but shrinks until y 80–820 fit above the bar (`--tm-fit` in `.tm-stage`; covering it cut the hourglass's and the red
+  disc's tops off, user feedback, 25 November 2026), and the backdrop goes on in the strips beside it: every full-stage
+  backdrop passes `bleed` to its `Draw` or wraps its svg's content in `Bleed` (`scenes.tsx`), which mirrors its
+  outermost 80 units back and forth like a wall or meadow going on – never the whole drawing mirrored (a second crane
+  post, half a house) and never a clip path (`timer.test.ts` checks). Look at a new picture at 844×340 too. Many small things that go off together (a caught star's ring and sparkles)
   are one drawing in one layer that grows and fades, never a layer each: Up to the Moon's 24 stars with eight layers
   each, sparkles moved by `var()` in their keyframes, kept an old phone's main thread twice as busy (23 November 2026).
   After changing what moves, run the picture's perf scenario (`bun run perf timer-<name>`) and compare with the commit

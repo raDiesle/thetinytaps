@@ -1588,7 +1588,7 @@ describe("the bar along the bottom and the last moments", () => {
     expect(DEFAULT_TIMER_SETTINGS.bar).toBe(true);
   });
 
-  test("the bar and the last moments' light move only by transform and opacity, and the stage still covers the screen", async () => {
+  test("the bar and the last moments' light move only by transform and opacity, and the stage still reaches the screen's bottom", async () => {
     const css = await Bun.file(new URL("./timer.css", import.meta.url)).text();
     const frames = [...css.matchAll(/@keyframes (tm-bar-[\w-]+|tm-final-light) \{([\s\S]*?)\n\}/g)];
     expect(frames.length).toBeGreaterThanOrEqual(6);
@@ -1598,7 +1598,31 @@ describe("the bar along the bottom and the last moments", () => {
     }
     // Moved up into the room above the bar, the stage must still reach the screen's bottom edge (a dark strip showed).
     const stage = css.slice(css.indexOf(".tm-with-bar .tm-stage {"), css.indexOf("}", css.indexOf(".tm-with-bar .tm-stage {")));
-    expect(stage).toContain("100cqh + var(--tm-bar-room)");
+    expect(stage).toContain("--tm-room: var(--tm-bar-room)");
+    const base = css.slice(css.indexOf(".tm-stage {"), css.indexOf("}", css.indexOf(".tm-stage {")));
+    expect(base).toContain("100cqh + var(--tm-room)");
+    expect(base).toMatch(/top: max\(.*100% - var\(--tm-stage-w\) \* 9 \/ 32\)/);
+  });
+
+  test("on a phone on its side the stage shrinks until y 80–820 fit above the bar, the backdrop going on beside it", async () => {
+    // Covering a screen wider than 16:9, the stage cut the hourglass's and the red disc's tops off (user feedback,
+    // 25 November 2026): it is never wider than lets y 80–820 (740 units) fit into the height left above the bar.
+    const css = await Bun.file(new URL("./timer.css", import.meta.url)).text();
+    const base = css.slice(css.indexOf(".tm-stage {"), css.indexOf("}", css.indexOf(".tm-stage {")));
+    expect(base).toContain("--tm-fit: calc((100cqh - var(--tm-room)) * 1600 / 740)");
+    expect(base).toContain("min(var(--tm-cover), var(--tm-fit))");
+    // So every picture's full-stage backdrop goes on past the stage's edges (`bleed`, `Bleed`), or a bare strip shows.
+    const files = [...new Bun.Glob("*.tsx").scanSync(new URL(".", import.meta.url).pathname)];
+    let backdrops = 0;
+    for (const file of files) {
+      const code = await Bun.file(new URL(`./${file}`, import.meta.url)).text();
+      for (const m of code.matchAll(/<Layer x=\{0\} y=\{0\} w=\{STAGE_W\} h=\{STAGE_H\} className="tm-back">/g)) {
+        backdrops++;
+        const next = code.slice(m.index, m.index + 400);
+        expect(/<Draw w=\{STAGE_W\} h=\{STAGE_H\} bleed>|<Bleed>/.test(next), `${file}: backdrop without bleed`).toBe(true);
+      }
+    }
+    expect(backdrops).toBeGreaterThanOrEqual(18);
   });
 
   test("the pizza's toppings lie on the cheese, inside the tomato ring and the crust", () => {

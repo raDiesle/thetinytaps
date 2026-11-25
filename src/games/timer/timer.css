@@ -13,12 +13,21 @@
   background: #2b2d5c;
 }
 
-/* A 16:9 stage covering the screen, its middle in the middle; the drawings keep what matters well inside it. */
+/* A 16:9 stage covering the screen, its middle in the middle of the room above the bar (`--tm-room`, none without it);
+   the drawings keep what matters within x 200–1400 and y 80–820. On a screen wider than 16:9 (a phone on its side) a
+   stage as wide as the screen cut a third of that band's top off (the hourglass's and the red disc's tops, user
+   feedback, 25 November 2026): there it is never wider than lets y 80–820 fit whole above the bar (`--tm-fit`), the
+   backdrops' mirrored edges fill the strips beside it (`Bleed` in `scenes.tsx`), and it still reaches the screen's
+   bottom edge (`top`'s second value). `timer.test.ts` checks the sizes. */
 .tm-stage {
+  --tm-room: 0px;
+  --tm-cover: max(100cqw, calc((100cqh + var(--tm-room)) * 16 / 9));
+  --tm-fit: calc((100cqh - var(--tm-room)) * 1600 / 740);
+  --tm-stage-w: min(var(--tm-cover), var(--tm-fit));
   position: absolute;
   left: 50%;
-  top: 50%;
-  width: max(100cqw, calc(100cqh * 16 / 9));
+  top: max(calc(50% - var(--tm-room) / 2), calc(100% - var(--tm-stage-w) * 9 / 32));
+  width: var(--tm-stage-w);
   aspect-ratio: 16 / 9;
   transform: translate(-50%, -50%);
 }
@@ -3676,12 +3685,11 @@
 }
 
 /* With the bar, the stage's middle moves up into the room above it, so the bar lies under what matters instead of over
-   its foot (it hid the candles' holders on a phone): only on a phone wider than 16:9 a strip is cut off at top and
-   bottom alike. The stage still reaches the screen's bottom edge (a dark strip showed under the bar on a tablet), so
+   its foot (it hid the candles' holders on a phone); on a phone wider than 16:9 the stage narrows instead (see
+   `.tm-stage`). The stage still reaches the screen's bottom edge (a dark strip showed under the bar on a tablet), so
    it is that much taller there, and a 4:3 tablet still shows x 200–1400 whole. */
 .tm-with-bar .tm-stage {
-  top: calc(50% - var(--tm-bar-room) / 2);
-  width: max(100cqw, calc((100cqh + var(--tm-bar-room)) * 16 / 9));
+  --tm-room: var(--tm-bar-room);
 }
 
 .tm-bar {
