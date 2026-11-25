@@ -418,13 +418,14 @@ function DailyGroup({
   // Measured again when the words change with the language, and the room with the carving.
   useLayoutEffect(() => {
     const words = sentence.current;
-    const box = words?.parentElement;
-    if (!words || !box) return;
+    const text = words?.parentElement;
+    const box = text?.parentElement;
+    if (!words || !text || !box) return;
     const fit = () => {
       words.hidden = false;
       const style = getComputedStyle(box);
       const room = box.clientHeight - parseFloat(style.paddingTop) - parseFloat(style.paddingBottom);
-      const parts = [...box.children].filter((part): part is HTMLElement => part instanceof HTMLElement && part.offsetHeight > 0);
+      const parts = [...text.children].filter((part): part is HTMLElement => part instanceof HTMLElement && part.offsetHeight > 0);
       const need = parts.reduce((sum, part) => sum + part.offsetHeight, 0) + (parseFloat(style.rowGap) || 0) * (parts.length - 1);
       words.hidden = need > room + 1 || words.scrollWidth > words.clientWidth + 1;
     };
@@ -437,30 +438,33 @@ function DailyGroup({
     <span className="shelf-daily-row" style={{ "--span": span, "--books-span": DAILY_SPAN, "--lean-room": LEAN_ROOM } as CSSProperties}>
       {carving && (
         <span className="shelf-carving" data-narrow={carving.narrow || undefined}>
-          {/* Kept whole, so a narrow carving never breaks it. */}
-          <span className="shelf-carving-big">
-            {t({
-              de: "Für\u00a0Groß\u00a0&\u00a0Klein",
-              ru: "Для\u00a0всей\u00a0семьи",
-              en: "For\u00a0Big\u00a0&\u00a0Little",
-              zh: "给大人和孩子",
-              hi: "बड़ों\u00a0और\u00a0छोटों\u00a0के\u00a0लिए",
-              es: "Grandes\u00a0y\u00a0chicos",
-              ar: "للكبار\u00a0والصغار",
-            })}
+          {/* The words together, only as big as they are, so the light behind them stays on them. */}
+          <span className="shelf-carving-text">
+            {/* Kept whole, so a narrow carving never breaks it. */}
+            <span className="shelf-carving-big">
+              {t({
+                de: "Für\u00a0Groß\u00a0&\u00a0Klein",
+                ru: "Для\u00a0всей\u00a0семьи",
+                en: "For\u00a0Big\u00a0&\u00a0Little",
+                zh: "给大人和孩子",
+                hi: "बड़ों\u00a0और\u00a0छोटों\u00a0के\u00a0लिए",
+                es: "Grandes\u00a0y\u00a0chicos",
+                ar: "للكبار\u00a0والصغار",
+              })}
+            </span>
+            <span className="shelf-carving-words" ref={sentence}>
+              {t({
+                de: "Der erste gemeinsame Schritt ins Digitale – mit Lernspielen und kleinen Helfern für den Tag.",
+                ru: "Первый шаг в цифровой мир вместе – развивающие игры и помощники на каждый день.",
+                en: "The first step into the digital world, taken together – with learning games and little helpers for the day.",
+                zh: "一起迈向数字世界的第一步——有益智游戏，也有日常小帮手。",
+                hi: "डिजिटल दुनिया में साथ मिलकर पहला क़दम – सीखने वाले खेलों और दिन भर के छोटे मददगारों के साथ।",
+                es: "El primer paso juntos al mundo digital, con juegos para aprender y pequeños ayudantes para el día.",
+                ar: "الخطوة الأولى معًا إلى العالم الرقمي – مع ألعاب تعليمية ومساعدين صغار لكل يوم.",
+              })}
+            </span>
+            <RoomNotes />
           </span>
-          <span className="shelf-carving-words" ref={sentence}>
-            {t({
-              de: "Der erste gemeinsame Schritt ins Digitale – mit Lernspielen und kleinen Helfern für den Tag.",
-              ru: "Первый шаг в цифровой мир вместе – развивающие игры и помощники на каждый день.",
-              en: "The first step into the digital world, taken together – with learning games and little helpers for the day.",
-              zh: "一起迈向数字世界的第一步——有益智游戏，也有日常小帮手。",
-              hi: "डिजिटल दुनिया में साथ मिलकर पहला क़दम – सीखने वाले खेलों और दिन भर के छोटे मददगारों के साथ।",
-              es: "El primer paso juntos al mundo digital, con juegos para aprender y pequeños ayudantes para el día.",
-              ar: "الخطوة الأولى معًا إلى العالم الرقمي – مع ألعاب تعليمية ومساعدين صغار لكل يوم.",
-            })}
-          </span>
-          <RoomNotes />
         </span>
       )}
       <span className="shelf-daily-books">
@@ -648,8 +652,8 @@ function Compartment({
 /**
  * Warm light falling on the back panel behind the books of a compartment that can be taken, so the eye goes to them and
  * the books only filling the shelf stand in its shadow (user decision, November 2026). Where the sign and the carved
- * words begin the board (`leads`), a brighter light falls on them as well, so what a visitor should see first stands
- * out (user request, November 2026). Still: it never moves.
+ * words begin the board (`leads`), it starts right of the words: their own brighter light lies close round them
+ * (`.shelf-carving-text`), never over the whole compartment up to its post. Still: it never moves.
  */
 function BooksLight({ cell, bh, spans, leads }: { cell: ShelfCell; bh: number; spans: number[]; leads: boolean }) {
   const books = cell.books ?? [];
@@ -657,12 +661,7 @@ function BooksLight({ cell, bh, spans, leads }: { cell: ShelfCell; bh: number; s
   const width = span * bh * BOOK_ASPECT + (books.length + 1) * BOOK_GAP * bh + (cell.lead ?? 0);
   if (!leads) return <span className="shelf-light" style={{ left: (cell.w - width) / 2, width }} />;
   const words = BOOK_GAP * bh + spans[books[0]] * bh * BOOK_ASPECT - DAILY_SPAN * bh * BOOK_ASPECT + (cell.lead ?? 0);
-  return (
-    <>
-      <span className="shelf-light" style={{ left: 2 + words, width: width - words }} />
-      <span className="shelf-light lead" style={{ left: 2, width: words + BOOK_GAP * bh }} />
-    </>
-  );
+  return <span className="shelf-light" style={{ left: 2 + words, width: width - words }} />;
 }
 
 /**

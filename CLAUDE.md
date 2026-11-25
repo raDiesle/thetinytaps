@@ -1030,8 +1030,9 @@ src/lib/                 speech, sfx (synthesized + recorded sounds), storage, d
   over their tops (`ShelfCell.tall`, `UNDER_SIGN`), and they get its room – only where that makes them clearly wider
   (`ABOVE_GAIN`), since under it they stand lower, and with a breath of room left beside the words (`WORDS_BREATH`;
   user feedback, November 2026: beside the sign on a tablet the spines were too thin for their pictures) – and the books spine out keep clear of the wall with the stickers (`STICKERS_ROOM`), the foxes on its o stay on the screen (`shelfLayout.test.ts`), and the books spine out fill only the
-  board's right end (`data-leads`). A brighter, still light falls on sign and words (`.shelf-light.lead`) so they stand
-  out, and the plan takes the sign's measured width (`SIGN_EMS`), never a wide guess, since every px it reserves comes
+  board's right end (`data-leads`). A brighter, still light lies close round the carved words only (`.shelf-carving-text`) so they stand
+  out – never over the whole compartment, where it reached the post and was cut off (user feedback, 25 November 2026;
+  `shelfGlow.test.ts`) –, and the plan takes the sign's measured width (`SIGN_EMS`), never a wide guess, since every px it reserves comes
   off the books. Upright, the words stand before the helpers too. On an upright screen it
   hangs above the shelf, never touching it. A new option becomes such a thing in the shelf too (`SHELF_THINGS`); their
   menus open outside the shelf's 3D (`MenuButton` portals them), since a transform would hold them in. The wall's picture (`bilder/buch-cover.webp`,
