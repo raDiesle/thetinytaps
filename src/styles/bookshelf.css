@@ -882,15 +882,6 @@
   background: radial-gradient(closest-side at 50% 58%, #ffe6a8d9, #ffd78f66 62%, #0000);
 }
 
-/*
- * On the sign and the carved words at the top board's far left, what a visitor should see first (user request, November
- * 2026): a brighter light, as of a lamp above them, falling from the top. Still, like the other.
- */
-.shelf-light.lead {
-  scale: 1.2 1;
-  background: radial-gradient(farthest-side at 50% 58%, #fff6dafa, #fff0cdf0 62%, #ffe6a8a0 84%, #0000);
-}
-
 /* ----- A compartment: a box going back from its opening, lit from the front ----- */
 
 .shelf-cell {
