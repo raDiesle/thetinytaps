@@ -3,7 +3,7 @@ import { readFileSync } from "node:fs";
 import { SURPRISE } from "@/games/letters/Surprises";
 import { freeSpot, type Placed } from "./place";
 import { SHAPES } from "./shapes";
-import { MAX_POPS, MAX_SPARKLES, POP_COLORS, POP_GAP_MS, POP_MS, SPARKLE_GAP_MS, SPARKLE_MS, TAP_AWAY_SURPRISES } from "./TapAwayPlay";
+import { MAX_POPS, MAX_SPARKLES, POP_COLORS, POP_GAP_MS, POP_MS, RIPPLE_GAP_MS, SPARKLE_GAP_MS, SPARKLE_MS, TAP_AWAY_SURPRISES } from "./TapAwayPlay";
 
 const css = readFileSync(new URL("./tapaway.css", import.meta.url), "utf8");
 
@@ -23,6 +23,13 @@ describe("Magic Keys shows several things at once, yet never a storm", () => {
     expect(TAP_AWAY_SURPRISES.maxAtOnce).toBeLessThanOrEqual(6);
     expect(TAP_AWAY_SURPRISES.gapMs).toBeLessThan(SURPRISE.gapMs);
     expect(TAP_AWAY_SURPRISES.gapMs).toBeGreaterThanOrEqual(100);
+  });
+
+  // A smashing hand kept about 18 rings on the page, a fifth of an old phone's main thread: presses landing together
+  // share one ripple, while a child's single taps (a few a second) each still get theirs.
+  test("presses landing together share one ripple", () => {
+    expect(RIPPLE_GAP_MS).toBeGreaterThanOrEqual(100);
+    expect(RIPPLE_GAP_MS).toBeLessThanOrEqual(250);
   });
 
   test("a mouse's sparkles stay a short trail", () => {

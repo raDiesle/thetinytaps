@@ -88,6 +88,17 @@ export interface Scenario {
   parts: Part[];
 }
 
+/**
+ * A fixed chance from here on (`Math.random` replaced by a seeded one): Zaubertasten's surprises are drawn by chance, and
+ * which kinds came swung its smashing stretch between 58 and 70 % busy on the same code (November 2026).
+ */
+const FIXED_CHANCE: Step = {
+  eval: "(() => { let a = 12345; Math.random = () => { a |= 0; a = (a + 0x6d2b79f5) | 0; let t = Math.imul(a ^ (a >>> 15), 1 | a); t = (t + Math.imul(t ^ (t >>> 7), 61 | t)) ^ t; return ((t ^ (t >>> 14)) >>> 0) / 4294967296; }; })()",
+};
+
+/** Zaubertasten: a finger landing somewhere on the screen every 130 ms, for the next 10 s. */
+const SMASH = `(() => { const end = performance.now() + 10000; const id = setInterval(() => { const el = document.querySelector(".tw-play"); if (!el || performance.now() > end) return clearInterval(id); const r = el.getBoundingClientRect(); el.dispatchEvent(new PointerEvent("pointerdown", { bubbles: true, clientX: r.x + Math.random() * r.width, clientY: r.y + 60 + Math.random() * (r.height - 60), pointerType: "touch", isPrimary: true })); }, 130); })()`;
+
 /** The first card or start button of a game's start screen. */
 const START: Step = { tap: ".start-button, .mode-card", optional: true };
 /** What a child taps while playing: anything that answers a tap, but the way back (a menu's page corner), which leaves. */
@@ -220,6 +231,25 @@ export const SCENARIOS: Scenario[] = [
       { label: "Tippen auf der Tastatur", before: [{ wait: 1500 }], ms: 8000, type: { keys: [..."abcmotx"], every: 500 } },
       // Keys that are no letter or number open a surprise each (fireworks on a canvas, a snowflake, a present …), at most three at once.
       { label: "Überraschungen", before: [{ wait: 1500 }], ms: 9000, type: { keys: [...",.-+#<*"], every: 600 } },
+    ],
+  },
+  {
+    // Zaubertasten: a hand banging on the keys or the screen brings several letters, digits with their shapes and
+    // surprises at once (up to `MAX_POPS` and five surprises), each a small layer of its own – far quicker presses than
+    // in the other keyboard games, since that is how the toy is played.
+    name: "zaubertasten",
+    path: "/drauflos/",
+    parts: [
+      { label: "Buchstaben und Zahlen", before: [{ wait: 1500 }, FIXED_CHANCE], ms: 8000, type: { keys: [..."a3km7zb9xe5"], every: 200 } },
+      { label: "Überraschungen", before: [{ wait: 1500 }, FIXED_CHANCE], ms: 9000, type: { keys: [...",.-+#<*"], every: 250 } },
+      { label: "Auf den Bildschirm patschen", before: [{ wait: 1500 }, FIXED_CHANCE], ms: 8000, tap: { selector: ".tw-play", every: 300 } },
+      // Both hands at once: keys of every kind and fingers landing all over the screen, as fast as the limits let things come.
+      {
+        label: "Mit beiden Händen",
+        before: [{ wait: 1500 }, FIXED_CHANCE, { eval: SMASH }],
+        ms: 9000,
+        type: { keys: [..."q,w7.e-r3t+z#u<i*o9p"], every: 110 },
+      },
     ],
   },
   {

@@ -30,6 +30,15 @@ its address stays `/drauflos/`.
   covers least. A tap's thing lands under the finger.
 - Never a storm all the same: the same key again only after `SAME_KEY_PAUSE_MS` (meanwhile a silent ripple), sparkles
   at most `MAX_SPARKLES`, and every limit kept in `tapaway.test.ts`.
+- Presses that only ripple share one ripple when they land within `RIPPLE_GAP_MS` of each other (a palm on the keys,
+  several fingers at once): each ripple is two rings, each a layer, and both hands smashing kept about 18 rings on the
+  page, which alone took a fifth of an old phone's main thread (November 2026: „Mit beiden Händen“ in `bun run perf
+  zaubertasten` went from about 66 % busy to 52 %, over the budget of 60 % before). A child's single taps still each get
+  theirs. The more there is on the page at once, the dearer each frame's commit of all its layers (the canvas surprises
+  draw in every frame): a new thing that comes often counts its layers against that stretch.
+- `bun run perf zaubertasten` measures letters, surprises, taps and both hands at once with a fixed chance
+  (`FIXED_CHANCE`), since the random kinds of surprises alone swung a stretch by over ten points; still run it a few
+  times before and after a change, and compare the averages.
 - Everything that moves is a small HTML layer animated by `transform` and `opacity` (`tapaway.css`, prefix `tw-`).
 - It is a category of its own with `toy: "poster"` in `games.ts` (no cover, no world, no book travel): the shelf draws
   it as `ShelfToy` in `Bookshelf.tsx`, first on the picture books' board (the trophy sign hangs at its right end and hid

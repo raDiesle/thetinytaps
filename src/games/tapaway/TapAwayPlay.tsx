@@ -5,7 +5,7 @@ import { useDevice } from "@/lib/device";
 import { useAppLanguage, useT } from "@/lib/language";
 import { pick } from "@/lib/random";
 import { playBlub, playBoing, playChimeNote, playPlop, playPop } from "@/lib/sfx";
-import { repeatPause } from "@/lib/spacing";
+import { repeatPause, spaced } from "@/lib/spacing";
 import { useTimers } from "@/lib/timers";
 import { talking } from "@/lib/voice";
 import { SAME_KEY_PAUSE_MS } from "@/games/letters/pace";
@@ -62,6 +62,13 @@ export const TAP_AWAY_SURPRISES: SurpriseLimits = { gapMs: 150, maxAtOnce: 5 };
 export const SPARKLE_GAP_MS = 60;
 export const SPARKLE_MS = 700;
 export const MAX_SPARKLES = 12;
+/**
+ * Presses that only ripple share one ripple when they land this close together (a palm on the keys, several fingers on
+ * the screen): every ripple is two rings, each a layer of its own, and both hands smashing kept about 18 rings on the
+ * page, which alone took a fifth of an old phone's main thread (`bun run perf zaubertasten`, „Mit beiden Händen“,
+ * November 2026). A child's single taps, a few a second, still each get theirs.
+ */
+export const RIPPLE_GAP_MS = 150;
 /** Room kept free at the top for ✕, the fullscreen note and ⚙️, in px. */
 const TOP_CLEAR = 72;
 
@@ -83,7 +90,9 @@ export function TapAwayPlay() {
   const t = useT();
   const { touchOnly } = useDevice();
   const { effects, ripple } = useTapFeedback();
-  const softTap = useSoftTap(ripple);
+  const ripples = useMemo(() => spaced(RIPPLE_GAP_MS), []);
+  const calmRipple = useCallback((x?: number, y?: number) => ripples.pass() && ripple(x, y), [ripples, ripple]);
+  const softTap = useSoftTap(calmRipple);
   const { surprises, spawn } = useSurprises(TAP_AWAY_SURPRISES);
   const { later } = useTimers();
   const root = useRef<HTMLDivElement>(null);
@@ -238,6 +247,17 @@ export function TapAwayPlay() {
     layer.append(dot);
   };
 
+  // The surprises and the rings follow their own stores: drawn once here, so a glyph coming or going never draws them again.
+  const layers = useMemo(
+    () => (
+      <>
+        <SurpriseLayer surprises={surprises} />
+        <FeedbackLayer effects={effects} />
+      </>
+    ),
+    [surprises, effects],
+  );
+
   return (
     <div ref={root} className="tw-play" data-tap-keep onPointerDown={onPointerDown} onPointerMove={onPointerMove}>
       {!started && (
@@ -269,8 +289,7 @@ export function TapAwayPlay() {
         ))}
       </div>
       <div ref={sparkles} className="tw-sparkles" aria-hidden />
-      <SurpriseLayer surprises={surprises} />
-      <FeedbackLayer effects={effects} />
+      {layers}
     </div>
   );
 }
