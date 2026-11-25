@@ -1641,6 +1641,11 @@
   translate: 0 -50%;
 }
 
+/* Beside a photo in the top right corner, never over it (`ChildPhoto`; 19cqmin is its height). */
+.rw-head-portrait-top-right > .pl-reward-add {
+  right: calc(19cqmin * var(--rw-portrait-ratio, 0.8) + 3cqmin);
+}
+
 .pl-reward-add,
 .rw-reward-add {
   padding: 0.2em 0.8em;

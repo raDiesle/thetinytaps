@@ -162,7 +162,7 @@ const BoxesBackdrop = memo(function BoxesBackdrop() {
   const wall = 470;
   return (
     <Layer x={0} y={0} w={STAGE_W} h={STAGE_H} className="tm-back">
-      <Draw w={STAGE_W} h={STAGE_H}>
+      <Draw w={STAGE_W} h={STAGE_H} bleed>
         <rect width={STAGE_W} height={wall} fill="#fff3d6" />
         {Array.from({ length: 20 }, (_, i) => (
           <rect key={i} x={i * 80 + 20} y="0" width="34" height={wall} fill="#ffe8b8" />

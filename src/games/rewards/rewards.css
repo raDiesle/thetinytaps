@@ -1347,6 +1347,17 @@
   margin: -0.4em 0;
 }
 
+/* A grown-up's own photo of a task or card (T-13): a square cut of its middle with soft corners, where the picture
+   stood – grey on a black-and-white print, like the child's photo. */
+.rw-pic.rw-item-photo {
+  object-fit: cover;
+  border-radius: 14%;
+}
+
+.rw-grey .rw-item-photo {
+  filter: grayscale(1);
+}
+
 /* The strip of pictures along the top of a colour print, from edge to edge over the sheet's padding. */
 .rw-strip {
   flex: none;
@@ -1428,6 +1439,189 @@
 .rw-blank {
   font-size: 3.2cqmin;
   font-weight: 600;
+}
+
+/* ---------- The photo of the child (`ChildPhoto`): the same on screen, on paper and while the chart is made ---------- */
+
+/* A photo in a corner makes the head as tall as itself, so the cards below make room for it and never lie under it. */
+.rw-head.rw-head-portrait-top-left,
+.rw-head.rw-head-portrait-top-right {
+  flex-wrap: nowrap;
+  align-items: center;
+}
+
+/* A print with a white rim, a little askew, held by a strip of tape – still, nothing moves. */
+.rw-portrait {
+  --rw-portrait-h: 19cqmin;
+  --rw-act: clamp(22px, 4.4cqmin, 32px);
+  position: relative;
+  box-sizing: border-box;
+  display: inline-block;
+  flex: none;
+  height: var(--rw-portrait-h);
+  aspect-ratio: var(--rw-portrait-ratio, 0.8);
+  margin: 0.8cqmin 1.2cqmin 0.4cqmin 0.4cqmin;
+  padding: calc(var(--rw-portrait-h) * 0.05);
+  border-radius: 0.4cqmin;
+  background: #fff;
+  box-shadow: 0 0.3cqmin 0.9cqmin rgb(0 0 0 / 25%);
+  rotate: -2.5deg;
+}
+
+.rw-portrait-top-right {
+  order: 9;
+  margin: 0.8cqmin 0.4cqmin 0.4cqmin 1.2cqmin;
+  rotate: 2.5deg;
+}
+
+/* Beside the heading it is small, about two lines of it high, so the head hardly grows. */
+.rw-portrait-title {
+  --rw-portrait-h: 12cqmin;
+  margin: 0.6cqmin 0.4cqmin 0.2cqmin;
+  rotate: -3deg;
+}
+
+.rw-portrait-print {
+  display: block;
+  width: 100%;
+  height: 100%;
+  overflow: hidden;
+  background: #ece8df;
+}
+
+.rw-portrait-img {
+  display: block;
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+}
+
+.rw-portrait-tape {
+  position: absolute;
+  top: calc(var(--rw-portrait-h) * -0.06);
+  left: 50%;
+  width: 44%;
+  height: calc(var(--rw-portrait-h) * 0.13);
+  translate: -50% 0;
+  rotate: 4deg;
+  background: rgb(250 236 170 / 82%);
+  box-shadow: 0 0.1cqmin 0.4cqmin rgb(0 0 0 / 22%);
+}
+
+/* On a black-and-white print the photo is grey too, and so is its tape. */
+.rw-grey .rw-portrait-img {
+  filter: grayscale(1);
+}
+
+.rw-grey .rw-portrait-tape {
+  background: rgb(225 225 225 / 85%);
+}
+
+.rw-portrait > .rw-act {
+  top: calc(var(--rw-act) * -0.35);
+}
+
+.rw-portrait > .rw-act-left {
+  left: calc(var(--rw-act) * -0.35);
+}
+
+.rw-portrait > .rw-act-right {
+  right: calc(var(--rw-act) * -0.35);
+}
+
+.rw-portrait:has(> .rw-act-delete:hover) {
+  outline: max(2px, 0.5cqmin) dashed #c62828;
+  outline-offset: 2px;
+}
+
+.rw-portrait:has(> .rw-act-delete:hover) .rw-portrait-img {
+  opacity: 0.6;
+}
+
+/* Without a photo, while the chart is made: a pale place for one beside the heading's sign, never on paper. */
+.rw-portrait-add {
+  display: inline-grid;
+  flex: none;
+  place-items: center;
+  width: 1.15em;
+  height: 1.15em;
+  padding: 0.08em;
+  box-sizing: border-box;
+  border: max(2px, 0.35cqmin) dashed color-mix(in srgb, var(--rw-ink) 55%, transparent);
+  border-radius: 0.2em;
+  color: color-mix(in srgb, var(--rw-ink) 60%, transparent);
+  font-size: 5.4cqmin;
+}
+
+.rw-portrait-add > svg {
+  width: 100%;
+  height: 100%;
+  fill: none;
+  stroke: currentColor;
+  stroke-width: 1.8;
+  stroke-linecap: round;
+  stroke-linejoin: round;
+}
+
+.rw-portrait-add:hover,
+.rw-portrait-add:focus-visible {
+  background: var(--rw-main);
+  color: var(--rw-ink);
+}
+
+/* The photo's window: the places as small sheets, then another photo and the note that it stays on this device. */
+.rw-portrait-place-pic {
+  display: block;
+  width: 2.1em;
+  height: 1.6em;
+  color: var(--ink, #222);
+}
+
+/* A card's or task's own photo in its window (T-13): a drawn camera to choose one, then the photo itself. */
+.rw-camera-sign {
+  display: block;
+  width: 1.3em;
+  height: 1.3em;
+  fill: none;
+  stroke: var(--ink, #222);
+  stroke-width: 1.7;
+  stroke-linecap: round;
+  stroke-linejoin: round;
+}
+
+.rw-own-photo .rw-pic {
+  width: 1.3em;
+  height: 1.3em;
+}
+
+.rw-own-photo-note {
+  margin: 0.4em 0 0;
+}
+
+.rw-portrait-row {
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 8px 16px;
+}
+
+.rw-portrait-replace {
+  padding: 8px 16px;
+  border: 2px solid var(--ink, #222);
+  border-radius: 999px;
+  background: #fff;
+  font: inherit;
+  font-weight: 700;
+  cursor: pointer;
+}
+
+.rw-portrait-replace:hover,
+.rw-portrait-replace:focus-visible {
+  background: var(--sunshine, #ffd84d);
+}
+
+.rw-portrait-note {
+  font-size: 0.9rem;
+  opacity: 0.8;
 }
 
 .rw-body {
@@ -2983,4 +3177,220 @@
   font-family: var(--font-emoji);
   font-size: 1.15em;
   line-height: 1;
+}
+
+/* ---------- The ways (T-31) and the photo poster (PosterPrint, T-32 to T-40) ---------- */
+
+/* Two big picture buttons, each with a line on what its way means. */
+.choice.rw-print-ways {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(min(100%, 220px), 1fr));
+  gap: 12px;
+}
+
+/* The label over both buttons, not floating beside the first. */
+.choice.rw-print-ways > legend {
+  float: none;
+  grid-column: 1 / -1;
+  margin-bottom: 4px;
+}
+
+.choice.rw-print-ways button {
+  display: grid;
+  border-radius: 18px;
+  grid-template-columns: auto 1fr;
+  align-items: center;
+  column-gap: 10px;
+  padding: 10px 14px;
+  text-align: start;
+}
+
+.rw-print-way-emoji {
+  grid-row: span 2;
+  font-family: var(--font-emoji);
+  font-size: 2.2em;
+  line-height: 1;
+}
+
+.rw-print-way-line {
+  font-size: 0.85em;
+  font-weight: 400;
+  opacity: 0.85;
+}
+
+/* The decorations, each as a small drawn frame above its name. */
+.rw-poster-decors {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+}
+
+.choice.rw-poster-decors button {
+  border-radius: 14px;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 4px;
+  padding: 6px 8px;
+}
+
+.rw-poster-decor-pic {
+  display: block;
+  width: 54px;
+  height: 40px;
+}
+
+.rw-poster-warning {
+  padding: 8px 12px;
+  border-left: 5px solid #d98a00;
+  border-radius: 8px;
+  background: #fff4d6;
+  font-weight: 600;
+}
+
+/* The poster as it will come, and beside it the wall with the poster at its real size. */
+.rw-poster-result {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: flex-start;
+  gap: 18px;
+  margin: 14px 0;
+}
+
+.rw-poster-figure {
+  position: relative;
+  width: min(100%, 300px);
+  max-height: 420px;
+  margin: 0;
+  border-radius: 3px;
+  background: #fff;
+  box-shadow: 0 2px 10px #2a1e5c40;
+}
+
+/* A panorama lies wide: it may take the panel's whole width. */
+.rw-poster-figure.rw-poster-wide {
+  width: 100%;
+}
+
+.rw-poster-figure img {
+  display: block;
+  width: 100%;
+  height: 100%;
+  object-fit: contain;
+}
+
+/* What the photo service may trim: dashed, on the preview only, never in the picture (T-37). */
+.rw-poster-safe {
+  position: absolute;
+  border: 1.5px dashed #d22;
+  box-shadow: 0 0 0 1px #ffffffb0;
+  pointer-events: none;
+}
+
+.rw-poster-busy {
+  position: absolute;
+  inset: auto 8px 8px;
+  padding: 4px 10px;
+  border-radius: 999px;
+  background: #fffdf4e6;
+  font-size: 0.85em;
+  text-align: center;
+}
+
+.rw-poster-wall {
+  flex: 1 1 260px;
+  max-width: 460px;
+  margin: 0;
+}
+
+.rw-poster-wall svg {
+  display: block;
+  width: 100%;
+  height: auto;
+  border-radius: 10px;
+  box-shadow: 0 1px 6px #2a1e5c30;
+}
+
+.rw-poster-wall figcaption {
+  margin-top: 6px;
+  font-size: 0.85em;
+  text-align: center;
+}
+
+.rw-poster-buttons {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 10px;
+}
+
+/* The hidden sheet the poster is drawn from: laid out at its true size far outside the screen, never seen. */
+.rw-poster-stage {
+  position: fixed;
+  top: 0;
+  left: -20000px;
+  pointer-events: none;
+}
+
+.rw-page.rw-poster {
+  position: relative;
+  display: flex;
+  background: var(--rw-paper, #fff);
+  background-position: center;
+  background-size: cover;
+}
+
+.rw-poster-sheets {
+  position: relative;
+  display: flex;
+  flex: 1;
+  flex-direction: column;
+  gap: 6mm;
+  min-width: 0;
+  min-height: 0;
+}
+
+.rw-poster-sheet {
+  display: flex;
+  flex: 1;
+  min-height: 0;
+}
+
+.rw-poster-frame {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+}
+
+/* A poster's look (T-33): a soft painted ground (or the theme's colours where its painting isn't made yet), a grain of
+   paper over it, the sheet lifted off it with a shadow, its heading on a ribbon and its pictures with a little depth. */
+.rw-poster-fancy:not(.rw-poster-painted) {
+  background-image:
+    radial-gradient(circle at 20% 15%, color-mix(in srgb, var(--rw-main) 22%, transparent), transparent 55%),
+    radial-gradient(circle at 85% 90%, color-mix(in srgb, var(--rw-main) 28%, transparent), transparent 60%),
+    linear-gradient(160deg, color-mix(in srgb, var(--rw-paper) 80%, #fff), color-mix(in srgb, var(--rw-main) 18%, var(--rw-paper)));
+}
+
+.rw-poster-fancy::before {
+  content: "";
+  position: absolute;
+  inset: 0;
+  background-image: repeating-radial-gradient(circle at 30% 40%, #0000000a 0 0.3mm, transparent 0.3mm 1.1mm);
+  pointer-events: none;
+}
+
+.rw-poster-fancy .rw-sheet {
+  background: color-mix(in srgb, var(--rw-paper, #fff) 90%, transparent);
+  box-shadow: 0 1.2mm 4mm #2a1e5c40;
+}
+
+.rw-poster-fancy .rw-title-line {
+  padding: 0.6cqmin 3cqmin;
+  border-radius: 1cqmin;
+  background: color-mix(in srgb, var(--rw-main) 45%, #fff);
+  box-shadow: 0 0.5cqmin 0 color-mix(in srgb, var(--rw-main) 70%, #000);
+}
+
+.rw-poster-fancy .rw-pic {
+  filter: drop-shadow(0 0.5mm 0.6mm #2a1e5c40);
 }

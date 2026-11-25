@@ -3,7 +3,7 @@ import { MASCOT_COLORS } from "@/components/Mascot";
 import { playKnock } from "@/lib/sfx";
 import { type Frame, keyframes } from "./keyframes";
 import { useRunClock } from "./pause";
-import { INK, Layer, STAGE_H, STAGE_W } from "./scenes";
+import { Bleed, INK, Layer, STAGE_H, STAGE_W } from "./scenes";
 import type { TurnCount } from "./settings";
 import type { TurnChild } from "./swap";
 
@@ -396,53 +396,55 @@ export const MarbleBackdrop = memo(function MarbleBackdrop() {
   return (
     <Layer x={0} y={0} w={STAGE_W} h={STAGE_H} className="tm-back">
       <svg viewBox={`0 0 ${STAGE_W} ${STAGE_H}`} preserveAspectRatio="none">
-        <rect width={STAGE_W} height={STAGE_H} fill="#fff4e6" />
-        {Array.from({ length: 17 }, (_, i) => (
-          <path key={i} d={`M${i * 100 + 50} 0 V${floor}`} stroke="#ffe8cc" strokeWidth="26" />
-        ))}
-        <rect y={floor} width={STAGE_W} height={STAGE_H - floor} fill="#d9a066" />
-        <path d={`M0 ${floor} H${STAGE_W}`} stroke="#a8743f" strokeWidth="6" />
-        <ellipse cx="800" cy={CUP.bottom + 6} rx="700" ry="54" fill="#91a7ff" opacity="0.55" />
-        <rect x={BOARD.x} y={BOARD.y} width={BOARD.w} height={BOARD.h} rx="22" fill="#f1d7a8" stroke={INK} strokeWidth="6" />
-        {[0.2, 0.45, 0.7].map((k) => (
-          <path
-            key={k}
-            d={`M${BOARD.x + 20} ${BOARD.y + BOARD.h * k} C${BOARD.x + 400} ${BOARD.y + BOARD.h * k - 12} ${BOARD.x + 700} ${BOARD.y + BOARD.h * k + 14} ${BOARD.x + BOARD.w - 20} ${BOARD.y + BOARD.h * k}`}
-            stroke="#e2bd85"
-            strokeWidth="4"
-            fill="none"
-          />
-        ))}
-        {[
-          [BOARD.x + 22, BOARD.y + 22],
-          [BOARD.x + BOARD.w - 22, BOARD.y + 22],
-          [BOARD.x + 22, BOARD.y + BOARD.h - 22],
-          [BOARD.x + BOARD.w - 22, BOARD.y + BOARD.h - 22],
-        ].map(([cx, cy]) => (
-          <circle key={`${cx}-${cy}`} cx={cx} cy={cy} r="7" fill="#adb5bd" stroke={INK} strokeWidth="3" />
-        ))}
-        {/* The jar: a glass with a red lid, a few marbles in it, its neck pointing down onto the first ramp. */}
-        <g strokeLinejoin="round">
-          <path
-            d={`M${x - w / 2} ${top + 14} H${x + w / 2} V${bottom - 26} Q${x + w / 2} ${bottom - 12} ${x + 16} ${bottom - 8} V${bottom} H${x - 16} V${bottom - 8} Q${x - w / 2} ${bottom - 12} ${x - w / 2} ${bottom - 26} Z`}
-            fill="#e7f5ff"
-            stroke={INK}
-            strokeWidth="5"
-            opacity="0.95"
-          />
-          {[
-            [-36, bottom - 30, 0],
-            [-6, bottom - 26, 1],
-            [24, bottom - 30, 2],
-            [48, bottom - 36, 3],
-          ].map(([dx, cy, c]) => (
-            <g key={`${dx}-${cy}`}>
-              <circle cx={x + dx} cy={cy} r="13" fill={MARBLE_COLORS[c]} stroke={INK} strokeWidth="3" />
-              <circle cx={x + dx - 4} cy={cy - 4} r="3.5" fill="#fff" opacity="0.8" />
-            </g>
+        <Bleed>
+          <rect width={STAGE_W} height={STAGE_H} fill="#fff4e6" />
+          {Array.from({ length: 17 }, (_, i) => (
+            <path key={i} d={`M${i * 100 + 50} 0 V${floor}`} stroke="#ffe8cc" strokeWidth="26" />
           ))}
-          <rect x={x - w / 2 - 8} y={top} width={w + 16} height="22" rx="8" fill="#e03131" stroke={INK} strokeWidth="5" />
-        </g>
+          <rect y={floor} width={STAGE_W} height={STAGE_H - floor} fill="#d9a066" />
+          <path d={`M0 ${floor} H${STAGE_W}`} stroke="#a8743f" strokeWidth="6" />
+          <ellipse cx="800" cy={CUP.bottom + 6} rx="700" ry="54" fill="#91a7ff" opacity="0.55" />
+          <rect x={BOARD.x} y={BOARD.y} width={BOARD.w} height={BOARD.h} rx="22" fill="#f1d7a8" stroke={INK} strokeWidth="6" />
+          {[0.2, 0.45, 0.7].map((k) => (
+            <path
+              key={k}
+              d={`M${BOARD.x + 20} ${BOARD.y + BOARD.h * k} C${BOARD.x + 400} ${BOARD.y + BOARD.h * k - 12} ${BOARD.x + 700} ${BOARD.y + BOARD.h * k + 14} ${BOARD.x + BOARD.w - 20} ${BOARD.y + BOARD.h * k}`}
+              stroke="#e2bd85"
+              strokeWidth="4"
+              fill="none"
+            />
+          ))}
+          {[
+            [BOARD.x + 22, BOARD.y + 22],
+            [BOARD.x + BOARD.w - 22, BOARD.y + 22],
+            [BOARD.x + 22, BOARD.y + BOARD.h - 22],
+            [BOARD.x + BOARD.w - 22, BOARD.y + BOARD.h - 22],
+          ].map(([cx, cy]) => (
+            <circle key={`${cx}-${cy}`} cx={cx} cy={cy} r="7" fill="#adb5bd" stroke={INK} strokeWidth="3" />
+          ))}
+          {/* The jar: a glass with a red lid, a few marbles in it, its neck pointing down onto the first ramp. */}
+          <g strokeLinejoin="round">
+            <path
+              d={`M${x - w / 2} ${top + 14} H${x + w / 2} V${bottom - 26} Q${x + w / 2} ${bottom - 12} ${x + 16} ${bottom - 8} V${bottom} H${x - 16} V${bottom - 8} Q${x - w / 2} ${bottom - 12} ${x - w / 2} ${bottom - 26} Z`}
+              fill="#e7f5ff"
+              stroke={INK}
+              strokeWidth="5"
+              opacity="0.95"
+            />
+            {[
+              [-36, bottom - 30, 0],
+              [-6, bottom - 26, 1],
+              [24, bottom - 30, 2],
+              [48, bottom - 36, 3],
+            ].map(([dx, cy, c]) => (
+              <g key={`${dx}-${cy}`}>
+                <circle cx={x + dx} cy={cy} r="13" fill={MARBLE_COLORS[c]} stroke={INK} strokeWidth="3" />
+                <circle cx={x + dx - 4} cy={cy - 4} r="3.5" fill="#fff" opacity="0.8" />
+              </g>
+            ))}
+            <rect x={x - w / 2 - 8} y={top} width={w + 16} height="22" rx="8" fill="#e03131" stroke={INK} strokeWidth="5" />
+          </g>
+        </Bleed>
       </svg>
     </Layer>
   );
