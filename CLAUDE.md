@@ -1074,7 +1074,8 @@ src/lib/                 speech, sfx (synthesized + recorded sounds), storage, d
   restarts at every keyframe, so the page would stop and start.
   The fox and the bear family stand at the bottom of every menu's page (`BookFamilies`, in `Sky`), the foxes in the left
   corner and the bears in the right, seen whole on every screen: below 1400 × 640 the page keeps that room free under
-  its cards (`--menu-floor`, read by `useFitGrid`, and the table of contents' `--toc-bottom`), and the world's things that
+  its cards (`--menu-floor`, read by `useFitGrid`, and the table of contents' `--toc-bottom`) – also on phones and tablets, where it is a
+  quarter of the height: never shrunk to make the cards' pictures bigger (user decision, 25 November 2026) –, and the world's things that
   stood there (blocks, toys) are left out; wider pages have them on the margins beside the cards. Never in
   the top row beside the title, where they were too small and in the way (user feedback, October 2026); the cards move
   up into the room the top row leaves. On a phone the sun, clouds and a room's window are left out too. A new kind of button gets its paper look in `book.css` with the others, never shiny plastic; a card is a picture taped onto the page without a ▶ on it (the whole card is tapped, so it is lower than its row), and the level row's choices are slips of paper lying askew, the chosen one yellow and taped down like a card (user feedback, October 2026). The fullscreen button and ⚙️ are
