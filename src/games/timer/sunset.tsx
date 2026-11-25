@@ -87,7 +87,7 @@ export const STARS: { x: number; y: number; at: number }[] = [
 const DaySky = memo(function DaySky() {
   return (
     <Layer x={0} y={0} w={STAGE_W} h={STAGE_H} className="tm-back">
-      <Draw w={STAGE_W} h={STAGE_H}>
+      <Draw w={STAGE_W} h={STAGE_H} bleed>
         <defs>
           <linearGradient id="tm-day" x1="0" y1="0" x2="0" y2="1">
             <stop offset="0" stopColor="#8fd3ff" />

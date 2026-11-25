@@ -25,7 +25,8 @@ import { COLOR_TRACK } from "./colorTrack";
 import { type ColorSort, INK, TrackLook, type TrackTheme } from "./trackTheme";
 import { BALL_R, type Pt } from "./path";
 import { useDevice } from "@/lib/device";
-import { useT } from "@/lib/language";
+import { useAppLanguage, useT } from "@/lib/language";
+import { songBeat, songFor } from "./song";
 import { shuffle } from "@/lib/random";
 import {
   playBoing,
@@ -39,6 +40,7 @@ import {
   playKnock,
   playPlop,
   playPop,
+  playSongNote,
   playSqueak,
   playSwirl,
   playThump,
@@ -48,6 +50,7 @@ import {
 } from "@/lib/sfx";
 import { loadRealSounds } from "@/lib/realSounds";
 import {
+  BAR_STEP,
   BARS,
   BASKET_FULL,
   BASKET_SLOTS,
@@ -57,6 +60,8 @@ import {
   DRUMS,
   HOPPER,
   LEDGE,
+  SONG_BARS,
+  SONG_SPEED,
   LEFT1,
   LEFT2,
   PIECES,
@@ -213,6 +218,8 @@ interface Marble {
   look: BallLook;
   /** When it was tapped and hopped (K-03). */
   nudged: number;
+  /** The line of the song it plays on row 1 (K-11), counted from the round's first; -1 before its first bar. */
+  line: number;
   /** Picked from the shelf: it flies from there into the hopper, starting at `at`. */
   fly: { from: Pt; at: number } | null;
   /** Distance rolled in all, for the tennis ball's hops. */
@@ -328,6 +335,9 @@ function Run({ sound, say, onDone, onGoal, look }: LevelProps & { look: TrackThe
   const drums = useRef(never(DRUMS.length));
   const chimes = useRef(never(CHIMES.length));
   const looped = useRef(-Infinity);
+  /** The song row 1 plays (K-11), the one children of the app language know, and the next line to give out. */
+  const song = songFor(useAppLanguage().id);
+  const songLine = useRef(0);
   const tilt = useRef(SEESAW.rest);
   const seesawTapped = useRef(-Infinity);
   const basketTapped = useRef(-Infinity);
@@ -385,6 +395,41 @@ function Run({ sound, say, onDone, onGoal, look }: LevelProps & { look: TrackThe
     sound(() => (kind === "iron" ? playDeepNote(i) : playCountNote(i)));
   };
 
+  /**
+   * „Kugel-Lied“ (K-11): a thing reaching the first bar of row 1 takes the song's next line, and each bar it rolls over
+   * plays that line's next beat – a note ringing as long as it is held, or, on a held beat, only the bar lights up. Over
+   * these bars it rolls at an even speed (`SONG_SPEED`), so the beat is steady; something heavy plays the line deep.
+   * After the bar of the song's last line the whole run dances once (`dance`).
+   */
+  const singBar = (bar: number, t: number, m: Marble) => {
+    if (bar === 0 || m.line < 0) m.line = songLine.current++;
+    bars.current[bar] = t;
+    const lines = song.lines;
+    const line = lines[m.line % lines.length];
+    const beat = songBeat(line, bar);
+    if (beat) {
+      const beatS = BAR_STEP / (SONG_SPEED * ROLLER[m.kind].pace);
+      sound(() => playSongNote(beat.freq, beat.beats * beatS, m.kind === "iron"));
+    }
+    if (bar === SONG_BARS - 1 && m.line % lines.length === lines.length - 1) dance(t);
+  };
+
+  /** The song is over: every part of the run sways, swings, flashes or hops once at the same moment, with a soft twinkle. */
+  const dance = (t: number) => {
+    stirred.current = t;
+    bars.current.fill(t);
+    drums.current.fill(t);
+    chimes.current.fill(t);
+    cues.current.fill(t);
+    for (const spot of spots.current) spot.hit = t;
+    seesawTapped.current = t;
+    basketTapped.current = t;
+    gateTapped.current = t;
+    flapHit.current = t;
+    looped.current = t;
+    sound(playTwinkle);
+  };
+
   const playDrum = (i: number, t: number) => {
     drums.current[i] = t;
     sound(() => playDrumNote(i));
@@ -423,7 +468,8 @@ function Run({ sound, say, onDone, onGoal, look }: LevelProps & { look: TrackThe
     const kind = m.kind;
     switch (event.kind) {
       case "note":
-        playBar(event.bar, t, kind);
+        if (event.bar < SONG_BARS) singBar(event.bar, t, m);
+        else playBar(event.bar, t, kind);
         break;
       case "bell":
         spots.current[event.slot].hit = t;
@@ -659,7 +705,8 @@ function Run({ sound, say, onDone, onGoal, look }: LevelProps & { look: TrackThe
       const pt = here?.seesaw ? seesawSpot((m.s - here.s0) / (here.s1 - here.s0), tilt.current) : pointAt(route, m.s).pt;
       if (here?.seesaw) onSeesaw = true;
       else if (here?.kind === "wheel") onWheel[spotOf(m.section)] = true;
-      m.hop += ((!here && spotOf(m.section) < 0 ? 1 : 0) - m.hop) * Math.min(1, dt * 10);
+      // The tennis ball hops along the rows, also over the song's bars, which only set an even speed (K-11).
+      m.hop += (((!here || here.kind === "note") && spotOf(m.section) < 0 ? 1 : 0) - m.hop) * Math.min(1, dt * 10);
       m.spin += (pt.x - m.x) / kind.r;
       m.x = pt.x;
       const k = (t - m.nudged) / NUDGE_MS;
@@ -761,6 +808,7 @@ function Run({ sound, say, onDone, onGoal, look }: LevelProps & { look: TrackThe
       color: color ?? BRIGHT_COLORS[id % BRIGHT_COLORS.length],
       look: "plain",
       nudged: -Infinity,
+      line: -1,
       fly: from ? { from, at: levelNow() } : null,
       dist: 0,
       hop: 0,

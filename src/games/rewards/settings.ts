@@ -1,6 +1,10 @@
 import { type Board, boardFromTemplate, type StarLog } from "./board";
 import { type ChartType, TEMPLATES } from "./catalog";
 import type { PhotoFormat } from "./photo";
+import type { PosterOptions } from "./poster";
+
+/** How a chart is made at home (T-31): its cards cut out and moved with Velcro, or all fixed on one sheet or poster. */
+export type PrintWay = "cards" | "fixed";
 
 /** How the board is printed. */
 export interface PrintOptions {
@@ -18,6 +22,10 @@ export interface PrintOptions {
   nextMonth: boolean;
   /** The photo size the stars are laid out on; missing in options saved before photo prints. */
   photo?: PhotoFormat["id"];
+  /** How the board is made at home (T-31); missing: as `boardWay` tells from the older choices. */
+  way?: PrintWay;
+  /** The photo poster's size, decoration and companion (T-32). */
+  poster?: PosterOptions;
 }
 
 export interface RewardsSettings {

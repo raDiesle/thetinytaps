@@ -1,20 +1,23 @@
 import { createContext, useContext } from "react";
 import pictureFiles from "./bilder/*.webp?glob";
 import { type CatalogMark, type NightLook, REWARD_BY_ID, STEP_BY_ID, TASK_BY_ID, type Theme } from "./catalog";
+import { usePhotoUrl } from "./ChildPhoto";
 
 // The pictures of bilder/ (made with Gemini, prompts in bilder/prompts.ts) in place of the catalogue's emoji: a task,
 // a plan's step, a reward and a mark show their picture, a grey print the line-art twin to colour in. What grown-ups
-// made themselves – their own task, or another emoji picked for a catalogue one – keeps its emoji.
+// made themselves – their own task, or another emoji picked for a catalogue one – keeps its emoji, and their own photo
+// of a task or card (T-13) stands before both.
 
 const PICTURES = new Map(Object.entries(pictureFiles).map(([file, url]) => [file.replace(/\.webp$/, ""), url]));
 
 /** A file of bilder/ by its name („fest“), if there is one. */
 export const picture = (name: string) => PICTURES.get(name);
 
-/** A board's task or reward, or a plan's step: an emoji, and the catalogue entry it came from. */
+/** A board's task or reward, or a plan's step: an emoji, the catalogue entry it came from, and an own photo's key. */
 interface Item {
   emoji: string;
   catalog?: string;
+  photo?: string;
 }
 
 /**
@@ -50,8 +53,15 @@ export function Pic({ src, emoji }: { src: string | undefined; emoji: string }) 
   );
 }
 
-/** A task's, step's or reward's picture, or its emoji. */
+/**
+ * A task's, step's or reward's picture, or its emoji – or the grown-up's own photo of it (T-13), read from this
+ * device's photo store: a square cut of its middle, grey on a grey print. While it is read its place stays empty (no
+ * emoji flashing up first); where it is no longer on this device the picture or emoji stands in for it.
+ */
 export function ItemPic({ item, kind = "task", lines = false }: { item: Item; kind?: "task" | "reward"; lines?: boolean }) {
+  const photo = usePhotoUrl(item.photo);
+  if (photo) return <img className="rw-pic rw-item-photo" src={photo} alt="" draggable={false} />;
+  if (photo === undefined) return <span className="rw-pic rw-item-photo" />;
   return <Pic src={itemPicture(item, kind, lines)} emoji={item.emoji} />;
 }
 

@@ -1,4 +1,4 @@
-// Piece by piece instead of flowing (H-45): the apples fall one by one, the train halts at its little stops one by one.
+// Piece by piece instead of flowing (H-45): the apples fall one by one, the pizza's slices go one by one.
 // A small child sees single things at once, where a flowing picture is hard to judge – and a long time still moves.
 
 /**
@@ -101,37 +101,7 @@ export function runSeconds(ms: number): number {
   return Math.max(1, Math.round(ms / 1000));
 }
 
-/**
- * The little stops with a bell along the track, at every length (user request, 24 November 2026: a time of any length
- * plays the whole way, only faster or slower – before, a stop came once a minute, so under two minutes there was none).
- */
-export const TRAIN_STOPS = 5;
-
-/** The stretches of the train's way: one to each stop and the last to the station. */
-export const TRAIN_PIECES = TRAIN_STOPS + 1;
-
-/** How long the train stands at each stop before its stretch is over (a short halt, then on it rolls). */
-export function haltMs(total: number, pieces: number): number {
-  return Math.min(3000, total / pieces / 4);
-}
-
-/**
- * The train's way piece by piece, as keyframes: `at` is a share of the run (0–1), `part` how far along the track the
- * train is then (0–1). It rolls each stretch, arrives at the stop `halt` ms before the stretch is over, stands
- * there and rolls on; the last stop is the station, reached as the time is up.
- */
-export function trainSteps(total: number, pieces: number, halt: number): { at: number; part: number }[] {
-  const unit = total / pieces;
-  const steps = [{ at: 0, part: 0 }];
-  for (let k = 1; k < pieces; k++) {
-    steps.push({ at: (k * unit - halt) / total, part: k / pieces });
-    steps.push({ at: (k * unit) / total, part: k / pieces });
-  }
-  steps.push({ at: 1, part: 1 });
-  return steps;
-}
-
-/** The moments (ms after the start) when a piece is done before the end: a slice is lifted off, the train reaches a stop. */
+/** The moments (ms after the start) when a piece is done before the end: a slice is lifted off, the ladybug is back at the top. */
 export function pieceMoments(total: number, pieces: number, early = 0): number[] {
   const unit = total / pieces;
   return Array.from({ length: pieces - 1 }, (_, i) => (i + 1) * unit - early);

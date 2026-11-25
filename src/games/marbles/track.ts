@@ -124,12 +124,14 @@ export const CHIMES = [940, 880, 820, 760, 700].map((x, i) => ({ x, length: 118 
 export const ROW8: Row = { from: { x: 350, y: 2010 }, to: { x: 110, y: 2022 } };
 export const ROW9: Row = { from: { x: 66, y: 2090 }, to: { x: 1250, y: 2140 } };
 
-/** Xylophone bars lying in rows 1a and 1b, a whole scale on row 9 just before the basket, and four on the switch's left way. */
+/** How far apart the bars of a xylophone are, from the start of one to the next. */
+export const BAR_STEP = 84;
+/** Xylophone bars lying in rows 1a and 1b (the song's, K-11), a whole scale on row 9 just before the basket, and four on the switch's left way. */
 export const BARS = Array.from({ length: 20 }, (_, i) => {
-  if (i < 4) return { x: 230 + i * 84, w: 76, row: ROW1A };
-  if (i < 8) return { x: 890 + (i - 4) * 84, w: 76, row: ROW1B };
-  if (i < 16) return { x: 300 + (i - 8) * 84, w: 76, row: ROW9 };
-  return { x: 470 + (i - 16) * 84, w: 76, row: LEFT1 };
+  if (i < 4) return { x: 230 + i * BAR_STEP, w: 76, row: ROW1A };
+  if (i < 8) return { x: 890 + (i - 4) * BAR_STEP, w: 76, row: ROW1B };
+  if (i < 16) return { x: 300 + (i - 8) * BAR_STEP, w: 76, row: ROW9 };
+  return { x: 470 + (i - 16) * BAR_STEP, w: 76, row: LEFT1 };
 });
 
 /**
@@ -332,6 +334,26 @@ function barStops(row: Row) {
   return right ? stops : stops.reverse();
 }
 
+/** The bars of row 1, 1a and 1b, which play the song (K-11): a line's eight beats, one per bar. */
+export const SONG_BARS = 8;
+/**
+ * Over the song's bars a thing rolls at this even speed (times its `pace`), so its line keeps an even beat a child can
+ * follow, a little under a quarter of a second each; rolling downhill it went over them in 0.15 s, too fast to hear a tune.
+ */
+export const SONG_SPEED = 360;
+/**
+ * A thing let out once the one before has struck this bar of row 1 plays its line right after that one's: from the
+ * shelf to the first bar takes about as long as the three beats left of the line (lines two seconds apart overlapped by
+ * half a line). Nothing leaves the shelf by itself any more (one tap, one thing; 25 November 2026), so this only sets
+ * the pace of the child the round's length is measured with (`track.test.ts`).
+ */
+export const SONG_HANDOVER = 5;
+
+/** Row 1a or 1b with its bars, rolled over at the song's even speed from the first bar on. */
+function songRow(row: Row): Part[] {
+  return rowParts(row, barStops(row)).map((part) => (part.event ? { ...part, speed: SONG_SPEED } : part));
+}
+
 /** Against the wall of `turn` (its bumper, number `i` of all the run's turns, sounds) and down onto the next row. */
 export function wallPart(turn: Turn, i: number): Part {
   return { pts: quad(turn.from, { x: turn.x - turnSide(turn) * 4, y: turn.from.y + 3 }, turn.to), event: { kind: "bump", turn: i } };
@@ -355,11 +377,8 @@ export interface Stretch {
 
 /** The fixed sections: hopper to the first spot, between the spots and the switch, and from the last spot to the world's stretch. */
 function fixedParts(stretch: Stretch): Part[][] {
-  const start: Part[] = [
-    { pts: [...line(HOPPER, { x: 120, y: 88 }), ...quad({ x: 120, y: 88 }, { x: 121, y: 108 }, ROW1A.from).slice(1)] },
-    ...rowParts(ROW1A, barStops(ROW1A)),
-  ];
-  const middle = rowParts(ROW1B, barStops(ROW1B));
+  const start: Part[] = [{ pts: [...line(HOPPER, { x: 120, y: 88 }), ...quad({ x: 120, y: 88 }, { x: 121, y: 108 }, ROW1A.from).slice(1)] }, ...songRow(ROW1A)];
+  const middle = songRow(ROW1B);
   // Against the wall, down onto row 2, past the barrier and along it to the third spot.
   const turn: Part[] = [turnPart(0), ...rowParts(ROW2, [{ x: GATE.x, event: { kind: "gate" } }])];
   // Row 2b to the seesaw, off it and through the tunnel to the switch.

@@ -341,3 +341,30 @@ export const RITUAL_PICTURE_QUEUE: QueuedPicture[] = [...RITUAL_PROMPTS, ...NIGH
     ref: p.ref,
     date: p.id.startsWith("nacht-") ? "2026-11-05" : "2026-11-04",
   }));
+
+/** What each colour theme's poster ground shows: its colours and a few things that belong to it, all along the edges. */
+const POSTER_GROUNDS: Record<string, string> = {
+  sonne: "warm butter-yellow and soft apricot, a pale sun peeking in at one corner, a few faint rays and tiny dots of light",
+  meer: "light sky-blue and soft turquoise, gentle waves along the bottom edge, a few faint bubbles and a small cloud at the top",
+  wiese: "fresh light green and soft spring yellow, grass and small daisies along the bottom edge, a few leaves drifting at the sides",
+  beere: "soft pink and light raspberry, small strawberries and blossoms scattered along the edges",
+  nacht: "pale lavender and soft periwinkle, a thin moon at one corner and small soft stars scattered along the edges",
+};
+
+/**
+ * The painted ground of a photo poster in each colour theme (T-33): the chart's sheet lies over its middle, so only the
+ * edges show – soft enough that the sheet stays what is looked at. Missing, the poster takes the theme's colours as a
+ * gradient (rewards.css, `.rw-poster-fancy`).
+ */
+export const POSTER_PICTURE_QUEUE: QueuedPicture[] = THEMES.map((theme) => ({
+  id: `poster-${theme.id}`,
+  file: `${DIR}/poster-${theme.id}.webp`,
+  use: `Belohnungstafel & Zeitplan: gemalter Hintergrund des Fotoposters im Farbthema „${theme.id}“ (T-33)`,
+  prompt: `A soft watercolour background for a children's wall poster, ${POSTER_GROUNDS[theme.id]}. The whole middle is calm, light and almost plain, as a chart will lie over it; the little motifs stay near the edges. Gentle paper texture, no outlines, no figures, no animals, no text, no letters, no numbers, no frame.`,
+  style: "",
+  aspect: "3:4",
+  size: "1200x1600",
+  date: "2026-11-25",
+}))
+  // A made picture leaves the queue by itself.
+  .filter((p) => !picture(p.id));

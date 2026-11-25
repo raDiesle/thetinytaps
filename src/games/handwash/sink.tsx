@@ -1,10 +1,12 @@
 import { type CSSProperties, memo } from "react";
 import type { Daytime } from "@/lib/days";
 
-// The basin seen from above, as a child stands at it: tiles on the wall behind, the counter, the white basin with its
-// drain, the chrome tap behind it and the soap pump beside it. The picture is 1600 × 900 units (16 : 9, the video's
-// stage); it is drawn once and lies still, and every part that moves (the tap's lever, the water, the pump's head, the
-// towel) is an HTML layer of its own over it, placed in the same units by `place`.
+// The basin seen from above, as a child stands at it on its stool: tiles on the wall behind, the counter, the white
+// basin with its drain, the chrome mixer tap behind it (a blue dot on its right for cold, a red one on its left for
+// warm), the pink soap pump on its left and the teal towel hanging from its hook on the right – the bathroom of the
+// painted pictures (`handwashPictures.ts`). The picture is 1600 × 900 units (16 : 9, the video's stage); it is drawn
+// once and lies still, and every part that moves (the tap's lever, the water, the pump's head, the towel's side that
+// folds round the hands) is an HTML layer of its own over it, placed in the same units by `place`.
 
 /** The picture's size in units. */
 export const STAGE_W = 1600;
@@ -33,11 +35,11 @@ export const SPOUT = { x: 800, y: 332 };
 export const AREAS = {
   left: { x: 440, y: 240, width: 340, height: 700 },
   right: { x: 820, y: 240, width: 340, height: 700 },
-  lever: { x: 740, y: 150, width: 120, height: 110 },
+  lever: { x: 740, y: 140, width: 120, height: 110 },
   stream: { x: SPOUT.x - 26, y: SPOUT.y - 4, width: 52, height: 370 },
-  splash: { x: SPOUT.x - 70, y: 660, width: 140, height: 70 },
-  pumpHead: { x: 1080, y: 120, width: 140, height: 90 },
-  towel: { x: 360, y: 300, width: 880, height: 600 },
+  splash: { x: SPOUT.x - 70, y: 664, width: 140, height: 70 },
+  pumpHead: { x: 500, y: 110, width: 150, height: 100 },
+  towelWrap: { x: 1180, y: 150, width: 380, height: 520 },
 } satisfies Record<string, Box>;
 
 const CHROME_STOPS = (
@@ -50,28 +52,44 @@ const CHROME_STOPS = (
   </>
 );
 
-/** The still picture: wall, counter, basin, tap and the soap bottle (its head is a layer of its own). */
+/** The terry cloth's loops, shared by the hanging towel and its side folding round the hands. */
+function Terry({ id }: { id: string }) {
+  return (
+    <pattern id={id} width={14} height={14} patternUnits="userSpaceOnUse">
+      <rect width={14} height={14} fill="#5fc2b6" />
+      <circle cx={4} cy={4} r={2.6} fill="#79d2c7" />
+      <circle cx={11} cy={10} r={2.6} fill="#4fb0a4" />
+    </pattern>
+  );
+}
+
+/** The still picture: wall, counter, basin, tap, the soap bottle (its head is a layer of its own) and the towel. */
 export const SinkPicture = memo(function SinkPicture({ daytime, label }: { daytime: Daytime; label: string }) {
   return (
     <svg className="hw-sink" viewBox={`0 0 ${STAGE_W} ${STAGE_H}`} role="img" aria-label={label}>
       <defs>
         <pattern id="hw-tiles" width={80} height={80} patternUnits="userSpaceOnUse">
-          <rect width={80} height={80} fill={daytime === "evening" ? "#dcebf5" : "#e8f6ff"} />
-          <path d="M0 1 H80 M1 0 V80" stroke="#bfdcee" strokeWidth={4} />
+          <rect width={80} height={80} fill={daytime === "evening" ? "#cfe3f2" : "#dff0fb"} />
+          <path d="M0 1 H80 M1 0 V80" stroke="#b3d3e8" strokeWidth={4} />
           <path d="M10 16 Q10 10 16 10 H28" fill="none" stroke="#fff" strokeWidth={3} strokeLinecap="round" opacity={0.8} />
         </pattern>
-        <linearGradient id="hw-counter" x1="0" y1="0" x2="0" y2="1">
-          <stop offset="0" stopColor="#e9dccb" />
-          <stop offset="1" stopColor="#f6eee3" />
+        <linearGradient id="hw-wall-shade" x1="0" y1="0" x2="0" y2="1">
+          <stop offset="0" stopColor="#000" stopOpacity={0} />
+          <stop offset="1" stopColor="#3a5a70" stopOpacity={0.22} />
         </linearGradient>
-        <radialGradient id="hw-rim" cx="0.5" cy="0.45" r="0.6">
-          <stop offset="0.75" stopColor="#ffffff" />
-          <stop offset="1" stopColor="#dfe8ef" />
+        <linearGradient id="hw-counter" x1="0" y1="0" x2="0" y2="1">
+          <stop offset="0" stopColor="#e6d6c2" />
+          <stop offset="0.25" stopColor="#f2e8db" />
+          <stop offset="1" stopColor="#f8f1e7" />
+        </linearGradient>
+        <radialGradient id="hw-rim" cx="0.5" cy="0.4" r="0.62">
+          <stop offset="0.7" stopColor="#ffffff" />
+          <stop offset="1" stopColor="#d8e3eb" />
         </radialGradient>
-        <radialGradient id="hw-bowl" cx="0.5" cy="0.7" r="0.75">
+        <radialGradient id="hw-bowl" cx="0.5" cy="0.78" r="0.8">
           <stop offset="0" stopColor="#ffffff" />
-          <stop offset="0.6" stopColor="#eef4f8" />
-          <stop offset="1" stopColor="#b9c8d4" />
+          <stop offset="0.55" stopColor="#eaf1f6" />
+          <stop offset="1" stopColor="#a9bccb" />
         </radialGradient>
         <linearGradient id="hw-chrome" x1="0" y1="0" x2="1" y2="0">
           {CHROME_STOPS}
@@ -81,47 +99,69 @@ export const SinkPicture = memo(function SinkPicture({ daytime, label }: { dayti
           <stop offset="1" stopColor="#7d8996" />
         </radialGradient>
         <linearGradient id="hw-soap" x1="0" y1="0" x2="1" y2="0">
-          <stop offset="0" stopColor="#f0a6c8" />
-          <stop offset="0.4" stopColor="#ffd6ea" />
-          <stop offset="1" stopColor="#e88fb8" />
+          <stop offset="0" stopColor="#e68fb7" />
+          <stop offset="0.35" stopColor="#ffd2e7" />
+          <stop offset="1" stopColor="#d97aa6" />
         </linearGradient>
+        <linearGradient id="hw-towel-shade" x1="0" y1="0" x2="1" y2="0">
+          <stop offset="0" stopColor="#000" stopOpacity={0.28} />
+          <stop offset="0.25" stopColor="#000" stopOpacity={0} />
+          <stop offset="0.55" stopColor="#fff" stopOpacity={0.12} />
+          <stop offset="1" stopColor="#000" stopOpacity={0.3} />
+        </linearGradient>
+        <Terry id="hw-terry" />
         <filter id="hw-blur" x="-20%" y="-20%" width="140%" height="140%">
           <feGaussianBlur stdDeviation={10} />
         </filter>
       </defs>
+      {/* The wall, darker down where it meets the counter, and the counter's front edge in light. */}
       <rect width={STAGE_W} height={210} fill="url(#hw-tiles)" />
+      <rect width={STAGE_W} height={210} fill="url(#hw-wall-shade)" />
       <rect y={196} width={STAGE_W} height={STAGE_H - 196} fill="url(#hw-counter)" />
-      <rect y={196} width={STAGE_W} height={14} fill="#d6c6b2" />
-      {/* Specks in the counter's stone. */}
+      <rect y={196} width={STAGE_W} height={12} fill="#cdbba5" />
       {Array.from({ length: 40 }, (_, i) => (
-        <circle key={i} cx={(i * 397) % STAGE_W} cy={240 + ((i * 211) % 640)} r={2 + (i % 3)} fill="#c9b8a2" opacity={0.35} />
+        <circle key={i} cx={(i * 397) % STAGE_W} cy={240 + ((i * 211) % 640)} r={2 + (i % 3)} fill="#c9b8a2" opacity={0.3} />
       ))}
-      {/* The basin: its shadow on the counter, the rim and the bowl, dark under the rim where the light doesn't reach. */}
-      <ellipse cx={812} cy={668} rx={566} ry={330} fill="#7a6a58" opacity={0.25} filter="url(#hw-blur)" />
-      <ellipse cx={800} cy={650} rx={560} ry={330} fill="url(#hw-rim)" stroke="#c8d3dc" strokeWidth={4} />
-      <ellipse cx={800} cy={672} rx={474} ry={266} fill="url(#hw-bowl)" stroke="#c3d0da" strokeWidth={3} />
-      <path d="M380 600 Q800 380 1220 600" fill="none" stroke="#9fb1bf" strokeWidth={22} opacity={0.18} filter="url(#hw-blur)" />
-      <circle cx={800} cy={700} r={36} fill="url(#hw-drain)" stroke="#6f7b88" strokeWidth={3} />
-      {[-16, 0, 16].map((d) => (
-        <path key={d} d={`M${786} ${700 + d} H${814}`} stroke="#5d6874" strokeWidth={4} strokeLinecap="round" />
+      {/* The basin: its shadow on the counter, the rim, and the bowl going down into it, dark under the far rim. */}
+      <ellipse cx={802} cy={676} rx={512} ry={322} fill="#6f5f4e" opacity={0.25} filter="url(#hw-blur)" />
+      <ellipse cx={790} cy={652} rx={500} ry={318} fill="url(#hw-rim)" stroke="#c4d0d9" strokeWidth={4} />
+      <ellipse cx={790} cy={676} rx={418} ry={254} fill="url(#hw-bowl)" stroke="#b8c7d2" strokeWidth={3} />
+      <path d="M392 620 Q790 400 1188 620" fill="none" stroke="#8ea3b3" strokeWidth={30} opacity={0.22} filter="url(#hw-blur)" />
+      <path d="M430 790 Q790 960 1150 790" fill="none" stroke="#fff" strokeWidth={10} opacity={0.6} strokeLinecap="round" />
+      <ellipse cx={800} cy={712} rx={40} ry={26} fill="#7d8996" opacity={0.25} filter="url(#hw-blur)" />
+      <ellipse cx={800} cy={704} rx={36} ry={24} fill="url(#hw-drain)" stroke="#6f7b88" strokeWidth={3} />
+      {[-10, 0, 10].map((d) => (
+        <path key={d} d={`M${786} ${704 + d} H${814}`} stroke="#5d6874" strokeWidth={4} strokeLinecap="round" />
       ))}
-      {/* The tap: its foot on the counter and the spout reaching out over the basin. */}
-      <ellipse cx={800} cy={222} rx={78} ry={30} fill="#6f7b88" opacity={0.3} filter="url(#hw-blur)" />
-      <ellipse cx={800} cy={212} rx={72} ry={28} fill="url(#hw-chrome)" stroke="#6f7b88" strokeWidth={3} />
-      <path d="M774 214 L774 300 Q774 334 800 334 Q826 334 826 300 L826 214 Z" fill="url(#hw-chrome)" stroke="#6f7b88" strokeWidth={3} />
-      <ellipse cx={800} cy={326} rx={20} ry={9} fill="#5d6874" />
-      <path d="M786 230 L786 296" stroke="#fff" strokeWidth={6} strokeLinecap="round" opacity={0.8} />
-      {/* The soap bottle, its head with the nozzle lying over it. */}
-      <ellipse cx={1158} cy={322} rx={70} ry={20} fill="#7a6a58" opacity={0.25} filter="url(#hw-blur)" />
-      <rect x={1092} y={188} width={124} height={134} rx={34} fill="url(#hw-soap)" stroke="#c46a96" strokeWidth={3} />
-      <rect x={1110} y={206} width={20} height={90} rx={10} fill="#fff" opacity={0.55} />
-      <circle cx={1170} cy={262} r={18} fill="#fff" opacity={0.6} />
-      <rect x={1136} y={170} width={36} height={24} rx={6} fill="#f2f2f2" stroke="#9a9a9a" strokeWidth={2} />
+      {/* The mixer tap: its foot with the cold and warm dots, its body and the spout reaching out over the basin. */}
+      <ellipse cx={804} cy={226} rx={82} ry={30} fill="#6f7b88" opacity={0.3} filter="url(#hw-blur)" />
+      <ellipse cx={800} cy={212} rx={74} ry={28} fill="url(#hw-chrome)" stroke="#6f7b88" strokeWidth={3} />
+      <circle cx={752} cy={214} r={8} fill="#f05a4a" stroke="#b33a2e" strokeWidth={2} />
+      <circle cx={848} cy={214} r={8} fill="#3d8ff0" stroke="#2862a8" strokeWidth={2} />
+      <path d="M774 214 L774 300 Q774 336 800 336 Q826 336 826 300 L826 214 Z" fill="url(#hw-chrome)" stroke="#6f7b88" strokeWidth={3} />
+      <ellipse cx={800} cy={328} rx={20} ry={9} fill="#5d6874" />
+      <path d="M786 232 L786 298" stroke="#fff" strokeWidth={6} strokeLinecap="round" opacity={0.8} />
+      {/* The soap bottle on the left, its head with the nozzle lying over it. */}
+      <ellipse cx={546} cy={324} rx={74} ry={20} fill="#6f5f4e" opacity={0.28} filter="url(#hw-blur)" />
+      <rect x={476} y={188} width={124} height={136} rx={34} fill="url(#hw-soap)" stroke="#c0628f" strokeWidth={3} />
+      <rect x={494} y={206} width={20} height={92} rx={10} fill="#fff" opacity={0.55} />
+      <circle cx={556} cy={262} r={18} fill="#fff" opacity={0.55} />
+      <rect x={520} y={170} width={36} height={24} rx={6} fill="#f2f2f2" stroke="#9a9a9a" strokeWidth={2} />
+      {/* The towel hanging from its hook on the right: its shadow on the wall and counter, the soft folds, the stripes. */}
+      <circle cx={1380} cy={30} r={14} fill="url(#hw-chrome)" stroke="#6f7b88" strokeWidth={3} />
+      <path d="M1236 74 Q1380 30 1524 74 L1546 664 Q1390 700 1226 664 Z" fill="#33524c" opacity={0.25} filter="url(#hw-blur)" transform="translate(16 18)" />
+      <path d="M1230 70 Q1380 22 1530 70 L1548 650 Q1390 684 1222 650 Z" fill="url(#hw-terry)" stroke="#3f9a8e" strokeWidth={5} strokeLinejoin="round" />
+      <path d="M1230 70 Q1380 22 1530 70 L1548 650 Q1390 684 1222 650 Z" fill="url(#hw-towel-shade)" />
+      {[1300, 1380, 1460].map((x, i) => (
+        <path key={i} d={`M${x} 60 Q${x + 12} 340 ${x - 6} 660`} fill="none" stroke="#2f7f75" strokeWidth={6} opacity={0.22} strokeLinecap="round" />
+      ))}
+      <path d="M1226 560 Q1390 590 1546 560 L1547 584 Q1390 614 1225 584 Z" fill="#fff" opacity={0.85} />
+      <path d="M1225 598 Q1390 628 1547 598 L1547 614 Q1390 644 1224 614 Z" fill="#ffcf5a" />
     </svg>
   );
 });
 
-/** The tap's lever, which turns to let the water run and back to stop it. */
+/** The tap's lever: lifted to let the water run, turned to the blue dot for cold and towards the red one for warm. */
 export const LeverArt = memo(function LeverArt() {
   return (
     <svg viewBox="0 0 120 110" aria-hidden>
@@ -137,11 +177,12 @@ export const LeverArt = memo(function LeverArt() {
   );
 });
 
-/** The water falling from the spout: light stripes running down inside the stream, a layer moving by itself. */
+/** The water falling from the spout: light stripes running down inside the stream, and a cold blue over it while cold. */
 export function Stream() {
   return (
     <div className="hw-stream-clip">
       <div className="hw-stream-flow" />
+      <div className="hw-stream-cold" />
     </div>
   );
 }
@@ -159,42 +200,48 @@ export const SplashArt = memo(function SplashArt() {
   );
 });
 
-/** The pump's head, pressed down to give the soap. */
+/** The pump's head, its nozzle reaching out over the basin, pressed down to give the soap. */
 export const PumpHeadArt = memo(function PumpHeadArt() {
   return (
-    <svg viewBox="0 0 140 90" aria-hidden>
-      <rect x={58} y={40} width={22} height={46} fill="#e6e6e6" stroke="#9a9a9a" strokeWidth={2} />
-      <path d="M44 22 Q44 10 56 10 L104 10 Q116 10 116 22 L116 40 L44 40 Z" fill="#fafafa" stroke="#9a9a9a" strokeWidth={3} />
-      <path d="M44 22 L8 26 Q2 27 2 33 L2 36 L44 34 Z" fill="#fafafa" stroke="#9a9a9a" strokeWidth={3} strokeLinejoin="round" />
-      <rect x={56} y={16} width={30} height={8} rx={4} fill="#fff" />
+    <svg viewBox="0 0 150 100" aria-hidden>
+      <rect x={28} y={40} width={20} height={56} fill="#e6e6e6" stroke="#9a9a9a" strokeWidth={2} />
+      <path d="M8 26 Q8 14 20 14 L60 14 Q72 14 72 26 L72 44 L8 44 Z" fill="#fafafa" stroke="#9a9a9a" strokeWidth={3} />
+      <path d="M70 22 L132 40 Q142 43 140 52 L139 56 L70 40 Z" fill="#fafafa" stroke="#9a9a9a" strokeWidth={3} strokeLinejoin="round" />
+      <ellipse cx={139} cy={54} rx={4} ry={3} fill="#c46a96" />
+      <rect x={18} y={20} width={30} height={8} rx={4} fill="#fff" />
     </svg>
   );
 });
 
-/** A soft terry towel, striped at its end, that comes to dry the hands. */
-export const TowelArt = memo(function TowelArt() {
+/**
+ * The towel's free side, folded round the hands: it lies over them while they rub inside, so they really are in the
+ * towel (user feedback, 25 November 2026: a towel lying flat on top of the hands is not how hands are dried).
+ */
+export const TowelWrapArt = memo(function TowelWrapArt() {
   return (
-    <svg viewBox="0 0 880 600" aria-hidden>
+    <svg viewBox="0 0 380 520" overflow="visible" aria-hidden>
       <defs>
-        <pattern id="hw-terry" width={14} height={14} patternUnits="userSpaceOnUse">
-          <rect width={14} height={14} fill="#7fd1c7" />
-          <circle cx={4} cy={4} r={2.4} fill="#93dcd3" />
-          <circle cx={11} cy={10} r={2.4} fill="#6cc3b8" />
-        </pattern>
-        <filter id="hw-towel-blur" x="-10%" y="-10%" width="120%" height="120%">
-          <feGaussianBlur stdDeviation={14} />
+        <Terry id="hw-terry-wrap" />
+        <linearGradient id="hw-wrap-shade" x1="0" y1="0" x2="1" y2="0">
+          <stop offset="0" stopColor="#fff" stopOpacity={0.3} />
+          <stop offset="0.12" stopColor="#fff" stopOpacity={0.05} />
+          <stop offset="0.5" stopColor="#000" stopOpacity={0} />
+          <stop offset="1" stopColor="#000" stopOpacity={0.3} />
+        </linearGradient>
+        <filter id="hw-wrap-blur" x="-20%" y="-20%" width="140%" height="140%">
+          <feGaussianBlur stdDeviation={12} />
         </filter>
       </defs>
-      <rect x={60} y={70} width={800} height={520} rx={60} fill="#3d4e4a" opacity={0.25} filter="url(#hw-towel-blur)" />
-      <path
-        d="M40 60 Q40 30 80 30 L820 40 Q850 40 850 70 L840 540 Q840 572 808 572 L84 580 Q48 580 48 548 Z"
-        fill="url(#hw-terry)"
-        stroke="#4aa59a"
-        strokeWidth={5}
-      />
-      <rect x={60} y={460} width={770} height={26} fill="#fff" opacity={0.7} />
-      <rect x={60} y={500} width={770} height={14} fill="#ffcf5a" opacity={0.85} />
-      <path d="M90 90 Q300 70 520 100" fill="none" stroke="#fff" strokeWidth={14} strokeLinecap="round" opacity={0.25} />
+      {/* Its shadow on the hands below it, then the cloth, rounded where it folds over at the left. */}
+      <path d="M30 40 Q10 260 34 500 L380 512 L380 30 Z" fill="#23413b" opacity={0.3} filter="url(#hw-wrap-blur)" transform="translate(-14 14)" />
+      <path d="M44 24 Q-6 60 4 260 Q-4 460 40 504 L380 516 L380 12 Z" fill="url(#hw-terry-wrap)" stroke="#3f9a8e" strokeWidth={5} strokeLinejoin="round" />
+      <path d="M44 24 Q-6 60 4 260 Q-4 460 40 504 L380 516 L380 12 Z" fill="url(#hw-wrap-shade)" />
+      <path d="M34 40 Q8 260 32 492" fill="none" stroke="#fff" strokeWidth={9} opacity={0.35} strokeLinecap="round" />
+      {[110, 200, 290].map((x, i) => (
+        <path key={i} d={`M${x} 24 Q${x - 16} 260 ${x + 6} 508`} fill="none" stroke="#2f7f75" strokeWidth={6} opacity={0.22} strokeLinecap="round" />
+      ))}
+      <path d="M12 420 Q190 434 380 424 L380 446 Q190 456 14 442 Z" fill="#fff" opacity={0.85} />
+      <path d="M18 458 Q190 470 380 460 L380 474 Q190 484 22 472 Z" fill="#ffcf5a" />
     </svg>
   );
 });

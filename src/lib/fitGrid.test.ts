@@ -1,5 +1,6 @@
 import { describe, expect, test } from "bun:test";
-import { bestFit, packGroups } from "./fitGrid";
+import { readFileSync } from "node:fs";
+import { bestFit, PICTURE_CARDS, packGroups, pictureWidth } from "./fitGrid";
 
 describe("packGroups", () => {
   test("a small group sits beside an earlier one when the row has room", () => {
@@ -66,5 +67,40 @@ describe("bestFit", () => {
   test("cards with titles keep their wider minimum", () => {
     // The same room for nineteen cards with words: seven columns would leave each too narrow for its title.
     expect(bestFit(19, 969, 424, false, [16, 3])).toBeNull();
+  });
+});
+
+describe("cards with a preview picture", () => {
+  // User feedback, 25 November 2026, from Lebendige Welten's menus: the name stands in one line under a picture as big
+  // as the room allows – never beside a small picture, broken into lines, or on the picture.
+  test("are fitted for the biggest picture, never flat", () => {
+    // Bewegungsabenteuer on a tablet: three cards in a row, each picture nearly the card's width.
+    const fit = bestFit(3, 969, 450, false, undefined, PICTURE_CARDS);
+    expect(fit?.columns).toBe(3);
+    expect(pictureWidth((969 - 2 * 24) / 3, fit?.row ?? 0, false)).toBeGreaterThan(280);
+  });
+
+  test("take all the room on a phone or tablet, and stop growing only on a big screen", () => {
+    // „Wie geht's dir?“ on a tablet: two cards, 969 × 390 px of room. Capped, their pictures were 333 px wide with a
+    // third of the room left empty under and beside them (user request, November 2026).
+    const tablet = bestFit(2, 969, 390, false, undefined, PICTURE_CARDS, false);
+    const big = bestFit(2, 969, 390, false, undefined, PICTURE_CARDS, true);
+    expect(tablet?.row).toBe(390);
+    expect(big?.row).toBe(280);
+    expect(pictureWidth((969 - 24) / 2, tablet?.row ?? 0, false)).toBeGreaterThan(450);
+  });
+
+  test("scroll rather than shrink their pictures past recognising", () => {
+    // Kettenreaktion's 21 machines on a phone on its side: all at once only as pictures about 54 px wide.
+    expect(bestFit(21, 805, 222, true, undefined, PICTURE_CARDS)).toBeNull();
+  });
+
+  test("keep their name in one line under the picture", () => {
+    const css = readFileSync("src/styles/book.css", "utf8").replace(/\/\*[\s\S]*?\*\//g, "");
+    const name = css.match(/:root \.game-card\.picture-card > \.game-title \{([^}]*)\}/)?.[1] ?? "";
+    expect(name).toContain("white-space: nowrap");
+    expect(name).not.toContain("position: absolute");
+    // No rule lays the picture over the card (the name once lay on Kettenreaktion's pictures).
+    expect(css).not.toMatch(/\.picture-card[^{]*\.with-picture\s*\{[^}]*position:\s*absolute/);
   });
 });

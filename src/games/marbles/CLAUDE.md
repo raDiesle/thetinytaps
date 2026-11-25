@@ -53,12 +53,12 @@ Before → after the rebuild of 22 November 2026, in seconds:
 | Hatschi-Kette (`sneeze`)      | 25–26            | 57.9–58.4         | `plannedSeconds`, every row of animals (`sneeze.test.ts`)                                             |
 | Wasserbahn (`water`)          | 29.0             | 59.0              | sum of its stretches, the child tapping at once (`water.test.ts`)                                     |
 | Nagelbrett (`pegs`)           | ~30 (10 marbles) | 61.0 (20 marbles) | seeded simulation of 30 rounds, one marble at a time (a tap a second: 13.0 → 24.7); no test bounds it |
-| Klingende Kugelbahn (`track`) | ~35.6            | 57.8              | whole round simulated in `track.test.ts`                                                              |
-| Farbenbahn (`colortrack`)     | ~35.6            | 57.6              | as above                                                                                              |
-| Schneebahn (`snowtrack`)      | ~35.6            | 56.2              | as above                                                                                              |
-| Weltraumbahn (`spacetrack`)   | ~35.6            | 59.0              | as above                                                                                              |
-| Wasserrutsche (`slidetrack`)  | ~35.6            | 59.9              | as above                                                                                              |
-| Baustellen-Bahn (`sitetrack`) | ~35.6            | 56.7              | as above                                                                                              |
+| Klingende Kugelbahn (`track`) | ~35.6            | 61.9              | whole round simulated in `track.test.ts` (+4 s on 25 November 2026 for the song, K-11)                |
+| Farbenbahn (`colortrack`)     | ~35.6            | 61.7              | as above                                                                                              |
+| Schneebahn (`snowtrack`)      | ~35.6            | 60.3              | as above                                                                                              |
+| Weltraumbahn (`spacetrack`)   | ~35.6            | 63.1              | as above                                                                                              |
+| Wasserrutsche (`slidetrack`)  | ~35.6            | 64.0              | as above                                                                                              |
+| Baustellen-Bahn (`sitetrack`) | ~35.6            | 60.8              | as above                                                                                              |
 
 ## Pause and skip
 
@@ -290,11 +290,28 @@ tipping troughs, see Every run's lower wall) and drops into the basket.
 A full basket raises the flag and ends the level (the round arrow / the next level's picture; any key goes on). Each tap
 or key lets out one thing, and nothing leaves the shelf by itself (25 November 2026; from 24 November until then the
 shelf let out the next every two seconds): once nothing is on the run, the camera goes back up to the shelf after
-`LOOK_UP_AFTER_MS`, quietly, and the hint marks the next thing to tap. A first marble alone takes about 45 s, a round
-about 58 s when the child lets out the next thing every two seconds. Tapping a spot swaps its part (bell, trampoline, funnel, paddle wheel), always.
+`LOOK_UP_AFTER_MS`, quietly, and the hint marks the next thing to tap. A first marble alone takes about 46 s, a round
+about 62 s when the child lets out the next thing every two seconds, once the one before has played its line of the song. Tapping a spot swaps its part (bell, trampoline, funnel, paddle wheel), always.
 On a computer a yellow space-bar button sits at the bottom in the middle, and Space rebuilds the run to the next
 of all its builds, counting like a car's mileage: the first spot takes its next part, and each time it is back at the first
 part the next spot moves on too (`rebuildNext`).
+
+„Kugel-Lied“ (K-11, `song.ts`, in every world of the run): the eight bars of row 1 – four on 1a, four on 1b after the
+first spot – play a song, one line per thing: the first thing to reach bar 0 takes line 1, the next line 2, and so on
+round the song (`singBar`). Each bar strikes the line's next beat (`songBeat`): a note that rings on through the held
+beats after it, or on a held beat only the bar lights up. Over those bars a thing rolls at the even `SONG_SPEED` (times
+its `pace`), so the beat is steady at a little under a quarter of a second (rolling downhill it was 0.15 s, too fast for
+a tune); the iron ball plays its line two octaves deeper and slower, the tennis ball still hops. A thing let out once the one
+before has struck bar `SONG_HANDOVER` starts its line on the beat after the last one ends (let out every two seconds,
+lines sounded half into each other); since each thing waits for its own tap (see the top), a child tapping fast hears
+lines overlap – that is the child's play, never held back. When the song's last line is through,
+every part of the run sways, swings or flashes once at the same moment with a soft twinkle (`dance`), nothing rising.
+German children hear „Alle meine Entchen“ (five lines), every other app language „Twinkle, Twinkle, Little Star“ (six
+lines; 小星星, „Estrellita“, the alphabet song), both traditional tunes; a tap on a bar still plays the bar's own note.
+- A song's line has exactly eight beats, one per bar, and starts on a note (`song.test.ts`); a new song for a language
+  goes into `songFor`, written in the eight-beat grid with `null` for held beats.
+- Anything that slows row 1 or changes what lies between the shelf and bar 0 changes when the next line comes: check it
+  in `track.test.ts`, whose round must stay 55–65 s.
 
 „Was rollt denn da?“ (K-07, always on): a shelf over the first row holds
 three of five things (marble, tennis ball, iron ball, apple, soap bubble; `ROLLER` in `track.ts`); tapping one flies it into

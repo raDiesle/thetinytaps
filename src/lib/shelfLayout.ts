@@ -44,15 +44,26 @@ export const SHELF_THINGS: ShelfThing[] = ["music", "playtime", "language", "fig
 
 /**
  * On a screen wider than tall the things on a board stand in one column at the shelf's right side, one compartment over
- * the other (user decision, November 2026): the hourglass on top in the tallest, the most needed; the speaker in the
- * middle; the globe at the bottom. The stickers are stuck on the right wall of the big compartment on top, beside the
- * everyday helpers, where they are seen better than in a narrow one (user feedback, November 2026).
+ * the other (user decision, November 2026): the hourglass on top in the tallest, the most needed; the globe in the
+ * middle; the speaker at the bottom, standing at the left of its compartment beside the trophy room's sign at its right
+ * (user request, 25 November 2026; `trophySignAt` in Bookshelf.tsx). The stickers are stuck on the right wall of the big
+ * compartment on top, beside the everyday helpers, where they are seen better than in a narrow one (user feedback,
+ * November 2026).
  */
 const SIDE_COLUMN: { things: ShelfThing[]; share: number }[] = [
-  { things: ["playtime"], share: 0.38 },
-  { things: ["music"], share: 0.31 },
+  { things: ["playtime"], share: 0.36 },
   { things: ["language"], share: 0.31 },
+  { things: ["music"], share: 0.33 },
 ];
+
+/**
+ * How wide that column is, as a share of the room and in px at least and at most: narrow, so the books get the room
+ * (user request, 25 November 2026: at 12 % of the room the three compartments were too wide for what stands in them; on a
+ * big monitor they keep their 150 px, where they were narrow already).
+ */
+const SIDE_SHARE = 0.095;
+const SIDE_MIN = 60;
+const SIDE_MAX = 150;
 
 /**
  * The sign with the app's name, on a screen wider than tall: it hangs on its chains in front of the shelf, down into its
@@ -331,7 +342,7 @@ function planWide(width: number, height: number, spans: number[], legs: number, 
   const frame = frameFor(width, height);
   const { post, wall, crown, board } = frame;
   const inner = height - crown - frame.plinth;
-  const side = clamp(width * 0.12, 62, 150);
+  const side = clamp(width * SIDE_SHARE, SIDE_MIN, SIDE_MAX);
   const room = width - 2 * post - wall - side;
   const option = (rows: number) => {
     const tier = (inner - (rows - 1) * board) / rows;
@@ -465,4 +476,26 @@ function planUpright(width: number, height: number, spans: number[], legs: numbe
     y += tiers[r];
   });
   return { width: middle + 2 * post, height, frame, cells, planks, bookHeight: Math.min(...bhs), upright: true, legs };
+}
+
+/**
+ * Where the rail of a group's sign runs under a compartment's books, `bh` high, standing together in its middle with
+ * `BOOK_GAP` between them: from the first to the last that belongs to the group – a toy among them (`isToy`, Zaubertasten's
+ * poster) is no learning game, so the rail of „Lernspiele“ leaves it out (user feedback, 25 November 2026).
+ */
+export function railUnder(cell: ShelfCell, bh: number, spans: number[], isToy: (place: number) => boolean): { left: number; width: number } {
+  const books = cell.books ?? [];
+  const all = books.reduce((sum, b) => sum + spans[b], 0) * bh * BOOK_ASPECT + (books.length - 1) * BOOK_GAP * bh;
+  let x = (cell.w - all) / 2;
+  let left: number | undefined;
+  let right = x;
+  for (const b of books) {
+    const w = spans[b] * bh * BOOK_ASPECT;
+    if (!isToy(b)) {
+      left ??= x;
+      right = x + w;
+    }
+    x += w + BOOK_GAP * bh;
+  }
+  return left === undefined ? { left: (cell.w - all) / 2, width: all } : { left, width: right - left };
 }
