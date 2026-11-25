@@ -288,7 +288,8 @@ In a fresh worktree run `bun install` first.
 - Container units (`cqw`, `cqh`) measure the nearest container *above* the element: on the container itself (its own
   padding, gap) they measure the next one up, often the whole window, so size only a container's children with them.
 - CSS is global and each game's CSS arrives only when the game is opened: prefix
-  classes and `@keyframes` by game or scene (`el-`, `bs-`); never style another
+  classes and `@keyframes` by game or scene (`el-`, `bs-`), a prefix no other game has (the Counting Tower and
+  Zaubertasten both used `tw-`; `css.test.ts` now fails on a prefixed class two games style); never style another
   game's classes. A game using another game's parts imports that CSS itself. Keyframes a game borrows
   (`pop-in`, `wiggle`, `bob`, …) live in `src/styles/animations.css`, which every page loads – never use
   keyframes from another game's CSS (`css.test.ts` checks it). Game sheets arrive in any order (the shelf preloads
@@ -412,7 +413,7 @@ In a fresh worktree run `bun install` first.
   `celebrate` is left only to a grown-ups' chart filled (Belohnungstafel, Tagesplan). The one place where a key or tap
   is meant to set off a show is Frei tippen, where keys without a letter, number or job, and taps beside the card, open
   a surprise (a firework, a present, an egg hatching, user request, November 2026) – one at a time, never a storm, and
-  never copied into another game's answers (`src/games/letters/CLAUDE.md`) – and „Drauflos tippen“, its copy without
+  never copied into another game's answers (`src/games/letters/CLAUDE.md`) – and „Zaubertasten“ („Magic Keys“), its copy without
   the card standing as a toy keyboard on the shelf, where every press is such a show (`src/games/tapaway/CLAUDE.md`). `tapFeedback.test.ts` keeps it
   calm, `calmAnswers.test.ts` keeps answers still and `celebrate` out of the games.
 - No wrong answers, no error sounds, nothing to read: pictures, sounds and voice. That means no words in the picture
@@ -959,7 +960,8 @@ src/lib/                 speech, sfx (synthesized + recorded sounds), storage, d
   decision, October 2026), the app's name „Fun for Both“ in its title, each category a picture book standing on it with its cover out;
   a category's page looks like its book's table of contents (`BookContents`, user feedback, October 2026): one line per
   game – its framed picture, its name, dots leading to its page number (the first game on page 1,
-  `gamePage`, user feedback, October 2026) – each line a soft wash of
+  `gamePage`, user feedback, October 2026; on a phone only picture and name, the name centred and never broken inside a
+  word – the dots and number squeezed beside a short name looked odd there, user feedback, November 2026) – each line a soft wash of
   its world's colour and all of it the tap, never cards. The lines stand side by side in columns and share the page's
   room (`contentsGrid`: up to three in a row, more in two rows, two columns upright), never one long column of flat
   lines, so the pictures are big (user request, November 2026); a tall line has its picture above the name, a flat one

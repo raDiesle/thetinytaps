@@ -39,7 +39,7 @@
 }
 
 /* Zug zum Bahnhof: the train rolls from its start to the buffers; at the end it stands there. */
-/* With a stop a minute (H-45) the stage names this run's keyframes in --tm-roll and --tm-shine (`TrainStepKeyframes`). */
+/* With its stops (H-45) the stage names this run's keyframes in --tm-roll and --tm-shine (`TrainStepKeyframes`). */
 .tm-train {
   animation: var(--tm-roll, tm-roll) var(--tm-ms) linear forwards;
 }
@@ -196,15 +196,9 @@
   }
 }
 
-/* Kerze: three candles burn one after another, each in its share of the time (--tm-i of --tm-of, set per candle): its
-   wax shrinks from the bottom up and its top with wick and flame goes down by as much. */
-.tm-wax-box,
-.tm-flame-box,
-.tm-puddle {
-  --tm-turn: calc(var(--tm-ms) / var(--tm-of));
-  --tm-from: calc(var(--tm-ms) * var(--tm-i) / var(--tm-of));
-}
-
+/* Kerze: six candles burn one after another, each lit by the fuse from the one before (`candlePlan` sets when it lights,
+   --tm-from, and how long it burns, --tm-turn, per candle): its wax shrinks from the bottom up and its top with wick and
+   flame goes down by as much. */
 .tm-wax {
   position: absolute;
   inset: 0;
@@ -223,15 +217,15 @@
 }
 
 .tm-flame-box {
-  /* The part that burns away, as a share of the candle's height (CANDLE: 570 high, 10 left in the puddle). */
-  --tm-burnt: 98.25%;
+  /* The part that burns away, as a share of the candle's height (CANDLE: 415 high, 10 left in the puddle). */
+  --tm-burnt: 97.59%;
   animation: tm-burn-top var(--tm-turn) linear var(--tm-from) both;
 }
 
 .tm-done .tm-wax,
 .tm-blow .tm-wax {
   animation: none;
-  transform: scaleY(0.0175);
+  transform: scaleY(0.0241);
 }
 
 .tm-done .tm-flame-box,
@@ -245,7 +239,7 @@
     transform: none;
   }
   to {
-    transform: scaleY(0.0175);
+    transform: scaleY(0.0241);
   }
 }
 
@@ -579,6 +573,71 @@
   to {
     transform: none;
   }
+}
+
+/* The fuse from one candle to the next (`Fuse`): the cord burns away from its start as the spark runs along it, in the
+   first moments of the next candle's share (--tm-fuse-at, --tm-fuse long), and its layer is gone once the spark is at
+   the wick. Only for those moments is its small svg painted again; the spark is a small layer moving by transform. */
+.tm-fuse-line {
+  stroke-dasharray: 1 2;
+  animation: tm-fuse-burn var(--tm-fuse) linear var(--tm-fuse-at) both;
+}
+
+.tm-fuse {
+  animation: tm-fuse-gone 0.2s linear calc(var(--tm-fuse-at) + var(--tm-fuse)) forwards;
+}
+
+@keyframes tm-fuse-burn {
+  from {
+    stroke-dashoffset: 0;
+  }
+  to {
+    stroke-dashoffset: -1;
+  }
+}
+
+@keyframes tm-fuse-gone {
+  to {
+    opacity: 0;
+  }
+}
+
+.tm-spark {
+  opacity: 0;
+  pointer-events: none;
+  animation: tm-spark-on var(--tm-fuse) linear var(--tm-fuse-at);
+}
+
+.tm-spark-go {
+  position: absolute;
+  inset: 0;
+  will-change: transform;
+  /* Its keyframes, tm-fuse-run, are written from the fuse's points (`fuseKeyframes`) and named on the element. */
+  animation-duration: var(--tm-fuse);
+  animation-timing-function: linear;
+  animation-delay: var(--tm-fuse-at);
+  animation-fill-mode: both;
+}
+
+.tm-spark-go svg {
+  display: block;
+  width: 100%;
+  height: 100%;
+}
+
+@keyframes tm-spark-on {
+  from,
+  to {
+    opacity: 1;
+  }
+}
+
+.tm-done .tm-fuse,
+.tm-blow .tm-fuse,
+.tm-done .tm-spark,
+.tm-blow .tm-spark {
+  animation: none;
+  opacity: 0;
 }
 
 /* Apfelbaum (H-45): the tree's year (`appleTimes`). The tree grows from a sapling a step a second; then the blossoms
@@ -1565,6 +1624,265 @@
   background: linear-gradient(to left, rgb(28 30 70 / 0.6) 75%, rgb(28 30 70 / 0.22));
 }
 
+/* Kugelbahn (H-117 with H-115): the strip of the room of the child whose turn it is is lit warm, every other one lies
+   in the same plain shade as Abwechseln's waiting side, so whose turn it is shows across the room. The marble rolls on
+   keyframes written for the turn (`tm-mr-…-go`, its spin inside it `-spin`); the flap over the next child's cup hangs
+   open, a marble lying in a cup shows at once as the rolling one lands there and fades out as a new round starts. */
+.tm-mr-light,
+.tm-mr-shade {
+  opacity: 0;
+  transition: opacity 0.35s ease-out;
+}
+
+.tm-mr-light.tm-on,
+.tm-mr-shade.tm-on {
+  opacity: 1;
+}
+
+.tm-mr-light {
+  background: radial-gradient(ellipse 70% 55% at 50% 72%, rgb(255 236 150 / 0.75), rgb(255 240 170 / 0.35) 60%, transparent 92%);
+}
+
+.tm-mr-shade {
+  background: rgb(28 30 70 / 0.6);
+}
+
+.tm-mr-roll,
+.tm-mr-spin,
+.tm-mr-rest > div {
+  will-change: transform;
+}
+
+.tm-mr-roll svg,
+.tm-mr-spin,
+.tm-mr-spin svg,
+.tm-mr-rest > div,
+.tm-mr-rest svg {
+  display: block;
+  width: 100%;
+  height: 100%;
+}
+
+.tm-mr-rest > div {
+  position: relative;
+}
+
+.tm-mr-shine {
+  position: absolute;
+  inset: 0;
+}
+
+.tm-mr-rest {
+  opacity: 0;
+  transition: opacity 0.6s ease-out;
+}
+
+.tm-mr-rest.tm-on {
+  opacity: 1;
+  transition: none;
+}
+
+/* The first marble of a round given anew drops from the rail's hole into the first child's cup. */
+.tm-mr-drop {
+  animation: tm-mr-drop 0.7s ease-in both;
+}
+
+@keyframes tm-mr-drop {
+  from {
+    transform: translateY(calc(-1 * var(--tm-mr-fall)));
+  }
+}
+
+.tm-mr-gate {
+  transform-origin: 8% 50%;
+  transition: transform 0.6s ease-in-out;
+}
+
+.tm-mr-gate.tm-open {
+  transform: rotate(80deg);
+}
+
+.tm-mr-gate svg {
+  display: block;
+  width: 100%;
+  height: 100%;
+}
+
+/* A tap lights the cup the marble goes to for a moment (H-51). */
+.tm-mr-goal {
+  border-radius: 50%;
+  background: radial-gradient(closest-side, rgb(255 246 190 / 0.95), rgb(255 230 140 / 0.55) 65%, transparent);
+  opacity: 0;
+  pointer-events: none;
+  animation: tm-left 1.6s ease-out;
+}
+
+.tm-done .tm-mr-roll,
+.tm-done .tm-mr-goal {
+  display: none;
+}
+
+/* Rennstrecke (race.tsx): the track lies in layers stacked in depth – the ground, a kart under the bridge, the bridge,
+   a kart on or beyond it, the start light and the children, a kart in front of them, a child hopping – and the kart's
+   keyframes switch its layer as it goes (`z-index` in steps). The kart is one small layer on its way, its wheels and
+   its top each turned by keyframes inside the ground's squash (`.tm-race-flat`), the top lifted over the wheels. The
+   driver bobs and the exhaust puffs at their own pace, so even a long, slow lap plainly moves. */
+.tm-race-ground,
+.tm-race-face,
+.tm-race-on-ground {
+  z-index: 1;
+}
+
+.tm-race-bridge,
+.tm-race-on-deck {
+  z-index: 3;
+}
+
+.tm-race-post,
+.tm-race-lamp,
+.tm-race-flag,
+.tm-race-kid {
+  z-index: 5;
+}
+
+.tm-race-face {
+  opacity: 0;
+  transition: opacity 0.6s ease-out;
+}
+
+.tm-race-face.tm-on {
+  opacity: 1;
+}
+
+.tm-race-trail {
+  opacity: 0.7;
+}
+
+/* A tap lights the way still to go for a moment (H-51). */
+.tm-race-ahead {
+  opacity: 0;
+  will-change: opacity;
+  animation: tm-left 1.6s ease-out;
+}
+
+.tm-race-kart {
+  transform-origin: 50% 60%;
+  will-change: transform;
+}
+
+.tm-race-kid {
+  transform-origin: 50% 100%;
+  will-change: transform;
+}
+
+.tm-race-flat {
+  position: absolute;
+  left: 0;
+  top: 20%;
+  width: 100%;
+  height: 80%;
+  transform: scaleY(0.55);
+}
+
+.tm-race-spin,
+.tm-race-rumble {
+  position: absolute;
+  inset: 0;
+}
+
+.tm-race-spin {
+  will-change: transform;
+}
+
+.tm-race-spin svg,
+.tm-race-driver svg {
+  display: block;
+  width: 100%;
+  height: 100%;
+}
+
+.tm-race-rumble {
+  animation: tm-race-rumble 0.24s linear infinite;
+}
+
+@keyframes tm-race-rumble {
+  50% {
+    transform: translate(-0.6%, 0.5%);
+  }
+}
+
+.tm-race-puff {
+  position: absolute;
+  left: 2%;
+  top: 38%;
+  width: 11%;
+  height: 11%;
+  border-radius: 50%;
+  background: #e9ecef;
+  box-shadow: 0 0 0 2px rgb(59 42 32 / 0.35);
+  opacity: 0;
+  animation: tm-race-puff 0.8s linear infinite;
+}
+
+.tm-race-puff.tm-late {
+  top: 51%;
+  animation-delay: -0.4s;
+}
+
+@keyframes tm-race-puff {
+  from {
+    opacity: 0.85;
+    transform: scale(0.4);
+  }
+  to {
+    opacity: 0;
+    transform: translateX(-130%) scale(1.7);
+  }
+}
+
+.tm-race-seat {
+  position: absolute;
+  left: 25%;
+  top: 6.67%;
+  width: 50%;
+  height: 50%;
+}
+
+.tm-race-driver {
+  width: 100%;
+  height: 100%;
+  animation: tm-race-bob 0.5s ease-in-out infinite alternate;
+}
+
+@keyframes tm-race-bob {
+  to {
+    transform: translateY(2.5%) rotate(-1.5deg);
+  }
+}
+
+.tm-race-lamp {
+  will-change: opacity;
+}
+
+.tm-race-flag {
+  transform-origin: 4% 100%;
+  will-change: transform;
+}
+
+.tm-done .tm-race-rumble,
+.tm-done .tm-race-driver,
+.tm-still-kart .tm-race-rumble {
+  animation: none;
+}
+
+.tm-done .tm-race-ahead {
+  display: none;
+}
+
+.tm-play[data-picture="race"] .tm-done-light {
+  z-index: 9;
+}
+
 .tm-toy {
   transition: transform 1.2s ease-in-out;
 }
@@ -2480,6 +2798,60 @@
   transform: var(--tm-end);
 }
 
+/* Marble Jar (H-149, jar.tsx): each marble is two layers on keyframes written for the run – across, and up and down –
+   from its place in the tube over the nails and the funnel into its place in the jar; the one on the latch wiggles
+   once a second while it waits (`.tm-hop-wait`). The latch turns down on its hinge for each marble, and the room still
+   to fill shrinks up to the jar's shoulders over the run. At the end each marble lies in its place. */
+.tm-jar-x,
+.tm-jar-y {
+  will-change: transform;
+  animation: var(--tm-anim) var(--tm-ms) linear both;
+}
+
+.tm-jar-y {
+  position: absolute;
+  inset: 0;
+}
+
+.tm-jar-latch {
+  transform-origin: 9% 50%;
+  animation: var(--tm-anim) var(--tm-ms) linear both;
+}
+
+.tm-jar-latch-open {
+  animation: none;
+  transform: rotate(80deg);
+}
+
+.tm-jar-left {
+  transform-origin: 50% 0;
+  animation: tm-jar-fill var(--tm-ms) linear both;
+}
+
+@keyframes tm-jar-fill {
+  to {
+    transform: scaleY(0);
+  }
+}
+
+.tm-jar-left .tm-left-glow {
+  inset: 0;
+  border-radius: 18%;
+  background: radial-gradient(closest-side, rgb(255 246 190 / 0.9), rgb(255 230 140 / 0.5) 70%, transparent);
+}
+
+.tm-done .tm-jar-x,
+.tm-done .tm-jar-y,
+.tm-done .tm-jar-latch,
+.tm-done .tm-jar-left {
+  animation: none;
+  transform: var(--tm-end);
+}
+
+.tm-done .tm-jar-left {
+  visibility: hidden;
+}
+
 /* The block house (H-125, blocks.tsx): its blocks stack in a box of their own (`isolation`), so their z-indices never
    reach past the picture to the end's light. Each carried block lies in a full-size box whose z-index steps from its
    row in the jumble to its place in the house as the beam lifts it (keyframes written for the run). */
@@ -3378,6 +3750,12 @@
   --tm-bar-flag: #fcc419;
 }
 
+.tm-play[data-picture="jar"] .tm-bar {
+  --tm-bar-a: #a5d8ff;
+  --tm-bar-b: #3a86ff;
+  --tm-bar-flag: #e03131;
+}
+
 .tm-play[data-picture="blocks"] .tm-bar {
   --tm-bar-a: #b2f2bb;
   --tm-bar-b: #5aa84a;
@@ -3415,6 +3793,16 @@
 .tm-bar[data-tone="bear"] {
   --tm-bar-a: #d8b48c;
   --tm-bar-b: #9c6334;
+}
+
+.tm-bar[data-tone="rabbit"] {
+  --tm-bar-a: #a5d8ff;
+  --tm-bar-b: #1c7ed6;
+}
+
+.tm-bar[data-tone="frog"] {
+  --tm-bar-a: #b2f2bb;
+  --tm-bar-b: #2f9e44;
 }
 
 /* The track: plain paper with a dotted way along it, the way still to go. */

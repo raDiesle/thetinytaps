@@ -26,8 +26,11 @@ export const LEVEL_IDS: Record<string, readonly string[]> = {
     "train",
     "caterpillar",
     "sunset",
+    "jar",
     "swap",
     "seesaw",
+    "marblerun",
+    "race",
   ],
   // Its cards are the days of the little bear or, by the row above them, the feelings.
   "/gefuehle/": [

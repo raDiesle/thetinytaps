@@ -371,6 +371,9 @@ export const timerIdeas: IdeaArea = {
       text: "Hinter ⚙️ „Wie viele Kinder?“ 2, 3 oder 4. Die Kissen stehen im Halbkreis um die Sanduhr, jedes mit seiner Farbe und Lampe, und das Spielzeug geht reihum. Wer schon dran war, bekommt ein kleines Häkchen auf sein Kissen, bis alle einmal dran waren.",
       why: "Geschwister sind oft mehr als zwei, und bei Besuch oder in der Kita streiten drei um dasselbe Bobbycar; reihum ist für Kinder ein vertrautes, gerechtes Prinzip.",
       effort: "M",
+      done: true,
+      partial:
+        "Gebaut zusammen mit H-117 als Bild „Kugelbahn“ (24. November 2026, Wunsch: „von Weitem klar, welches Kind dran ist, einstellbar von 2 bis 4 Kindern“), nicht mit Kissen um die Sanduhr: Hinter ⚙️ „Wie viele Kinder?“ 2, 3 oder 4; dann stehen so viele Becher nebeneinander – Fuchs, Bär, Hase (blau, lange Ohren), Frosch (grün, runde Augenbuckel), keine Gesichter. Statt eines Häkchens bleibt die Murmel, die in den Becher eines Kindes gefallen ist, darin liegen, bis alle einmal dran waren; dann sind die Becher wieder leer. „Wer ist dran?“ hinter ⚙️ nennt alle Kinder; wechselt die Zahl, geht es mit dem Kind weiter, das gerade dran ist, sonst mit dem ersten.",
     },
     {
       id: "H-116",
@@ -387,6 +390,9 @@ export const timerIdeas: IdeaArea = {
       text: "Eine Murmel (oder ein kleiner Zug) fährt während der ganzen Runde auf einer geschwungenen Bahn von der Seite des einen Kindes zur Seite des anderen und fällt dort in seinen Becher – dann ist es dran, und die Bahn kippt zurück. Man sieht jederzeit, wohin es geht und wie weit es noch ist.",
       why: "Ein Weg mit einem Ziel beim wartenden Kind zeigt Richtung und Rest der Zeit in einem Bild, wie der Zug zum Bahnhof, den Kinder im Timer schon kennen.",
       effort: "M",
+      done: true,
+      partial:
+        "Gebaut als Bild „Kugelbahn“ in der Gruppe Abwechseln, zusammen mit H-115 (24. November 2026, marbleRun.tsx). An der Wand des Kinderzimmers hängt eine hölzerne Kugelbahn: oben links ein Glas voller Murmeln, darunter vier Zickzack-Rampen mit runden Kurven und unten eine Schiene über den Bechern der Kinder. Die ganze Runde lang rollt eine Murmel gleichmäßig hinunter (sie dreht sich mindestens eine halbe Umdrehung pro Sekunde, so bewegt sich auch bei langen Runden sichtbar etwas, und klackt leise in jeder Kurve), die Klappe über dem Becher des nächsten Kindes steht offen, und am Ende der Runde fällt sie dort hinein – dann ist dieses Kind dran. Von Weitem: Der Streifen des Zimmers über dem Becher des Kindes, das dran ist, liegt im warmen Licht, alle anderen im selben dunklen Schatten wie bei Abwechseln, und die Leiste unten hat die Farbe dieses Kindes. Ein Tippen lässt den Becher aufleuchten, in den die Murmel rollt. Die Bahn kippt nicht zurück; jede Runde kommt eine neue Murmel in einer anderen Farbe aus dem Glas.",
     },
     // Aufräumen (user request, 21 November 2026): a timer made for tidying up, best at 5 minutes – ideas collected, the
     // best one (H-118) built, and the user's own idea of a fixed 5-minute tidy-up song (H-119) taken up.
@@ -542,6 +548,30 @@ export const timerIdeas: IdeaArea = {
       text: "Sind mehrere Spiel-Video-Bilder da (Klötzchenhaus H-125, Tunnel H-126, Jump'n'Run H-127, Schatzkarte H-128 …), stehen sie auf dem Startbildschirm des Timers in einer eigenen Gruppe „Wie im Spiel“, so wie Abwechseln eine eigene Gruppe hat.",
       why: "Große Geschwister und Eltern finden die Spiel-Bilder so auf einen Blick, und sie unterscheiden sich von den ruhigen Bildern wie Sanduhr und Kerze.",
       effort: "S",
+    },
+    // User request, 24 November 2026: „ein neuer Timer, bei dem sich ein Glas mit Kugeln füllt (wie das Brett bei
+    // Kettenreaktion)“.
+    {
+      id: "H-149",
+      emoji: "🫙",
+      title: "Kugelglas: Murmeln hüpfen übers Nagelbrett ins Glas",
+      text: "Ein Timer-Bild wie das Nagelbrett der Kettenreaktion: Oben wartet eine Reihe bunter Murmeln in einem Glasrohr, eine nach der anderen fällt heraus, springt von Nagel zu Nagel über ein Holzbrett, rollt auf einem Trichter zur Mitte und fällt in ein großes Einmachglas, das sich Reihe für Reihe füllt. Ist das Glas voll, ist die Zeit um.",
+      why: "Ein Glas, das sich füllt, sieht ein Kind von Weitem: wie viel schon drin ist und wie viel noch fehlt. Jede Murmel ist ein kleines Ereignis mit Klang, und das Hüpfen über die Nägel ist spannend anzusehen, ohne dass etwas schiefgeht.",
+      effort: "M",
+      done: true,
+      partial:
+        "Gebaut am 24. November 2026 als Bild „Marble Jar“ („Kugelglas“, jar.tsx): Ein Glasrohr über einem Nagelbrett mit fünf Reihen Nägeln, darunter zwei schräge Trichterbretter und ein Einmachglas mit roter Schleife um den Hals. Alle fünf Sekunden öffnet eine kleine Klappe am Rohr, eine Murmel fällt, prallt Reihe für Reihe von einem Nagel nach links oder rechts ab, rollt den Trichter hinunter, fällt durch den Hals und rollt auf ihren Platz – das Glas füllt sich vom Boden her, Reihe für Reihe, mit 60 Plätzen. Bei jeder Länge fallen alle 60 ins leere Glas, bei 5 Minuten alle fünf Sekunden eine, bei kürzeren Zeiten nur schneller; die letzte landet genau, wenn die Zeit um ist. Die Murmel, die als Nächste dran ist, wackelt einmal pro Sekunde auf der Klappe. Jede Murmel macht beim Landen ein helles Plink (mit Abstand), am Ende klingt ein Glockenspiel; ein Tippen lässt den Platz, der im Glas noch frei ist, aufleuchten. Name und zwei Sätze Englisch zuerst und gleich in alle sieben Sprachen übersetzt (jarNames.ts); die Aufnahmen folgen auf Wunsch.",
+    },
+    {
+      id: "H-150",
+      emoji: "🏎️",
+      title: "Rennstrecke: Fuchs- und Bärenkind fahren abwechselnd eine Runde",
+      text: "Abwechseln als Autorennen: eine große Rennstrecke in Form einer Acht, die weit in den Hintergrund reicht, mit Start und Ziel. Das Kind, das dran ist, fährt eine Runde – so lang wie seine Zeit –, an der Ziellinie steigt es aus und das andere Tier steigt ein und fährt weiter. Mit vielen Effekten und Einzelheiten, etwa wie auf einer Formel-1-Strecke.",
+      why: "Ein Rennen kennen Kinder vom Bobbycar und aus Bilderbüchern; das Kart, das die ganze Runde lang unterwegs ist, zeigt, wie viel von der eigenen Zeit schon gefahren ist, und das wartende Kind sieht es auf seine Ziellinie zukommen.",
+      effort: "L",
+      done: true,
+      partial:
+        "Gebaut am 24. November 2026 als Bild „Rennstrecke“ in der Gruppe Abwechseln (race.tsx): eine Achterstrecke in Perspektive, deren hintere Schleife weit in den Hintergrund reicht, mit Brücke über der Kreuzung, rot-weißen Randsteinen, Reifenstapeln, Tribünen und einer Großbildleinwand, die das Gesicht des Kinds zeigt, das gerade fährt. Fuchskind und Bärenkind fahren abwechselnd ein Kart, jeweils eine ganze Runde so lang wie die Zeit: Die Startampel schaltet Rot, Gelb, Grün, das Kart rollt los, ruckelt und pufft, die gefahrene Strecke färbt sich in der Farbe des Kinds, und in den letzten Sekunden winkt die Zielflagge. An der Ziellinie hüpft das Kind aus dem Kart auf seine Matte und das wartende hüpft hinein. Ein Tippen lässt den Rest der Runde aufleuchten. Es sagt dieselben Sätze wie Abwechseln. Nur sein Name ist neuer Text, Englisch zuerst und gleich in alle sieben Sprachen übersetzt (raceNames.ts).",
     },
   ],
 };

@@ -116,6 +116,26 @@ export const LANGUAGE_STATUS: LanguageStatusRow[] = [
         note: "Das dritte Spiel-Video-Bild und das erste, das keine Klötzchenwelt ist: ein Jump'n'Run nach oben, in dem ein kleiner Hüpfer vom Grund eines Sees bis zum Mond schwimmt, hüpft, klettert und fliegt und am Ende in eine Torte springt (H-127, jump.tsx; am 23. November 2026 neu gebaut statt „Hop to the Flag“), Englisch zuerst geschrieben und gleich in alle Sprachen übersetzt: sein Name „Up to the Moon“ („Hoch bis zum Mond“) und seine zwei Sätze am Anfang und am Ende (jumpNames.ts). Beide Sätze am 23. November 2026 von ElevenLabs gesprochen mit den Klonen von Tapsis Stimme im zweiten Konto: Englisch, Chinesisch, Hindi, Spanisch und Arabisch mit „Tapsi Coach (Klon)“, Deutsch mit „Tapsi Coach (Klon de)“, Russisch mit „Tapsi Coach (Klon ru)“ – beide Sätze eines Bildes aus einer Stimme, wie bei den anderen Bildern. Die Texte für Suchmaschinen nennen es in allen sieben Sprachen.",
         files: ["src/games/timer/jumpNames.ts"],
       },
+      {
+        label: "🫙 Marble Jar",
+        languages: { de: "text", en: "text", zh: "text", hi: "text", es: "text", ar: "text", ru: "text" },
+        recorded: true,
+        note: "Das Bild, in dem Murmeln über ein Nagelbrett wie in der Kettenreaktion hüpfen und ein Glas füllen (H-149, jar.tsx, 24. November 2026), Englisch zuerst geschrieben und gleich in alle Sprachen übersetzt: sein Name „Marble Jar“ („Kugelglas“) und seine zwei Sätze am Anfang und am Ende (jarNames.ts). Die Aufnahmen fehlen noch und werden nur auf Wunsch gemacht; bis dahin bleiben beide Sätze still. Die Texte für Suchmaschinen nennen es in allen sieben Sprachen.",
+        files: ["src/games/timer/jarNames.ts"],
+      },
+      {
+        label: "🎱 Marble Run",
+        recorded: true,
+        languages: { de: "text", en: "text", zh: "text", hi: "text", es: "text", ar: "text", ru: "text" },
+        note: "Das Bild „Kugelbahn“ in der Gruppe Abwechseln (H-117 mit H-115, marbleRun.tsx, 24. November 2026): zwei bis vier Kinder wechseln sich ab, eine Murmel rollt die ganze Runde lang in den Becher des nächsten Kindes. Englisch zuerst geschrieben und gleich in alle Sprachen übersetzt (marbleNames.ts): sein Name „Marble Run“ („Kugelbahn“), hinter ⚙️ „Wie viele Kinder?“ und die Namen des Hasen- und des Froschkinds, und die zwei neuen Sätze „Tauschen! Jetzt ist das Hasenkind dran.“ und „… das Froschkind dran.“. Diese zwei Sätze warten noch auf ihre Aufnahme (bis dahin still); Fuchs- und Bärenkind sagen die schon aufgenommenen Sätze von Abwechseln. Die Texte für Suchmaschinen nennen es in allen sieben Sprachen.",
+        files: ["src/games/timer/marbleNames.ts"],
+      },
+      {
+        label: "🏎️ Rennstrecke",
+        languages: { de: "done", en: "done", zh: "done", hi: "done", es: "done", ar: "done", ru: "done" },
+        note: "Das Bild „Rennstrecke“ in der Gruppe Abwechseln (race.tsx, 24. November 2026): Fuchskind und Bärenkind fahren abwechselnd eine Runde im Kart auf einer Achterstrecke mit Brücke. Nur sein Name („Race Track“, Tooltip und Vorlesen) ist neuer Text, englisch zuerst und gleich in alle Sprachen übersetzt (raceNames.ts). Es sagt dieselben Sätze wie Abwechseln, die schon aufgenommen sind. Die Texte für Suchmaschinen nennen es in allen sieben Sprachen.",
+        files: ["src/games/timer/raceNames.ts"],
+      },
     ],
   },
   {
@@ -347,7 +367,7 @@ export const LANGUAGE_STATUS: LanguageStatusRow[] = [
     href: "/drauflos/",
     recorded: true,
     languages: { de: "done", en: "done", zh: "done", hi: "done", es: "done", ar: "done", ru: "done" },
-    note: "Neu (24. November 2026, L-24), englisch zuerst und gleich in alle sieben Sprachen übersetzt: Name, Zeile, die Aufforderung vor dem ersten Druck („Drück irgendeine Taste!“ / „Tipp irgendwohin!“) und die Texte für Suchmaschinen. Gesprochen werden nur die Buchstabennamen, aus den Aufnahmen von „Buchstaben & Zahlen“ in jeder Sprache; sonst nur Töne.",
+    note: "Neu (24. November 2026, L-24), englisch zuerst und gleich in alle sieben Sprachen übersetzt: Name, Zeile, die Aufforderung vor dem ersten Druck („Drück irgendeine Taste!“ / „Tipp irgendwohin!“) und die Texte für Suchmaschinen. Der neue Name „Zaubertasten“ („Magic Keys“) auf dem Plakat über der Tastatur am selben Tag in alle sieben Sprachen. Gesprochen werden nur die Buchstabennamen, aus den Aufnahmen von „Buchstaben & Zahlen“ in jeder Sprache; sonst nur Töne.",
   },
   {
     href: "/bilder/",
@@ -660,7 +680,7 @@ export const LANGUAGE_STATUS: LanguageStatusRow[] = [
     href: "/zaehlturm/",
     recorded: true,
     languages: { en: "partial", de: "partial", zh: "partial", hi: "partial", es: "partial", ar: "partial", ru: "partial" },
-    note: "Neu (21. November 2026, L-18), englisch zuerst: Name, Zeile im Inhaltsverzeichnis, die Namen der zehn Ziele (für „Weiter“ und die Pokale) und die Texte hinter ⚙️ („Start at“, „From 1“) nur auf Englisch, bis Übersetzungen gewünscht sind. Gezählt wird mit den Zahlwörtern eins bis neun aus den Aufnahmen von „Buchstaben & Zahlen“, in jeder Sprache; 10 bis 99 sind die englischen zweistelligen Zahlwörter von „Buchstaben & Zahlen“ und „one hundred!“ eigenes Englisch, alle noch nicht aufgenommen – bis dahin bleiben diese Klötze still. Die Texte für Suchmaschinen gibt es in allen sieben Sprachen.",
+    note: "Neu gebaut am 24. November 2026 als ein Haus von 1 bis 100 (L-18): Name, Zeile im Inhaltsverzeichnis und die vorgelesenen Namen der Fahrstuhl-Pfeile („Next ten“, „Ten back“) in allen sieben Sprachen, sonst hat das Spiel keine Worte. Gezählt wird mit den Zahlwörtern eins bis neun aus den Aufnahmen von „Buchstaben & Zahlen“, in jeder Sprache; 10 bis 99 gibt es nur als englische zweistellige Zahlwörter von „Buchstaben & Zahlen“ („twenty-three!“), „hundert!“ in allen sieben Sprachen – alle noch nicht aufgenommen, bis dahin bleiben diese Klötze still. Die Texte für Suchmaschinen gibt es in allen sieben Sprachen.",
   },
   {
     href: "/mitmachen/",

@@ -74,6 +74,18 @@ describe("menu pictures", () => {
     }
   });
 
+  test("every toy on the shelf has its poster picture, made by bun run previews", () => {
+    // The poster on the shelf shows a picture from its game (user request, 24 November 2026).
+    const toys = CATEGORIES.filter((category) => category.toy);
+    expect(toys.length).toBeGreaterThan(0);
+    for (const toy of toys) {
+      const file = `src/components/bilder/plakat-${toy.id}.webp`;
+      expect(existsSync(join(ROOT, file)), file).toBe(true);
+      expect(TOOL.includes(`"${file}"`), file).toBe(true);
+      expect(statSync(join(ROOT, file)).size, file).toBeLessThan(60_000);
+    }
+  });
+
   test("the pictures are small: a menu of twenty cards stays light on a phone", () => {
     for (const folder of new Set(folders)) {
       for (const name of readdirSync(join(ROOT, folder))) {

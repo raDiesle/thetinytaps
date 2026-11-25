@@ -1,4 +1,4 @@
-/* „Tap Away“: the whole page is the toy. Everything that moves is a small HTML layer moved by transform and opacity. */
+/* „Magic Keys“: the whole page is the toy. Everything that moves is a small HTML layer moved by transform and opacity. */
 
 .tw-play {
   position: absolute;
@@ -57,6 +57,26 @@
   text-shadow: 0 0.04em 0 #5a3a2a55;
 }
 
+/* A digit's shapes round its number: each pops in a moment after the one before, so they can be counted. */
+.tw-thing {
+  position: absolute;
+  animation: tw-thing 0.35s cubic-bezier(0.3, 0.7, 0.4, 1.4) var(--delay) both;
+}
+
+.tw-thing > svg {
+  width: 100%;
+  height: 100%;
+}
+
+@keyframes tw-thing {
+  from {
+    transform: scale(0);
+  }
+  to {
+    transform: scale(1);
+  }
+}
+
 @keyframes tw-pop {
   0% {
     transform: scale(0.2) rotate(calc(var(--turn) * -2));
@@ -108,5 +128,9 @@
 
   .tw-sparkle {
     display: none;
+  }
+
+  .tw-thing {
+    animation: none;
   }
 }

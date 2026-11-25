@@ -4,6 +4,9 @@ import { BLOCKS_NAME } from "./blocksNames";
 import { BOXES_NAME } from "./boxesNames";
 import { TUNNEL_NAME } from "./tunnelNames";
 import { JUMP_NAME } from "./jumpNames";
+import { JAR_NAME } from "./jarNames";
+import { MARBLE_NAME } from "./marbleNames";
+import { RACE_NAME } from "./raceNames";
 import { TIDY_NAME } from "./tidyNames";
 
 /** The game's name, on its start screen, its spine on the shelf and in the browser tab. */
@@ -85,10 +88,16 @@ export const PICTURES: { id: TimerPicture; emoji: string; name: Texts }[] = [
     // still finds it. The old translations meant a sunset and were dropped; translated anew on 10 November 2026.
     name: { de: "Sonnenaufgang", en: "Sunrise", zh: "日出", hi: "सूर्योदय", es: "Amanecer", ar: "شروق الشمس", ru: "Восход" },
   },
+  // Marble Jar (H-149, 24 November 2026): marbles bounce down a pegboard like Kettenreaktion's and fill a glass jar.
+  { id: "jar", emoji: "🫙", name: JAR_NAME },
   { id: "swap", emoji: "🔁", name: SWAP_NAME },
   // Tennis (H-71) stood here and was taken out again (user request, 21 November 2026: poorly done). In its place the
   // seesaw (H-109), the best of the better ideas H-108 to H-117: written English first, translated on 22 November 2026.
   { id: "seesaw", emoji: "⚖️", name: { en: "Seesaw", de: "Wippe", zh: "跷跷板", hi: "सी-सॉ", es: "Balancín", ar: "أرجوحة التوازن", ru: "Качели-балансир" } },
+  // The Kugelbahn (H-117 with H-115, 24 November 2026): two to four children, a marble rolling into the next one's cup.
+  { id: "marblerun", emoji: "🎱", name: MARBLE_NAME },
+  // The Rennstrecke (user request, 24 November 2026): the fox and the bear child drive a lap of an eight in turns.
+  { id: "race", emoji: "🏎️", name: RACE_NAME },
 ];
 
 /**
@@ -106,14 +115,14 @@ export const SWAP_NOTE: Localized = {
 };
 
 /** Whether a picture is one of taking turns, running on without end (`TurnPicture`). */
-export const isTurns = (id: TimerPicture): id is TurnPicture => id === "swap" || id === "seesaw";
+export const isTurns = (id: TimerPicture): id is TurnPicture => id === "swap" || id === "seesaw" || id === "marblerun" || id === "race";
 
 /** The pictures that run until the time is up, in their order: all but those of taking turns. */
 export const TIMED_PICTURES = PICTURES.filter((p) => !isTurns(p.id));
 
 /**
  * The picture after `id` for „Weiter“: the next one that runs until the time is up, after the last the first – never
- * „Abwechseln“ or the Wippe, which go on without an end; from them the first.
+ * „Abwechseln“, the Wippe or the Kugelbahn, which go on without an end; from them the first.
  */
 export function nextPicture(id: TimerPicture): TimerPicture {
   const i = TIMED_PICTURES.findIndex((p) => p.id === id);

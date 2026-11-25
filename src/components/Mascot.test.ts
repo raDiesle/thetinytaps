@@ -34,6 +34,7 @@ const MASCOT_DRAWINGS = [
   "src/games/scenes/strand/beach.tsx",
   "src/games/scenes/winterbaustelle/people.tsx",
   "src/games/timer/jumpFox.tsx",
+  "src/games/timer/race.tsx",
 ];
 
 /** Pieces of the old flat heads (triangle ears, an egg of a head), copied from file to file before. */
@@ -79,7 +80,9 @@ describe("the shared fox and bear", () => {
     const doing: Record<string, string> = {
       "src/games/together/pairs.tsx":
         "Was gehört zusammen?: the child the doctor listens to and the hairdresser cuts, and the family the key opens the door to",
-      "src/games/tower/Kid.tsx": "Counting Tower: the child climbing the tower block by block and taking the goal",
+      "src/games/tower/Kid.tsx": "Counting Tower: the child hopping onto every block of the house and up from floor to floor",
+      "src/games/timer/race.tsx":
+        "Timer's Rennstrecke: the child whose turn comes next, waiting on its mat at the line, hopping into the kart as the other hops out",
     };
     for await (const file of new Bun.Glob("src/**/*.tsx").scan(".")) {
       if (file.endsWith("Mascot.tsx")) continue;

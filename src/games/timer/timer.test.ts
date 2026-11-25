@@ -9,8 +9,8 @@ import {
   BLOCK,
   beamFrames,
   beamShades,
+  catchMs,
   beamTransform,
-  blockCount,
   blockPose,
   blocksPlan,
   cursorFrames,
@@ -20,31 +20,13 @@ import {
   HOUSE as BLOCK_HOUSE,
   JUMBLE,
   MAX_BLOCKS,
-  MIN_BLOCKS,
   SLOTS,
   SLIP,
-  SLIP_FALL_MS,
+  slipMs,
   slotFoot,
   WINDOWS,
 } from "./blocks";
-import {
-  CHEST,
-  CRUMBLE_MS,
-  digCount,
-  HILL,
-  MAX_DIG,
-  MIN_DIG,
-  PICK,
-  pickCorner,
-  ROOM,
-  S as DIG,
-  SPOTS,
-  spotCorner,
-  spotKind,
-  toolFrames,
-  TUNNEL,
-  tunnelPlan,
-} from "./tunnel";
+import { CHEST, CRUMBLE_MS, HILL, MAX_DIG, PICK, pickCorner, ROOM, S as DIG, SPOTS, spotCorner, spotKind, toolFrames, TUNNEL, tunnelPlan } from "./tunnel";
 import {
   ANCHOR,
   BASKET,
@@ -66,10 +48,7 @@ import {
   jumpPlan,
   leapsOf,
   MAX_MOVES,
-  MIN_MOVES,
-  MIN_UNIT,
   MOON as JUMP_MOON,
-  moveCount,
   ORBIT,
   ORBIT_R,
   PACE,
@@ -95,16 +74,16 @@ import {
   WORLD_H,
   wayOf,
 } from "./jump";
-import { BOX_COUNT, BOXES, boxesPlan, boxLeft, boxSlot, floorPlaces, IN_BOX, LID_H, MAX_PER_BOX, MIN_PER_BOX, OPENING, perBox, TOY as BOX_TOY } from "./boxes";
+import { BOX_COUNT, BOXES, boxesPlan, boxLeft, boxSlot, floorPlaces, IN_BOX, LID_H, OPENING, PER_BOX, TOY as BOX_TOY } from "./boxes";
 import { BITE_R, BUTTERFLY, biteSpot, bodyFront, frontAfter, LEAF, LEAF_FLOOR, leafLeft, leafShape, leafSpan, planBites, REACH } from "./caterpillar";
 import { DISC, DOTS, dotAt } from "./disc";
+import { BOARD, FUNNEL, funnelY, JAR, jarPlan, MARBLE_R as JAR_MARBLE_R, MAX_MARBLES, NAIL_R, NAILS, SLOTS as JAR_SLOTS, TUBE } from "./jar";
 import { PICTURE_LINES, SOON_LINE, TURN_LINES, timerSaid } from "./voice";
 import { BLOOM, FLOWER_FLOOR, GROWN_AT, HOLDER, SPOUT, SPROUT, SPROUT_SIZE, STAKE, STALK, TAP } from "./flower";
 import { PIZZA, PIZZA_FLOOR, slice, SLICES, SLICE_SECONDS, TOPPINGS } from "./pizza";
 import { FINAL_MS, FINAL_NOTES, finalMs } from "./bar";
 import { FLOWERS, MOON, MOON_SET_AT, ridgeAt, SKY_CUT, STARS, SUN, SUN_FROM } from "./sunset";
 import {
-  appleCount,
   applePlaces,
   appleTimes,
   harvestOrder,
@@ -113,19 +92,35 @@ import {
   MAX_APPLES,
   MAX_DOTS,
   MAX_MARKS,
-  MAX_STOPS,
-  MIN_APPLES,
   markUnit,
   marksLeft,
   percentMarks,
-  pieceCount,
+  TRAIN_PIECES,
+  TRAIN_STOPS,
   pieceMoments,
   runSeconds,
   soonMs,
   trainSteps,
 } from "./pieces";
-import { bulbBelow, CANDLE, FLAME_H, GLASS, HOURGLASS_BOX, PLATE, SAND_FLOOR, STAGE_H, STAGE_W, TRAIN } from "./scenes";
-import { FIRST_TURN } from "./SwapPlay";
+import {
+  bulbBelow,
+  CANDLE,
+  candlePlan,
+  FLAME_H,
+  FUSE,
+  FUSE_AT,
+  FUSE_MS,
+  GLASS,
+  HOURGLASS_BOX,
+  PLATE,
+  SAND_FLOOR,
+  STAGE_H,
+  STAGE_W,
+  TABLE,
+  TRAIN,
+} from "./scenes";
+import { FIRST_TURN, heldMarbles, turnChildren } from "./SwapPlay";
+import { CUP_W, CUP_XS, MARBLE_COLORS, MARBLE_R, marblePlan, RAMPS, REST_Y } from "./marbleRun";
 import { PLANK_BOX, SAW, SAW_GROUND, SAW_TILT, SEAT_CUSHION_W, TYRE_TOP, TYRE_X, WALKER } from "./seesaw";
 import { LAMP, SWAP_FLOOR, SWAP_SEATS, TOY } from "./swap";
 import { DEFAULT_TIMER_SETTINGS, TIMER_SECONDS } from "./settings";
@@ -140,17 +135,25 @@ import {
   HEAP_SCALE,
   heapSlot as toySlot,
   MAX_TOYS,
-  MIN_TOYS,
   POSTS,
   TOY as TOY_SIZE,
   TOY_PLACES,
   tidyTimes,
   tidyToys,
-  toyCount,
 } from "./tidy";
 
 describe("Timer", () => {
   const RIGHT_EDGE = 1340;
+
+  test("every length plays a picture's whole story, only faster or slower: its scenes get fixed counts, never ones worked out from the time", async () => {
+    // User request, 24 November 2026: a short time once started the Block House half built and the climb to the moon
+    // further up, and had fewer toys and apples.
+    const code = await Bun.file(new URL("./TimerPlay.tsx", import.meta.url)).text();
+    const counts = [...code.matchAll(/<\w+Scene count=\{([^}]+)\}/g)].map((m) => m[1]);
+    expect(counts.length).toBeGreaterThanOrEqual(6);
+    for (const count of counts) expect(count, count).toMatch(/^[A-Z][A-Z_]*$/);
+    expect(code).not.toMatch(/\w+Count\(set\)|perBox\(|pieceCount\(/);
+  });
 
   test("every picture has its own id, an emoji and a name, they stand in the order the user asked for and „Weiter“ goes round all but those of taking turns", () => {
     expect(new Set(PICTURES.map((p) => p.id)).size).toBe(PICTURES.length);
@@ -160,16 +163,18 @@ describe("Timer", () => {
       expect(pick(p.name, firstLanguage(p.name)).trim()).not.toBe("");
     }
     // The order the user asked for (November 2026): Rote Scheibe, Sanduhr, Kerze, Apfelbaum, Blume, Pizza, Wecker, and
-    // Abwechseln and the Wippe (H-109) last, in a group of their own. Tennis (H-71) stood there and was taken out (user
-    // request, 21 November 2026: poorly done).
+    // Abwechseln, the Wippe (H-109), the Kugelbahn (H-117) and the Rennstrecke last, in a group of their own. Tennis (H-71) stood there
+    // and was taken out (user request, 21 November 2026: poorly done).
     expect(PICTURES.slice(0, 7).map((p) => p.id)).toEqual(["disc", "sand", "candle", "apple", "flower", "pizza", "clock"]);
-    expect(PICTURES.slice(-2).map((p) => p.id)).toEqual(["swap", "seesaw"]);
+    expect(PICTURES.slice(-4).map((p) => p.id)).toEqual(["swap", "seesaw", "marblerun", "race"]);
     expect(PICTURES.map((p) => p.id as string)).not.toContain("tennis");
     expect(DEFAULT_TIMER_SETTINGS.picture).toBe(PICTURES[0].id);
     // Taking turns runs without end, so „Weiter“ never leads into it.
     expect(TIMED_PICTURES.map((p) => p.id)).not.toContain("swap");
     expect(TIMED_PICTURES.map((p) => p.id)).not.toContain("seesaw");
-    expect(TIMED_PICTURES).toHaveLength(PICTURES.length - 2);
+    expect(TIMED_PICTURES.map((p) => p.id)).not.toContain("marblerun");
+    expect(TIMED_PICTURES.map((p) => p.id)).not.toContain("race");
+    expect(TIMED_PICTURES).toHaveLength(PICTURES.length - 4);
     const seen = new Set<string>();
     let id = TIMED_PICTURES[0].id;
     for (let i = 0; i < TIMED_PICTURES.length; i++) {
@@ -180,6 +185,8 @@ describe("Timer", () => {
     expect(id).toBe(TIMED_PICTURES[0].id);
     expect(nextPicture("swap")).toBe(TIMED_PICTURES[0].id);
     expect(nextPicture("seesaw")).toBe(TIMED_PICTURES[0].id);
+    expect(nextPicture("marblerun")).toBe(TIMED_PICTURES[0].id);
+    expect(nextPicture("race")).toBe(TIMED_PICTURES[0].id);
   });
 
   test("the alarm clock shows the time left on a screen whose digits never shift, starting on the time set and ending on 0:00", () => {
@@ -252,13 +259,48 @@ describe("Timer", () => {
     expect(SAND_FLOOR).toBeLessThanOrEqual(810);
     // Tall, so the heap is seen growing (user feedback, November 2026).
     expect(GLASS.bottom - GLASS.top).toBeGreaterThanOrEqual(590);
-    expect(CANDLE.base).toBeLessThanOrEqual(820);
-    // Tall candles, their flames still on the screen; three of them burning one after the other.
-    expect(CANDLE.top - FLAME_H).toBeGreaterThanOrEqual(80);
-    expect(CANDLE.base - CANDLE.top).toBeGreaterThanOrEqual(500);
-    expect(CANDLE.xs.length).toBeGreaterThanOrEqual(3);
+    // The candles stand on a table seen whole above the bar on a phone on its side (user request, 24 November 2026:
+    // at 785 the table lay under the bar and they seemed to stand on nothing): its top and front edge above y 760.
+    expect(CANDLE.base).toBeLessThanOrEqual(TABLE.front - 30);
+    expect(TABLE.edge).toBeLessThanOrEqual(760);
+    // Tall candles, their flames still on that screen (from y 121 there with the bar); six burning one after the other.
+    expect(CANDLE.top - FLAME_H).toBeGreaterThanOrEqual(110);
+    expect(CANDLE.base - CANDLE.top).toBeGreaterThanOrEqual(400);
+    expect(CANDLE.xs.length).toBeGreaterThanOrEqual(6);
     expect(CANDLE.xs[0] - CANDLE.w / 2).toBeGreaterThanOrEqual(200);
+    expect(CANDLE.xs[CANDLE.xs.length - 1] + CANDLE.w / 2).toBeLessThanOrEqual(RIGHT_EDGE);
+    // The table's legs stand within a tablet's 4:3 cut, so it is plainly a table there too.
+    expect(TABLE.left + 24).toBeGreaterThanOrEqual(240);
+    expect(TABLE.right - 24).toBeLessThanOrEqual(1360);
     expect(STAGE_H).toBe(900);
+  });
+
+  test("Kerze: each candle burnt down lights the fuse to the next, whose spark lights it (user request, 24 November 2026)", () => {
+    for (const total of [10_000, 5 * 60_000, 3 * 3_600_000]) {
+      const plan = candlePlan(total);
+      expect(plan).toHaveLength(CANDLE.xs.length);
+      expect(plan[0].light).toBe(0);
+      expect(plan[plan.length - 1].out).toBeCloseTo(total);
+      for (let i = 1; i < plan.length; i++) {
+        // The spark sets off as the candle before goes out, and the candle lights as it reaches the wick.
+        expect(plan[i].fuseAt).toBeCloseTo(plan[i - 1].out);
+        expect(plan[i].light).toBeCloseTo(plan[i].fuseAt + plan[i].fuse);
+        expect(plan[i].fuse).toBeGreaterThan(0);
+        expect(plan[i].fuse).toBeLessThanOrEqual(FUSE_MS);
+        // Every length plays it all, the fuse only quicker: it never takes most of a candle's share.
+        expect(plan[i].fuse).toBeLessThanOrEqual((plan[i].out - plan[i].fuseAt) / 4 + 1);
+      }
+    }
+    // The fuse runs from beside one candle's stub, over the table, to the next candle's wick.
+    const [start, end] = [FUSE[0], FUSE[FUSE.length - 1]];
+    const step = CANDLE.xs[1] - CANDLE.xs[0];
+    expect(Math.abs(start[0])).toBeLessThanOrEqual(CANDLE.w / 2);
+    expect(start[1]).toBeGreaterThanOrEqual(CANDLE.base - CANDLE.stub - 4);
+    expect(Math.abs(end[0] - step)).toBeLessThanOrEqual(10);
+    expect(end[1]).toBeLessThan(CANDLE.top);
+    expect(Math.max(...FUSE.map(([, y]) => y))).toBeLessThan(TABLE.front);
+    expect(FUSE_AT[0]).toBe(0);
+    expect(FUSE_AT[FUSE_AT.length - 1]).toBeCloseTo(1);
   });
 
   test("the CSS burns the candle all the way down before its flame goes out, and its smoke rises for seconds", async () => {
@@ -318,21 +360,20 @@ describe("Timer", () => {
     expect(DISC.cy + DISC.face).toBeLessThanOrEqual(820);
   });
 
-  test("piece by piece: one a minute, at least one, never more than fit (H-45)", () => {
-    expect(pieceCount(60_000, MAX_APPLES)).toBe(1);
-    expect(pieceCount(5 * 60_000, MAX_APPLES)).toBe(5);
-    expect(pieceCount(20_000, MAX_APPLES)).toBe(1);
-    expect(pieceCount(3 * 3600_000, MAX_APPLES)).toBe(MAX_APPLES);
-    expect(pieceCount(30 * 60_000, MAX_STOPS)).toBe(MAX_STOPS);
+  test("piece by piece: the train halts at its five stops at every length, then reaches the station as the time is up (H-45)", () => {
+    // User request, 24 November 2026: before, a stop came once a minute, so under two minutes the train never halted.
+    expect(TRAIN_STOPS).toBe(5);
+    for (const total of [10_000, 60_000, 5 * 60_000, 3 * 3600_000]) {
+      const steps = trainSteps(total, TRAIN_PIECES, haltMs(total, TRAIN_PIECES));
+      // A halt at each stop (arriving and leaving at the same place), then the station at the end.
+      const halts = steps.filter((s, i) => i > 0 && steps[i - 1].part === s.part);
+      expect(halts).toHaveLength(TRAIN_STOPS);
+      expect(steps.at(-1)).toEqual({ at: 1, part: 1 });
+      for (let i = 1; i < steps.length; i++) expect(steps[i].at).toBeGreaterThan(steps[i - 1].at);
+      expect(pieceMoments(total, TRAIN_PIECES, haltMs(total, TRAIN_PIECES))).toHaveLength(TRAIN_STOPS);
+    }
     expect(pieceMoments(300_000, 5)).toEqual([60_000, 120_000, 180_000, 240_000]);
     expect(pieceMoments(300_000, 1)).toEqual([]);
-  });
-
-  test("Apfelbaum: always many apples, also for a short time – they only fall more often", () => {
-    expect(appleCount(10_000)).toBe(MIN_APPLES);
-    expect(appleCount(60_000)).toBeGreaterThanOrEqual(10);
-    expect(appleCount(3 * 3600_000)).toBe(MAX_APPLES);
-    expect(MIN_APPLES).toBeGreaterThanOrEqual(6);
   });
 
   test("a step every second: the caterpillar bites once a second, the leaf going evenly and gone with the last bite", () => {
@@ -460,7 +501,7 @@ describe("Timer", () => {
 
   test("Apfelbaum: the tree grows, the blossoms open one by one, each becomes an apple in turn, the cart comes under each as it falls; the last lands at the end", () => {
     for (const total of [10_000, 60_000, 5 * 60_000, 3 * 3600_000]) {
-      const count = appleCount(total);
+      const count = MAX_APPLES;
       const t = appleTimes(total, count);
       expect(t.harvest).toHaveLength(count);
       for (let i = 0; i < count; i++) {
@@ -511,7 +552,7 @@ describe("Timer", () => {
       }
     }
     expect(CART.x + CART.w).toBeLessThanOrEqual(RIGHT_EDGE);
-    for (const count of [MIN_APPLES, 12, MAX_APPLES]) {
+    for (const count of [6, 12, MAX_APPLES]) {
       for (const p of treeApples(count)) expect(p.x - CART_MIDDLE + CART.box.left).toBeGreaterThanOrEqual(190);
     }
     // The bees are tiny beside a blossom (user feedback, November 2026: much smaller).
@@ -529,13 +570,10 @@ describe("Timer", () => {
     }
   });
 
-  test("Tidy Up: fifteen toys at five minutes, always many, the crane taking one at a time, the last landing as the time is up (H-118)", () => {
-    expect(toyCount(5 * 60_000)).toBe(15);
+  test("Tidy Up: fifteen toys at any length, the crane taking one at a time, the last landing as the time is up (H-118)", () => {
     expect(MAX_TOYS).toBe(15);
-    expect(toyCount(10_000)).toBe(MIN_TOYS);
-    expect(toyCount(3 * 3600_000)).toBe(MAX_TOYS);
     for (const total of [10_000, 60_000, 5 * 60_000, 3 * 3600_000]) {
-      const count = toyCount(total);
+      const count = MAX_TOYS;
       const times = tidyTimes(total, count);
       let before = 0;
       for (const t of times) {
@@ -617,12 +655,10 @@ describe("Timer", () => {
       ).toBe(true);
   });
 
-  test("Five Boxes: three toys a box at five minutes, each hop finished before the next, a lid shut after its box's last toy, the last as the time is up (H-120)", () => {
-    expect(perBox(5 * 60_000)).toBe(3);
-    expect(perBox(10_000)).toBe(MIN_PER_BOX);
-    expect(perBox(3 * 3600_000)).toBe(MAX_PER_BOX);
+  test("Five Boxes: three toys a box at any length, each hop finished before the next, a lid shut after its box's last toy, the last as the time is up (H-120)", () => {
+    expect(PER_BOX).toBe(3);
     for (const total of [10_000, 60_000, 5 * 60_000, 3 * 3600_000]) {
-      const count = perBox(total);
+      const count = PER_BOX;
       const { toys, lids } = boxesPlan(total, count);
       expect(toys).toHaveLength(BOX_COUNT * count);
       expect(lids).toHaveLength(BOX_COUNT);
@@ -650,7 +686,7 @@ describe("Timer", () => {
     // The lid standing open stays below the top edge, and so does the top of every hop.
     expect(BOXES.rim - OPENING - LID_H).toBeGreaterThanOrEqual(80);
     for (let k = 0; k < BOX_COUNT; k++) {
-      for (const count of [MIN_PER_BOX, 3, MAX_PER_BOX]) {
+      for (const count of [2, PER_BOX, 4]) {
         const places = floorPlaces(k, count);
         expect(places).toHaveLength(count);
         for (const [j, place] of places.entries()) {
@@ -682,12 +718,10 @@ describe("Timer", () => {
     for (const part of ["hop", "hop-wait", "boxes-lid"]) expect(css, part).toMatch(new RegExp(`\\.tm-done \\.tm-${part}[,\\s{]`));
   });
 
-  test("Block House: all twenty blocks at five minutes, carried one at a time, the house built from the bottom up, the last block landing as the time is up (H-125)", () => {
-    expect(blockCount(5 * 60_000)).toBe(MAX_BLOCKS);
-    expect(blockCount(10_000)).toBe(MIN_BLOCKS);
-    expect(blockCount(3 * 3600_000)).toBe(MAX_BLOCKS);
+  test("Block House: all twenty blocks at any length, carried one at a time, the house built from the bottom up, the last block landing as the time is up (H-125)", () => {
+    expect(MAX_BLOCKS).toBe(20);
     for (const total of [10_000, 60_000, 5 * 60_000, 3 * 3600_000]) {
-      const count = blockCount(total);
+      const count = MAX_BLOCKS;
       const { built, blocks } = blocksPlan(total, count);
       expect(built + blocks.length).toBe(MAX_BLOCKS);
       let before = 0;
@@ -737,8 +771,8 @@ describe("Timer", () => {
 
   test("Block House: the beam carries each block all its share – it moves every second, floats clear of the jumble, the house built and the crystal, and slips now and then (H-125)", () => {
     const overlap = (a: { x: number; y: number }, b: { x: number; y: number }) => Math.abs(a.x - b.x) < FACE - 4 && Math.abs(a.y - b.y) < FACE - 4;
-    for (const total of [60_000, 5 * 60_000, 3600_000]) {
-      const { built, blocks } = blocksPlan(total, blockCount(total));
+    for (const total of [10_000, 60_000, 5 * 60_000, 3600_000]) {
+      const { built, blocks } = blocksPlan(total, MAX_BLOCKS);
       for (const [i, b] of blocks.entries()) {
         // Lying still before its turn, resting on its place after it.
         expect(blockPose(b, b.start - 1)).toMatchObject({ ...b.from, rot: b.tilt });
@@ -763,25 +797,26 @@ describe("Timer", () => {
           expect(pose.y - BLOCK).toBeGreaterThanOrEqual(80);
         }
       }
-      // Every third block slips once on a long share, and the beam's light is off while it falls.
+      // Every third block slips once, in a run of any length (quicker in a short one), and the beam's light is off while it falls.
       const slipping = blocks.filter((b) => b.drop !== undefined);
       expect(slipping.length).toBe(Math.floor((blocks.length + 1) / 3));
       const shades = beamShades(blocks);
       for (const b of slipping) {
         const at = b.drop ?? 0;
-        expect(blockPose(b, at + SLIP_FALL_MS).y - blockPose(b, at).y).toBeCloseTo(SLIP);
-        expect(blockPose(b, at + SLIP_FALL_MS / 2).held).toBe(false);
-        expect(shades.some((s) => s.at > at && s.at <= at + SLIP_FALL_MS && s.o === 0)).toBe(true);
+        const slip = slipMs(b);
+        expect(blockPose(b, at + slip).y - blockPose(b, at).y).toBeCloseTo(SLIP);
+        expect(blockPose(b, at + slip / 2).held).toBe(false);
+        expect(shades.some((s) => s.at > at && s.at <= at + slip && s.o === 0)).toBe(true);
+        // Caught again well before it lands.
+        expect(at + slip + catchMs(b)).toBeLessThan(b.land);
       }
     }
-    // A short run has no time to slip.
-    expect(blocksPlan(10_000, blockCount(10_000)).blocks.every((b) => b.drop === undefined)).toBe(true);
   });
 
   test("Block House: the beam's tip lies on the carried block at every keyframe, reaching from the crystal's tip (H-125)", () => {
     expect(beamTransform({ x: GEM.tip.x, y: GEM.tip.y + BEAM_L })).toBe("rotate(0.00deg) scaleY(1.000)");
     const total = 5 * 60_000;
-    const { blocks } = blocksPlan(total, blockCount(total));
+    const { blocks } = blocksPlan(total, MAX_BLOCKS);
     const frames = beamFrames(blocks);
     for (const b of blocks)
       for (const f of frames.filter((f) => f.at >= b.start + (b.land - b.start) * 0.07 && f.at <= b.land)) {
@@ -801,12 +836,10 @@ describe("Timer", () => {
     expect(css).toMatch(/\.tm-blocks \{\s*isolation: isolate;/);
   });
 
-  test("Treasure Tunnel: all twenty blocks at five minutes, dug one after the other from the entrance, the last gone as the time is up (H-126)", () => {
-    expect(digCount(5 * 60_000)).toBe(MAX_DIG);
-    expect(digCount(10_000)).toBe(MIN_DIG);
-    expect(digCount(3 * 3600_000)).toBe(MAX_DIG);
+  test("Treasure Tunnel: all twenty blocks at any length, dug one after the other from the entrance, the last gone as the time is up (H-126)", () => {
+    expect(MAX_DIG).toBe(20);
     for (const total of [10_000, 60_000, 5 * 60_000, 3 * 3600_000]) {
-      const { dug, unit, blocks } = tunnelPlan(total, digCount(total));
+      const { dug, unit, blocks } = tunnelPlan(total, MAX_DIG);
       expect(dug + blocks.length).toBe(MAX_DIG);
       for (const [i, b] of blocks.entries()) {
         expect(b.k).toBe(dug + i);
@@ -856,15 +889,13 @@ describe("Timer", () => {
       expect(css, part).toMatch(new RegExp(`\\.tm-done \\.tm-${part}[,\\s{]`));
   });
 
-  test("Up to the Moon: every move at five minutes, quick hops and slow ways one after the other, then the way down as a fifth of the time, landing as it is up (H-127)", () => {
-    expect(moveCount(5 * 60_000)).toBe(MAX_MOVES);
-    expect(moveCount(10_000)).toBe(MIN_MOVES);
-    expect(moveCount(3 * 3600_000)).toBe(MAX_MOVES);
+  test("Up to the Moon: every move at any length, quick hops and slow ways one after the other, then the way down as a fifth of the time, landing as it is up (H-127)", () => {
     for (const total of [10_000, 60_000, 5 * 60_000, 3 * 3600_000]) {
-      const { first, unit, leap, moves, dive } = jumpPlan(total, moveCount(total));
-      // It always ends on the moon, a short time starting further up, never hurrying.
-      expect(first + moves.length).toBe(MAX_MOVES);
-      if (moves.length > MIN_MOVES) expect(unit).toBeGreaterThanOrEqual(MIN_UNIT);
+      const { first, unit, leap, moves, dive } = jumpPlan(total, MAX_MOVES);
+      // It always climbs the whole way from the lake to the moon, a short time only quicker (user request, 24 November 2026).
+      expect(first).toBe(0);
+      expect(moves).toHaveLength(MAX_MOVES);
+      expect(unit).toBeGreaterThan(0);
       // User feedback, 23 November 2026: never standing still and then a quick move – each move leaves as the one
       // before lands, its star caught halfway. A hop is quick, `HOP_MS` a leap (slow leaps looked odd), and the slow
       // ways – swimming, the lift, the balloons, space – take the time the hops leave, by their pace.
@@ -945,7 +976,7 @@ describe("Timer", () => {
 
   test("Up to the Moon: on every move it is somewhere new each second, never waiting in place (H-127)", () => {
     const total = 5 * 60_000;
-    const { first, moves, dive } = jumpPlan(total, moveCount(total));
+    const { first, moves, dive } = jumpPlan(total, MAX_MOVES);
     const { across, upDown } = jumpFrames(first, moves, dive);
     const value = (list: { at: number; transform: string }[], ms: number) => {
       const i = list.findIndex((f) => f.at > ms);
@@ -961,7 +992,7 @@ describe("Timer", () => {
 
   test("Up to the Moon: under the parachute it swings from side to side, staying on a tablet's screen, and drops straight into the cake (H-127)", () => {
     for (const total of [10_000, 5 * 60_000, 3 * 3600_000]) {
-      const { dive } = jumpPlan(total, moveCount(total));
+      const { dive } = jumpPlan(total, MAX_MOVES);
       const n = swingCount(dive);
       expect(n).toBeGreaterThanOrEqual(1);
       expect(n).toBeLessThanOrEqual(60);
@@ -1093,7 +1124,7 @@ describe("Timer", () => {
 
   test("Up to the Moon: the fox moves as it goes – its own pose for each kind of move, and the cars it rides go along with it (H-127)", () => {
     for (const total of [10_000, 5 * 60_000]) {
-      const { first, moves, dive } = jumpPlan(total, moveCount(total));
+      const { first, moves, dive } = jumpPlan(total, MAX_MOVES);
       const line = poseTimeline(moves, dive);
       const poseAt = (ms: number) => [...line].reverse().find((p) => p.from <= ms)!.pose;
       for (const m of moves) expect(poseAt((m.start + m.land) / 2), `move ${m.k}`).toBe(POSE_OF[m.kind]);
@@ -1148,7 +1179,7 @@ describe("Timer", () => {
     const balloonsFrom = HOP_SPOTS.findIndex((s) => s.by === "fly") - 1;
     const jetpackFrom = HOP_SPOTS.findIndex((s) => s.by === "jet") - 1;
     for (const total of [10_000, 5 * 60_000]) {
-      const { first, moves, dive } = jumpPlan(total, moveCount(total));
+      const { first, moves, dive } = jumpPlan(total, MAX_MOVES);
       const gear = gearLooks(first, moves, dive);
       // Started low, the balloons and the jetpack wait for it; started higher up, what it passed is already taken.
       expect(at(gear["waiting-balloons"].frames, 0)).toBe(first <= balloonsFrom);
@@ -1216,14 +1247,84 @@ describe("Timer", () => {
       expect(css, part).toMatch(new RegExp(`\\.tm-done \\.tm-${part}[,\\s{]`));
   });
 
+  test("Marble Jar: all sixty marbles at every length, landing in turn, the last as the time is up (H-149)", () => {
+    for (const total of [10_000, 30_000, 60_000, 3 * 60_000, 5 * 60_000, 10 * 60_000, 3 * 3_600_000]) {
+      const { marbles, prefilled } = jarPlan(total, MAX_MARBLES);
+      // The whole story at every length (user request, 24 November 2026): the jar starts empty, also for ten seconds.
+      expect(prefilled).toBe(0);
+      expect(marbles).toHaveLength(MAX_MARBLES);
+      expect(marbles.at(-1)?.land, `${total}`).toBeCloseTo(total, 3);
+      for (let i = 1; i < marbles.length; i++) {
+        expect(marbles[i].release, `${total}`).toBeGreaterThan(marbles[i - 1].release);
+        expect(marbles[i].land, `${total}`).toBeGreaterThan(marbles[i - 1].land);
+      }
+      // Each falls on its own place, the jar filling from its floor up; a short run's marbles go quicker, so only a few
+      // fly at once.
+      expect(marbles.map((m) => m.slot)).toEqual(marbles.map((_, i) => i));
+      let most = 0;
+      for (let t = 0; t < total; t += Math.max(50, total / 2000)) most = Math.max(most, marbles.filter((m) => m.release <= t && m.land > t).length);
+      expect(most, `${total}`).toBeLessThanOrEqual(8);
+    }
+    // Five minutes: one every five seconds.
+    const five = jarPlan(5 * 60_000, MAX_MARBLES).marbles;
+    expect(five[1].release - five[0].release).toBeCloseTo(5000, -2);
+  });
+
+  test("Marble Jar: every marble lies inside the jar on its own place, and every bounce sits on a nail (H-149)", () => {
+    for (const [i, slot] of JAR_SLOTS.entries()) {
+      expect(slot.x - JAR_MARBLE_R).toBeGreaterThanOrEqual(JAR.left);
+      expect(slot.x + JAR_MARBLE_R).toBeLessThanOrEqual(JAR.right);
+      expect(slot.y + JAR_MARBLE_R).toBeLessThanOrEqual(JAR.floor + 0.01);
+      for (const other of JAR_SLOTS.slice(i + 1)) expect(Math.hypot(slot.x - other.x, slot.y - other.y)).toBeGreaterThanOrEqual(2 * JAR_MARBLE_R - 0.01);
+    }
+    // The highest row lies under the jar's shoulders, wide enough for its marbles to pass the neck.
+    expect(Math.min(...JAR_SLOTS.map((s) => s.y)) - JAR_MARBLE_R).toBeGreaterThan(JAR.lip + 60);
+    expect(JAR.neckRight - JAR.neckLeft).toBeGreaterThan(4 * JAR_MARBLE_R);
+    const { marbles } = jarPlan(5 * 60_000, MAX_MARBLES);
+    for (const m of marbles) {
+      for (const hit of m.impacts) {
+        const touch = Math.min(...NAILS.map((n) => Math.hypot(n.x - hit.x, n.y - hit.y)));
+        expect(touch).toBeCloseTo(JAR_MARBLE_R + NAIL_R, 3);
+      }
+      // Across and up or down, it stays where a tablet's 4:3 cut shows it.
+      for (const step of m.across) {
+        expect(step.v - JAR_MARBLE_R).toBeGreaterThanOrEqual(235);
+        expect(step.v + JAR_MARBLE_R).toBeLessThanOrEqual(RIGHT_EDGE);
+      }
+    }
+    // The board holds every nail, the funnel slopes down to the jar's neck from both sides, and the tube's gate stands
+    // above the first row.
+    for (const n of NAILS) {
+      expect(n.x - NAIL_R).toBeGreaterThan(BOARD.x);
+      expect(n.x + NAIL_R).toBeLessThan(BOARD.x + BOARD.w);
+    }
+    expect(funnelY(FUNNEL.from.x)).toBeLessThan(funnelY(FUNNEL.to.x));
+    expect(funnelY(1600 - FUNNEL.from.x)).toBeCloseTo(funnelY(FUNNEL.from.x), 3);
+    expect(FUNNEL.to.x).toBeLessThanOrEqual(JAR.neckLeft + JAR_MARBLE_R * 2);
+    expect(TUBE.gate).toBeLessThan(Math.min(...NAILS.map((n) => n.y)) - JAR_MARBLE_R - NAIL_R);
+    // A phone on its side with the bar shows the stage from about y 120: the latch and the marble on it stay below that.
+    expect(TUBE.gate - JAR_MARBLE_R).toBeGreaterThanOrEqual(120);
+    expect(BOARD.x).toBeGreaterThanOrEqual(235);
+    expect(BOARD.x + BOARD.w).toBeLessThanOrEqual(RIGHT_EDGE);
+    expect(JAR.floor).toBeLessThanOrEqual(820);
+  });
+
+  test("Marble Jar: marbles, latch and what is left are layers on CSS animations that snap to their place at the end, with no clip path (H-149)", async () => {
+    const code = await Bun.file(new URL("./jar.tsx", import.meta.url)).text();
+    expect(code).not.toMatch(/clip-?[pP]ath/);
+    const css = await Bun.file(new URL("./timer.css", import.meta.url)).text();
+    for (const part of ["jar-x", "jar-y", "jar-latch", "jar-left"]) expect(css, part).toMatch(new RegExp(`\\.tm-done \\.tm-${part}[,\\s{]`));
+  });
+
   // User feedback, November 2026: the drawn fox and bear children in the timer's pictures (holding the basket and the
   // hose, blowing out the candle, taking turns) looked odd, and were taken out of every picture. The pictures tell
   // their story by themselves; Abwechseln's children are the real ones, their places two cushions.
   // The one exception is Up to the Moon's fox (`jumpFox.tsx`): it is the figure doing the run, swimming, hopping and
-  // riding, never one standing by (user request, 23 November 2026), drawn with the shared head.
+  // riding, never one standing by (user request, 23 November 2026), drawn with the shared head – and the Rennstrecke's
+  // two children (`race.tsx`, 24 November 2026), who are the drivers taking turns at the wheel, never standing by.
   test("no timer picture draws a fox or bear figure", async () => {
     for await (const file of new Bun.Glob("src/games/timer/*.tsx").scan(".")) {
-      if (file.endsWith("jumpFox.tsx")) continue;
+      if (file.endsWith("jumpFox.tsx") || file.endsWith("race.tsx")) continue;
       const code = await Bun.file(file).text();
       expect(/<Mascot(Head)?[\s/>]|MASCOT_COLORS\.\w+\.paw/.test(code) ? `${file} draws a fox or bear` : file).toBe(file);
     }
@@ -1295,6 +1396,59 @@ describe("Timer", () => {
     expect(FIRST_TURN).toBe("fox");
     const play = await Bun.file("src/games/timer/SwapPlay.tsx").text();
     expect(play).not.toMatch(/Math\.random|DRAW_STEPS|WHO_BEGINS/);
+  });
+
+  // Kugelbahn (H-117 with H-115): the marble's way stays in what every screen shows, ends in the cup of the child whose
+  // turn comes next for two to four children, and its frames come in time order, the fall into the cup last and quick.
+  test("the Kugelbahn's marble rolls down the run into every child's cup, the whole turn long", () => {
+    const RIGHT = 1340;
+    for (const count of [2, 3, 4] as const) {
+      const xs = CUP_XS[count];
+      expect(xs).toHaveLength(count);
+      for (let i = 1; i < count; i++) expect(xs[i] - xs[i - 1]).toBeGreaterThanOrEqual(CUP_W[count] + 40);
+      expect(xs[0] - CUP_W[count] / 2).toBeGreaterThanOrEqual(220);
+      expect(xs[count - 1] + CUP_W[count] / 2).toBeLessThanOrEqual(RIGHT + 30);
+      for (let to = 0; to < count; to++) {
+        for (const ms of [10_000, 300_000]) {
+          const { frames, bends } = marblePlan(count, to, ms);
+          for (const f of frames) {
+            expect(f.x - MARBLE_R).toBeGreaterThanOrEqual(235);
+            expect(f.x + MARBLE_R).toBeLessThanOrEqual(RIGHT);
+            expect(f.y - MARBLE_R).toBeGreaterThanOrEqual(80);
+            expect(f.y + MARBLE_R).toBeLessThanOrEqual(820);
+          }
+          for (let k = 1; k < frames.length; k++) expect(frames[k].at).toBeGreaterThanOrEqual(frames[k - 1].at);
+          const last = frames[frames.length - 1];
+          expect(last.at).toBe(ms);
+          expect(last.x).toBe(xs[to]);
+          expect(last.y).toBe(REST_Y);
+          // The fall is quick, the rolling takes the rest: the marble is still on the rails a moment before the end.
+          expect(ms - frames[frames.length - 2].at).toBeLessThanOrEqual(601);
+          expect(bends).toHaveLength(RAMPS - 1);
+          // Even a long turn spins the marble at least half a turn a second, all the way down the rails.
+          for (let k = 1; k < frames.length - 1; k++) {
+            const seconds = (frames[k].at - frames[k - 1].at) / 1000;
+            expect(Math.abs(frames[k].turn - frames[k - 1].turn)).toBeGreaterThanOrEqual(seconds * 180 * 0.99);
+          }
+        }
+      }
+    }
+  });
+
+  // H-115: a marble lies in the cup of every child who had a turn in this round, the cups empty again as a new round starts.
+  test("the Kugelbahn's cups keep a marble for each child who had its turn in the round", () => {
+    const has = (held: (string | null)[]) => held.map((c) => c !== null);
+    expect(has(heldMarbles(0, 0, 3))).toEqual([true, false, false]);
+    expect(has(heldMarbles(0, 1, 3))).toEqual([true, true, false]);
+    expect(has(heldMarbles(0, 2, 3))).toEqual([true, true, true]);
+    expect(has(heldMarbles(0, 3, 3))).toEqual([true, false, false]);
+    expect(has(heldMarbles(2, 0, 4))).toEqual([false, false, true, false]);
+    expect(has(heldMarbles(2, 2, 4))).toEqual([true, false, true, true]);
+    // The marble landing in a cup keeps its colour there: the one rolling in turn k has turn k + 1's.
+    expect(heldMarbles(0, 1, 2)[1]).toBe(MARBLE_COLORS[1]);
+    expect(turnChildren("marblerun", 4)).toEqual(["fox", "bear", "rabbit", "frog"]);
+    expect(turnChildren("marblerun", 3)).toEqual(["fox", "bear", "rabbit"]);
+    expect(turnChildren("swap", 4)).toEqual(["fox", "bear"]);
   });
 
   // The book's paper margin and the ⚙️ note lie over the stage's right edge (x 1400 at 4:3): a figure standing to 1380

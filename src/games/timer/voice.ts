@@ -2,11 +2,13 @@ import type { TargetLanguageId } from "@/content/targetLanguages";
 import { type Localized, pick, type Texts } from "@/lib/language";
 import { recordedVoice } from "@/lib/voice";
 import type { TimerPicture, TurnPicture } from "./settings";
-import type { Holder } from "./swap";
+import type { Holder, TurnChild } from "./swap";
+import { MORE_TURN_TO } from "./marbleNames";
 import { BLOCKS_LINES } from "./blocksNames";
 import { BOXES_LINES } from "./boxesNames";
 import { TUNNEL_LINES } from "./tunnelNames";
 import { JUMP_LINES } from "./jumpNames";
+import { JAR_LINES } from "./jarNames";
 import { TIDY_LINES } from "./tidyNames";
 import voiceFiles from "./stimme/**/*.mp3?glob";
 
@@ -241,6 +243,7 @@ export const PICTURE_LINES: Record<TimedPicture, { start: Texts; end: Texts }> =
   blocks: BLOCKS_LINES,
   tunnel: TUNNEL_LINES,
   jump: JUMP_LINES,
+  jar: JAR_LINES,
 };
 
 /** Said with the bell a while before the end (H-49). */
@@ -287,8 +290,11 @@ export const BEGINS: Record<Holder, Localized> = {
   },
 };
 
-/** Said at every change of turn, and when a grown-up gives the turn to a child behind ⚙️. */
-export const TURN_TO: Record<Holder, Localized> = {
+/**
+ * Said at every change of turn, and when a grown-up gives the turn to a child behind ⚙️; the Kugelbahn's third and
+ * fourth child (rabbit, frog) came English first (`marbleNames.ts`).
+ */
+export const TURN_TO: Record<TurnChild, Texts> = {
   fox: {
     de: "Tauschen! Jetzt ist das Fuchskind dran.",
     en: "Swap! Now it's the little fox's turn.",
@@ -307,10 +313,11 @@ export const TURN_TO: Record<Holder, Localized> = {
     ar: "تبديل! الآن دور الدب الصغير.",
     ru: "Меняемся! Теперь очередь медвежонка.",
   },
+  ...MORE_TURN_TO,
 };
 
-/** Every line Abwechseln can say, in the order they come. */
-export const TURN_LINES: Localized[] = [WHO_BEGINS, ...Object.values(BEGINS), ...Object.values(TURN_TO)];
+/** Every line Abwechseln, the Wippe and the Kugelbahn can say, in the order they come. */
+export const TURN_LINES: Texts[] = [WHO_BEGINS, ...Object.values(BEGINS), ...Object.values(TURN_TO)];
 
 /**
  * Every line the Timer can say in `language`, each once: the pictures' start and end lines, the bell's, and Abwechseln's.

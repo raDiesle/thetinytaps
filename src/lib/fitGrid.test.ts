@@ -1,5 +1,5 @@
 import { describe, expect, test } from "bun:test";
-import { packGroups } from "./fitGrid";
+import { bestFit, packGroups } from "./fitGrid";
 
 describe("packGroups", () => {
   test("a small group sits beside an earlier one when the row has room", () => {
@@ -53,5 +53,18 @@ describe("packGroups", () => {
           });
           expect(Math.max(...places.map((p) => p.row + p.height))).toBe(lines.reduce((a, b) => a + b, 0));
         }
+  });
+});
+
+describe("bestFit", () => {
+  test("the Timer's sixteen timed pictures and its three of taking turns fit a tablet's screen", () => {
+    // Measured at 1024 × 768: the list 969 px wide, 424 px of room under the head above the families.
+    const fit = bestFit(19, 969, 424, false, [16, 3], 1.6);
+    expect(fit).toEqual({ columns: 7, row: 113, reserve: 1 });
+  });
+
+  test("cards with titles keep their wider minimum", () => {
+    // The same room for nineteen cards with words: seven columns would leave each too narrow for its title.
+    expect(bestFit(19, 969, 424, false, [16, 3])).toBeNull();
   });
 });

@@ -1,4 +1,14 @@
-import { type CSSProperties, type HTMLAttributes, type MouseEvent, type PointerEvent, type ReactNode, useLayoutEffect, useRef, useState } from "react";
+import {
+  type CSSProperties,
+  type HTMLAttributes,
+  type MouseEvent,
+  type PointerEvent,
+  type ReactNode,
+  type RefObject,
+  useLayoutEffect,
+  useRef,
+  useState,
+} from "react";
 import { Link, useNavigate } from "react-router";
 import { FullscreenButton } from "@/components/FullscreenButton";
 import { Logo } from "@/components/Logo";
@@ -51,8 +61,10 @@ interface ShelfBook {
   spine?: string;
   /** A game standing as several books tied together with a ribbon (`Game.volumes`): those books, spine out. */
   volumes?: ShelfBook[];
-  /** A toy standing on the board instead of a book (`Category.toy`), as wide as a picture book. */
-  toy?: "keyboard";
+  /** A toy standing on the board instead of a book (`Category.toy`), narrower than a picture book (`TOY_SPAN`). */
+  toy?: "poster";
+  /** The picture on a toy's poster (`bilder/plakat-<category>.webp`, made by `bun run previews`). */
+  poster?: string;
 }
 
 /** The cloths of the books standing spine out with a game's name, one after the other: bright, unlike the books only filling the shelf. */
@@ -134,6 +146,7 @@ for (const entry of SHELF) {
     cover: entry.game ? undefined : pictures[`cover-${c.id}.webp`],
     games: !entry.game && hasPage(c) ? c.games.map((g) => g.emoji) : undefined,
     toy: c.toy,
+    poster: c.toy ? pictures[`plakat-${c.id}.webp`] : undefined,
   };
   const volumes = (entry.game && shelfVolumes(entry.game))?.map(
     (v, i): ShelfBook => ({
@@ -742,32 +755,42 @@ function Book({ book, onClick }: { book: ShelfBook; onClick: (e: MouseEvent<HTML
   );
 }
 
-/** How long the toy keyboard's keys go down before its game opens, in ms (`shelf-toy-press` in bookshelf-books.css). */
+/** How long the poster is pressed back before its game opens, in ms (`.shelf-toy.pressed` in bookshelf-books.css). */
 const TOY_PRESS_MS = 260;
 
 /**
- * A toy standing on the board among the picture books instead of a book (`Category.toy`, user request, 24 November
- * 2026): a wooden toy keyboard with big bright keys, leaning back a little at the board's front edge, as wide as a
- * picture book and lower. It says without a word that here one presses keys. A tap presses it down with a click and a
+ * How wide the poster looks against its place (`TOY_SPAN`): a little into the gap on either side, as big as it can be
+ * and still clear of the book beside it.
+ */
+const POSTER_REACH = 1.5;
+
+/**
+ * A toy's place on the board among the picture books instead of a book (`Category.toy`, user request, 24 November
+ * 2026): a big poster from its game (`ToyPoster`), stuck flat onto the shelf's back panel with its foot on the board –
+ * never leaning, never behind the book beside it, and nothing standing in front of it (a toy keyboard stood there first
+ * and looked like a till; it was taken out, user feedback, 24 November 2026). A tap presses the poster with a knock and a
  * note, and its game opens – no book comes out, no page turns, and the way back simply comes to the shelf again.
  */
 function ShelfToy({ book }: { book: ShelfBook }) {
   const t = useT();
   const navigate = useNavigate();
+  const link = useRef<HTMLAnchorElement>(null);
+  usePosterPlace(link);
   const onClick = (e: MouseEvent<HTMLAnchorElement>) => {
     if (e.metaKey || e.ctrlKey || e.shiftKey) return;
     e.preventDefault();
     const toy = e.currentTarget;
     if (toy.classList.contains("pressed")) return;
     toy.classList.add("pressed");
-    playKnock(900);
+    playKnock(560);
     playChimeNote(Math.floor(Math.random() * 8));
-    // The game's code was asked for as the finger landed; the keys go down meanwhile, and it opens once both are done.
+    // The game's code was asked for as the finger landed; the poster is pressed meanwhile, and it opens once both are done.
     const code = pageCodeSoon(book.href);
     window.setTimeout(() => void code.finally(() => navigate(book.href)), TOY_PRESS_MS);
   };
   return (
     <Link
+      ref={link}
       to={book.href}
       className="shelf-toy"
       data-toy={book.toy}
@@ -777,64 +800,65 @@ function ShelfToy({ book }: { book: ShelfBook }) {
       {...loadOnIntent(book.href)}
       onClick={onClick}
     >
-      <span className="shelf-toy-shadow" />
-      <ToyKeyboard />
+      <span className="shelf-poster-spot" />
+      <ToyPoster title={t(book.title)} picture={book.poster} />
     </Link>
   );
 }
 
-/** The colours of the toy keyboard's keys, bright as building blocks. */
-const TOY_KEYS = ["#e8434b", "#f7a21b", "#ffd23f", "#3fae49", "#2f8fd8", "#8a5bd6", "#e8559c"];
+/**
+ * Keeps the poster on the back panel over its own place. The shelf's perspective draws everything on the panel towards
+ * the middle of the shelf and makes it smaller, so a poster laid out in its place was seen behind the book beside it
+ * (user feedback, 24 November 2026). `.shelf-poster-spot` is the place moved back onto the panel, unseen: measured
+ * against the place itself (the link, standing in the row), it tells how far the panel moves and shrinks it there, and
+ * the poster is moved back over its place and grown by that much (`--poster-x`, `--poster-k`), its foot staying where
+ * the board meets the panel.
+ */
+function usePosterPlace(link: RefObject<HTMLAnchorElement | null>) {
+  useLayoutEffect(() => {
+    const place = link.current;
+    const spot = place?.querySelector<HTMLElement>(".shelf-poster-spot");
+    if (!place || !spot) return;
+    const measure = () => {
+      const seen = place.getBoundingClientRect();
+      const back = spot.getBoundingClientRect();
+      if (!back.width || !spot.offsetWidth) return;
+      // How much one px moved on the panel is seen, and how far the panel's version of the place lies from the place.
+      const shrink = back.width / spot.offsetWidth;
+      const x = (seen.left + seen.width / 2 - (back.left + back.width / 2)) / shrink;
+      place.style.setProperty("--poster-x", `${x.toFixed(1)}px`);
+      place.style.setProperty("--poster-k", ((seen.width / back.width) * POSTER_REACH).toFixed(3));
+    };
+    measure();
+    const observer = new ResizeObserver(measure);
+    observer.observe(place);
+    window.addEventListener("resize", measure);
+    return () => {
+      observer.disconnect();
+      window.removeEventListener("resize", measure);
+    };
+  }, [link]);
+}
 
-/** The toy keyboard: a wooden case tipped towards the room, three rows of chunky keys and a long space bar. */
-function ToyKeyboard() {
-  // The case's top is narrower at the back (y 6) than at the front (y 84): every key's corners follow that slope.
-  const across = (y: number, u: number) => 60 + (u - 60) * (0.84 + (0.16 * (y - 6)) / 78);
-  const key = (y: number, h: number, u0: number, u1: number) =>
-    `M${across(y, u0)} ${y} H${across(y, u1)} L${across(y + h, u1)} ${y + h} H${across(y + h, u0)} Z`;
-  const rows = [
-    { y: 14, n: 6 },
-    { y: 34, n: 6 },
-    { y: 54, n: 5 },
-  ];
+/**
+ * The poster (user request, 24 November 2026): a big picture from the game – a firework, a number with its shapes,
+ * letters – under the game's name, on paper taped at three corners. The fourth, top right, curls away from the wood.
+ * All drawn still, in CSS (`.shelf-poster` in bookshelf-books.css).
+ */
+function ToyPoster({ title, picture }: { title: string; picture?: string }) {
   return (
-    <svg className="shelf-toy-art" viewBox="0 0 120 100" aria-hidden>
-      {/* The case: its top, then its front edge below, darker, with the wood's grain. */}
-      <path
-        d="M14 6 Q10 6 9 10 L2 80 Q2 86 8 86 H112 Q118 86 118 80 L111 10 Q110 6 106 6 Z"
-        fill="#c98a4f"
-        stroke="#5a3a1e"
-        strokeWidth="2.5"
-        strokeLinejoin="round"
-      />
-      <path
-        d="M2 80 Q2 86 8 86 H112 Q118 86 118 80 V90 Q118 98 110 98 H10 Q2 98 2 90 Z"
-        fill="#8f5a2c"
-        stroke="#5a3a1e"
-        strokeWidth="2.5"
-        strokeLinejoin="round"
-      />
-      <path d="M16 11 C44 9 78 13 104 10 M8 92 C40 94 80 90 112 93" fill="none" stroke="#b07440" strokeWidth="1.4" />
-      {rows.flatMap((row, r) => {
-        // Every key 16 wide; the row of five sits half a key in, as on a real keyboard.
-        const width = 16;
-        const x0 = 12 + (6 - row.n) * 8;
-        return Array.from({ length: row.n }, (_, i) => {
-          const u0 = x0 + i * width + 1;
-          const u1 = u0 + width - 2.6;
-          const color = TOY_KEYS[(r * 3 + i) % TOY_KEYS.length];
-          return (
-            <g key={`${r}-${i}`}>
-              <path d={key(row.y + 3, 15, u0, u1)} fill="#00000040" />
-              <path d={key(row.y, 15, u0, u1)} fill={color} stroke="#5a3a1e" strokeWidth="1.6" strokeLinejoin="round" />
-              <path d={key(row.y + 2, 3.5, u0 + 2.5, u1 - 4)} fill="#ffffff70" />
-            </g>
-          );
-        });
-      })}
-      <path d={key(74, 9, 32, 88)} fill="#00000040" transform="translate(0 2.5)" />
-      <path d={key(72, 9, 32, 88)} fill="#fff4dc" stroke="#5a3a1e" strokeWidth="1.6" strokeLinejoin="round" />
-    </svg>
+    <span className="shelf-poster" aria-hidden>
+      <span className="shelf-poster-paper">
+        <span className="shelf-poster-title" style={{ "--len": Math.max(...title.split(/\s+/).map((word) => [...word].length)) } as CSSProperties}>
+          {title}
+        </span>
+        {picture && <img className="shelf-poster-picture" src={picture} alt="" decoding="async" draggable={false} />}
+      </span>
+      <span className="shelf-poster-curl" />
+      <span className="shelf-poster-tape" data-corner="top-left" />
+      <span className="shelf-poster-tape" data-corner="bottom-left" />
+      <span className="shelf-poster-tape" data-corner="bottom-right" />
+    </span>
   );
 }
 

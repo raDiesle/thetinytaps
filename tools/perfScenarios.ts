@@ -228,11 +228,11 @@ export const SCENARIOS: Scenario[] = [
     parts: [{ label: "Zahlen tippen", before: [{ wait: 1500 }], ms: 8000, type: { keys: [..."3719524"], every: 700 } }],
   },
   {
-    // Zähl-Turm: each key flies a block onto the tower and the child hops onto it, all as layers moved by their
-    // transform; the tenth brings the goal's end picture and the tower tumbling.
+    // Zähl-Turm: each key lowers a block from the crane's hook and the child hops onto it, all layers moved by their
+    // transform; the tenth brings the beam sliding in and the whole world (the camera) going up a floor.
     name: "zaehlturm",
-    path: "/zaehlturm/",
-    parts: [{ label: "Klötze bis zum Ziel", before: [{ wait: 1500 }], ms: 14000, type: { keys: [..."aaaaaaaaaa"], every: 1100 } }],
+    path: "/zaehlturm/?seite=1",
+    parts: [{ label: "Ein Stockwerk und hinauf", before: [{ wait: 1500 }], ms: 15000, type: { keys: [..."aaaaaaaaaaaa"], every: 1100 } }],
   },
   {
     // Mitmachen: the child hops, claps and stamps on its own layer; keys during a round only ripple.
@@ -305,7 +305,7 @@ export const SCENARIOS: Scenario[] = [
   // steam, the twinkling, the flame, what is left lighting up), the moon setting and the sun rising, the pizza's slices
   // lifted off, the ladybug crawling round the red disc, the alarm clock's digits ticking, the toy crane carrying toys
   // into the box, the toys hopping into their five boxes, the crystal's beam carrying the blocks out of their jumble into the block house, the pickaxe digging the treasure tunnel block by block, the hopper climbing up to the moon catching its stars, the picture following it like a camera, in „Abwechseln“ the toy hopping onto the first cushion and the hourglass running, and on the Wippe the
-  // chick stepping along the plank as the seesaw tips slowly. Each card is tapped by its name (its
+  // chick stepping along the plank as the seesaw tips slowly, on the Kugelbahn the marble rolling down its ramps, on the Rennstrecke the kart driving round the figure eight, and the marbles bouncing down the pegboard into the jar. Each card is tapped by its name (its
   // tooltip), so the cards' order and groups may change.
   ...(
     [
@@ -325,8 +325,11 @@ export const SCENARIOS: Scenario[] = [
       ["zug", "Zug zum Bahnhof"],
       ["raupe", "Raupe"],
       ["sonne", "Sonnenaufgang"],
+      ["kugelglas", "Kugelglas"],
       ["abwechseln", "Abwechseln"],
       ["wippe", "Wippe"],
+      ["kugelbahn", "Kugelbahn"],
+      ["rennstrecke", "Rennstrecke"],
     ] as const
   ).map(([name, title]) => ({
     name: `timer-${name}`,
@@ -353,6 +356,18 @@ export const SCENARIOS: Scenario[] = [
     name: "timer-wippe-wechsel",
     path: "/timer/?sekunden=5",
     parts: [{ label: "Wechsel", before: [{ tap: `.mode-card[title^="Wippe"]` }, { wait: 500 }], ms: 10000, tap: { selector: ".tm-play", every: 1500 } }],
+  },
+  // The Kugelbahn with short turns: the marble rolling down the run, falling into the next cup, the strips of light changing.
+  {
+    name: "timer-kugelbahn-wechsel",
+    path: "/timer/?sekunden=5",
+    parts: [{ label: "Wechsel", before: [{ tap: `.mode-card[title^="Kugelbahn"]` }, { wait: 500 }], ms: 10000, tap: { selector: ".tm-play", every: 1500 } }],
+  },
+  // The Rennstrecke with short turns: the start light, the kart driving its lap, the children hopping out and in at the line.
+  {
+    name: "timer-rennstrecke-wechsel",
+    path: "/timer/?sekunden=5",
+    parts: [{ label: "Wechsel", before: [{ tap: `.mode-card[title^="Rennstrecke"]` }, { wait: 500 }], ms: 10000, tap: { selector: ".tm-play", every: 1500 } }],
   },
   // A timer's last moments and its end, with the shortest length (10 s, the first slip): the bar along the bottom
   // filling, the warm light gathering from the edges, the bar's marker and flag beating, then the end's light and trophy.

@@ -21,6 +21,26 @@ test("keyframe names are unique across all CSS files", () => {
   expect(twice).toEqual([]);
 });
 
+// A game's prefixed class (`zt-play`, `tw-play`) is styled by that game alone: the Counting Tower and Zaubertasten both
+// had `.tw-play`, and since the shelf preloads every game's CSS, each laid its rules over the other's (November 2026).
+// Plain state words (`.on`, `.done`) only ever go with a prefixed class and may repeat; so may the shared components'
+// own classes a game restyles inside its own root.
+const SHARED_CLASSES = new Set(["game-end", "game-end-button", "nudge-0", "nudge-1"]);
+
+test("no two games style the same prefixed class", () => {
+  const games = new Map<string, Set<string>>();
+  for (const file of cssFiles.filter((f) => f.startsWith(join("src", "games")))) {
+    const game = file.split(/[\\/]/)[2];
+    const css = readFileSync(file, "utf8").replace(/\/\*[\s\S]*?\*\//g, "");
+    for (const [, name] of css.matchAll(/\.([a-zA-Z][\w-]*-[\w-]+)/g)) {
+      if (SHARED_CLASSES.has(name)) continue;
+      games.set(name, new Set([...(games.get(name) ?? []), game]));
+    }
+  }
+  const twice = [...games].filter(([, where]) => where.size > 1).map(([name, where]) => `${name}: ${[...where].join(", ")}`);
+  expect(twice).toEqual([]);
+});
+
 // Words in an `animation` shorthand that are not keyframe names.
 const animationKeywords = new Set(
   "none infinite linear ease ease-in ease-out ease-in-out step-start step-end forwards backwards both normal reverse alternate alternate-reverse running paused inherit initial unset".split(
@@ -174,4 +194,21 @@ test("app-wide z-index layers take a --z-… name defined in base.css", () => {
     }
   }
   expect(wrong).toEqual([]);
+});
+
+// The poster of „Magic Keys“ on the shelf stood taped onto the back panel above a toy keyboard, laid out in its place:
+// the shelf's perspective drew it towards the middle, behind the book beside it, and the keyboard looked like a till.
+// Then it leant on the panel from the board, which looked wrong too (user feedback, 24 November 2026). It is stuck flat
+// on the panel, nothing in front of it, and moved back over its place by what `usePosterPlace` measures.
+test("the shelf's poster is stuck flat on the back panel over its own place", () => {
+  const css = readFileSync("src/styles/bookshelf-books.css", "utf8").replace(/\/\*[\s\S]*?\*\//g, "");
+  const rules = [...css.matchAll(/([^{}]*\.shelf-poster(?![\w-])[^{}]*)\{([^}]*)\}/g)].map(([, , body]) => body);
+  expect(rules.length).toBeGreaterThan(0);
+  for (const body of rules) expect(body).not.toMatch(/rotate/);
+  const placed = rules.filter((body) => /transform:/.test(body));
+  expect(placed.length).toBeGreaterThan(0);
+  for (const body of placed) expect(body).toMatch(/translateZ\(calc\(var\(--d\) \* -0\.8[^)]*\)\) translateX\(var\(--poster-x[^)]*\)\) scale\(/);
+  const shelf = readFileSync("src/components/Bookshelf.tsx", "utf8");
+  expect(shelf).toMatch(/usePosterPlace\(link\)/);
+  expect(shelf).not.toMatch(/ToyKeyboard|shelf-toy-body/);
 });

@@ -1,39 +1,51 @@
 # Counting Tower (Zähl-Turm)
 
-`/zaehlturm/`, a page of the book „Buchstaben & Zahlen“ (L-18, November 2026). Every key or tap puts the next block
-on a tower, the fox or bear child (`useFigure`, `Kid.tsx`) climbs onto it and the voice says its number. English first:
-its name, the goals' names and the options behind ⚙️ wait for their translations (`languageStatus.ts`).
+`/zaehlturm/`, a page of the book „Buchstaben & Zahlen“ (L-18). Built new on 24 November 2026 (user request): one
+house built from 1 to 100 in one go. Its name, line and the panel's arrows' names are in all seven languages
+(`names.ts`).
 
 ## How it plays
 
-- It counts to one hundred, with no option for less (user decision, November 2026): ten rounds of ten blocks, 1–10,
-  11–20 … 91–100, the numbers printed on the blocks and the big digit beside the tower showing the whole number (the
-  tenth block of each round gold). It plays at once (`startMode`), no start screen.
-- Each round has a goal of its own above the tower, in `GOAL_ORDER` (`names.ts`): balloon, nest, paper plane, cloud,
-  rainbow slide, kite, big bird, hot-air balloon, the owl's hollow and the moon at 100. The sky goes from morning to
-  night over the ten rounds (`SKY` in `drawings.tsx`). Every block must bring more suspense: the goal stirs and comes
-  nearer at blocks 3, 6 and 9 (`STIR_AT`), the tower leans and sways a little more with each block (`BLOCK_SHIFT`,
-  `SWAY_DEG`), the child reaches up from the eighth, and the goal is out of reach at nine and reached at ten
-  (`layout.test.ts` checks this for every goal on every screen). The tenth block lands slower (`LAST_FLY_MS`).
-- At ten the goal does its own thing with the child (`FINALE`: floats carry it down, homes take the baby animal back and
-  the child jumps into the leaves, the cloud and the moon rock it, the rainbow is a slide, the bird and the hot-air
-  balloon take it for a ride), the tower tumbles, and `GameEnd` shows that round's trophy (`level` = the goal).
-  „Nochmal“ builds the same round again, „Weiter“ goes on to the next ten (after 100: from 1),
-  showing the next goal on its sky (`GoalCard` in `drawings.tsx`, user request, 23 November 2026).
-- Behind ⚙️ (held, `PlayOptions`, as play starts its `intro`) only two things, user request November 2026: „Start at“, a
-  slider 1–100 that jumps to any number and goes on from there – the earlier blocks of that round already stand, without
-  flying in – and „From 1“. Nothing else goes there; no settings of the start screen.
+- **One continuous level from 1 to 100** (user request, 24 November 2026): no rounds, no cards, no options behind ⚙️.
+  It plays at once (`startMode`). Each tap or key lowers the next block from the crane's hook into its place, the fox
+  or bear child (`useFigure`, `Kid.tsx`) hops onto it and the voice says its number.
+- **The screen's width is used** (user request): a floor is ten blocks side by side across the screen
+  (`houseLayout` in `layout.ts`), with a ledge on the left where the child waits for a floor's first block and the
+  elevator panel on the right. When a floor's ten are laid, a colourful wooden beam slides in over it from the left,
+  the child jumps onto it, and **the camera goes up a floor like a jump-and-run** (the whole world is one layer moved by
+  its transform; `cameraAt`). The next ten fill the next row from left to right.
+- **Every ten looks different** (user request): each floor has its own colours, pattern and beam (`FLOORS` in
+  `floors.ts`), and a few blocks of each floor are part of the house that answer as they land, each with its own
+  sound – the front door opening (5), windows lighting up, a cat and a dog looking out, a birdhouse, flowers growing,
+  a fish swimming by, a heart, a star (`Special`, `ARRIVAL` in `TowerPlay.tsx`). A floor's tenth is always plain and
+  comes down slowly to a drum roll.
+- **Big blocks** (user request): as big as ten across the room left of the panel allow, at most a fifth of the screen's
+  height (`layout.test.ts` checks every screen).
+- **Jump a ten up or back** (user request): the elevator panel on the right holds only its two arrows; ▲ goes on at the
+  next ten (11, 21 …), ▼ back to the ten before (on the first floor: from 1). Jumping by tens is all it does – no
+  display of the number laid between them (user feedback, 24 November 2026: jumping by tens is enough), nor single
+  steps or a number to pick. The scene is built anew there and the
+  camera rides from where it was, like an elevator. Only a tap on an arrow jumps (`screenTap`), never a press
+  elsewhere.
+- At 100 the child runs to the ledge, the roof comes down on the crane's rope, smoke puffs from the chimney, the flag
+  goes up and the camera zooms out to the whole house, then `GameEnd` with the game's one trophy. „Nochmal“ builds it
+  again from 1 (`onAgain`); there is no „Weiter“ (one level).
 - Where it stands is kept: the address's `?seite=` is the next block's number (`useStepAddress`), and the next number is
-  stored (`tinytaps.tower.v1`), so a link or a new visit goes on there.
+  stored (`tinytaps.tower.v1`), so a link or a new visit goes on there; after 100 a new visit starts at 1.
 
 ## Rules
 
-- Everything that moves (blocks, the child, the goal, the tower swaying, stars, leaves) is a small HTML layer moved by
-  its transform with `element.animate`; the sky, meadow and tree are one svg drawn once (`Backdrop`, `memo`). Never
-  animate inside that svg. `bun run perf zaehlturm` measures a round.
-- One press, one block; presses while a block flies or the finale runs only ripple, with a soft knock at most every
-  `EXTRA_SOUND_GAP_MS`. Numbers are said one after the other, never over each other.
+- Classes are prefixed `zt-` (Zaubertasten has `tw-`; `css.test.ts` fails on a prefixed class two games style).
+- Everything that moves (the world as camera, blocks, beams, the hook, the child, roof, flag, smoke, a special's moving
+  part) is an HTML layer moved by its transform or opacity with `element.animate` (set the final style, animate from the
+  old). The backdrop is one svg drawn once (`Backdrop`, `memo`), never animated inside. `bun run perf zaehlturm` measures
+  a floor and the camera going up.
+- One press, one block; presses while a block comes down, a beam slides or the camera moves only ripple, with a soft
+  knock at most every `EXTRA_SOUND_GAP_MS`. Numbers are said one after the other (`queue`).
 - The voice: one to nine from the letters games' recordings (`lettersVoice`), 10–99 their English two-digit words
-  (`TWO_DIGIT_WORDS`), 100 `HUNDRED` – silent until recorded, listed in `voiceLines.ts`.
-- A new goal gets its place in `goalPlace` (`layout.ts`, checked on every screen in `layout.test.ts`), its drawing, its
-  `FINALE` timing, its name in `GOAL_NAMES`, its trophy picture, its `GoalCard`, and the SEO texts in all seven languages name it.
+  (`TWO_DIGIT_WORDS`), 100 `HUNDRED` – silent until recorded, listed in `voiceLines.ts`. The current and next floor's
+  words are loaded as a floor starts.
+- A new special gets its type in `floors.ts`, its drawing (`ACTOR`, `SpecialBack`/`SpecialActor`/`SpecialFront` in
+  `drawings.tsx`) and its arrival and sound in `ARRIVAL`; a floor keeps at least two specials, never on place 10.
+- Upright phones (after „Trotzdem hochkant“) show the house narrow with much sky; that is fine, phones are played
+  sideways.

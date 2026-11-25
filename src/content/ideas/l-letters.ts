@@ -169,7 +169,7 @@ export const lettersIdeas: IdeaArea = {
       effort: "S",
       done: true,
       partial:
-        "Gebaut als „Counting Tower“ (`/zaehlturm/`, 21. November 2026), neu gedacht und bis hundert (Nutzerwunsch, ohne Option): zehn Runden zu je zehn Klötzen (1–10, 11–20 … 91–100), jede mit ihrem eigenen Ziel über dem Turm, das mit jedem Klotz näher kommt und beim zehnten erreicht wird – Luftballon, Vogelnest, Papierflieger, Wolke, Regenbogen-Rutsche, Drachen, großer Vogel, Heißluftballon, Eulenhöhle und zuletzt der Mond bei 100. Das Fuchs- oder Bärkind (Junge / Mädchen) steht oben und klettert mit, der Turm wackelt mit jedem Klotz etwas mehr, der Himmel geht vom Morgen bis in die Nacht. Jede Runde endet mit ihrem Bild, Pokal und „Weiter“ zur nächsten Zehnerreihe. Hinter ⚙️ (gehalten): neu bei 1 anfangen oder mit einem Regler zu jeder Zahl springen; die früheren Klötze der Runde stehen dann schon. Die Zahlwörter eins bis neun sind aufgenommen, 10–100 warten auf ihre Aufnahme und bleiben bis dahin still.",
+        "Am 24. November 2026 ganz neu gebaut (Nutzerwunsch): ein Haus von 1 bis 100 in einem Stück, ohne Runden. Jeder Tipp senkt den nächsten Klotz vom Kranhaken an seinen Platz, das Fuchs- oder Bärkind hüpft darauf, die Stimme zählt. Zehn Klötze sind ein Stockwerk über die ganze Breite des Bildschirms, darüber schiebt sich ein bunter Holzbalken, und der Bildschirm fährt wie in einem Jump-and-Run ein Stockwerk hinauf. Jedes Stockwerk sieht anders aus (eigene Farben und Muster, eigener Balken) und hat Klötze, die zum Haus gehören und beim Landen etwas tun: die Haustür geht auf, Licht geht an, Katze, Hund, Vogelhaus, Blumen, Fisch, Herz, Stern. Rechts ein Fahrstuhl-Tableau mit zwei Pfeilen, die einen ganzen Zehner hinauf oder zurück springen (die Zahlenanzeige dazwischen fiel am selben Tag weg: Zehnersprünge reichen). Bei 100 kommt das Dach, Rauch steigt, die Fahne geht hoch, man sieht das ganze Haus, dann der Pokal. Davor: gebaut als „Counting Tower“ (`/zaehlturm/`, 21. November 2026), neu gedacht und bis hundert (Nutzerwunsch, ohne Option): zehn Runden zu je zehn Klötzen (1–10, 11–20 … 91–100), jede mit ihrem eigenen Ziel über dem Turm, das mit jedem Klotz näher kommt und beim zehnten erreicht wird – Luftballon, Vogelnest, Papierflieger, Wolke, Regenbogen-Rutsche, Drachen, großer Vogel, Heißluftballon, Eulenhöhle und zuletzt der Mond bei 100. Das Fuchs- oder Bärkind (Junge / Mädchen) steht oben und klettert mit, der Turm wackelt mit jedem Klotz etwas mehr, der Himmel geht vom Morgen bis in die Nacht. Jede Runde endet mit ihrem Bild, Pokal und „Weiter“ zur nächsten Zehnerreihe. Hinter ⚙️ (gehalten): neu bei 1 anfangen oder mit einem Regler zu jeder Zahl springen; die früheren Klötze der Runde stehen dann schon. Die Zahlwörter eins bis neun sind aufgenommen, 10–100 warten auf ihre Aufnahme und bleiben bis dahin still.",
     },
     {
       id: "L-19",
@@ -220,12 +220,12 @@ export const lettersIdeas: IdeaArea = {
     {
       id: "L-24",
       emoji: "🎹",
-      title: "Drauflos tippen: Spielzeug-Tastatur im Regal",
+      title: "Zaubertasten (zuerst „Drauflos tippen“): Spielzeug-Tastatur im Regal",
       text: "Ein Spiel ohne Buch, als hölzerne Spielzeug-Tastatur neben den Bilderbüchern im Regal: jede Taste, jeder Tipp und jeder Klick bringt sofort etwas Buntes mit Ton – ein Buchstabe oder eine Zahl groß auf der Seite mit seinem Namen, sonst eine Überraschung aus „Frei tippen“ oder eine bunte Form, und die Maus zieht eine kurze Glitzerspur. Nichts zu finden, nichts zu lernen, keine Karte.",
       why: "Für das Drauflostippen kleiner Kinder auf Tastatur, Maus oder Bildschirm, wonach Eltern suchen: es passiert immer etwas, und nichts geht kaputt.",
       effort: "M",
       partial:
-        "Gebaut am 24. November 2026 (/drauflos/): ruhig gehalten wie jedes Spiel – höchstens fünf Buchstaben oder Formen und drei Überraschungen auf einmal, dieselbe Taste erst nach einer Pause wieder; kein Zähler, kein Ende.",
+        "Gebaut am 24. November 2026 (/drauflos/), noch am selben Tag „Zaubertasten“ getauft und mit einem Plakat aus dem Spiel über der Spielzeug-Tastatur im Regal, an drei Ecken mit Tesa festgeklebt, die vierte hebt sich ab. Schnell nacheinander gedrückt erscheint mehreres zugleich, jedes mit Platz neben den anderen (bis zu acht Buchstaben oder Formen und fünf Überraschungen); eine Zahl kommt mit genauso vielen Formen rundherum. Dieselbe Taste erst nach einer Pause wieder; kein Zähler, kein Ende. Ebenfalls am 24. November wurde die Spielzeug-Tastatur wieder entfernt (sie sah aus wie eine Kasse): Jetzt klebt nur das Plakat flach an der Rückwand, unten auf dem Brett und frei vom Buch daneben, und ein Tipp darauf öffnet das Spiel.",
       done: true,
     },
   ],
