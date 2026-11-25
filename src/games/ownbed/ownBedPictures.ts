@@ -193,6 +193,10 @@ const MADE = new Set<string>([
   "eng",
   "kuscheln",
   "lieb",
+  "sagen",
+  "nicht-wollen",
+  "daneben",
+  "da",
 ]);
 
 /** Every picture of the story still to make. */
