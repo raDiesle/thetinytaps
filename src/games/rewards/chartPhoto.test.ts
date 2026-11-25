@@ -15,6 +15,7 @@ import {
   photoPlaceOf,
   scaledSize,
 } from "./chartPhoto";
+import { distinctSteps } from "./plan";
 
 describe("the photo of the child on a chart", () => {
   test("an old chart, or a place no longer known, takes the default place top left", () => {
@@ -50,6 +51,22 @@ describe("the photo of the child on a chart", () => {
   test("the photos kept are exactly those a chart names", () => {
     const keys = photoKeysOf([{ photo: { key: "foto-a-1" } }, {}, { photo: { key: "foto-b-2", place: "title" } }, { photo: { key: "foto-a-1" } }]);
     expect([...keys].sort()).toEqual(["foto-a-1", "foto-b-2"]);
+  });
+
+  test("a task's or card's own photo (T-13) is kept too, and a board's weekday numbers are no cards", () => {
+    const keys = photoKeysOf([
+      { tasks: [{ photo: "foto-t-1" }, {}], days: [1, 2, 3] },
+      { photo: { key: "foto-c-1" }, days: [[{ photo: "foto-s-1" }, {}], [], [{ photo: "foto-s-2" }]] },
+    ]);
+    expect([...keys].sort()).toEqual(["foto-c-1", "foto-s-1", "foto-s-2", "foto-t-1"]);
+  });
+
+  test("a card with its own photo is printed as a card of its own, beside the same card without", () => {
+    const start = defaultDraft("de");
+    if (start.type !== "plan") throw new Error("the wizard starts on a plan");
+    const [first] = start.plan.days[0];
+    const plan = { ...start.plan, same: false, days: [[first], [{ ...first, photo: "foto-s-1" }], [first]] };
+    expect(distinctSteps(plan).map((step) => step.photo)).toEqual([undefined, "foto-s-1"]);
   });
 
   test("another Zeitraum in the wizard keeps the photo and its place", () => {

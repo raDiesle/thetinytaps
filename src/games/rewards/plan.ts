@@ -19,6 +19,8 @@ export interface PlanStep {
   label?: string;
   /** The catalogue task or activity it came from. */
   catalog?: string;
+  /** Key of the grown-up's own photo of it in `photoStore` (T-13), shown in place of its picture or emoji. */
+  photo?: string;
   /** Its game ticks it by itself (Zähne putzen, Aufs Töpfchen). */
   linked?: LinkedGame;
   /** The time of day of a linked step: only a brushing in the morning ticks a morning routine's teeth. */
@@ -589,14 +591,15 @@ export function withSame(plan: Plan, same: boolean, weekdayIndex: number): Plan 
 
 /**
  * Every different card of a plan, for the page of cards to cut out: once each – or as often as one day has it, as
- * „Mein Tag“ has the teeth card in the morning and the evening, both on the board at once.
+ * „Mein Tag“ has the teeth card in the morning and the evening, both on the board at once. A card with an own photo
+ * (T-13) is another card than the same one without.
  */
 export function distinctSteps(plan: Plan): PlanStep[] {
   const kept = new Map<string, number>();
   return plan.days.flatMap((day) => {
     const inDay = new Map<string, number>();
     return day.filter((step) => {
-      const key = `${step.emoji}|${step.label ?? step.catalog ?? ""}`;
+      const key = `${step.emoji}|${step.photo ?? ""}|${step.label ?? step.catalog ?? ""}`;
       const n = (inDay.get(key) ?? 0) + 1;
       inDay.set(key, n);
       if (n <= (kept.get(key) ?? 0)) return false;

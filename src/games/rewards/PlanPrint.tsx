@@ -3,6 +3,7 @@ import { Choice, SettingsGroup, Toggle } from "@/components/SettingControls";
 import { type Localized, useT } from "@/lib/language";
 import { NO_LINKED } from "./board";
 import { NOW_WAYS, THEME_BY_ID, THEMES } from "./catalog";
+import { usePhotoUrls } from "./ChildPhoto";
 import { counting, dayPartsOf, distinctSteps, partIn, type Plan, stepsOn } from "./plan";
 import { PlanSheet, type PlanLook, useStepLabel } from "./PlanSheet";
 import { MIN_CARD_MM, type PhotoFormat } from "./photo";
@@ -131,6 +132,8 @@ export function PlanPrint({
 }) {
   const t = useT();
   const label = useStepLabel();
+  // The cards' own photos (T-13), read from this device for the photo prints' canvas.
+  const photos = usePhotoUrls(distinctSteps(shown).flatMap((step) => (step.photo ? [step.photo] : [])));
   const offered = printsCards(shown) !== "never";
   const way = planWay(shown, options);
   // Fixed: the plan printed with every card on its sheet, whatever it shows on screen.
@@ -199,7 +202,10 @@ export function PlanPrint({
             ar: "كل صورة في الخطة مرة واحدة، من كل الأيام، كبطاقة للوحة فيلكرو.",
             ru: "Каждая картинка плана по одному разу, со всех дней, – карточкой для доски на липучках.",
           })}
-          cards={distinctSteps(plan).map((step) => ({ emoji: step.emoji, picture: itemPicture(step, "task"), label: label(step) }))}
+          cards={distinctSteps(plan).map((step) => {
+            const own = step.photo ? photos.get(step.photo) : undefined;
+            return { emoji: step.emoji, picture: own ?? itemPicture(step, "task"), ...(own ? { photo: true } : {}), label: label(step) };
+          })}
           min={MIN_CARD_MM}
           theme={theme}
           name={t({

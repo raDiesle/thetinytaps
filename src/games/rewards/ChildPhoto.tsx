@@ -15,6 +15,17 @@ export const PHOTO_NAME: Texts = {
   ru: "Фото ребёнка",
 };
 
+/** „Das Foto bleibt auf diesem Gerät …“: said wherever a photo is chosen – the child's and a card's own (T-13). */
+export const PHOTO_STAYS: Texts = {
+  en: "The photo stays on this device and is never sent.",
+  de: "Das Foto bleibt auf diesem Gerät und wird nie verschickt.",
+  zh: "照片只保存在本设备上，绝不会发送出去。",
+  hi: "फ़ोटो इसी डिवाइस पर रहती है और कभी भेजी नहीं जाती।",
+  es: "La foto se queda en este dispositivo y nunca se envía.",
+  ar: "تبقى الصورة على هذا الجهاز ولا تُرسَل أبدًا.",
+  ru: "Фото остаётся на этом устройстве и никуда не отправляется.",
+};
+
 /** The names of the places, in the photo's window. */
 export const PHOTO_PLACE_NAMES: Record<PhotoPlace, Texts> = {
   "top-left": { en: "Top left", de: "Oben links", zh: "左上角", hi: "ऊपर बाईं ओर", es: "Arriba a la izquierda", ar: "أعلى اليسار", ru: "Вверху слева" },
@@ -43,6 +54,26 @@ export function usePhotoUrl(key: string | undefined): string | null | undefined 
   }, [key]);
   if (!key) return null;
   return url?.key === key ? url.url : undefined;
+}
+
+/**
+ * The object URLs of several photos, by key, once read (T-13: the own photos of a plan's cards for its photo prints,
+ * which a canvas draws from a URL); a key not (yet) read is missing.
+ */
+export function usePhotoUrls(keys: readonly string[]): ReadonlyMap<string, string> {
+  const [urls, setUrls] = useState<ReadonlyMap<string, string>>(() => new Map());
+  const wanted = [...new Set(keys)].sort().join(" ");
+  useEffect(() => {
+    let on = true;
+    const list = wanted ? wanted.split(" ") : [];
+    Promise.all(list.map(async (key) => [key, await photoUrl(key)] as const)).then(
+      (found) => on && setUrls(new Map(found.flatMap(([key, url]) => (url ? [[key, url] as const] : [])))),
+    );
+    return () => {
+      on = false;
+    };
+  }, [wanted]);
+  return urls;
 }
 
 /** Whether a sheet's head lays out a photo in a corner: the photo is there (or still being read). */

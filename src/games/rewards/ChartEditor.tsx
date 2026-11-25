@@ -33,7 +33,7 @@ import {
 } from "./board";
 import { BoardSheet, SCREEN_LOOK, useRewardLabel, useTaskLabel } from "./BoardSheet";
 import { type ChartPhoto, DEFAULT_PHOTO_PLACE, newPhotoKey, PHOTO_PLACES, photoPlaceOf } from "./chartPhoto";
-import { PHOTO_NAME, PHOTO_PLACE_NAMES, PhotoPlacePic } from "./ChildPhoto";
+import { PHOTO_NAME, PHOTO_PLACE_NAMES, PHOTO_STAYS, PhotoPlacePic } from "./ChildPhoto";
 import { putPhoto, shrinkPhoto } from "./photoStore";
 import {
   ACTIVITIES,
@@ -318,8 +318,15 @@ export function ChartEditor({
   const filePicker = useRef<HTMLInputElement>(null);
   const latest = useRef(draft);
   latest.current = draft;
-  const pickPhoto = () => filePicker.current?.click();
+  // Where the next photo chosen goes: the child's (null), or a card's or task's own (T-13), set as its window asks.
+  const photoFor = useRef<((draft: Draft, key: string) => Draft) | null>(null);
+  const pickPhoto = (target: ((draft: Draft, key: string) => Draft) | null = null) => {
+    photoFor.current = target;
+    filePicker.current?.click();
+  };
   const takePhoto = async (file: File | undefined) => {
+    const target = photoFor.current;
+    photoFor.current = null;
     if (!file) return;
     const made = await shrinkPhoto(file);
     const key = newPhotoKey();
@@ -338,6 +345,7 @@ export function ChartEditor({
       return;
     }
     const now = latest.current;
+    if (target) return onChange(target(now, key));
     onChange(withChartPhoto(now, { key, place: chartOf(now).photo?.place ?? DEFAULT_PHOTO_PLACE, ratio: Math.round(made.ratio * 1000) / 1000 }));
   };
 
@@ -851,7 +859,18 @@ export function ChartEditor({
       )}
 
       {editing && plan && editing.what === "card" && (
-        <CardDialog plan={plan} cellKey={editing.key} every={editing.every} onChange={setPlan} onClose={() => setEditing(null)} />
+        <CardDialog
+          plan={plan}
+          cellKey={editing.key}
+          every={editing.every}
+          onChange={setPlan}
+          onOwnPhoto={() => {
+            const { key: cell, every: all = false } = editing;
+            setEditing(null);
+            pickPhoto((now, key) => (now.type === "plan" ? { type: "plan", plan: withCardPhoto(now.plan, cell, all, key) } : now));
+          }}
+          onClose={() => setEditing(null)}
+        />
       )}
       {editing && plan && editing.what === "add" && (
         <AddDialog
@@ -899,6 +918,10 @@ export function ChartEditor({
           board={draft.board}
           taskId={editing.what === "task" ? editing.id : undefined}
           onChange={(board) => onChange({ type: "board", board })}
+          onOwnPhoto={(id) => {
+            setEditing(null);
+            pickPhoto((now, key) => (now.type === "board" ? { type: "board", board: withTaskPhoto(now.board, id, key) } : now));
+          }}
           onClose={() => setEditing(null)}
         />
       )}
@@ -1137,6 +1160,94 @@ function withDay(plan: Plan, day: Date, steps: PlanStep[]): Plan {
   return withSteps(own, weekday(day), steps);
 }
 
+/** A plan's card with the grown-up's own photo (T-13), or without it again: on the day tapped, or with `every` on every day. */
+function withCardPhoto(plan: Plan, cell: string, every: boolean, photo: string | undefined): Plan {
+  const { day, taskId } = parseCellKey(cell);
+  const set = (list: PlanStep[]) => list.map((s) => (s.id === taskId ? { ...s, photo } : s));
+  return every ? withEveryDay(plan, set) : withDay(plan, day, set(stepsOn(plan, day)));
+}
+
+/** A board's task with the grown-up's own photo (T-13), or without it again. */
+const withTaskPhoto = (board: Board, id: string, photo: string | undefined): Board => ({
+  ...board,
+  tasks: board.tasks.map((task) => (task.id === id ? { ...task, photo } : task)),
+});
+
+/** „Eigenes Foto“: the heading of a card's or task's own photo in its window (T-13). */
+const OWN_PHOTO: Localized = {
+  de: "Eigenes Foto",
+  en: "Your own photo",
+  zh: "自己的照片",
+  hi: "अपनी फ़ोटो",
+  es: "Foto propia",
+  ar: "صورتكم الخاصة",
+  ru: "Своё фото",
+};
+
+/**
+ * A card's or task's own photo (T-13): a photo of the child's own potty, toothbrush or Kita door, which a two-year-old
+ * knows best, in place of its picture – chosen on this device and kept only here, like the child's photo. Once there,
+ * a tap chooses another, and „Ohne Foto“ brings its picture back.
+ */
+function OwnPhotoPicks({
+  item,
+  onChoose,
+  onRemove,
+}: {
+  item: { emoji: string; catalog?: string; photo?: string };
+  onChoose: () => void;
+  onRemove: () => void;
+}) {
+  const t = useT();
+  return (
+    <>
+      <h4 className="rw-edit-sub">{t(OWN_PHOTO)}</h4>
+      <div className="rw-picks rw-picks-tiles rw-own-photo" role="group" aria-label={t(OWN_PHOTO)}>
+        <Pick
+          selected={!!item.photo}
+          onClick={onChoose}
+          emoji={item.photo ? <ItemPic item={item} /> : <CameraSign />}
+          label={
+            item.photo
+              ? t({ de: "Anderes Foto", en: "Another photo", zh: "换一张照片", hi: "दूसरी फ़ोटो", es: "Otra foto", ar: "صورة أخرى", ru: "Другое фото" })
+              : t({ de: "Foto wählen", en: "Choose a photo", zh: "选择照片", hi: "फ़ोटो चुनें", es: "Elegir una foto", ar: "اختاروا صورة", ru: "Выбрать фото" })
+          }
+        />
+        {item.photo && (
+          <Pick
+            selected={false}
+            onClick={onRemove}
+            emoji={<ItemPic item={{ ...item, photo: undefined }} />}
+            label={t({ de: "Ohne Foto", en: "Without photo", zh: "不用照片", hi: "बिना फ़ोटो", es: "Sin foto", ar: "بدون صورة", ru: "Без фото" })}
+          />
+        )}
+      </div>
+      <p className="rw-portrait-note rw-own-photo-note">
+        {t({
+          de: "Ein Foto vom eigenen Töpfchen, der eigenen Zahnbürste oder der Kita-Tür erkennt Ihr Kind am besten.",
+          en: "Your child knows a photo of their own potty, toothbrush or nursery door best.",
+          zh: "孩子最认得自己的便盆、牙刷或幼儿园大门的照片。",
+          hi: "अपने पॉटी, अपने टूथब्रश या क्रेश के दरवाज़े की फ़ोटो आपका बच्चा सबसे अच्छी तरह पहचानता है।",
+          es: "Lo que mejor reconoce su peque es una foto de su propio orinal, su cepillo de dientes o la puerta de la guardería.",
+          ar: "يتعرّف طفلكم أفضل ما يكون على صورة نونيّته أو فرشاة أسنانه أو باب حضانته.",
+          ru: "Лучше всего ребёнок узнаёт фото своего горшка, своей зубной щётки или двери детского сада.",
+        })}{" "}
+        {t(PHOTO_STAYS)}
+      </p>
+    </>
+  );
+}
+
+/** A small drawn camera for „Foto wählen“, in the line of the child's photo's pale place. */
+function CameraSign() {
+  return (
+    <svg className="rw-camera-sign" viewBox="0 0 24 24" aria-hidden>
+      <path d="M3 8.5a2 2 0 0 1 2-2h2.4l1.5-2.2h6.2l1.5 2.2H19a2 2 0 0 1 2 2V18a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z" />
+      <circle cx="12" cy="13" r="3.8" />
+    </svg>
+  );
+}
+
 /** A card from the catalogue in a part of the day: a card a game ticks counts for that part's time. */
 const cardIn = (id: string, part: Slot | undefined, stars: number): PlanStep => {
   const step = stepFromCatalog(id, part);
@@ -1153,6 +1264,7 @@ function CardDialog({
   cellKey,
   every = false,
   onChange,
+  onOwnPhoto,
   onClose,
 }: {
   plan: Plan;
@@ -1160,6 +1272,8 @@ function CardDialog({
   /** Tapped at the head of a week's grid: the card of every day changes alike. */
   every?: boolean;
   onChange: (plan: Plan) => void;
+  /** Opens the file picker for the card's own photo (T-13). */
+  onOwnPhoto: () => void;
   onClose: () => void;
 }) {
   const t = useT();
@@ -1182,6 +1296,14 @@ function CardDialog({
       }
       onClose={onClose}
     >
+      <OwnPhotoPicks
+        item={step}
+        onChoose={onOwnPhoto}
+        onRemove={() => {
+          onChange(withCardPhoto(plan, cellKey, every, undefined));
+          onClose();
+        }}
+      />
       <h4 className="rw-edit-sub">
         {t({ de: "Tauschen gegen", en: "Swap for", zh: "换成", hi: "इससे बदलें", es: "Cambiar por", ar: "استبدال بـ", ru: "Заменить на" })}
       </h4>
@@ -1532,24 +1654,27 @@ function PhotoDialog({ draft, onChange, onReplace, onClose }: { draft: Draft; on
             ru: "Выбрать другое фото",
           })}
         </button>
-        <span className="rw-portrait-note">
-          {t({
-            en: "The photo stays on this device and is never sent.",
-            de: "Das Foto bleibt auf diesem Gerät und wird nie verschickt.",
-            zh: "照片只保存在本设备上，绝不会发送出去。",
-            hi: "फ़ोटो इसी डिवाइस पर रहती है और कभी भेजी नहीं जाती।",
-            es: "La foto se queda en este dispositivo y nunca se envía.",
-            ar: "تبقى الصورة على هذا الجهاز ولا تُرسَل أبدًا.",
-            ru: "Фото остаётся на этом устройстве и никуда не отправляется.",
-          })}
-        </span>
+        <span className="rw-portrait-note">{t(PHOTO_STAYS)}</span>
       </div>
     </EditDialog>
   );
 }
 
 /** A board's task tapped (or ＋): swapped for another, or a new one – its times of day and 🗑️ are on the sheet (`EditTasks`). */
-function TaskDialog({ board, taskId, onChange, onClose }: { board: Board; taskId?: string; onChange: (board: Board) => void; onClose: () => void }) {
+function TaskDialog({
+  board,
+  taskId,
+  onChange,
+  onOwnPhoto,
+  onClose,
+}: {
+  board: Board;
+  taskId?: string;
+  onChange: (board: Board) => void;
+  /** Opens the file picker for the task's own photo (T-13). */
+  onOwnPhoto: (id: string) => void;
+  onClose: () => void;
+}) {
   const t = useT();
   const taskLabel = useTaskLabel();
   const task = board.tasks.find((own) => own.id === taskId);
@@ -1580,6 +1705,16 @@ function TaskDialog({ board, taskId, onChange, onClose }: { board: Board; taskId
       }
       onClose={onClose}
     >
+      {task && (
+        <OwnPhotoPicks
+          item={task}
+          onChoose={() => onOwnPhoto(task.id)}
+          onRemove={() => {
+            onChange(withTaskPhoto(board, task.id, undefined));
+            onClose();
+          }}
+        />
+      )}
       {task && (
         <h4 className="rw-edit-sub">
           {t({ de: "Tauschen gegen", en: "Swap for", zh: "换成", hi: "इससे बदलें", es: "Cambiar por", ar: "استبدال بـ", ru: "Заменить на" })}

@@ -17,6 +17,11 @@ export interface BoardTask {
   label?: string;
   /** The catalogue task it came from, for its label and picture. */
   catalog?: string;
+  /**
+   * Key of the grown-up's own photo of it in `photoStore` (T-13: their own potty, toothbrush, Kita door), shown in place
+   * of its picture or emoji – on screen and on paper. Never the picture itself: that stays in IndexedDB on this device.
+   */
+  photo?: string;
   /** Its game puts the star on the board by itself (week and day boards only). */
   linked?: LinkedGame;
   /** A field for each of these times of day (brushing in the morning and the evening); none: one field a day. */

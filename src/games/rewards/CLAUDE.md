@@ -92,6 +92,20 @@ deleting a chart, 🗑️ on the photo or „Abbrechen“ in the wizard deletes 
 (`draftInSpan`). The Datenschutzerklärung names it (IndexedDB, `tracking.test.ts`). Its classes are `rw-portrait*`:
 `rw-photo*` belongs to the photo prints (`PhotoPrint`).
 
+**An own photo for a task or card** (T-13: the child's own potty, toothbrush or Kita door, which a two-year-old knows
+best): the window a card of a plan or a task of a board opens (a tap or its ⚙️) starts with „Eigenes Foto“ –
+„Foto wählen“ (a drawn camera, `CameraSign`) opens the same file picker as the child's photo, and once there „Anderes
+Foto“ and „Ohne Foto“, which brings the picture back (`OwnPhotoPicks`, `withCardPhoto`, `withTaskPhoto`). The file
+picker knows where a photo goes by `photoFor` in `ChartEditor` (null: the child's). The card keeps its name, stars and
+place; only its key is new on it (`PlanStep.photo`, `BoardTask.photo`, a key in the same store, read by the same
+`photoStore`). `ItemPic` draws it wherever the picture stood – screen, A4, cut-out cards, poster, Urkunde – as a square
+cut of its middle with soft corners (`.rw-item-photo`, grey on a grey print), its place empty while it is read and the
+picture or emoji where it is not on this device; the photo prints draw it on their canvas the same way
+(`PhotoCard.photo`, `usePhotoUrls` in `PlanPrint`). Swapping the card, „Ohne Foto“ or an emoji typed under „Weitere
+Einstellungen“ takes it off, and `photoKeysOf` keeps every task's and card's photo when the store is cleaned – a new
+place that can hold a photo key joins it there, or its photo is deleted at the next visit (`chartPhoto.test.ts`). Only
+tasks and cards have one: not the reward nor the Countdown's big day (the idea names tasks).
+
 The page is one tall page of the book that carries everything and scrolls with it (user feedback,
 November 2026): `<Sky />` lies in the page's box (`position: absolute`), not fixed to the window, the text for search
 engines is on it too, and the content keeps inside its paper margin. The wizard is printed on the page, no card laid on

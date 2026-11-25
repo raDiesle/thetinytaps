@@ -118,6 +118,9 @@ export const rewardChartIdeas: IdeaArea = {
       title: "Eigenes Foto als Aufgabenbild",
       text: "Ein Foto vom eigenen Töpfchen, der eigenen Zahnbürste oder Kita-Tür als Bild einer Aufgabe – erkennt ein Zweijähriger am besten. Bleibt nur auf dem Gerät (IndexedDB), auch im Ausdruck.",
       effort: "M",
+      done: true,
+      partial:
+        "Gebaut (25. November 2026): Im Fenster jeder Karte des Plans und jeder Aufgabe der Tafel (Tippen oder ⚙️) steht oben „Eigenes Foto“ – „Foto wählen“ öffnet die Dateiauswahl (auf dem Handy auch die Kamera), danach „Anderes Foto“ und „Ohne Foto“, das das Bild zurückbringt. Das Foto steht als quadratischer Ausschnitt an der Stelle des Bildes: auf dem Bildschirm, im A4-Druck (im Graudruck grau), auf den Ausschneidekarten, dem Fotoabzug der Karten, dem Poster und der Urkunde. Gespeichert wie das Foto des Kindes: verkleinert, ohne Ortsangaben, nur in der IndexedDB; gelöscht mit „Ohne Foto“, dem Tausch der Karte, einem selbst getippten Emoji oder der Tafel. Datenschutzerklärung und Suchtexte in allen sieben Sprachen ergänzt. Bewusst weggelassen: ein Foto für die Belohnung und den großen Tag des Countdowns (die Idee nennt Aufgaben).",
     },
     {
       id: "T-14",

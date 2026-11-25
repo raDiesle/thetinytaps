@@ -173,10 +173,11 @@ export function PrivacyPage() {
           die Spiele auch ohne Internet laufen, legt die Seite eine Kopie ihrer Dateien in den Speicher des Browsers (Service Worker).
         </p>
         <p>
-          Wenn Sie ein Foto Ihres Kindes auf die Belohnungstafel oder den Tagesplan legen, wird es schon im Browser verkleinert und neu gespeichert, wobei
-          Angaben wie Aufnahmeort und Kamera aus der Datei fallen, und dann nur in der Datenbank Ihres Browsers auf diesem Gerät abgelegt (IndexedDB). Das Foto
-          wird nie gesendet – nicht an uns, nicht an die Statistik und an niemanden sonst. Es wird gelöscht, wenn Sie es auf der Tafel wegnehmen (🗑️) oder die
-          Tafel löschen.
+          Wenn Sie ein Foto Ihres Kindes auf die Belohnungstafel oder den Tagesplan legen, oder ein eigenes Foto als Bild einer Aufgabe oder Karte (etwa vom
+          Töpfchen oder der Zahnbürste), wird es schon im Browser verkleinert und neu gespeichert, wobei Angaben wie Aufnahmeort und Kamera aus der Datei
+          fallen, und dann nur in der Datenbank Ihres Browsers auf diesem Gerät abgelegt (IndexedDB). Das Foto wird nie gesendet – nicht an uns, nicht an die
+          Statistik und an niemanden sonst. Es wird gelöscht, wenn Sie es auf der Tafel wegnehmen (🗑️ oder „Ohne Foto“), die Karte tauschen oder die Tafel
+          löschen.
         </p>
         <p>
           Das alles bleibt auf Ihrem Gerät und wird nicht an uns oder andere übertragen. Sie können es jederzeit löschen, indem Sie in Ihrem Browser die

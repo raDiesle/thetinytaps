@@ -58,6 +58,27 @@ export const PHOTO_KEY = /^foto-[a-z0-9]+-[a-z0-9]+$/;
 /** A new key for a photo just chosen: each upload its own, so ↶ after a replaced photo brings the old one back. */
 export const newPhotoKey = (): string => `foto-${Date.now().toString(36)}-${Math.random().toString(36).slice(2, 10) || "0"}`;
 
-/** The keys of the photos on these charts – everything else in the store belongs to nothing and is deleted. */
-export const photoKeysOf = (charts: readonly { photo?: ChartPhoto }[]): Set<string> =>
-  new Set(charts.flatMap((chart) => (chart.photo?.key ? [chart.photo.key] : [])));
+/** A chart as far as its photos go: the child's, and the own photos of a board's tasks or a plan's cards (T-13). */
+interface WithPhotos {
+  photo?: ChartPhoto;
+  tasks?: readonly { photo?: string }[];
+  /** A plan's cards day by day; a board's `days` are weekday numbers and hold none. */
+  days?: readonly unknown[];
+}
+
+/** The own photo's key of a plan's card, if it has one. */
+const stepPhoto = (step: unknown): string[] =>
+  step && typeof step === "object" && "photo" in step && typeof step.photo === "string" && step.photo ? [step.photo] : [];
+
+/**
+ * The keys of the photos on these charts – the child's and every task's or card's own – everything else in the store
+ * belongs to nothing and is deleted.
+ */
+export const photoKeysOf = (charts: readonly WithPhotos[]): Set<string> =>
+  new Set(
+    charts.flatMap((chart) => [
+      ...(chart.photo?.key ? [chart.photo.key] : []),
+      ...(chart.tasks ?? []).flatMap((task) => (task.photo ? [task.photo] : [])),
+      ...(chart.days ?? []).flatMap((day) => (Array.isArray(day) ? day.flatMap(stepPhoto) : [])),
+    ]),
+  );

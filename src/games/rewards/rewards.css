@@ -1347,6 +1347,17 @@
   margin: -0.4em 0;
 }
 
+/* A grown-up's own photo of a task or card (T-13): a square cut of its middle with soft corners, where the picture
+   stood – grey on a black-and-white print, like the child's photo. */
+.rw-pic.rw-item-photo {
+  object-fit: cover;
+  border-radius: 14%;
+}
+
+.rw-grey .rw-item-photo {
+  filter: grayscale(1);
+}
+
 /* The strip of pictures along the top of a colour print, from edge to edge over the sheet's padding. */
 .rw-strip {
   flex: none;
@@ -1564,6 +1575,27 @@
   width: 2.1em;
   height: 1.6em;
   color: var(--ink, #222);
+}
+
+/* A card's or task's own photo in its window (T-13): a drawn camera to choose one, then the photo itself. */
+.rw-camera-sign {
+  display: block;
+  width: 1.3em;
+  height: 1.3em;
+  fill: none;
+  stroke: var(--ink, #222);
+  stroke-width: 1.7;
+  stroke-linecap: round;
+  stroke-linejoin: round;
+}
+
+.rw-own-photo .rw-pic {
+  width: 1.3em;
+  height: 1.3em;
+}
+
+.rw-own-photo-note {
+  margin: 0.4em 0 0;
 }
 
 .rw-portrait-row {
