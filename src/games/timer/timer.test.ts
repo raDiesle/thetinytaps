@@ -121,7 +121,6 @@ import {
 } from "./scenes";
 import { FIRST_TURN, heldMarbles, turnChildren } from "./SwapPlay";
 import { CUP_W, CUP_XS, MARBLE_COLORS, MARBLE_R, marblePlan, RAMPS, REST_Y } from "./marbleRun";
-import { PLANK_BOX, SAW, SAW_GROUND, SAW_TILT, SEAT_CUSHION_W, TYRE_TOP, TYRE_X, WALKER } from "./seesaw";
 import { LAMP, SWAP_FLOOR, SWAP_SEATS, TOY } from "./swap";
 import { DEFAULT_TIMER_SETTINGS, TIMER_SECONDS } from "./settings";
 import {
@@ -162,19 +161,20 @@ describe("Timer", () => {
       // The older pictures are named German first, a new one (Tidy Up) English first.
       expect(pick(p.name, firstLanguage(p.name)).trim()).not.toBe("");
     }
-    // The order the user asked for (November 2026): Rote Scheibe, Sanduhr, Kerze, Apfelbaum, Blume, Pizza, Wecker, and
-    // Abwechseln, the Wippe (H-109), the Kugelbahn (H-117) and the Rennstrecke last, in a group of their own. Tennis (H-71) stood there
-    // and was taken out (user request, 21 November 2026: poorly done).
-    expect(PICTURES.slice(0, 7).map((p) => p.id)).toEqual(["disc", "sand", "candle", "apple", "flower", "pizza", "clock"]);
-    expect(PICTURES.slice(-4).map((p) => p.id)).toEqual(["swap", "seesaw", "marblerun", "race"]);
+    // The order the user asked for (November 2026; Wecker and Apfelbaum, then Apfelbaum and Kerze swapped and Up to the
+    // Moon brought to the second row's start, 25 November 2026): Rote Scheibe, Sanduhr, Apfelbaum, Wecker, Blume, Pizza,
+    // Kerze, Tidy Up, Up to the Moon, and Abwechseln, the Kugelbahn (H-117) and the Rennstrecke last, in a group of their
+    // own. Tennis (H-71) and the Wippe (H-109) stood there and were taken out (user requests, 21 and 25 November 2026).
+    expect(PICTURES.slice(0, 9).map((p) => p.id)).toEqual(["disc", "sand", "apple", "clock", "flower", "pizza", "candle", "tidy", "jump"]);
+    expect(PICTURES.slice(-3).map((p) => p.id)).toEqual(["swap", "marblerun", "race"]);
     expect(PICTURES.map((p) => p.id as string)).not.toContain("tennis");
+    expect(PICTURES.map((p) => p.id as string)).not.toContain("seesaw");
     expect(DEFAULT_TIMER_SETTINGS.picture).toBe(PICTURES[0].id);
     // Taking turns runs without end, so „Weiter“ never leads into it.
     expect(TIMED_PICTURES.map((p) => p.id)).not.toContain("swap");
-    expect(TIMED_PICTURES.map((p) => p.id)).not.toContain("seesaw");
     expect(TIMED_PICTURES.map((p) => p.id)).not.toContain("marblerun");
     expect(TIMED_PICTURES.map((p) => p.id)).not.toContain("race");
-    expect(TIMED_PICTURES).toHaveLength(PICTURES.length - 4);
+    expect(TIMED_PICTURES).toHaveLength(PICTURES.length - 3);
     const seen = new Set<string>();
     let id = TIMED_PICTURES[0].id;
     for (let i = 0; i < TIMED_PICTURES.length; i++) {
@@ -184,7 +184,6 @@ describe("Timer", () => {
     expect(seen.size).toBe(TIMED_PICTURES.length);
     expect(id).toBe(TIMED_PICTURES[0].id);
     expect(nextPicture("swap")).toBe(TIMED_PICTURES[0].id);
-    expect(nextPicture("seesaw")).toBe(TIMED_PICTURES[0].id);
     expect(nextPicture("marblerun")).toBe(TIMED_PICTURES[0].id);
     expect(nextPicture("race")).toBe(TIMED_PICTURES[0].id);
   });
@@ -648,7 +647,7 @@ describe("Timer", () => {
   });
 
   // The perf scenarios tap each card by its tooltip, which follows the app language (German while measuring): Tidy Up's
-  // and the Wippe's still asked for „Tidy Up“ and „Seesaw“ after their names were translated, and measured nothing.
+  // and the Wippe's (taken out since) still asked for „Tidy Up“ and „Seesaw“ after their names were translated, and measured nothing.
   test("every timer card a perf scenario taps is named so in German, and every timed picture has its scenario", () => {
     const german = PICTURES.map((p) => pick(p.name, "de"));
     const tapped = SCENARIOS.filter((s) => s.path.startsWith("/timer/")).flatMap((s) =>
@@ -1356,37 +1355,6 @@ describe("Timer", () => {
     expect(TOY.onCushion - TOY.h).toBeGreaterThanOrEqual(80);
   });
 
-  // H-109: the seesaw is the time – a seat sinks the whole turn long until it lies on its tyre, as the chick walks over to
-  // it, then the other child's seat, up high, sinks. It must touch down for real, stay fair, tip far (user request,
-  // 21 November 2026: a bigger board, a plainer motion) and be seen whole on a phone on its side.
-  test("Wippe: the seat touches down on its tyre, both seats the same either side, and everything stays on the screen (H-109)", () => {
-    const rad = (SAW_TILT * Math.PI) / 180;
-    // Tipped, the plank's underside under the low seat lies exactly on the tyre's top, and the tyres lie under the seats.
-    expect(SAW.y + SAW.thick / 2 + SAW.seat * Math.sin(rad)).toBeCloseTo(TYRE_TOP);
-    expect(SAW.x - TYRE_X.fox).toBeCloseTo(TYRE_X.bear - SAW.x);
-    expect(TYRE_TOP).toBeLessThan(SAW_GROUND);
-    // A big board and a tilt a child sees from the sofa, and the plank's end never sinks into the ground.
-    expect(SAW_TILT).toBeGreaterThanOrEqual(22);
-    expect(SAW.thick).toBeGreaterThanOrEqual(40);
-    expect(SAW.y + SAW.thick / 2 + SAW.half * Math.sin(rad)).toBeLessThan(SAW_GROUND);
-    // Fair: the pivot in the middle of the stage, both seats as far from it.
-    expect(SAW.x as number).toBe(STAGE_W / 2);
-    // Level (at the end) the cushions stay within the screen's safe part.
-    expect(SAW.x - SAW.seat - SEAT_CUSHION_W / 2).toBeGreaterThanOrEqual(200);
-    expect(SAW.x + SAW.seat + SEAT_CUSHION_W / 2).toBeLessThanOrEqual(RIGHT_EDGE);
-    // The chick walks between the cushions, never into them, and the cushion up high (its ears) and the chick at the
-    // high end stay below the top.
-    expect(WALKER.reach + WALKER.w / 2).toBeLessThanOrEqual(SAW.seat - SEAT_CUSHION_W / 2);
-    const plankTop = SAW.y - SAW.thick / 2;
-    expect(plankTop - WALKER.h - WALKER.reach * Math.sin(rad)).toBeGreaterThanOrEqual(80);
-    expect(plankTop - 114 - SAW.seat * Math.sin(rad)).toBeGreaterThanOrEqual(80);
-    // The chick walks far each turn, so its way is seen even on a long one.
-    expect(WALKER.reach * 2).toBeGreaterThanOrEqual(500);
-    // The plank turns round the pivot in the middle of its layer.
-    expect(PLANK_BOX.x + PLANK_BOX.w / 2).toBe(SAW.x as number);
-    expect(PLANK_BOX.y + PLANK_BOX.h / 2).toBe(SAW.y as number);
-  });
-
   // November 2026: below the head, the row of lengths left a phone on its side too little room for the twelve cards, and
   // the Abwechseln group fell below the screen. In the head it stands beside the ribbon, in room taken anyway.
   test("the row of lengths stands in the menu's head, so every card fits on a phone on its side", async () => {
@@ -1403,7 +1371,7 @@ describe("Timer", () => {
 
   // User feedback, 21 November 2026: no start sequence drawing a side at random – the fox child begins at once, shown
   // from the first second, and a grown-up gives the other child the first turn behind ⚙️.
-  test("Abwechseln and the Wippe start with the fox child's turn, never with a draw", async () => {
+  test("Abwechseln starts with the fox child's turn, never with a draw", async () => {
     expect(FIRST_TURN).toBe("fox");
     const play = await Bun.file("src/games/timer/SwapPlay.tsx").text();
     expect(play).not.toMatch(/Math\.random|DRAW_STEPS|WHO_BEGINS/);
@@ -1633,7 +1601,7 @@ describe("the bar along the bottom and the last moments", () => {
         expect(/<Draw w=\{STAGE_W\} h=\{STAGE_H\} bleed>|<Bleed>/.test(next), `${file}: backdrop without bleed`).toBe(true);
       }
     }
-    expect(backdrops).toBeGreaterThanOrEqual(18);
+    expect(backdrops).toBeGreaterThanOrEqual(17);
   });
 
   // User feedback, November 2026: one puff from the middle every second looked the same for an hour.

@@ -45,10 +45,13 @@ const SHADE = { fox: HOURGLASS_BOX.x, bear: HOURGLASS_BOX.x + HOURGLASS_BOX.w } 
 
 /**
  * A child's floor cushion, round and soft, in the fox's or the bear's colours with that animal's ears sewn on (pointed
- * or round) – no face, so it stays a cushion and never a drawn animal standing by. Its bottom's middle at (`x`, `y`),
- * `w` wide: by default on the floor at the child's place (`SWAP_SEATS`); the Wippe puts it on its seats.
+ * or round) – no face, so it stays a cushion and never a drawn animal standing by – on the floor at the child's place
+ * (`SWAP_SEATS`).
  */
-export function Cushion({ kind, x = SWAP_SEATS[kind], y = SWAP_FLOOR + 6, w = SWAP_SEATS.w }: { kind: Holder; x?: number; y?: number; w?: number }) {
+function Cushion({ kind }: { kind: Holder }) {
+  const x = SWAP_SEATS[kind];
+  const y = SWAP_FLOOR + 6;
+  const w = SWAP_SEATS.w;
   const c = MASCOT_COLORS[kind];
   const k = w / 184;
   return (
@@ -155,12 +158,11 @@ export function SwapLight({ kind, on }: { kind: Holder; on: boolean }) {
 
 /**
  * The soft shade over one side of the room while it is the other child's turn (or the other lamp's, while they draw):
- * up to the hourglass's frame, or up to `edge` where the two sides meet (the Wippe: its middle).
+ * up to the hourglass's frame.
  */
-export function SwapShade({ kind, on, edge }: { kind: Holder; on: boolean; edge?: number }) {
-  const right = edge ?? SHADE.bear;
-  const x = kind === "fox" ? 0 : right;
-  const w = kind === "fox" ? (edge ?? SHADE.fox) : STAGE_W - right;
+export function SwapShade({ kind, on }: { kind: Holder; on: boolean }) {
+  const x = kind === "fox" ? 0 : SHADE.bear;
+  const w = kind === "fox" ? SHADE.fox : STAGE_W - SHADE.bear;
   return <Layer x={x} y={0} w={w} h={STAGE_H} className={`tm-swap-shade tm-swap-shade-${kind}${on ? " tm-on" : ""}`} />;
 }
 

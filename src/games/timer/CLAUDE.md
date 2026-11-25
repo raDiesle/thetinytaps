@@ -22,9 +22,9 @@ request, November 2026; the middle rather than the end, user feedback, November 
 `GameMode.art`): the very drawing of a run (`SceneParts`), cut as for 5 minutes and started half of it ago, every
 animation in it put at that moment and then stopped (`holdAt`, `.tm-card-art.tm-still`), so the menu stands still. The cards come as wide as
 the picture (`ART_ASPECT`). Names are only read out and their tooltip. They stand in the order the user chose (November
-2026, `PICTURES`): Rote Scheibe, Sanduhr, Kerze, Apfelbaum, Blume, Pizza, Wecker, then Tidy Up, Five Boxes, Block House, Treasure Tunnel, Up to the Moon and the others, the Marble Jar last, on one
+2026, `PICTURES`; last changed 25 November 2026): Rote Scheibe, Sanduhr, Apfelbaum, Wecker, Blume, Pizza, Kerze, then Tidy Up, Up to the Moon (first in the second row of eight), Five Boxes, Block House, Treasure Tunnel and the others, the Marble Jar last, on one
 frame with no name; after all of them Abwechseln is a category of its own, named on its frame (`GameMode.kind`): its two children
-with the toy, the lamps and the hourglass, then the Wippe, the Kugelbahn and the Rennstrecke, and that they run on without end is said in their tooltip (`SWAP_NOTE`). Where there is
+with the toy, the lamps and the hourglass, then the Kugelbahn and the Rennstrecke, and that they run on without end is said in their tooltip (`SWAP_NOTE`). Where there is
 room, its frame stands beside the pictures' rather than in a row of its own below (`packGroups`' `reserve`), so all
 cards still fit on one screen (with the Marble Jar's sixteenth picture and the Rennstrecke, the fourth way of taking
 turns, on a tablet and a 1280×800 screen only in eight columns of about 100 px, the group of turns in a line of its own
@@ -279,32 +279,13 @@ taken out (user request, November 2026). The pictures:
   `SWAP_TOYS`, kept as `toy`), „Wer ist dran?“ (starts that child's turn anew) and the time to the change. The turn is worked out from the clock (`turnAt`).
 - „Tennis“ 🎾 (H-71) stood beside Abwechseln from 7 November 2026 and was taken out on 21 November 2026 (user request:
   poorly done). Its id `tennis` is gone from `PICTURES`, so a kept choice falls back to the first picture.
-- „Wippe“ ⚖️ (H-109, `seesaw.tsx`, 21 November 2026, chosen as the best of H-108 to H-117; reworked the same day after
-  feedback): Abwechseln on a seesaw, in its group after the hourglass, run by the same `SwapRun` (the fox child first,
-  turns from the clock, „Wer ist dran?“, the same voice lines) – without a toy (a Bobbycar riding on the seat looked odd,
-  so its toy choice is hidden there). The seesaw is the time: the seat of the child whose turn it is starts up high and
-  sinks evenly the whole turn long until its underside lies on a tyre half buried under it (`SAW_TILT` worked out from
-  `TYRE_TOP`), then the other seat, now up high, sinks – so the waiting child sees its own seat rise towards its turn.
-  What tips it is a yellow chick walking along the plank (`Chick`, `WALKER`): from beside the low seat over to the high
-  one, as long as the turn, its weight carrying the plank evenly with it; when the seat touches down (a soft bump and a
-  chime) it turns round and walks back. Its legs swing and its body bobs at their own pace however long the turn is, so
-  a ten-minute turn still plainly moves. The plank is big and steep (`SAW`: thick, the seats as far apart as the
-  tablet's 4:3 cut allows, the pivot high, about 26° each way). The plank with its handles, the cushions on its seats
-  (the shared `Cushion`, no figures) and its hub is one HTML layer turning round the pivot (`PLANK_BOX`): one CSS
-  animation, `infinite alternate` with a turn each way, `alternate-reverse` when the bear child begins, its delay read
-  once as the turns start (a delay changed on a running animation moves it); the chick walks in it by a second animation
-  as long (`tm-saw-walk-*`), turns back the plank's turn round its feet (`tm-saw-back-*`, so it stays upright) and looks
-  the way it walks. Two names of the same keyframes (`tm-saw-a`/`-b`, by `round` and `wake`) start them anew when a
-  grown-up gives the turn and when the page comes back (`visibilitychange`: while hidden the animations' time can stand
-  still while the clock runs on – the sinking seat was then the waiting child's). Before the first turn the plank already
-  stands tipped for the fox child with the chick still beside the bear's seat; at the end it lies level, the chick in the
-  middle. Whose turn it is: warm sun over that half (`SeesawSun`), the other half in shade (`SwapShade` with `edge` at
-  the pivot). A tap lights the tyre the falling seat goes to (`SeesawGoal`). Its name („Seesaw“, „Wippe“) was written
-  English first and translated into every app language on 22 November 2026.
+- „Wippe“ ⚖️ (H-109) stood in the Abwechseln group from 21 November 2026 – a chick walking along a seesaw's plank, the
+  seat it walked to sinking the whole turn – and was taken out on 25 November 2026 (user request). Its id `seesaw` is
+  gone from `PICTURES`, so a kept choice falls back to the first picture.
 - „Kugelbahn“ 🎱 (H-117 with H-115, `marbleRun.tsx`, 24 November 2026; user request: „von Weitem klar ersichtlich,
   welches Kind gerade dran ist“, two to four children): the last in the Abwechseln group, run by the same `SwapRun`,
   which takes turns among `turnChildren` (`TURN_CHILDREN`: fox, bear, rabbit, frog, the first `kids` of them, set behind
-  ⚙️ „Wie viele Kinder?“, `settings.kids`; Abwechseln and the Wippe keep fox and bear). A wooden marble run hangs on the
+  ⚙️ „Wie viele Kinder?“, `settings.kids`; Abwechseln keeps fox and bear). A wooden marble run hangs on the
   playroom's wall: a jar of marbles at its top left, four zigzag ramps (`RUN`, `RAMPS`) with round end pieces, and a
   bottom rail running right to left over the children's cups (`CUP_XS`, `CUP_W` per count), a hole with a flap and a
   funnel over each. The marble is the time: the whole turn long one marble rolls down at an even pace into the cup of
@@ -366,7 +347,7 @@ Files: `TimerGame.tsx` (start screen: cards, minutes and the own time's slip), `
 run: working out its length, the question when a clock time is past, the clock, the phases `running` →
 `blow` (candle only) → `done`, taps, the end, the sounds of the pieces), `pieces.ts` (how a run is cut into pieces, the
 train's halts, where the apples hang; tested), `SwapPlay.tsx` and `swap.tsx` („Abwechseln“: its turns, and its room,
-lamps, cushions and toys), `seesaw.tsx` (the Wippe's playground, plank, stand and chick), `marbleRun.tsx` (the Kugelbahn's run, cups and marbles; `marbleNames.ts` its texts), `race.tsx` (the Rennstrecke's track, kart, start light and children; `raceNames.ts` its name), `apples.tsx`, `caterpillar.tsx`, `clock.tsx`, `disc.tsx`, `flower.tsx`, `sunset.tsx`, `pizza.tsx`, `tidy.tsx`, `boxes.tsx`, `blocks.tsx`, `tunnel.tsx`, `jump.tsx`, `jar.tsx` (one picture each, `jumpFox.tsx` its fox's poses; `tidyNames.ts`, `boxesNames.ts`, `blocksNames.ts`, `tunnelNames.ts`, `jumpNames.ts` and `jarNames.ts` their texts), `hop.tsx` (a toy hopping
+lamps, cushions and toys), `marbleRun.tsx` (the Kugelbahn's run, cups and marbles; `marbleNames.ts` its texts), `race.tsx` (the Rennstrecke's track, kart, start light and children; `raceNames.ts` its name), `apples.tsx`, `caterpillar.tsx`, `clock.tsx`, `disc.tsx`, `flower.tsx`, `sunset.tsx`, `pizza.tsx`, `tidy.tsx`, `boxes.tsx`, `blocks.tsx`, `tunnel.tsx`, `jump.tsx`, `jar.tsx` (one picture each, `jumpFox.tsx` its fox's poses; `tidyNames.ts`, `boxesNames.ts`, `blocksNames.ts`, `tunnelNames.ts`, `jumpNames.ts` and `jarNames.ts` their texts), `hop.tsx` (a toy hopping
 into its box, shared), `pause.tsx` (the run's clock, pause and start over), `keyframes.ts` (keyframes written for a run), `shown.tsx`
 („Zeit im Bild“: its choice, the note with digits or tally marks), `scenes.tsx` (the other drawings
 and the shared `Layer`, `Draw`, `LeftGlow`), `timer.css`, `content.ts`
@@ -415,7 +396,7 @@ and the shared `Layer`, `Draw`, `LeftGlow`), `timer.css`, `content.ts`
   watching. **Everything counts on the run's own clock** (`RunClock`,
   `usePausableClock`, `useRunClock`): the real clock less every pause, standing still while paused – the end, the
   pieces' sounds, the last notes, the caterpillar's bites, the alarm clock's digits, the note in the corner, the bar's
-  and the seesaw's delays, whose turn it is. CSS animations stand still under `.tm-paused` and go on in step with it.
+  whose turn it is. CSS animations stand still under `.tm-paused` and go on in step with it.
   A new picture or anything new worked out from the time reads `useRunClock().now()`, never `Date.now()`
   (`timer.test.ts` checks every file of a run). A clock time set („bis 17:30“) is no longer named behind ⚙️ once
   paused, since it ends later now. `.tm-play` is `overflow: clip`, never `hidden`: focusing the button at its foot
@@ -479,24 +460,24 @@ and the shared `Layer`, `Draw`, `LeftGlow`), `timer.css`, `content.ts`
   child, on the left, begins, and a grown-up changes it behind ⚙️ (user feedback, 21 November 2026: the lamps' draw at
   the start was not wanted; `timer.test.ts` checks). A new way to show a turn keeps that: a big change of the whole side,
   never a small sign.
-- **What runs slowly shows from afar that it moves, even on a long turn** (user feedback on the Wippe, 21 November
-  2026: at bigger numbers its slow tilt looked still): next to the slow motion that is the time, something moves at its
-  own steady pace (the chick's steps), and the slow motion itself is made as big as the picture allows (a big board,
+- **What runs slowly shows from afar that it moves, even on a long turn** (user feedback on the Wippe, taken out since,
+  21 November 2026: at bigger numbers its slow tilt looked still): next to the slow motion that is the time, something
+  moves at its own steady pace (the Wippe's chick's steps, the Kugelbahn's spinning marble), and the slow motion itself is made as big as the picture allows (a big board,
   a steep tilt) – evenly, never speeding up or jerking.
 - **A picture of taking turns plays out something toddlers know and do themselves** (user feedback, 21 November 2026:
   Tennis was poorly done and is taken out – a game two-year-olds hardly know, seen from the side so the ball's flight is a short arc in
   the middle, the players standing stiff, the ball hopping above the racket instead of lying on it, the time only a row
-  of lights): a new one (the Wippe, H-109, the Kugelbahn, H-117, and the Rennstrecke, H-150, do it; more ideas in H-108 to H-116) shows a scene from their own day (a
+  of lights): a new one (the Kugelbahn, H-117, and the Rennstrecke, H-150, do it; more ideas in H-108 to H-116) shows a scene from their own day (a
   seesaw, a swing, a ball rolled to each other), seen so the change crosses the whole picture, with what passes over
   really held or sat on, and the time in the very motion where it can be – and it thinks of the waiting child, who
   should see its turn coming. Whatever rides or walks on something that tips or turns stays upright (turned back the
-  same way, as the Wippe's chick), and nothing rides along only to be there (the Wippe's toy on the seat looked odd), and a picture of taking turns is added to `TurnPicture`, `isTurns` and `LEVEL_IDS`, after the
+  same way, as the Wippe's chick did), and nothing rides along only to be there (the Wippe's toy on the seat looked odd), and a picture of taking turns is added to `TurnPicture`, `isTurns` and `LEVEL_IDS`, after the
   others in the Abwechseln group.
 - **One drawing for one thing**: a thing two pictures show (the hourglass) is one component both use, never copied and
   drawn again with its own sizes (user request, November 2026; `timer.test.ts` checks the hourglass).
-- **The cards' order is the user's** (November 2026: Rote Scheibe, Sanduhr, Kerze, Apfelbaum, Blume, Pizza, then the
-  Wecker, then Tidy Up, Five Boxes, Block House, Treasure Tunnel and Up to the Moon, the Zug, Raupe and Sonnenaufgang, then
-  the Marble Jar; Abwechseln last): keep it when adding a picture (a new one goes after these, before Abwechseln, unless the
+- **The cards' order is the user's** (November 2026, last changed 25 November 2026: Rote Scheibe, Sanduhr, Apfelbaum,
+  Wecker, Blume, Pizza, Kerze, then Tidy Up, Up to the Moon, Five Boxes, Block House, Treasure Tunnel, the Zug, Raupe and
+  Sonnenaufgang, then the Marble Jar; Abwechseln, Kugelbahn and Rennstrecke last): keep it when adding a picture (a new one goes after these, before Abwechseln, unless the
   user says otherwise), and add it to the perf scenarios' list in `tools/perfScenarios.ts`, which taps each card by its
   name (`timer.test.ts` checks the order). Abwechseln is another thing to do than the pictures that run until the time
   is up – taking turns without end – so it stands in a group of its own after them (`GameMode.kind`, user request,

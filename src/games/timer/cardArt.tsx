@@ -2,7 +2,6 @@ import { memo, useLayoutEffect, useRef, useState } from "react";
 import { MARBLE_COLORS, MarbleScene } from "./marbleRun";
 import { RaceScene } from "./race";
 import { DEFAULT_TIMER_SETTINGS, type SwapToy, type TimerPicture, type TurnCount } from "./settings";
-import { SAW, Seesaw, SeesawBackdrop, SeesawStand, SeesawSun } from "./seesaw";
 import { SwapBackdrop, SwapCushions, SwapHourglass, SwapLight, SwapShade, TURN_CHILDREN, Toy } from "./swap";
 import { SceneParts, stageStyle } from "./TimerPlay";
 
@@ -17,15 +16,14 @@ const MIDDLE = 0.5;
 
 /**
  * Pictures whose middle shows little take another moment, as a share of the run: the Sonnenaufgang's moon has set at
- * the middle and its sun not yet risen, and the Wippe lies nearly level there, so its card shows the fox child's seat
- * still well up; the Block House's middle has a block just landed, so its card shows the next one carried by the beam;
+ * the middle and its sun not yet risen, so its card shows it later; the Block House's middle has a block just landed, so its card shows the next one carried by the beam;
  * Up to the Moon's middle is the lift in the skyscraper's side with sky round it, so its card shows the fox in the cable
  * car's basket between the treehouse and the skyscraper's window; the Marble Jar's middle has a marble just landed, so
  * its card shows the next one bouncing down the nails; the Kerze's middle has a candle just burnt down, so its card shows
  * the spark running along the fuse to the next one; the Rennstrecke's middle has the kart far off on the back loop, so
  * its card shows the fox child's kart crossing the bridge.
  */
-const LATER: Partial<Record<TimerPicture, number>> = { sunset: 0.68, seesaw: 0.25, blocks: 0.53, jump: 0.23, jar: 0.509, candle: 0.506, race: 0.82 };
+const LATER: Partial<Record<TimerPicture, number>> = { sunset: 0.68, blocks: 0.53, jump: 0.23, jar: 0.509, candle: 0.506, race: 0.82 };
 
 /**
  * Stops a card's drawing `at` ms into its run: every animation in it is put at that moment, its look there written into
@@ -52,8 +50,7 @@ function holdAt(card: HTMLElement | null, at: number) {
  * the picture is the button, no words on it; the middle rather than the end, user feedback, November 2026) – the tree
  * full of apples with the cart under them, the train halfway to the station, the leaf half eaten. It is the very drawing
  * of a run (`SceneParts`, started `MIDDLE` of it ago – `LATER` for a few), stopped at that moment by `holdAt`. „Abwechseln“ shows the fox
- * child's lamp on, the toy on its cushion and the hourglass half run; the Wippe the fox child's side in the sun, its seat
- * on its way down with the chick walking over to it; the Kugelbahn the fox child's strip lit, a marble in its cup and the
+ * child's lamp on, the toy on its cushion and the hourglass half run; the Kugelbahn the fox child's strip lit, a marble in its cup and the
  * next one halfway down the run to the bear child's cup, with as many cups as children set (`kids`, else three, so a
  * card standing alone shows it is for more than two).
  */
@@ -80,14 +77,6 @@ export const TimerCardArt = memo(function TimerCardArt({
           <SwapShade kind="bear" on />
           <SwapHourglass ms={CARD_MS} startedAt={startedAt + at} flip={false} waiting={false} glow={0} />
           <Toy toy={toy} place="fox" />
-        </span>
-      ) : picture === "seesaw" ? (
-        <span className="tm-stage">
-          <SeesawBackdrop />
-          <SeesawSun kind="fox" on />
-          <SwapShade kind="bear" on edge={SAW.x} />
-          <SeesawStand />
-          <Seesaw holder="fox" running first="fox" turnMs={CARD_MS} startedAt={startedAt + at} round={0} />
         </span>
       ) : picture === "race" ? (
         <span className="tm-stage">

@@ -316,7 +316,7 @@ export const TURN_TO: Record<TurnChild, Texts> = {
   ...MORE_TURN_TO,
 };
 
-/** Every line Abwechseln, the Wippe and the Kugelbahn can say, in the order they come. */
+/** Every line Abwechseln, the Kugelbahn and the Rennstrecke can say, in the order they come. */
 export const TURN_LINES: Texts[] = [WHO_BEGINS, ...Object.values(BEGINS), ...Object.values(TURN_TO)];
 
 /**

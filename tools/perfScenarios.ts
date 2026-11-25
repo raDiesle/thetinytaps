@@ -305,30 +305,29 @@ export const SCENARIOS: Scenario[] = [
   // The timer's pictures in their order on its start screen, each running for a while with a tap now and then (the
   // steam, the twinkling, the flame, what is left lighting up), the moon setting and the sun rising, the pizza's slices
   // lifted off, the ladybug crawling round the red disc, the alarm clock's digits ticking, the toy crane carrying toys
-  // into the box, the toys hopping into their five boxes, the crystal's beam carrying the blocks out of their jumble into the block house, the pickaxe digging the treasure tunnel block by block, the hopper climbing up to the moon catching its stars, the picture following it like a camera, in „Abwechseln“ the toy hopping onto the first cushion and the hourglass running, and on the Wippe the
-  // chick stepping along the plank as the seesaw tips slowly, on the Kugelbahn the marble rolling down its ramps, on the Rennstrecke the kart driving round the figure eight, and the marbles bouncing down the pegboard into the jar. Each card is tapped by its name (its
+  // into the box, the toys hopping into their five boxes, the crystal's beam carrying the blocks out of their jumble into the block house, the pickaxe digging the treasure tunnel block by block, the hopper climbing up to the moon catching its stars, the picture following it like a camera, in „Abwechseln“ the toy hopping onto the first cushion and the hourglass running,
+  // on the Kugelbahn the marble rolling down its ramps, on the Rennstrecke the kart driving round the figure eight, and the marbles bouncing down the pegboard into the jar. Each card is tapped by its name (its
   // tooltip), so the cards' order and groups may change.
   ...(
     [
       ["scheibe", "Rote Scheibe"],
       ["sanduhr", "Sanduhr"],
-      ["kerze", "Kerze"],
       ["apfelbaum", "Apfelbaum"],
+      ["wecker", "Wecker"],
       ["blume", "Blume"],
       ["pizza", "Pizza"],
-      ["wecker", "Wecker"],
+      ["kerze", "Kerze"],
       // Tidy Up and Five Boxes were written English first; the German app names their cards in German since they were translated.
       ["aufraeumen", "Aufräumen"],
+      ["mond", "Hoch bis zum Mond"],
       ["kisten", "Fünf Kisten"],
       ["kloetzchen", "Klötzchenhaus"],
       ["schatztunnel", "Schatztunnel"],
-      ["mond", "Hoch bis zum Mond"],
       ["zug", "Zug zum Bahnhof"],
       ["raupe", "Raupe"],
       ["sonne", "Sonnenaufgang"],
       ["kugelglas", "Kugelglas"],
       ["abwechseln", "Abwechseln"],
-      ["wippe", "Wippe"],
       ["kugelbahn", "Kugelbahn"],
       ["rennstrecke", "Rennstrecke"],
     ] as const
@@ -351,12 +350,6 @@ export const SCENARIOS: Scenario[] = [
         tap: { selector: ".tm-play", every: 1500 },
       },
     ],
-  },
-  // The Wippe with short turns: the chick walking over, the seat touching down, the chick turning round and the plank tipping back.
-  {
-    name: "timer-wippe-wechsel",
-    path: "/timer/?sekunden=5",
-    parts: [{ label: "Wechsel", before: [{ tap: `.mode-card[title^="Wippe"]` }, { wait: 500 }], ms: 10000, tap: { selector: ".tm-play", every: 1500 } }],
   },
   // The Kugelbahn with short turns: the marble rolling down the run, falling into the next cup, the strips of light changing.
   {

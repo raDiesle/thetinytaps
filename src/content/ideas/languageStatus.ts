@@ -71,11 +71,6 @@ export const LANGUAGE_STATUS: LanguageStatusRow[] = [
         note: "Name, Satz im Regal, die drei Bilder und „Wie lange?“ übersetzt am 3. November 2026, alles andere am 5. November 2026: der Zettel „Andere …“ mit seinem Blatt, die Frage nach einer schon vergangenen Uhrzeit, die Restzeit, die Namen der Bilder und bei „Abwechseln“ Spielzeug, „Wer ist dran?“ und „Bis zum Wechsel“. Am 10. November 2026 übersetzt, was noch fehlte: die Zeile auf der Karte „Abwechseln“ („Läuft ohne Ende, jeder ist mal dran“), hinter ⚙️ die Wahl „Zeit im Bild“ (Aus, Zahlen, Striche) und die Namen der Bilder „Sonnenaufgang“, „Wecker“ und „Tennis“.",
       },
       {
-        label: "⚖️ Wippe",
-        languages: { de: "done", en: "done", zh: "done", hi: "done", es: "done", ar: "done", ru: "done" },
-        note: "Das Bild „Wippe“ in der Gruppe Abwechseln (H-109, 21. November 2026): nur sein Name („Seesaw“, Tooltip und Vorlesen) ist neuer Text, englisch zuerst, am 22. November 2026 in alle anderen Sprachen übersetzt („Wippe“). Es sagt dieselben Sätze wie Abwechseln, die schon in allen Sprachen aufgenommen sind.",
-      },
-      {
         label: "🗣️ Stimme",
         languages: { de: "done", en: "done", zh: "done", hi: "done", es: "done", ar: "done", ru: "done" },
         recorded: true,
