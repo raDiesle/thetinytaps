@@ -7,7 +7,7 @@ import { CANVAS_BOX, CANVAS_MAX_DPR, type CanvasParams, canvasEffect } from "./s
 // and opacity; the canvas kinds are drawn in `surpriseCanvas.ts`.
 
 /** The kinds drawn here in SVG and CSS. */
-export const ART_KINDS = ["comet", "snowflake", "mandala", "splash", "pinwheel", "balls"] as const;
+export const ART_KINDS = ["comet", "snowflake", "mandala", "splash", "pinwheel", "ball"] as const;
 
 /** One kind drawn here. */
 export type ArtKind = (typeof ART_KINDS)[number];
@@ -30,7 +30,7 @@ export type ArtParams =
   | { kind: "mandala"; colors: string[]; rings: { count: number; shape: "petal" | "dot" | "diamond" | "drop"; turn: number }[] }
   | { kind: "splash"; color: string; second: string; blob: string; small: string; drops: { x: number; y: number; r: number }[] }
   | { kind: "pinwheel"; colors: string[]; blades: 4 | 6; spin: number }
-  | { kind: "balls"; balls: { x: number; drop: number; color: string; stripe: string; dots: boolean; turn: number; delay: number }[] };
+  | { kind: "ball"; drop: number; color: string; stripe: string; dots: boolean; turn: number };
 
 /** A smooth blob round (0, 0): radius about `r`, with `lobes` bulges of chance size. */
 function blobPath(r: number, lobes: number, spread: number): string {
@@ -104,20 +104,16 @@ export function artParams(kind: ArtKind): ArtParams {
     }
     case "pinwheel":
       return { kind, colors: shuffle(BRIGHT).slice(0, 3), blades: pick([4, 6] as const), spin: pick([1, -1]) * rand(720, 1080) };
-    case "balls": {
-      const count = pick([3, 4, 5]);
-      const colors = shuffle(BRIGHT);
+    case "ball": {
+      // One ball dropping onto the spot – never a row of them side by side (user feedback, 25 November 2026).
+      const [color, other] = shuffle(BRIGHT);
       return {
         kind,
-        balls: Array.from({ length: count }, (_, i) => ({
-          x: (i - (count - 1) / 2) * 0.24 + rand(-0.03, 0.03),
-          drop: rand(0.8, 1.1),
-          color: colors[i],
-          stripe: pick(["#ffffff", "#ffd23f", colors[(i + 3) % colors.length]]),
-          dots: Math.random() < 0.4,
-          turn: pick([-1, 1]) * rand(90, 270),
-          delay: i * rand(0.06, 0.09),
-        })),
+        drop: rand(0.55, 0.75),
+        color,
+        stripe: pick(["#ffffff", "#ffd23f", other]),
+        dots: Math.random() < 0.4,
+        turn: pick([-1, 1]) * rand(90, 270),
       };
     }
   }
@@ -142,8 +138,8 @@ export function ArtView({ s, size }: { s: ArtParams; size: number }) {
       return <Splash s={s} size={size} />;
     case "pinwheel":
       return <Pinwheel s={s} />;
-    case "balls":
-      return <Balls s={s} size={size} />;
+    case "ball":
+      return <Ball s={s} size={size} />;
   }
 }
 
@@ -247,9 +243,19 @@ function Snowflake({ s, size }: { s: Extract<ArtParams, { kind: "snowflake" }>; 
   );
 }
 
+/** The mandala's rings' radii, in its svg's units. */
+export const MANDALA_RADII = [14, 28, 41];
+/**
+ * Half the side of each ring's svg box: the outer ring's shapes reach past 50 (41 plus a petal of 1.5 × its size), and
+ * in a box of 100 their tips were cut off (user feedback, 25 November 2026; `surprises.test.ts`).
+ */
+export const MANDALA_VIEW = 60;
+/** A ring shape's size at radius `r`; it reaches 1.5 times that past `r`. */
+export const ringShapeSize = (r: number) => 3 + r * 0.16;
+
 /** One shape of a mandala's ring, pointing outwards from (0, -r). */
 function RingShape({ shape, r, color }: { shape: "petal" | "dot" | "diamond" | "drop"; r: number; color: string }) {
-  const s = 3 + r * 0.16;
+  const s = ringShapeSize(r);
   if (shape === "petal") return <ellipse cx="0" cy={-r} rx={s * 0.75} ry={s * 1.5} fill={color} stroke={LINE} strokeWidth="1.5" />;
   if (shape === "dot") return <circle cx="0" cy={-r} r={s * 0.9} fill={color} stroke={LINE} strokeWidth="1.5" />;
   if (shape === "diamond")
@@ -267,14 +273,14 @@ function RingShape({ shape, r, color }: { shape: "petal" | "dot" | "diamond" | "
 }
 
 function Mandala({ s }: { s: Extract<ArtParams, { kind: "mandala" }> }) {
-  const radii = [14, 28, 41];
+  const radii = MANDALA_RADII;
   return (
     <>
       {s.rings.map((ring, i) => (
         <svg
           key={i}
           className="ft-mandala-ring"
-          viewBox="-50 -50 100 100"
+          viewBox={`${-MANDALA_VIEW} ${-MANDALA_VIEW} ${MANDALA_VIEW * 2} ${MANDALA_VIEW * 2}`}
           role="presentation"
           style={vars({ "--turn": `${ring.turn}deg`, "--delay": `${i * 0.12}s` })}
         >
@@ -325,34 +331,23 @@ function Pinwheel({ s }: { s: Extract<ArtParams, { kind: "pinwheel" }> }) {
   );
 }
 
-function Balls({ s, size }: { s: Extract<ArtParams, { kind: "balls" }>; size: number }) {
+function Ball({ s, size }: { s: Extract<ArtParams, { kind: "ball" }>; size: number }) {
   return (
-    <>
-      {s.balls.map((b, i) => (
-        <div key={i} className="ft-ball-x" style={vars({ left: `${b.x * size}px` })}>
-          <svg
-            className="ft-ball"
-            viewBox="-50 -50 100 100"
-            role="presentation"
-            style={vars({ "--drop": `${-b.drop * size}px`, "--turn": `${b.turn}deg`, "--delay": `${b.delay}s` })}
-          >
-            <circle r="46" fill={b.color} stroke={LINE} strokeWidth="3" />
-            {b.dots ? (
-              [
-                [-18, -16],
-                [16, -20],
-                [-4, 10],
-                [22, 16],
-                [-22, 22],
-              ].map(([cx, cy]) => <circle key={`${cx}`} cx={cx} cy={cy} r="7" fill={b.stripe} />)
-            ) : (
-              <path d="M-44 -12 C-20 -2 20 -2 44 -12 L45 6 C20 16 -20 16 -45 6 Z" fill={b.stripe} />
-            )}
-            <ellipse cx="-18" cy="-24" rx="10" ry="6" fill="#ffffff88" transform="rotate(-30 -18 -24)" />
-          </svg>
-        </div>
-      ))}
-    </>
+    <svg className="ft-ball" viewBox="-50 -50 100 100" role="presentation" style={vars({ "--drop": `${-s.drop * size}px`, "--turn": `${s.turn}deg` })}>
+      <circle r="46" fill={s.color} stroke={LINE} strokeWidth="3" />
+      {s.dots ? (
+        [
+          [-18, -16],
+          [16, -20],
+          [-4, 10],
+          [22, 16],
+          [-22, 22],
+        ].map(([cx, cy]) => <circle key={`${cx}`} cx={cx} cy={cy} r="7" fill={s.stripe} />)
+      ) : (
+        <path d="M-44 -12 C-20 -2 20 -2 44 -12 L45 6 C20 16 -20 16 -45 6 Z" fill={s.stripe} />
+      )}
+      <ellipse cx="-18" cy="-24" rx="10" ry="6" fill="#ffffff88" transform="rotate(-30 -18 -24)" />
+    </svg>
   );
 }
 

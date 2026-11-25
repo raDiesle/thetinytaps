@@ -1,7 +1,7 @@
 import { readFileSync } from "node:fs";
 import { expect, test } from "bun:test";
-import { ART_KINDS } from "./SurpriseArt";
-import { SURPRISE, SURPRISE_KINDS } from "./Surprises";
+import { ART_KINDS, artParams, MANDALA_RADII, MANDALA_VIEW, ringShapeSize } from "./SurpriseArt";
+import { SURPRISE, SURPRISE_KINDS, surpriseParams } from "./Surprises";
 import {
   CANVAS_KINDS,
   CANVAS_MAX_DPR,
@@ -39,7 +39,7 @@ test("the rainbow stays out (user feedback, November 2026: not cool)", () => {
 });
 
 test("every surprise is drawn by the app itself, never with emojis – the present's toy and the egg's baby too", () => {
-  for (const file of ["Surprises.tsx", "SurpriseArt.tsx", "SurpriseFigures.tsx", "surpriseCanvas.ts", "surprises.css"]) {
+  for (const file of ["Surprises.tsx", "SurpriseArt.tsx", "SurpriseToys.tsx", "SurpriseFigures.tsx", "surpriseCanvas.ts", "surprises.css"]) {
     const source = readFileSync(`src/games/letters/${file}`, "utf8");
     expect({ file, emojis: source.match(/\p{Extended_Pictographic}/gu) ?? [] }).toEqual({ file, emojis: [] });
   }
@@ -59,15 +59,21 @@ const CLASSES: Record<Kind, RegExp | null> = {
   firework: /^\.ft-(rocket|flash|spark)/,
   gift: /^\.ft-gift/,
   egg: /^\.ft-egg/,
-  balloons: /^\.ft-balloon/,
-  flowers: /^\.ft-(stem|head)/,
+  balloon: /^\.ft-balloon/,
+  flower: /^\.ft-(stem|head)/,
   bubbles: /^\.ft-bubble/,
   comet: /^\.ft-comet/,
   snowflake: /^\.ft-snowflake/,
   mandala: /^\.ft-mandala/,
   splash: /^\.ft-splash/,
   pinwheel: /^\.ft-pinwheel/,
-  balls: /^\.ft-ball/,
+  ball: /^\.ft-ball/,
+  butterfly: /^\.ft-fly/,
+  jack: /^\.ft-jack/,
+  heart: /^\.ft-heart/,
+  cloud: /^\.ft-(cloud|rain)/,
+  frog: /^\.ft-frog/,
+  fish: /^\.ft-fish/,
   skyrocket: null,
   fountain: null,
   swirl: null,
@@ -76,22 +82,28 @@ const CLASSES: Record<Kind, RegExp | null> = {
 
 /**
  * The latest `--delay` each kind sets in its TSX (an animation with a delay written in the stylesheet is read from
- * there): the firework's bang after its rocket plus the last of three bursts and a spiral's last spark; the third
- * flower; the latest bubble; the third ring; the fifth ball. A longer delay there needs its kind's `lifeMs` raised too.
+ * there): the firework's bang after its rocket plus the last of three rings; the latest bubble; the third ring of the
+ * mandala; the cloud's last raindrop. A longer delay there needs its kind's `lifeMs` raised too.
  */
 const LATEST_DELAY_MS: Record<Kind, number> = {
   firework: 450 + 440,
   gift: 0,
   egg: 0,
-  balloons: 0,
-  flowers: 300,
-  bubbles: 350,
+  balloon: 0,
+  flower: 0,
+  bubbles: 7 * 60,
   comet: 0,
   snowflake: 0,
   mandala: 240,
   splash: 0,
   pinwheel: 0,
-  balls: 4 * 90,
+  ball: 0,
+  butterfly: 0,
+  jack: 0,
+  heart: 0,
+  cloud: 700 + 450,
+  frog: 0,
+  fish: 0,
   skyrocket: 0,
   fountain: 0,
   swirl: 0,
@@ -109,6 +121,35 @@ test("every surprise animation runs once and ends before its surprise is removed
     expect({ selector: selector.trim(), kind }).toEqual({ selector: selector.trim(), kind: expect.any(String) });
     if (kind) expect(Number(seconds) * 1000 + (delayMs ?? LATEST_DELAY_MS[kind])).toBeLessThanOrEqual(SURPRISE.lifeMs[kind]);
   }
+});
+
+// User feedback, 25 November 2026: a surprise is aimed at the spot where it was opened – one balloon, one flower, one
+// ball, never a row of them side by side; what comes in many (bubbles) gathers round the spot instead of rising away.
+test("each surprise is one thing at its spot, and many small ones stay round it", () => {
+  const size = 300;
+  for (let i = 0; i < 40; i++) {
+    for (const kind of SURPRISE_KINDS) {
+      const p = surpriseParams(kind, size) as Record<string, unknown>;
+      // No kind draws a list of side-by-side things (`balloons`, `flowers`, `balls`) any more.
+      expect({ kind, lists: ["balloons", "flowers", "balls"].filter((k) => k in p) }).toEqual({ kind, lists: [] });
+    }
+    const bubbles = surpriseParams("bubbles", size);
+    if (bubbles.kind !== "bubbles") throw new Error("bubbles");
+    for (const b of bubbles.bubbles) {
+      expect(Math.hypot(b.x + b.dx, b.y + b.dy)).toBeLessThanOrEqual(size * 0.4);
+      expect(Math.abs(b.dy)).toBeLessThanOrEqual(size * 0.08);
+    }
+    const firework = surpriseParams("firework", size);
+    if (firework.kind !== "firework") throw new Error("firework");
+    for (const burst of firework.bursts) expect({ x: burst.x, y: burst.y }).toEqual({ x: 0, y: 0 });
+  }
+  expect(Object.keys(artParams("ball"))).not.toContain("balls");
+});
+
+// User feedback, 25 November 2026: the mandala's outer petals were cut off at its svg's edge.
+test("the mandala's outer ring fits inside its svg box", () => {
+  const outer = Math.max(...MANDALA_RADII);
+  expect(outer + ringShapeSize(outer) * 1.5).toBeLessThanOrEqual(MANDALA_VIEW);
 });
 
 test("a surprise's wrapper carries its kind as an attribute, never as a class its drawing animates", () => {

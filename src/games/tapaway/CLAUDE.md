@@ -16,7 +16,10 @@ its address stays `/drauflos/`.
   0 stays a digit alone.
 - Every other key, every tap and click: one of Frei tippen's surprises right where the finger landed (`useSurprises`,
   `SurpriseLayer` from `src/games/letters/Surprises.tsx`), else – while one may not come yet – a bright shape with a
-  plop (`shapes.tsx`, drawn, never emoji), else only ripples.
+  plop (`shapes.tsx`, drawn, never emoji), else only ripples. Each surprise is one thing aimed at that spot – one
+  balloon, one flower, one ball, bubbles round it rather than rising away (user feedback, 25 November 2026; the rule
+  stands with the surprises in `src/games/letters/CLAUDE.md`): several things at once come from several presses,
+  never from one.
 - A mouse moving leaves a short trail of sparkles: tiny spans made imperatively (never by React), each fading by itself.
 - Before the first press one still line says what to do („Press any key!“ / „Tap anywhere!“ on touch devices).
 
