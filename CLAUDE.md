@@ -713,9 +713,10 @@ A game may give it before its end where reaching the goal once is enough (Ketten
   November 2026, from Lebendige Welten's menus): the picture on top, as wide as the card, and the name in one line
   under it – never beside a small picture on a flat card, never broken into lines, never on the picture (Kettenreaktion's
   names lay on its pictures in paper boxes, `labelOnPicture`, taken out). `useFitGrid(…, PICTURE_CARDS)` picks the grid
-  with the biggest pictures and shrinks all names of a menu alike until the longest fits (`fitNames`); where all cards
+  with the biggest pictures and shrinks all names of a menu alike until the longest fits (`fitNames`, a table of contents' names too: a long name
+  never pushes its line off the page); where all cards
   at once would leave pictures too small to make out (`MIN_PICTURE`), the menu scrolls instead (`fitGrid.test.ts`). On a phone or tablet (shorter
-  side below `TABLET_SCREEN`) the cards take all the room down to the families' floor, never capped at a height, and a
+  side below `TABLET_SCREEN`) the cards take all the room down to the page's bottom margin, over the families, never capped at a height, and a
   table of contents measures where its lines begin (`--toc-top`, `BookContents`) rather than guessing it from the
   ribbon, with a name strip of one line: no room given away (user request, November 2026; only a big screen keeps
   `MAX_PICTURE_ROW`). A cut shows what the game is about, close enough to be recognised and whole: the figure and the thing
@@ -1073,10 +1074,11 @@ src/lib/                 speech, sfx (synthesized + recorded sounds), storage, d
   must not swell past the screen (keep the eye far: `perspective(320vw)`), and its keyframes run `linear` – an easing
   restarts at every keyframe, so the page would stop and start.
   The fox and the bear family stand at the bottom of every menu's page (`BookFamilies`, in `Sky`), the foxes in the left
-  corner and the bears in the right, seen whole on every screen: below 1400 × 640 the page keeps that room free under
-  its cards (`--menu-floor`, read by `useFitGrid`, and the table of contents' `--toc-bottom`) – also on phones and tablets, where it is a
-  quarter of the height: never shrunk to make the cards' pictures bigger (user decision, 25 November 2026) –, and the world's things that
-  stood there (blocks, toys) are left out; wider pages have them on the margins beside the cards. Never in
+  corner and the bears in the right, at their full size (never shrunk), and below 1400 × 640 the page keeps no room
+  free for them: the cards take all the room down to the page's bottom margin and may lie over them (user decision, 25
+  November 2026: the pictures' size comes first – a reserved strip under the cards took a quarter of a phone's height;
+  `MenuTop.test.ts`). The world's things that stood there (blocks, toys) are left out; wider pages have them on the
+  margins beside the cards. Never in
   the top row beside the title, where they were too small and in the way (user feedback, October 2026); the cards move
   up into the room the top row leaves. On a phone the sun, clouds and a room's window are left out too. A new kind of button gets its paper look in `book.css` with the others, never shiny plastic; a card is a picture taped onto the page without a ▶ on it (the whole card is tapped, so it is lower than its row), and the level row's choices are slips of paper lying askew, the chosen one yellow and taped down like a card (user feedback, October 2026). The fullscreen button and ⚙️ are
   small notes of plain paper with a paperclip over the edge they hang from – the page's top edge in a menu's top right

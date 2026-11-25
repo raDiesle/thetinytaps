@@ -5,6 +5,7 @@ import { bookIdOf, type Game, gamePage } from "@/content/games";
 import { useT } from "@/lib/language";
 import { useTurnPage } from "@/lib/look";
 import { useFigurePictures } from "@/lib/figurePictures";
+import { fitNames } from "@/lib/fitGrid";
 import { canTestUnfinished } from "@/lib/localTest";
 import { loadOnIntent } from "@/lib/preloadPages";
 import previews from "./vorschau/*.webp?glob";
@@ -21,7 +22,7 @@ import girlPreviews from "./vorschau-maedchen/*.webp?glob";
 export function BookContents({ games, world }: { games: Game[]; world: string }) {
   const { cols, rows } = contentsGrid(games.length);
   const list = useRef<HTMLOListElement>(null);
-  useLayoutEffect(() => (list.current ? measureTop(list.current) : undefined), []);
+  useLayoutEffect(() => (list.current ? fitContents(list.current) : undefined), []);
   return (
     <ol
       ref={list}
@@ -42,13 +43,15 @@ export function BookContents({ games, world }: { games: Game[]; world: string })
  * Keeps `--toc-top`, the room above the lines that their height leaves out (`.toc` in `book.css`), at where the lines
  * really begin: the stylesheet's estimate from the ribbon's size was 8 px too much on a phone and 20 px on a tablet,
  * room the pictures lost (user request, November 2026: no room given away on phones and tablets). Measured by layout
- * offsets, never the drawn box, which a book flying off the shelf scales. Returns the clean-up.
+ * offsets, never the drawn box, which a book flying off the shelf scales. Then shrinks the names alike where the
+ * longest word no longer fits beside or under its picture (`fitNames`). Returns the clean-up.
  */
-function measureTop(list: HTMLOListElement) {
+function fitContents(list: HTMLOListElement) {
   const place = () => {
     let top = 0;
     for (let el: HTMLElement | null = list; el; el = el.offsetParent as HTMLElement | null) top += el.offsetTop;
     list.style.setProperty("--toc-top", `${Math.ceil(top)}px`);
+    fitNames(list, ".toc-title");
   };
   place();
   // What stands above the lines may change after the first frame (fonts, the ribbon's picture), and the screen turns.
@@ -56,6 +59,7 @@ function measureTop(list: HTMLOListElement) {
   const observer = new ResizeObserver(place);
   if (page) for (const child of page.children) if (child !== list) observer.observe(child);
   window.addEventListener("resize", place);
+  void document.fonts?.ready.then(place);
   return () => {
     observer.disconnect();
     window.removeEventListener("resize", place);

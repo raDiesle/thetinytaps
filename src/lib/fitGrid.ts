@@ -181,12 +181,14 @@ const MIN_NAME_FIT = 0.6;
 /**
  * Shrinks the names of a menu's picture cards alike (`--name-fit` on the list), so the longest stands whole in one line
  * under its picture and all names of the menu keep one size (user feedback, 25 November 2026: names broke into two or
- * three lines beside small pictures).
+ * three lines beside small pictures). A table of contents passes its names (`.toc-title`, up to three lines): there a
+ * long word must fit across, and the lines must fit in their room.
  */
-function fitNames(list: HTMLElement) {
-  const names = list.querySelectorAll<HTMLElement>(".picture-card > .game-title");
+export function fitNames(list: HTMLElement, selector = ".picture-card > .game-title") {
+  const names = list.querySelectorAll<HTMLElement>(selector);
   if (!names.length) return;
-  const overflow = () => [...names].reduce((fit, name) => (name.scrollWidth > name.clientWidth ? Math.min(fit, name.clientWidth / name.scrollWidth) : fit), 1);
+  const ratio = (name: HTMLElement) => (name.scrollWidth ? Math.min(name.clientWidth / name.scrollWidth, name.clientHeight / name.scrollHeight) : 1);
+  const overflow = () => [...names].reduce((fit, name) => Math.min(fit, ratio(name)), 1);
   let fit = 1;
   list.style.setProperty("--name-fit", "1");
   // The padding and rounding keep a name from shrinking quite in step with its font: measured again, a little smaller each time.
@@ -221,17 +223,12 @@ function contentHeight(page: HTMLElement) {
 const isPhone = () => Math.min(window.innerWidth, window.innerHeight) < PHONE_SCREEN;
 
 /**
- * Room the page keeps free under its cards for a picture standing there: `--menu-floor`, a registered length
- * (`@property` in `book.css`, so it reads as pixels), the animal families at the bottom of the page.
- */
-const floorOf = (page: HTMLElement) => parseFloat(getComputedStyle(page).getPropertyValue("--menu-floor")) || 0;
-
-/**
  * How tall `part` of the menu `page` may grow so that the page's first screen holds everything above and below it
- * (not what waits `data-below-fold`), with the room under the last row the cards keep.
+ * (not what waits `data-below-fold`), with the room under the last row the cards keep. No room is kept for the
+ * families at the bottom of the page: the cards may lie over them (user decision, 25 November 2026).
  */
 function roomFor(part: HTMLElement, page: HTMLElement) {
-  return window.innerHeight - (contentHeight(page) - part.offsetHeight) - Math.max(isPhone() ? BOTTOM_PHONE : BOTTOM, floorOf(page));
+  return window.innerHeight - (contentHeight(page) - part.offsetHeight) - (isPhone() ? BOTTOM_PHONE : BOTTOM);
 }
 
 /**
