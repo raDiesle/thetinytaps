@@ -97,28 +97,12 @@ describe("home menu", () => {
   });
 
   // Taken out, a book spine out shows its spine picture big as its cover: at 160 px Zähne putzen's crop of a face
-  // looked like a half-drawn page still loading (user feedback, November 2026). The older ones wait to be redone.
+  // looked like a half-drawn page still loading (user feedback, November 2026).
   test("every spine picture is big enough to be the book's cover", () => {
-    const SMALL_SPINES = [
-      "abstillen",
-      "abstillennachts",
-      "belohnungstafel",
-      "flaeschchen",
-      "grosses-bett",
-      "haare-waschen",
-      "kita",
-      "schnullerfee",
-      "tagesplan",
-      "timer",
-      "toepfchen",
-      "wie-lange-warten",
-    ];
     for (const file of readdirSync("src/components/bilder").filter((f) => /^spine-.*\.webp$/.test(f))) {
-      const id = file.slice("spine-".length, -".webp".length);
       const { width, height } = webpSize(readFileSync(`src/components/bilder/${file}`));
       expect(width, file).toBe(height);
-      if (SMALL_SPINES.includes(id)) expect(width, `${file} is big now: take it off SMALL_SPINES`).toBeLessThan(480);
-      else expect(width, file).toBeGreaterThanOrEqual(480);
+      expect(width, file).toBeGreaterThanOrEqual(480);
     }
   });
 
