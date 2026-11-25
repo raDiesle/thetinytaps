@@ -624,7 +624,7 @@ A game may give it before its end where reaching the goal once is enough (Ketten
   November 2026): each of its games is a book of its own, standing spine out side by side, a small picture from its game
   at the top of a paper label along the spine and its name below it (`SpineBook`, so a child finds it at a glance,
   user feedback, October 2026) – a picture or a cut of one, never an emoji, which looked poorer (`bilder/spine-<id>.webp`,
-  user feedback, November 2026; `content.test.ts` checks) – opening its game directly – taken out, its cover shows that very spine picture and nothing else, no title, line or second picture (user feedback, November 2026; `BookFaces`) –; they lean a little to the left together, on their bottom
+  user feedback, November 2026; `content.test.ts` checks) – opening its game directly – taken out, its cover shows that very spine picture and nothing else, no title, line or second picture (user feedback, November 2026; `BookFaces`) – so that picture shows a whole thing (a whole figure, a whole head with hair and ears), never a close crop of a face's parts, and is at least 480 px square: enlarged on the flying cover, Zähne putzen's 160 px crop of eyes, nose and grin looked like a half-drawn page whose rest was still loading (user feedback, 25 November 2026; `content.test.ts` checks the size, its `SMALL_SPINES` lists the older ones still to redo) –; they lean a little to the left together, on their bottom
   left corners (`--lean`), so the names running down their spines are read without bending the
   head as far (user feedback, November 2026) – taken out, a book straightens as it lifts; the category has no page, and its games' way back is the
   shelf. The name on a spine stands in one line, never broken – smaller where it is long (`--len`, by its script's letter width, `--per-letter`), checked in every
@@ -1074,7 +1074,8 @@ src/lib/                 speech, sfx (synthesized + recorded sounds), storage, d
   restarts at every keyframe, so the page would stop and start.
   The fox and the bear family stand at the bottom of every menu's page (`BookFamilies`, in `Sky`), the foxes in the left
   corner and the bears in the right, seen whole on every screen: below 1400 × 640 the page keeps that room free under
-  its cards (`--menu-floor`, read by `useFitGrid`, and the table of contents' `--toc-bottom`), and the world's things that
+  its cards (`--menu-floor`, read by `useFitGrid`, and the table of contents' `--toc-bottom`) – also on phones and tablets, where it is a
+  quarter of the height: never shrunk to make the cards' pictures bigger (user decision, 25 November 2026) –, and the world's things that
   stood there (blocks, toys) are left out; wider pages have them on the margins beside the cards. Never in
   the top row beside the title, where they were too small and in the way (user feedback, October 2026); the cards move
   up into the room the top row leaves. On a phone the sun, clouds and a room's window are left out too. A new kind of button gets its paper look in `book.css` with the others, never shiny plastic; a card is a picture taped onto the page without a ▶ on it (the whole card is tapped, so it is lower than its row), and the level row's choices are slips of paper lying askew, the chosen one yellow and taped down like a card (user feedback, October 2026). The fullscreen button and ⚙️ are

@@ -171,22 +171,6 @@ export const BASKET_IN: Pt = { x: 1322, y: BASKET.rimY - 22 };
 /** Marbles in the basket that make it full. */
 export const BASKET_FULL = 6;
 
-/**
- * What leaves the shelf next by itself, once the child has let out the first thing (user request, 24 November 2026:
- * after the start a round runs to its end with no more taps). `lands` are the things that land, in or on their way:
- * `"next"` takes the shelf's next thing in turn, a number the shelf place of that colour where the run sorts by colour
- * (each colour once first, then the one furthest on, so a tube is full after about six), and `null` lets nothing out
- * any more, since enough are on their way to end the round.
- */
-export function autoTake(lands: { color: string }[], sort?: { colors: string[]; full: number }): "next" | number | null {
-  if (!sort) return lands.length < BASKET_FULL ? "next" : null;
-  const counts = sort.colors.map((c) => lands.filter((m) => m.color === c).length);
-  const most = Math.max(...counts);
-  if (most >= sort.full) return null;
-  const missing = counts.indexOf(0);
-  return missing >= 0 ? missing : counts.indexOf(most);
-}
-
 /* ---------- Things that roll (K-07) ---------- */
 
 /** Something that can roll down the run; with the shelf on, the child picks which. */
@@ -358,9 +342,10 @@ export const SONG_BARS = 8;
  */
 export const SONG_SPEED = 360;
 /**
- * The next thing leaves the shelf by itself only once the one before has struck this bar of row 1: from the shelf to
- * the first bar takes about as long as the three beats left of the line, so the next line follows on the next beat
- * instead of sounding into the one before (lines let out every two seconds overlapped by half a line).
+ * A thing let out once the one before has struck this bar of row 1 plays its line right after that one's: from the
+ * shelf to the first bar takes about as long as the three beats left of the line (lines two seconds apart overlapped by
+ * half a line). Nothing leaves the shelf by itself any more (one tap, one thing; 25 November 2026), so this only sets
+ * the pace of the child the round's length is measured with (`track.test.ts`).
  */
 export const SONG_HANDOVER = 5;
 
