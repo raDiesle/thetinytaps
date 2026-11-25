@@ -1,7 +1,6 @@
 import type { Localized, Texts } from "@/lib/language";
 import type { TimerPicture, TurnPicture } from "./settings";
 import { BLOCKS_NAME } from "./blocksNames";
-import { BOXES_NAME } from "./boxesNames";
 import { TUNNEL_NAME } from "./tunnelNames";
 import { JUMP_NAME } from "./jumpNames";
 import { JAR_NAME } from "./jarNames";
@@ -39,9 +38,9 @@ export const tomorrowAt = (at: string): Localized => ({
 
 /** The pictures in their order on the start screen; „Weiter“ at the end goes on with the next, after the last the first. */
 export const PICTURES: { id: TimerPicture; emoji: string; name: Texts }[] = [
-  // The order the user asked for (November 2026): the red disc Kitas know first, then the hourglass, the candle, the
-  // apple tree, the flower and the pizza, then the alarm clock (H-70) and the rest; „Abwechseln“ last, in a group of its
-  // own on the start screen (`TimerGame`).
+  // The order the user asked for (November 2026, last changed 25 November 2026): the red disc Kitas know first, then the
+  // hourglass, the apple tree, the alarm clock (H-70), the flower, the pizza and the candle, Tidy Up, Up to the Moon and
+  // the rest; „Abwechseln“ last, in a group of its own on the start screen (`TimerGame`).
   {
     id: "disc",
     emoji: "🔴",
@@ -52,34 +51,21 @@ export const PICTURES: { id: TimerPicture; emoji: string; name: Texts }[] = [
     emoji: "⏳",
     name: { de: "Sanduhr", en: "Hourglass", zh: "沙漏", hi: "रेत घड़ी", es: "Reloj de arena", ar: "الساعة الرملية", ru: "Песочные часы" },
   },
-  { id: "candle", emoji: "🕯️", name: { de: "Kerze", en: "Candle", zh: "蜡烛", hi: "मोमबत्ती", es: "Vela", ar: "الشمعة", ru: "Свеча" } },
   { id: "apple", emoji: "🍎", name: { de: "Apfelbaum", en: "Apple Tree", zh: "苹果树", hi: "सेब का पेड़", es: "Manzano", ar: "شجرة التفاح", ru: "Яблоня" } },
+  { id: "clock", emoji: "⏰", name: { de: "Wecker", en: "Alarm Clock", zh: "闹钟", hi: "अलार्म घड़ी", es: "Despertador", ar: "المنبّه", ru: "Будильник" } },
   { id: "flower", emoji: "🌸", name: { de: "Blume", en: "Flower", zh: "小花", hi: "फूल", es: "Flor", ar: "الزهرة", ru: "Цветок" } },
   { id: "pizza", emoji: "🍕", name: { de: "Pizza", en: "Pizza", zh: "披萨", hi: "पिज़्ज़ा", es: "Pizza", ar: "البيتزا", ru: "Пицца" } },
-  { id: "clock", emoji: "⏰", name: { de: "Wecker", en: "Alarm Clock", zh: "闹钟", hi: "अलार्म घड़ी", es: "Despertador", ar: "المنبّه", ru: "Будильник" } },
+  { id: "candle", emoji: "🕯️", name: { de: "Kerze", en: "Candle", zh: "蜡烛", hi: "मोमबत्ती", es: "Vela", ar: "الشمعة", ru: "Свеча" } },
   // Tidy Up (H-118): a toy crane puts the toys into the box, best at five minutes; written English first, translated on 22 November 2026.
   { id: "tidy", emoji: "🧸", name: TIDY_NAME },
-  // Five Boxes (H-120, 22 November 2026): a box for each sort, its toys hopping in and its lid shutting, one a minute at five minutes.
-  { id: "boxes", emoji: "📦", name: BOXES_NAME },
+  // Up to the Moon (H-127, rebuilt 23 November 2026; first in the cards' second row, user request, 25 November 2026), a jump-and-run going up: a fox swims, hops up a tree, rides a cable car and a lift and flies from a lake up to the moon, the picture following it, then sails down into a cake.
+  { id: "jump", emoji: "🚀", name: JUMP_NAME },
+  // Five Boxes (H-120) stood here and was taken out again (user request, 25 November 2026).
   // The block house (H-125, 22 November 2026), the first timer like a game played by itself: blocks hop out of a jumble into a house.
   { id: "blocks", emoji: "🧱", name: BLOCKS_NAME },
   // The treasure tunnel (H-126, 22 November 2026), the second like a block world played by itself: a tunnel dug block by block to a chest.
   { id: "tunnel", emoji: "⛏️", name: TUNNEL_NAME },
-  // Up to the Moon (H-127, rebuilt 23 November 2026), a jump-and-run going up: a fox swims, hops up a tree, rides a cable car and a lift and flies from a lake up to the moon, the picture following it, then sails down into a cake.
-  { id: "jump", emoji: "🚀", name: JUMP_NAME },
-  {
-    id: "train",
-    emoji: "🚂",
-    name: {
-      de: "Zug zum Bahnhof",
-      en: "Train to the Station",
-      zh: "开往车站的火车",
-      hi: "स्टेशन की ओर ट्रेन",
-      es: "Tren a la estación",
-      ar: "القطار إلى المحطة",
-      ru: "Поезд на станцию",
-    },
-  },
+  // „Zug zum Bahnhof“ stood here and was taken out (user request, 25 November 2026).
   { id: "caterpillar", emoji: "🐛", name: { de: "Raupe", en: "Caterpillar", zh: "毛毛虫", hi: "इल्ली", es: "Oruga", ar: "اليرقة", ru: "Гусеница" } },
   {
     id: "sunset",
@@ -91,9 +77,7 @@ export const PICTURES: { id: TimerPicture; emoji: string; name: Texts }[] = [
   // Marble Jar (H-149, 24 November 2026): marbles bounce down a pegboard like Kettenreaktion's and fill a glass jar.
   { id: "jar", emoji: "🫙", name: JAR_NAME },
   { id: "swap", emoji: "🔁", name: SWAP_NAME },
-  // Tennis (H-71) stood here and was taken out again (user request, 21 November 2026: poorly done). In its place the
-  // seesaw (H-109), the best of the better ideas H-108 to H-117: written English first, translated on 22 November 2026.
-  { id: "seesaw", emoji: "⚖️", name: { en: "Seesaw", de: "Wippe", zh: "跷跷板", hi: "सी-सॉ", es: "Balancín", ar: "أرجوحة التوازن", ru: "Качели-балансир" } },
+  // Tennis (H-71) and the Wippe (H-109) stood here and were taken out again (user requests, 21 and 25 November 2026).
   // The Kugelbahn (H-117 with H-115, 24 November 2026): two to four children, a marble rolling into the next one's cup.
   { id: "marblerun", emoji: "🎱", name: MARBLE_NAME },
   // The Rennstrecke (user request, 24 November 2026): the fox and the bear child drive a lap of an eight in turns.
@@ -115,14 +99,14 @@ export const SWAP_NOTE: Localized = {
 };
 
 /** Whether a picture is one of taking turns, running on without end (`TurnPicture`). */
-export const isTurns = (id: TimerPicture): id is TurnPicture => id === "swap" || id === "seesaw" || id === "marblerun" || id === "race";
+export const isTurns = (id: TimerPicture): id is TurnPicture => id === "swap" || id === "marblerun" || id === "race";
 
 /** The pictures that run until the time is up, in their order: all but those of taking turns. */
 export const TIMED_PICTURES = PICTURES.filter((p) => !isTurns(p.id));
 
 /**
  * The picture after `id` for „Weiter“: the next one that runs until the time is up, after the last the first – never
- * „Abwechseln“, the Wippe or the Kugelbahn, which go on without an end; from them the first.
+ * „Abwechseln“, the Kugelbahn or the Rennstrecke, which go on without an end; from them the first.
  */
 export function nextPicture(id: TimerPicture): TimerPicture {
   const i = TIMED_PICTURES.findIndex((p) => p.id === id);

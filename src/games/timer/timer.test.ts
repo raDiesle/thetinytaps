@@ -74,7 +74,6 @@ import {
   WORLD_H,
   wayOf,
 } from "./jump";
-import { BOX_COUNT, BOXES, boxesPlan, boxLeft, boxSlot, floorPlaces, IN_BOX, LID_H, OPENING, PER_BOX, TOY as BOX_TOY } from "./boxes";
 import { BITE_R, BUTTERFLY, biteSpot, bodyFront, frontAfter, LEAF, LEAF_FLOOR, leafLeft, leafShape, leafSpan, planBites, REACH } from "./caterpillar";
 import { DISC, DOTS, dotAt } from "./disc";
 import { BOARD, FUNNEL, funnelY, JAR, jarPlan, MARBLE_R as JAR_MARBLE_R, MAX_MARBLES, NAIL_R, NAILS, SLOTS as JAR_SLOTS, TUBE } from "./jar";
@@ -87,7 +86,6 @@ import {
   applePlaces,
   appleTimes,
   harvestOrder,
-  haltMs,
   ladybugLaps,
   MAX_APPLES,
   MAX_DOTS,
@@ -95,30 +93,11 @@ import {
   markUnit,
   marksLeft,
   percentMarks,
-  TRAIN_PIECES,
-  TRAIN_STOPS,
   pieceMoments,
   runSeconds,
   soonMs,
-  trainSteps,
 } from "./pieces";
-import {
-  bulbBelow,
-  CANDLE,
-  candlePlan,
-  FLAME_H,
-  FUSE,
-  FUSE_AT,
-  FUSE_MS,
-  GLASS,
-  HOURGLASS_BOX,
-  PLATE,
-  SAND_FLOOR,
-  STAGE_H,
-  STAGE_W,
-  TABLE,
-  TRAIN,
-} from "./scenes";
+import { bulbBelow, CANDLE, candlePlan, FLAME_H, FUSE, FUSE_AT, FUSE_MS, GLASS, HOURGLASS_BOX, PLATE, SAND_FLOOR, STAGE_H, STAGE_W, TABLE } from "./scenes";
 import { FIRST_TURN, turnChildren } from "./SwapPlay";
 import {
   AXLE_Y,
@@ -135,7 +114,6 @@ import {
   REST_TOP,
   RUN,
 } from "./marbleRun";
-import { PLANK_BOX, SAW, SAW_GROUND, SAW_TILT, SEAT_CUSHION_W, TYRE_TOP, TYRE_X, WALKER } from "./seesaw";
 import { LAMP, SWAP_FLOOR, SWAP_SEATS, TOY } from "./swap";
 import { DEFAULT_TIMER_SETTINGS, TIMER_SECONDS } from "./settings";
 import {
@@ -176,19 +154,20 @@ describe("Timer", () => {
       // The older pictures are named German first, a new one (Tidy Up) English first.
       expect(pick(p.name, firstLanguage(p.name)).trim()).not.toBe("");
     }
-    // The order the user asked for (November 2026): Rote Scheibe, Sanduhr, Kerze, Apfelbaum, Blume, Pizza, Wecker, and
-    // Abwechseln, the Wippe (H-109), the Kugelbahn (H-117) and the Rennstrecke last, in a group of their own. Tennis (H-71) stood there
-    // and was taken out (user request, 21 November 2026: poorly done).
-    expect(PICTURES.slice(0, 7).map((p) => p.id)).toEqual(["disc", "sand", "candle", "apple", "flower", "pizza", "clock"]);
-    expect(PICTURES.slice(-4).map((p) => p.id)).toEqual(["swap", "seesaw", "marblerun", "race"]);
+    // The order the user asked for (November 2026; Wecker and Apfelbaum, then Apfelbaum and Kerze swapped and Up to the
+    // Moon brought to the second row's start, 25 November 2026): Rote Scheibe, Sanduhr, Apfelbaum, Wecker, Blume, Pizza,
+    // Kerze, Tidy Up, Up to the Moon, and Abwechseln, the Kugelbahn (H-117) and the Rennstrecke last, in a group of their
+    // own. Tennis (H-71) and the Wippe (H-109) stood there and were taken out (user requests, 21 and 25 November 2026).
+    expect(PICTURES.slice(0, 9).map((p) => p.id)).toEqual(["disc", "sand", "apple", "clock", "flower", "pizza", "candle", "tidy", "jump"]);
+    expect(PICTURES.slice(-3).map((p) => p.id)).toEqual(["swap", "marblerun", "race"]);
     expect(PICTURES.map((p) => p.id as string)).not.toContain("tennis");
+    expect(PICTURES.map((p) => p.id as string)).not.toContain("seesaw");
     expect(DEFAULT_TIMER_SETTINGS.picture).toBe(PICTURES[0].id);
     // Taking turns runs without end, so „Weiter“ never leads into it.
     expect(TIMED_PICTURES.map((p) => p.id)).not.toContain("swap");
-    expect(TIMED_PICTURES.map((p) => p.id)).not.toContain("seesaw");
     expect(TIMED_PICTURES.map((p) => p.id)).not.toContain("marblerun");
     expect(TIMED_PICTURES.map((p) => p.id)).not.toContain("race");
-    expect(TIMED_PICTURES).toHaveLength(PICTURES.length - 4);
+    expect(TIMED_PICTURES).toHaveLength(PICTURES.length - 3);
     const seen = new Set<string>();
     let id = TIMED_PICTURES[0].id;
     for (let i = 0; i < TIMED_PICTURES.length; i++) {
@@ -198,7 +177,6 @@ describe("Timer", () => {
     expect(seen.size).toBe(TIMED_PICTURES.length);
     expect(id).toBe(TIMED_PICTURES[0].id);
     expect(nextPicture("swap")).toBe(TIMED_PICTURES[0].id);
-    expect(nextPicture("seesaw")).toBe(TIMED_PICTURES[0].id);
     expect(nextPicture("marblerun")).toBe(TIMED_PICTURES[0].id);
     expect(nextPicture("race")).toBe(TIMED_PICTURES[0].id);
   });
@@ -272,11 +250,6 @@ describe("Timer", () => {
   });
 
   test("what matters stays where every screen shows it (x 200–1400, y 80–820)", () => {
-    expect(TRAIN.x).toBeGreaterThanOrEqual(200);
-    expect(TRAIN.stop + TRAIN.w).toBeLessThanOrEqual(1400 + 200);
-    // A long way to go, so every second shows a step: the train drives most of the picture's width.
-    expect(TRAIN.stop - TRAIN.x).toBeGreaterThanOrEqual(1000);
-    expect(TRAIN.stop).toBeLessThanOrEqual(RIGHT_EDGE);
     expect(GLASS.cx - GLASS.w / 2).toBeGreaterThanOrEqual(200);
     // With a margin: at 80 and 820 the hourglass's plates touched the screen's edges on a phone on its side.
     expect(GLASS.top - 4 - PLATE).toBeGreaterThanOrEqual(110);
@@ -385,18 +358,7 @@ describe("Timer", () => {
     expect(DISC.cy + DISC.face).toBeLessThanOrEqual(820);
   });
 
-  test("piece by piece: the train halts at its five stops at every length, then reaches the station as the time is up (H-45)", () => {
-    // User request, 24 November 2026: before, a stop came once a minute, so under two minutes the train never halted.
-    expect(TRAIN_STOPS).toBe(5);
-    for (const total of [10_000, 60_000, 5 * 60_000, 3 * 3600_000]) {
-      const steps = trainSteps(total, TRAIN_PIECES, haltMs(total, TRAIN_PIECES));
-      // A halt at each stop (arriving and leaving at the same place), then the station at the end.
-      const halts = steps.filter((s, i) => i > 0 && steps[i - 1].part === s.part);
-      expect(halts).toHaveLength(TRAIN_STOPS);
-      expect(steps.at(-1)).toEqual({ at: 1, part: 1 });
-      for (let i = 1; i < steps.length; i++) expect(steps[i].at).toBeGreaterThan(steps[i - 1].at);
-      expect(pieceMoments(total, TRAIN_PIECES, haltMs(total, TRAIN_PIECES))).toHaveLength(TRAIN_STOPS);
-    }
+  test("piece by piece: the moments split the run evenly, the last piece being the end's (H-45)", () => {
     expect(pieceMoments(300_000, 5)).toEqual([60_000, 120_000, 180_000, 240_000]);
     expect(pieceMoments(300_000, 1)).toEqual([]);
   });
@@ -487,19 +449,6 @@ describe("Timer", () => {
     const rule = css.slice(css.indexOf(".tm-shown {"), css.indexOf("}", css.indexOf(".tm-shown {")));
     expect(rule).toContain("right:");
     expect(rule).toContain("bottom:");
-  });
-
-  test("the train halts at every stop and reaches the station as the time is up", () => {
-    const total = 5 * 60_000;
-    const steps = trainSteps(total, 5, haltMs(total, 5));
-    expect(steps[0]).toEqual({ at: 0, part: 0 });
-    expect(steps.at(-1)).toEqual({ at: 1, part: 1 });
-    for (let i = 1; i < steps.length; i++) {
-      expect(steps[i].at).toBeGreaterThan(steps[i - 1].at);
-      expect(steps[i].part).toBeGreaterThanOrEqual(steps[i - 1].part);
-    }
-    // Four halts on the way, each standing still for a while.
-    expect(steps.filter((s, i) => i > 0 && s.part === steps[i - 1].part)).toHaveLength(4);
   });
 
   test("every apple hangs inside the crown, apart from the others, and falls straight down past no other apple", () => {
@@ -662,7 +611,7 @@ describe("Timer", () => {
   });
 
   // The perf scenarios tap each card by its tooltip, which follows the app language (German while measuring): Tidy Up's
-  // and the Wippe's still asked for „Tidy Up“ and „Seesaw“ after their names were translated, and measured nothing.
+  // and the Wippe's (taken out since) still asked for „Tidy Up“ and „Seesaw“ after their names were translated, and measured nothing.
   test("every timer card a perf scenario taps is named so in German, and every timed picture has its scenario", () => {
     const german = PICTURES.map((p) => pick(p.name, "de"));
     const tapped = SCENARIOS.filter((s) => s.path.startsWith("/timer/")).flatMap((s) =>
@@ -678,69 +627,6 @@ describe("Timer", () => {
         tapped.some((title) => name.startsWith(title)),
         name,
       ).toBe(true);
-  });
-
-  test("Five Boxes: three toys a box at any length, each hop finished before the next, a lid shut after its box's last toy, the last as the time is up (H-120)", () => {
-    expect(PER_BOX).toBe(3);
-    for (const total of [10_000, 60_000, 5 * 60_000, 3 * 3600_000]) {
-      const count = PER_BOX;
-      const { toys, lids } = boxesPlan(total, count);
-      expect(toys).toHaveLength(BOX_COUNT * count);
-      expect(lids).toHaveLength(BOX_COUNT);
-      let before = 0;
-      for (const toy of toys) {
-        // One toy at a time, from the left box to the right, never two in the air at once.
-        expect(toy.hop.start).toBeGreaterThanOrEqual(before);
-        expect(toy.hop.land).toBeGreaterThan(toy.hop.start);
-        // Its box's lid swings only once it is in.
-        expect(lids[toy.box].start).toBeGreaterThanOrEqual(toy.hop.land);
-        if (toy.box > 0) expect(toy.hop.start).toBeGreaterThanOrEqual(lids[toy.box - 1].shut);
-        // It waits its turn wiggling only while nothing else moves.
-        if (toy.hop.waitFrom !== undefined) expect(toy.hop.waitFrom).toBeGreaterThanOrEqual(before);
-        before = toy.hop.land;
-      }
-      for (const lid of lids) expect(lid.shut).toBeGreaterThan(lid.start);
-      expect(lids.at(-1)?.shut).toBeCloseTo(total);
-    }
-  });
-
-  test("Five Boxes: the boxes and toys stay on the screen, the toys lie in front of their box without hiding each other, each lands on its own place inside it (H-120)", () => {
-    const half = BOX_TOY / 2;
-    expect(boxLeft(0)).toBeGreaterThanOrEqual(200);
-    expect(boxLeft(BOX_COUNT - 1) + BOXES.w).toBeLessThanOrEqual(RIGHT_EDGE);
-    // The lid standing open stays below the top edge, and so does the top of every hop.
-    expect(BOXES.rim - OPENING - LID_H).toBeGreaterThanOrEqual(80);
-    for (let k = 0; k < BOX_COUNT; k++) {
-      for (const count of [2, PER_BOX, 4]) {
-        const places = floorPlaces(k, count);
-        expect(places).toHaveLength(count);
-        for (const [j, place] of places.entries()) {
-          // On the floor in front of the boxes, within the screen and above the bar along the bottom.
-          expect(place.y - BOX_TOY).toBeGreaterThan(BOXES.bottom - 40);
-          expect(place.y).toBeLessThanOrEqual(780);
-          expect(place.x - half).toBeGreaterThanOrEqual(200);
-          expect(place.x + half).toBeLessThanOrEqual(RIGHT_EDGE);
-          for (const other of places.slice(0, j)) expect(Math.hypot(place.x - other.x, place.y - other.y)).toBeGreaterThanOrEqual(0.8 * BOX_TOY);
-          // In the box, side by side and within its walls, its top showing above the rim.
-          const slot = boxSlot(k, j, count);
-          const small = (IN_BOX * BOX_TOY) / 2;
-          expect(slot.x - small).toBeGreaterThanOrEqual(boxLeft(k) + 6);
-          expect(slot.x + small).toBeLessThanOrEqual(boxLeft(k) + BOXES.w - 6);
-          expect(slot.y - 2 * small).toBeLessThan(BOXES.rim);
-        }
-      }
-    }
-    const { toys } = boxesPlan(5 * 60_000, 3);
-    for (const toy of toys) expect(toy.hop.peak - BOX_TOY).toBeGreaterThanOrEqual(80);
-  });
-
-  test("Five Boxes: toys and lids move as layers on one CSS animation each and snap to their place at the end, with no clip path (H-120)", async () => {
-    for (const file of ["./boxes.tsx", "./hop.tsx"]) {
-      const code = await Bun.file(new URL(file, import.meta.url)).text();
-      expect(code).not.toMatch(/clip-?[pP]ath/);
-    }
-    const css = await Bun.file(new URL("./timer.css", import.meta.url)).text();
-    for (const part of ["hop", "hop-wait", "boxes-lid"]) expect(css, part).toMatch(new RegExp(`\\.tm-done \\.tm-${part}[,\\s{]`));
   });
 
   test("Block House: all twenty blocks at any length, carried one at a time, the house built from the bottom up, the last block landing as the time is up (H-125)", () => {
@@ -1370,37 +1256,6 @@ describe("Timer", () => {
     expect(TOY.onCushion - TOY.h).toBeGreaterThanOrEqual(80);
   });
 
-  // H-109: the seesaw is the time – a seat sinks the whole turn long until it lies on its tyre, as the chick walks over to
-  // it, then the other child's seat, up high, sinks. It must touch down for real, stay fair, tip far (user request,
-  // 21 November 2026: a bigger board, a plainer motion) and be seen whole on a phone on its side.
-  test("Wippe: the seat touches down on its tyre, both seats the same either side, and everything stays on the screen (H-109)", () => {
-    const rad = (SAW_TILT * Math.PI) / 180;
-    // Tipped, the plank's underside under the low seat lies exactly on the tyre's top, and the tyres lie under the seats.
-    expect(SAW.y + SAW.thick / 2 + SAW.seat * Math.sin(rad)).toBeCloseTo(TYRE_TOP);
-    expect(SAW.x - TYRE_X.fox).toBeCloseTo(TYRE_X.bear - SAW.x);
-    expect(TYRE_TOP).toBeLessThan(SAW_GROUND);
-    // A big board and a tilt a child sees from the sofa, and the plank's end never sinks into the ground.
-    expect(SAW_TILT).toBeGreaterThanOrEqual(22);
-    expect(SAW.thick).toBeGreaterThanOrEqual(40);
-    expect(SAW.y + SAW.thick / 2 + SAW.half * Math.sin(rad)).toBeLessThan(SAW_GROUND);
-    // Fair: the pivot in the middle of the stage, both seats as far from it.
-    expect(SAW.x as number).toBe(STAGE_W / 2);
-    // Level (at the end) the cushions stay within the screen's safe part.
-    expect(SAW.x - SAW.seat - SEAT_CUSHION_W / 2).toBeGreaterThanOrEqual(200);
-    expect(SAW.x + SAW.seat + SEAT_CUSHION_W / 2).toBeLessThanOrEqual(RIGHT_EDGE);
-    // The chick walks between the cushions, never into them, and the cushion up high (its ears) and the chick at the
-    // high end stay below the top.
-    expect(WALKER.reach + WALKER.w / 2).toBeLessThanOrEqual(SAW.seat - SEAT_CUSHION_W / 2);
-    const plankTop = SAW.y - SAW.thick / 2;
-    expect(plankTop - WALKER.h - WALKER.reach * Math.sin(rad)).toBeGreaterThanOrEqual(80);
-    expect(plankTop - 114 - SAW.seat * Math.sin(rad)).toBeGreaterThanOrEqual(80);
-    // The chick walks far each turn, so its way is seen even on a long one.
-    expect(WALKER.reach * 2).toBeGreaterThanOrEqual(500);
-    // The plank turns round the pivot in the middle of its layer.
-    expect(PLANK_BOX.x + PLANK_BOX.w / 2).toBe(SAW.x as number);
-    expect(PLANK_BOX.y + PLANK_BOX.h / 2).toBe(SAW.y as number);
-  });
-
   // November 2026: below the head, the row of lengths left a phone on its side too little room for the twelve cards, and
   // the Abwechseln group fell below the screen. In the head it stands beside the ribbon, in room taken anyway.
   test("the row of lengths stands in the menu's head, so every card fits on a phone on its side", async () => {
@@ -1417,7 +1272,7 @@ describe("Timer", () => {
 
   // User feedback, 21 November 2026: no start sequence drawing a side at random – the fox child begins at once, shown
   // from the first second, and a grown-up gives the other child the first turn behind ⚙️.
-  test("Abwechseln and the Wippe start with the fox child's turn, never with a draw", async () => {
+  test("Abwechseln starts with the fox child's turn, never with a draw", async () => {
     expect(FIRST_TURN).toBe("fox");
     const play = await Bun.file("src/games/timer/SwapPlay.tsx").text();
     expect(play).not.toMatch(/Math\.random|DRAW_STEPS|WHO_BEGINS/);
@@ -1666,7 +1521,7 @@ describe("the bar along the bottom and the last moments", () => {
         expect(/<Draw w=\{STAGE_W\} h=\{STAGE_H\} bleed>|<Bleed>/.test(next), `${file}: backdrop without bleed`).toBe(true);
       }
     }
-    expect(backdrops).toBeGreaterThanOrEqual(18);
+    expect(backdrops).toBeGreaterThanOrEqual(15);
   });
 
   // User feedback, November 2026: one puff from the middle every second looked the same for an hour.

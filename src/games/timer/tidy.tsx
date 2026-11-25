@@ -277,7 +277,7 @@ const TidyBackdrop = memo(function TidyBackdrop() {
   );
 });
 
-/** One toy in a 100 × 100 box standing on its bottom edge; Five Boxes (`boxes.tsx`) draws its toys with it too. */
+/** One toy in a 100 × 100 box standing on its bottom edge. */
 export function ToyArt({ kind }: { kind: ToyKind }) {
   const line = { stroke: INK, strokeWidth: 4, strokeLinejoin: "round" as const };
   let art: ReactNode;
