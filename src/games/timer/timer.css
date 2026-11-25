@@ -1538,18 +1538,22 @@
   background: linear-gradient(to left, rgb(28 30 70 / 0.6) 75%, rgb(28 30 70 / 0.22));
 }
 
-/* Kugelbahn (H-117 with H-115): the strip of the room of the child whose turn it is is lit warm, every other one lies
-   in the same plain shade as Abwechseln's waiting side, so whose turn it is shows across the room. The marble rolls on
-   keyframes written for the turn (`tm-mr-…-go`, its spin inside it `-spin`); the flap over the next child's cup hangs
-   open, a marble lying in a cup shows at once as the rolling one lands there and fades out as a new round starts. */
+/* Kugelbahn (H-117 with H-115, marbleRun.tsx): the strip of the room of the child whose turn it is is lit warm, every
+   other one lies in the same plain shade as Abwechseln's waiting side, and the child's cup stands in a warm glow of
+   light while the others are dimmed – each a small layer of its own, changing only as the turn does. The board turns
+   over round its axle (`-board`, a scale of its own layer), the crank winds once (`-crank`), the baskets hanging on
+   their pins go up and down with it and the top one tips (`-up`, `-down`), and the marble rolls (`-go`, its spin
+   inside it `-spin`): keyframes written for the turn. */
 .tm-mr-light,
-.tm-mr-shade {
+.tm-mr-shade,
+.tm-mr-glow {
   opacity: 0;
-  transition: opacity 0.35s ease-out;
+  transition: opacity 0.5s ease-out;
 }
 
 .tm-mr-light.tm-on,
-.tm-mr-shade.tm-on {
+.tm-mr-shade.tm-on,
+.tm-mr-glow.tm-on {
   opacity: 1;
 }
 
@@ -1558,27 +1562,45 @@
 }
 
 .tm-mr-shade {
-  background: rgb(28 30 70 / 0.6);
+  background: rgb(28 30 70 / 0.62);
 }
 
+/* The light round the cup of the child whose turn it is: plain from across the room. */
+.tm-mr-glow {
+  border-radius: 50%;
+  background: radial-gradient(closest-side, rgb(255 248 200 / 0.95), rgb(255 214 90 / 0.7) 45%, rgb(255 200 60 / 0.3) 72%, transparent);
+}
+
+/* The other children's cups lie in the shade; the cup whose child's turn it is shines in its own colours, with a
+   golden rim round it. Dimmed, never see-through: at half opacity the wall showed through the cup. Its filter
+   changes only as the turn does. */
+.tm-mr-cup {
+  filter: brightness(0.6) saturate(0.6) drop-shadow(0 0 0 transparent) drop-shadow(0 0 0 transparent);
+  transition: filter 0.5s ease-out;
+}
+
+.tm-mr-cup.tm-on {
+  filter: brightness(1) saturate(1) drop-shadow(0 0 0.4cqh #ffd43b) drop-shadow(0 0 1.2cqh rgb(255 212 59 / 0.8));
+}
+
+.tm-mr-board,
+.tm-mr-crank,
+.tm-mr-basket,
 .tm-mr-roll,
-.tm-mr-spin,
-.tm-mr-rest > div {
+.tm-mr-spin {
   will-change: transform;
 }
 
+.tm-mr-board svg,
+.tm-mr-crank svg,
+.tm-mr-basket svg,
+.tm-mr-cup svg,
 .tm-mr-roll svg,
 .tm-mr-spin,
-.tm-mr-spin svg,
-.tm-mr-rest > div,
-.tm-mr-rest svg {
+.tm-mr-spin svg {
   display: block;
   width: 100%;
   height: 100%;
-}
-
-.tm-mr-rest > div {
-  position: relative;
 }
 
 .tm-mr-shine {
@@ -1586,43 +1608,7 @@
   inset: 0;
 }
 
-.tm-mr-rest {
-  opacity: 0;
-  transition: opacity 0.6s ease-out;
-}
-
-.tm-mr-rest.tm-on {
-  opacity: 1;
-  transition: none;
-}
-
-/* The first marble of a round given anew drops from the rail's hole into the first child's cup. */
-.tm-mr-drop {
-  animation: tm-mr-drop 0.7s ease-in both;
-}
-
-@keyframes tm-mr-drop {
-  from {
-    transform: translateY(calc(-1 * var(--tm-mr-fall)));
-  }
-}
-
-.tm-mr-gate {
-  transform-origin: 8% 50%;
-  transition: transform 0.6s ease-in-out;
-}
-
-.tm-mr-gate.tm-open {
-  transform: rotate(80deg);
-}
-
-.tm-mr-gate svg {
-  display: block;
-  width: 100%;
-  height: 100%;
-}
-
-/* A tap lights the cup the marble goes to for a moment (H-51). */
+/* A tap lights the basket the marble goes to for a moment (H-51). */
 .tm-mr-goal {
   border-radius: 50%;
   background: radial-gradient(closest-side, rgb(255 246 190 / 0.95), rgb(255 230 140 / 0.55) 65%, transparent);
@@ -1631,7 +1617,6 @@
   animation: tm-left 1.6s ease-out;
 }
 
-.tm-done .tm-mr-roll,
 .tm-done .tm-mr-goal {
   display: none;
 }
@@ -2376,6 +2361,23 @@
 
 .tm-shown b > .tm-colon {
   width: 0.34em;
+}
+
+/* Taking turns, the whole turn's length stands beside the time left, smaller and lighter, on the same line
+   (`TotalTime`, `totalEm`). */
+.tm-shown-with-total {
+  display: flex;
+  align-items: baseline;
+  gap: calc(var(--tm-note-font) * 0.3);
+}
+
+.tm-shown-total {
+  font-size: calc(var(--tm-note-font) * 0.6);
+  font-style: normal;
+  font-weight: 700;
+  font-variant-numeric: tabular-nums;
+  white-space: nowrap;
+  opacity: 0.6;
 }
 
 /* The time is up (user request, 23 November 2026: plain to see in every timer): the note stays at 0:00, red, and

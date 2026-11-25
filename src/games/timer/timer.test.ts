@@ -98,8 +98,22 @@ import {
   soonMs,
 } from "./pieces";
 import { bulbBelow, CANDLE, candlePlan, FLAME_H, FUSE, FUSE_AT, FUSE_MS, GLASS, HOURGLASS_BOX, PLATE, SAND_FLOOR, STAGE_H, STAGE_W, TABLE } from "./scenes";
-import { FIRST_TURN, heldMarbles, turnChildren } from "./SwapPlay";
-import { CUP_W, CUP_XS, MARBLE_COLORS, MARBLE_R, marblePlan, RAMPS, REST_Y } from "./marbleRun";
+import { FIRST_TURN, turnChildren } from "./SwapPlay";
+import {
+  AXLE_Y,
+  BASKET as RUN_BASKET,
+  BOARD as RUN_BOARD,
+  CRANK,
+  CUP_W,
+  CUP_XS,
+  MARBLE_R,
+  marblePlan,
+  marbleWay,
+  RAMPS,
+  REST_BOTTOM,
+  REST_TOP,
+  RUN,
+} from "./marbleRun";
 import { LAMP, SWAP_FLOOR, SWAP_SEATS, TOY } from "./swap";
 import { DEFAULT_TIMER_SETTINGS, TIMER_SECONDS } from "./settings";
 import {
@@ -1264,54 +1278,73 @@ describe("Timer", () => {
     expect(play).not.toMatch(/Math\.random|DRAW_STEPS|WHO_BEGINS/);
   });
 
-  // Kugelbahn (H-117 with H-115): the marble's way stays in what every screen shows, ends in the cup of the child whose
-  // turn comes next for two to four children, and its frames come in time order, the fall into the cup last and quick.
-  test("the Kugelbahn's marble rolls down the run into every child's cup, the whole turn long", () => {
+  // Kugelbahn (H-117 with H-115, reworked 25 November 2026): a board with a basket at its top and one at its bottom on
+  // the left, turning over round its axle as a crank winds at each turn's start. The run must be the same upside down,
+  // the marble's way stays in what every screen shows, and it ends in the bottom basket as the turn ends.
+  test("the Kugelbahn's run is the same upside down, so the board can turn over round its axle", () => {
+    const way = marbleWay();
+    const mirrored = way.map((p) => ({ x: p.x, y: 2 * AXLE_Y - p.y })).reverse();
+    for (let i = 0; i < way.length; i++) {
+      expect(mirrored[i].x).toBeCloseTo(way[i].x, 6);
+      expect(mirrored[i].y).toBeCloseTo(way[i].y, 6);
+    }
+    expect(RAMPS % 2).toBe(0);
+    expect(way[0].x).toBe(RUN.left);
+    expect(way.at(-1)?.x).toBe(RUN.left);
+    // The baskets' pins and the board lie as far above the axle as below it.
+    expect(RUN_BASKET.top + RUN_BASKET.bottom).toBe(2 * AXLE_Y);
+    expect(RUN_BOARD.y + RUN_BOARD.h / 2).toBe(AXLE_Y);
+    // The top basket's marble lies above the first ramp's start, the bottom one's below the last ramp's end.
+    expect(REST_TOP).toBeLessThan(way[0].y);
+    expect(REST_BOTTOM).toBeGreaterThan((way.at(-1)?.y ?? 0) + 2 * MARBLE_R);
+  });
+
+  test("the Kugelbahn's marble turns over with the board, then rolls down into the bottom basket, the whole turn long", () => {
+    const RIGHT = 1340;
+    expect(CRANK.x + CRANK.r + 14).toBeLessThanOrEqual(RIGHT);
+    for (const ms of [10_000, 60_000, 300_000]) {
+      const { frames, bends, flip, riser, sinker, board } = marblePlan(ms);
+      for (const f of frames) {
+        expect(f.x - MARBLE_R * f.scale).toBeGreaterThanOrEqual(235);
+        expect(f.x + MARBLE_R * f.scale).toBeLessThanOrEqual(RIGHT);
+        expect(f.y - MARBLE_R * f.scale).toBeGreaterThanOrEqual(80);
+        expect(f.y + MARBLE_R).toBeLessThanOrEqual(820);
+      }
+      for (const list of [frames, riser, sinker, board]) for (let k = 1; k < list.length; k++) expect(list[k].at).toBeGreaterThanOrEqual(list[k - 1].at);
+      // It starts in the bottom basket, comes up to the top one as the board turns over, and ends in the bottom one.
+      expect(frames[0]).toMatchObject({ at: 0, x: RUN_BASKET.x, y: REST_BOTTOM });
+      expect(frames.filter((f) => f.phase === "flip").at(-1)).toMatchObject({ at: flip, y: REST_TOP });
+      const last = frames[frames.length - 1];
+      expect(last).toMatchObject({ at: ms, x: RUN_BASKET.x, y: REST_BOTTOM });
+      expect(board[0].scale).toBe(1);
+      expect(board.at(-1)?.scale).toBe(-1);
+      expect(riser.at(-1)?.dy).toBe(RUN_BASKET.top - RUN_BASKET.bottom);
+      expect(sinker.at(-1)?.dy).toBe(RUN_BASKET.bottom - RUN_BASKET.top);
+      // The turning over and the fall are quick, the rolling takes the rest.
+      expect(flip).toBeLessThanOrEqual(1800);
+      expect(ms - (frames.find((f) => f.phase === "fall")?.at ?? 0)).toBeLessThanOrEqual(601);
+      expect(bends).toHaveLength(RAMPS - 1);
+      // Even a long turn spins the marble at least half a turn a second, all the way down the rails.
+      for (let k = 1; k < frames.length; k++) {
+        if (frames[k].phase !== "roll") continue;
+        const seconds = (frames[k].at - frames[k - 1].at) / 1000;
+        expect(Math.abs(frames[k].turn - frames[k - 1].turn)).toBeGreaterThanOrEqual(seconds * 180 * 0.99);
+      }
+    }
+  });
+
+  test("the Kugelbahn's cups stand apart, in the picture and clear of the bottom basket", () => {
     const RIGHT = 1340;
     for (const count of [2, 3, 4] as const) {
       const xs = CUP_XS[count];
       expect(xs).toHaveLength(count);
       for (let i = 1; i < count; i++) expect(xs[i] - xs[i - 1]).toBeGreaterThanOrEqual(CUP_W[count] + 40);
-      expect(xs[0] - CUP_W[count] / 2).toBeGreaterThanOrEqual(220);
+      expect(xs[0] - CUP_W[count] * 0.42).toBeGreaterThanOrEqual(RUN_BASKET.x + 50);
       expect(xs[count - 1] + CUP_W[count] / 2).toBeLessThanOrEqual(RIGHT + 30);
-      for (let to = 0; to < count; to++) {
-        for (const ms of [10_000, 300_000]) {
-          const { frames, bends } = marblePlan(count, to, ms);
-          for (const f of frames) {
-            expect(f.x - MARBLE_R).toBeGreaterThanOrEqual(235);
-            expect(f.x + MARBLE_R).toBeLessThanOrEqual(RIGHT);
-            expect(f.y - MARBLE_R).toBeGreaterThanOrEqual(80);
-            expect(f.y + MARBLE_R).toBeLessThanOrEqual(820);
-          }
-          for (let k = 1; k < frames.length; k++) expect(frames[k].at).toBeGreaterThanOrEqual(frames[k - 1].at);
-          const last = frames[frames.length - 1];
-          expect(last.at).toBe(ms);
-          expect(last.x).toBe(xs[to]);
-          expect(last.y).toBe(REST_Y);
-          // The fall is quick, the rolling takes the rest: the marble is still on the rails a moment before the end.
-          expect(ms - frames[frames.length - 2].at).toBeLessThanOrEqual(601);
-          expect(bends).toHaveLength(RAMPS - 1);
-          // Even a long turn spins the marble at least half a turn a second, all the way down the rails.
-          for (let k = 1; k < frames.length - 1; k++) {
-            const seconds = (frames[k].at - frames[k - 1].at) / 1000;
-            expect(Math.abs(frames[k].turn - frames[k - 1].turn)).toBeGreaterThanOrEqual(seconds * 180 * 0.99);
-          }
-        }
-      }
     }
   });
 
-  // H-115: a marble lies in the cup of every child who had a turn in this round, the cups empty again as a new round starts.
-  test("the Kugelbahn's cups keep a marble for each child who had its turn in the round", () => {
-    const has = (held: (string | null)[]) => held.map((c) => c !== null);
-    expect(has(heldMarbles(0, 0, 3))).toEqual([true, false, false]);
-    expect(has(heldMarbles(0, 1, 3))).toEqual([true, true, false]);
-    expect(has(heldMarbles(0, 2, 3))).toEqual([true, true, true]);
-    expect(has(heldMarbles(0, 3, 3))).toEqual([true, false, false]);
-    expect(has(heldMarbles(2, 0, 4))).toEqual([false, false, true, false]);
-    expect(has(heldMarbles(2, 2, 4))).toEqual([true, false, true, true]);
-    // The marble landing in a cup keeps its colour there: the one rolling in turn k has turn k + 1's.
-    expect(heldMarbles(0, 1, 2)[1]).toBe(MARBLE_COLORS[1]);
+  test("the Kugelbahn takes turns among two to four children", () => {
     expect(turnChildren("marblerun", 4)).toEqual(["fox", "bear", "rabbit", "frog"]);
     expect(turnChildren("marblerun", 3)).toEqual(["fox", "bear", "rabbit"]);
     expect(turnChildren("swap", 4)).toEqual(["fox", "bear"]);
