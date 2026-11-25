@@ -3146,3 +3146,219 @@
   font-size: 1.15em;
   line-height: 1;
 }
+
+/* ---------- The ways (T-31) and the photo poster (PosterPrint, T-32 to T-40) ---------- */
+
+/* Two big picture buttons, each with a line on what its way means. */
+.choice.rw-print-ways {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(min(100%, 220px), 1fr));
+  gap: 12px;
+}
+
+/* The label over both buttons, not floating beside the first. */
+.choice.rw-print-ways > legend {
+  float: none;
+  grid-column: 1 / -1;
+  margin-bottom: 4px;
+}
+
+.choice.rw-print-ways button {
+  display: grid;
+  border-radius: 18px;
+  grid-template-columns: auto 1fr;
+  align-items: center;
+  column-gap: 10px;
+  padding: 10px 14px;
+  text-align: start;
+}
+
+.rw-print-way-emoji {
+  grid-row: span 2;
+  font-family: var(--font-emoji);
+  font-size: 2.2em;
+  line-height: 1;
+}
+
+.rw-print-way-line {
+  font-size: 0.85em;
+  font-weight: 400;
+  opacity: 0.85;
+}
+
+/* The decorations, each as a small drawn frame above its name. */
+.rw-poster-decors {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+}
+
+.choice.rw-poster-decors button {
+  border-radius: 14px;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 4px;
+  padding: 6px 8px;
+}
+
+.rw-poster-decor-pic {
+  display: block;
+  width: 54px;
+  height: 40px;
+}
+
+.rw-poster-warning {
+  padding: 8px 12px;
+  border-left: 5px solid #d98a00;
+  border-radius: 8px;
+  background: #fff4d6;
+  font-weight: 600;
+}
+
+/* The poster as it will come, and beside it the wall with the poster at its real size. */
+.rw-poster-result {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: flex-start;
+  gap: 18px;
+  margin: 14px 0;
+}
+
+.rw-poster-figure {
+  position: relative;
+  width: min(100%, 300px);
+  max-height: 420px;
+  margin: 0;
+  border-radius: 3px;
+  background: #fff;
+  box-shadow: 0 2px 10px #2a1e5c40;
+}
+
+/* A panorama lies wide: it may take the panel's whole width. */
+.rw-poster-figure.rw-poster-wide {
+  width: 100%;
+}
+
+.rw-poster-figure img {
+  display: block;
+  width: 100%;
+  height: 100%;
+  object-fit: contain;
+}
+
+/* What the photo service may trim: dashed, on the preview only, never in the picture (T-37). */
+.rw-poster-safe {
+  position: absolute;
+  border: 1.5px dashed #d22;
+  box-shadow: 0 0 0 1px #ffffffb0;
+  pointer-events: none;
+}
+
+.rw-poster-busy {
+  position: absolute;
+  inset: auto 8px 8px;
+  padding: 4px 10px;
+  border-radius: 999px;
+  background: #fffdf4e6;
+  font-size: 0.85em;
+  text-align: center;
+}
+
+.rw-poster-wall {
+  flex: 1 1 260px;
+  max-width: 460px;
+  margin: 0;
+}
+
+.rw-poster-wall svg {
+  display: block;
+  width: 100%;
+  height: auto;
+  border-radius: 10px;
+  box-shadow: 0 1px 6px #2a1e5c30;
+}
+
+.rw-poster-wall figcaption {
+  margin-top: 6px;
+  font-size: 0.85em;
+  text-align: center;
+}
+
+.rw-poster-buttons {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 10px;
+}
+
+/* The hidden sheet the poster is drawn from: laid out at its true size far outside the screen, never seen. */
+.rw-poster-stage {
+  position: fixed;
+  top: 0;
+  left: -20000px;
+  pointer-events: none;
+}
+
+.rw-page.rw-poster {
+  position: relative;
+  display: flex;
+  background: var(--rw-paper, #fff);
+  background-position: center;
+  background-size: cover;
+}
+
+.rw-poster-sheets {
+  position: relative;
+  display: flex;
+  flex: 1;
+  flex-direction: column;
+  gap: 6mm;
+  min-width: 0;
+  min-height: 0;
+}
+
+.rw-poster-sheet {
+  display: flex;
+  flex: 1;
+  min-height: 0;
+}
+
+.rw-poster-frame {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+}
+
+/* A poster's look (T-33): a soft painted ground (or the theme's colours where its painting isn't made yet), a grain of
+   paper over it, the sheet lifted off it with a shadow, its heading on a ribbon and its pictures with a little depth. */
+.rw-poster-fancy:not(.rw-poster-painted) {
+  background-image:
+    radial-gradient(circle at 20% 15%, color-mix(in srgb, var(--rw-main) 22%, transparent), transparent 55%),
+    radial-gradient(circle at 85% 90%, color-mix(in srgb, var(--rw-main) 28%, transparent), transparent 60%),
+    linear-gradient(160deg, color-mix(in srgb, var(--rw-paper) 80%, #fff), color-mix(in srgb, var(--rw-main) 18%, var(--rw-paper)));
+}
+
+.rw-poster-fancy::before {
+  content: "";
+  position: absolute;
+  inset: 0;
+  background-image: repeating-radial-gradient(circle at 30% 40%, #0000000a 0 0.3mm, transparent 0.3mm 1.1mm);
+  pointer-events: none;
+}
+
+.rw-poster-fancy .rw-sheet {
+  background: color-mix(in srgb, var(--rw-paper, #fff) 90%, transparent);
+  box-shadow: 0 1.2mm 4mm #2a1e5c40;
+}
+
+.rw-poster-fancy .rw-title-line {
+  padding: 0.6cqmin 3cqmin;
+  border-radius: 1cqmin;
+  background: color-mix(in srgb, var(--rw-main) 45%, #fff);
+  box-shadow: 0 0.5cqmin 0 color-mix(in srgb, var(--rw-main) 70%, #000);
+}
+
+.rw-poster-fancy .rw-pic {
+  filter: drop-shadow(0 0.5mm 0.6mm #2a1e5c40);
+}

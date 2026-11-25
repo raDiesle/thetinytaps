@@ -22,11 +22,11 @@ import { PanelButton, PRINT, useComputer } from "./pageParts";
 import { counting, fromOlder, type Plan, parseRoutineStep, restartDay, starsOf, stepsOn } from "./plan";
 import { PlanEditor } from "./PlanEditor";
 import { PlanGallery } from "./PlanGallery";
-import { PlanPrint } from "./PlanPrint";
+import { PlanPrint, planPosterSheet } from "./PlanPrint";
 import { PlanScreen } from "./PlanScreen";
 import { TODAY, usePlanTitle } from "./PlanSheet";
 import { PLANNER_SETTINGS_KEY, plannerDefaults } from "./planSettings";
-import { PrintPanel } from "./PrintPanel";
+import { boardPosterSheet, PrintPanel } from "./PrintPanel";
 import { EARLIER, LATER, REVIEW, Review, usePeriodLabel, YESTERDAY } from "./Review";
 import { NO_STARS, pageStart, REWARDS_SETTINGS_KEY, REWARDS_STARS_KEY, rewardsDefaults } from "./settings";
 import { ChartEditor } from "./ChartEditor";
@@ -249,10 +249,32 @@ export function RewardsGame({ type: routeType = "board" }: { type?: PageKind }) 
           <PlanEditor key={plan.id} plan={plan} day={planDay} onChange={changePlan} onRestartToday={() => setLog(restartDay(log, plan.id, today))} />
         );
   const remove = type === "board" ? board && boards.boards.length > 1 && (() => removeBoard(board)) : plan && allPlans.length > 1 && (() => removePlan(plan));
+  // The other charts that may share the big poster (T-39): a routine goes on top of a chart of stars.
+  const posterCharts = [
+    ...boards.boards.map((b) => ({ id: b.id, label: boardTab(b), kind: "board" as const, sheet: boardPosterSheet(b, today, boards.print) })),
+    ...allPlans.map((p) => ({ id: p.id, label: planTab(p), kind: counting(p) ? ("board" as const) : ("plan" as const), sheet: planPosterSheet(p, today) })),
+  ];
+  const shownChart = type === "board" ? board?.id : plan?.id;
+  const companions = posterCharts.filter((c) => c.id !== shownChart);
   const print =
     type === "board"
-      ? board && <PrintPanel board={board} options={boards.print} onChange={(patch) => updateBoards({ print: { ...boards.print, ...patch } })} />
-      : plan && <PlanPrint plan={plan} day={planDay} options={plans.print} onChange={(patch) => updatePlans({ print: { ...plans.print, ...patch } })} />;
+      ? board && (
+          <PrintPanel
+            board={board}
+            options={boards.print}
+            companions={companions}
+            onChange={(patch) => updateBoards({ print: { ...boards.print, ...patch } })}
+          />
+        )
+      : plan && (
+          <PlanPrint
+            plan={plan}
+            day={planDay}
+            options={plans.print}
+            companions={companions}
+            onChange={(patch) => updatePlans({ print: { ...plans.print, ...patch } })}
+          />
+        );
   const screen =
     type === "board"
       ? board && (

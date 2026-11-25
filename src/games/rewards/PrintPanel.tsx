@@ -1,7 +1,7 @@
 import { type CSSProperties, type ReactNode, useEffect, useRef, useState } from "react";
 import { createPortal } from "react-dom";
 import { Choice, SettingsGroup, Toggle } from "@/components/SettingControls";
-import { type Localized, useT } from "@/lib/language";
+import { type EnglishFirst, type Localized, useT } from "@/lib/language";
 import { type Board, fourWeeks, NO_LINKED } from "./board";
 import { BoardSheet, type SheetLook, useRewardLabel, useTaskLabel } from "./BoardSheet";
 import { MARK_BY_ID, MARKS, THEME_BY_ID, type Theme, THEMES } from "./catalog";
@@ -9,7 +9,9 @@ import { MIN_STAR_MM, photoFormat, photoLayout } from "./photo";
 import { PRINT } from "./pageParts";
 import { ItemPic, MarkPic, markPicture } from "./pictures";
 import { PhotoPrint } from "./PhotoPrint";
-import type { PrintOptions } from "./settings";
+import { posterFormatsFor } from "./poster";
+import { type PosterCompanion, PosterPrint } from "./PosterPrint";
+import type { PrintOptions, PrintWay } from "./settings";
 import { StickerLink, VelcroLink } from "./shopLinks";
 
 /** Print options both panels share. */
@@ -51,6 +53,98 @@ export function InkChoice({ color, onChange }: { color: boolean; onChange: (colo
   );
 }
 
+/** The two ways a chart is made at home (T-31), each with what it means in one line. */
+const WAYS: { id: PrintWay; emoji: string; title: EnglishFirst; line: EnglishFirst }[] = [
+  {
+    id: "fixed",
+    emoji: "🖼️",
+    title: {
+      en: "All fixed in one picture",
+      de: "Alles fest auf einem Bild",
+      zh: "全部固定在一张图上",
+      hi: "सब कुछ एक ही तस्वीर पर",
+      es: "Todo fijo en una imagen",
+      ar: "كل شيء ثابت في صورة واحدة",
+      ru: "Всё на одной картинке",
+    },
+    line: {
+      en: "Nothing to cut out – it hangs at once, on A4 or as a photo poster.",
+      de: "Nichts zu schneiden – hängt sofort, auf A4 oder als Fotoposter.",
+      zh: "不用剪——马上就能挂，打印在纸上或做成照片海报。",
+      hi: "कुछ काटना नहीं – तुरंत टँग जाता है, कागज़ पर या फ़ोटो पोस्टर के रूप में।",
+      es: "Nada que recortar: se cuelga al momento, en A4 o como póster fotográfico.",
+      ar: "لا شيء للقص – يُعلّق فورًا، على الورق أو كملصق صور.",
+      ru: "Ничего не вырезать – вешается сразу, на листе или фотопостером.",
+    },
+  },
+  {
+    id: "cards",
+    emoji: "✂️",
+    title: {
+      en: "Cards to cut out",
+      de: "Karten zum Ausschneiden",
+      zh: "可剪下的卡片",
+      hi: "काटने वाले कार्ड",
+      es: "Tarjetas para recortar",
+      ar: "بطاقات للقص",
+      ru: "Карточки для вырезания",
+    },
+    line: {
+      en: "More crafting – the cards can be moved around with Velcro.",
+      de: "Mehr Bastelarbeit – die Karten lassen sich mit Klett umstecken.",
+      zh: "要多动手——卡片可以用魔术贴换位置。",
+      hi: "थोड़ी ज़्यादा कारीगरी – कार्ड वेल्क्रो से इधर-उधर लगाए जा सकते हैं।",
+      es: "Más manualidad: las tarjetas se cambian de sitio con velcro.",
+      ar: "عمل يدوي أكثر – يمكن نقل البطاقات بالفيلكرو.",
+      ru: "Больше рукоделия – карточки можно переставлять на липучках.",
+    },
+  },
+];
+
+/**
+ * How the chart is made at home, chosen first (T-31): two big picture buttons, each saying in a line what it means,
+ * rather than a list of options to put together – the choice brings the options that belong to its way and hides the
+ * others (fixed: no cut-out pages, no cards as photo prints, the arrow wandering on the sheet).
+ */
+export function PrintWayChoice({ way, onChange }: { way: PrintWay; onChange: (way: PrintWay) => void }) {
+  const t = useT();
+  return (
+    <fieldset className="choice rw-print-ways">
+      <legend>
+        {t({
+          en: "How do you want to use it?",
+          de: "Wie möchten Sie sie nutzen?",
+          zh: "您想怎么用？",
+          hi: "आप इसे कैसे इस्तेमाल करना चाहते हैं?",
+          es: "¿Cómo quiere usarla?",
+          ar: "كيف تريدون استخدامها؟",
+          ru: "Как вы хотите её использовать?",
+        })}
+      </legend>
+      {WAYS.map((w) => (
+        <button key={w.id} type="button" className={w.id === way ? "selected" : undefined} aria-pressed={w.id === way} onClick={() => onChange(w.id)}>
+          <span className="rw-print-way-emoji" aria-hidden>
+            {w.emoji}
+          </span>
+          <span className="choice-label">{t(w.title)}</span>
+          <span className="rw-print-way-line">{t(w.line)}</span>
+        </button>
+      ))}
+    </fieldset>
+  );
+}
+
+/** A board's way: the one chosen, else cut-outs where an older choice asked for stickers or cards, else fixed. */
+export const boardWay = (options: PrintOptions): PrintWay => options.way ?? (options.stickers || options.cards ? "cards" : "fixed");
+
+/** The look of a board on a poster: always in colour (a photo service prints colour), fields to colour in as chosen. */
+const posterLook = (options: PrintOptions): SheetLook => ({ print: true, color: true, colorIn: options.colorIn });
+
+/** A board as it stands on a poster, laid out for the box it gets. */
+export const boardPosterSheet = (board: Board, day: Date, options: PrintOptions) => (aspect: number) => (
+  <BoardSheet board={board} stars={undefined} linked={NO_LINKED} today={day} look={posterLook(options)} aspect={aspect} />
+);
+
 /** A4 in millimetres. */
 export const A4 = { long: 297, short: 210 };
 /** CSS pixels per millimetre, to scale the preview. */
@@ -69,17 +163,33 @@ export const orientationOf = (board: Board, options: PrintOptions): "landscape" 
  * shows when printing (`rw-print-root` in rewards.css), so the browser prints
  * exactly them and nothing of the app – straight from the browser, offline too, no PDF.
  */
-export function PrintPanel({ board, options, onChange }: { board: Board; options: PrintOptions; onChange: (patch: Partial<PrintOptions>) => void }) {
+export function PrintPanel({
+  board,
+  options: chosen,
+  companions,
+  onChange,
+}: {
+  board: Board;
+  options: PrintOptions;
+  /** The other charts that may share the big poster with it (T-39). */
+  companions: PosterCompanion[];
+  onChange: (patch: Partial<PrintOptions>) => void;
+}) {
   const t = useT();
+  const way = boardWay(chosen);
+  // Fixed: nothing to cut out, whatever was ticked on the other way.
+  const options = way === "fixed" ? { ...chosen, stickers: false, cards: false } : chosen;
   const orientation = orientationOf(board, options);
   const look: SheetLook = { print: true, color: options.color, colorIn: options.colorIn };
   const pages = <PrintPages board={board} options={options} look={look} orientation={orientation} />;
+  const theme = THEME_BY_ID.get(board.theme) ?? THEMES[0];
   const mark = MARK_BY_ID.get(board.mark) ?? MARKS[0];
   const stars = photoLayout(photoFormat(options.photo), MIN_STAR_MM);
 
   return (
     <section className="settings rw-print-panel">
       <SettingsGroup title={t(PRINT)}>
+        <PrintWayChoice way={way} onChange={(next) => onChange({ way: next })} />
         <Choice
           label={t(PRINT_WORDS.page)}
           value={options.orientation}
@@ -115,32 +225,36 @@ export function PrintPanel({ board, options, onChange }: { board: Board; options
           checked={options.colorIn}
           onChange={(colorIn) => onChange({ colorIn })}
         />
-        <Toggle
-          label={t({
-            de: "Zweite Seite: Sterne zum Ausschneiden und Aufkleben",
-            en: "Second page: stars to cut out and stick on",
-            zh: "第二页：可剪下粘贴的星星",
-            hi: "दूसरा पेज: काटकर चिपकाने के लिए सितारे",
-            es: "Segunda página: estrellas para recortar y pegar",
-            ar: "صفحة ثانية: نجوم للقص واللصق",
-            ru: "Вторая страница: звёзды, чтобы вырезать и наклеить",
-          })}
-          checked={options.stickers}
-          onChange={(stickers) => onChange({ stickers })}
-        />
-        <Toggle
-          label={t({
-            de: "Dazu: Aufgaben und Belohnung als Bildkarten zum Ausschneiden",
-            en: "Also: tasks and reward as picture cards to cut out",
-            zh: "另附：任务和奖励的图片卡，可剪下",
-            hi: "साथ में: काम और इनाम काटने वाले तस्वीर कार्ड के रूप में",
-            es: "Además: tareas y premio como tarjetas con imágenes para recortar",
-            ar: "إضافةً إلى ذلك: المهام والمكافأة كبطاقات صور للقص",
-            ru: "Ещё: задания и награда карточками с картинками для вырезания",
-          })}
-          checked={!!options.cards}
-          onChange={(cards) => onChange({ cards })}
-        />
+        {way === "cards" && (
+          <Toggle
+            label={t({
+              de: "Zweite Seite: Sterne zum Ausschneiden und Aufkleben",
+              en: "Second page: stars to cut out and stick on",
+              zh: "第二页：可剪下粘贴的星星",
+              hi: "दूसरा पेज: काटकर चिपकाने के लिए सितारे",
+              es: "Segunda página: estrellas para recortar y pegar",
+              ar: "صفحة ثانية: نجوم للقص واللصق",
+              ru: "Вторая страница: звёзды, чтобы вырезать и наклеить",
+            })}
+            checked={options.stickers}
+            onChange={(stickers) => onChange({ stickers })}
+          />
+        )}
+        {way === "cards" && (
+          <Toggle
+            label={t({
+              de: "Dazu: Aufgaben und Belohnung als Bildkarten zum Ausschneiden",
+              en: "Also: tasks and reward as picture cards to cut out",
+              zh: "另附：任务和奖励的图片卡，可剪下",
+              hi: "साथ में: काम और इनाम काटने वाले तस्वीर कार्ड के रूप में",
+              es: "Además: tareas y premio como tarjetas con imágenes para recortar",
+              ar: "إضافةً إلى ذلك: المهام والمكافأة كبطاقات صور للقص",
+              ru: "Ещё: задания и награда карточками с картинками для вырезания",
+            })}
+            checked={!!options.cards}
+            onChange={(cards) => onChange({ cards })}
+          />
+        )}
         <p className="setting-note">
           {t({
             de: "Gedruckt wird die Tafel leer – die Sterne kommen mit Aufklebern, Stempeln oder Buntstiften darauf. Laminiert (oder in einer Klarsichthülle) hält sie mit abwischbarem Stift viele Wochen.",
@@ -172,32 +286,52 @@ export function PrintPanel({ board, options, onChange }: { board: Board; options
         </button>
       </SettingsGroup>
       <Preview orientation={orientation}>{pages}</Preview>
-      <PhotoPrint
-        title={`${mark.emoji} ${t({ de: "Zum Ankletten: als Fotoabzug", en: "To stick on with Velcro: as a photo print", zh: "用魔术贴贴：冲印成照片", hi: "वेल्क्रो से चिपकाने के लिए: फ़ोटो प्रिंट", es: "Para pegar con velcro: como copia fotográfica", ar: "للتثبيت بالفيلكرو: كصورة مطبوعة", ru: "На липучках: как фотоотпечаток" })}`}
-        note={t({
-          de: "Ein Foto voller Zeichen der Tafel: ausgeschnitten und mit Klettpunkten bekommt Ihr Kind jeden Stern zum Selbst-Ankletten, und die laminierte Tafel hält viele Wochen.",
-          en: "A photo full of the chart’s marks: cut out and with Velcro dots, every star is one your child can stick on, and the laminated chart lasts many weeks.",
-          zh: "一张印满奖励表标记的照片：剪开并贴上魔术贴后，孩子可以自己贴上每一颗星星，过塑的奖励表能用好几周。",
-          hi: "चार्ट के निशानों से भरी एक फ़ोटो: काटकर वेल्क्रो डॉट लगाने पर हर सितारा बच्चा खुद चिपका सकता है, और लैमिनेट किया चार्ट कई हफ़्ते चलता है।",
-          es: "Una foto llena de las marcas de la tabla: recortadas y con puntos de velcro, su peque puede pegar cada estrella, y la tabla plastificada dura muchas semanas.",
-          ar: "صورة مليئة بعلامات اللوحة: بعد قصّها وإضافة نقاط الفيلكرو يستطيع طفلكم تثبيت كل نجمة بنفسه، وتدوم اللوحة المغلّفة أسابيع كثيرة.",
-          ru: "Фото, полное значков таблицы: вырезанные и с липучками, каждую звезду ребёнок сможет прикрепить сам, а ламинированная таблица прослужит много недель.",
-        })}
-        cards={Array.from({ length: stars.cols * stars.rows }, () => ({ emoji: mark.emoji, picture: markPicture(mark) }))}
-        min={MIN_STAR_MM}
-        theme={THEME_BY_ID.get(board.theme) ?? THEMES[0]}
+      <PosterPrint
+        formats={posterFormatsFor({ kind: "board", view: board.kind, parts: 1, cards: 0 })}
+        orientation={orientation}
+        theme={theme}
         name={t({
-          de: "belohnungstafel-sterne",
-          en: "reward-chart-stars",
-          zh: "奖励表-星星",
-          hi: "इनाम-चार्ट-सितारे",
-          es: "tabla-de-premios-estrellas",
-          ar: "لوحة-المكافآت-نجوم",
-          ru: "таблица-наград-звёзды",
+          en: "reward-chart-poster",
+          de: "belohnungstafel-poster",
+          zh: "奖励表-海报",
+          hi: "इनाम-चार्ट-पोस्टर",
+          es: "tabla-de-premios-poster",
+          ar: "لوحة-المكافآت-ملصق",
+          ru: "таблица-наград-постер",
         })}
-        format={options.photo}
-        onFormat={(photo) => onChange({ photo })}
+        sheet={boardPosterSheet(board, new Date(), options)}
+        companions={companions}
+        options={options.poster ?? {}}
+        onChange={(patch) => onChange({ poster: { ...options.poster, ...patch } })}
       />
+      {way === "cards" && (
+        <PhotoPrint
+          title={`${mark.emoji} ${t({ de: "Zum Ankletten: als Fotoabzug", en: "To stick on with Velcro: as a photo print", zh: "用魔术贴贴：冲印成照片", hi: "वेल्क्रो से चिपकाने के लिए: फ़ोटो प्रिंट", es: "Para pegar con velcro: como copia fotográfica", ar: "للتثبيت بالفيلكرو: كصورة مطبوعة", ru: "На липучках: как фотоотпечаток" })}`}
+          note={t({
+            de: "Ein Foto voller Zeichen der Tafel: ausgeschnitten und mit Klettpunkten bekommt Ihr Kind jeden Stern zum Selbst-Ankletten, und die laminierte Tafel hält viele Wochen.",
+            en: "A photo full of the chart’s marks: cut out and with Velcro dots, every star is one your child can stick on, and the laminated chart lasts many weeks.",
+            zh: "一张印满奖励表标记的照片：剪开并贴上魔术贴后，孩子可以自己贴上每一颗星星，过塑的奖励表能用好几周。",
+            hi: "चार्ट के निशानों से भरी एक फ़ोटो: काटकर वेल्क्रो डॉट लगाने पर हर सितारा बच्चा खुद चिपका सकता है, और लैमिनेट किया चार्ट कई हफ़्ते चलता है।",
+            es: "Una foto llena de las marcas de la tabla: recortadas y con puntos de velcro, su peque puede pegar cada estrella, y la tabla plastificada dura muchas semanas.",
+            ar: "صورة مليئة بعلامات اللوحة: بعد قصّها وإضافة نقاط الفيلكرو يستطيع طفلكم تثبيت كل نجمة بنفسه، وتدوم اللوحة المغلّفة أسابيع كثيرة.",
+            ru: "Фото, полное значков таблицы: вырезанные и с липучками, каждую звезду ребёнок сможет прикрепить сам, а ламинированная таблица прослужит много недель.",
+          })}
+          cards={Array.from({ length: stars.cols * stars.rows }, () => ({ emoji: mark.emoji, picture: markPicture(mark) }))}
+          min={MIN_STAR_MM}
+          theme={theme}
+          name={t({
+            de: "belohnungstafel-sterne",
+            en: "reward-chart-stars",
+            zh: "奖励表-星星",
+            hi: "इनाम-चार्ट-सितारे",
+            es: "tabla-de-premios-estrellas",
+            ar: "لوحة-المكافآت-نجوم",
+            ru: "таблица-наград-звёзды",
+          })}
+          format={options.photo}
+          onFormat={(photo) => onChange({ photo })}
+        />
+      )}
       {createPortal(<div className="rw-print-root">{pages}</div>, document.body)}
     </section>
   );

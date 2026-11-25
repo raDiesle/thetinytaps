@@ -19,6 +19,7 @@ const CHILD_DRAWINGS = [
   "src/games/teeth/origin.tsx", // Zähne putzen: the face and shoulders in the story of the sugar monsters
   "src/games/teeth/prep.tsx", // Zähne putzen: the child's arm in its sleeve at the sink
   "src/games/handwash/hands.tsx", // Hände waschen: the child's own arms in their sleeves over the basin
+  "src/games/rewards/PosterPrint.tsx", // Belohnungstafel: the child beside the photo poster on the wall, its size to compare
 ];
 
 describe("the child's figure", () => {

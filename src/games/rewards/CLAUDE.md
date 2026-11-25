@@ -67,7 +67,7 @@ numbered unless „Karten nummerieren“ under „Weitere Einstellungen“ says 
 (`defaultDraft`): its cards in one line („Ganzer Tag“), no signs, a Zähler of 1 and no reward; a Zeitraum keeps
 name, colours and reward (`draftInSpan`; the Woche with a Zähler is the board Vorlage „woche“'s tasks, the same every
 day), „✓ Tafel anlegen“ / „✓ Plan anlegen“ makes it. The wizard's head (`.rw-wizard-head`, sticky on top) holds, from
-the left, that button big and yellow, „Abbrechen“ and the stamp „🖨️ Zum Ausdrucken – auf A4 oder als Fotoabzug“ – the
+the left, that button big and yellow, „Abbrechen“ and the stamp „🖨️ Zum Ausdrucken – auf A4, als Fotoabzug oder als Fotoposter“ – the
 editor's buttons all start on the left (user feedback, November 2026). No note explains the Zeitraum: its picture
 buttons say it (the note with an arrow went, user feedback, November 2026). Opened on a template from the
 gallery it starts on that template. While the wizard is open nothing on top or below belongs to the chart behind it.
@@ -247,6 +247,25 @@ files, so a phone hands it to the photo app or a shop's app). Below it the guide
 save, order like holiday photos (matt, „ganzes Bild“), cut and round the corners, 20 mm Velcro dots (soft side on the
 card), safety. The Tagesplan shows it first, before A4; the board after its A4 page.
 
+**Two ways** (T-31, `PrintWayChoice` in `PrintPanel.tsx`, `PrintOptions.way`, `PlanPrintOptions.way`): „🖼️ Alles fest
+auf einem Bild“ (nothing to cut: no sticker or card pages, no photo print of cards, a plan without the „Jetzt“ field)
+and „✂️ Karten zum Ausschneiden“. A chart's old options pick its way until one is chosen (stickers or cards on: cards).
+A plan that can only be one (`printsCards`: a marker's plan fixed, the field's cards) shows no choice.
+
+**Fotoposter** (T-32 to T-40; `poster.ts` the formats and arithmetic, `posterDecor.tsx` the frames, `PosterPrint.tsx`
+the panel): the very sheet of screen and A4, laid out with its short side at 210 mm (`layoutSize`) in an offscreen
+stage (`.rw-poster-stage`, portalled to `body`) and rasterized by `html-to-image` (imported when needed) into a JPG at
+the format's pixels – 20 × 30, 30 × 40 (default), 40 × 60, a panorama 30 × 90 / 40 × 120 for a day in one or two rows,
+a square 30 × 30 for a Countdown and a collecting board (`posterFormatsFor`). English names them in inches. It redraws
+once the stage has stood still `SETTLE_MS` (the child's photo arrives later from IndexedDB). Round it a frame of the
+season by default (`seasonalDecor`) or all year, the heading on a ribbon, the sheet lifted with a shadow; the painted
+grounds `poster-<theme>` wait in the picture queue, a gradient of the theme meanwhile. On 40 × 60 another chart may
+join it (T-39, `PosterCompanion`, built in `RewardsGame`): the poster stands upright, the plan above, the board below.
+The preview dashes the `POSTER_SAFE_MM` margin, warns where a picture prints under `SHARP_DPI` and names the largest
+sharp format (`blurriest`, `largestSharp`), and a drawn child's room shows the poster at true size beside a child of
+90 cm (`PosterWall`, the figure by „Junge / Mädchen“). Then „💾 Speichern“ / „📤 Teilen“ and the guide: order matte as
+„ganzes Bild“, an acrylic frame and a whiteboard marker or stickers, a clothes peg for a plan.
+
 ## Rules
 
 - No punishment, ever: a star is never taken away by the board, only undone right after a mistake; a missed day stays
@@ -260,7 +279,19 @@ card), safety. The Tagesplan shows it first, before A4; the board after its A4 p
   (`rewards.test.ts` checks `reviewPeriods`).
 - Few tasks: the editor advises one to three and allows `MAX_TASKS`; templates use at most three.
 - The child's name stays in localStorage only – never in a URL, a log or a picture prompt.
-- What is printed and what is on screen come from the same `BoardSheet`; never give print its own layout.
+- What is printed and what is on screen come from the same `BoardSheet`; never give print its own layout. The photo
+  poster too: it rasterizes that sheet with a decoration round it, never a poster layout of its own – a new poster idea
+  is a layer round the sheet (`posterDecor.tsx`) or a size (`POSTER_FORMATS`, checked in `poster.test.ts`).
+- No fox, bear or Tapsi as decoration on a poster (T-33 asked for them at the edge): mascots stand only where they do
+  something (root `CLAUDE.md`); the poster's room may draw the child as the measure of size (`Mascot.test.ts`).
+- A row of choices styled for itself overrides the shared `.choice` as `.choice.rw-…`: its legend floats left
+  (`start-screen.css`), and big picture buttons wrapped beside it until `.choice.rw-print-ways` set it on a line of its own.
+- html-to-image copies an svg's children without their stylesheet: a collecting board's dotted way (`fill: none` by
+  class) came out as a black shape. `inlineSvgStyles` writes their computed styles on for the drawing and takes them
+  off again; a new style an svg on the sheet needs from CSS joins `SVG_STYLES`. Look at the poster of every Zeitraum
+  after changing a sheet's svg.
+- The poster is drawn only after the stage stands still, and a hidden Browser pane throttles its timers: „wird
+  gezeichnet“ standing for seconds there is no bug – wait, or look with the pane shown.
 - Defaults are the same on every load: no random id in anything `rewardsDefaults` gives, since an unsaved
   default is rebuilt on each load and stars are keyed by board and task id (a random task id once lost the stars).
 - The views and the ready-made boards are clear from the first visit, never behind a menu: a first visit opens the
