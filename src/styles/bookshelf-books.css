@@ -505,7 +505,6 @@
   flex: 1;
   flex-direction: column;
   justify-content: center;
-  gap: 0.2em;
   align-self: center;
   height: 98%;
   padding: 0 calc(var(--bh) * var(--lean-clear, 0) + var(--pull, 0px)) 0 0;
@@ -523,6 +522,30 @@
   text-shadow: 0 1px 0 #fff4dccc;
   transform: translate(var(--sx), var(--sy)) translateZ(calc(var(--d) * -0.97 + 2px));
   pointer-events: none;
+}
+
+/*
+ * The carved words together, only as wide and tall as they are, with a brighter light on the panel close round them, so
+ * what a visitor should see first stands out (user request, November 2026). The light lies on the words only, a little
+ * past them, bright over every line (none lies in the dark) and fading out only beyond them, well inside the
+ * compartment: once it lit the whole compartment from post to books, reached
+ * the post and was cut off there (user feedback, 25 November 2026; `shelfGlow.test.ts`). Still, like the other light.
+ */
+.shelf-carving-text {
+  position: relative;
+  display: flex;
+  flex-direction: column;
+  gap: 0.2em;
+  align-self: center;
+  max-width: 100%;
+}
+
+.shelf-carving-text::before {
+  position: absolute;
+  inset: -0.9em -0.7em;
+  z-index: -1;
+  background: radial-gradient(closest-side, #fff6dafa, #fff0cdf0 66%, #ffe6a8a0 86%, #0000);
+  content: "";
 }
 
 /*
@@ -607,16 +630,16 @@
   padding-top: max(0px, calc(var(--bh) * 1.04 - var(--ch) * 0.7));
 }
 
-.room-scene[data-plan="wide"] .shelf-carving > * {
+.room-scene[data-plan="wide"] .shelf-carving-text > * {
   --fit: clamp(calc(var(--bh) * 0.085), min(7.2cqw, 10cqh), calc(var(--bh) * 0.15));
 }
 
-.room-scene[data-plan="wide"] .shelf-carving > .shelf-carving-big {
+.room-scene[data-plan="wide"] .shelf-carving-text > .shelf-carving-big {
   font-size: calc(var(--fit) * 1.45);
 }
 
-.room-scene[data-plan="wide"] .shelf-carving > .shelf-carving-words,
-.room-scene[data-plan="wide"] .shelf-carving > .home-menu {
+.room-scene[data-plan="wide"] .shelf-carving-text > .shelf-carving-words,
+.room-scene[data-plan="wide"] .shelf-carving-text > .home-menu {
   font-size: max(var(--fit), 8px);
 }
 
