@@ -43,7 +43,11 @@ import { faceKey } from "./stains";
 // jaw.ts), so the picture can turn and tilt to show exactly where to brush.
 
 export { INK, SKIN } from "./face";
-export const TOOTH_FILLS: Record<FaceKind, string> = { outer: "#fffdf6", top: "#fcf3dd", inner: "#f5ede0", side: "#e6d8bd" };
+/**
+ * A clean tooth's faces: a bright, cool white, the side turned to the viewer purest, the others a breath darker so the
+ * tooth reads round – never cream (user feedback, November 2026: brushed teeth should be a beautiful white).
+ */
+export const TOOTH_FILLS: Record<FaceKind, string> = { outer: "#ffffff", top: "#f5f7fb", inner: "#eff2f7", side: "#dde2ea" };
 /**
  * A face not brushed yet is a little yellow, with grey-yellow plaque along the gum (in the fissure on a chewing surface)
  * and a few grey spots (`StainedFace`); brushed it turns white (user request, November 2026). Soft, a picture book's
@@ -338,7 +342,7 @@ function Crown({ tooth: t, project, dirty }: { tooth: MouthModel["teeth"][number
 
 /** The groove along a molar's chewing surface. */
 function Groove({ tooth: t, project }: { tooth: MouthModel["teeth"][number]; project: Project }) {
-  return <path d={`M${t.groove!.map((g) => fmt(project.point(g))).join(" L")}`} fill="none" stroke="#d9c49a" strokeWidth={2} strokeLinecap="round" />;
+  return <path d={`M${t.groove!.map((g) => fmt(project.point(g))).join(" L")}`} fill="none" stroke="#ccd3de" strokeWidth={2} strokeLinecap="round" />;
 }
 
 /** A number of its own for each tooth, so the stains differ from tooth to tooth but stay where they are. */
@@ -426,6 +430,15 @@ function GumFaces({ gum, project, top }: { gum: MouthModel["gums"][number]; proj
 
 /** The mirror's glass behind the head. */
 const MIRROR_GLASS = "#dff6ff";
+
+/**
+ * The face's outline in a profile as a path: `line` is `profileLine`'s two runs of equal length, down to the upper
+ * lip's end and on from the lower one's, drawn apart so nothing runs across the mouth between the lips.
+ */
+function profileOutline(line: Point2[]): string {
+  const half = line.length / 2;
+  return `M${line.slice(0, half).map(fmt).join(" L")} M${line.slice(half).map(fmt).join(" L")}`;
+}
 
 /** What a profile needs on the screen: the face's outline, the region past it, the lips' near half and the front teeth. */
 interface ProfileParts {
@@ -652,6 +665,10 @@ export function Mouth({ view, zone, monsters, dirty, brush, happy, dazzled, acti
   const seenDirty = useRef(new Set<string>());
   for (const k of dirty) if (zoneFaces.has(k)) seenDirty.current.add(k);
   const shownStains = stains.filter((g) => seenDirty.current.has(g.key));
+  // A brushed face sparkles only once the brush has reached the next tooth (user feedback, November 2026: a glint
+  // flashing while the brush still lay on the tooth was hardly seen, and only the step's last tooth seemed to sparkle),
+  // and then every brushed face of the view goes on sparkling softly while the head holds still.
+  const sparkling = stains.filter((g) => !dirty.includes(g.key) && brush !== null && brushLeft(brush, g.tooth.id));
 
   const placed = (m: MonsterSpot) => {
     const face = toothFace(m.tooth, m.surface);
@@ -704,7 +721,9 @@ export function Mouth({ view, zone, monsters, dirty, brush, happy, dazzled, acti
     return (
       <g>
         <path d={side.beyond} fill={MIRROR_GLASS} />
-        <path d={`M${side.line.map(fmt).join(" L")}`} fill="none" stroke={INK} strokeWidth={7} strokeLinejoin="round" strokeLinecap="round" />
+        {/* Two lines, down to the upper lip and on from the lower one: the outline never runs across the mouth between
+            the lips, where it lay as a black stroke in front of the teeth (user feedback, November 2026). */}
+        <path d={profileOutline(side.line)} fill="none" stroke={INK} strokeWidth={7} strokeLinejoin="round" strokeLinecap="round" />
         <path d={near} fill="none" stroke={INK} strokeWidth={34} strokeLinejoin="round" strokeLinecap="round" />
         <path d={near} fill="none" stroke={LIP} strokeWidth={27} strokeLinejoin="round" strokeLinecap="round" />
       </g>
@@ -768,42 +787,6 @@ export function Mouth({ view, zone, monsters, dirty, brush, happy, dazzled, acti
         </div>
       )}
 
-      {zone && !gliding && (
-        <svg className="mouth mouth-moving zone-glow" viewBox={viewBox} aria-hidden>
-          <defs>
-            <clipPath id="mirror-glow">
-              <rect {...frame} />
-            </clipPath>
-            <clipPath id="mouth-inside-glow">
-              <path d={lipsPath} />
-            </clipPath>
-          </defs>
-          <g clipPath="url(#mirror-glow)">
-            <g clipPath="url(#mouth-inside-glow)">
-              {/* The frame lies inside each tooth's face, and the tooth's gum is laid over it again just as the still
-                  picture has it: the face runs on under the gum's walls, and a frame drawn along its whole edge framed a
-                  strip of gum too, with a gap between it and the tooth (user feedback, November 2026). */}
-              {zone.teeth.map((id) => {
-                const face = toothFace(id, zone.surface);
-                const at = all[id.jaw];
-                if (at.facing(face.normal) <= MIN_FACING) return null;
-                const key = toothKey(id);
-                const d = facePath(face, at, zone.surface === "outer" ? 7 : 3);
-                return (
-                  <g key={key}>
-                    <clipPath id={`zone-tooth-${key}`}>
-                      <path d={d} />
-                    </clipPath>
-                    <path d={d} clipPath={`url(#zone-tooth-${key})`} fill="none" stroke="#ffd23f" strokeWidth={10} strokeLinejoin="round" />
-                    <GumFaces gum={gumsByKey.get(key)!} project={at} top={false} />
-                  </g>
-                );
-              })}
-            </g>
-          </g>
-        </svg>
-      )}
-
       {/* All clean: a bright light round the teeth that breathes, clipped to the mouth with the teeth themselves left
           out, so their outlines stay sharp, and a warm light beaming out round the lips. Its own layer, which only
           changes its opacity. */}
@@ -859,21 +842,27 @@ export function Mouth({ view, zone, monsters, dirty, brush, happy, dazzled, acti
         {action && <LipArrows action={action} lips={lipPoints} zoom={project.zoom} onScreen={onScreen} />}
         {/* A last sugar monster peeks in, dazzled by the clean teeth, and puts on sunglasses: no sugar left for it. */}
         {dazzled && <DazzledMonster screen={screen} />}
-        {/* A tooth just brushed white sparkles once. */}
-        {shownStains
-          .filter((g) => !dirty.includes(g.key))
-          .map((g) => {
-            const at = onScreen(g.glint, GLINT_SIZE * BRUSHED_GLINT);
+        {/* The teeth of this view already brushed sparkle softly, small glints coming and going, once the brush has
+            moved on from them (`sparkling`). */}
+        {sparkling.map((g) =>
+          g.sparkles.map((spark, j) => {
+            const at = onScreen(spark, GLINT_SIZE * SPARKLE_SIZE);
             return (
-              <Sprite key={g.key} spot={{ x: round(at.x), y: round(at.y), scale: round(at.scale, 1000) }} reach={GLINT_REACH} className="tooth-glint brushed">
-                <div>
+              <Sprite
+                key={`${g.key}-${j}`}
+                spot={{ x: round(at.x), y: round(at.y), scale: round(at.scale, 1000) }}
+                reach={GLINT_REACH}
+                className="tooth-glint brushed"
+              >
+                <div style={{ "--turn": j + (g.seed % 3) * 0.5 } as CSSProperties}>
                   <svg viewBox={spriteBox(GLINT_REACH)} aria-hidden>
                     <Glint />
                   </svg>
                 </div>
               </Sprite>
             );
-          })}
+          }),
+        )}
         {/* All clean: glints of light flash on the teeth in turn, each a small layer of its own. */}
         {!gliding &&
           glints.map((g) => {
@@ -1220,8 +1209,24 @@ function Glint() {
   );
 }
 
-/** A glint on a tooth just brushed is a little smaller than the end's. */
-const BRUSHED_GLINT = 0.8;
+/**
+ * The sparkles on a tooth brushed are small, under a third of the end's glints, two to a face: small glints rather
+ * than one big one (user feedback, November 2026).
+ */
+const SPARKLE_SIZE = 0.3;
+
+/**
+ * Whether the brush has moved on from `tooth` to the next one: it has reached the stop after the tooth's last. A tooth
+ * with no stop is never left.
+ */
+function brushLeft(brush: { stops: { tooth: ToothId }[]; at: number }, tooth: ToothId): boolean {
+  const key = toothKey(tooth);
+  let last = -1;
+  brush.stops.forEach((s, i) => {
+    if (toothKey(s.tooth) === key) last = i;
+  });
+  return last >= 0 && last < brush.stops.length - 1 && brush.at >= last + 1;
+}
 
 /** What a stain layer of one face needs, in picture units: where it lies and what the still picture draws over it. */
 interface StainGeometry {
@@ -1232,8 +1237,8 @@ interface StainGeometry {
   seed: number;
   /** The layer's place, a little bigger than the face for its outline. */
   box: Box;
-  /** Where the face sparkles once it is clean: near its biting edge, clear of its monster's middle. */
-  glint: { x: number; y: number };
+  /** Where the face sparkles once it is clean: two small points apart on it. */
+  sparkles: { x: number; y: number }[];
   /**
    * The outlines of what the still picture draws over the face – its crown's later faces, its gum's walls, the teeth
    * drawn after it that reach into its box – as plain shapes (`cut`, filled with their outline) and gum rims (`rims`,
@@ -1301,7 +1306,7 @@ function stainGeometry(
       project,
       seed: seedOf(id),
       box,
-      glint: project.point(onFace(face, 0.32, 0.28)),
+      sparkles: [project.point(onFace(face, 0.3, 0.3)), project.point(onFace(face, 0.7, 0.65))],
       cut: [...own, ...walls.cut, ...after.flatMap((a) => a.cut)],
       rims: [...walls.rims, ...after.flatMap((a) => a.rims)],
     },
