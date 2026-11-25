@@ -49,6 +49,9 @@ export const SURPRISE_KINDS = ["firework", "gift", "egg", "balloon", "flower", "
 /** One kind of surprise. */
 export type SurpriseKind = (typeof SURPRISE_KINDS)[number];
 
+/** The kinds that are fireworks: „Zaubertasten“ brings them more often (`TAP_AWAY_SURPRISES.bag`). */
+export const FIREWORK_KINDS = ["firework", "skyrocket", "starburst", "wheel", "fountain", "sparkler", "swirl"] as const satisfies readonly SurpriseKind[];
+
 /** How surprises are kept from piling up while a child hammers keys (`surprises.test.ts` keeps them few). */
 export const SURPRISE = {
   /** A new surprise comes at most this often; presses between only ripple. */
@@ -80,6 +83,8 @@ export const SURPRISE = {
     fountain: CANVAS_SECONDS.fountain * 1000 + 200,
     swirl: CANVAS_SECONDS.swirl * 1000 + 200,
     sparkler: CANVAS_SECONDS.sparkler * 1000 + 200,
+    wheel: CANVAS_SECONDS.wheel * 1000 + 200,
+    starburst: CANVAS_SECONDS.starburst * 1000 + 200,
   } satisfies Record<SurpriseKind, number>,
 };
 
@@ -303,6 +308,19 @@ function createSurpriseStore(): SurpriseStore {
 export interface SurpriseLimits {
   gapMs: number;
   maxAtOnce: number;
+  /** What one shuffled bag holds, a kind listed twice coming twice as often: every kind once by default. */
+  bag?: readonly SurpriseKind[];
+}
+
+/**
+ * A shuffled bag of `kinds` with no kind twice in a row, nor first when it was just shown (`last`): shuffled again
+ * until it fits, which a bag with a few kinds twice or three times does within a few tries.
+ */
+export function shuffledBag(kinds: readonly SurpriseKind[], last?: SurpriseKind): SurpriseKind[] {
+  const fits = (bag: readonly SurpriseKind[]) => bag[0] !== last && bag.every((k, i) => i === 0 || k !== bag[i - 1]);
+  let bag = shuffle(kinds);
+  for (let i = 0; i < 200 && !fits(bag); i++) bag = shuffle(kinds);
+  return bag;
 }
 
 /**
@@ -315,7 +333,7 @@ export function useSurprises(limits: SurpriseLimits = SURPRISE) {
   const [store] = useState(createSurpriseStore);
   useEffect(() => () => store.dispose(), [store]);
   const { later } = useTimers();
-  const { gapMs, maxAtOnce } = limits;
+  const { gapMs, maxAtOnce, bag: kinds = SURPRISE_KINDS } = limits;
   const gate = useMemo(() => spaced(gapMs), [gapMs]);
   const extras = useMemo(() => spaced(EXTRA_SOUND_GAP_MS), []);
   const bag = useRef<SurpriseKind[]>([]);
@@ -324,15 +342,11 @@ export function useSurprises(limits: SurpriseLimits = SURPRISE) {
 
   /** The next kind from a shuffled bag; a new bag never starts with the kind just shown. */
   const nextKind = useCallback(() => {
-    if (bag.current.length === 0) {
-      let next = shuffle(SURPRISE_KINDS);
-      if (next[0] === last.current.kind) next = [...next.slice(1), next[0]];
-      bag.current = next;
-    }
+    if (bag.current.length === 0) bag.current = shuffledBag(kinds, last.current.kind);
     const kind = bag.current.shift() as SurpriseKind;
     last.current.kind = kind;
     return kind;
-  }, []);
+  }, [kinds]);
 
   const spawn = useCallback(
     (x: number, y: number, size: number) => {
@@ -450,6 +464,15 @@ export function useSurprises(limits: SurpriseLimits = SURPRISE) {
         case "sparkler":
           playSizzle();
           if (extra) later(playTwinkle, 1900);
+          break;
+        case "wheel":
+          playWhirr();
+          later(playSizzle, 200);
+          break;
+        case "starburst":
+          // Its bang comes at once, right where it was opened; the crackle as its stars go out.
+          playFirework(0.05, false);
+          if (extra) later(playCrackle, 1000);
           break;
       }
       return true;

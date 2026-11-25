@@ -1,7 +1,7 @@
 import { readFileSync } from "node:fs";
 import { expect, test } from "bun:test";
 import { ART_KINDS, artParams, MANDALA_RADII, MANDALA_VIEW, ringShapeSize } from "./SurpriseArt";
-import { SURPRISE, SURPRISE_KINDS, surpriseParams } from "./Surprises";
+import { FIREWORK_KINDS, SURPRISE, SURPRISE_KINDS, shuffledBag, surpriseParams } from "./Surprises";
 import {
   CANVAS_KINDS,
   CANVAS_MAX_DPR,
@@ -78,6 +78,8 @@ const CLASSES: Record<Kind, RegExp | null> = {
   fountain: null,
   swirl: null,
   sparkler: null,
+  wheel: null,
+  starburst: null,
 };
 
 /**
@@ -108,6 +110,8 @@ const LATEST_DELAY_MS: Record<Kind, number> = {
   fountain: 0,
   swirl: 0,
   sparkler: 0,
+  wheel: 0,
+  starburst: 0,
 };
 
 test("every surprise animation runs once and ends before its surprise is removed", () => {
@@ -196,4 +200,18 @@ test("a canvas surprise keeps its sparks few and ends before its surprise is rem
     expect({ name, within: seconds * 1000 < SURPRISE.lifeMs[look.kind] }).toEqual({ name, within: true });
     expect({ name, sparks: most <= MAX_SPARKS, some: most > 10 }).toEqual({ name, sparks: true, some: true });
   }
+});
+
+// A bag may hold a kind more than once (Zaubertasten's fireworks), yet never shows the same kind twice in a row.
+test("a bag with kinds listed several times never brings one twice in a row", () => {
+  const kinds = [...SURPRISE_KINDS, ...FIREWORK_KINDS, ...FIREWORK_KINDS];
+  let last: Kind | undefined = "firework";
+  for (let i = 0; i < 50; i++) {
+    const bag = shuffledBag(kinds, last);
+    expect(bag.length).toBe(kinds.length);
+    expect(bag[0]).not.toBe(last);
+    for (let k = 1; k < bag.length; k++) expect(bag[k]).not.toBe(bag[k - 1]);
+    last = bag[bag.length - 1];
+  }
+  for (const kind of FIREWORK_KINDS) expect(SURPRISE_KINDS as readonly string[]).toContain(kind);
 });

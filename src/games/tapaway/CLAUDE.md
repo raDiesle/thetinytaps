@@ -16,7 +16,10 @@ its address stays `/drauflos/`.
   0 stays a digit alone.
 - Every other key, every tap and click: one of Frei tippen's surprises right where the finger landed (`useSurprises`,
   `SurpriseLayer` from `src/games/letters/Surprises.tsx`), else – while one may not come yet – a bright shape with a
-  plop (`shapes.tsx`, drawn, never emoji), else only ripples. Each surprise is one thing aimed at that spot – one
+  plop (`shapes.tsx`, drawn, never emoji), else only ripples. Fireworks come three times as often as the other kinds
+  (`TAP_AWAY_SURPRISES.bag`, `FIREWORK_KINDS`), over half of all surprises.
+- Every letter, digit and shape bursts onto the page with a small ring of sparks flying out (`POP_SPARKS` streaks,
+  `.tw-burst`), a little firework with every press. Each surprise is one thing aimed at that spot – one
   balloon, one flower, one ball, bubbles round it rather than rising away (user feedback, 25 November 2026; the rule
   stands with the surprises in `src/games/letters/CLAUDE.md`): several things at once come from several presses,
   never from one.
@@ -24,6 +27,14 @@ its address stays `/drauflos/`.
 - Before the first press one still line says what to do („Press any key!“ / „Tap anywhere!“ on touch devices).
 
 ## Rules
+
+- **Small and light, never chunky** (user feedback, 25 November 2026: „mache Elemente kleiner, damit sie nicht so
+  klobig erscheinen“): letters, shapes and surprises are small shares of the page (`GLYPH_SHARE`, `SHAPE_SHARE`,
+  `SURPRISE_SHARE`, smaller than Frei tippen's surprises), so several stand light side by side; never grow them back to
+  a card's size. Look at 844×390 that a digit and its shapes still read there (`GLYPH_MIN`).
+- **More fireworks** (user request, 25 November 2026): fireworks are what children want most here – over half of the
+  surprises are one, and each press bursts with sparks (`tapaway.test.ts` checks both). A new firework kind goes into
+  `FIREWORK_KINDS` (`Surprises.tsx`), so it comes as often.
 
 - **Several things at once, side by side** (user request, 24 November 2026): quick presses one after the other each
   show their thing while the ones before still stand – up to `MAX_POPS` letters, digits and shapes, one every
