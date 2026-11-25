@@ -10,7 +10,7 @@ import { useTimers } from "@/lib/timers";
 import { talking } from "@/lib/voice";
 import { SAME_KEY_PAUSE_MS } from "@/games/letters/pace";
 import { useSoftTap } from "@/games/letters/softTap";
-import { SurpriseLayer, type SurpriseLimits, useSurprises } from "@/games/letters/Surprises";
+import { FIREWORK_KINDS, SURPRISE_KINDS, SurpriseLayer, type SurpriseLimits, useSurprises } from "@/games/letters/Surprises";
 import { lettersVoice } from "@/games/letters/voice";
 import { freeSpot, type Placed } from "./place";
 import { SHAPES, type ShapeKind, ShapeView } from "./shapes";
@@ -25,18 +25,21 @@ import "./tapaway.css";
 // others while there is room (`freeSpot`) – the one game where that is wanted (user request, 24 November 2026) – and
 // still within limits, so what can't come only ripples (see CLAUDE.md).
 
-/** A glyph's (letter's or digit's) size: this share of the play area's shorter side, within these limits in px. */
-const GLYPH_SHARE = 0.34;
-const GLYPH_MIN = 90;
-const GLYPH_MAX = 300;
+/**
+ * A glyph's (letter's or digit's) size: this share of the play area's shorter side, within these limits in px. Smaller
+ * than Frei tippen's card, so several stand light on the page instead of chunky (user feedback, 25 November 2026).
+ */
+export const GLYPH_SHARE = 0.22;
+const GLYPH_MIN = 72;
+const GLYPH_MAX = 200;
 /** A shape's size, the same way. */
-const SHAPE_SHARE = 0.24;
-const SHAPE_MIN = 70;
-const SHAPE_MAX = 220;
-/** A surprise's size, as in Frei tippen. */
-const SURPRISE_SHARE = 0.42;
-const SURPRISE_MIN = 120;
-const SURPRISE_MAX = 360;
+export const SHAPE_SHARE = 0.14;
+const SHAPE_MIN = 44;
+const SHAPE_MAX = 130;
+/** A surprise's size, smaller than in Frei tippen for the same reason. */
+export const SURPRISE_SHARE = 0.3;
+const SURPRISE_MIN = 100;
+const SURPRISE_MAX = 260;
 
 /** A digit's number beside its shapes is this much smaller than a letter, so both fit where a letter would. */
 const COUNTED_SHARE = 0.72;
@@ -56,8 +59,14 @@ export const MAX_POPS = 8;
  * (user request, 24 November 2026), slower than a held-down hand's flood.
  */
 export const POP_GAP_MS = 90;
-/** Surprises here come quicker and more at once than in Frei tippen, where they answer beside a card. */
-export const TAP_AWAY_SURPRISES: SurpriseLimits = { gapMs: 150, maxAtOnce: 5 };
+/**
+ * Surprises here come quicker and more at once than in Frei tippen, where they answer beside a card, and fireworks
+ * three times as often as the other kinds – over half of all surprises (user request, 25 November 2026: more fireworks).
+ */
+export const TAP_AWAY_SURPRISES: SurpriseLimits = { gapMs: 150, maxAtOnce: 5, bag: [...SURPRISE_KINDS, ...FIREWORK_KINDS, ...FIREWORK_KINDS] };
+/** The little burst of sparks every glyph and shape comes with: this many sparks, flying this many of its sizes. */
+export const POP_SPARKS = 12;
+const SPARK_REACH: [number, number] = [0.55, 0.85];
 /** A mouse's sparkles: one at most this often while it moves, each living `SPARKLE_MS`, at most `MAX_SPARKLES` at once. */
 export const SPARKLE_GAP_MS = 60;
 export const SPARKLE_MS = 700;
@@ -68,8 +77,11 @@ const TOP_CLEAR = 72;
 /** Bright colours for glyphs and shapes, each readable with a white outline on the light page. */
 export const POP_COLORS = ["#ff4f6d", "#ff9f1c", "#2ec4b6", "#3a86ff", "#8338ec", "#ff5fb8", "#3ec300", "#ffbe0b"];
 
+/** One spark of a glyph's or shape's burst: its direction in degrees, how far it flies in px, its colour. */
+type PopSpark = { angle: number; distance: number; color: string };
+
 /** One glyph or shape on the page; `reach` is how far it and its shapes reach round its middle. */
-type Pop = { id: number; x: number; y: number; size: number; reach: number; color: string; turn: number } & (
+type Pop = { id: number; x: number; y: number; size: number; reach: number; color: string; turn: number; sparks: PopSpark[] } & (
   | { kind: "glyph"; text: string; count?: { n: number; shape: ShapeKind; color: string } }
   | { kind: "shape"; shape: ShapeKind }
 );
@@ -128,9 +140,9 @@ export function TapAwayPlay() {
     return { x: clamp(at.x - box.left, reach, box.width - reach), y: clamp(at.y - box.top, TOP_CLEAR + reach * 0.9, box.height - reach) };
   };
 
-  /** Puts a glyph or shape on the page for `POP_MS`; false when too soon or too many. */
+  /** Puts a glyph or shape on the page for `POP_MS`, bursting out with sparks; false when too soon or too many. */
   const pop = useCallback(
-    (make: (box: DOMRect, color: string) => Omit<Pop, "id" | "color" | "turn">) => {
+    (make: (box: DOMRect, color: string) => Omit<Pop, "id" | "color" | "turn" | "sparks">) => {
       const box = area();
       const now = performance.now();
       if (!box || live.current >= MAX_POPS || now - lastPop.current < POP_GAP_MS) return false;
@@ -138,7 +150,15 @@ export function TapAwayPlay() {
       let color = pick(POP_COLORS);
       while (color === lastColor.current) color = pick(POP_COLORS);
       lastColor.current = color;
-      const item = { ...make(box, color), id: nextId.current++, color, turn: rand(-12, 12) } as Pop;
+      const made = make(box, color);
+      // The burst: sparks evenly round it, each a little off its place, in its colour, gold and white.
+      const start = rand(0, 360);
+      const sparks = Array.from({ length: POP_SPARKS }, (_, i) => ({
+        angle: start + (i * 360) / POP_SPARKS + rand(-8, 8),
+        distance: made.reach * rand(...SPARK_REACH) + made.size * 0.25,
+        color: i % 3 === 0 ? color : i % 3 === 1 ? "#ffc300" : "#fff3b0",
+      }));
+      const item = { ...made, id: nextId.current++, color, turn: rand(-12, 12), sparks } as Pop;
       live.current++;
       shown.current = [...shown.current, item];
       setPops((list) => [...list, item]);
@@ -275,7 +295,10 @@ export function TapAwayPlay() {
   );
 }
 
-/** A glyph or shape: one small HTML layer that pops in, stays a moment and floats away, moved by transform and opacity alone. */
+/**
+ * A glyph or shape: one small HTML layer that pops in, stays a moment and floats away, and behind it a burst of sparks
+ * flying out as it comes, like a little firework – each moved by transform and opacity alone.
+ */
 const PopView = memo(function PopView({ pop }: { pop: Pop }) {
   const style = {
     left: pop.x - pop.size / 2,
@@ -286,11 +309,19 @@ const PopView = memo(function PopView({ pop }: { pop: Pop }) {
     "--turn": `${pop.turn}deg`,
     "--life": `${POP_MS}ms`,
   } as CSSProperties;
+  const spark = Math.max(14, pop.size * 0.22);
   return (
-    <span className={`tw-pop ${pop.kind === "glyph" ? "tw-glyph" : "tw-shape"}`} style={style}>
-      {pop.kind === "glyph" ? <span style={{ fontSize: pop.size * 0.86 }}>{pop.text}</span> : <ShapeView shape={pop.shape} color={pop.color} />}
-      {pop.kind === "glyph" && pop.count && <Counted size={pop.size} {...pop.count} />}
-    </span>
+    <>
+      <span className="tw-burst" style={{ left: pop.x, top: pop.y }}>
+        {pop.sparks.map((s, i) => (
+          <span key={i} className="tw-spark" style={{ "--a": `${s.angle}deg`, "--d": `${s.distance}px`, "--c": s.color, width: spark } as CSSProperties} />
+        ))}
+      </span>
+      <span className={`tw-pop ${pop.kind === "glyph" ? "tw-glyph" : "tw-shape"}`} style={style}>
+        {pop.kind === "glyph" ? <span style={{ fontSize: pop.size * 0.86 }}>{pop.text}</span> : <ShapeView shape={pop.shape} color={pop.color} />}
+        {pop.kind === "glyph" && pop.count && <Counted size={pop.size} {...pop.count} />}
+      </span>
+    </>
   );
 });
 

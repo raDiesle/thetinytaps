@@ -5,15 +5,20 @@ import { ROW } from "./names";
 //
 // A floor of ten blocks spans the screen's width (user request, 24 November 2026: use the width, a house built row by
 // row, ten across, then the next ten on top), with a ledge on the left where the child waits for a floor's first block
-// and the elevator panel on the right. The world is as tall as the whole house with its roof and a sky above it; the
-// camera moves up a floor with each ten, as in a jump-and-run.
+// and, on the right, a narrow strip for the small plus that adds the next row. The blocks are as big as that allows
+// (user feedback, 25 November 2026: bigger blocks – the elevator panel that took a column of its own went for the plus).
+// The world is as tall as the whole house with its roof and a sky above it; the camera moves up a floor with each ten,
+// as in a jump-and-run, and can be swiped along it.
 
 /** A block's width and height (it is square): `s`. The beam laid over a full floor is this much of it. */
 export const BEAM = 0.22;
 /** The ledge on the beam's left end, where the child stands before a floor's first block. */
-export const LEDGE = 0.95;
+export const LEDGE = 0.9;
 /** How far the beam reaches past the floor's right end. */
-export const OVERHANG = 0.2;
+export const OVERHANG = 0.15;
+/** The strip right of the beam for the plus that adds the next row, and the plus's size, in blocks. */
+export const PLUS_ROOM = 0.45;
+export const PLUS = 0.34;
 /** The roof's height and how far it reaches past the floor on each side. */
 export const ROOF = 2.4;
 export const EAVE = 0.3;
@@ -48,23 +53,23 @@ export interface HouseLayout {
   worldH: number;
   /** Where a floor's top stands on the screen while it is built (pixels from the screen's top). */
   anchor: number;
-  /** The elevator panel on the right: its left edge, width and middle. */
-  panel: { left: number; width: number; middle: number };
   /** The child's size. */
   kidW: number;
   kidH: number;
 }
 
-/** Lays the world out for a screen of `w` × `h`. */
-export function houseLayout(w: number, h: number): HouseLayout {
-  const panelW = Math.round(Math.min(170, Math.max(66, 0.12 * w)));
-  const edge = Math.max(10, 0.015 * w);
-  const gap = Math.max(10, 0.02 * w);
-  // The house with its ledge and overhang in the room left of the panel; a floor at most a fifth of the screen high,
-  // so the floor below and the hanging block above stay in view.
-  const room = w - panelW - 2 * edge - gap;
-  const s = Math.max(12, Math.min(room / (LEDGE + ROW + OVERHANG), 0.2 * h));
-  const beamLeft = edge + (room - (LEDGE + ROW + OVERHANG) * s) / 2;
+/**
+ * Lays the world out for a screen of `w` × `h`, whose edges the book's paper margin covers by `frame` pixels (`--frame`:
+ * the plus at the right end hid under it).
+ */
+export function houseLayout(w: number, h: number, frame = 0): HouseLayout {
+  const edge = frame + Math.max(4, 0.006 * w);
+  // The house with its ledge, overhang and the plus's strip across the screen; a floor at most a fifth of the screen
+  // high, so the floor below and the hanging block above stay in view.
+  const room = w - 2 * edge;
+  const across = LEDGE + ROW + OVERHANG + PLUS_ROOM;
+  const s = Math.max(12, Math.min(room / across, 0.2 * h));
+  const beamLeft = edge + (room - across * s) / 2;
   const x0 = beamLeft + LEDGE * s;
   const floorH = s * (1 + BEAM);
   // Over the roof a sky as high as the screen, the moon in it; under the meadow's line a strip of meadow.
@@ -85,7 +90,6 @@ export function houseLayout(w: number, h: number): HouseLayout {
     ground,
     worldH: ground + meadow,
     anchor,
-    panel: { left: w - edge - panelW, width: panelW, middle: h / 2 },
     kidW: (KID * s * 2) / 3,
     kidH: KID * s,
   };
@@ -99,6 +103,14 @@ export const floorTop = (l: HouseLayout, f: number) => floorBottom(l, f) - l.s;
 
 /** The middle of the block at place `k` (1 to 10) of floor `f`. */
 export const slotAt = (l: HouseLayout, f: number, k: number): Point => ({ x: l.x0 + (k - 0.5) * l.s, y: floorBottom(l, f) - l.s / 2 });
+
+/** The middle of the plus beside floor `f`'s right end, which adds that floor: where its row would go. */
+export const plusAt = (l: HouseLayout, f: number): Point => ({ x: l.x0 + (ROW + OVERHANG + PLUS_ROOM / 2) * l.s, y: floorBottom(l, f) - l.s / 2 });
+
+/** The camera's reach while a floor is built and the house is swiped along: from a little over it down to the meadow. */
+export function lookRange(l: HouseLayout, f: number): { top: number; bottom: number } {
+  return { top: Math.max(0, cameraAt(l, f) - 0.35 * l.h), bottom: Math.max(cameraAt(l, f), l.worldH - l.h) };
+}
 
 /** The middle of the block waiting on the crane's hook above place `k` of floor `f`. */
 export const hangingAt = (l: HouseLayout, f: number, k: number): Point => ({ x: l.x0 + (k - 0.5) * l.s, y: floorTop(l, f) - HANG * l.s - l.s / 2 });

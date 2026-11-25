@@ -1,25 +1,13 @@
-import { type CSSProperties, memo, type ReactNode } from "react";
+import { memo, type ReactNode, useId } from "react";
 import { MASCOT_INK as INK } from "@/components/Mascot";
-import { FLOORS, type Pattern, type Special, colorOf, floorOf, specialOf } from "./floors";
+import { type Dressing, FLOORS, type Pattern, colorOf, dressingOf, floorOf } from "./floors";
 import { EAVE, type HouseLayout, ROOF, floorBottom, roofTop } from "./layout";
 import { ROW } from "./names";
 
 // The Counting Tower's drawings. The sky, meadow and trees are one big svg drawn once (`Backdrop`); every block, beam,
-// the roof and the crane's hook is a small svg on an HTML layer of its own, and what moves in a block as it lands (a
-// light going on, the cat coming up, the door opening) is a still smaller layer inside it – so a phone only ever moves
+// the roof and the crane's hook is a small svg on an HTML layer of its own, and what moves in a block as it lands (its
+// ears coming up, its crown coming down) is a still smaller layer inside it – so a phone only ever moves
 // layers and never paints the big picture again (root CLAUDE.md, phones).
-
-/** A plate with a number on it, for the specials (the plain blocks carry theirs big). */
-function Plate({ n, y = 68, h = 28 }: { n: number; y?: number; h?: number }) {
-  return (
-    <>
-      <rect x="20" y={y} width="60" height={h} rx="8" fill="#fffaf0" stroke={INK} strokeWidth="3.5" />
-      <text x="50" y={y + h / 2 + 1} textAnchor="middle" dominantBaseline="central" fontSize={h * 0.92} fontWeight="900" fontFamily="inherit" fill={INK}>
-        {n}
-      </text>
-    </>
-  );
-}
 
 /** The light on a block's top edge and the shade along its foot, so it looks like a wooden toy block, not a flat box. */
 function Shading() {
@@ -130,247 +118,396 @@ function PatternArt({ pattern, n }: { pattern: Pattern; n: number }) {
   }
 }
 
-/** A plain block of its floor: its colour, the floor's pattern and its number big on its front; each ten's last sparkles. */
-function PlainBlock({ n }: { n: number }) {
-  const { pattern } = FLOORS[floorOf(n)];
+/** The face of every block, in its 100 × 100 box: the dressings reach round it and a little past the box. */
+const FACE = { x: 4, y: 4, w: 92, h: 92, r: 12 };
+
+/**
+ * Every block's number: the same size, weight, colours and place on every block, and „?“ in that style on the block still
+ * hanging from the hook (user feedback, 25 November 2026: the number is seen only once it is laid, and no block shows its
+ * number smaller or otherwise than the others – a block differs only round it). Its zone, x 20–80 and y 30–78, stays
+ * free of every dressing's front.
+ */
+function BlockNumber({ text }: { text: string }) {
   return (
-    <svg className="zt-art" viewBox="0 0 100 100" aria-hidden>
-      <rect x="3" y="3" width="94" height="94" rx="11" fill={colorOf(n)} />
-      <PatternArt pattern={pattern} n={n} />
-      <Shading />
-      {n % ROW === 0 && <path d="M14 50 l5 -10 l5 10 l-5 10 Z M76 50 l5 -10 l5 10 l-5 10 Z" fill="#fff" opacity="0.85" />}
-      <rect x="3" y="3" width="94" height="94" rx="11" fill="none" stroke={INK} strokeWidth="4.5" />
-      <text
-        x="50"
-        y="52"
-        textAnchor="middle"
-        dominantBaseline="central"
-        fontSize={n >= 100 ? 40 : 54}
-        fontWeight="900"
-        fontFamily="inherit"
-        fill="#fff"
-        stroke={INK}
-        strokeWidth="7"
-        paintOrder="stroke"
-        strokeLinejoin="round"
-      >
-        {n}
-      </text>
-    </svg>
+    <text
+      x="50"
+      y="55"
+      textAnchor="middle"
+      dominantBaseline="central"
+      fontSize="46"
+      fontWeight="900"
+      fontFamily="inherit"
+      letterSpacing="-1"
+      fill="#fff"
+      stroke={INK}
+      strokeWidth="7"
+      paintOrder="stroke"
+      strokeLinejoin="round"
+    >
+      {text}
+    </text>
   );
 }
 
-/** Where a special's moving part lies in its block (in the block's 100 × 100), and whether it is cut round. */
-interface ActorBox {
-  x: number;
-  y: number;
-  w: number;
-  h: number;
-  round?: boolean;
+/** A dressing's parts: behind the face, on the face under the number, and in front of the face round the number. */
+interface DressParts {
+  back?: ReactNode;
+  inside?: ReactNode;
+  front?: ReactNode;
 }
 
-/** The window's opening in a block: the light, the cat, the dog and the flowers live in it. */
-const WINDOW: ActorBox = { x: 22, y: 12, w: 56, h: 48 };
+/** Two of a thing, the second mirrored at the block's middle. */
+const pair = (part: ReactNode) => (
+  <>
+    {part}
+    <g transform="translate(100 0) scale(-1 1)">{part}</g>
+  </>
+);
 
-/** Each special's moving part. */
-const ACTOR: Record<Special, ActorBox> = {
-  window: WINDOW,
-  cat: WINDOW,
-  dog: WINDOW,
-  flowers: { x: 18, y: 30, w: 64, h: 34 },
-  door: { x: 27, y: 33, w: 46, h: 64 },
-  birdhouse: { x: 38, y: 32, w: 24, h: 24, round: true },
-  fish: { x: 25, y: 11, w: 50, h: 50, round: true },
-  heart: { x: 0, y: 0, w: 100, h: 66 },
-  star: { x: 0, y: 0, w: 100, h: 66 },
-};
-
-/** The block behind a special: its colour, the opening or the thing on it. */
-function SpecialBack({ n, special }: { n: number; special: Special }) {
-  const color = colorOf(n);
-  const hole = (fill: string) => <rect x={WINDOW.x} y={WINDOW.y} width={WINDOW.w} height={WINDOW.h} rx="6" fill={fill} />;
-  return (
-    <svg className="zt-art" viewBox="0 0 100 100" aria-hidden>
-      <rect x="3" y="3" width="94" height="94" rx="11" fill={color} />
-      <Shading />
-      {special === "window" && hole("#3b4a78")}
-      {(special === "cat" || special === "dog" || special === "flowers") && hole("#ffe8a3")}
-      {special === "door" && <path d="M27 97 V52 Q27 33 50 33 Q73 33 73 52 V97 Z" fill="#ffd8a8" />}
-      {special === "birdhouse" && (
-        <>
-          <path d="M28 64 V34 L50 18 L72 34 V64 Z" fill="#f1d7a4" stroke={INK} strokeWidth="3.5" strokeLinejoin="round" />
-          <circle cx="50" cy="44" r="11" fill="#3b2a1a" />
-        </>
-      )}
-      {special === "fish" && (
-        <>
-          <circle cx="50" cy="36" r="25" fill="#74c0fc" />
-          <circle cx="36" cy="26" r="3" fill="#fff" opacity="0.7" />
-          <circle cx="40" cy="18" r="2" fill="#fff" opacity="0.7" />
-        </>
-      )}
-      {special === "heart" && <path d={heartPath(50, 36, 20)} fill="#5a3d6b" />}
-      {special === "star" && <path d={starPath(50, 35, 28)} fill="#3b4a78" />}
-    </svg>
-  );
-}
-
-/** A special's moving part, drawn in its own box (`ACTOR`), in the state it ends in once landed. */
-function SpecialActor({ special }: { special: Special }) {
-  const { w, h } = ACTOR[special];
-  const art = (children: ReactNode) => (
-    <svg className="zt-art" viewBox={`0 0 ${w} ${h}`} aria-hidden>
-      {children}
-    </svg>
-  );
-  switch (special) {
-    case "window":
-      return art(
-        <>
-          <rect width={w} height={h} fill="#ffe066" />
-          <ellipse cx={w / 2} cy={h * 0.45} rx={w * 0.4} ry={h * 0.35} fill="#fff7d6" />
-        </>,
-      );
+/** What a dressing draws, in the block's 100 × 100 (its face 4–96), the block's own colour `c` where it is part of it. */
+function dressParts(dressing: Dressing, c: string): DressParts {
+  const line = { stroke: INK, strokeWidth: 3, strokeLinejoin: "round" as const, strokeLinecap: "round" as const };
+  switch (dressing) {
     case "cat":
-      return art(
-        <g stroke={INK} strokeWidth="2.5" strokeLinejoin="round">
-          <path d="M12 48 V22 L16 8 L24 18 H32 L40 8 L44 22 V48 Z" fill="#f59f00" />
-          <path d="M18 30 h4 M34 30 h4" stroke="none" />
-          <circle cx="21" cy="28" r="2.6" fill={INK} stroke="none" />
-          <circle cx="35" cy="28" r="2.6" fill={INK} stroke="none" />
-          <path d="M26 33 L28 35.5 L30 33 Z" fill="#e8590c" />
-          <path d="M28 36 Q25 39 23 37 M28 36 Q31 39 33 37" fill="none" strokeWidth="1.8" />
-          <path d="M8 33 H18 M8 37 H18 M38 33 H48 M38 37 H48" strokeWidth="1.4" />
-        </g>,
-      );
-    case "dog":
-      return art(
-        <g stroke={INK} strokeWidth="2.5" strokeLinejoin="round">
-          <path d="M14 48 V24 Q14 10 28 10 Q42 10 42 24 V48 Z" fill="#d9a066" />
-          <path d="M14 14 Q4 18 8 34 Q14 34 16 24 Z M42 14 Q52 18 48 34 Q42 34 40 24 Z" fill="#8b5a2b" />
-          <circle cx="22" cy="24" r="2.6" fill={INK} stroke="none" />
-          <circle cx="34" cy="24" r="2.6" fill={INK} stroke="none" />
-          <ellipse cx="28" cy="32" rx="4.5" ry="3.2" fill={INK} />
-          <path d="M28 35 V38 M24 38 Q28 44 32 38" fill="#ff8787" strokeWidth="2" />
-        </g>,
-      );
+      return {
+        back: pair(
+          <>
+            <path d="M5 34 L11 -20 L45 8 Z" fill={c} {...line} strokeWidth={3.5} />
+            <path d="M14 20 L16 -7 L34 9 Z" fill="#ffb3c6" />
+          </>,
+        ),
+        front: pair(<path d="M-3 58 L18 63 M-3 70 L18 69 M-1 82 L18 75" stroke={INK} strokeWidth="3" strokeLinecap="round" />),
+      };
+    case "bear":
+      return {
+        back: pair(
+          <>
+            <circle cx="20" cy="2" r="19" fill={c} {...line} strokeWidth={3.5} />
+            <circle cx="20" cy="2" r="10" fill="#f1d7a4" />
+          </>,
+        ),
+      };
+    case "bunny":
+      return {
+        back: pair(
+          <g transform="rotate(-12 32 8)">
+            <ellipse cx="32" cy="-2" rx="10" ry="21" fill="#fff" {...line} strokeWidth={3.5} />
+            <ellipse cx="32" cy="0" rx="4.5" ry="14" fill="#ffb3c6" />
+          </g>,
+        ),
+      };
+    case "frog":
+      return {
+        back: pair(<circle cx="26" cy="2" r="18" fill={c} {...line} strokeWidth={3.5} />),
+        front: pair(
+          <>
+            <circle cx="26" cy="1" r="11.5" fill="#fff" stroke={INK} strokeWidth="2.5" />
+            <circle cx="28" cy="3" r="5.5" fill={INK} />
+            <circle cx="26" cy="1" r="1.8" fill="#fff" />
+          </>,
+        ),
+      };
+    case "headphones":
+      return {
+        front: (
+          <>
+            <path d="M12 46 Q10 -16 50 -16 Q90 -16 88 46" fill="none" stroke={INK} strokeWidth="11" strokeLinecap="round" />
+            <path d="M12 46 Q10 -16 50 -16 Q90 -16 88 46" fill="none" stroke="#868e96" strokeWidth="6" strokeLinecap="round" />
+            {pair(
+              <>
+                <rect x="-3" y="38" width="19" height="34" rx="8" fill="#e64980" {...line} />
+                <rect x="1" y="44" width="7" height="22" rx="3.5" fill="#fff" opacity="0.45" />
+              </>,
+            )}
+          </>
+        ),
+      };
+    case "crown":
+      return {
+        front: (
+          <>
+            <path d="M26 14 L26 -14 L38 -1 L50 -20 L62 -1 L74 -14 L74 14 Z" fill="#fcc419" {...line} />
+            <rect x="24" y="8" width="52" height="9" rx="3" fill="#f59f00" {...line} strokeWidth={2.5} />
+            <circle cx="50" cy="-8" r="4" fill="#e03131" stroke={INK} strokeWidth="1.5" />
+            <circle cx="36" cy="12.5" r="2.6" fill="#4dabf7" />
+            <circle cx="64" cy="12.5" r="2.6" fill="#51cf66" />
+          </>
+        ),
+      };
+    case "wheels":
+      return {
+        front: (
+          <>
+            {pair(
+              <>
+                <circle cx="24" cy="96" r="13" fill="#343a40" {...line} />
+                <circle cx="24" cy="96" r="5" fill="#ced4da" stroke={INK} strokeWidth="2" />
+              </>,
+            )}
+            <circle cx="93" cy="60" r="6" fill="#ffe066" stroke={INK} strokeWidth="2.5" />
+          </>
+        ),
+      };
+    case "spikes":
+      return {
+        back: (
+          <path
+            d="M2 46 L-6 36 L3 28 L-6 16 L8 12 L4 -4 L20 4 L24 -12 L36 2 L44 -14 L52 2 L62 -14 L68 2 L80 -10 L82 6 L98 -2 L94 14 L106 18 L97 28 L106 36 L98 46 Z"
+            fill="#8b5a2b"
+            {...line}
+          />
+        ),
+      };
+    case "dino":
+      return {
+        back: (
+          <>
+            {[
+              [18, 16],
+              [39, 24],
+              [61, 24],
+              [82, 16],
+            ].map(([x, h]) => (
+              <path key={x} d={`M${x - 11} 10 Q${x - 6} ${-h} ${x} ${-h - 2} Q${x + 6} ${-h} ${x + 11} 10 Z`} fill="#20c997" {...line} />
+            ))}
+          </>
+        ),
+      };
     case "flowers":
-      return art(
-        <g stroke={INK} strokeWidth="2">
-          {[12, 26, 40, 54].map((x, i) => (
-            <g key={x}>
-              <path d={`M${x} ${h} V${12 + (i % 2) * 6}`} stroke="#2f9e44" strokeWidth="3" />
-              <circle cx={x} cy={10 + (i % 2) * 6} r="6.5" fill={["#ff6b6b", "#ffd43b", "#f783ac", "#748ffc"][i]} />
-              <circle cx={x} cy={10 + (i % 2) * 6} r="2.4" fill="#fff3bf" strokeWidth="1" />
-            </g>
-          ))}
-        </g>,
-      );
-    case "door":
-      return art(
-        <>
-          <path d={`M0 ${h} V19 Q0 0 ${w / 2} 0 Q${w} 0 ${w} 19 V${h} Z`} fill="#1c7ed6" stroke={INK} strokeWidth="3" />
-          <rect x="8" y="16" width={w - 16} height="18" rx="4" fill="#4dabf7" stroke={INK} strokeWidth="2" />
-          <rect x="8" y="40" width={w - 16} height="18" rx="4" fill="#4dabf7" stroke={INK} strokeWidth="2" />
-          <circle cx={w - 9} cy="44" r="3.5" fill="#fcc419" stroke={INK} strokeWidth="1.5" />
-        </>,
-      );
-    case "birdhouse":
-      return art(
-        <g stroke={INK} strokeWidth="2">
-          <circle cx="12" cy="14" r="9" fill="#ffd43b" />
-          <path d="M19 13 L24 15 L19 17 Z" fill="#ff922b" />
-          <circle cx="14" cy="11" r="1.8" fill={INK} stroke="none" />
-        </g>,
-      );
-    case "fish":
-      return art(
-        <g stroke={INK} strokeWidth="2.2" strokeLinejoin="round">
-          <path d="M10 25 Q22 12 34 25 Q22 38 10 25 Z" fill="#ff922b" />
-          <path d="M33 25 L44 17 L44 33 Z" fill="#ff922b" />
-          <circle cx="17" cy="23" r="1.8" fill={INK} stroke="none" />
-        </g>,
-      );
-    case "heart":
-      return art(<path d={heartPath(50, 36, 20)} fill="#ff8fab" />);
-    case "star":
-      return art(<path d={starPath(50, 35, 28)} fill="#ffe066" />);
+      return {
+        back: (
+          <>
+            {(
+              [
+                [24, -6, "#ff6b6b"],
+                [50, -14, "#ffd43b"],
+                [76, -6, "#748ffc"],
+              ] as const
+            ).map(([x, y, color]) => (
+              <g key={x}>
+                <path d={`M${x} 12 V${y}`} stroke="#2f9e44" strokeWidth="4" />
+                <path d={`M${x} ${y + 14} q8 -8 12 -2 q-6 6 -12 2 Z`} fill="#51cf66" stroke={INK} strokeWidth="1.5" />
+                {[0, 72, 144, 216, 288].map((a) => (
+                  <circle
+                    key={a}
+                    cx={x + 6 * Math.cos((a * Math.PI) / 180)}
+                    cy={y + 6 * Math.sin((a * Math.PI) / 180)}
+                    r="5"
+                    fill={color}
+                    stroke={INK}
+                    strokeWidth="1.5"
+                  />
+                ))}
+                <circle cx={x} cy={y} r="3.5" fill="#fff3bf" stroke={INK} strokeWidth="1.2" />
+              </g>
+            ))}
+          </>
+        ),
+      };
+    case "water":
+      return {
+        inside: (
+          <>
+            <path d="M0 62 Q12 54 24 62 T48 62 T72 62 T96 62 T120 62 V100 H0 Z" fill="#339af0" opacity="0.9" />
+            <path d="M0 62 Q12 54 24 62 T48 62 T72 62 T96 62 T120 62" fill="none" stroke="#fff" strokeWidth="3" opacity="0.7" />
+            <circle cx="14" cy="40" r="3.5" fill="none" stroke="#fff" strokeWidth="2" opacity="0.8" />
+            <circle cx="86" cy="30" r="4.5" fill="none" stroke="#fff" strokeWidth="2" opacity="0.8" />
+            <circle cx="88" cy="44" r="2.5" fill="none" stroke="#fff" strokeWidth="2" opacity="0.8" />
+          </>
+        ),
+        front: (
+          <g strokeLinejoin="round" stroke={INK} strokeWidth="2">
+            <path d="M4 86 Q11 78 18 86 Q11 94 4 86 Z" fill="#ff922b" />
+            <path d="M17 86 L24 81 L24 91 Z" fill="#ff922b" />
+            <circle cx="8.5" cy="85" r="1.4" fill={INK} stroke="none" />
+          </g>
+        ),
+      };
+    case "antennae":
+      return {
+        back: pair(
+          <>
+            <path d="M34 10 L22 -14" stroke={INK} strokeWidth="3.5" strokeLinecap="round" />
+            <circle cx="22" cy="-15" r="6.5" fill="#ff6b6b" stroke={INK} strokeWidth="2.5" />
+          </>,
+        ),
+        front: pair(
+          <>
+            <circle cx="10" cy="22" r="3.5" fill="#ced4da" stroke={INK} strokeWidth="1.8" />
+            <circle cx="10" cy="86" r="3.5" fill="#ced4da" stroke={INK} strokeWidth="1.8" />
+          </>,
+        ),
+      };
+    case "bowtie":
+      return {
+        front: (
+          <>
+            <path d="M50 85 L25 74 Q20 85 25 96 Z M50 85 L75 74 Q80 85 75 96 Z" fill="#e03131" {...line} strokeWidth={2.5} />
+            <path d="M31 80 L31 90 M69 80 L69 90" stroke="#fff" strokeWidth="2.5" strokeLinecap="round" opacity="0.6" />
+            <circle cx="50" cy="85" r="6.5" fill="#c92a2a" stroke={INK} strokeWidth="2.5" />
+          </>
+        ),
+      };
+    case "shoes":
+      return {
+        front: pair(
+          <>
+            <path d="M4 100 V92 Q4 82 16 82 H28 Q40 84 42 94 Q42 102 34 102 H8 Q4 102 4 100 Z" fill="#4263eb" {...line} strokeWidth={2.5} />
+            <path d="M16 86 L24 90 M20 84 L27 88" stroke="#fff" strokeWidth="2" strokeLinecap="round" />
+            <path d="M5 98 H41" stroke="#fff" strokeWidth="2.5" opacity="0.8" />
+          </>,
+        ),
+      };
+    case "wings":
+      return {
+        back: pair(
+          <>
+            <path d="M24 16 Q4 18 -4 -16 Q8 -10 12 -20 Q18 -8 26 -12 Q34 2 24 16 Z" fill="#fff" {...line} />
+            <path d="M8 -6 Q14 4 22 4 M14 -12 Q18 -2 24 -2" fill="none" stroke={INK} strokeWidth="1.8" opacity="0.5" />
+          </>,
+        ),
+      };
+    case "propeller":
+      return {
+        front: (
+          <>
+            <path d="M50 -4 V-14" stroke={INK} strokeWidth="3" />
+            <ellipse cx="39" cy="-15" rx="11" ry="3.5" fill="#ffd43b" stroke={INK} strokeWidth="2" />
+            <ellipse cx="61" cy="-15" rx="11" ry="3.5" fill="#ff6b6b" stroke={INK} strokeWidth="2" />
+            <path d="M28 16 Q28 -6 50 -6 Q72 -6 72 16 Z" fill="#4dabf7" {...line} />
+            <path d="M50 -6 Q42 4 42 16 M50 -6 Q58 4 58 16" fill="none" stroke="#fff" strokeWidth="3" opacity="0.7" />
+            <path d="M70 16 Q88 10 94 18 Q84 22 70 20 Z" fill="#1c7ed6" {...line} strokeWidth={2.5} />
+          </>
+        ),
+      };
+    case "cake":
+      return {
+        front: (
+          <>
+            <rect x="45" y="-14" width="10" height="20" rx="2" fill="#fff" {...line} strokeWidth={2.5} />
+            <path d="M45 -8 L55 -12 M45 -1 L55 -5" stroke="#f783ac" strokeWidth="3" />
+            <path d="M50 -15 Q44 -22 50 -30 Q56 -22 50 -15 Z" fill="#ffa94d" stroke={INK} strokeWidth="2" />
+            <path
+              d="M4 18 V12 Q4 4 12 4 H88 Q96 4 96 12 V18 Q90 28 84 18 Q78 30 70 18 Q62 26 56 18 Q50 30 42 18 Q36 26 30 18 Q22 30 16 18 Q10 26 4 18 Z"
+              fill="#fff0f6"
+              {...line}
+              strokeWidth={2.5}
+            />
+            {(
+              [
+                [14, 10, "#ff6b6b", 30],
+                [30, 9, "#4dabf7", -30],
+                [64, 10, "#51cf66", 30],
+                [80, 9, "#fcc419", -30],
+              ] as const
+            ).map(([x, y, color, turn]) => (
+              <rect key={x} x={x} y={y} width="6" height="2.6" rx="1.3" fill={color} transform={`rotate(${turn} ${x} ${y})`} />
+            ))}
+          </>
+        ),
+      };
+    case "gift":
+      return {
+        inside: (
+          <>
+            <rect x="43" y="0" width="14" height="100" fill="#fff" opacity="0.8" />
+            <rect x="0" y="45" width="100" height="14" fill="#fff" opacity="0.8" />
+          </>
+        ),
+        front: (
+          <>
+            {pair(<path d="M50 6 Q30 -18 24 -2 Q24 10 50 6 Z" fill="#fa5252" {...line} strokeWidth={2.5} />)}
+            <circle cx="50" cy="5" r="6" fill="#e03131" stroke={INK} strokeWidth="2.5" />
+          </>
+        ),
+      };
+    case "lights":
+      return {
+        front: (
+          <>
+            {[
+              [14, 4],
+              [32, 4],
+              [50, 4],
+              [68, 4],
+              [86, 4],
+              [96, 22],
+              [96, 40],
+              [96, 58],
+              [96, 76],
+              [86, 96],
+              [68, 96],
+              [50, 96],
+              [32, 96],
+              [14, 96],
+              [4, 76],
+              [4, 58],
+              [4, 40],
+              [4, 22],
+            ].map(([x, y], i) => (
+              <circle key={i} cx={x} cy={y} r="4.8" fill={["#ffe066", "#ff8787", "#74c0fc", "#8ce99a"][i % 4]} stroke={INK} strokeWidth="1.8" />
+            ))}
+          </>
+        ),
+      };
+    case "nest":
+      return {
+        front: (
+          <>
+            <circle cx="52" cy="-6" r="10" fill="#ffd43b" {...line} strokeWidth={2.5} />
+            <path d="M61 -7 L69 -4 L61 -1 Z" fill="#ff922b" stroke={INK} strokeWidth="1.8" strokeLinejoin="round" />
+            <circle cx="55" cy="-9" r="1.8" fill={INK} />
+            <ellipse cx="50" cy="6" rx="26" ry="9" fill="#a9714b" {...line} strokeWidth={2.5} />
+            <path d="M28 4 Q40 10 52 4 M48 8 Q62 12 72 5 M32 10 L44 6" fill="none" stroke="#5c3d22" strokeWidth="2" />
+          </>
+        ),
+      };
   }
 }
 
-/** What lies over a special's moving part: the window's frame and bars, the flower box, the door's frame, the plate. */
-function SpecialFront({ n, special }: { n: number; special: Special }) {
-  const frame = (bars: boolean) => (
-    <>
-      <rect x={WINDOW.x} y={WINDOW.y} width={WINDOW.w} height={WINDOW.h} rx="6" fill="none" stroke="#fffaf0" strokeWidth="5" />
-      {bars && <path d={`M50 ${WINDOW.y} V${WINDOW.y + WINDOW.h} M${WINDOW.x} 36 H${WINDOW.x + WINDOW.w}`} stroke="#fffaf0" strokeWidth="4" />}
-      <rect x={WINDOW.x - 3} y={WINDOW.y} width={WINDOW.w + 6} height={WINDOW.h} rx="6" fill="none" stroke={INK} strokeWidth="2.5" />
-      <rect x="16" y="59" width="68" height="6" rx="3" fill="#fffaf0" stroke={INK} strokeWidth="2.5" />
-    </>
-  );
-  return (
-    <svg className="zt-art" viewBox="0 0 100 100" aria-hidden>
-      {special === "window" && (
-        <>
-          {frame(true)}
-          <path d="M24 14 Q30 26 24 38 Z M76 14 Q70 26 76 38 Z" fill="#f783ac" stroke={INK} strokeWidth="1.5" />
-        </>
-      )}
-      {(special === "cat" || special === "dog") && frame(false)}
-      {special === "flowers" && (
-        <>
-          {frame(true)}
-          <rect x="16" y="56" width="68" height="12" rx="3" fill="#c0703a" stroke={INK} strokeWidth="2.5" />
-        </>
-      )}
-      {special === "door" && (
-        <>
-          <path d="M27 97 V52 Q27 33 50 33 Q73 33 73 52 V97" fill="none" stroke={INK} strokeWidth="3.5" />
-          <rect x="20" y="91" width="60" height="7" rx="2" fill="#ced4da" stroke={INK} strokeWidth="2.5" />
-        </>
-      )}
-      {special === "birdhouse" && (
-        <>
-          <path d="M22 36 L50 14 L78 36" fill="none" stroke="#e03131" strokeWidth="7" strokeLinecap="round" strokeLinejoin="round" />
-          <path d="M50 58 V66" stroke={INK} strokeWidth="3" />
-        </>
-      )}
-      {special === "fish" && <circle cx="50" cy="36" r="25" fill="none" stroke="#f6c453" strokeWidth="6" />}
-      {special === "heart" && <path d={heartPath(50, 36, 20)} fill="none" stroke="#fffaf0" strokeWidth="4.5" />}
-      {special === "star" && <path d={starPath(50, 35, 28)} fill="none" stroke="#fffaf0" strokeWidth="4" strokeLinejoin="round" />}
-      <rect x="3" y="3" width="94" height="94" rx="11" fill="none" stroke={INK} strokeWidth="4.5" />
-      {special === "door" ? <Plate n={n} y={5} h={24} /> : <Plate n={n} />}
-    </svg>
-  );
-}
-
 /**
- * One block of the house, numbered: a plain block of its floor, or one of the house's specials – the door, a window, the
- * cat … – whose moving part (`.zt-actor`) the game moves once as it lands.
+ * One block of the house: its floor's colour and pattern, its dressing round it (`dressingOf`) and its number – or „?“
+ * while it still hangs from the crane's hook (`hidden`). The dressing's parts behind and in front of the face are
+ * layers of their own (`.zt-dress`), which the game moves once as the block lands.
  */
-export const HouseBlock = memo(function HouseBlock({ n }: { n: number }) {
-  const special = specialOf(n);
-  if (!special) return <PlainBlock n={n} />;
-  const box = ACTOR[special];
-  const style: CSSProperties = {
-    left: `${box.x}%`,
-    top: `${box.y}%`,
-    width: `${box.w}%`,
-    height: `${box.h}%`,
-    borderRadius: box.round ? "50%" : undefined,
-  };
+export const HouseBlock = memo(function HouseBlock({ n, hidden = false }: { n: number; hidden?: boolean }) {
+  const clip = useId();
+  const color = colorOf(n);
+  const { pattern } = FLOORS[floorOf(n)];
+  const parts = dressParts(dressingOf(n), color);
   return (
     <>
-      <SpecialBack n={n} special={special} />
-      <div className="zt-hole" style={style}>
-        <div className={`zt-actor zt-actor-${special}`}>
-          <SpecialActor special={special} />
-        </div>
-      </div>
-      <SpecialFront n={n} special={special} />
+      {parts.back && <DressLayer side="back">{parts.back}</DressLayer>}
+      <svg className="zt-art" viewBox="0 0 100 100" aria-hidden>
+        <defs>
+          <clipPath id={clip}>
+            <rect x={FACE.x} y={FACE.y} width={FACE.w} height={FACE.h} rx={FACE.r} />
+          </clipPath>
+        </defs>
+        <rect x={FACE.x} y={FACE.y} width={FACE.w} height={FACE.h} rx={FACE.r} fill={color} />
+        <g clipPath={`url(#${clip})`}>
+          <PatternArt pattern={pattern} n={n} />
+          {parts.inside}
+        </g>
+        <Shading />
+        <rect x={FACE.x} y={FACE.y} width={FACE.w} height={FACE.h} rx={FACE.r} fill="none" stroke={INK} strokeWidth="4.5" />
+        <BlockNumber text={hidden ? "?" : String(n)} />
+      </svg>
+      {parts.front && <DressLayer side="front">{parts.front}</DressLayer>}
     </>
   );
 });
+
+/** A dressing's part behind or in front of a block's face, on a layer of its own so it can come as the block lands. */
+function DressLayer({ side, children }: { side: "back" | "front"; children: ReactNode }) {
+  return (
+    <div className={`zt-dress zt-dress-${side}`}>
+      <svg className="zt-art" viewBox="0 0 100 100" aria-hidden>
+        {children}
+      </svg>
+    </div>
+  );
+}
 
 /** The wooden beam laid over a full floor, `w` × `h` pixels, with its grain and a bolt over every block. */
 export const Beam = memo(function Beam({ w, h, s, color }: { w: number; h: number; s: number; color: string }) {
@@ -452,7 +589,7 @@ const SKY = ["#141b45", "#26306e", "#5b4b9a", "#f08c7a", "#ffc9a0", "#a5d8ff", "
 
 /**
  * The world behind the house, drawn once: the sky going from day at the meadow over the evening to the night with its
- * stars and the moon above the roof, clouds on the way up, the meadow with the path to the door and two trees. It
+ * stars and the moon above the roof, clouds on the way up, the meadow with two trees. It
  * reaches far past the screen on every side, so the whole house zoomed out at the end still stands in it.
  */
 export const Backdrop = memo(function Backdrop({ layout: l }: { layout: HouseLayout }) {
@@ -485,7 +622,6 @@ export const Backdrop = memo(function Backdrop({ layout: l }: { layout: HouseLay
       <circle cx="22" cy="-112" r="10" fill="#ff6b6b" />
     </g>
   );
-  const door = l.x0 + 4.5 * s;
   return (
     <svg className="zt-backdrop" viewBox={`${left} 0 ${width} ${height}`} style={{ left, width, height }} aria-hidden>
       <defs>
@@ -522,8 +658,7 @@ export const Backdrop = memo(function Backdrop({ layout: l }: { layout: HouseLay
         d={`M${left} ${ground + 0.5 * s} Q${left + width * 0.5} ${ground + 0.2 * s} ${left + width} ${ground + 0.6 * s} V${height} H${left} Z`}
         fill="#69db7c"
       />
-      {/* The path to the front door, the house's footing. */}
-      <path d={`M${door - 0.3 * s} ${ground} L${door + 0.3 * s} ${ground} L${door + 0.9 * s} ${height} L${door - 0.9 * s} ${height} Z`} fill="#f1d7a4" />
+      {/* The house's footing. */}
       <rect x={l.beamLeft} y={ground - 1} width={right - l.beamLeft} height={0.22 * s} rx="4" fill="#adb5bd" stroke={INK} strokeWidth="3" />
       {[-0.9, 1.3, 2.4, 6.8, 8.2, 11.2].map((d, i) => (
         <g key={d} transform={`translate(${l.x0 + d * s} ${ground + (0.45 + (i % 2) * 0.2) * s})`}>

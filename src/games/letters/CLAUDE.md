@@ -101,11 +101,18 @@ the page before it.
   (arrows and Backspace keep theirs), Space and Enter, or a tap beside the card, opens a surprise – Space and Enter do
   their own thing (the card's jump, the horn or whistle) only when no surprise can come now, pressed quickly again (user
   request, November 2026; `specialKey`; in step-by-step counting they still reveal the next part first). A surprise is a firework, a present
-  with a toy, an egg a baby animal hatches from, balloons that pop, flowers growing, soap bubbles, a shooting star, a
-  snowflake breaking into small ones, a mandala unfolding, a paint splash, a pinwheel, bouncing balls, and on a canvas
-  skyrockets with many bursts (chrysanthemum, palm, crossette, glitter, saturn, double), a spark fountain, a swirl of
-  sparks and a sparkler drawing a figure (heart, star, spiral …) – a tap
-  right where the finger landed, a key somewhere on the stage clear of the card. The kinds take turns from a shuffled
+  with a toy, an egg a baby animal hatches from, a balloon blowing up and popping, a flower growing, soap bubbles, a
+  shooting star, a snowflake breaking into small ones, a mandala unfolding, a paint splash, a pinwheel, a bouncing ball,
+  a butterfly fluttering, a jack-in-the-box, a beating heart, a raining cloud, a frog jumping and croaking, a fish
+  leaping out of a puddle (`SurpriseToys.tsx`), and on a canvas skyrockets with many bursts (chrysanthemum, palm,
+  crossette, glitter, saturn, double, willow, strobe, smiley, crossing rings), a spark fountain, a swirl of sparks, a
+  sparkler drawing a figure (heart, star, spiral …), a catherine wheel spinning and a starburst banging right at the
+  spot, its stars crackling as they go out (the last two for Zaubertasten's „more fireworks“, 25 November 2026) – a tap right where the finger landed, a key somewhere on the stage clear of the card.
+  **Each surprise is aimed at its spot** (user feedback from Zaubertasten, 25 November 2026): one thing, there – one
+  balloon, one flower, one egg, one ball, never two or three side by side with room between them, nor a firework's
+  bursts spread beside each other; what comes in many (bubbles, sparks, small flakes) gathers round the spot and stays
+  there, never rising or drifting away from it (`surpriseParams`, `surprises.test.ts`). A drawing stays inside its
+  svg's `viewBox`: the mandala's outer petals reached past its box and were cut off at the edges (`MANDALA_VIEW`). The kinds take turns from a shuffled
   bag, never the same twice in a row, and each is drawn anew every time (colours, pattern, burst, what comes out), so
   every press brings something new. It appears, does its thing and goes again by itself within `SURPRISE.lifeMs`. Never a
   storm: a new one at most every `SURPRISE.gapMs` (¼ s), at most `SURPRISE.maxAtOnce` at once, presses between only ripple; its
@@ -119,9 +126,9 @@ the page before it.
   `ft-<kind>`: that is the class its own drawing animates, and once ran the snowflake's grow-and-fade on the whole
   surprise, so its small flakes never showed. Zählen and the other games keep their calm ripples: this
   is Frei tippen's own, never a pattern for other games' answers (root `CLAUDE.md`) – the one other game that opens
-  them is „Zaubertasten“ (`src/games/tapaway/`), Frei tippen without its card, where the show is the whole game and several may stand at once (it passes looser `SurpriseLimits`; Frei tippen keeps `SURPRISE`); a
+  them is „Zaubertasten“ (`src/games/tapaway/`), Frei tippen without its card, where the show is the whole game and several may stand at once (it passes looser `SurpriseLimits` with a `bag` holding the `FIREWORK_KINDS` three times; Frei tippen keeps `SURPRISE`, every kind once); a
   change to `useSurprises` or `SurpriseLayer` is checked there too. A new kind goes into
-  `ART_KINDS` (`SurpriseArt.tsx`) or `CANVAS_KINDS` (`surpriseCanvas.ts`), its classes and latest delay into the
+  `ART_KINDS` (`SurpriseArt.tsx`), `TOY_KINDS` (`SurpriseToys.tsx`) or `CANVAS_KINDS` (`surpriseCanvas.ts`), its classes and latest delay into the
   test's `CLASSES` and `LATEST_DELAY_MS`; in the dev server `__surprise("<kind>")` makes the next surprise that kind.
 - Choices show the plain value, not an example to decode: the word length is the number of letters (3, 4, 7).
 - „Wörter tippen“ has no settings of its own: no own letter case, picture reveal, „any key types“ or tablet keys;
