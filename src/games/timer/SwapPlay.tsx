@@ -8,7 +8,7 @@ import { afterPageMotion } from "@/lib/pageMotion";
 import { loadRecordings, playChime, playKnock, playMelody, playTusch, playTwinkle, playWhoosh, recorded } from "@/lib/sfx";
 import { hush } from "@/lib/voice";
 import { useWakeLock } from "@/lib/wakeLock";
-import { TimeBar, TimeBarChoice } from "./bar";
+import { TimeBar, TimeBarChoice, TimeUp } from "./bar";
 import { nextPicture, PICTURES, SWAP_NAME } from "./content";
 import { TimerCardArt } from "./cardArt";
 import type { SwapToy, TimeShown, TimerPicture, TurnCount, TurnPicture } from "./settings";
@@ -385,6 +385,7 @@ export function SwapRun({
             {done && <div className="tm-done-light" />}
           </div>
         )}
+        {done && <TimeUp />}
         {bar && ticking && holder && <TimeBar key={`${turnStart}-${turn}`} startedAt={turnStart} total={turnMs} tone={holder} glow={poke} />}
         {(ticking || done) && <TimeShownNote shown={timeShown} endsAt={turnStart + turnMs} total={turnMs} up={done} />}
         {ticking && <PauseControls paused={paused} onPause={pause} onResume={resume} onRestart={onAgain} />}

@@ -124,7 +124,7 @@ export function Editor({
                     ar: "صورة (إيموجي)",
                     ru: "Картинка (эмодзи)",
                   })}
-                  onChange={(e) => setTask(task.id, { emoji: e.target.value })}
+                  onChange={(e) => setTask(task.id, { emoji: e.target.value, photo: undefined })}
                 />
                 <input
                   type="text"

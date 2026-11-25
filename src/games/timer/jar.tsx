@@ -284,7 +284,7 @@ const JarBackdrop = memo(function JarBackdrop() {
   const table = 800;
   return (
     <Layer x={0} y={0} w={STAGE_W} h={STAGE_H} className="tm-back">
-      <Draw w={STAGE_W} h={STAGE_H}>
+      <Draw w={STAGE_W} h={STAGE_H} bleed>
         <rect width={STAGE_W} height={table} fill="#bfe3f5" />
         {Array.from({ length: 9 }, (_, row) =>
           Array.from({ length: 17 }, (_, k) => <circle key={`${row}-${k}`} cx={k * 100 + (row % 2) * 50} cy={row * 90 + 40} r="9" fill="#d8eefa" />),

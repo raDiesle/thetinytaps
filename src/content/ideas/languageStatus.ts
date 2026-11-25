@@ -89,13 +89,6 @@ export const LANGUAGE_STATUS: LanguageStatusRow[] = [
         files: ["src/games/timer/tidyNames.ts"],
       },
       {
-        label: "📦 Five Boxes",
-        languages: { de: "done", en: "done", zh: "done", hi: "done", es: "done", ar: "done", ru: "done" },
-        recorded: true,
-        note: "Das Bild mit den fünf Kisten, in die die Spielsachen Sorte für Sorte hüpfen (H-120, boxes.tsx, 22. November 2026), Englisch zuerst geschrieben und gleich in alle Sprachen übersetzt: sein Name „Five Boxes“ („Fünf Kisten“) und seine zwei Sätze am Anfang und am Ende (boxesNames.ts). Beide Sätze am 23. November 2026 von ElevenLabs gesprochen mit den Klonen von Tapsis Stimme im zweiten Konto: Englisch, Chinesisch, Hindi, Spanisch und Arabisch mit „Tapsi Coach (Klon)“, Deutsch mit „Tapsi Coach (Klon de)“, Russisch mit „Tapsi Coach (Klon ru)“ – beide Sätze eines Bildes aus einer Stimme. Die Texte für Suchmaschinen nennen es in allen sieben Sprachen.",
-        files: ["src/games/timer/boxesNames.ts"],
-      },
-      {
         label: "🧱 Block House",
         languages: { de: "done", en: "done", zh: "done", hi: "done", es: "done", ar: "done", ru: "done" },
         recorded: true,
@@ -285,7 +278,7 @@ export const LANGUAGE_STATUS: LanguageStatusRow[] = [
   },
   {
     href: "/haende-waschen/",
-    note: "Hände waschen (H-136, 22. November 2026), Englisch zuerst und gleich in allen sieben Sprachen: Name, Satz fürs Regal (names.ts), die Namen der Schritte in der Leiste (steps.ts) und die Beschreibung des Bilds. Auf dem Bild steht nichts, und gesprochen wird nichts. Das gesungene Lied fehlt noch in allen Sprachen (H-142, mit Suno wie das Zahnputzlied); bis dahin spielt eine Platzhalter-Melodie.",
+    note: "Hände waschen (H-136, 22. November 2026), Englisch zuerst und gleich in allen sieben Sprachen: Name, Satz fürs Regal (names.ts), die Namen der Schritte in der Leiste (steps.ts, seit 25. November 2026 dreizehn Schritte vom Ruf zum Essen bis zum Lauf zum Tisch) und die Beschreibung des Bilds. Auf dem Bild steht nichts, und gesprochen wird nichts. Das gesungene Lied fehlt noch in allen Sprachen (H-142, mit Suno wie das Zahnputzlied); bis dahin spielt eine Platzhalter-Melodie.",
     languages: { de: "done", en: "done", zh: "done", hi: "done", es: "done", ar: "done", ru: "done" },
   },
   {
@@ -330,6 +323,11 @@ export const LANGUAGE_STATUS: LanguageStatusRow[] = [
         label: "🖍️ Schwarz-weiß zum Ausmalen beworben",
         languages: { de: "done", en: "done", zh: "done", hi: "done", es: "done", ar: "done", ru: "done" },
         note: "Seit 4. November 2026: die Wahl „🎨 In Farbe / 🖍️ Schwarz-weiß zum Ausmalen“ beim Drucken und die Zeile im Druck-Stempel des Assistenten, übersetzt am 5. November 2026.",
+      },
+      {
+        label: "🖼️ Fotoposter und die Wahl „Karten zum Ausschneiden / Alles fest auf einem Bild“",
+        languages: { de: "done", en: "done", zh: "done", hi: "done", es: "done", ar: "done", ru: "done" },
+        note: "Seit 25. November 2026 (T-31 bis T-40): die beiden Wege beim Drucken, die Posterformate (auf Englisch in Zoll), Rahmen und Jahreszeiten, Plan und Tafel zusammen, der Hinweis zur Schärfe, das Zimmer in echter Größe, „Speichern“ / „Teilen“, die Anleitung vom Bild zum Poster, der Druck-Stempel und die Suchtexte – englisch zuerst, gleich in alle sieben Sprachen übersetzt. Nichts davon wird gesprochen.",
       },
       {
         label: "🌙 Buch „Wie lange warten?“ (Countdown)",

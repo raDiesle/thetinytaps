@@ -1,130 +1,116 @@
-import { type CSSProperties, memo, useCallback, useEffect, useMemo, useRef, useState } from "react";
+import { type CSSProperties, useCallback, useEffect, useMemo, useRef, useState } from "react";
 import { GameEnd } from "@/components/GameEnd";
+import { FeedbackLayer, useTapFeedback } from "@/components/TapFeedback";
 import { useNoBackgroundMusic } from "@/lib/backgroundMusic";
+import { DEV } from "@/lib/buildInfo";
 import { type Daytime, daytimeOf } from "@/lib/days";
 import { useT } from "@/lib/language";
 import { usePageStill } from "@/lib/pageMotion";
 import { noPointerClick } from "@/lib/press";
-import { loadRecordings, playChime, playGiggle, playPlop, playRecorded, playSplash, playTuneNote } from "@/lib/sfx";
+import { loadRecordings, playChime, playPlop, playRecorded, playSplash, playTuneNote } from "@/lib/sfx";
 import { stepInAddress, useStepAddress } from "@/lib/stepAddress";
 import { useTimers } from "@/lib/timers";
 import { useWakeLock } from "@/lib/wakeLock";
-import { DIRT_MONSTERS, type DirtMonster, Foam, GLINTS, HandArt, handSpot, MONSTER_W, MonsterArt, Sleeve, SoapDab, Wet } from "./hands";
-import { AREAS, LeverArt, place, PumpHeadArt, SinkPicture, SplashArt, Stream, TowelArt } from "./sink";
-import { BEAT_MS, RUB_STEPS, STEPS, type StepId } from "./steps";
+import pictureFiles from "./bilder/*.webp?glob";
+import { Dirt, Foam, HAND_VIEWS, HandArt, type HandView, handSpot, Sleeve, SleeveRoll, SoapDab, Wet } from "./hands";
+import { AREAS, LeverArt, place, PumpHeadArt, SinkPicture, SplashArt, Stream, TowelWrapArt } from "./sink";
+import { BEAT_MS, type PictureId, playedSteps, RUB_STEPS, STEPS, type Step, type StepId } from "./steps";
 
 /** The hand washing played for a video (`HandwashVideo`): the picture alone, nothing to tap, nothing kept. */
 export interface VideoRun {
   /** Morning or evening, chosen for the video instead of read from the clock. */
   daytime: Daytime;
-  /** Called once the clean hands have shone a moment, to end the recording. */
+  /** Called once the last picture has stood a moment, to end the recording. */
   onFinished: () => void;
 }
 
-/** After the last step a video keeps the clean hands this long before it ends. */
+/** After the last step a video keeps its picture this long before it ends. */
 const VIDEO_TAIL_MS = 2500;
 
-const indexOf = (id: StepId) => STEPS.findIndex((s) => s.id === id);
+/** The painted pictures that are made, by id (`bilder/<id>.webp`). */
+const PICTURES = new Map(Object.entries(pictureFiles).map(([file, url]) => [file.replace(/\.webp$/, ""), url]));
 
-/** Grains a washed-off monster falls apart into: where they drift (in % of the monster) and whether they are foam. */
-const GRAINS = [
-  { dx: -70, dy: -60, foam: true },
-  { dx: 60, dy: -80, foam: false },
-  { dx: -40, dy: 70, foam: false },
-  { dx: 80, dy: 30, foam: true },
-  { dx: 10, dy: -110, foam: true },
-  { dx: -90, dy: 10, foam: false },
-];
+/** The steps played: in the built site those whose pictures are still waiting are left out. */
+const PLAYED = playedSteps(STEPS, (id) => PICTURES.has(id), DEV);
 
-/** Where a monster stands: still waiting, being washed off now, or gone. */
-type MonsterState = "waiting" | "active" | "gone";
+/** Every painted picture of the steps played, in order. */
+const PLAYED_PICTURES = PLAYED.flatMap((s) => s.pictures ?? []);
 
-/** One dirt monster on its hand, a small HTML layer of its own: it dances to the beat in its step, then dissolves. */
-const Monster = memo(function Monster({
-  monster,
-  state,
-  tickled,
-  onTickle,
-}: {
-  monster: DirtMonster;
-  state: MonsterState;
-  tickled: boolean;
-  onTickle: (id: string) => void;
-}) {
+/**
+ * How each hand is seen in a step (left, right), so one hand soaps the other: the right palm up for the soap, the left
+ * hand's palm lying on it while they rub, one spread hand over the other's back, the fingers interlaced.
+ */
+const VIEWS: Partial<Record<StepId, [HandView, HandView]>> = {
+  soap: ["back", "palm"],
+  palms: ["back", "palm"],
+  backs: ["backSpread", "backSpread"],
+  backs2: ["backSpread", "backSpread"],
+  between: ["backSpread", "palmSpread"],
+  rinse: ["back", "palm"],
+};
+
+/** How much of the dirt is left in a step (1 all of it, 0 none): it goes with the rubbing and the last of it with the rinse. */
+const DIRT: Partial<Record<StepId, number>> = { palms: 0.6, backs: 0.4, backs2: 0.25, between: 0.12, water: 0.12 };
+
+/** One view of a hand with its dirt, foam and wet shine, shown while the step sees the hand so. */
+function View({ side, view }: { side: "left" | "right"; view: HandView }) {
   return (
-    <div
-      className={`hw-monster ${state}${tickled && state === "waiting" ? " tickled" : ""}`}
-      style={handSpot(monster.x, monster.y, MONSTER_W)}
-      data-tap={state === "gone" ? "done" : ""}
-      onPointerDown={(e) => {
-        if (state !== "waiting") return;
-        // A tapped monster giggles instead of the tap pausing the washing.
-        e.stopPropagation();
-        onTickle(monster.id);
-      }}
-    >
-      <div className="hw-monster-body">
-        <MonsterArt color={monster.color} variant={monster.variant} />
+    <div className={`hw-view v-${view}`}>
+      <HandArt side={side} view={view} />
+      <div className="hw-dirt">
+        <Dirt view={view} />
       </div>
-      {state === "active" &&
-        GRAINS.map((g, i) => (
-          <i
-            key={i}
-            className={`hw-grain${g.foam ? " foam" : ""}`}
-            style={{ "--dx": `${g.dx}%`, "--dy": `${g.dy}%`, "--grain": monster.color } as CSSProperties}
-          />
-        ))}
+      <div className="hw-foam">
+        <Foam view={view} />
+      </div>
+      <div className="hw-wet">
+        <Wet view={view} />
+      </div>
     </div>
   );
-});
+}
 
-/** One hand with its sleeve, its wet shine, the soap, the foam, its dirt monsters and its glints. */
-function Hand({
-  side,
-  daytime,
-  stateOf,
-  tickled,
-  onTickle,
-}: {
-  side: "left" | "right";
-  daytime: Daytime;
-  stateOf: (monster: DirtMonster) => MonsterState;
-  tickled: string | null;
-  onTickle: (id: string) => void;
-}) {
+/** One hand: its four views, the sleeve over its arm with the rolled-up cuff, the soap in the right palm. */
+function Hand({ side, daytime }: { side: "left" | "right"; daytime: Daytime }) {
   return (
     <div className={`hw-hand hw-${side}`} style={place(AREAS[side])}>
       <div className="hw-pose">
         <div className="hw-rub">
           <div className="hw-mirror">
-            <HandArt side={side} />
-            <div className="hw-wet">
-              <Wet />
-            </div>
-            {side === "left" && (
-              <div className="hw-dab" style={handSpot(166, 340, 70)}>
-                <SoapDab />
-              </div>
-            )}
-            <div className="hw-foam">
-              <Foam />
-            </div>
-            {DIRT_MONSTERS.filter((m) => m.side === side).map((m) => (
-              <Monster key={m.id} monster={m} state={stateOf(m)} tickled={tickled === m.id} onTickle={onTickle} />
-            ))}
-            {GLINTS.map((g, i) => (
-              <i
-                key={i}
-                className="hw-glint"
-                style={{ ...handSpot(g.x, g.y, 64), animationDelay: `${((g.delay + (side === "right" ? 0.75 : 0)) * BEAT_MS) / 1000}s` }}
-              />
+            {HAND_VIEWS.map((view) => (
+              <View key={view} side={side} view={view} />
             ))}
             <div className="hw-sleeve">
               <Sleeve side={side} daytime={daytime} />
+              <div className="hw-roll">
+                <SleeveRoll side={side} daytime={daytime} />
+              </div>
             </div>
+            {side === "right" && (
+              <div className="hw-dab" style={handSpot(170, 350, 76)}>
+                <SoapDab />
+              </div>
+            )}
           </div>
         </div>
       </div>
+    </div>
+  );
+}
+
+/** A painted picture of the home (or, in the dev server, its placeholder until it is made). */
+function Picture({ id, name }: { id: PictureId; name: string }) {
+  const url = PICTURES.get(id);
+  return (
+    <div className={`hw-pic p-${id}`}>
+      {url ? (
+        <img className="hw-pic-img" src={url} alt="" decoding="async" />
+      ) : (
+        <div className="hw-pic-img hw-pic-missing">
+          <span>{name}</span>
+          <small>bilder/{id}.webp</small>
+        </div>
+      )}
     </div>
   );
 }
@@ -145,27 +131,59 @@ function PauseIcon({ paused }: { paused: boolean }) {
   );
 }
 
+/** The classes of the picture in a step: what is held on from step to step, and how each hand is seen. */
+function stageStates(steps: readonly Step[], index: number, done: boolean) {
+  const step = steps[index];
+  const id = step.id;
+  const from = (first: StepId) => {
+    const at = steps.findIndex((s) => s.id === first);
+    return at >= 0 && index >= at;
+  };
+  const before = (end: StepId) => {
+    const at = steps.findIndex((s) => s.id === end);
+    return at < 0 || index < at;
+  };
+  const [left, right] = VIEWS[id] ?? ["back", "back"];
+  return [
+    `at-${id}`,
+    done ? "done" : "",
+    step.pictures ? "pictured" : "",
+    `l-${left}`,
+    `r-${right}`,
+    from("sleeves") && id !== "sleeves" ? "sleeves-up" : "",
+    id === "sleeves" ? "rolling" : "",
+    id === "water" || id === "rinse" ? "water-on" : "",
+    id === "soap" ? "dab" : "",
+    RUB_STEPS.includes(id) || id === "water" ? "foamy" : "",
+    from("water") && before("towel") ? "wet" : "",
+  ]
+    .filter(Boolean)
+    .join(" ");
+}
+
 /**
- * Hände waschen (idea H-136): the child's own hands over the basin, washed step by step to the beat of the song to come
- * – sleeves up, water on, wet, soap, the five rubbing steps that wash off a dirt monster each, rinse, water off and the
- * towel, then the clean hands shine. It plays by itself, no tapping needed: a tap on the picture or Space pauses, the
- * arrow keys and the bar jump between steps, a tapped monster giggles.
+ * Hände waschen (idea H-136): the whole way of washing one's hands, as the user told it (25 November 2026), seen through
+ * the child's own eyes – Mama calls that dinner is nearly ready, into the bathroom and up the step stool (painted
+ * pictures), then the child's own hands over the basin: sleeves up, soap into one hand, one hand soaps the other (palm
+ * on palm, over each back, between the fingers) while the dirt goes, water on and feel how warm it is, rinse, water off,
+ * into the towel – and off to eat (painted again). It plays by itself, to the beat of the song to come: a tap or a key
+ * answers with soft rings, Space or the bar's button pauses, the arrow keys and the bar jump between steps.
  */
 export function HandwashPlay({ video }: { video?: VideoRun }) {
   const t = useT();
   const { later } = useTimers();
   const still = usePageStill();
+  const { effects, ripple } = useTapFeedback();
   const [round, setRound] = useState(0);
-  const [index, setIndex] = useState(() => Math.max(0, video ? 0 : STEPS.findIndex((s) => s.id === stepInAddress())));
+  const [index, setIndex] = useState(() => Math.max(0, video ? 0 : PLAYED.findIndex((s) => s.id === stepInAddress())));
   const [paused, setPaused] = useState(false);
   const [done, setDone] = useState(false);
   // The picture stands at its start until the book lies open: only then the states come on and their motions run.
   const [started, setStarted] = useState(false);
-  const [tickled, setTickled] = useState<string | null>(null);
   // biome-ignore lint/correctness/useExhaustiveDependencies: a new round reads the clock again
   const daytime = useMemo(() => video?.daytime ?? daytimeOf(), [video?.daytime, round]);
   const running = started && !paused && !done;
-  const step = STEPS[index];
+  const step = PLAYED[index];
 
   useStepAddress(video ? undefined : done ? "ende" : step.id);
   useWakeLock(started && !done);
@@ -187,10 +205,10 @@ export function HandwashPlay({ video }: { video?: VideoRun }) {
   const left = useRef<{ index: number; ms: number } | null>(null);
   useEffect(() => {
     if (!running) return;
-    const ms = left.current?.index === index && left.current.ms > 0 ? left.current.ms : STEPS[index].beats * BEAT_MS;
+    const ms = left.current?.index === index && left.current.ms > 0 ? left.current.ms : PLAYED[index].beats * BEAT_MS;
     const from = performance.now();
     const timer = later(() => {
-      if (index + 1 < STEPS.length) setIndex(index + 1);
+      if (index + 1 < PLAYED.length) setIndex(index + 1);
       else setDone(true);
     }, ms);
     return () => {
@@ -199,14 +217,14 @@ export function HandwashPlay({ video }: { video?: VideoRun }) {
     };
   }, [running, index, later]);
 
-  // The sounds of a step, as it begins: the water splashing on, the pump giving its soap, the chime of clean hands.
-  // A dirt monster dissolves silently: only the song is heard while rubbing (as with Zähne putzen's sugar monsters).
+  // The sounds of a step, as it begins: the pump giving its soap, the water coming on, the chime at the table.
   // biome-ignore lint/correctness/useExhaustiveDependencies: only a new step plays them, never a pause going on
   useEffect(() => {
     if (!started) return;
-    if (step.id === "water" || step.id === "rinse") later(() => playRecorded("splash", playSplash), BEAT_MS);
-    if (step.id === "soap") later(playPlop, BEAT_MS * 2.4);
-    if (step.id === "shine") later(playChime, BEAT_MS);
+    if (step.id === "water") later(() => playRecorded("splash", playSplash), BEAT_MS);
+    if (step.id === "rinse") playRecorded("splash", playSplash);
+    if (step.id === "soap") later(playPlop, BEAT_MS * 2.6);
+    if (step.id === "run") later(playChime, BEAT_MS * 2);
   }, [started, index, round]);
 
   // Until the song is made (H-142) a placeholder tune keeps the beat.
@@ -222,32 +240,16 @@ export function HandwashPlay({ video }: { video?: VideoRun }) {
   }, [video, done, later]);
 
   const jump = useCallback((to: number) => {
-    if (to < 0 || to >= STEPS.length) return;
+    if (to < 0 || to >= PLAYED.length) return;
     left.current = null;
     setDone(false);
     setIndex(to);
   }, []);
 
-  const tickle = useCallback(
-    (id: string) => {
-      setTickled(id);
-      playGiggle();
-      later(() => setTickled(null), BEAT_MS * 2);
-    },
-    [later],
-  );
-
   const togglePause = useCallback(() => setPaused((p) => !p), []);
 
-  // A key or a tap beside the monsters makes the next one still waiting giggle (a plop once all are gone). It never
-  // pauses: a child tapping the picture alone would stop the washing and not know how to go on (the perf run's taps
-  // beside a monster paused it) – pausing is the button's and Space's.
-  const answerBeside = useCallback(() => {
-    const waiting = DIRT_MONSTERS.find((m) => indexOf(m.step) > index);
-    if (waiting) tickle(waiting.id);
-    else playPlop();
-  }, [index, tickle]);
-
+  // A tap or a key never pauses: a child tapping the picture alone would stop the washing and not know how to go on.
+  // It answers with soft rings; pausing is the button's and Space's.
   useEffect(() => {
     if (video) return;
     const onKey = (e: KeyboardEvent) => {
@@ -256,12 +258,11 @@ export function HandwashPlay({ video }: { video?: VideoRun }) {
       if (e.key === " ") togglePause();
       else if (e.key === "ArrowRight") jump(index + 1);
       else if (e.key === "ArrowLeft") jump(index - 1);
-      // Every other key makes the next monster still waiting giggle.
-      else answerBeside();
+      else ripple();
     };
     window.addEventListener("keydown", onKey);
     return () => window.removeEventListener("keydown", onKey);
-  }, [video, done, index, jump, answerBeside, togglePause]);
+  }, [video, done, index, jump, togglePause, ripple]);
 
   const again = () => {
     left.current = null;
@@ -272,30 +273,10 @@ export function HandwashPlay({ video }: { video?: VideoRun }) {
     setStarted(false);
   };
 
-  const stateOf = useCallback(
-    (m: DirtMonster): MonsterState => {
-      const at = indexOf(m.step);
-      if (!started || at > index) return "waiting";
-      return at === index && !done ? "active" : "gone";
-    },
-    [started, index, done],
-  );
-
-  const id = step.id;
-  const states = started
-    ? [
-        `at-${done ? "done" : id}`,
-        "sleeves-up",
-        (id === "water" || id === "wet" || id === "rinse") && !done ? "water-on" : "",
-        (id === "wet" || id === "rinse") && !done ? "hands-under" : "",
-        index >= indexOf("wet") && index < indexOf("towel") && !done ? "wet" : "",
-        id === "soap" && !done ? "dab" : "",
-        RUB_STEPS.includes(id) && !done ? "foamy" : "",
-        id === "shine" || done ? "clean" : "",
-      ]
-        .filter(Boolean)
-        .join(" ")
-    : "";
+  // Before the book lies open the hands stand still, seen from the back – and a painted picture already stands.
+  const states = started ? stageStates(PLAYED, index, done) : `l-back r-back${step.pictures ? ` at-${step.id} pictured` : ""}`;
+  const rinseAt = PLAYED.findIndex((s) => s.id === "rinse");
+  const dirt = done || index >= rinseAt ? 0 : (DIRT[step.id] ?? 1);
 
   const label = t({
     en: "Your own hands over the basin, washed step by step",
@@ -312,17 +293,16 @@ export function HandwashPlay({ video }: { video?: VideoRun }) {
       <div
         key={round}
         className={`hw-stage ${states}`}
-        onPointerDown={() => {
+        style={{ "--dirt": dirt } as CSSProperties}
+        onPointerDown={(e) => {
           // In a video nothing on the picture answers a click.
-          if (!video && !done && !paused) answerBeside();
+          if (!video && !done && !paused) ripple(e.clientX, e.clientY);
         }}
       >
         <SinkPicture daytime={daytime} label={label} />
         <div className="hw-layer hw-splash" style={place(AREAS.splash)}>
           <SplashArt />
         </div>
-        <Hand side="left" daytime={daytime} stateOf={stateOf} tickled={tickled} onTickle={tickle} />
-        <Hand side="right" daytime={daytime} stateOf={stateOf} tickled={tickled} onTickle={tickle} />
         <div className="hw-layer hw-stream" style={place(AREAS.stream)}>
           <Stream />
         </div>
@@ -332,9 +312,14 @@ export function HandwashPlay({ video }: { video?: VideoRun }) {
         <div className="hw-layer hw-pump-head" style={place(AREAS.pumpHead)}>
           <PumpHeadArt />
         </div>
-        <div className="hw-layer hw-towel" style={place(AREAS.towel)}>
-          <TowelArt />
+        <Hand side="left" daytime={daytime} />
+        <Hand side="right" daytime={daytime} />
+        <div className="hw-layer hw-towel-wrap" style={place(AREAS.towelWrap)}>
+          <TowelWrapArt />
         </div>
+        {PLAYED_PICTURES.map((id) => (
+          <Picture key={id} id={id} name={t(PLAYED.find((s) => s.pictures?.includes(id))?.name ?? STEPS[0].name)} />
+        ))}
         {paused && (
           // While paused (only a grown-up pauses), a tap anywhere on the picture goes on: going on stops nothing.
           <div
@@ -365,7 +350,7 @@ export function HandwashPlay({ video }: { video?: VideoRun }) {
           >
             <PauseIcon paused={paused} />
           </button>
-          {STEPS.map((s, i) => (
+          {PLAYED.map((s, i) => (
             <button
               key={s.id}
               type="button"
@@ -380,6 +365,7 @@ export function HandwashPlay({ video }: { video?: VideoRun }) {
           ))}
         </div>
       )}
+      <FeedbackLayer effects={effects} />
       {done && !video && <GameEnd onAgain={again} />}
     </div>
   );

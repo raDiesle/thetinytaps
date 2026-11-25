@@ -191,7 +191,7 @@ const TunnelBackdrop = memo(function TunnelBackdrop() {
   const crackTop = floor - HILL[TUNNEL.cols + 1] * S;
   return (
     <Layer x={0} y={0} w={STAGE_W} h={STAGE_H} className="tm-back">
-      <Draw w={STAGE_W} h={STAGE_H}>
+      <Draw w={STAGE_W} h={STAGE_H} bleed>
         <defs>
           <linearGradient id="tm-tunnel-sky" x1="0" y1="0" x2="0" y2="1">
             <stop offset="0" stopColor="#7cc6ff" />

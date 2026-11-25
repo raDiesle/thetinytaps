@@ -8,7 +8,7 @@ import { SceneParts, stageStyle } from "./TimerPlay";
 
 /**
  * The card's picture is cut as for this long a run, so it shows the pieces a usual timer has (the apples in the cart,
- * the train's posts); the length set in the row doesn't redraw every card.
+ * the pizza's slices); the length set in the row doesn't redraw every card.
  */
 const CARD_MS = 5 * 60_000;
 
@@ -50,7 +50,7 @@ function holdAt(card: HTMLElement | null, at: number) {
 /**
  * A picture card on the start screen: the picture as it looks halfway through its run (user request, November 2026:
  * the picture is the button, no words on it; the middle rather than the end, user feedback, November 2026) – the tree
- * full of apples with the cart under them, the train halfway to the station, the leaf half eaten. It is the very drawing
+ * full of apples with the cart under them, the hourglass half run, the leaf half eaten. It is the very drawing
  * of a run (`SceneParts`, started `MIDDLE` of it ago – `LATER` for a few), stopped at that moment by `holdAt`. „Abwechseln“ shows the fox
  * child's lamp on, the toy on its cushion and the hourglass half run; the Wippe the fox child's side in the sun, its seat
  * on its way down with the chick walking over to it; the Kugelbahn the fox child's strip lit, a marble in its cup and the
@@ -114,7 +114,7 @@ export const TimerCardArt = memo(function TimerCardArt({
           />
         </span>
       ) : (
-        <span className="tm-stage" style={stageStyle(picture, CARD_MS)}>
+        <span className="tm-stage" style={stageStyle(CARD_MS)}>
           <SceneParts picture={picture} phase="running" total={CARD_MS} set={CARD_MS} poke={0} startedAt={startedAt} still />
         </span>
       )}

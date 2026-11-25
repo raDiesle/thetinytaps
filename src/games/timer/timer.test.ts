@@ -74,20 +74,18 @@ import {
   WORLD_H,
   wayOf,
 } from "./jump";
-import { BOX_COUNT, BOXES, boxesPlan, boxLeft, boxSlot, floorPlaces, IN_BOX, LID_H, OPENING, PER_BOX, TOY as BOX_TOY } from "./boxes";
 import { BITE_R, BUTTERFLY, biteSpot, bodyFront, frontAfter, LEAF, LEAF_FLOOR, leafLeft, leafShape, leafSpan, planBites, REACH } from "./caterpillar";
 import { DISC, DOTS, dotAt } from "./disc";
 import { BOARD, FUNNEL, funnelY, JAR, jarPlan, MARBLE_R as JAR_MARBLE_R, MAX_MARBLES, NAIL_R, NAILS, SLOTS as JAR_SLOTS, TUBE } from "./jar";
 import { PICTURE_LINES, SOON_LINE, TURN_LINES, timerSaid } from "./voice";
 import { BLOOM, FLOWER_FLOOR, GROWN_AT, HOLDER, SPOUT, SPROUT, SPROUT_SIZE, STAKE, STALK, TAP } from "./flower";
-import { PIZZA, PIZZA_FLOOR, slice, SLICES, SLICE_SECONDS, TOPPINGS } from "./pizza";
+import { PIZZA, PIZZA_FLOOR, slice, SLICES, SLICE_SECONDS, STEAM, STEAM_SPOTS, TOPPINGS } from "./pizza";
 import { FINAL_MS, FINAL_NOTES, finalMs } from "./bar";
 import { FLOWERS, MOON, MOON_SET_AT, ridgeAt, SKY_CUT, STARS, SUN, SUN_FROM } from "./sunset";
 import {
   applePlaces,
   appleTimes,
   harvestOrder,
-  haltMs,
   ladybugLaps,
   MAX_APPLES,
   MAX_DOTS,
@@ -95,30 +93,11 @@ import {
   markUnit,
   marksLeft,
   percentMarks,
-  TRAIN_PIECES,
-  TRAIN_STOPS,
   pieceMoments,
   runSeconds,
   soonMs,
-  trainSteps,
 } from "./pieces";
-import {
-  bulbBelow,
-  CANDLE,
-  candlePlan,
-  FLAME_H,
-  FUSE,
-  FUSE_AT,
-  FUSE_MS,
-  GLASS,
-  HOURGLASS_BOX,
-  PLATE,
-  SAND_FLOOR,
-  STAGE_H,
-  STAGE_W,
-  TABLE,
-  TRAIN,
-} from "./scenes";
+import { bulbBelow, CANDLE, candlePlan, FLAME_H, FUSE, FUSE_AT, FUSE_MS, GLASS, HOURGLASS_BOX, PLATE, SAND_FLOOR, STAGE_H, STAGE_W, TABLE } from "./scenes";
 import { FIRST_TURN, heldMarbles, turnChildren } from "./SwapPlay";
 import { CUP_W, CUP_XS, MARBLE_COLORS, MARBLE_R, marblePlan, RAMPS, REST_Y } from "./marbleRun";
 import { PLANK_BOX, SAW, SAW_GROUND, SAW_TILT, SEAT_CUSHION_W, TYRE_TOP, TYRE_X, WALKER } from "./seesaw";
@@ -213,6 +192,17 @@ describe("Timer", () => {
     }
   });
 
+  test("the time being up shows from across the room in every timer: the whole picture turns golden in a breathing frame (user request, 25 November 2026)", async () => {
+    for (const run of ["TimerPlay.tsx", "SwapPlay.tsx"]) {
+      const code = await Bun.file(`${import.meta.dir}/${run}`).text();
+      expect(code, run).toMatch(/\{(phase !== "running"|done) && <TimeUp \/>\}/);
+    }
+    const css = await Bun.file(`${import.meta.dir}/timer.css`).text();
+    // Every colour changes, and the frame lies inside the book's paper margin, which hid one at the screen's edge.
+    expect(css).toMatch(/\.tm-up-tint \{[^}]*mix-blend-mode: color;/);
+    expect(css).toMatch(/\.tm-up-frame \{[^}]*inset: var\(--frame, 0px\);[^}]*tm-up-breathe/);
+  });
+
   test("the removed pictures stay removed (user feedback, November 2026: Eimer and Kuchen made no sense)", () => {
     const ids: string[] = PICTURES.map((p) => p.id);
     expect(ids).not.toContain("bucket");
@@ -247,11 +237,6 @@ describe("Timer", () => {
   });
 
   test("what matters stays where every screen shows it (x 200–1400, y 80–820)", () => {
-    expect(TRAIN.x).toBeGreaterThanOrEqual(200);
-    expect(TRAIN.stop + TRAIN.w).toBeLessThanOrEqual(1400 + 200);
-    // A long way to go, so every second shows a step: the train drives most of the picture's width.
-    expect(TRAIN.stop - TRAIN.x).toBeGreaterThanOrEqual(1000);
-    expect(TRAIN.stop).toBeLessThanOrEqual(RIGHT_EDGE);
     expect(GLASS.cx - GLASS.w / 2).toBeGreaterThanOrEqual(200);
     // With a margin: at 80 and 820 the hourglass's plates touched the screen's edges on a phone on its side.
     expect(GLASS.top - 4 - PLATE).toBeGreaterThanOrEqual(110);
@@ -360,18 +345,7 @@ describe("Timer", () => {
     expect(DISC.cy + DISC.face).toBeLessThanOrEqual(820);
   });
 
-  test("piece by piece: the train halts at its five stops at every length, then reaches the station as the time is up (H-45)", () => {
-    // User request, 24 November 2026: before, a stop came once a minute, so under two minutes the train never halted.
-    expect(TRAIN_STOPS).toBe(5);
-    for (const total of [10_000, 60_000, 5 * 60_000, 3 * 3600_000]) {
-      const steps = trainSteps(total, TRAIN_PIECES, haltMs(total, TRAIN_PIECES));
-      // A halt at each stop (arriving and leaving at the same place), then the station at the end.
-      const halts = steps.filter((s, i) => i > 0 && steps[i - 1].part === s.part);
-      expect(halts).toHaveLength(TRAIN_STOPS);
-      expect(steps.at(-1)).toEqual({ at: 1, part: 1 });
-      for (let i = 1; i < steps.length; i++) expect(steps[i].at).toBeGreaterThan(steps[i - 1].at);
-      expect(pieceMoments(total, TRAIN_PIECES, haltMs(total, TRAIN_PIECES))).toHaveLength(TRAIN_STOPS);
-    }
+  test("piece by piece: the moments split the run evenly, the last piece being the end's (H-45)", () => {
     expect(pieceMoments(300_000, 5)).toEqual([60_000, 120_000, 180_000, 240_000]);
     expect(pieceMoments(300_000, 1)).toEqual([]);
   });
@@ -462,19 +436,6 @@ describe("Timer", () => {
     const rule = css.slice(css.indexOf(".tm-shown {"), css.indexOf("}", css.indexOf(".tm-shown {")));
     expect(rule).toContain("right:");
     expect(rule).toContain("bottom:");
-  });
-
-  test("the train halts at every stop and reaches the station as the time is up", () => {
-    const total = 5 * 60_000;
-    const steps = trainSteps(total, 5, haltMs(total, 5));
-    expect(steps[0]).toEqual({ at: 0, part: 0 });
-    expect(steps.at(-1)).toEqual({ at: 1, part: 1 });
-    for (let i = 1; i < steps.length; i++) {
-      expect(steps[i].at).toBeGreaterThan(steps[i - 1].at);
-      expect(steps[i].part).toBeGreaterThanOrEqual(steps[i - 1].part);
-    }
-    // Four halts on the way, each standing still for a while.
-    expect(steps.filter((s, i) => i > 0 && s.part === steps[i - 1].part)).toHaveLength(4);
   });
 
   test("every apple hangs inside the crown, apart from the others, and falls straight down past no other apple", () => {
@@ -653,69 +614,6 @@ describe("Timer", () => {
         tapped.some((title) => name.startsWith(title)),
         name,
       ).toBe(true);
-  });
-
-  test("Five Boxes: three toys a box at any length, each hop finished before the next, a lid shut after its box's last toy, the last as the time is up (H-120)", () => {
-    expect(PER_BOX).toBe(3);
-    for (const total of [10_000, 60_000, 5 * 60_000, 3 * 3600_000]) {
-      const count = PER_BOX;
-      const { toys, lids } = boxesPlan(total, count);
-      expect(toys).toHaveLength(BOX_COUNT * count);
-      expect(lids).toHaveLength(BOX_COUNT);
-      let before = 0;
-      for (const toy of toys) {
-        // One toy at a time, from the left box to the right, never two in the air at once.
-        expect(toy.hop.start).toBeGreaterThanOrEqual(before);
-        expect(toy.hop.land).toBeGreaterThan(toy.hop.start);
-        // Its box's lid swings only once it is in.
-        expect(lids[toy.box].start).toBeGreaterThanOrEqual(toy.hop.land);
-        if (toy.box > 0) expect(toy.hop.start).toBeGreaterThanOrEqual(lids[toy.box - 1].shut);
-        // It waits its turn wiggling only while nothing else moves.
-        if (toy.hop.waitFrom !== undefined) expect(toy.hop.waitFrom).toBeGreaterThanOrEqual(before);
-        before = toy.hop.land;
-      }
-      for (const lid of lids) expect(lid.shut).toBeGreaterThan(lid.start);
-      expect(lids.at(-1)?.shut).toBeCloseTo(total);
-    }
-  });
-
-  test("Five Boxes: the boxes and toys stay on the screen, the toys lie in front of their box without hiding each other, each lands on its own place inside it (H-120)", () => {
-    const half = BOX_TOY / 2;
-    expect(boxLeft(0)).toBeGreaterThanOrEqual(200);
-    expect(boxLeft(BOX_COUNT - 1) + BOXES.w).toBeLessThanOrEqual(RIGHT_EDGE);
-    // The lid standing open stays below the top edge, and so does the top of every hop.
-    expect(BOXES.rim - OPENING - LID_H).toBeGreaterThanOrEqual(80);
-    for (let k = 0; k < BOX_COUNT; k++) {
-      for (const count of [2, PER_BOX, 4]) {
-        const places = floorPlaces(k, count);
-        expect(places).toHaveLength(count);
-        for (const [j, place] of places.entries()) {
-          // On the floor in front of the boxes, within the screen and above the bar along the bottom.
-          expect(place.y - BOX_TOY).toBeGreaterThan(BOXES.bottom - 40);
-          expect(place.y).toBeLessThanOrEqual(780);
-          expect(place.x - half).toBeGreaterThanOrEqual(200);
-          expect(place.x + half).toBeLessThanOrEqual(RIGHT_EDGE);
-          for (const other of places.slice(0, j)) expect(Math.hypot(place.x - other.x, place.y - other.y)).toBeGreaterThanOrEqual(0.8 * BOX_TOY);
-          // In the box, side by side and within its walls, its top showing above the rim.
-          const slot = boxSlot(k, j, count);
-          const small = (IN_BOX * BOX_TOY) / 2;
-          expect(slot.x - small).toBeGreaterThanOrEqual(boxLeft(k) + 6);
-          expect(slot.x + small).toBeLessThanOrEqual(boxLeft(k) + BOXES.w - 6);
-          expect(slot.y - 2 * small).toBeLessThan(BOXES.rim);
-        }
-      }
-    }
-    const { toys } = boxesPlan(5 * 60_000, 3);
-    for (const toy of toys) expect(toy.hop.peak - BOX_TOY).toBeGreaterThanOrEqual(80);
-  });
-
-  test("Five Boxes: toys and lids move as layers on one CSS animation each and snap to their place at the end, with no clip path (H-120)", async () => {
-    for (const file of ["./boxes.tsx", "./hop.tsx"]) {
-      const code = await Bun.file(new URL(file, import.meta.url)).text();
-      expect(code).not.toMatch(/clip-?[pP]ath/);
-    }
-    const css = await Bun.file(new URL("./timer.css", import.meta.url)).text();
-    for (const part of ["hop", "hop-wait", "boxes-lid"]) expect(css, part).toMatch(new RegExp(`\\.tm-done \\.tm-${part}[,\\s{]`));
   });
 
   test("Block House: all twenty blocks at any length, carried one at a time, the house built from the bottom up, the last block landing as the time is up (H-125)", () => {
@@ -1588,7 +1486,7 @@ describe("the bar along the bottom and the last moments", () => {
     expect(DEFAULT_TIMER_SETTINGS.bar).toBe(true);
   });
 
-  test("the bar and the last moments' light move only by transform and opacity, and the stage still covers the screen", async () => {
+  test("the bar and the last moments' light move only by transform and opacity, and the stage still reaches the screen's bottom", async () => {
     const css = await Bun.file(new URL("./timer.css", import.meta.url)).text();
     const frames = [...css.matchAll(/@keyframes (tm-bar-[\w-]+|tm-final-light) \{([\s\S]*?)\n\}/g)];
     expect(frames.length).toBeGreaterThanOrEqual(6);
@@ -1598,7 +1496,55 @@ describe("the bar along the bottom and the last moments", () => {
     }
     // Moved up into the room above the bar, the stage must still reach the screen's bottom edge (a dark strip showed).
     const stage = css.slice(css.indexOf(".tm-with-bar .tm-stage {"), css.indexOf("}", css.indexOf(".tm-with-bar .tm-stage {")));
-    expect(stage).toContain("100cqh + var(--tm-bar-room)");
+    expect(stage).toContain("--tm-room: var(--tm-bar-room)");
+    const base = css.slice(css.indexOf(".tm-stage {"), css.indexOf("}", css.indexOf(".tm-stage {")));
+    expect(base).toContain("100cqh + var(--tm-room)");
+    expect(base).toMatch(/top: max\(.*100% - var\(--tm-stage-w\) \* 9 \/ 32\)/);
+  });
+
+  test("on a phone on its side the stage shrinks until y 80–820 fit above the bar, the backdrop going on beside it", async () => {
+    // Covering a screen wider than 16:9, the stage cut the hourglass's and the red disc's tops off (user feedback,
+    // 25 November 2026): it is never wider than lets y 80–820 (740 units) fit into the height left above the bar.
+    const css = await Bun.file(new URL("./timer.css", import.meta.url)).text();
+    const base = css.slice(css.indexOf(".tm-stage {"), css.indexOf("}", css.indexOf(".tm-stage {")));
+    expect(base).toContain("--tm-fit: calc((100cqh - var(--tm-room)) * 1600 / 740)");
+    expect(base).toContain("min(var(--tm-cover), var(--tm-fit))");
+    // So every picture's full-stage backdrop goes on past the stage's edges (`bleed`, `Bleed`), or a bare strip shows.
+    const files = [...new Bun.Glob("*.tsx").scanSync(new URL(".", import.meta.url).pathname)];
+    let backdrops = 0;
+    for (const file of files) {
+      const code = await Bun.file(new URL(`./${file}`, import.meta.url)).text();
+      for (const m of code.matchAll(/<Layer x=\{0\} y=\{0\} w=\{STAGE_W\} h=\{STAGE_H\} className="tm-back">/g)) {
+        backdrops++;
+        const next = code.slice(m.index, m.index + 400);
+        expect(/<Draw w=\{STAGE_W\} h=\{STAGE_H\} bleed>|<Bleed>/.test(next), `${file}: backdrop without bleed`).toBe(true);
+      }
+    }
+    expect(backdrops).toBeGreaterThanOrEqual(16);
+  });
+
+  // User feedback, November 2026: one puff from the middle every second looked the same for an hour.
+  test("the pizza's steam rises at another place each second, in other looks and sizes", () => {
+    // Every second of a round one place steams, each place once.
+    expect(STEAM.map((s) => s.beat).sort((a, b) => a - b)).toEqual(Array.from({ length: STEAM_SPOTS }, (_, i) => i));
+    const byBeat = [...STEAM].sort((a, b) => a.beat - b.beat);
+    byBeat.forEach((s, i) => {
+      const next = byBeat[(i + 1) % byBeat.length];
+      const p = { x: Math.sin(s.angle) * s.radius, y: Math.cos(s.angle) * s.radius };
+      const q = { x: Math.sin(next.angle) * next.radius, y: Math.cos(next.angle) * next.radius };
+      // It jumps across the pizza, never to the place beside it.
+      expect(Math.hypot(p.x - q.x, p.y - q.y)).toBeGreaterThan(PIZZA.r * 0.45);
+    });
+    // And each second looks different from the second before, over both rounds and round the turn.
+    const looks = [...byBeat.map((s) => s.kinds[0]), ...byBeat.map((s) => s.kinds[1])];
+    looks.forEach((look, i) => expect(look).not.toBe(looks[(i + 1) % looks.length]));
+    expect(new Set(STEAM.flatMap((s) => s.kinds)).size).toBe(4);
+    expect(new Set(STEAM.map((s) => s.size)).size).toBe(STEAM_SPOTS);
+    for (const s of STEAM) {
+      expect(s.kinds[0]).not.toBe(s.kinds[1]);
+      // It rises from the cheese, never from the crust's edge.
+      expect(s.radius).toBeLessThanOrEqual(PIZZA.r * 0.75);
+    }
   });
 
   test("the pizza's toppings lie on the cheese, inside the tomato ring and the crust", () => {

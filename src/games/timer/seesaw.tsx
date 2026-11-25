@@ -1,6 +1,6 @@
 import { memo, useEffect, useRef, useState, type CSSProperties } from "react";
 import { useRunClock } from "./pause";
-import { INK, Layer, STAGE_H, STAGE_W } from "./scenes";
+import { Bleed, INK, Layer, STAGE_H, STAGE_W } from "./scenes";
 import { Cushion, type Holder } from "./swap";
 
 // Wippe (H-109): two children take turns on a seesaw. The cushions in the fox's and the bear's colours sit on its two
@@ -69,16 +69,18 @@ export const SeesawBackdrop = memo(function SeesawBackdrop() {
   return (
     <Layer x={0} y={0} w={STAGE_W} h={STAGE_H} className="tm-back">
       <svg viewBox={`0 0 ${STAGE_W} ${STAGE_H}`} preserveAspectRatio="none">
-        <rect width={STAGE_W} height={STAGE_H} fill="#d0ebff" />
-        <path
-          d={`M0 ${SAW_GROUND - 120} C120 ${SAW_GROUND - 200} 260 ${SAW_GROUND - 190} 380 ${SAW_GROUND - 130} C520 ${SAW_GROUND - 210} 700 ${SAW_GROUND - 200} 820 ${SAW_GROUND - 140} C980 ${SAW_GROUND - 220} 1180 ${SAW_GROUND - 200} 1300 ${SAW_GROUND - 135} C1420 ${SAW_GROUND - 190} 1540 ${SAW_GROUND - 180} ${STAGE_W} ${SAW_GROUND - 120} V${SAW_GROUND} H0 Z`}
-          fill="#8ce99a"
-        />
-        <rect y={SAW_GROUND} width={STAGE_W} height={STAGE_H - SAW_GROUND} fill="#69db7c" />
-        <path d={`M0 ${SAW_GROUND} H${STAGE_W}`} stroke="#40c057" strokeWidth="6" />
-        <ellipse cx={SAW.x} cy={SAW_GROUND + 40} rx="620" ry="58" fill="#ffe8a3" />
-        <Tyre x={TYRE_X.fox} />
-        <Tyre x={TYRE_X.bear} />
+        <Bleed>
+          <rect width={STAGE_W} height={STAGE_H} fill="#d0ebff" />
+          <path
+            d={`M0 ${SAW_GROUND - 120} C120 ${SAW_GROUND - 200} 260 ${SAW_GROUND - 190} 380 ${SAW_GROUND - 130} C520 ${SAW_GROUND - 210} 700 ${SAW_GROUND - 200} 820 ${SAW_GROUND - 140} C980 ${SAW_GROUND - 220} 1180 ${SAW_GROUND - 200} 1300 ${SAW_GROUND - 135} C1420 ${SAW_GROUND - 190} 1540 ${SAW_GROUND - 180} ${STAGE_W} ${SAW_GROUND - 120} V${SAW_GROUND} H0 Z`}
+            fill="#8ce99a"
+          />
+          <rect y={SAW_GROUND} width={STAGE_W} height={STAGE_H - SAW_GROUND} fill="#69db7c" />
+          <path d={`M0 ${SAW_GROUND} H${STAGE_W}`} stroke="#40c057" strokeWidth="6" />
+          <ellipse cx={SAW.x} cy={SAW_GROUND + 40} rx="620" ry="58" fill="#ffe8a3" />
+          <Tyre x={TYRE_X.fox} />
+          <Tyre x={TYRE_X.bear} />
+        </Bleed>
       </svg>
     </Layer>
   );

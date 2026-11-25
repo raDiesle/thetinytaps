@@ -107,9 +107,10 @@ const GIRL_BOOK_DIR = "src/components/vorschau-maedchen";
 const VIDEO_GAMES: Record<string, { href: string; hide?: string }> = {
   // Its face big, without the song's bar and buttons at its side.
   zaehne: { href: "/zaehne/", hide: ".teeth-controls, .teeth-progress" },
-  // The train, a picture to wait with, rather than the first card's bare red disc, without the minutes in its corner
-  // nor the bar along the bottom.
-  timer: { href: "/timer/train/", hide: ".tm-shown, .tm-bar" },
+  // The six candles linked by their fuses, a picture to wait with that shows its whole chain from the start, rather than
+  // the first card's bare red disc (the train shown here was taken out, 25 November 2026), without the minutes in its
+  // corner nor the bar and its pause button along the bottom.
+  timer: { href: "/timer/candle/", hide: ".tm-shown, .tm-bar, .tm-pause-button" },
   bilder: { href: "/bilder/" },
   // The animal and its choices without their names and the round's question.
   tiere: { href: "/tiere/", hide: ".ap-name, .ap-topic" },
@@ -131,8 +132,11 @@ const POSTERS: Record<string, { href: string; play: (cdp: Cdp) => Promise<void> 
     href: "/drauflos/",
     play: async (cdp) => {
       // A key pressed with chance fixed for its first calls. The first surprise of a fresh bag is a firework when the
-      // shuffle's chance always says „stay“ (`SURPRISE_KINDS[0]`): two calls place it (`freeSpot`), fifteen shuffle,
-      // then its warm palette in two rings of round sparks. The four comes blue with yellow hearts round it.
+      // shuffle's chance always says „stay“ (`TAP_AWAY_SURPRISES.bag[0]`): two calls place it (`freeSpot`), one fewer
+      // than the bag holds kinds shuffle (37 for 24 kinds and the fireworks twice more – a new kind needs one more here,
+      // a new firework kind three, or the poster shows another surprise), then its warm palette in two rings of round
+      // sparks. The four comes blue with yellow hearts round it at the bottom right, the B orange at the bottom left
+      // (colour, then the two calls of `freeSpot`), so the poster is the same each time and nothing is cut off.
       const pressFixed = (key: string, code: string, fixed: number[]) =>
         evaluate(
           cdp,
@@ -145,11 +149,11 @@ const POSTERS: Record<string, { href: string; play: (cdp: Cdp) => Promise<void> 
             return true;
           })()`,
         );
-      await pressFixed("-", "Minus", [0.45, 0.3, ...Array(15).fill(0.9999), 0, 0.25, 0]);
+      await pressFixed("-", "Minus", [0.45, 0.3, ...Array(37).fill(0.9999), 0, 0.25, 0]);
       await sleep(250);
-      await pressFixed("4", "Digit4", [0.4, 0.9, 0.15]);
+      await pressFixed("4", "Digit4", [0.4, 0.9, 0.15, 0.78, 0.8]);
       await sleep(250);
-      await press(cdp, "b");
+      await pressFixed("b", "KeyB", [0.15, 0.15, 0.85]);
       await sleep(350);
     },
   },
@@ -243,8 +247,8 @@ const PLAYS: Record<string, (cdp: Cdp) => Promise<void>> = {
     await press(cdp, "3");
     await sleep(4500);
   },
-  // The house's first floor with its door and windows under its beam, the second floor begun with the flowers and the
-  // cat in its window, the next block hanging on the hook.
+  // The house's first floor of dressed blocks (ears, headphones, crown …) under its beam, the second floor begun, and the
+  // next block hanging on the hook with its question mark.
   "components/zaehlturm": async (cdp) => {
     // The game goes on where the last visit stopped: start again at 1 for each picture.
     await evaluate(cdp, `localStorage.removeItem("tinytaps.tower.v1"); location.replace(location.pathname + "?seite=1"); true`);

@@ -6,6 +6,7 @@ import {
   DAILY_TALL,
   LEAN_CLEAR,
   planShelf,
+  railUnder,
   SHELF_THINGS,
   SIGN_DIP,
   SIGN_OVER_POST,
@@ -77,14 +78,17 @@ describe("the bookshelf", () => {
   });
 
   // All the grown-ups' things in one column at the right, the hourglass – the most needed – on top in the tallest
-  // compartment, the speaker beside the stickers (user decision, November 2026).
+  // compartment (user decision, November 2026), the globe under it and the speaker at the bottom, where the trophy
+  // room's sign stands beside it (user request, 25 November 2026).
   test.each(ROOMS.filter(([w, h]) => w > h))(
     "a wide shelf has the things in one column at its right, the hourglass on top, in a %i × %i room",
     (width, height) => {
       const { cells, frame, width: w } = planShelf(width, height, BOOKS);
       const things = cells.filter((c) => c.things && !c.books);
       for (const cell of things) expect(cell.x + cell.w).toBeCloseTo(w - frame.post);
-      expect(things.map((c) => c.things)).toEqual([["playtime"], ["music"], ["language"]]);
+      expect(things.map((c) => c.things)).toEqual([["playtime"], ["language"], ["music"]]);
+      // Narrow: at 12 % of the room the three compartments were too wide (user request, 25 November 2026).
+      expect(things[0].w).toBeLessThanOrEqual(Math.max(60, Math.min(150, width * 0.1)));
       expect(things[0].y).toBeCloseTo(frame.crown);
       expect(things[0].h).toBe(Math.max(...things.map((c) => c.h)));
     },
@@ -321,4 +325,31 @@ describe("the bookshelf", () => {
     expect(rule(".shelf-daily-books > .shelf-bundle")).toContain("--lean: 0deg");
     expect(rule(".shelf-bundle")).not.toContain("rotate");
   });
+});
+
+// Zaubertasten's poster stands among the picture books but is no learning game: the rail of „Lernspiele“ runs only
+// under the books (user feedback, 25 November 2026).
+test("the rail of a group's sign leaves a toy among its books out", () => {
+  const spans = [1, TOY_SPAN, 1, 1];
+  const cell = { x: 0, y: 0, w: 1000, h: 300, books: [1, 2, 3] };
+  const bh = 200;
+  const toy = railUnder(cell, bh, spans, (b) => b === 1);
+  const all = railUnder(cell, bh, spans, () => false);
+  const toyWidth = TOY_SPAN * bh * BOOK_ASPECT + BOOK_GAP * bh;
+  expect(toy.left).toBeCloseTo(all.left + toyWidth);
+  expect(toy.width).toBeCloseTo(all.width - toyWidth);
+});
+
+// The words carved before the everyday helpers read plainly (user feedback, 25 November 2026): the app's rounded
+// letters, upright, and the light behind them bright over all their lines, not fading out under the first ones – it
+// lies close round the words (`.shelf-carving-text`), its full brightness reaching past their middle (`shelfGlow.test.ts`
+// keeps it clear of the compartment's edges).
+test("the carved words are set plainly and lie wholly in the light", () => {
+  const books = readFileSync(new URL("../styles/bookshelf-books.css", import.meta.url), "utf8");
+  const carving = books.match(/\n\.shelf-carving \{([^}]*)\}/)?.[1] ?? "";
+  expect(carving).toContain("font-family: var(--font-rounded)");
+  expect(books).not.toMatch(/\.shelf-carving[^{]*\{[^}]*font-style: italic/);
+  const light = books.match(/\.shelf-carving-text::before \{([^}]*)\}/)?.[1] ?? "";
+  const bright = light.match(/radial-gradient\(closest-side, #[0-9a-f]{6}f\w, #[0-9a-f]{6}f\w (\d+)%/)?.[1];
+  expect(Number(bright)).toBeGreaterThanOrEqual(60);
 });

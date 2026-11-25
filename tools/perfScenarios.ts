@@ -184,16 +184,17 @@ export const SCENARIOS: Scenario[] = [
     ],
   },
   {
-    // Hände waschen plays at once: sleeves, water and soap, then the rubbing with the foam and the monsters dissolving,
-    // and the rinse with the stream and the towel. The stretches follow the clock with no waits between them.
+    // Hände waschen plays at once: sleeves and soap from the pump, then the rubbing with the hands crossing and the foam
+    // growing while the dirt fades, then water on, the rinse under the stream, water off and the hands into the towel.
+    // The built site leaves out the painted rooms until they are made. The stretches follow the clock with no waits.
     name: "haende-waschen",
     path: "/haende-waschen/",
     parts: [
-      { label: "Ärmel, Wasser, Seife", ms: 8500 },
-      { label: "Reiben: Handflächen und Handrücken", ms: 8500 },
-      { label: "Reiben: Monster antippen", ms: 8500, tap: { selector: ".hw-monster", every: 700 } },
+      { label: "Ärmel und Seife", ms: 5500 },
+      { label: "Reiben: Handflächen und Handrücken", ms: 10000 },
+      { label: "Reiben: aufs Bild tippen", ms: 8000, tap: { selector: ".hw-stage", every: 700 } },
       { label: "Reiben: springen", ms: 6000, type: { keys: ["ArrowRight"], every: 2000 } },
-      { label: "Abspülen, Handtuch, Glanz", ms: 12000 },
+      { label: "Wasser, Abspülen, Handtuch", ms: 14000 },
     ],
   },
   {
@@ -302,9 +303,9 @@ export const SCENARIOS: Scenario[] = [
   { name: "grosses-bett", path: "/grosses-bett/", parts: [{ label: "Inhalt, dann Geschichte blättern", before: [{ wait: 1500 }], ms: 8000, tap: TAPS }] },
   { name: "belohnungstafel", path: "/belohnungstafel/", parts: [{ label: "Sterne kleben", before: [START, { wait: 1500 }], ms: 6000, tap: TAPS }] },
   // The timer's pictures in their order on its start screen, each running for a while with a tap now and then (the
-  // steam, the twinkling, the flame, what is left lighting up), the moon setting and the sun rising, the pizza's slices
+  // twinkling, the flame, what is left lighting up), the moon setting and the sun rising, the pizza's slices
   // lifted off, the ladybug crawling round the red disc, the alarm clock's digits ticking, the toy crane carrying toys
-  // into the box, the toys hopping into their five boxes, the crystal's beam carrying the blocks out of their jumble into the block house, the pickaxe digging the treasure tunnel block by block, the hopper climbing up to the moon catching its stars, the picture following it like a camera, in „Abwechseln“ the toy hopping onto the first cushion and the hourglass running, and on the Wippe the
+  // into the box, the crystal's beam carrying the blocks out of their jumble into the block house, the pickaxe digging the treasure tunnel block by block, the hopper climbing up to the moon catching its stars, the picture following it like a camera, in „Abwechseln“ the toy hopping onto the first cushion and the hourglass running, and on the Wippe the
   // chick stepping along the plank as the seesaw tips slowly, on the Kugelbahn the marble rolling down its ramps, on the Rennstrecke the kart driving round the figure eight, and the marbles bouncing down the pegboard into the jar. Each card is tapped by its name (its
   // tooltip), so the cards' order and groups may change.
   ...(
@@ -316,13 +317,11 @@ export const SCENARIOS: Scenario[] = [
       ["blume", "Blume"],
       ["pizza", "Pizza"],
       ["wecker", "Wecker"],
-      // Tidy Up and Five Boxes were written English first; the German app names their cards in German since they were translated.
+      // Tidy Up was written English first; the German app names their cards in German since they were translated.
       ["aufraeumen", "Aufräumen"],
-      ["kisten", "Fünf Kisten"],
       ["kloetzchen", "Klötzchenhaus"],
       ["schatztunnel", "Schatztunnel"],
       ["mond", "Hoch bis zum Mond"],
-      ["zug", "Zug zum Bahnhof"],
       ["raupe", "Raupe"],
       ["sonne", "Sonnenaufgang"],
       ["kugelglas", "Kugelglas"],

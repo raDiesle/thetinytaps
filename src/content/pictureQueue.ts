@@ -1,7 +1,7 @@
 import { ALLTAG_PICTURE_QUEUE } from "@/games/feelings/alltagDrawings";
 import { DAY_PICTURE_QUEUE } from "@/games/feelings/dayPictures";
 import { MOOD_PICTURE_QUEUE } from "@/games/feelings/moodPictures";
-import { RITUAL_PICTURE_QUEUE } from "@/games/rewards/bilder/prompts";
+import { POSTER_PICTURE_QUEUE, RITUAL_PICTURE_QUEUE } from "@/games/rewards/bilder/prompts";
 import { TOGETHER_PICTURE_QUEUE } from "@/games/together/picturePrompts";
 import { MILK_CHAIN_PICTURE_QUEUE } from "@/games/milkchain/milkChainPictures";
 import { PACIFIER_PICTURE_QUEUE } from "@/games/pacifierstory/pacifierStoryPictures";
@@ -18,6 +18,7 @@ import { BED_PICTURE_QUEUE } from "@/games/bedstory/bedStoryPictures";
 import { CAUSE_PICTURE_QUEUE } from "@/games/cause/causePictures";
 import { READER_PICTURE_QUEUE } from "@/components/readerPictures";
 import { SYMBOL_PICTURE_QUEUE } from "@/games/potty/symbolPictures";
+import { HANDWASH_PICTURE_QUEUE } from "@/games/handwash/handwashPictures";
 
 // Pictures asked for that wait until they can be made cheaply (/bild-erzeugen). Every picture asked for comes in
 // here first; `bun run image queue` then makes at once what is already as cheap as it gets (a full sheet, or a
@@ -92,6 +93,7 @@ export interface QueuedPicture {
 /** Every picture waiting, oldest first. */
 export const PICTURE_QUEUE: QueuedPicture[] = [
   ...RITUAL_PICTURE_QUEUE,
+  ...POSTER_PICTURE_QUEUE,
   ...ALLTAG_PICTURE_QUEUE,
   ...DAY_PICTURE_QUEUE,
   ...MOOD_PICTURE_QUEUE,
@@ -111,4 +113,5 @@ export const PICTURE_QUEUE: QueuedPicture[] = [
   ...READER_PICTURE_QUEUE,
   ...SYMBOL_PICTURE_QUEUE,
   ...BED_PICTURE_QUEUE,
+  ...HANDWASH_PICTURE_QUEUE,
 ];

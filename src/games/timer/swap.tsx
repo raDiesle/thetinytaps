@@ -2,7 +2,7 @@ import { memo, useId, useState, type CSSProperties } from "react";
 import { MASCOT_COLORS } from "@/components/Mascot";
 import type { Localized } from "@/lib/language";
 import { useRunClock } from "./pause";
-import { HOURGLASS_BOX, Hourglass, Layer, SAND_FLOOR, STAGE_H, STAGE_W } from "./scenes";
+import { Bleed, HOURGLASS_BOX, Hourglass, Layer, SAND_FLOOR, STAGE_H, STAGE_W } from "./scenes";
 import type { SwapToy } from "./settings";
 
 // Abwechseln (H-52): a toy lies on the fox child's cushion while the hourglass runs; when it is empty the toy hops over
@@ -97,12 +97,14 @@ export const SwapBackdrop = memo(function SwapBackdrop() {
   return (
     <Layer x={0} y={0} w={STAGE_W} h={STAGE_H} className="tm-back">
       <svg viewBox={`0 0 ${STAGE_W} ${STAGE_H}`} preserveAspectRatio="none">
-        <rect width={STAGE_W} height={STAGE_H} fill="#e6f4ea" />
-        <rect y={SWAP_FLOOR - 16} width={STAGE_W} height={STAGE_H} fill="#d9a066" />
-        <path d={`M0 ${SWAP_FLOOR - 16} H${STAGE_W}`} stroke="#a8743f" strokeWidth="6" />
-        <ellipse cx="800" cy={SWAP_FLOOR + 10} rx="640" ry="44" fill="#91a7ff" opacity="0.6" />
-        <Lamp kind="fox" />
-        <Lamp kind="bear" />
+        <Bleed>
+          <rect width={STAGE_W} height={STAGE_H} fill="#e6f4ea" />
+          <rect y={SWAP_FLOOR - 16} width={STAGE_W} height={STAGE_H} fill="#d9a066" />
+          <path d={`M0 ${SWAP_FLOOR - 16} H${STAGE_W}`} stroke="#a8743f" strokeWidth="6" />
+          <ellipse cx="800" cy={SWAP_FLOOR + 10} rx="640" ry="44" fill="#91a7ff" opacity="0.6" />
+          <Lamp kind="fox" />
+          <Lamp kind="bear" />
+        </Bleed>
       </svg>
     </Layer>
   );
