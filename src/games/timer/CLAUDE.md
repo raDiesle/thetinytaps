@@ -23,8 +23,10 @@ request, November 2026; the middle rather than the end, user feedback, November 
 animation in it put at that moment and then stopped (`holdAt`, `.tm-card-art.tm-still`), so the menu stands still. The cards come as wide as
 the picture (`ART_ASPECT`). Names are only read out and their tooltip. They stand in the order the user chose (November
 2026, `PICTURES`): Rote Scheibe, Sanduhr, Kerze, Apfelbaum, Blume, Pizza, Wecker, then Tidy Up, Five Boxes, Block House, Treasure Tunnel, Up to the Moon and the others, the Marble Jar last, on one
-frame with no name; after all of them Abwechseln is a category of its own, named on its frame (`GameMode.kind`): its two children
-with the toy, the lamps and the hourglass, then the Wippe, the Kugelbahn and the Rennstrecke, and that they run on without end is said in their tooltip (`SWAP_NOTE`). Where there is
+frame with no name; after all of them Abwechseln is a category of its own, named on its frame „Abwechseln (bis 4)“
+(`TURNS_GROUP` in `playersNames.ts`, `GameMode.kind`; user request, 25 November 2026: the menu says that up to four
+children can play): its children's cushions, the lamps and the hourglass, then the Wippe, the Kugelbahn and the
+Rennstrecke, each card with as many children as set and their names or photos, and that they run on without end is said in their tooltip (`SWAP_NOTE`). Where there is
 room, its frame stands beside the pictures' rather than in a row of its own below (`packGroups`' `reserve`), so all
 cards still fit on one screen (with the Marble Jar's sixteenth picture and the Rennstrecke, the fourth way of taking
 turns, on a tablet and a 1280×800 screen only in eight columns of about 100 px, the group of turns in a line of its own
@@ -261,24 +263,41 @@ taken out (user request, November 2026). The pictures:
   wait. Board, jar and every marble's way stay within x 235–1340, and the latch with the marble on it within what a
   phone on its side shows (y ≥ 120 with the bar: the first try had them cut off at the top; the tube's queue above may
   go off the screen there; `timer.test.ts` checks).
-- „Abwechseln“ 🔁 (H-52): two children take turns with a toy. The time set is one turn. Its hourglass is the
-  Sanduhr's own (`Hourglass` in `scenes.tsx`, user request, November 2026: one drawing, never a second one built
-  beside it), standing between two floor cushions (`SWAP_SEATS`, the same way left and right of it): the fox child's
-  (orange, with pointed ears sewn on) and the bear child's (brown, round ears). A lamp hangs over each. Whose turn it is
-  shows at once from afar (user feedback, November 2026): that child's lamp is on and shines on its cushion
-  (`SwapLight`), the other side lies in shade (`SwapShade`), and the toy sits on the lit cushion. The fox child begins
-  (`FIRST_TURN`), its lamp on from the first second: once the page lies still the toy hops from in front of the
-  hourglass onto its cushion – the sand only starts as it lands. No draw of who begins (the lamps clicking on and off at
-  random were taken out, user feedback, 21 November 2026); a grown-up gives the bear child the first turn behind ⚙️. When the sand is through the lamps change, the toy hops over with a whoosh and a chime and
-  the hourglass turns itself over – back and forth until a grown-up leaves with ✕ (with „bis um“ set, until then, each
-  turn as long as the row's minutes; at the end both lamps shine). Behind ⚙️: the toy (Bobbycar, Puppe, Ball,
-  `SWAP_TOYS`, kept as `toy`), „Wer ist dran?“ (starts that child's turn anew) and the time to the change. The turn is worked out from the clock (`turnAt`).
+- „Abwechseln“ 🔁 (H-52): two to four children take turns (`kids`, „Wie viele Kinder?“ behind ⚙️, two by default;
+  user request, 25 November 2026). The time set is one turn. Its hourglass is the Sanduhr's own (`Hourglass` in
+  `scenes.tsx`, user request, November 2026: one drawing, never a second one built beside it), standing between the
+  children's floor cushions (`swapPlaces`: two the same way left and right of it, three or four split round a smaller
+  hourglass, `glass`, `glassBox`), left to right in the order of their turns (`TURN_CHILDREN`): the fox child's
+  (orange, pointed ears), the bear child's (brown, round ears), the rabbit child's (blue, long ears) and the frog
+  child's (green, eye bumps) – big ears sewn on top, seen from afar (`CushionEars`, `KID_LOOK`). A lamp hangs over each.
+  Whose turn it is shows at once from afar (user feedback, November 2026 and 25 November 2026): that child's lamp is on
+  and shines on its cushion (`SwapLight`), the other places lie in shade (`SwapShades`, `shadeStrips`: from the edge or
+  the hourglass to halfway to the next cushion), and its cushion puffs itself up from its foot and pricks its ears
+  (`SwapSeat`, `.tm-seat-puff`, `.tm-seat-ears`) with one wiggle as the turn begins, while the waiting ones sink a
+  little with their ears down. No toy any more (user feedback, 25 November 2026: a car lying on the cushion's head
+  looked odd and hid its ears; the Bobbycar, Puppe and Ball, `toy`, were taken out). The fox child begins
+  (`FIRST_TURN`), its lamp on from the first second, its cushion pricking its ears once the page lies still. No draw
+  of who begins (the lamps clicking on and off at random were taken out, user feedback, 21 November 2026); a grown-up
+  gives another child the first turn behind ⚙️. When the sand is through the next child's lamp comes on, its cushion
+  pricks its ears, and the hourglass turns itself over with a whoosh and a chime – round and round until a grown-up
+  leaves with ✕ (with „bis um“ set, until then, each turn as long as the row's minutes; at the end every lamp shines).
+  Behind ⚙️: how many children, „Wer ist dran?“ (starts that child's turn anew), the children's names and photos
+  (`PlayersChoice`, `players.tsx`) and the time to the change. The turn is worked out from the clock (`turnAt`).
+  **Names and photos** (user request, 25 November 2026): behind ⚙️ each child playing has a row – its animal, a round
+  button with a camera that picks a photo on the device (`photoFromFile`: cut square from its middle, made 240 px and a
+  JPEG, so it stays small in the settings) and a name to write (`NAME_MAX` letters). Kept in the timer's settings
+  (`players`, in this browser only, never sent anywhere; the Datenschutzerklärung says so), shown in every picture of
+  taking turns on that child's place by `PlayerPatch` – a round photo framed in the child's colour, else the name on a
+  light label, else nothing – on the cushion's front, the seesaw's cushions, the cups and the race's mats and screen,
+  and „Wer ist dran?“ names the child by it (`kidLabel`). A photo stands instead of the name. Nothing reads them out.
 - „Tennis“ 🎾 (H-71) stood beside Abwechseln from 7 November 2026 and was taken out on 21 November 2026 (user request:
   poorly done). Its id `tennis` is gone from `PICTURES`, so a kept choice falls back to the first picture.
 - „Wippe“ ⚖️ (H-109, `seesaw.tsx`, 21 November 2026, chosen as the best of H-108 to H-117; reworked the same day after
   feedback): Abwechseln on a seesaw, in its group after the hourglass, run by the same `SwapRun` (the fox child first,
-  turns from the clock, „Wer ist dran?“, the same voice lines) – without a toy (a Bobbycar riding on the seat looked odd,
-  so its toy choice is hidden there). The seesaw is the time: the seat of the child whose turn it is starts up high and
+  turns from the clock, „Wer ist dran?“, the same voice lines) – without a toy (a Bobbycar riding on the seat looked odd).
+  With three or four children (25 November 2026) the seat that sinks is the left one and the right one in turn, counted
+  from the first turn, and carries the cushion of the child whose turn it is, the seat up high that of the child whose
+  turn comes next (`seesawSides`, the plank's cushions by `seats`); with two each keeps its seat. The seesaw is the time: the seat of the child whose turn it is starts up high and
   sinks evenly the whole turn long until its underside lies on a tyre half buried under it (`SAW_TILT` worked out from
   `TYRE_TOP`), then the other seat, now up high, sinks – so the waiting child sees its own seat rise towards its turn.
   What tips it is a yellow chick walking along the plank (`Chick`, `WALKER`): from beside the low seat over to the high
@@ -300,7 +319,7 @@ taken out (user request, November 2026). The pictures:
 - „Kugelbahn“ 🎱 (H-117 with H-115, `marbleRun.tsx`, 24 November 2026; user request: „von Weitem klar ersichtlich,
   welches Kind gerade dran ist“, two to four children): the last in the Abwechseln group, run by the same `SwapRun`,
   which takes turns among `turnChildren` (`TURN_CHILDREN`: fox, bear, rabbit, frog, the first `kids` of them, set behind
-  ⚙️ „Wie viele Kinder?“, `settings.kids`; Abwechseln and the Wippe keep fox and bear). A wooden marble run hangs on the
+  ⚙️ „Wie viele Kinder?“, `settings.kids` – the same for every picture of taking turns since 25 November 2026). A wooden marble run hangs on the
   playroom's wall: a jar of marbles at its top left, four zigzag ramps (`RUN`, `RAMPS`) with round end pieces, and a
   bottom rail running right to left over the children's cups (`CUP_XS`, `CUP_W` per count), a hole with a flap and a
   funnel over each. The marble is the time: the whole turn long one marble rolls down at an even pace into the cup of
@@ -315,19 +334,20 @@ taken out (user request, November 2026). The pictures:
   turn (H-115): the marble that fell into a child's cup stays there until every child has had a turn (`heldMarbles`),
   then the cups are empty again and the new round's first marble lies in the first child's; a new turn's marble comes
   in another colour (`MARBLE_COLORS`). The first turn begins with a marble dropping into the fox child's cup (`DROP_MS`).
-  „Wer ist dran?“ names all children (`KID_NAMES`); changing the number goes on with the child whose turn it is if it
+  „Wer ist dran?“ names all children (`KID_NAMES`, or their own names, `kidLabel`); changing the number goes on with the child whose turn it is if it
   still plays, else with the first. A tap lights the cup the marble goes to. The rabbit's and the frog's „Tauschen! …“
   (`MORE_TURN_TO` in `marbleNames.ts`) were written English first and translated at once; they wait for their recording
   (silent until then).
 - „Rennstrecke“ 🏎️ (`race.tsx`, H-150, user request, 24 November 2026: a long track in a figure eight, start and
   finish, one child drives and after the finish the other gets in, „tolle Effekte und Details“): the last in the
-  Abwechseln group, run by `SwapRun` with fox and bear (no toy, its choice hidden). A race track seen in perspective
+  Abwechseln group, run by `SwapRun` with the children set (2–4: fox, bear, rabbit, frog; no toy, its choice hidden). A race track seen in perspective
   from a low height (`project`: `HORIZON`, `DEPTH`, `TILT`, `sizeAt`), so its far loop reaches far into the background
   and the way is long (`CORNERS`, smoothed into `SAMPLES` points by `buildTrack`, `TRACK.total`): the start and finish
   line in front, one loop to the right, through the crossing under the bridge, round the far loop past the grandstands
   and a big screen, and back over the bridge (`BRIDGE`, its ramps rising `up` along the track) into the left loop. Kerbs
   in red and white, run-off, tyre stacks, bushes, mowing stripes, grandstands full of dots, the screen showing the face of
-  the child driving (`RaceScreen`), all drawn once (`RaceGround`, `RaceBridge`, `RacePost`, `memo`). The time is the
+  the child driving (`RaceScreen`: its photo where a grown-up picked one, else its laughing face, and its name on the
+  band below where one is written), all drawn once (`RaceGround`, `RaceBridge`, `RacePost`, `memo`). The time is the
   lap: each turn (`Lap`, keyed by turn) the kart drives one whole lap as long as the turn (`racePlan`): with a
   handover the child hops out onto its mat and the other hops in (`swap`, `hop`, `seated`, `Kid`), the start light's
   three lamps go red, yellow, green (`lights`, `go`, with a note each and the engine), then the kart drives with a
@@ -335,11 +355,21 @@ taken out (user request, November 2026). The pictures:
   turn (`kartFrames`, `LAP_FRAMES` points: where, how big, which way it heads – drawn from above, turned and squashed
   into the view – and in which layer: under the bridge, over it, near; `layerAt`), the driver bobbing and the kart
   rumbling at their own pace, little puffs behind. The road driven turns the driver's colour (`Paint`, once a second,
-  the deck's part over the bridge), and the waiting child stands on its mat beside the line. In the lap's last seconds
-  the chequered flag on its own pole waves the kart home. A tap lights the rest of the lap (`tm-race-ahead`, H-51).
+  the deck's part over the bridge), and the waiting children stand on their mats in a row in front of the line in turn
+  order (`MAT_XS` for 2, 3 and 4, `matOf`, `RaceMats`), each mat in the child's colour (`RACE_KIDS`) with its photo or
+  name at its front (`patchAt`, `PlayerPatch`); in a turn the child who drove before hops out onto its mat and the one
+  whose turn it is hops in from its own. The mats keep clear of the track, of each other, of the start light's post and
+  of the kart on the line, so no waiting child is hidden (`race.test.ts` checks every count, on the 4:3 cut too). In the
+  lap's last seconds the chequered flag on the start light's box waves the kart home (`flagBox`; on a pole of its own at
+  the left it stood where a third mat goes, 25 November 2026). A tap lights the rest of the lap (`tm-race-ahead`, H-51).
   Its card shows the fox child's kart on the bridge (`LATER` 0.82). Only its name is new text (`raceNames.ts`, English
-  first, in every app language); it says Abwechseln's lines. The two children are the figures doing the run, the one
-  exception to „no fox or bear figure“ besides Up to the Moon (see the rules).
+  first, in every app language); it says Abwechseln's lines. The children are the figures doing the run, the one
+  exception to „no fox or bear figure“ besides Up to the Moon (see the rules): fox and bear the shared `Mascot` child
+  (`Driver` and the screen its `MascotHead`), the rabbit and the frog drawn in `race.tsx` in the same child's style,
+  since `Mascot` has only fox and bear (`AnimalKid`, `AnimalHead`: a round head, eyes a little below its middle with a
+  warm brown iris and two lights, rosy cheeks, `MASCOT_INK` round everything, `BODY` with chubby arms and round paws,
+  dungarees in the child's colour – the rabbit white with long ears in blue, the frog green with its eyes in bumps on
+  top, in dark green), each memoized (`KidFigure`, `Driver`, `ScreenFace`).
   At the end the picture's own sound, then children cheer (the `cheer` recording) while a warm light spreads over the
   picture (`.tm-done-light`), a friendly tune after it, then `GameEnd` with the picture's trophy (nothing rises, the trophy replaced it, user decision, November 2026) with „Nochmal“ and „Weiter“ (the next picture,
   the same minutes, `nextPicture`; „Weiter“ shows that picture's card, `TimerCardArt` as `next.art`, user request, 23
@@ -362,7 +392,7 @@ Files: `TimerGame.tsx` (start screen: cards, minutes and the own time's slip), `
 run: working out its length, the question when a clock time is past, the clock, the phases `running` →
 `blow` (candle only) → `done`, taps, the end, the sounds of the pieces), `pieces.ts` (how a run is cut into pieces, the
 train's halts, where the apples hang; tested), `SwapPlay.tsx` and `swap.tsx` („Abwechseln“: its turns, and its room,
-lamps, cushions and toys), `seesaw.tsx` (the Wippe's playground, plank, stand and chick), `marbleRun.tsx` (the Kugelbahn's run, cups and marbles; `marbleNames.ts` its texts), `race.tsx` (the Rennstrecke's track, kart, start light and children; `raceNames.ts` its name), `apples.tsx`, `caterpillar.tsx`, `clock.tsx`, `disc.tsx`, `flower.tsx`, `sunset.tsx`, `pizza.tsx`, `tidy.tsx`, `boxes.tsx`, `blocks.tsx`, `tunnel.tsx`, `jump.tsx`, `jar.tsx` (one picture each, `jumpFox.tsx` its fox's poses; `tidyNames.ts`, `boxesNames.ts`, `blocksNames.ts`, `tunnelNames.ts`, `jumpNames.ts` and `jarNames.ts` their texts), `hop.tsx` (a toy hopping
+lamps and cushions), `players.tsx` (the children's names and photos: the rows behind ⚙️, `PlayerPatch` on their places; `playersNames.ts` its texts and the group's name), `seesaw.tsx` (the Wippe's playground, plank, stand and chick), `marbleRun.tsx` (the Kugelbahn's run, cups and marbles; `marbleNames.ts` its texts), `race.tsx` (the Rennstrecke's track, kart, start light and children; `raceNames.ts` its name), `apples.tsx`, `caterpillar.tsx`, `clock.tsx`, `disc.tsx`, `flower.tsx`, `sunset.tsx`, `pizza.tsx`, `tidy.tsx`, `boxes.tsx`, `blocks.tsx`, `tunnel.tsx`, `jump.tsx`, `jar.tsx` (one picture each, `jumpFox.tsx` its fox's poses; `tidyNames.ts`, `boxesNames.ts`, `blocksNames.ts`, `tunnelNames.ts`, `jumpNames.ts` and `jarNames.ts` their texts), `hop.tsx` (a toy hopping
 into its box, shared), `pause.tsx` (the run's clock, pause and start over), `keyframes.ts` (keyframes written for a run), `shown.tsx`
 („Zeit im Bild“: its choice, the note with digits or tally marks), `scenes.tsx` (the other drawings
 and the shared `Layer`, `Draw`, `LeftGlow`), `timer.css`, `content.ts`
@@ -457,8 +487,10 @@ and the shared `Layer`, `Draw`, `LeftGlow`), `timer.css`, `content.ts`
   tiny beside what runs down, as in life – big bees took the eye from the blossoms (user feedback, November 2026).
 - **Whose turn it is, is seen from across the room, from the very first second** (user feedback, November 2026: a
   toy lying beside one of two small cushions did not tell it; asked again on 21 November 2026, so the shade is dark,
-  `rgb(28 30 70 / 0.6)`): the child's whole side changes – its lamp or sun on, the other side in plain shade – and the
-  toy sits on that cushion, not beside it. Who begins is shown from the first second, never drawn at random: the fox
+  `rgb(28 30 70 / 0.6)`): the child's whole side changes – its lamp or sun on, the other side in plain shade – and its
+  own place answers (the cushion puffs up and pricks its ears, the seat sinks, the cup is lit). Nothing lies on a
+  cushion or covers its ears (user feedback, 25 November 2026: the car on the cushion's head looked odd and hid them),
+  and the ears are big enough to tell the children apart from across the room. Who begins is shown from the first second, never drawn at random: the fox
   child, on the left, begins, and a grown-up changes it behind ⚙️ (user feedback, 21 November 2026: the lamps' draw at
   the start was not wanted; `timer.test.ts` checks). A new way to show a turn keeps that: a big change of the whole side,
   never a small sign.
@@ -475,6 +507,10 @@ and the shared `Layer`, `Draw`, `LeftGlow`), `timer.css`, `content.ts`
   should see its turn coming. Whatever rides or walks on something that tips or turns stays upright (turned back the
   same way, as the Wippe's chick), and nothing rides along only to be there (the Wippe's toy on the seat looked odd), and a picture of taking turns is added to `TurnPicture`, `isTurns` and `LEVEL_IDS`, after the
   others in the Abwechseln group.
+- **Every picture of taking turns plays with two to four children** (user request, 25 November 2026): one count for
+  all of them (`kids`, two by default, behind ⚙️ while playing), the children always the first of `TURN_CHILDREN`, and
+  their names or photos on their places (`players`). A new picture of taking turns takes `kids` and `players` too, keeps
+  all four places within x 200–1340 and fair (`timer.test.ts` checks the cushions), and the menu's group says „(bis 4)“.
 - **One drawing for one thing**: a thing two pictures show (the hourglass) is one component both use, never copied and
   drawn again with its own sizes (user request, November 2026; `timer.test.ts` checks the hourglass).
 - **The cards' order is the user's** (November 2026: Rote Scheibe, Sanduhr, Kerze, Apfelbaum, Blume, Pizza, then the
@@ -513,12 +549,13 @@ and the shared `Layer`, `Draw`, `LeftGlow`), `timer.css`, `content.ts`
   children that pushed the cart, held the hose and blew out the candle – drawn in SVG they looked odd, a bear with two
   brown circles for paws on the hose. A picture tells its story by itself (the cart rolling by itself, the hose in a forked
   stick, the last candle going out by itself); where it is about the real children (Abwechseln), a thing of theirs
-  stands for them (the cushions in fox and bear colours, no face). `timer.test.ts` checks that no picture draws one.
+  stands for them (the cushions in the children's colours with their animals' ears, no face, and their names or photos). `timer.test.ts` checks that no picture draws one.
   Tennis, whose players were the shared `Mascot` children, was the one exception and is taken out (21 November 2026).
   The one exception is Up to the Moon's fox child (`jumpFox.tsx`, user request, 23 November 2026): it is the figure doing
   the run, never one standing by, drawn with the shared head, arms, feet and tail of `Mascot.tsx` – and the
-  Rennstrecke's fox and bear children (`race.tsx`, 24 November 2026), the drivers taking turns at the wheel: the one
-  whose turn comes waits on its mat at the line, the shared `Mascot` child, and hops in as the other hops out.
+  Rennstrecke's children (`race.tsx`, 24 November 2026; fox, bear, rabbit and frog since 25 November 2026), the drivers
+  taking turns at the wheel: those whose turn comes wait on their mats at the line (fox and bear the shared `Mascot`
+  child, rabbit and frog `AnimalKid` in its style), and the next hops in as the one before hops out.
 - **What grows, grows as a whole** (user feedback, November 2026): a plant rising gets bigger as it rises – its stalk
   thicker, its leaves bigger – scaled from its foot (`transform-origin` at the soil, never stretched one way), and a
   flower grows open from small to big with all its petals at once, never petal after petal.

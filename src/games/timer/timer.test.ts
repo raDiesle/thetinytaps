@@ -119,10 +119,10 @@ import {
   TABLE,
   TRAIN,
 } from "./scenes";
-import { FIRST_TURN, heldMarbles, turnChildren } from "./SwapPlay";
+import { FIRST_TURN, heldMarbles, seesawSides, turnChildren } from "./SwapPlay";
 import { CUP_W, CUP_XS, MARBLE_COLORS, MARBLE_R, marblePlan, RAMPS, REST_Y } from "./marbleRun";
 import { PLANK_BOX, SAW, SAW_GROUND, SAW_TILT, SEAT_CUSHION_W, TYRE_TOP, TYRE_X, WALKER } from "./seesaw";
-import { LAMP, SWAP_FLOOR, SWAP_SEATS, TOY } from "./swap";
+import { glassBox, LAMP, SWAP_FLOOR, shadeStrips, swapPlaces } from "./swap";
 import { DEFAULT_TIMER_SETTINGS, TIMER_SECONDS } from "./settings";
 import {
   BEAM,
@@ -1330,19 +1330,46 @@ describe("Timer", () => {
     }
   });
 
-  test("Abwechseln keeps both cushions with their lamps and the toy on every screen, the same way either side of the hourglass (H-52)", () => {
-    const half = SWAP_SEATS.w / 2;
-    expect(SWAP_SEATS.fox - half).toBeGreaterThanOrEqual(200);
-    expect(SWAP_SEATS.bear + half).toBeLessThanOrEqual(RIGHT);
-    // Neither cushion nor the toy on it reaches under the hourglass.
-    expect(SWAP_SEATS.fox + Math.max(half, TOY.w / 2)).toBeLessThanOrEqual(HOURGLASS_BOX.x);
-    expect(SWAP_SEATS.bear - Math.max(half, TOY.w / 2)).toBeGreaterThanOrEqual(HOURGLASS_BOX.x + HOURGLASS_BOX.w);
-    // Fair: both places as far from the hourglass's middle.
-    expect(GLASS.cx - SWAP_SEATS.fox).toBe(SWAP_SEATS.bear - GLASS.cx);
-    // The lamps' shades and the toy waiting in front of the hourglass are seen on a phone on its side too.
+  test("Abwechseln keeps two to four cushions with their lamps on every screen, clear of each other and of the hourglass (H-52)", () => {
+    for (const count of [2, 3, 4] as const) {
+      const { xs, w, glass } = swapPlaces(count);
+      const g = glassBox(glass);
+      const half = w / 2;
+      expect(xs).toHaveLength(count);
+      expect(xs[0] - half, `${count}`).toBeGreaterThanOrEqual(200);
+      expect(xs[count - 1] + half, `${count}`).toBeLessThanOrEqual(RIGHT);
+      // Left to right in the order of the turns, never touching each other nor reaching under the hourglass.
+      for (let i = 1; i < count; i++) expect(xs[i] - xs[i - 1], `${count}`).toBeGreaterThanOrEqual(w + 10);
+      for (const x of xs) expect(x + half <= g.x || x - half >= g.x + g.w, `${count}: ${x}`).toBe(true);
+      // The hourglass stands on the floor and shrinks round its middle.
+      expect(g.y + g.h).toBe(SWAP_FLOOR);
+      expect(g.x + g.w / 2).toBe(GLASS.cx);
+      // Each strip of shade covers its own cushion, and the strips never overlap.
+      const strips = shadeStrips(count);
+      strips.forEach(({ from, to }, i) => {
+        expect(from, `${count}/${i}`).toBeLessThanOrEqual(xs[i] - half);
+        expect(to, `${count}/${i}`).toBeGreaterThanOrEqual(xs[i] + half);
+        if (i > 0) expect(from).toBeGreaterThanOrEqual(strips[i - 1].to);
+      });
+    }
+    // Fair with two and four: the places as far from the hourglass's middle on both sides.
+    for (const count of [2, 4] as const) {
+      const { xs } = swapPlaces(count);
+      for (let i = 0; i < count / 2; i++) expect(GLASS.cx - xs[i]).toBe(xs[count - 1 - i] - GLASS.cx);
+    }
+    expect(HOURGLASS_BOX.w).toBeGreaterThan(0);
+    // The lamps' shades are seen on a phone on its side too.
     expect(LAMP.rim - 30).toBeGreaterThanOrEqual(80);
-    expect(TOY.waiting).toBeLessThanOrEqual(820);
-    expect(TOY.onCushion - TOY.h).toBeGreaterThanOrEqual(80);
+  });
+
+  // User feedback, 25 November 2026: a car lying on a cushion's head looked odd and hid its ears. Whose turn it is shows
+  // by the cushion itself, puffed up with its ears pricked under its lamp – nothing lies on it or covers its ears.
+  test("Abwechseln shows whose turn it is by the cushion itself, with no toy on it", async () => {
+    const code = await Bun.file("src/games/timer/swap.tsx").text();
+    expect(code).not.toMatch(/SWAP_TOYS|function Toy\b|<Toy\b/);
+    const css = await Bun.file("src/games/timer/timer.css").text();
+    expect(css).toContain(".tm-seat-ears");
+    expect(css).not.toContain("tm-toy-hop");
   });
 
   // H-109: the seesaw is the time – a seat sinks the whole turn long until it lies on its tyre, as the chick walks over to
@@ -1446,9 +1473,25 @@ describe("Timer", () => {
     expect(has(heldMarbles(2, 2, 4))).toEqual([true, false, true, true]);
     // The marble landing in a cup keeps its colour there: the one rolling in turn k has turn k + 1's.
     expect(heldMarbles(0, 1, 2)[1]).toBe(MARBLE_COLORS[1]);
-    expect(turnChildren("marblerun", 4)).toEqual(["fox", "bear", "rabbit", "frog"]);
-    expect(turnChildren("marblerun", 3)).toEqual(["fox", "bear", "rabbit"]);
-    expect(turnChildren("swap", 4)).toEqual(["fox", "bear"]);
+    // Every picture of taking turns takes two to four children (user request, 25 November 2026); an old count gives two.
+    expect(turnChildren(4)).toEqual(["fox", "bear", "rabbit", "frog"]);
+    expect(turnChildren(3)).toEqual(["fox", "bear", "rabbit"]);
+    expect(turnChildren(2)).toEqual(["fox", "bear"]);
+    expect(turnChildren(7 as never)).toEqual(["fox", "bear"]);
+  });
+
+  test("the Wippe takes turns among two to four children: its sides alternate, the sinking seat carries the child whose turn it is", () => {
+    const two = turnChildren(2);
+    expect(seesawSides(0, two)).toEqual({ side: "fox", seats: { fox: "fox", bear: "bear" } });
+    expect(seesawSides(1, two)).toEqual({ side: "bear", seats: { fox: "fox", bear: "bear" } });
+    const three = turnChildren(3);
+    for (let step = 0; step < 12; step++) {
+      const { side, seats } = seesawSides(step, three);
+      expect(side).toBe(step % 2 === 0 ? "fox" : "bear");
+      // The seat that sinks is the child's whose turn it is, the one up high the next child's.
+      expect(seats[side]).toBe(three[step % 3]);
+      expect(seats[side === "fox" ? "bear" : "fox"]).toBe(three[(step + 1) % 3]);
+    }
   });
 
   // The book's paper margin and the ⚙️ note lie over the stage's right edge (x 1400 at 4:3): a figure standing to 1380

@@ -169,8 +169,10 @@ export function PrivacyPage() {
         <p>
           Damit die Spiele sich merken, was Sie gewählt haben, speichert die Seite im Speicher Ihres Browsers (Local Storage): Sprache, Musik an oder aus, Junge
           oder Mädchen, die Spielzeit des Tages, die Sterne der Belohnungstafel, den Tagesplan und was Sie dort eintippen, etwa Namen von Aufgaben, und bei „Wie
-          geht's dir?“ das Gefühl, das Ihr Kind heute gewählt hat, damit es am Abend neben dem vom Morgen steht (am nächsten Tag wird es überschrieben). Damit
-          die Spiele auch ohne Internet laufen, legt die Seite eine Kopie ihrer Dateien in den Speicher des Browsers (Service Worker).
+          geht's dir?“ das Gefühl, das Ihr Kind heute gewählt hat, damit es am Abend neben dem vom Morgen steht (am nächsten Tag wird es überschrieben), und
+          beim Timer „Abwechseln“ die Namen der Kinder und die Fotos, die Sie für sie auswählen: Ein Foto wird dafür schon auf Ihrem Gerät klein und quadratisch
+          zugeschnitten und nie hochgeladen. Damit die Spiele auch ohne Internet laufen, legt die Seite eine Kopie ihrer Dateien in den Speicher des Browsers
+          (Service Worker).
         </p>
         <p>
           Das alles bleibt auf Ihrem Gerät und wird nicht an uns oder andere übertragen. Sie können es jederzeit löschen, indem Sie in Ihrem Browser die

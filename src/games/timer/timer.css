@@ -1581,8 +1581,16 @@
 }
 
 /* Abwechseln (H-52): the Sanduhr's hourglass runs one turn (its sand started `--tm-delay` ago) and turns itself over
-   for the next; while the lamps draw who begins it stands full and still (`.tm-wait`). The lamp over the child whose
-   turn it is shines on its cushion, the other side lies in soft shade, and the toy hops over onto the lit cushion. */
+   for the next; while the page still turns it stands full and still (`.tm-wait`). With three or four children it is
+   smaller (`.tm-swap-glass-size`, scaled towards its foot). The lamp over the child whose turn it is shines on its
+   cushion, every other child's strip of the room lies in shade, and the lit cushion puffs itself up and pricks up its
+   ears („Ohren spitzen“, `.tm-seat`), with one wiggle of the ears as the turn begins; the waiting ones sit a little
+   lower, their ears relaxed but whole (user feedback, 25 November 2026: the ears must be plainly seen). */
+.tm-swap-glass-size {
+  position: absolute;
+  inset: 0;
+}
+
 .tm-swap-glass .tm-sand,
 .tm-swap-glass .tm-sand-fill {
   animation-delay: var(--tm-delay);
@@ -1614,14 +1622,58 @@
   opacity: 1;
 }
 
-/* Dark enough that the side waiting is plainly not the one whose turn it is (user feedback, 21 November 2026: the
+/* Dark enough that a place waiting is plainly not the one whose turn it is (user feedback, 21 November 2026: the
    softer shade did not tell it clearly). */
-.tm-swap-shade-fox {
-  background: linear-gradient(to right, rgb(28 30 70 / 0.6) 75%, rgb(28 30 70 / 0.22));
+.tm-swap-shade {
+  background: rgb(28 30 70 / 0.6);
 }
 
-.tm-swap-shade-bear {
-  background: linear-gradient(to left, rgb(28 30 70 / 0.6) 75%, rgb(28 30 70 / 0.22));
+.tm-seat-puff,
+.tm-seat-ears {
+  position: absolute;
+  inset: 0;
+  transition: transform 0.6s cubic-bezier(0.34, 1.56, 0.64, 1);
+}
+
+.tm-seat svg {
+  position: absolute;
+  inset: 0;
+  display: block;
+  width: 100%;
+  height: 100%;
+  overflow: visible;
+}
+
+.tm-seat-puff {
+  transform-origin: var(--tm-seat-foot);
+  transform: scale(0.92);
+}
+
+.tm-seat-ears {
+  transform-origin: var(--tm-seat-ear-base);
+  transform: scaleY(0.86);
+}
+
+.tm-seat.tm-on .tm-seat-puff {
+  transform: scale(1.1);
+}
+
+.tm-seat.tm-on .tm-seat-ears {
+  transform: scaleY(1.18);
+}
+
+.tm-seat.tm-on .tm-seat-ears svg {
+  transform-origin: var(--tm-seat-ear-base);
+  animation: tm-seat-wiggle 0.7s 0.45s ease-in-out;
+}
+
+@keyframes tm-seat-wiggle {
+  25% {
+    transform: rotate(-5deg);
+  }
+  75% {
+    transform: rotate(5deg);
+  }
 }
 
 /* Kugelbahn (H-117 with H-115): the strip of the room of the child whose turn it is is lit warm, every other one lies
@@ -1728,6 +1780,7 @@
    its top each turned by keyframes inside the ground's squash (`.tm-race-flat`), the top lifted over the wheels. The
    driver bobs and the exhaust puffs at their own pace, so even a long, slow lap plainly moves. */
 .tm-race-ground,
+.tm-race-mats,
 .tm-race-face,
 .tm-race-on-ground {
   z-index: 1;
@@ -1883,25 +1936,11 @@
   z-index: 9;
 }
 
-.tm-toy {
-  transition: transform 1.2s ease-in-out;
-}
-
 .tm-toy > div,
 .tm-toy svg {
   display: block;
   width: 100%;
   height: 100%;
-}
-
-.tm-toy-hop {
-  animation: tm-toy-hop 1.2s ease-in-out;
-}
-
-@keyframes tm-toy-hop {
-  50% {
-    transform: translateY(-70%);
-  }
 }
 
 /* Wippe (H-109): the plank turns round its pivot as one layer, back and forth for ever, one turn each way (`--tm-ms`,
@@ -4114,4 +4153,92 @@
 .tm-paused :is(.tm-stage, .tm-bar) *::before,
 .tm-paused :is(.tm-stage, .tm-bar) *::after {
   animation-play-state: paused !important;
+}
+
+/*
+ * Behind ⚙️: a row for each child taking turns – its animal, its photo (a tap picks one), its name and ✕ for the photo
+ * (user request, 25 November 2026). Two rows side by side where the panel is wide, so four children stay compact.
+ */
+.tm-players {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(240px, 1fr));
+  gap: 8px 18px;
+  width: 100%;
+}
+
+.tm-player-row {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  min-width: 0;
+}
+
+.tm-player-animal {
+  flex-shrink: 0;
+  font-size: 1.5rem;
+  line-height: 1;
+}
+
+.tm-player-pick {
+  display: grid;
+  flex-shrink: 0;
+  place-items: center;
+  width: 44px;
+  height: 44px;
+  padding: 0;
+  overflow: hidden;
+  border: 3px dashed var(--ink);
+  border-radius: 50%;
+  background: #fffbe6;
+  font-size: 1.2rem;
+  cursor: pointer;
+}
+
+.tm-player-pick img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+}
+
+.tm-player-pick.tm-player-has-photo {
+  border-style: solid;
+}
+
+.tm-player-name-input {
+  flex: 1;
+  min-width: 0;
+  height: 40px;
+  padding: 0 12px;
+  border: 3px solid var(--ink);
+  border-radius: 12px;
+  background: #fff;
+  color: inherit;
+  font: inherit;
+  font-size: 1rem;
+}
+
+.tm-player-pick:focus-visible,
+.tm-player-name-input:focus-visible,
+.tm-player-remove:focus-visible {
+  outline: 3px solid var(--ocean);
+  outline-offset: 2px;
+}
+
+.tm-player-remove {
+  flex-shrink: 0;
+  width: 32px;
+  height: 32px;
+  padding: 0;
+  border: 2px solid var(--ink);
+  border-radius: 50%;
+  background: #fff;
+  color: inherit;
+  font-size: 0.9rem;
+  cursor: pointer;
+}
+
+.tm-players-note {
+  margin: 0;
+  font-size: 0.85rem;
+  opacity: 0.75;
 }

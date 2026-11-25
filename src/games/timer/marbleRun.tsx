@@ -4,8 +4,8 @@ import { playKnock } from "@/lib/sfx";
 import { type Frame, keyframes } from "./keyframes";
 import { useRunClock } from "./pause";
 import { INK, Layer, STAGE_H, STAGE_W } from "./scenes";
-import type { TurnCount } from "./settings";
-import type { TurnChild } from "./swap";
+import { PlayerPatch } from "./players";
+import type { PlayerLook, Players, TurnChild, TurnCount } from "./settings";
 
 // Kugelbahn (H-117 with H-115, user request, 24 November 2026): two to four children take turns, reihum. A wooden
 // marble run hangs on the playroom's wall, a zigzag of ramps from a jar of marbles at the top left down to a bottom rail
@@ -323,8 +323,8 @@ function CupBack({ kind, x, w }: { kind: TurnChild; x: number; w: number }) {
   );
 }
 
-/** The front of a cup, over a marble lying in it: its body, a pale band round it and a soft shine. */
-function CupFront({ kind, x, w }: { kind: TurnChild; x: number; w: number }) {
+/** The front of a cup, over a marble lying in it: its body, a pale band round it, a soft shine and the child's photo or name. */
+function CupFront({ kind, x, w, player }: { kind: TurnChild; x: number; w: number; player?: PlayerLook }) {
   const look = CUP_LOOK[kind];
   const rx = w / 2;
   const ry = w * 0.13;
@@ -347,6 +347,7 @@ function CupFront({ kind, x, w }: { kind: TurnChild; x: number; w: number }) {
         transform={`translate(0 3)`}
         opacity="0.9"
       />
+      <PlayerPatch look={player} x={x} y={band - 4} r={w * 0.16} color={look.shade} />
     </g>
   );
 }
@@ -370,13 +371,13 @@ const CupsBack = memo(function CupsBack({ kids }: { kids: readonly TurnChild[] }
 });
 
 /** The cups' fronts, over the marbles lying in them; drawn once for that many children. */
-const CupsFront = memo(function CupsFront({ kids }: { kids: readonly TurnChild[] }) {
+const CupsFront = memo(function CupsFront({ kids, players }: { kids: readonly TurnChild[]; players: Players }) {
   const count = kids.length as TurnCount;
   return (
     <Layer x={0} y={CUPS_TOP} w={STAGE_W} h={CUPS_H}>
       <svg viewBox={`0 ${CUPS_TOP} ${STAGE_W} ${CUPS_H}`}>
         {kids.map((kind, i) => (
-          <CupFront key={kind} kind={kind} x={CUP_XS[count][i]} w={CUP_W[count]} />
+          <CupFront key={kind} kind={kind} x={CUP_XS[count][i]} w={CUP_W[count]} player={players[kind]} />
         ))}
       </svg>
     </Layer>
@@ -528,6 +529,8 @@ export interface Rolling {
   color: string;
 }
 
+const NO_PLAYERS: Players = {};
+
 /**
  * The Kugelbahn on the stage for the children `kids` (two to four, left to right): `lit` says whose strip of the room is
  * lit (the child whose turn it is, or everyone at the end), `held` the colour of the marble lying in each cup (or null),
@@ -543,6 +546,7 @@ export function MarbleScene({
   drop,
   poke,
   quiet,
+  players = NO_PLAYERS,
 }: {
   kids: readonly TurnChild[];
   lit: readonly boolean[];
@@ -552,6 +556,8 @@ export function MarbleScene({
   drop?: { cup: number; key: number };
   poke: number;
   quiet?: boolean;
+  /** The children's photos and names, on their cups' fronts. */
+  players?: Players;
 }) {
   const count = kids.length as TurnCount;
   const xs = CUP_XS[count];
@@ -574,7 +580,7 @@ export function MarbleScene({
         <RestingMarble key={x} x={x} color={held[i] ?? MARBLE_COLORS[0]} on={held[i] !== null} drop={drop?.cup === i ? drop.key : undefined} />
       ))}
       {rolling && <RollingMarble key={rolling.name} count={count} quiet={quiet} {...rolling} />}
-      <CupsFront kids={kids} />
+      <CupsFront kids={kids} players={players} />
     </>
   );
 }

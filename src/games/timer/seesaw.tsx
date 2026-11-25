@@ -1,10 +1,12 @@
 import { memo, useEffect, useRef, useState, type CSSProperties } from "react";
 import { useRunClock } from "./pause";
 import { INK, Layer, STAGE_H, STAGE_W } from "./scenes";
+import type { Players, TurnChild } from "./settings";
 import { Cushion, type Holder } from "./swap";
 
-// Wippe (H-109): two children take turns on a seesaw. The cushions in the fox's and the bear's colours sit on its two
-// seats. The seat of the child whose turn it is starts up high and sinks slowly the whole turn long until it touches
+// Wippe (H-109): two to four children take turns on a seesaw. The cushions of the children whose turn it is and whose
+// comes next sit on its two seats (with two children always the fox's left and the bear's right; with three or four the
+// seat that just touched down takes the cushion of the child after next, each with its photo or name). The seat of the child whose turn it is starts up high and sinks slowly the whole turn long until it touches
 // down on its tyre – then the turn is over and the other seat, now up high, sinks. What tips it is a chick walking along
 // the plank: it starts beside the low seat and walks over to the high one, and as its weight moves the plank tips evenly
 // with it (user request, 21 November 2026: the toy riding on the seat looked odd, and on a long turn the slow tilt alone
@@ -104,8 +106,18 @@ function Handle({ x }: { x: number }) {
   );
 }
 
-/** The plank with its handles, the two cushions on its seats and the hub it turns on, lying level; drawn once and turned as a whole. */
-const PlankDrawing = memo(function PlankDrawing() {
+/** Which child's cushion sits on each seat: the left one (the fox's side) and the right one (the bear's). */
+export type SeatKids = Record<Holder, TurnChild>;
+
+/** The seats with two children: the fox's left, the bear's right. A constant, so the plank isn't drawn again each second. */
+export const TWO_SEATS: SeatKids = { fox: "fox", bear: "bear" };
+const NO_PLAYERS: Players = {};
+
+/**
+ * The plank with its handles, the cushions on its seats and the hub it turns on, lying level; drawn once (again only
+ * when a seat's cushion changes) and turned as a whole.
+ */
+const PlankDrawing = memo(function PlankDrawing({ seats, players }: { seats: SeatKids; players: Players }) {
   const B = PLANK_BOX;
   return (
     <svg viewBox={`${B.x} ${B.y} ${B.w} ${B.h}`}>
@@ -118,8 +130,8 @@ const PlankDrawing = memo(function PlankDrawing() {
       />
       <Handle x={SAW.x - SAW.seat + 120} />
       <Handle x={SAW.x + SAW.seat - 120} />
-      <Cushion kind="fox" x={SAW.x - SAW.seat} y={PLANK_TOP + 4} w={SEAT_CUSHION_W} />
-      <Cushion kind="bear" x={SAW.x + SAW.seat} y={PLANK_TOP + 4} w={SEAT_CUSHION_W} />
+      <Cushion kind={seats.fox} x={SAW.x - SAW.seat} y={PLANK_TOP + 4} w={SEAT_CUSHION_W} look={players[seats.fox]} />
+      <Cushion kind={seats.bear} x={SAW.x + SAW.seat} y={PLANK_TOP + 4} w={SEAT_CUSHION_W} look={players[seats.bear]} />
       <circle cx={SAW.x} cy={SAW.y} r="30" fill="#ffd43b" stroke={INK} strokeWidth="6" />
       <circle cx={SAW.x} cy={SAW.y} r="9" fill={INK} />
     </svg>
@@ -205,7 +217,10 @@ export function Seesaw({
   startedAt,
   round,
   level = false,
+  seats = TWO_SEATS,
+  players = NO_PLAYERS,
 }: {
+  /** The side whose seat sinks in this turn (the fox's left, the bear's right). */
   holder: Holder;
   running: boolean;
   first: Holder;
@@ -213,6 +228,10 @@ export function Seesaw({
   startedAt: number;
   round: number;
   level?: boolean;
+  /** The children whose cushions sit on the seats. */
+  seats?: SeatKids;
+  /** Their photos and names. */
+  players?: Players;
 }) {
   const B = PLANK_BOX;
   const W = WALKER;
@@ -245,7 +264,7 @@ export function Seesaw({
   } as CSSProperties;
   return (
     <Layer x={B.x} y={B.y} w={B.w} h={B.h} className={`tm-saw tm-move${name}`} style={{ ...style, transform: running ? undefined : `rotate(${rest}deg)` }}>
-      <PlankDrawing />
+      <PlankDrawing seats={seats} players={players} />
       <div
         className="tm-saw-walker"
         style={{
