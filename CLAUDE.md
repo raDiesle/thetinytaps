@@ -702,13 +702,16 @@ A game may give it before its end where reaching the goal once is enough (Ketten
   plays (`CardPicture`, `PREVIEW_SIZE`), a small still webp in the game's `vorschau/` folder (`GameShell previews`; the
   books' lines in `src/components/vorschau/<book id>.webp`) made by `bun run previews` in headless Chrome – never the
   game's own svg drawn into the menu, which would have a phone draw every game at once. The picture is framed like a
-  photo pasted in, as big as the card allows above its name (beside it on a flat card), and on a table of contents' line
+  photo pasted in, and on a table of contents' line
   a big rounded rectangle as tall as the line, or as wide as it where the line is tall (see the table of contents
   below) – never over the name, never a small round cut (user feedback, November 2026, three times: round cuts showed
   too little, then pictures filling the card lay over the words, then one column of flat lines left them far too
-  small); only where many cards'
-  pictures are the point the picture fills the card and the name lies on it in a small paper box (`GameShell
-  labelOnPicture`, Kettenreaktion, user request). A cut shows what the game is about, close enough to be recognised and whole: the figure and the thing
+  small). **A card with a picture looks alike in every menu and at every size** (`pictureCard`, user feedback, 25
+  November 2026, from Lebendige Welten's menus): the picture on top, as wide as the card, and the name in one line
+  under it – never beside a small picture on a flat card, never broken into lines, never on the picture (Kettenreaktion's
+  names lay on its pictures in paper boxes, `labelOnPicture`, taken out). `useFitGrid(…, PICTURE_CARDS)` picks the grid
+  with the biggest pictures and shrinks all names of a menu alike until the longest fits (`fitNames`); where all cards
+  at once would leave pictures too small to make out (`MIN_PICTURE`), the menu scrolls instead (`fitGrid.test.ts`). A cut shows what the game is about, close enough to be recognised and whole: the figure and the thing
   it is about (an animal with the right food and at least one wrong one), the letter, picture and word together, the
   number with all its things, several sock pairs on the line, a dancer mid-move (`WHOLE`, `ALONE`, `PLAYS` – a moment
   played into the game first, never only its empty start). A new game, level, scene or card runs it
@@ -725,7 +728,8 @@ A game may give it before its end where reaching the goal once is enough (Ketten
   in `useFitGrid` and in the styles' `(max-width: 599.98px), (max-height: 599.98px)`): there a menu shows no title
   either (only read out; the home logo stays), a start screen with many cards puts its `level` row into the head beside
   the corner (`levelInHead`, like Lebendige Bilder's menu), and the
-  cards get smaller and flat (emoji beside the title; too narrow for that, emoji above a small title without ▶). The sun sits in the top
+  cards get smaller and flat (emoji beside the title; too narrow for that, emoji above a small title without ▶) – but a
+  card with a picture never goes flat (see „Menus show pictures from the games“). The sun sits in the top
   left corner, stepped aside for the page's corner (not on a phone, where it only crowds the cards); buttons for grown-ups never cover it. „Einstellungen“ (where a game still has them) is a
   small sign without words (⚙️; the name as tooltip and read out) – a paper
   note clipped beside the fullscreen note, see the picture book below – so it takes no row of its own; a panel opens right under the top row. A

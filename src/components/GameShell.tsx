@@ -11,7 +11,7 @@ import { Sky } from "@/components/Sky";
 import { categoryHref, categoryOf, isHidden, pagesBetween } from "@/content/games";
 import { useNoBackgroundMusic } from "@/lib/backgroundMusic";
 import { putBookBack } from "@/lib/bookTravel";
-import { useFitGrid } from "@/lib/fitGrid";
+import { PICTURE_CARDS, useFitGrid } from "@/lib/fitGrid";
 import { enterKidMode, exitKidMode } from "@/lib/fullscreen";
 import { useT } from "@/lib/language";
 import { codeSoon } from "@/lib/lazyPart";
@@ -84,12 +84,6 @@ interface GameShellProps {
    * previews` makes them; a still picture costs a phone nothing, where the game's own svg in every card would.
    */
   previews?: Record<string, string>;
-  /**
-   * The picture fills the whole card and the name lies on it in a small paper box, readable over any picture – for
-   * many cards whose pictures are the point (Kettenreaktion's machines, user request, November 2026). Without it the
-   * framed picture stands above the name.
-   */
-  labelOnPicture?: boolean;
   /** The mode played last, marked on its card. */
   mode?: string;
   onMode?: (id: string) => void;
@@ -141,7 +135,6 @@ export function GameShell({
   modes,
   prepare,
   previews,
-  labelOnPicture,
   mode,
   onMode,
   startMode,
@@ -193,8 +186,9 @@ export function GameShell({
   const grid = useFitGrid(
     modes?.length ?? 0,
     groups?.map((g) => g.modes.length),
-    // Cards that are a picture come about as wide as a screen, the shape of the picture.
-    modes?.some((m) => m.art) ? ART_ASPECT : undefined,
+    // Cards that are a picture come about as wide as a screen, the shape of the picture; cards with a preview picture
+    // above their name get the biggest pictures.
+    modes?.some((m) => m.art) ? ART_ASPECT : modes?.some((m) => previews?.[`${m.id}.webp`]) ? PICTURE_CARDS : undefined,
   );
   // The background song runs on from the menus into the game (BackgroundMusic), until the play time is over.
   useNoBackgroundMusic(playing && playtime.goodNight);
@@ -339,7 +333,7 @@ export function GameShell({
     m.unfinished && !canPlayUnfinished() ? (
       <li key={m.id}>
         <div
-          className={`game-card mode-card disabled${labelOnPicture ? pictureCard(previews?.[`${m.id}.webp`]) : ""}`}
+          className={`game-card mode-card disabled${pictureCard(previews?.[`${m.id}.webp`])}`}
           role="button"
           aria-disabled
           data-mode={m.id}
@@ -360,7 +354,7 @@ export function GameShell({
       <li key={m.id}>
         <button
           type="button"
-          className={`game-card mode-card${m.art ? " mode-art-card" : labelOnPicture ? pictureCard(previews?.[`${m.id}.webp`]) : ""}`}
+          className={`game-card mode-card${m.art ? " mode-art-card" : pictureCard(previews?.[`${m.id}.webp`])}`}
           onPointerDown={() => void prepare?.(m.id).catch(() => undefined)}
           onClick={() => pick(m.id)}
           data-mode={m.id}
