@@ -1,7 +1,6 @@
 import type { Localized, Texts } from "@/lib/language";
 import type { TimerPicture, TurnPicture } from "./settings";
 import { BLOCKS_NAME } from "./blocksNames";
-import { BOXES_NAME } from "./boxesNames";
 import { TUNNEL_NAME } from "./tunnelNames";
 import { JUMP_NAME } from "./jumpNames";
 import { JAR_NAME } from "./jarNames";
@@ -59,27 +58,14 @@ export const PICTURES: { id: TimerPicture; emoji: string; name: Texts }[] = [
   { id: "clock", emoji: "⏰", name: { de: "Wecker", en: "Alarm Clock", zh: "闹钟", hi: "अलार्म घड़ी", es: "Despertador", ar: "المنبّه", ru: "Будильник" } },
   // Tidy Up (H-118): a toy crane puts the toys into the box, best at five minutes; written English first, translated on 22 November 2026.
   { id: "tidy", emoji: "🧸", name: TIDY_NAME },
-  // Five Boxes (H-120, 22 November 2026): a box for each sort, its toys hopping in and its lid shutting, one a minute at five minutes.
-  { id: "boxes", emoji: "📦", name: BOXES_NAME },
+  // Five Boxes (H-120) stood here and was taken out again (user request, 25 November 2026).
   // The block house (H-125, 22 November 2026), the first timer like a game played by itself: blocks hop out of a jumble into a house.
   { id: "blocks", emoji: "🧱", name: BLOCKS_NAME },
   // The treasure tunnel (H-126, 22 November 2026), the second like a block world played by itself: a tunnel dug block by block to a chest.
   { id: "tunnel", emoji: "⛏️", name: TUNNEL_NAME },
   // Up to the Moon (H-127, rebuilt 23 November 2026), a jump-and-run going up: a fox swims, hops up a tree, rides a cable car and a lift and flies from a lake up to the moon, the picture following it, then sails down into a cake.
   { id: "jump", emoji: "🚀", name: JUMP_NAME },
-  {
-    id: "train",
-    emoji: "🚂",
-    name: {
-      de: "Zug zum Bahnhof",
-      en: "Train to the Station",
-      zh: "开往车站的火车",
-      hi: "स्टेशन की ओर ट्रेन",
-      es: "Tren a la estación",
-      ar: "القطار إلى المحطة",
-      ru: "Поезд на станцию",
-    },
-  },
+  // „Zug zum Bahnhof“ stood here and was taken out (user request, 25 November 2026).
   { id: "caterpillar", emoji: "🐛", name: { de: "Raupe", en: "Caterpillar", zh: "毛毛虫", hi: "इल्ली", es: "Oruga", ar: "اليرقة", ru: "Гусеница" } },
   {
     id: "sunset",
