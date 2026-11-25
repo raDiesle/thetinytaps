@@ -525,11 +525,12 @@
 }
 
 /*
- * The carved words together, only as wide and tall as they are, with a brighter light on the panel close round them, so
- * what a visitor should see first stands out (user request, November 2026). The light lies on the words only, a little
- * past them, bright over every line (none lies in the dark) and fading out only beyond them, well inside the
- * compartment: once it lit the whole compartment from post to books, reached
- * the post and was cut off there (user feedback, 25 November 2026; `shelfGlow.test.ts`). Still, like the other light.
+ * The carved words together, only as wide and tall as they are, with a brighter light on the panel round them, so what
+ * a visitor should see first stands out (user request, November 2026): one even light over all of their lines, a
+ * rounded box a little bigger than the words, blurred so it fades out softly beyond them, well inside the compartment.
+ * Lighting the whole compartment it reached the post and was cut off there, and an ellipse round the words ended too
+ * hard and left their corners dim (user feedback, 25 November 2026; `shelfGlow.test.ts`). Still, like the other light:
+ * painted once.
  */
 .shelf-carving-text {
   position: relative;
@@ -542,9 +543,11 @@
 
 .shelf-carving-text::before {
   position: absolute;
-  inset: -0.9em -0.7em;
+  inset: -0.5em -0.7em;
   z-index: -1;
-  background: radial-gradient(closest-side, #fff6dafa, #fff0cdf0 66%, #ffe6a8a0 86%, #0000);
+  border-radius: 2em;
+  background: #fff3d4d0;
+  filter: blur(1.25em);
   content: "";
 }
 
