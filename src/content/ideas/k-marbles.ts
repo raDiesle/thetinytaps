@@ -75,6 +75,8 @@ export const marblesIdeas: IdeaArea = {
       why: "Wählen aus wenigen Bildern; nebenbei schwer und leicht, schnell und langsam.",
       effort: "M",
       done: true,
+      partial:
+        "Gebaut. Vom 24. bis 25. November 2026 ließ das Regal nach dem ersten Tippen alle zwei Sekunden das nächste Ding von selbst los; das sah aus, als ließe ein Tippen mehrere Kugeln fallen. Seit dem 25. November lässt jedes Tippen genau ein Ding los, und nichts rollt mehr von selbst.",
     },
     {
       id: "K-08",
@@ -128,6 +130,8 @@ export const marblesIdeas: IdeaArea = {
       why: "Wo ich tippe, startet die Kugel – das versteht schon ein 2-Jähriger. Jedes Fach ist ein Gewinn.",
       effort: "M",
       done: true,
+      partial:
+        "Gebaut. Seit dem 25. November 2026 lässt jedes Tippen genau eine Kugel fallen und keine fällt mehr von selbst (vom 24. November an kam die nächste von selbst, sobald keine mehr fiel).",
     },
     {
       id: "K-14",
