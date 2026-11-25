@@ -332,6 +332,11 @@ export const LANGUAGE_STATUS: LanguageStatusRow[] = [
         note: "Seit 4. November 2026: die Wahl „🎨 In Farbe / 🖍️ Schwarz-weiß zum Ausmalen“ beim Drucken und die Zeile im Druck-Stempel des Assistenten, übersetzt am 5. November 2026.",
       },
       {
+        label: "🖼️ Fotoposter und die Wahl „Karten zum Ausschneiden / Alles fest auf einem Bild“",
+        languages: { de: "done", en: "done", zh: "done", hi: "done", es: "done", ar: "done", ru: "done" },
+        note: "Seit 25. November 2026 (T-31 bis T-40): die beiden Wege beim Drucken, die Posterformate (auf Englisch in Zoll), Rahmen und Jahreszeiten, Plan und Tafel zusammen, der Hinweis zur Schärfe, das Zimmer in echter Größe, „Speichern“ / „Teilen“, die Anleitung vom Bild zum Poster, der Druck-Stempel und die Suchtexte – englisch zuerst, gleich in alle sieben Sprachen übersetzt. Nichts davon wird gesprochen.",
+      },
+      {
         label: "🌙 Buch „Wie lange warten?“ (Countdown)",
         languages: { de: "done", en: "done", zh: "done", hi: "done", es: "done", ar: "done", ru: "done" },
         note: "Seit 4. November 2026 (H-05): der Name des dritten Buchs im Schuber (names.ts), übersetzt am 5. November 2026; die Seite für Suchmaschinen gibt es wie alle in allen sieben Sprachen (seo.ts, seo.<Sprache>.ts). Was das Kind hört („Noch 3-mal schlafen, dann …“) war schon übersetzt.",

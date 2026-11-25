@@ -6,7 +6,7 @@ import { categoryHref, categoryOf } from "@/content/games";
 import { SCENE_ENTRIES, scenePath, sceneTitle, UPCOMING_SCENES } from "@/games/scenes/catalog";
 import { carryOverScenesSettings, DEFAULT_SCENES_SETTINGS, SCENE_MODES, SCENES_SETTINGS_KEY, type SceneMode } from "@/games/scenes/settings";
 import { useGameSettings } from "@/lib/common";
-import { useFitGrid } from "@/lib/fitGrid";
+import { PICTURE_CARDS, useFitGrid } from "@/lib/fitGrid";
 import { useAppLanguage, useT } from "@/lib/language";
 import { useUpdateBetweenGames } from "@/lib/pwa";
 import { useTitle } from "@/lib/title";
@@ -32,7 +32,7 @@ export function ScenesMenu() {
   useTitle(title);
   useUpdateBetweenGames();
   const [settings, update] = useGameSettings(SCENES_SETTINGS_KEY, DEFAULT_SCENES_SETTINGS);
-  const grid = useFitGrid(SCENE_ENTRIES.length + UPCOMING_SCENES.length);
+  const grid = useFitGrid(SCENE_ENTRIES.length + UPCOMING_SCENES.length, undefined, PICTURE_CARDS);
   return (
     <main className="home">
       <Sky />

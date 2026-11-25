@@ -1,4 +1,15 @@
-import { type MutableRefObject, type PointerEvent, type ReactNode, useCallback, useEffect, useLayoutEffect, useMemo, useRef, useState } from "react";
+import {
+  type MutableRefObject,
+  type PointerEvent,
+  type ReactNode,
+  type WheelEvent,
+  useCallback,
+  useEffect,
+  useLayoutEffect,
+  useMemo,
+  useRef,
+  useState,
+} from "react";
 import { GameEnd } from "@/components/GameEnd";
 import type { MascotPose } from "@/components/Mascot";
 import { TapHint } from "@/components/TapHint";
@@ -6,21 +17,29 @@ import { FeedbackLayer, useTapFeedback } from "@/components/TapFeedback";
 import { useLanguagePack } from "@/content/languages";
 import { pick, useAppLanguage, useT } from "@/lib/language";
 import { noPointerClick } from "@/lib/press";
-import { loadRealSounds, playBark, playMeow, playTweet } from "@/lib/realSounds";
+import { loadRealSounds, playCroak, playHonk, playMeow, playTweet } from "@/lib/realSounds";
 import {
+  playBeeps,
   playBlub,
   playChime,
   playClimbNote,
-  playDoorbell,
+  playDing,
   playDrumRoll,
   playGlockenspielEnd,
+  playHop,
   playKnock,
   playLift,
+  playMelody,
   playPlink,
+  playPlop,
   playPop,
   playPuff,
+  playSniff,
+  playStamp,
   playThump,
+  playTrill,
   playTwinkle,
+  playWhirr,
   playWhoosh,
 } from "@/lib/sfx";
 import { EXTRA_SOUND_GAP_MS } from "@/lib/spacing";
@@ -31,7 +50,7 @@ import { useTimers } from "@/lib/timers";
 import { TWO_DIGIT_WORDS } from "../letters/twoDigits";
 import { lettersVoice, useLettersSay } from "../letters/voice";
 import { Backdrop, Beam, Flag, Hook, HOOK, HouseBlock, Puff, Roof, roofBox } from "./drawings";
-import { FLOORS, type Special, floorOf, placeOf, specialOf } from "./floors";
+import { type Dressing, dressingOf, FLOORS, floorOf, placeOf } from "./floors";
 import { Kid } from "./Kid";
 import {
   BEAM,
@@ -44,10 +63,13 @@ import {
   floorTop,
   hangingAt,
   houseLayout,
+  lookRange,
+  PLUS,
+  plusAt,
   slotAt,
   wholeHouse,
 } from "./layout";
-import { HUNDRED, JUMP_TEXTS, ROW, TOTAL } from "./names";
+import { ADD_ROW_TEXT, HUNDRED, ROW, TOTAL } from "./names";
 import "./tower.css";
 
 /** The next block to put on, kept for the next visit. */
@@ -69,6 +91,14 @@ const UP_MS = 1100;
 const ARRIVE_MS = 520;
 /** The camera riding to another ten after a jump: longer the further. */
 const rideMs = (floors: number) => Math.min(1800, 500 + 260 * floors);
+/** The camera riding back to the floor being built when a press comes while the house was swiped along. */
+const BACK_MS = 420;
+/**
+ * A finger or mouse that moves this far before it lifts swipes along the house instead of laying a block; one that holds
+ * still this long lays its block without waiting to lift.
+ */
+const SWIPE_PX = 12;
+const HOLD_MS = 220;
 /** From the hundredth's beam: the roof coming down, the smoke and the flag, the whole house, the end's buttons. */
 const FINALE = { roof: 500, roofDrop: 1100, flag: 2100, whole: 3000, wholeMs: 1900, end: 5400 };
 
@@ -96,17 +126,21 @@ const worldFor = (l: HouseLayout, next: number) => (next > TOTAL ? whole(l) : ca
  */
 export function TowerPlay() {
   const ref = useRef<HTMLDivElement>(null);
-  const [size, setSize] = useState({ w: 0, h: 0 });
+  const [size, setSize] = useState({ w: 0, h: 0, frame: 0 });
   useLayoutEffect(() => {
     const el = ref.current;
     if (!el) return;
-    const measure = () => setSize((s) => (s.w === el.clientWidth && s.h === el.clientHeight ? s : { w: el.clientWidth, h: el.clientHeight }));
+    const measure = () => {
+      // The book's paper margin lying over the picture's edges.
+      const frame = Number.parseFloat(getComputedStyle(el).getPropertyValue("--frame")) || 0;
+      setSize((s) => (s.w === el.clientWidth && s.h === el.clientHeight && s.frame === frame ? s : { w: el.clientWidth, h: el.clientHeight, frame }));
+    };
     measure();
     const observer = new ResizeObserver(measure);
     observer.observe(el);
     return () => observer.disconnect();
   }, []);
-  const layout = useMemo(() => (size.w > 0 && size.h > 0 ? houseLayout(size.w, size.h) : null), [size.w, size.h]);
+  const layout = useMemo(() => (size.w > 0 && size.h > 0 ? houseLayout(size.w, size.h, size.frame) : null), [size.w, size.h, size.frame]);
 
   /** The next block to put on; 101 once the house is finished. */
   const [next, setNext] = useState(() => asNumber(stepInAddress()) ?? asNumber(readStored(PROGRESS_KEY, { next: 1 }).next) ?? 1);
@@ -115,8 +149,8 @@ export function TowerPlay() {
   const ride = useRef<string | undefined>(undefined);
   useStepAddress(Math.min(next, TOTAL));
 
-  const jump = (to: number) => {
-    if (layout) ride.current = worldFor(layout, next);
+  const jump = (to: number, from?: string) => {
+    if (layout) ride.current = from ?? worldFor(layout, next);
     setNext(to);
     writeStored(PROGRESS_KEY, { next: to });
     setRun((r) => r + 1);
@@ -151,7 +185,8 @@ interface SceneProps {
   start: number;
   ride: MutableRefObject<string | undefined>;
   onPlaced: (n: number) => void;
-  onJump: (to: number) => void;
+  /** Goes on at `to`, the world riding there from `from` (its transform as it stands). */
+  onJump: (to: number, from?: string) => void;
   ending: ReactNode;
 }
 
@@ -161,26 +196,46 @@ type Phase = "build" | "beam" | "finale" | "end";
 /** The CSS `transform` putting a box of `w` × `h` with its middle at `p`. */
 const centred = (p: Point, w: number, h: number) => `translate(${p.x - w / 2}px, ${p.y - h / 2}px)`;
 
-/** How a special's moving part comes as its block lands, and its sound. */
-const ARRIVAL: Record<Special, { frames: Keyframe[]; ms: number; sound: () => void }> = {
-  window: { frames: [{ opacity: 0 }, { opacity: 1 }], ms: 600, sound: () => playPlink(4) },
-  heart: { frames: [{ opacity: 0 }, { opacity: 1 }], ms: 700, sound: playChime },
-  star: { frames: [{ opacity: 0 }, { opacity: 1 }], ms: 700, sound: playTwinkle },
-  cat: { frames: [{ transform: "translateY(100%)" }, { transform: "none" }], ms: 550, sound: playMeow },
-  dog: { frames: [{ transform: "translateY(100%)" }, { transform: "none" }], ms: 550, sound: playBark },
-  flowers: { frames: [{ transform: "scaleY(0)" }, { transform: "none" }], ms: 650, sound: playPop },
-  birdhouse: { frames: [{ transform: "translateY(90%) scale(0.6)" }, { transform: "none" }], ms: 450, sound: playTweet },
-  fish: { frames: [{ transform: "translateX(-115%)" }, { transform: "none" }], ms: 900, sound: playBlub },
-  door: {
-    frames: [
-      { transform: "none", offset: 0 },
-      { transform: "scaleX(0.12)", offset: 0.25 },
-      { transform: "scaleX(0.12)", offset: 0.72 },
-      { transform: "none", offset: 1 },
-    ],
-    ms: 1700,
-    sound: playDoorbell,
-  },
+/** How a block's dressing comes as it lands: up from behind it, down onto it, popping out, or sliding in. */
+type Arrive = "rise" | "drop" | "pop" | "slide";
+const ARRIVE_FRAMES: Record<Arrive, Keyframe[]> = {
+  rise: [{ transform: "translateY(32%)" }, { transform: "none" }],
+  drop: [
+    { transform: "translateY(-40%)", opacity: 0 },
+    { transform: "none", opacity: 1 },
+  ],
+  pop: [
+    { transform: "scale(0.4)", opacity: 0 },
+    { transform: "none", opacity: 1 },
+  ],
+  slide: [
+    { transform: "translateX(-35%)", opacity: 0 },
+    { transform: "none", opacity: 1 },
+  ],
+};
+
+/** Each dressing's arrival and its own sound (where it has one), played at most every `EXTRA_SOUND_GAP_MS`. */
+const DRESS_ARRIVAL: Record<Dressing, { move: Arrive; sound?: () => void }> = {
+  cat: { move: "rise", sound: playMeow },
+  bear: { move: "rise" },
+  bunny: { move: "rise", sound: () => playHop() },
+  frog: { move: "rise", sound: playCroak },
+  headphones: { move: "drop", sound: playMelody },
+  crown: { move: "drop", sound: playTwinkle },
+  wheels: { move: "slide", sound: playHonk },
+  spikes: { move: "rise", sound: playSniff },
+  dino: { move: "rise", sound: playThump },
+  flowers: { move: "rise", sound: playPlop },
+  water: { move: "slide", sound: playBlub },
+  antennae: { move: "rise", sound: playBeeps },
+  bowtie: { move: "pop", sound: playPop },
+  shoes: { move: "pop", sound: () => playStamp() },
+  wings: { move: "rise", sound: playTrill },
+  propeller: { move: "drop", sound: playWhirr },
+  cake: { move: "drop", sound: playChime },
+  gift: { move: "drop", sound: playDing },
+  lights: { move: "pop", sound: () => playPlink(5) },
+  nest: { move: "drop", sound: playTweet },
 };
 
 /** The house for one screen size: the world with everything placed in its pixels, the elevator panel over it. */
@@ -201,6 +256,12 @@ function HouseScene({ layout: l, start, ride, onPlaced, onJump, ending }: SceneP
   const { effects, ripple, glow } = useTapFeedback();
   const busyUntil = useRef(0);
   const lastSoft = useRef(0);
+  const lastExtra = useRef(0);
+  /** How far the camera stands below (+) or above (−) the floor being built while the house is swiped along. */
+  const look = useRef(0);
+  const [looking, setLooking] = useState(false);
+  /** The finger or mouse pressed on the scene, until it is a tap or a swipe. */
+  const gesture = useRef<{ id: number; x: number; y: number; from: number; swipe: boolean; hold?: ReturnType<typeof later> } | null>(null);
   const scene = useRef<HTMLDivElement>(null);
   const world = useRef<HTMLDivElement>(null);
   const kid = useRef<HTMLDivElement>(null);
@@ -240,7 +301,7 @@ function HouseScene({ layout: l, start, ride, onPlaced, onJump, ending }: SceneP
       language,
     );
   }, [word, language, floor]);
-  useEffect(() => loadRealSounds([playMeow, playBark, playTweet]), []);
+  useEffect(() => loadRealSounds([playMeow, playCroak, playHonk, playTweet]), []);
 
   // Everything moved by hand stands where the scene starts; after a jump the world rides there from where it was.
   useLayoutEffect(() => {
@@ -317,8 +378,30 @@ function HouseScene({ layout: l, start, ride, onPlaced, onJump, ending }: SceneP
     later(() => (f < ROW - 1 ? nextFloor(f + 1) : finale()), BEAM_MS + 350);
   };
 
+  /** Back to the floor being built, after the house was swiped along: the camera rides there from where it stands. */
+  const lookBack = () => {
+    if (look.current === 0) return;
+    look.current = 0;
+    setLooking(false);
+    moveWorld(camera(cameraAt(l, floor)), BACK_MS);
+  };
+
+  /** The camera at `y` while the house is swiped along, kept between a little over the floor being built and the meadow. */
+  const lookTo = (y: number) => {
+    const { top, bottom } = lookRange(l, floor);
+    const at = Math.min(bottom, Math.max(top, y));
+    world.current?.getAnimations().forEach((a) => {
+      a.cancel();
+    });
+    if (world.current) world.current.style.transform = camera(at);
+    look.current = at - cameraAt(l, floor);
+    setLooking(Math.abs(look.current) > 0.5);
+  };
+
   /** Up to floor `f`: the camera rises a floor, the child runs back to the ledge, the hook brings the floor's first block. */
   const nextFloor = (f: number) => {
+    look.current = 0;
+    setLooking(false);
     moveWorld(camera(cameraAt(l, f)), UP_MS);
     setPose("stand");
     runTo({ x: slotAt(l, f - 1, ROW).x, y: floorBottom(l, f) }, feetAt(l, f, 0), UP_MS);
@@ -386,8 +469,11 @@ function HouseScene({ layout: l, start, ride, onPlaced, onJump, ending }: SceneP
     onPlaced(n);
     playKnock(420 + k * 45);
     playClimbNote(k - 1);
-    const special = specialOf(n);
-    if (special) later(ARRIVAL[special].sound, 120);
+    const { sound } = DRESS_ARRIVAL[dressingOf(n)];
+    if (sound && performance.now() - lastExtra.current > EXTRA_SOUND_GAP_MS) {
+      lastExtra.current = performance.now();
+      later(sound, 120);
+    }
     const line = word(n);
     say(line.text, true, line.english);
     hop(feetAt(l, f, k - 1), feetAt(l, f, k), HOP_MS, 0, k === 1 ? 1.4 : 0.7);
@@ -434,6 +520,8 @@ function HouseScene({ layout: l, start, ride, onPlaced, onJump, ending }: SceneP
       return;
     }
     glow(x, y);
+    // Swiped along the house, the camera comes back to where the block goes.
+    lookBack();
     const n = count + 1;
     const f = floorOf(n);
     const k = placeOf(n);
@@ -453,16 +541,19 @@ function HouseScene({ layout: l, start, ride, onPlaced, onJump, ending }: SceneP
   const pressRef = useRef(press);
   pressRef.current = press;
 
-  // The block just landed settles, and a special's moving part arrives (a light going on, the cat coming up).
+  // The block just landed settles, and its dressing arrives (the ears coming up, the crown coming down).
   useLayoutEffect(() => {
     if (count <= mounted.count || count > TOTAL) return;
     const el = blocks.current[count];
     if (!el) return;
     const base = centred(slotAt(l, floorOf(count), placeOf(count)), s, s);
     el.animate([{ transform: `${base} scale(1.05, 0.9)` }, { transform: base }], { duration: 220, easing: "ease-out" });
-    const special = specialOf(count);
-    const actor = el.querySelector<HTMLElement>(".zt-actor");
-    if (special && actor) actor.animate(ARRIVAL[special].frames, { duration: ARRIVAL[special].ms, delay: 80, easing: "ease-out", fill: "backwards" });
+    const { move } = DRESS_ARRIVAL[dressingOf(count)];
+    for (const part of el.querySelectorAll<HTMLElement>(".zt-dress")) {
+      // What rises from behind the block rises; what lies on its front pops out instead of sliding over it.
+      const kind = move === "rise" && part.classList.contains("zt-dress-front") ? "pop" : move;
+      part.animate(ARRIVE_FRAMES[kind], { duration: 480, delay: 60, easing: "cubic-bezier(0.3, 1.3, 0.6, 1)", fill: "backwards" });
+    }
   }, [count]);
 
   // A full floor's beam slides in from the left, out of the picture, along the floor's top.
@@ -509,11 +600,55 @@ function HouseScene({ layout: l, start, ride, onPlaced, onJump, ending }: SceneP
     return () => window.removeEventListener("keydown", onKeyDown);
   }, [l, count]);
 
-  const onPointerDown = (e: PointerEvent) => press(e.clientX, e.clientY);
+  // A press lays a block once it is plainly a tap: the finger lifts, or holds still a moment. One that moves first swipes
+  // the camera along the house, up and down (user feedback, 25 November 2026: scroll or swipe, by hand or mouse), and
+  // lays nothing. A second finger while one is down is a tap at once.
+  const onPointerDown = (e: PointerEvent) => {
+    if (gesture.current) {
+      press(e.clientX, e.clientY);
+      return;
+    }
+    e.currentTarget.setPointerCapture?.(e.pointerId);
+    const g = {
+      id: e.pointerId,
+      x: e.clientX,
+      y: e.clientY,
+      from: cameraAt(l, floor) + look.current,
+      swipe: false,
+      hold: undefined as ReturnType<typeof later> | undefined,
+    };
+    g.hold = later(() => {
+      if (gesture.current !== g || g.swipe) return;
+      gesture.current = null;
+      pressRef.current(g.x, g.y);
+    }, HOLD_MS);
+    gesture.current = g;
+  };
+  const onPointerMove = (e: PointerEvent) => {
+    const g = gesture.current;
+    if (!g || g.id !== e.pointerId) return;
+    const dy = e.clientY - g.y;
+    if (!g.swipe) {
+      if (phase !== "build" || Math.hypot(e.clientX - g.x, dy) < SWIPE_PX) return;
+      g.swipe = true;
+      if (g.hold) clearTimeout(g.hold);
+    }
+    lookTo(g.from - dy);
+  };
+  const onPointerUp = (e: PointerEvent) => {
+    const g = gesture.current;
+    if (!g || g.id !== e.pointerId) return;
+    gesture.current = null;
+    if (g.hold) clearTimeout(g.hold);
+    if (!g.swipe && e.type === "pointerup") press(g.x, g.y);
+  };
+  const onWheel = (e: WheelEvent) => {
+    if (phase !== "build" || e.ctrlKey) return;
+    lookTo(cameraAt(l, floor) + look.current + e.deltaY * (e.deltaMode === 1 ? 40 : e.deltaMode === 2 ? l.h : 1));
+  };
 
-  /** The panel's arrows: a whole ten up, or back to the ten before (on the first floor: from 1 again). */
-  const up = phase === "build" || phase === "beam" ? (floor < ROW - 1 ? (floor + 1) * ROW + 1 : undefined) : undefined;
-  const down = phase === "build" || phase === "beam" ? (count > 0 ? Math.max(0, floor - 1) * ROW + 1 : undefined) : undefined;
+  /** The plus beside the next row: lays the rest of this floor at once and goes on at the next ten. */
+  const addRow = phase === "build" && floor < ROW - 1 ? (floor + 1) * ROW + 1 : undefined;
   const hanging = count < TOTAL ? hangingAt(l, floor, laid + 1) : undefined;
   const flagW = 0.45 * s;
   const flagH = 1.1 * s;
@@ -521,7 +656,15 @@ function HouseScene({ layout: l, start, ride, onPlaced, onJump, ending }: SceneP
 
   return (
     <>
-      <div className="zt-scene" ref={scene} onPointerDown={onPointerDown}>
+      <div
+        className="zt-scene"
+        ref={scene}
+        onPointerDown={onPointerDown}
+        onPointerMove={onPointerMove}
+        onPointerUp={onPointerUp}
+        onPointerCancel={onPointerUp}
+        onWheel={onWheel}
+      >
         <div className="zt-world" ref={world} style={{ width: l.w, height: l.worldH }}>
           <Backdrop layout={l} />
           {roof && (
@@ -554,6 +697,17 @@ function HouseScene({ layout: l, start, ride, onPlaced, onJump, ending }: SceneP
                 <Roof w={box.width} h={box.height} />
               </div>
             </>
+          )}
+          {addRow !== undefined && (
+            <AddRow
+              at={plusAt(l, floor + 1)}
+              size={PLUS * s}
+              label={t(ADD_ROW_TEXT)}
+              onAdd={() => {
+                const w = world.current;
+                onJump(addRow, w ? getComputedStyle(w).transform : undefined);
+              }}
+            />
           )}
           {Array.from({ length: beams }, (_, f) => (
             <div
@@ -592,7 +746,7 @@ function HouseScene({ layout: l, start, ride, onPlaced, onJump, ending }: SceneP
                 <Hook />
               </div>
               <div className="zt-block zt-hook-block" ref={hookBlock}>
-                <HouseBlock n={count + 1} />
+                <HouseBlock n={count + 1} hidden />
               </div>
             </div>
           )}
@@ -600,20 +754,7 @@ function HouseScene({ layout: l, start, ride, onPlaced, onJump, ending }: SceneP
             <Kid pose={pose} />
           </div>
         </div>
-        {(phase === "build" || phase === "beam") && (
-          <ElevatorPanel
-            l={l}
-            up={up}
-            down={down}
-            upLabel={t(JUMP_TEXTS.up)}
-            downLabel={t(JUMP_TEXTS.down)}
-            onJump={(to) => {
-              // A jump in the middle of a floor's beam or a ride waits for nothing: the scene is built anew.
-              onJump(to);
-            }}
-          />
-        )}
-        {hanging && phase === "build" && count === mounted.count && (
+        {hanging && phase === "build" && count === mounted.count && !looking && (
           <TapHint x={hanging.x} y={hanging.y - cameraAt(l, floor)} r={0.75 * s} side={laid >= ROW - 2 ? "left" : "right"} />
         )}
         <FeedbackLayer effects={effects} />
@@ -624,57 +765,32 @@ function HouseScene({ layout: l, start, ride, onPlaced, onJump, ending }: SceneP
 }
 
 /**
- * The elevator panel on the right: an arrow up and down that jump a whole ten – up to the next floor, or back to the
- * floor below – so grown-ups can go on at 11, 21 … at once (user request, 24 November 2026). Jumping by tens is all it
- * does: no display of the number laid between the arrows (user feedback, 24 November 2026), the voice and the house
- * count already. Only a tap on an arrow jumps, never a press elsewhere; a quick second tap changes nothing.
+ * The small plus beside the next row, where that row will stand: a tap lays the rest of this floor and goes on at the
+ * next ten (11, 21 …), the camera riding up like an elevator. Grown-ups' way on, so it is small and quiet (user feedback,
+ * 25 November 2026: the elevator panel's big arrows were far too loud; going back a ten is gone with them – the house
+ * is swiped down instead). Only a tap right on it goes on (no grown tap area), never a press elsewhere; a quick second
+ * tap changes nothing.
  */
-function ElevatorPanel({
-  l,
-  up,
-  down,
-  upLabel,
-  downLabel,
-  onJump,
-}: {
-  l: HouseLayout;
-  up?: number;
-  down?: number;
-  upLabel: string;
-  downLabel: string;
-  onJump: (to: number) => void;
-}) {
-  const { left, width, middle } = l.panel;
-  const height = Math.min(2 * width, 0.86 * l.h);
-  const arrow = (to: number | undefined, label: string, dir: "up" | "down") => (
+function AddRow({ at, size, label, onAdd }: { at: Point; size: number; label: string; onAdd: () => void }) {
+  return (
     <button
       type="button"
-      className={`zt-jump zt-jump-${dir}`}
-      data-tap=""
+      className="zt-add"
       aria-label={label}
-      disabled={to === undefined}
+      style={{ width: size, height: size, transform: centred(at, size, size) }}
       onPointerDown={(e: PointerEvent) => {
         e.stopPropagation();
-        if (to !== undefined && screenTap()) onJump(to);
+        if (screenTap()) onAdd();
       }}
       onClick={noPointerClick(() => {
-        if (to !== undefined && screenTap()) onJump(to);
+        if (screenTap()) onAdd();
       })}
     >
-      <svg viewBox="0 0 100 100" aria-hidden>
-        <circle cx="50" cy="50" r="44" />
-        <path d={dir === "up" ? "M50 28 L74 64 H26 Z" : "M50 72 L74 36 H26 Z"} />
+      <svg viewBox="0 0 40 40" aria-hidden>
+        <circle cx="20" cy="20" r="17" />
+        <path className="zt-add-edge" d="M20 12 V28 M12 20 H28" />
+        <path className="zt-add-cross" d="M20 12 V28 M12 20 H28" />
       </svg>
     </button>
-  );
-  return (
-    <div
-      className="zt-panel"
-      style={{ left, top: middle - height / 2, width, height, padding: `${0.08 * width}px ${0.1 * width}px` }}
-      onPointerDown={(e) => e.stopPropagation()}
-    >
-      {arrow(up, upLabel, "up")}
-      {arrow(down, downLabel, "down")}
-    </div>
   );
 }

@@ -99,7 +99,11 @@ taken out (user request, November 2026). The pictures:
   time it is back at the top, clockwise from 12 o'clock with a plink (H-67, `ladybugLaps`: the rounds fit the time
   exactly; beyond 30 minutes a dot every second or third round, so they go round once at most, `MAX_DOTS`).
 - „Pizza“ 🍕 (`pizza.tsx`, H-47's children's way): 24 slices on a wooden board, one lifted off towards its side at each
-  24th of the time from 12 o'clock round, with a munch (spaced) (`SLICES`, `pieceMoments`); a little steam rises every second.
+  24th of the time from 12 o'clock round, with a munch (spaced) (`SLICES`, `pieceMoments`). Every second steam rises
+  from another of eight places on it (`STEAM`), jumping across the pizza (three places on per beat), each place in its
+  own size and two looks taking turns – three wavy lines, a curl, two wisps, a little cloud –, standing on its slice
+  and gone with it, so no steam rises from the bare board (user feedback, November 2026: one puff in the middle every
+  second looked the same for an hour).
   Each slice is a small layer cut to its wedge by a still `clip-path`, so a tap lights exactly the slices left.
 - „Wecker“ ⏰ (`clock.tsx`, H-70, user request, November 2026): a children's digital radio alarm clock on the bedside
   table – a chunky, rounded turquoise case with a big yellow snooze bar on top, little feet, a star and a heart sticker,
@@ -341,7 +345,7 @@ taken out (user request, November 2026). The pictures:
   first, in every app language); it says Abwechseln's lines. The two children are the figures doing the run, the one
   exception to „no fox or bear figure“ besides Up to the Moon (see the rules).
   At the end the picture's own sound, then children cheer (the `cheer` recording) while a warm light spreads over the
-  picture (`.tm-done-light`), a friendly tune after it, then `GameEnd` with the picture's trophy (nothing rises, the trophy replaced it, user decision, November 2026) with „Nochmal“ and „Weiter“ (the next picture,
+  picture (`.tm-done-light`) and the whole picture turns golden in a glowing frame (`TimeUp`, see the rules), a friendly tune after it, then `GameEnd` with the picture's trophy (nothing rises, the trophy replaced it, user decision, November 2026) with „Nochmal“ and „Weiter“ (the next picture,
   the same minutes, `nextPicture`; „Weiter“ shows that picture's card, `TimerCardArt` as `next.art`, user request, 23
   November 2026). Every tap or key during the run answers (steam and a whistle, twinkling, the flame
   flaring) with a warm light where it was, and what is still left lights up softly for a moment (H-51, „Wie lange
@@ -427,8 +431,21 @@ and the shared `Layer`, `Draw`, `LeftGlow`), `timer.css`, `content.ts`
   dish, the pizza's mixed toppings lying across the cuts (`TOPPINGS`, drawn by every slice near them and cut by its
   wedge) – and in quiet texture of the backdrop (wallpaper, floorboards, a table's grain, all in `.tm-back`), never a
   new thing standing beside it (see „A picture makes sense as it is“). Still drawings stay `memo`, painted once.
+- **The step every second varies where it can** (user feedback from the Pizza, November 2026): where it is a thing
+  rising or appearing on the picture (steam, a puff, a twinkle) rather than a part turning in its place (a wheel, the
+  sand's stream), it comes at another place each second, in other looks and sizes, never the same puff from the same
+  spot for the whole run – each place still a small layer of its own moving by transform and opacity
+  (`timer.test.ts` checks the pizza's steam).
 - **The end is plain to see and hear**: the picture's own last step, then children cheering, a warm light over the
   picture and the trophy at the end – for every picture, Abwechseln's clock time too. Never a storm of confetti.
+- **That the time is up shows from across the room** (user request, 25 November 2026: „deutlich auch von weiter weg“,
+  „alle Farben sollten sich ändern im Bild und/oder ein Rahmen außenrum“): the moment it is up (the candle's last puff
+  included) `TimeUp` (`bar.tsx`) turns every colour of the picture golden – a `color` and a light `multiply` blend over
+  the stage, so a colourful apple tree and a dark candle room alike become one gold – and a thick light-golden frame
+  lights up inside the book's paper margin (`--frame`, which hid a frame at the screen's edge) and breathes slowly
+  (`opacity` only, still under reduced motion) until the end is left. One sign for every timer, mounted by `TimerPlay`
+  and `SwapPlay` alike, never a picture's own: a new kind of run mounts it too (`timer.test.ts`). The note, the
+  trophy and the end's buttons lie above it in their own colours, so „Weiter“'s next picture stands out of the gold.
 - **A picture makes sense as it is**: where something comes from and why it happens is plain (the water from a tap and a
   hose, never an endless can; no boat in a bucket, no flower opening for no reason – Eimer and Kuchen were taken out,
   user feedback, November 2026). A new picture is one whole small story a child knows from life, and shows nothing

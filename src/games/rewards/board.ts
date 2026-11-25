@@ -3,6 +3,7 @@ import { dayKey, weekOf } from "@/lib/days";
 import { type BoardKind, type LinkedGame, REWARD_BY_ID, type Slot, SLOTS, TASK_BY_ID, type Template } from "./catalog";
 import type { TargetLanguageId } from "@/content/targetLanguages";
 import { type Localized, pick } from "@/lib/language";
+import type { ChartPhoto } from "./chartPhoto";
 
 // A board as the grown-up made it, and the stars on it. Everything here is plain
 // data and pure functions, so the screen, the print and the tests share them.
@@ -16,6 +17,11 @@ export interface BoardTask {
   label?: string;
   /** The catalogue task it came from, for its label and picture. */
   catalog?: string;
+  /**
+   * Key of the grown-up's own photo of it in `photoStore` (T-13: their own potty, toothbrush, Kita door), shown in place
+   * of its picture or emoji – on screen and on paper. Never the picture itself: that stays in IndexedDB on this device.
+   */
+  photo?: string;
   /** Its game puts the star on the board by itself (week and day boards only). */
   linked?: LinkedGame;
   /** A field for each of these times of day (brushing in the morning and the evening); none: one field a day. */
@@ -43,6 +49,8 @@ export interface Board {
   title: string;
   /** The sign before the heading: a mark's id, `NO_TITLE_MARK` for none; missing: the board's own mark. */
   titleMark?: string;
+  /** The photo of the child on the sheet and where it sits (`chartPhoto.ts`); missing: none. The picture itself stays in `photoStore`. */
+  photo?: ChartPhoto;
   tasks: BoardTask[];
   /** Weekdays of a week or month board, 0 = Monday. */
   days: number[];

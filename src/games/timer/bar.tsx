@@ -111,6 +111,22 @@ export function FinalLight({ endsAt }: { endsAt: number }) {
   return <div className="tm-final-light" style={{ "--tm-final-ms": `${ms}ms` } as CSSProperties} />;
 }
 
+/**
+ * The time is up, seen from across the room (user request, 25 November 2026): the whole picture turns golden – every
+ * colour changes at once, so even a glance from afar tells running from over – and a thick golden frame lights up round
+ * the screen and breathes slowly while the end is shown. Still layers – the tint by its blends, the frame breathing by
+ * `opacity` –, never a flash; the picture's own end runs on beneath them.
+ */
+export function TimeUp() {
+  return (
+    <>
+      <div className="tm-up-tint" />
+      <div className="tm-up-warm" />
+      <div className="tm-up-frame" />
+    </>
+  );
+}
+
 /** The choice behind ⚙️ while a timer runs: the bar along the bottom, or not. */
 export function TimeBarChoice({ value, onChange }: { value: boolean; onChange: (bar: boolean) => void }) {
   const t = useT();

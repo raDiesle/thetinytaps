@@ -33,6 +33,7 @@ import {
   type ShelfRect,
   type ShelfThing,
   TOY_SPAN,
+  railUnder,
 } from "@/lib/shelfLayout";
 import pictures from "./bilder/*.webp?glob";
 
@@ -523,11 +524,9 @@ function GroupSign({ name, board, style }: { name: string; board?: boolean; styl
   );
 }
 
-/** Where a compartment's picture books stand, from the first to the last, standing together in its middle. */
+/** The rail of a group's sign under a compartment's picture books, a toy among them left out (`railUnder`). */
 function groupWidth(cell: ShelfCell, bh: number, spans: number[]): CSSProperties {
-  const books = cell.books ?? [];
-  const width = books.reduce((sum, b) => sum + spans[b], 0) * bh * BOOK_ASPECT + (books.length - 1) * BOOK_GAP * bh;
-  return { left: (cell.w - width) / 2, width };
+  return railUnder(cell, bh, spans, (b) => Boolean(PLACES[b][0].toy));
 }
 
 /**
@@ -542,14 +541,21 @@ function labelOf(cell: ShelfCell, layout: ShelfLayout): Localized | undefined {
 }
 
 /**
- * Where the trophy room's sign is nailed on: the bottom right corner of the lowest compartment holding picture books
- * (the second board on a wide shelf), on the post right of it, so that it reaches left into that compartment.
+ * Where the trophy room's sign is nailed on, the bottom right corner of a compartment against the post right of it: on
+ * a wide shelf the speaker's, the bottom of the column at the right, where it stands beside the speaker (user request,
+ * 25 November 2026), sized by that narrow compartment (`size`); on an upright shelf, whose things stand in small
+ * compartments on top, the lowest compartment holding picture books, reaching left into it.
  */
-function trophySignAt(layout: ShelfLayout): { left: number; top: number } {
+function trophySignAt(layout: ShelfLayout): { left: number; top: number; size?: number } {
+  const speaker = layout.upright ? undefined : layout.cells.find((cell) => !cell.books && cell.things?.includes("music"));
+  if (speaker) return { left: speaker.x + speaker.w, top: speaker.y + speaker.h, size: Math.min(speaker.w * TROPHY_BESIDE, speaker.h * 0.62) };
   const pictureBooks = layout.cells.filter((cell) => cell.books?.some((b) => !PLACES[b][0].colour));
   const cell = pictureBooks.sort((a, b) => b.y - a.y || b.x - a.x)[0] ?? layout.cells[layout.cells.length - 1];
   return { left: cell.x + cell.w, top: cell.y + cell.h };
 }
+
+/** The share of the speaker's compartment the trophy sign beside it is wide; the speaker takes what is left at its left. */
+const TROPHY_BESIDE = 0.52;
 
 /** A rectangle of the shelf's plan as a style. */
 const rect = (r: ShelfRect): CSSProperties => ({ left: r.x, top: r.y, width: r.w, height: r.h });
@@ -765,9 +771,17 @@ const TOY_PRESS_MS = 260;
 const POSTER_REACH = 1.5;
 
 /**
+ * The clear room kept round the poster's paper on every side, as a part of its width: its tape reaches about 0.15 of it
+ * past the corners, and a little more stays free to the boards above and below, the wall on the left and the book on
+ * the right. With its foot on the board, the board's front hid its lower tape, and against the wall the wall hid its
+ * left tape – both looked cut off (user feedback, 25 November 2026).
+ */
+const POSTER_MARGIN = 0.22;
+
+/**
  * A toy's place on the board among the picture books instead of a book (`Category.toy`, user request, 24 November
- * 2026): a big poster from its game (`ToyPoster`), stuck flat onto the shelf's back panel with its foot on the board –
- * never leaning, never behind the book beside it, and nothing standing in front of it (a toy keyboard stood there first
+ * 2026): a big poster from its game (`ToyPoster`), stuck flat onto the shelf's back panel in the middle between the
+ * boards, clear of them, the wall and the book beside it, tape included (user feedback, 25 November 2026) – never leaning, never behind the book beside it, and nothing standing in front of it (a toy keyboard stood there first
  * and looked like a till; it was taken out, user feedback, 24 November 2026). A tap presses the poster with a knock and a
  * note, and its game opens – no book comes out, no page turns, and the way back simply comes to the shelf again.
  */
@@ -811,8 +825,10 @@ function ShelfToy({ book }: { book: ShelfBook }) {
  * the middle of the shelf and makes it smaller, so a poster laid out in its place was seen behind the book beside it
  * (user feedback, 24 November 2026). `.shelf-poster-spot` is the place moved back onto the panel, unseen: measured
  * against the place itself (the link, standing in the row), it tells how far the panel moves and shrinks it there, and
- * the poster is moved back over its place and grown by that much (`--poster-x`, `--poster-k`), its foot staying where
- * the board meets the panel.
+ * the poster is moved back over its place and grown by that much (`--poster-x`, `--poster-k`) – but only as far as
+ * it fits, tape and `POSTER_MARGIN` round it, into the compartment's panel as seen (`.shelf-cell-shade`, below the
+ * board above's front edge, right of the wall) and left of the book beside it; it hangs in the middle between the
+ * boards (`--poster-y`), clear of all of them (user feedback, 25 November 2026).
  */
 function usePosterPlace(link: RefObject<HTMLAnchorElement | null>) {
   useLayoutEffect(() => {
@@ -825,17 +841,51 @@ function usePosterPlace(link: RefObject<HTMLAnchorElement | null>) {
       if (!back.width || !spot.offsetWidth) return;
       // How much one px moved on the panel is seen, and how far the panel's version of the place lies from the place.
       const shrink = back.width / spot.offsetWidth;
-      const x = (seen.left + seen.width / 2 - (back.left + back.width / 2)) / shrink;
+      // Seen on the screen: as wide as `POSTER_REACH` over the middle of its place, as long as that fits.
+      const hw = back.height / back.width;
+      let w = seen.width * POSTER_REACH;
+      let cx = seen.left + seen.width / 2;
+      let bottom = back.bottom;
+      const cell = place.closest(".shelf-cell");
+      const shade = cell?.querySelector(".shelf-cell-shade")?.getBoundingClientRect();
+      if (cell && shade?.height) {
+        // The panel as seen: from the board above's front edge (or the panel's top, whichever is lower) to the board
+        // below, from the wall (or what stands before it in the row) to the book after it.
+        const top = Math.max(shade.top, cell.getBoundingClientRect().top);
+        const room = shade.bottom - top;
+        const left = Math.max(shade.left, place.previousElementSibling?.getBoundingClientRect().right ?? -Infinity);
+        const right = Math.min(shade.right, place.nextElementSibling?.getBoundingClientRect().left ?? Infinity);
+        w = Math.min(w, room / (hw + 2 * POSTER_MARGIN), (right - left) / (1 + 2 * POSTER_MARGIN));
+        const m = w * POSTER_MARGIN;
+        cx = Math.min(Math.max(cx, left + m + w / 2), right - m - w / 2);
+        bottom = top + (room + w * hw) / 2;
+      }
+      // Back from the screen to the panel, where one px is seen `shrink` px; the spot's foot is the scale's origin.
+      const x = (cx - (back.left + back.width / 2)) / shrink;
+      const y = (bottom - back.bottom) / shrink;
+      const k = w / back.width;
       place.style.setProperty("--poster-x", `${x.toFixed(1)}px`);
-      place.style.setProperty("--poster-k", ((seen.width / back.width) * POSTER_REACH).toFixed(3));
+      place.style.setProperty("--poster-y", `${y.toFixed(1)}px`);
+      place.style.setProperty("--poster-k", k.toFixed(3));
     };
     measure();
-    const observer = new ResizeObserver(measure);
+    // The shelf plans its boards anew after a resize, so the compartment may change after the place did: watch it too,
+    // and measure once more a frame later (turned upright, a stale measure left the poster off the middle).
+    let frame = 0;
+    const later = () => {
+      measure();
+      cancelAnimationFrame(frame);
+      frame = requestAnimationFrame(measure);
+    };
+    const observer = new ResizeObserver(later);
     observer.observe(place);
-    window.addEventListener("resize", measure);
+    const cell = place.closest(".shelf-cell");
+    if (cell) observer.observe(cell);
+    window.addEventListener("resize", later);
     return () => {
       observer.disconnect();
-      window.removeEventListener("resize", measure);
+      cancelAnimationFrame(frame);
+      window.removeEventListener("resize", later);
     };
   }, [link]);
 }

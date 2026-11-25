@@ -2445,9 +2445,76 @@
   }
 }
 
-.tm-steam-puff {
+/* The pizza's steam (H-63): each place a small layer standing on its slice and fading with it; inside, its two looks
+   take turns, each rising once in its own second of a round of 2 × STEAM_ROUND_S (`pizza.tsx` sets delay and length),
+   then waiting unseen. Wavy lines stretch up as they rise, a cloud swells; all drift a little sideways (`--tm-sway`). */
+.tm-pz-steam {
+  animation: tm-pz-steam-gone 0.6s linear both;
+}
+
+.tm-done .tm-pz-steam {
+  animation: none;
+  opacity: 0;
+}
+
+@keyframes tm-pz-steam-gone {
+  to {
+    opacity: 0;
+  }
+}
+
+.tm-pz-puff {
   inset: 0;
   opacity: 0;
+  transform-origin: 50% 100%;
+  animation: tm-pz-wisp 16s ease-out infinite;
+}
+
+.tm-pz-cloud {
+  animation-name: tm-pz-cloud;
+}
+
+.tm-pz-puff svg {
+  display: block;
+  width: 100%;
+  height: 100%;
+  overflow: visible;
+}
+
+@keyframes tm-pz-wisp {
+  0% {
+    opacity: 0;
+    transform: translateY(25%) scale(0.7, 0.35);
+  }
+  3% {
+    opacity: 0.9;
+  }
+  12% {
+    opacity: 0;
+    transform: translate(var(--tm-sway), -45%) scale(1, 1.15);
+  }
+  100% {
+    opacity: 0;
+    transform: translate(var(--tm-sway), -45%) scale(1, 1.15);
+  }
+}
+
+@keyframes tm-pz-cloud {
+  0% {
+    opacity: 0;
+    transform: translateY(20%) scale(0.3);
+  }
+  3% {
+    opacity: 0.85;
+  }
+  12% {
+    opacity: 0;
+    transform: translate(var(--tm-sway), -50%) scale(1.2);
+  }
+  100% {
+    opacity: 0;
+    transform: translate(var(--tm-sway), -50%) scale(1.2);
+  }
 }
 
 .tm-to-grow .tm-left-glow {
@@ -2481,6 +2548,70 @@
 @keyframes tm-done-light {
   to {
     opacity: 1;
+  }
+}
+
+/* The time is up, seen from across the room (`TimeUp`, user request, 25 November 2026): every colour of the picture
+   turns golden by one still tint, and a thick golden frame lights up round the screen and breathes slowly while the
+   end is shown – two layers, the frame animated by `opacity` only. Under the corner's note and the end's buttons. */
+.tm-up-tint,
+.tm-up-warm,
+.tm-up-frame {
+  position: absolute;
+  inset: 0;
+  z-index: 1;
+  pointer-events: none;
+  opacity: 0;
+  will-change: opacity;
+  animation: tm-up-in 0.9s ease-out forwards;
+}
+
+/* Every colour takes the gold's hue, and the light ones (a white dial, a pale wall) turn golden too. */
+.tm-up-tint {
+  background: #ffae1f;
+  mix-blend-mode: color;
+}
+
+.tm-up-warm {
+  background: #ffd47a;
+  mix-blend-mode: multiply;
+}
+
+/* Inside the book's paper margin (`--frame`), which would hide it. */
+.tm-up-frame {
+  --tm-up-band: clamp(16px, 5vmin, 44px);
+  inset: var(--frame, 0px);
+  border: var(--tm-up-band) solid #ffd84a;
+  border-radius: calc(var(--tm-up-band) * 0.5);
+  /* Lighter than the tinted picture, so it stands out of it: a bright line inside and light glowing inwards. */
+  box-shadow:
+    0 0 0 2px #e07b00,
+    inset 0 0 0 3px #fff8dc,
+    inset 0 0 calc(var(--tm-up-band) * 2) calc(var(--tm-up-band) * 0.5) rgb(255 228 120 / 0.85);
+  animation:
+    tm-up-in 0.9s ease-out forwards,
+    tm-up-breathe 2.4s ease-in-out 0.9s infinite;
+}
+
+@keyframes tm-up-in {
+  to {
+    opacity: 1;
+  }
+}
+
+@keyframes tm-up-breathe {
+  0%,
+  100% {
+    opacity: 1;
+  }
+  50% {
+    opacity: 0.55;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .tm-up-frame {
+    animation: tm-up-in 0.9s ease-out forwards;
   }
 }
 
