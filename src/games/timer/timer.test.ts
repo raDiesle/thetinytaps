@@ -141,10 +141,10 @@ describe("Timer", () => {
       expect(pick(p.name, firstLanguage(p.name)).trim()).not.toBe("");
     }
     // The order the user asked for (November 2026; Wecker and Apfelbaum, then Apfelbaum and Kerze swapped and Up to the
-    // Moon brought to the second row's start, 25 November 2026): Rote Scheibe, Sanduhr, Apfelbaum, Wecker, Blume, Pizza,
-    // Kerze, Tidy Up, Up to the Moon, and Abwechseln, the Kugelbahn (H-117) and the Rennstrecke last, in a group of their
+    // Moon brought to the start of the second row of five, 25 November 2026): Rote Scheibe, Sanduhr, Apfelbaum, Wecker,
+    // Blume, Up to the Moon, Pizza, Kerze, Tidy Up, and Abwechseln, the Kugelbahn (H-117) and the Rennstrecke last, in a group of their
     // own. Tennis (H-71) and the Wippe (H-109) stood there and were taken out (user requests, 21 and 25 November 2026).
-    expect(PICTURES.slice(0, 9).map((p) => p.id)).toEqual(["disc", "sand", "apple", "clock", "flower", "pizza", "candle", "tidy", "jump"]);
+    expect(PICTURES.slice(0, 9).map((p) => p.id)).toEqual(["disc", "sand", "apple", "clock", "flower", "jump", "pizza", "candle", "tidy"]);
     expect(PICTURES.slice(-3).map((p) => p.id)).toEqual(["swap", "marblerun", "race"]);
     expect(PICTURES.map((p) => p.id as string)).not.toContain("tennis");
     expect(PICTURES.map((p) => p.id as string)).not.toContain("seesaw");

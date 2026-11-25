@@ -22,7 +22,7 @@ request, November 2026; the middle rather than the end, user feedback, November 
 `GameMode.art`): the very drawing of a run (`SceneParts`), cut as for 5 minutes and started half of it ago, every
 animation in it put at that moment and then stopped (`holdAt`, `.tm-card-art.tm-still`), so the menu stands still. The cards come as wide as
 the picture (`ART_ASPECT`). Names are only read out and their tooltip. They stand in the order the user chose (November
-2026, `PICTURES`; last changed 25 November 2026): Rote Scheibe, Sanduhr, Apfelbaum, Wecker, Blume, Pizza, Kerze, then Tidy Up, Up to the Moon (right after it, so it starts a row of four), Block House, Treasure Tunnel and the others, the Marble Jar last, on one
+2026, `PICTURES`; last changed 25 November 2026): Rote Scheibe, Sanduhr, Apfelbaum, Wecker, Blume, Up to the Moon (sixth, so it starts the second row where five cards stand in a row, as at 1280×800, 1440×900 and on a tablet), Pizza, Kerze, then Tidy Up, Block House, Treasure Tunnel and the others, the Marble Jar last, on one
 frame with no name; after all of them Abwechseln is a category of its own, named on its frame (`GameMode.kind`): its two children
 with the toy, the lamps and the hourglass, then the Kugelbahn and the Rennstrecke, and that they run on without end is said in their tooltip (`SWAP_NOTE`). Where there is
 room, its frame stands beside the pictures' rather than in a row of its own below (`packGroups`' `reserve`), so all
@@ -457,7 +457,7 @@ and the shared `Layer`, `Draw`, `LeftGlow`), `timer.css`, `content.ts`
 - **One drawing for one thing**: a thing two pictures show (the hourglass) is one component both use, never copied and
   drawn again with its own sizes (user request, November 2026; `timer.test.ts` checks the hourglass).
 - **The cards' order is the user's** (November 2026, last changed 25 November 2026: Rote Scheibe, Sanduhr, Apfelbaum,
-  Wecker, Blume, Pizza, Kerze, then Tidy Up, Up to the Moon, Block House, Treasure Tunnel, the Raupe and Sonnenaufgang,
+  Wecker, Blume, Up to the Moon, Pizza, Kerze, then Tidy Up, Block House, Treasure Tunnel, the Raupe and Sonnenaufgang,
   then the Marble Jar; Abwechseln, Kugelbahn and Rennstrecke last): keep it when adding a picture (a new one goes after these, before Abwechseln, unless the
   user says otherwise), and add it to the perf scenarios' list in `tools/perfScenarios.ts`, which taps each card by its
   name (`timer.test.ts` checks the order). Abwechseln is another thing to do than the pictures that run until the time

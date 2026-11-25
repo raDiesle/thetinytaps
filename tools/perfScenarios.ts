@@ -315,11 +315,11 @@ export const SCENARIOS: Scenario[] = [
       ["apfelbaum", "Apfelbaum"],
       ["wecker", "Wecker"],
       ["blume", "Blume"],
+      ["mond", "Hoch bis zum Mond"],
       ["pizza", "Pizza"],
       ["kerze", "Kerze"],
       // Tidy Up was written English first; the German app names their cards in German since they were translated.
       ["aufraeumen", "Aufräumen"],
-      ["mond", "Hoch bis zum Mond"],
       ["kloetzchen", "Klötzchenhaus"],
       ["schatztunnel", "Schatztunnel"],
       ["raupe", "Raupe"],
