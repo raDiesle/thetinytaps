@@ -22,7 +22,7 @@ export const timerIdeas: IdeaArea = {
       effort: "S",
       done: true,
       partial:
-        "Gebaut als Timer (/timer/), ein eigenes Buch bei den Alltagshelfern: Zug zum Bahnhof, Sanduhr oder Kerze, 1, 2, 3, 5 oder 10 Minuten in der Reihe über den Karten. Am Ende eine Melodie und die Fuchs- oder Bärenfamilie winkt (bei der Kerze pustet das Bärenkind sie aus). Der Bildschirm bleibt an, und der Timer zählt keine Spielzeit.",
+        "Gebaut als Timer (/timer/), ein eigenes Buch bei den Alltagshelfern: Zug zum Bahnhof, Sanduhr oder Kerze, 1, 2, 3, 5 oder 10 Minuten in der Reihe über den Karten. Am Ende eine Melodie und die Fuchs- oder Bärenfamilie winkt (bei der Kerze pustet das Bärenkind sie aus). Der Bildschirm bleibt an, und der Timer zählt keine Spielzeit. Der „Zug zum Bahnhof“ wurde am 25. November 2026 wieder herausgenommen (Wunsch), zusammen mit „Fünf Kisten“ (H-120).",
     },
     {
       id: "H-45",
@@ -424,7 +424,7 @@ export const timerIdeas: IdeaArea = {
       effort: "M",
       done: true,
       partial:
-        "Gebaut als Bild „Fünf Kisten“ (Five Boxes) im Timer (22. November 2026, boxes.tsx): fünf offene Kisten in Rot, Grün, Blau, Gelb und Lila an der Wand, vorne auf jeder ein rundes Schild mit ihrer Sorte (Bauklotz, Auto, Ball, Ente, Buch – die Spielsachen von „Aufräumen“), davor liegen auf dem Teppich die Sachen jeder Sorte in verschiedenen Farben. Kiste für Kiste von links hüpft ein Spielzeug nach dem anderen in hohem Bogen in seine Kiste (hop.tsx, ohne Figur, die es wirft), und ist das letzte drin, klappt der Deckel zu – der letzte, wenn die Zeit um ist. Bei 5 Minuten drei Sachen je Kiste, sonst zwei bis vier. Das Spielzeug, das als Nächstes dran ist, wackelt jede Sekunde. Name und Sätze Englisch zuerst und in alle sieben Sprachen übersetzt, Aufnahmen folgen auf Wunsch.",
+        "Gebaut als Bild „Fünf Kisten“ (Five Boxes) im Timer (22. November 2026, boxes.tsx): fünf offene Kisten in Rot, Grün, Blau, Gelb und Lila an der Wand, vorne auf jeder ein rundes Schild mit ihrer Sorte (Bauklotz, Auto, Ball, Ente, Buch – die Spielsachen von „Aufräumen“), davor liegen auf dem Teppich die Sachen jeder Sorte in verschiedenen Farben. Kiste für Kiste von links hüpft ein Spielzeug nach dem anderen in hohem Bogen in seine Kiste (hop.tsx, ohne Figur, die es wirft), und ist das letzte drin, klappt der Deckel zu – der letzte, wenn die Zeit um ist. Bei 5 Minuten drei Sachen je Kiste, sonst zwei bis vier. Das Spielzeug, das als Nächstes dran ist, wackelt jede Sekunde. Name und Sätze Englisch zuerst und in alle sieben Sprachen übersetzt, Aufnahmen folgen auf Wunsch. Am 25. November 2026 wieder herausgenommen (Wunsch), zusammen mit dem „Zug zum Bahnhof“.",
     },
     {
       id: "H-121",

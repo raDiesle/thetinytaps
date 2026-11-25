@@ -5,7 +5,6 @@ import type { TimerPicture, TurnPicture } from "./settings";
 import type { Holder, TurnChild } from "./swap";
 import { MORE_TURN_TO } from "./marbleNames";
 import { BLOCKS_LINES } from "./blocksNames";
-import { BOXES_LINES } from "./boxesNames";
 import { TUNNEL_LINES } from "./tunnelNames";
 import { JUMP_LINES } from "./jumpNames";
 import { JAR_LINES } from "./jarNames";
@@ -178,26 +177,6 @@ export const PICTURE_LINES: Record<TimedPicture, { start: Texts; end: Texts }> =
       ru: "Будильник звенит!",
     },
   },
-  train: {
-    start: {
-      de: "Der Zug fährt zum Bahnhof.",
-      en: "The train goes to the station.",
-      zh: "火车开往车站。",
-      hi: "रेलगाड़ी स्टेशन जा रही है।",
-      es: "El tren va a la estación.",
-      ar: "القطار يذهب إلى المحطة.",
-      ru: "Поезд едет на станцию.",
-    },
-    end: {
-      de: "Der Zug ist am Bahnhof!",
-      en: "The train is at the station!",
-      zh: "火车到站了！",
-      hi: "रेलगाड़ी स्टेशन पहुँच गई!",
-      es: "¡El tren está en la estación!",
-      ar: "القطار في المحطة!",
-      ru: "Поезд на станции!",
-    },
-  },
   caterpillar: {
     start: {
       de: "Die Raupe frisst das Blatt.",
@@ -239,7 +218,6 @@ export const PICTURE_LINES: Record<TimedPicture, { start: Texts; end: Texts }> =
     },
   },
   tidy: TIDY_LINES,
-  boxes: BOXES_LINES,
   blocks: BLOCKS_LINES,
   tunnel: TUNNEL_LINES,
   jump: JUMP_LINES,

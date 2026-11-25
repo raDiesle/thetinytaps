@@ -1,14 +1,12 @@
 import type { OwnTime } from "./time";
 
 /**
- * What runs down while the child watches: a train going to the station, an apple tree harvested into a cart, an hourglass, a
- * caterpillar eating a leaf, a flower growing (H-53), a candle, the sunrise (H-54), a red disc, a pizza eaten slice by slice (H-47), a children's
+ * What runs down while the child watches: an apple tree harvested into a cart, an hourglass, a caterpillar eating a leaf, a flower growing (H-53), a candle, the sunrise (H-54), a red disc, a pizza eaten slice by slice (H-47), a children's
  * digital alarm clock counting down (H-70), a jar filling with marbles from a pegboard (H-149) – or „Abwechseln“ (H-52),
  * two children taking turns with a toy, turn after turn, two to four children on a marble run (H-117), or the fox and
  * the bear child driving a lap of a race track each.
  */
 export type TimerPicture =
-  | "train"
   | "apple"
   | "sand"
   | "caterpillar"
@@ -19,7 +17,6 @@ export type TimerPicture =
   | "pizza"
   | "clock"
   | "tidy"
-  | "boxes"
   | "blocks"
   | "tunnel"
   | "jump"

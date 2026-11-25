@@ -47,40 +47,6 @@
   will-change: transform;
 }
 
-/* Zug zum Bahnhof: the train rolls from its start to the buffers; at the end it stands there. */
-/* With its stops (H-45) the stage names this run's keyframes in --tm-roll and --tm-shine (`TrainStepKeyframes`). */
-.tm-train {
-  animation: var(--tm-roll, tm-roll) var(--tm-ms) linear forwards;
-}
-
-.tm-done .tm-train {
-  animation: none;
-  transform: translateX(var(--tm-train));
-}
-
-@keyframes tm-roll {
-  to {
-    transform: translateX(var(--tm-train));
-  }
-}
-
-.tm-steam {
-  transform-box: fill-box;
-  transform-origin: 50% 100%;
-  animation: tm-steam 1.2s ease-out forwards;
-}
-
-@keyframes tm-steam {
-  from {
-    opacity: 0.95;
-    transform: translateY(10px) scale(0.4);
-  }
-  to {
-    opacity: 0;
-    transform: translateY(-70px) scale(1.5);
-  }
-}
-
 /* Sanduhr: the top's sand sinks out through the neck, the bottom heap rises; the stream runs while it does. Each bulb's
    sand is drawn still in the bulb's shape (`.tm-sand-fill`), and a window over it (`.tm-sand`, overflow hidden) slides
    from the sand's level (`--tm-level`) down to the neck, or up from the bottom to it, while the drawing slides back the
@@ -439,8 +405,7 @@
   }
 }
 
-/* Every second a small, soft step (H-63), so a long time never looks stuck: the train's wheels turn once and a puff of
-   steam rises, the sand pours through the hourglass's neck, a drop of wax runs a little further. Each is a small
+/* Every second a small, soft step (H-63), so a long time never looks stuck: the sand pours through the hourglass's neck, a drop of wax runs a little further. Each is a small
    layer of its own moving by transform and opacity; at the end they stand still. */
 .tm-beat {
   position: absolute;
@@ -451,45 +416,6 @@
 .tm-blow .tm-beat {
   animation: none;
   opacity: 0;
-}
-
-.tm-done .tm-wheel,
-.tm-blow .tm-wheel {
-  opacity: 1;
-}
-
-.tm-wheel {
-  animation: tm-turn 1s ease-in-out infinite;
-}
-
-.tm-wheel svg {
-  display: block;
-  width: 100%;
-  height: 100%;
-}
-
-@keyframes tm-turn {
-  to {
-    transform: rotate(1turn);
-  }
-}
-
-.tm-chug {
-  border-radius: 50%;
-  background: #fff;
-  opacity: 0;
-  animation: tm-chug 1s ease-out infinite;
-}
-
-@keyframes tm-chug {
-  from {
-    opacity: 0.9;
-    transform: translateY(30%) scale(0.35);
-  }
-  to {
-    opacity: 0;
-    transform: translateY(-110%) scale(1.15);
-  }
 }
 
 .tm-drop {
@@ -537,28 +463,7 @@
   }
 }
 
-/* Where it came from and where it goes (H-64): the rail ahead of the train shines and shrinks towards the buffers as
-   the train rolls on; the wax that ran down spreads on the holder. */
-.tm-rail-shine {
-  position: absolute;
-  inset: 0;
-  border-radius: 4px;
-  background: linear-gradient(#ffffff, #c5d0da 45%, #8d9aa6);
-  transform-origin: 100% 50%;
-  animation: var(--tm-shine, tm-shine) var(--tm-ms) linear forwards;
-}
-
-.tm-done .tm-rail-shine {
-  animation: none;
-  transform: scaleX(0);
-}
-
-@keyframes tm-shine {
-  to {
-    transform: scaleX(0);
-  }
-}
-
+/* The wax that ran down spreads on the holder (H-64). */
 .tm-puddle {
   position: absolute;
   inset: 0;
@@ -2682,22 +2587,20 @@
   transform: rotate(calc(var(--tm-side) * 24deg));
 }
 
-/* A toy hopping into its box (`hop.tsx`: Five Boxes): three layers inside each other, across, up and down, and its
-   size from its foot, each on keyframes written for the run; while it waits its turn it wiggles a second at a time. At
-   the end each stands where it landed. */
+/* Layers on keyframes written for the run (the Block House's cursor, the Treasure Tunnel's pickaxe, Up to the Moon's
+   fox, the Marble Jar's marbles), nested where a way is across, up and down and a size; what waits its turn wiggles a
+   second at a time (`.tm-hop-wait`). At the end each stands where it landed. */
 .tm-hop {
   will-change: transform;
   animation: var(--tm-anim) var(--tm-ms) linear both;
 }
 
 .tm-hop-y,
-.tm-hop-s,
 .tm-hop-wait {
   position: absolute;
   inset: 0;
 }
 
-.tm-hop-s,
 .tm-hop-wait {
   transform-origin: 50% 100%;
 }
@@ -2731,29 +2634,6 @@
 }
 
 .tm-done .tm-hop {
-  transform: var(--tm-end);
-}
-
-/* Five Boxes (H-120, boxes.tsx): each box's lid folds over its hinge, the half behind the toys shrinking to its edge,
-   then the half in front of them growing from it until it lies shut on the opening. */
-.tm-boxes-lid {
-  transform-origin: 50% 100%;
-  will-change: transform;
-  animation: var(--tm-anim) var(--tm-ms) linear both;
-}
-
-.tm-boxes-label {
-  position: absolute;
-}
-
-.tm-boxes-label > svg {
-  display: block;
-  width: 100%;
-  height: 100%;
-}
-
-.tm-done .tm-boxes-lid {
-  animation: none;
   transform: var(--tm-end);
 }
 
@@ -3696,16 +3576,9 @@
   --tm-bar-b: #15aabf;
 }
 
-.tm-play[data-picture="tidy"] .tm-bar,
-.tm-play[data-picture="train"] .tm-bar {
+.tm-play[data-picture="tidy"] .tm-bar {
   --tm-bar-a: #a5d8ff;
   --tm-bar-b: #339af0;
-}
-
-.tm-play[data-picture="boxes"] .tm-bar {
-  --tm-bar-a: #d0bfff;
-  --tm-bar-b: #9775fa;
-  --tm-bar-flag: #fcc419;
 }
 
 .tm-play[data-picture="jar"] .tm-bar {

@@ -84,13 +84,6 @@ export const LANGUAGE_STATUS: LanguageStatusRow[] = [
         files: ["src/games/timer/tidyNames.ts"],
       },
       {
-        label: "📦 Five Boxes",
-        languages: { de: "done", en: "done", zh: "done", hi: "done", es: "done", ar: "done", ru: "done" },
-        recorded: true,
-        note: "Das Bild mit den fünf Kisten, in die die Spielsachen Sorte für Sorte hüpfen (H-120, boxes.tsx, 22. November 2026), Englisch zuerst geschrieben und gleich in alle Sprachen übersetzt: sein Name „Five Boxes“ („Fünf Kisten“) und seine zwei Sätze am Anfang und am Ende (boxesNames.ts). Beide Sätze am 23. November 2026 von ElevenLabs gesprochen mit den Klonen von Tapsis Stimme im zweiten Konto: Englisch, Chinesisch, Hindi, Spanisch und Arabisch mit „Tapsi Coach (Klon)“, Deutsch mit „Tapsi Coach (Klon de)“, Russisch mit „Tapsi Coach (Klon ru)“ – beide Sätze eines Bildes aus einer Stimme. Die Texte für Suchmaschinen nennen es in allen sieben Sprachen.",
-        files: ["src/games/timer/boxesNames.ts"],
-      },
-      {
         label: "🧱 Block House",
         languages: { de: "done", en: "done", zh: "done", hi: "done", es: "done", ar: "done", ru: "done" },
         recorded: true,
