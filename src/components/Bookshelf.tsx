@@ -33,6 +33,7 @@ import {
   type ShelfRect,
   type ShelfThing,
   TOY_SPAN,
+  railUnder,
 } from "@/lib/shelfLayout";
 import pictures from "./bilder/*.webp?glob";
 
@@ -523,11 +524,9 @@ function GroupSign({ name, board, style }: { name: string; board?: boolean; styl
   );
 }
 
-/** Where a compartment's picture books stand, from the first to the last, standing together in its middle. */
+/** The rail of a group's sign under a compartment's picture books, a toy among them left out (`railUnder`). */
 function groupWidth(cell: ShelfCell, bh: number, spans: number[]): CSSProperties {
-  const books = cell.books ?? [];
-  const width = books.reduce((sum, b) => sum + spans[b], 0) * bh * BOOK_ASPECT + (books.length - 1) * BOOK_GAP * bh;
-  return { left: (cell.w - width) / 2, width };
+  return railUnder(cell, bh, spans, (b) => Boolean(PLACES[b][0].toy));
 }
 
 /**
@@ -542,14 +541,21 @@ function labelOf(cell: ShelfCell, layout: ShelfLayout): Localized | undefined {
 }
 
 /**
- * Where the trophy room's sign is nailed on: the bottom right corner of the lowest compartment holding picture books
- * (the second board on a wide shelf), on the post right of it, so that it reaches left into that compartment.
+ * Where the trophy room's sign is nailed on, the bottom right corner of a compartment against the post right of it: on
+ * a wide shelf the speaker's, the bottom of the column at the right, where it stands beside the speaker (user request,
+ * 25 November 2026), sized by that narrow compartment (`size`); on an upright shelf, whose things stand in small
+ * compartments on top, the lowest compartment holding picture books, reaching left into it.
  */
-function trophySignAt(layout: ShelfLayout): { left: number; top: number } {
+function trophySignAt(layout: ShelfLayout): { left: number; top: number; size?: number } {
+  const speaker = layout.upright ? undefined : layout.cells.find((cell) => !cell.books && cell.things?.includes("music"));
+  if (speaker) return { left: speaker.x + speaker.w, top: speaker.y + speaker.h, size: Math.min(speaker.w * TROPHY_BESIDE, speaker.h * 0.62) };
   const pictureBooks = layout.cells.filter((cell) => cell.books?.some((b) => !PLACES[b][0].colour));
   const cell = pictureBooks.sort((a, b) => b.y - a.y || b.x - a.x)[0] ?? layout.cells[layout.cells.length - 1];
   return { left: cell.x + cell.w, top: cell.y + cell.h };
 }
+
+/** The share of the speaker's compartment the trophy sign beside it is wide; the speaker takes what is left at its left. */
+const TROPHY_BESIDE = 0.52;
 
 /** A rectangle of the shelf's plan as a style. */
 const rect = (r: ShelfRect): CSSProperties => ({ left: r.x, top: r.y, width: r.w, height: r.h });

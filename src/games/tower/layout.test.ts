@@ -1,11 +1,27 @@
 import { describe, expect, test } from "bun:test";
-import { FLOORS, floorOf, placeOf, specialOf } from "./floors";
-import { cameraAt, cameraAtRoof, feetAt, flagTop, floorTop, hangingAt, houseLayout, KID, OVERHANG, roofTop, slotAt, wholeHouse } from "./layout";
+import { DRESSINGS, dressingOf, FLOORS, floorOf, placeOf } from "./floors";
+import {
+  cameraAt,
+  cameraAtRoof,
+  feetAt,
+  flagTop,
+  floorTop,
+  hangingAt,
+  houseLayout,
+  KID,
+  lookRange,
+  OVERHANG,
+  PLUS,
+  plusAt,
+  roofTop,
+  slotAt,
+  wholeHouse,
+} from "./layout";
 import { ROW, TOTAL } from "./names";
 
 // The house spans the screen's width, a floor of ten blocks at a time, and the camera follows it up: on every screen –
 // a phone on its side and upright, a tablet, a computer – the floor being built, its hanging block and the child stand
-// in view, clear of the elevator panel, and the whole house fits at the end.
+// in view, the plus for the next row beside it, and the whole house fits at the end.
 const SCREENS = [
   [844, 390],
   [640, 360],
@@ -16,17 +32,31 @@ const SCREENS = [
 ] as const;
 
 describe.each(SCREENS)("%i × %i", (w, h) => {
-  const l = houseLayout(w, h);
+  // The book's paper margin over the picture's edges, as `--frame` in book.css.
+  const frame = w >= 900 && h >= 600 ? 16 : 10;
+  const l = houseLayout(w, h, frame);
 
-  test("a floor with its ledge and the beam's overhang lies on the screen, left of the panel", () => {
-    expect(l.beamLeft).toBeGreaterThanOrEqual(0);
-    expect(l.x0 + (ROW + OVERHANG) * l.s).toBeLessThanOrEqual(l.panel.left);
-    expect(l.panel.left + l.panel.width).toBeLessThanOrEqual(w);
+  test("a floor with its ledge, the beam's overhang and the plus beside it lies on the screen", () => {
+    expect(l.beamLeft).toBeGreaterThanOrEqual(frame);
+    const plus = plusAt(l, 1);
+    expect(plus.x - (PLUS * l.s) / 2).toBeGreaterThanOrEqual(l.x0 + (ROW + OVERHANG) * l.s);
+    expect(plus.x + (PLUS * l.s) / 2).toBeLessThanOrEqual(w - frame);
   });
 
-  test("the blocks are big: a floor uses most of the width, or a fifth of the screen's height", () => {
-    expect(l.s).toBeGreaterThanOrEqual(Math.min(0.06 * w, 0.2 * h) - 0.5);
-    if (w === 844) expect(l.s).toBeGreaterThanOrEqual(55);
+  test("the blocks are big: a floor uses nearly the whole width, or a fifth of the screen's height", () => {
+    // User feedback, 25 November 2026: bigger blocks. A landscape phone had 63 px with the elevator panel.
+    expect(l.s).toBeGreaterThanOrEqual(Math.min(0.08 * w, 0.2 * h) - 0.5);
+    if (w === 844) expect(l.s).toBeGreaterThanOrEqual(70);
+  });
+
+  test("swiping along the house reaches the meadow and back, never past the world", () => {
+    for (let f = 0; f < ROW; f++) {
+      const { top, bottom } = lookRange(l, f);
+      expect(top).toBeGreaterThanOrEqual(0);
+      expect(top).toBeLessThanOrEqual(cameraAt(l, f));
+      expect(bottom).toBeGreaterThanOrEqual(cameraAt(l, f));
+      expect(bottom + h).toBeLessThanOrEqual(l.worldH + 0.01);
+    }
   });
 
   test("on every floor the hanging block, the child's head and the floor's top are on the screen", () => {
@@ -69,23 +99,27 @@ describe.each(SCREENS)("%i × %i", (w, h) => {
 });
 
 describe("floors", () => {
-  test("ten floors, each looking different, each with something of the house in it", () => {
+  test("ten floors, each looking different", () => {
     expect(FLOORS).toHaveLength(ROW);
     expect(new Set(FLOORS.map((f) => f.pattern)).size).toBe(ROW);
     expect(new Set(FLOORS.map((f) => f.colors[0])).size).toBe(ROW);
-    for (const floor of FLOORS) {
-      const specials = Object.keys(floor.specials).map(Number);
-      expect(specials.length).toBeGreaterThanOrEqual(2);
-      // The tenth block of a floor is always plain: it comes down slowly to the drum roll and the beam follows it.
-      for (const k of specials) expect(k >= 1 && k < ROW).toBe(true);
-    }
+    for (let n = 1; n <= TOTAL; n++) expect(floorOf(n) * ROW + placeOf(n)).toBe(n);
   });
 
-  test("the front door is on the ground floor, every number has its floor and place", () => {
-    expect(Object.values(FLOORS[0].specials)).toContain("door");
+  test("no block looks like another: a floor's ten wear ten dressings, each unlike its neighbours and the one below", () => {
+    // User feedback, 25 November 2026: no box may repeat its look.
+    const looks = new Set<string>();
     for (let n = 1; n <= TOTAL; n++) {
-      expect(floorOf(n) * ROW + placeOf(n)).toBe(n);
+      const floor = FLOORS[floorOf(n)];
+      looks.add(`${floor.pattern} ${dressingOf(n)}`);
+      if (placeOf(n) > 1) expect(dressingOf(n), `${n}`).not.toBe(dressingOf(n - 1));
+      if (n > ROW) expect(dressingOf(n), `${n}`).not.toBe(dressingOf(n - ROW));
     }
-    expect(specialOf(5)).toBe("door");
+    expect(looks.size).toBe(TOTAL);
+    for (let f = 0; f < ROW; f++) {
+      expect(new Set(Array.from({ length: ROW }, (_, i) => dressingOf(f * ROW + i + 1))).size).toBe(ROW);
+    }
+    // Every dressing is worn somewhere.
+    expect(new Set(Array.from({ length: TOTAL }, (_, i) => dressingOf(i + 1))).size).toBe(DRESSINGS.length);
   });
 });
