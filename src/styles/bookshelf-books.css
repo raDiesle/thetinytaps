@@ -820,8 +820,8 @@
 
 /*
  * A toy's place among the picture books (`ShelfToy`, `Category.toy`): `TOY_SPAN` picture books wide, as tall as its
- * poster (`ToyPoster`), which is stuck flat onto the back panel with its foot on the board (user feedback, 24 November
- * 2026: never leaning, nothing in front of it). The place itself stays in the row, unseen, and is what is tapped.
+ * poster (`ToyPoster`), which is stuck flat onto the back panel, in the middle between the boards and clear of both
+ * (user feedback, 24 and 25 November 2026: never leaning, nothing in front of it, never cut off by a board). The place itself stays in the row, unseen, and is what is tapped.
  */
 .shelf-row > .shelf-toy {
   --bw: calc(var(--bh) * 0.82 * 0.6); /* `TOY_SPAN` picture books */
@@ -854,14 +854,15 @@
 }
 
 /*
- * The poster: paper stuck flat onto the back panel, its foot where the board meets it. Seen on the panel it would lie
- * smaller and nearer the shelf's middle – behind the book beside it –, so `usePosterPlace` moves it back over its place
- * and grows it (`--poster-x`, `--poster-k`). Tape holds three corners; the fourth (top right) curls away, its paper's
+ * The poster: paper stuck flat onto the back panel, in the middle between the boards. Seen on the panel it would lie
+ * smaller and nearer the shelf's middle – behind the book beside it –, so `usePosterPlace` moves it back over its place,
+ * lifts it clear of the board (`--poster-y`) and grows it as far as the compartment's height allows (`--poster-x`,
+ * `--poster-k`). Tape holds three corners; the fourth (top right) curls away, its paper's
  * back seen. Still, like everything on the shelf.
  */
 .shelf-poster {
   --curl: calc(var(--pw) * 0.16);
-  transform: translateZ(calc(var(--d) * -0.8 + 2px)) translateX(var(--poster-x, 0px)) scale(var(--poster-k, 1));
+  transform: translateZ(calc(var(--d) * -0.8 + 2px)) translateX(var(--poster-x, 0px)) translateY(var(--poster-y, 0px)) scale(var(--poster-k, 1));
   filter: drop-shadow(0 calc(var(--pw) * 0.015) calc(var(--pw) * 0.02) #2a170866);
 }
 
@@ -869,7 +870,7 @@
    first measure must not slide it in). */
 .shelf-toy.pressed > .shelf-poster {
   transition: transform 0.12s ease-out;
-  transform: translateZ(calc(var(--d) * -0.8 + 2px)) translateX(var(--poster-x, 0px)) scale(calc(var(--poster-k, 1) * 0.96));
+  transform: translateZ(calc(var(--d) * -0.8 + 2px)) translateX(var(--poster-x, 0px)) translateY(var(--poster-y, 0px)) scale(calc(var(--poster-k, 1) * 0.96));
 }
 
 .shelf-poster-paper {

@@ -51,8 +51,12 @@ its address stays `/drauflos/`.
   A tap presses its poster back with a knock and a note, then the game opens; ✕ and Esc lead back to the shelf.
 - **Its poster** (`ToyPoster`, user request, 24 November 2026) is the whole thing on the shelf: the game's name big on
   top and a picture from the game below, on paper held by three pieces of tape (top left, bottom left, bottom right)
-  while the top right corner curls off. It is stuck **flat on the back panel, its foot where the board meets it** –
-  never leaning from the board (user feedback, 24 November 2026: „ganz hinten an der Wand, nicht schräg“), and nothing
+  while the top right corner curls off. It is stuck **flat on the back panel, in the middle between the two boards and
+  clear of both** – never leaning from the board (user feedback, 24 November 2026: „ganz hinten an der Wand, nicht
+  schräg“), and never with its foot on the board, where the board's front hid its lower tape and it looked cut off
+  (user feedback, 25 November 2026: „Abstand von den Regalbrettern“): `usePosterPlace` lifts it into the middle of the
+  compartment's panel as seen (`--poster-y`) and keeps it no taller than `POSTER_ROOM` of it, its tape included in that
+  room (about 20 px clear above and below at 844×390, 40 at 1280×720). Nothing
   stands in front of it (a toy keyboard did first and looked like a till, user feedback, 24 November 2026). On the panel
   the shelf's perspective draws a thing towards the shelf's middle and makes it smaller, so laid out in its place the
   poster was seen behind the book beside it: `usePosterPlace` measures an unseen copy of the place on the panel
