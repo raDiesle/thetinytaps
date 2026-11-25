@@ -243,8 +243,8 @@ const PLAYS: Record<string, (cdp: Cdp) => Promise<void>> = {
     await press(cdp, "3");
     await sleep(4500);
   },
-  // The house's first floor with its door and windows under its beam, the second floor begun with the flowers and the
-  // cat in its window, the next block hanging on the hook.
+  // The house's first floor of dressed blocks (ears, headphones, crown …) under its beam, the second floor begun, and the
+  // next block hanging on the hook with its question mark.
   "components/zaehlturm": async (cdp) => {
     // The game goes on where the last visit stopped: start again at 1 for each picture.
     await evaluate(cdp, `localStorage.removeItem("tinytaps.tower.v1"); location.replace(location.pathname + "?seite=1"); true`);
