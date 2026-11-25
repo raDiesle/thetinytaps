@@ -155,13 +155,21 @@ test("the side view's cut is never faded in by its opacity", () => {
   expect(cut).not.toMatch(/opacity/);
 });
 
-// The frame on the teeth to brush once ran along each tooth's whole face, which goes on under the gum, so it framed a
-// strip of gum too, with a gap to the tooth (user feedback, November 2026): it is clipped to the tooth, the gum laid
-// over it again, and the monsters' glow only just round them.
-test("the frame on the teeth to brush stays on the teeth", () => {
-  const glow = mouth.match(/className="mouth mouth-moving zone-glow"[\s\S]*?<\/svg>/)?.[0] ?? "";
-  expect(glow).toMatch(/clipPath=\{`url\(#zone-tooth-/);
-  expect(glow).toContain("<GumFaces");
+// The face's outline once ran straight from the upper lip's end to the lower one's, a black stroke in front of the
+// teeth between the lips (user feedback, November 2026): it is drawn as two lines, broken at the mouth.
+test("the side view's outline never runs across the mouth between the lips", () => {
+  const cut = mouth.match(/const profileCut = useMemo\([\s\S]*?\}, \[/)?.[0] ?? "";
+  expect(cut).toContain("d={profileOutline(side.line)}");
+  expect(cut).not.toContain("side.line.map");
+  expect(mouth).toMatch(/function profileOutline[\s\S]*?slice\(0, half\)[\s\S]*? M\$\{line\.slice\(half\)/);
+});
+
+// The teeth to brush once had a pulsing gold frame (user feedback, November 2026: the yellow glow is too much, the grey
+// stain is enough): their stain and monsters mark them, and the monsters' glow stays only just round them.
+test("no gold frame or glow marks the teeth to brush", () => {
+  expect(mouth).not.toContain("zone-glow");
+  expect(mouth).not.toMatch(/zone-tooth-|stroke="#ffd23f"/);
+  expect(css).not.toContain("zone-glow");
   expect(Number(mouth.match(/className="monster-glow" cy=\{-3\} r=\{(\d+)\}/)?.[1])).toBeLessThanOrEqual(22);
   expect(Number(css.match(/\.sprite-glow \{[^}]*width: ([\d.]+)%/)?.[1])).toBeLessThanOrEqual(64);
 });

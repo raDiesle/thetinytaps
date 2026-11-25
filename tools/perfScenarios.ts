@@ -334,7 +334,7 @@ export const SCENARIOS: Scenario[] = [
     path: "/timer/",
     parts: [{ label: "Läuft", before: [{ tap: `.mode-card[title^="${title}"]` }, { wait: 1500 }], ms: 8000, tap: { selector: ".tm-play", every: 1500 } }],
   })),
-  // „Abwechseln“ meant with short turns: the toy hopping over, the lamps changing and the hourglass turning itself over.
+  // „Abwechseln“ meant with short turns: the cushions pricking their ears, the lamps changing and the hourglass turning itself over.
   // `?sekunden=` works only on the dev server, so on the built site these two measure the start of a turn of the row's
   // length (November 2026).
   {

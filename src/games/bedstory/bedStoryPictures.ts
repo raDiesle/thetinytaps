@@ -208,7 +208,7 @@ const refOf = (page: BedPage) => referenceOf(page).ref;
 
 /** What is left once the book's last picture is made: it stays out of the shelf until then (`unfinished` in `games.ts`). */
 const AFTER =
-  "Wenn damit das letzte Bild des Buchs gemacht ist (BED_PICTURE_QUEUE leer): src/components/bilder/spine-grosses-bett.webp schneiden (160×160 aus bett-machen.webp, wie spine-haare-waschen.webp), einen perf-Ablauf „grosses-bett“ in tools/perfScenarios.ts wie „haare-waschen“ eintragen, und der Nutzerin sagen, dass das Buch veröffentlicht werden kann (unfinished in games.ts streichen, das Buch in den Suchtexten der Startseite nennen) – nicht selbst veröffentlichen.";
+  "Wenn damit das letzte Bild des Buchs gemacht ist (BED_PICTURE_QUEUE leer): src/components/bilder/spine-grosses-bett.webp schneiden (480×480 aus bett-machen.webp, wie spine-haare-waschen.webp), einen perf-Ablauf „grosses-bett“ in tools/perfScenarios.ts wie „haare-waschen“ eintragen, und der Nutzerin sagen, dass das Buch veröffentlicht werden kann (unfinished in games.ts streichen, das Buch in den Suchtexten der Startseite nennen) – nicht selbst veröffentlichen.";
 
 /** The queue entry of a page's picture. */
 export function bedPicture(page: BedPage): QueuedPicture {

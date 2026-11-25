@@ -107,18 +107,18 @@ late in the video. A new thing shown beside the picture (a control, a chart, a b
   50°, never at once, and only with the teeth together – never by fading its opacity: half see-through, its glass and
   lips lay over the front view's lips and gum for a moment and looked broken (user feedback, November 2026). Its
   outline slides in from the head's own edge on the far side, where it covers nothing, to the face's front
-  (`profileParts`), so the far cheek goes behind it as if the head turned on. `jaw.test.ts` checks the lips end in front
-  of the front teeth, `layers.test.ts` that the cut has no opacity.
+  (`profileParts`), so the far cheek goes behind it as if the head turned on. The face's outline stops at the upper lip
+  and goes on from the lower one, never drawn across the mouth between them (`profileOutline`): a straight ink line
+  from lip to lip lay as a black contour in front of the teeth (user feedback, November 2026). `jaw.test.ts` checks the
+  lips end in front of the front teeth, `layers.test.ts` that the cut has no opacity and the outline is broken at the mouth.
 - A monster sits on its tooth, not over its neighbours: keep `MONSTER_SIZE` (`mouth.tsx`) small, and the story's monsters about a tooth wide.
 - A monster clings to its tooth, a little sticky (user feedback, November 2026): a puddle of its sugar under it, drips
   in its colour hanging from its foot (`MONSTER_DRIPS`, a little different per kind), little paws pressed flat onto
   the tooth on both sides (`MONSTER_PAWS`) and a wet shine on its head – all drawn in `Monster`, so the story's are the
   same. `layers.test.ts` checks.
-- What marks the teeth to brush now stays on the teeth (user feedback, November 2026): the gold frame lies inside each
-  tooth's face, clipped to it, and the tooth's gum walls are laid over it again as the still picture has them
-  (`GumFaces`), so it ends where the gum begins – a frame along the face's whole edge, which runs on under the gum,
-  framed a strip of gum too with a gap to the tooth. The glow behind a monster being brushed is only just round it
-  (`.sprite-glow`, `monster-glow` r 21), never a wide halo reaching onto the gum. `layers.test.ts` checks.
+- Nothing yellow marks the teeth to brush (user feedback, November 2026): a gold frame pulsing on each of them was
+  taken out – their grey-yellow stain and their monsters say which they are. The glow behind a monster being brushed
+  is only just round it (`.sprite-glow`, `monster-glow` r 21), never a wide halo reaching onto the gum. `layers.test.ts` checks.
 - A monster lies on its tooth's face like a sticker, in the face's perspective, never upright in front of it: on a face
   turned away (the front teeth seen from the side) it is squashed along the way the face turns, as much as it is turned
   (`leanOn`, at most to `MIN_LEAN`), so it clings to the tooth – upright they looked as if they flew before the teeth
@@ -137,7 +137,12 @@ late in the video. A new thing shown beside the picture (a control, a chart, a b
 - That strip runs the whole height, from just under the ✕'s corner to the bottom, with one even gap (`--teeth-gap`) to
   the ✕'s corner, the picture's left edge and its bottom edge – measured inside the book's paper margin (`--frame`),
   never from the screen's edge, and never capped in height (user feedback, November 2026: on tablets and phones it stood
-  off the edge, its left side under the paper margin and short of the bottom). `controls.test.ts` checks.
+  off the edge, its left side under the paper margin and short of the bottom). On the left it lies at the paper margin
+  with a small gap even where a camera's cut-out leaves a safe area, as the ✕'s corner does – stepped in by it the
+  strip stood far off the edge on a phone (user feedback, November 2026). Beside the picture each phase outside the
+  brushing is only as tall as its symbol and the brushing's seven steps get all the rest of the strip's height, so a
+  step is big enough to tap on a phone, though no longer as long as its time against the phases' (user feedback,
+  November 2026: they were 8 px; held upright the steps take twelve shares to a phase's two). `controls.test.ts` checks.
 - What the child should see stays still long enough to be seen (at least a bar, 2.14 s) before it moves on; nothing whizzes across.
 - Every motion goes with the song (112 BPM): durations are beats (0.536 s), two beats or bars, and nothing loops faster than a beat (a tapped giggle may be quicker). Write new timings that way (`STROKE_S` in `brush.tsx`, the beat comment in `teeth.css`).
 - No words on the picture, ever – no heading („Süßes essen“, „Geschafft!“), no hint for grown-ups („Erbsengroß“, „Ausspucken“), no goodbye line (user feedback, November 2026): the picture, the song and the voice say it, the trophy handed over by `GameEnd` says „well done“ (no medal of its own: it was taken out for the trophy, user feedback, November 2026). The names of the prelude parts and the steps live in the progress bar's tooltips. `controls.test.ts` checks.
@@ -187,7 +192,7 @@ late in the video. A new thing shown beside the picture (a control, a chart, a b
 - Say every line through `spokenIn`/`stepText`/`daytimeText` and `say`, which plays its ElevenLabs recording (`stimme/`, Tapsi's voice, October 2026; where the language has no recording of a line its English one plays, else nothing – `spokenIn` carries the English text as `english`); two lines that may be in different languages are said one after the other (`queue`), never joined into one string. A line that is not queued cuts off what is being said, so an effect that says something only on a change (going on after a pause) must not say it when the game mounts: that once cut off „Guten Morgen!“ before the first cue. A new or changed line is listed for recording by `src/content/recordedLines.ts` and stays silent until `bun run voice make --only zaehne` (only when the user asks).
 - Never switch the song in, or decode it, while brushing: a song that arrives mid-brushing makes the picture stutter on phones. It loads from the start screen on, and the clock waits for it before the countdown (with „Musik lädt …“ and a bar when it is late); the stand-in tune is only for a song that can't load.
 - 3D parts drawn as flat faces are stacked by the planes between them, never by sorting their middles: a small part next to a long one (a bristle tuft at the far end of the head) can have its middle nearer and show through the plastic. The brush's boxes all lie apart along one of its axes (`drawOrder` in `brush.tsx`, checked in `brush.test.ts`); a new part has to as well.
-- The mirror is pictures on top of each other (`mouth.tsx`), each a layer of its own (`.mouth-moving`) over the still one (face, teeth, gums), which is built once per view (`useMemo`): the glow on the teeth to brush, an svg of its own that pulses as a whole (its opacity, which a phone does without painting); the lips over the glow and the waiting monsters, which stand still; the monsters being brushed now, the arrows on the lips and the end's dazzled monster (`DazzledMonster`), each a small HTML layer of its own (`Sprite`, `.mouth-sprite`) whose sway, tremble, glow, nudge and twinkle move the HTML round its little svg (`.sprite-body`, `.sprite-glow`, `.dazzle-body`, `.dazzle-glasses`); the end's shine on the teeth (`.teeth-shine`) is an svg of its own like the glow, fading in and breathing as a whole, never something inside an svg; the mirror's glass and frame, drawn in screen px (its own viewBox, which never changes, so a turning head doesn't paint it again); then the brush. A CSS animation inside an svg has the phone paint that svg again in every frame, and even small ones kept its main thread busy: never animate anything inside an svg here (the glow once pulsed in one svg with the lips, the monsters swayed and blinked in one the size of the screen, the face blinked in the still picture – each had the phone paint the screen anew many times a second). So nothing blinks in the mirror. Never put something that changes with the clock into the still picture, and keep what the clock passes to the moving parts the same from tick to tick (`PlacedMonster` is `memo`, `tickle` a `useCallback`, places rounded): redrawing the whole mouth with every 200 ms tick made the brushing stutter on phones.
+- The mirror is pictures on top of each other (`mouth.tsx`), each a layer of its own (`.mouth-moving`) over the still one (face, teeth, gums), which is built once per view (`useMemo`): the stains fading on the teeth being brushed, each a small HTML layer (`ToothStain`); the lips and the waiting monsters, which stand still; the monsters being brushed now, the arrows on the lips and the end's dazzled monster (`DazzledMonster`), each a small HTML layer of its own (`Sprite`, `.mouth-sprite`) whose sway, tremble, glow, nudge and twinkle move the HTML round its little svg (`.sprite-body`, `.sprite-glow`, `.dazzle-body`, `.dazzle-glasses`); the end's shine on the teeth (`.teeth-shine`) is an svg of its own, fading in and breathing as a whole, never something inside an svg; the mirror's glass and frame, drawn in screen px (its own viewBox, which never changes, so a turning head doesn't paint it again); then the brush. A CSS animation inside an svg has the phone paint that svg again in every frame, and even small ones kept its main thread busy: never animate anything inside an svg here (the glow once pulsed in one svg with the lips, the monsters swayed and blinked in one the size of the screen, the face blinked in the still picture – each had the phone paint the screen anew many times a second). So nothing blinks in the mirror. Never put something that changes with the clock into the still picture, and keep what the clock passes to the moving parts the same from tick to tick (`PlacedMonster` is `memo`, `tickle` a `useCallback`, places rounded): redrawing the whole mouth with every 200 ms tick made the brushing stutter on phones.
 - The brush's shape is drawn for the stop it is nearest and only turns when it reaches the next one (then it settles, rounded, so a brush holding still writes nothing to the page); gliding between stops only moves its layer. Its layer is only as big as the brush (`reach` in `brush.tsx`): a layer the size of the screen had a phone paint whole bands of the screen again each time the brush turned.
 - Phones must keep up (`bun run perf zaehne` stays within its budget on the old Android; run it after changing what
   moves). What moves on every frame is an HTML layer moved by CSS (`transform`, `opacity`): the brush's strokes, the
@@ -196,8 +201,8 @@ late in the video. A new thing shown beside the picture (a control, a chart, a b
   still (no blink, no sway). The one per-frame redraw is the mirror while the head turns or the mouth opens (`gliding`): keep it
   cheap – the model is built once per step of opening (`mouthAt`), points are formatted by rounding (`fmt`), and a
   monster's drawing is kept while only its place changes (`PlacedMonster`). Every layer with the picture's viewBox is
-  painted whole in each of those frames, so as few as possible are drawn then: the glow on the teeth waits until the
-  head holds still, and the lips with the waiting monsters join the still picture meanwhile (one screen per frame
+  painted whole in each of those frames, so as few as possible are drawn then: the stains' layers and the sparkles wait
+  until the head holds still, and the lips with the waiting monsters join the still picture meanwhile (one screen per frame
   instead of four, November 2026). Nothing that stays put on the screen (the mirror's frame and glass) takes the
   picture's viewBox. Where a device can't draw such a frame well within its time (an old phone), the glide
   draws every other frame only (`useGlidingView`: after two frames missed or drawn slowly – it renders inside the frame
@@ -233,7 +238,7 @@ late in the video. A new thing shown beside the picture (a control, a chart, a b
   (stars twinkling on the teeth looked out of place) and never an emoji. The end shows the whole laughing head, never only the lips, and the surprise is a sugar monster that
   peeks in at the mirror's edge, dazzled by the clean teeth, and puts on sunglasses – never on the teeth themselves, which are
   clean now.
-- The teeth start a little yellow and grey and turn white as they are brushed, tooth by tooth, each sparkling once
+- The teeth start a little yellow and grey and turn white as they are brushed, tooth by tooth, and sparkle (see below)
   (user request, November 2026). In the story the sugar stains them while the monsters grow (`StainedTeeth`, a `Piece`
   fading in by its opacity, `teeth-origin-stain`); in the mirror every face a step brushes is stained until the brush
   has taken all of its monsters off (`dirtyFaces` in `stains.ts`): a soft yellow, grey-yellow plaque along the gum (on a
@@ -243,10 +248,15 @@ late in the video. A new thing shown beside the picture (a control, a chart, a b
   like the rest), and each one's stain lies over it in a small HTML layer of its own the size of that face
   (`ToothStain`, `.tooth-stain`), with everything the still picture draws over that face (its gum's walls, nearer teeth,
   the other row) masked out of it by their outlines in plain black, worked out once (`StainGeometry.cut`, `rims`) – never
-  by drawing those things again through a filter that turns them black; once clean it fades in a beat by its opacity and a smaller glint flashes on it once
-  (`.tooth-glint.brushed`, `teeth-glint-once`). Never fade a stain inside the mirror's svg nor rebuild the still picture
-  as each tooth is done (`stains.test.ts`). The yellow fill that once marked the teeth to brush is gone: the stain and
-  the monsters mark them while the head turns, the gold frame once it holds still.
+  by drawing those things again through a filter that turns them black; once clean it fades in a beat by its opacity.
+  Never fade a stain inside the mirror's svg nor rebuild the still picture as each tooth is done (`stains.test.ts`). The
+  yellow fill and the gold frame that once marked the teeth to brush are gone: the stain and the monsters mark them.
+- A brushed tooth is a beautiful white (user feedback, November 2026): its front pure white, its other faces a cool
+  white a breath darker (`TOOTH_FILLS`), never cream. It sparkles only once the brush has reached the next tooth
+  (`brushLeft`), after a beat's pause, and then every brushed face of the view sparkles on while the head holds still,
+  not only the last one (`sparkling`): two small glints a face, faint and slow, coming and going in turn every two
+  bars (`SPARKLE_SIZE`, `.tooth-glint.brushed`, `teeth-sparkle`) – never one big glint over the tooth, nor a flash while
+  the brush still lies on it, where it was hardly seen (user feedback, November 2026). `stains.test.ts` checks.
 - The story's teeth stand close, neighbours nearly touching (`rowOf`, `story.test.ts`): gaps between them looked like
   teeth lost (November 2026).
 - The story shows the mouth as big as it can (user feedback, November 2026: zoom in more, so the child sees more): on a

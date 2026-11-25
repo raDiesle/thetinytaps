@@ -180,17 +180,6 @@
   pointer-events: auto;
 }
 
-/* The surfaces to brush now shine. */
-.zone-glow {
-  animation: glow-pulse 2.14s ease-in-out infinite;
-}
-
-@keyframes glow-pulse {
-  50% {
-    opacity: 0.25;
-  }
-}
-
 /* The monsters sit on the teeth from the start (the story before, origin.tsx, shows them growing):
    they don't pop up, they only fade in softly as their side of a tooth turns into view. The ones being brushed
    dance and dissolve (`.monster-sprite` below). */
@@ -398,22 +387,26 @@
   }
 }
 
+/* Brushed teeth sparkle softly once the brush has moved on to the next tooth (mouth.tsx, `sparkling`): after a beat's
+   pause, two small glints on each face come and go in turn, each for about a bar, round again every two bars – small and
+   faint, never one big flash (user feedback, November 2026). */
 .tooth-glint.brushed > div {
-  animation: teeth-glint-once 2.14s ease-in-out 0.27s both;
+  animation: teeth-sparkle 4.29s ease-in-out calc(0.536s + var(--turn) * 1.07s) infinite;
 }
 
-@keyframes teeth-glint-once {
+@keyframes teeth-sparkle {
   0% {
     opacity: 0;
-    transform: scale(0.2) rotate(-25deg);
+    transform: scale(0.2) rotate(-20deg);
   }
-  30% {
-    opacity: 0.85;
+  20% {
+    opacity: 0.7;
     transform: scale(1) rotate(0deg);
   }
+  45%,
   100% {
     opacity: 0;
-    transform: scale(0.4) rotate(12deg);
+    transform: scale(0.3) rotate(10deg);
   }
 }
 
@@ -579,10 +572,11 @@
   transition: transform 0.2s linear;
 }
 
-/* A phase outside the brushing (eating sweets, getting the brush, putting it away): its symbol beside one groove, as
-   long as two steps. Getting the brush and putting it away happen at the sink, so they share its blue. */
+/* A phase outside the brushing (eating sweets, getting the brush, putting it away): its symbol beside one groove.
+   Getting the brush and putting it away happen at the sink, so they share its blue. */
 .teeth-tile {
-  /* The symbol's room first, then the rest shared out: two shares for a phase, seven for the brushing's steps. */
+  /* The symbol's room first, then the rest shared out: two shares for a phase, twelve for the brushing's seven steps,
+     so a step is nearly as long as a phase and easy to tap, though it lasts longer (user feedback, November 2026). */
   flex: 2 1 calc(var(--symbol) + var(--gap));
   min-width: 0;
   display: flex;
@@ -619,7 +613,7 @@
 
 /* The brushing itself: its steps in a frame of their own, a soft green tray they lie in, the clean tooth at its end. */
 .teeth-brushing {
-  flex: 7 1 calc(var(--symbol) + var(--gap) + 16px);
+  flex: 12 1 calc(var(--symbol) + var(--gap) + 16px);
   min-width: 0;
   display: flex;
   align-items: center;
@@ -700,11 +694,13 @@
      the bottom, the same gap (`--teeth-gap`) from the ✕'s corner, the picture's left edge and its bottom edge – inside
      the book's paper margin (`--frame`), which once hid its left side on a tablet (user feedback, November 2026: on
      tablets and phones it stood off the edge, short of the bottom, with uneven gaps). The margins undo
-     `.teeth-play`'s own padding (10 px top and bottom, 6 px left, or the safe area). */
+     `.teeth-play`'s own padding (10 px top and bottom, 6 px left, or the safe area). On the left it lies at the paper
+     margin even where a camera's cut-out leaves a safe area there, as the ✕'s corner does: stepped in by it the strip
+     stood far off the edge on a phone (user feedback, November 2026), and the cut-out only grazes its symbols. */
   .teeth-controls {
     order: -1;
     flex-direction: column;
-    --teeth-gap: clamp(6px, 1.2vmin, 10px);
+    --teeth-gap: clamp(4px, 1vmin, 10px);
     --teeth-edge: calc(var(--frame, 0px) + var(--teeth-gap));
     display: grid;
     grid-template-columns: auto auto;
@@ -715,8 +711,8 @@
     width: auto;
     margin: calc(var(--play-corner, 0px) + var(--teeth-gap) - max(10px, env(safe-area-inset-top))) 0
       calc(max(var(--teeth-edge), env(safe-area-inset-bottom)) - max(10px, env(safe-area-inset-bottom)))
-      calc(max(var(--teeth-edge), env(safe-area-inset-left)) - max(6px, env(safe-area-inset-left)));
-    padding: 6px;
+      calc(var(--teeth-edge) - max(6px, env(safe-area-inset-left)));
+    padding: 6px 6px 6px 3px;
     border-color: #3d304533;
     border-radius: 24px;
     background: var(--paper-grain), color-mix(in srgb, var(--paper, #fbf4e3) 55%, #fff0);
@@ -739,17 +735,20 @@
     align-self: stretch;
     align-items: stretch;
     --gap: clamp(3px, 0.7vmin, 6px);
-    --symbol: clamp(26px, 5.4vmin, 40px);
+    --symbol: clamp(22px, 5.4vmin, 40px);
     --lane: clamp(16px, 3.2vmin, 26px);
     min-height: 0;
     /* Room beside the thin bar, so a finger hits it easily. */
     padding: 4px 0;
   }
 
-  /* Upright, a phase's symbol stands left of its groove, and every groove lies in one lane. */
+  /* Upright, a phase's symbol stands left of its groove, and every groove lies in one lane. A phase takes only its
+     symbol's height, and the brushing's steps get all the rest of the strip's height, so each is big enough to tap on a
+     phone, though not as long as its time against the phases' (user feedback, November 2026: they were 8 px). */
   .teeth-tile {
-    min-height: calc(var(--symbol) + 4px);
-    padding: 0 4px 0 8px;
+    flex: none;
+    height: calc(var(--symbol) + 4px);
+    padding: 0 4px 0 3px;
     border: 2px solid transparent;
   }
 
@@ -762,9 +761,10 @@
   }
 
   .teeth-brushing {
+    flex: 1 1 0;
     min-height: 0;
     margin: 0;
-    padding: 4px 4px 4px 8px;
+    padding: 4px 4px 4px 3px;
     border-radius: 20px;
     align-items: stretch;
   }
@@ -800,7 +800,7 @@
 
   .teeth-segment {
     flex: 1;
-    width: clamp(11px, 2.2vmin, 18px);
+    width: clamp(13px, 2.6vmin, 20px);
     height: auto;
     min-height: 0;
     border-width: 1.5px;
@@ -833,8 +833,7 @@
 
 /* Pause: brush, monsters and glow stand still under a big button that goes on. */
 .teeth-play.paused .monster-glow,
-.teeth-play.paused .monster-body,
-.teeth-play.paused .zone-glow {
+.teeth-play.paused .monster-body {
   animation-play-state: paused;
 }
 
@@ -937,13 +936,12 @@
 
   .monster-body,
   .origin-monster > svg,
-  .zone-glow,
   .teeth-shine,
   .monster-glow {
     animation: none;
   }
 
-  /* The glints stand still, lit; a tooth just brushed shows none. */
+  /* The glints stand still, lit; a tooth brushed shows none. */
   .tooth-glint > div {
     opacity: 0.85;
     animation: none;

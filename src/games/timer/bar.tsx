@@ -47,7 +47,7 @@ export function TimeBar({
   done?: boolean;
   tone?: string;
 }) {
-  // The animations start where the clock is: from the run's start (later than now while a turn's toy still hops), and
+  // The animations start where the clock is: from the run's start (later than now while a turn is still about to begin), and
   // again when the page comes back or has finished turning, since animations stand still while a page turns.
   // On the run's clock, so a pause holds it where it is and it goes on from there.
   const { now } = useRunClock();

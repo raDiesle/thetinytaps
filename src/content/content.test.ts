@@ -96,6 +96,16 @@ describe("home menu", () => {
     }
   });
 
+  // Taken out, a book spine out shows its spine picture big as its cover: at 160 px Zähne putzen's crop of a face
+  // looked like a half-drawn page still loading (user feedback, November 2026).
+  test("every spine picture is big enough to be the book's cover", () => {
+    for (const file of readdirSync("src/components/bilder").filter((f) => /^spine-.*\.webp$/.test(f))) {
+      const { width, height } = webpSize(readFileSync(`src/components/bilder/${file}`));
+      expect(width, file).toBe(height);
+      expect(width, file).toBeGreaterThanOrEqual(480);
+    }
+  });
+
   test("every category has its world (backdrop, card colours, the picture on its card)", () => {
     for (const category of CATEGORIES.filter((c) => !c.toy)) expect(WORLDS as readonly string[], category.id).toContain(category.id);
   });
@@ -718,3 +728,12 @@ test("games labelled „in Bearbeitung“ stand in their book's table of content
     expect(NO_INDEX_PATHS, game.href).toContain(game.href);
   }
 });
+
+/** The width and height a webp file says in its header (VP8X, lossy VP8 or lossless VP8L). */
+function webpSize(bytes: Buffer) {
+  const chunk = bytes.toString("ascii", 12, 16);
+  if (chunk === "VP8X") return { width: 1 + bytes.readUIntLE(24, 3), height: 1 + bytes.readUIntLE(27, 3) };
+  if (chunk === "VP8 ") return { width: bytes.readUInt16LE(26) & 0x3fff, height: bytes.readUInt16LE(28) & 0x3fff };
+  const bits = bytes.readUInt32LE(21);
+  return { width: 1 + (bits & 0x3fff), height: 1 + ((bits >> 14) & 0x3fff) };
+}

@@ -4,7 +4,8 @@ import { Choice } from "@/components/SettingControls";
 import { useGameSettings } from "@/lib/common";
 import { useT } from "@/lib/language";
 import { TimerCardArt } from "./cardArt";
-import { isTurns, PICTURES, SWAP_NAME, SWAP_NOTE, TIMER_TITLE } from "./content";
+import { isTurns, PICTURES, SWAP_NOTE, TIMER_TITLE } from "./content";
+import { TURNS_GROUP } from "./playersNames";
 import { OwnTimeSheet } from "./OwnTimeSheet";
 import { DEFAULT_TIMER_SETTINGS, TIMER_SECONDS, TIMER_SETTINGS_KEY, type TimerPicture } from "./settings";
 import { lengthWords, type OwnTime } from "./time";
@@ -39,8 +40,8 @@ export function TimerGame() {
     emoji: p.emoji,
     title: t(p.name),
     note: isTurns(p.id) ? t(SWAP_NOTE) : undefined,
-    kind: isTurns(p.id) ? t(SWAP_NAME) : undefined,
-    art: <TimerCardArt picture={p.id} toy={settings.toy} kids={settings.kids} />,
+    kind: isTurns(p.id) ? t(TURNS_GROUP) : undefined,
+    art: <TimerCardArt picture={p.id} kids={settings.kids} players={settings.players} />,
   }));
   // A picture kept from before may since have been taken out („Eimer“, „Kuchen“): then the first one is marked.
   const picture = PICTURES.some((p) => p.id === settings.picture) ? settings.picture : DEFAULT_TIMER_SETTINGS.picture;
@@ -106,8 +107,8 @@ export function TimerGame() {
       <TimerPlay
         settings={{ ...settings, picture, seconds, useOwn }}
         onPicture={(picture) => update({ picture })}
-        onToy={(toy) => update({ toy })}
         onKids={(kids) => update({ kids })}
+        onPlayers={(players) => update({ players })}
         onShown={(timeNote) => update({ timeNote })}
         onBar={(bar) => update({ bar })}
       />

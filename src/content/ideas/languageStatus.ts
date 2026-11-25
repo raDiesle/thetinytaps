@@ -124,6 +124,12 @@ export const LANGUAGE_STATUS: LanguageStatusRow[] = [
         note: "Das Bild „Rennstrecke“ in der Gruppe Abwechseln (race.tsx, 24. November 2026): Fuchskind und Bärenkind fahren abwechselnd eine Runde im Kart auf einer Achterstrecke mit Brücke. Nur sein Name („Race Track“, Tooltip und Vorlesen) ist neuer Text, englisch zuerst und gleich in alle Sprachen übersetzt (raceNames.ts). Es sagt dieselben Sätze wie Abwechseln, die schon aufgenommen sind. Die Texte für Suchmaschinen nennen es in allen sieben Sprachen.",
         files: ["src/games/timer/raceNames.ts"],
       },
+      {
+        label: "👥 Mitspieler",
+        languages: { de: "done", en: "done", zh: "done", hi: "done", es: "done", ar: "done", ru: "done" },
+        note: "Bis zu vier Kinder in jedem Bild von Abwechseln, jedes mit Namen oder Foto (25. November 2026): der Name der Gruppe im Menü „Abwechseln (bis 4)“ und hinter ⚙️ „Namen und Fotos der Kinder“ mit seinen Knöpfen und dem Hinweis, dass alles nur auf dem Gerät bleibt. Englisch zuerst geschrieben und gleich in alle Sprachen übersetzt (playersNames.ts). Nichts davon wird gesprochen.",
+        files: ["src/games/timer/playersNames.ts"],
+      },
     ],
   },
   {
