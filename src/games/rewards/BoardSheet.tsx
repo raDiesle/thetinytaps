@@ -31,6 +31,7 @@ import { DaySign, type DaySignSet } from "./daySigns";
 import { type CatalogMark, DAY_NAMES, MARK_BY_ID, MARKS, REWARD_BY_ID, type Slot, TASK_BY_ID, TEMPLATES, THEME_BY_ID, THEMES } from "./catalog";
 import { ItemPic, MarkPic, Pic, picture, SheetStrip } from "./pictures";
 import { RewardActions, SheetAction } from "./SheetAction";
+import { ChildPhoto, photoHead, photoInCorner } from "./ChildPhoto";
 import { SheetTitle, titleMarkOf } from "./SheetTitle";
 
 /** „Woche vom ____“: the line on a printed week to write its first day on. */
@@ -162,13 +163,19 @@ export function BoardSheet({
   const fieldProps = { mark, look, fresh, example, signs: board.signs };
   const dateFormat = (options: Intl.DateTimeFormatOptions) => new Intl.DateTimeFormat(speechLang, options);
 
+  // The child's photo (user request, November 2026): in a corner of the head, which grows to hold it, or beside the heading.
+  const head = photoHead(board.photo);
+  const corner = photoInCorner(board.photo);
+  const photo = <ChildPhoto photo={board.photo} editing={editing} />;
+
   return (
     <div
       className={`rw-sheet rw-kind-${board.kind}${look.print ? " rw-on-paper" : ""}${grey ? " rw-grey" : ""}${example ? " rw-with-examples" : ""}${editing ? " rw-editing" : ""}`}
       style={style}
     >
       {look.print && look.color && <SheetStrip theme={theme} />}
-      <header className="rw-head">
+      <header className={head.className} style={head.style}>
+        {corner && photo}
         <SheetTitle
           title={title}
           own={!!board.title.trim()}
@@ -176,6 +183,7 @@ export function BoardSheet({
           mark={titleMarkOf(board.titleMark, board.mark)}
           editing={editing}
           onTitle={onTitle}
+          photo={corner ? undefined : photo}
         />
         {look.print && board.kind === "week" && <span className="rw-blank">{t(WEEK_OF)} ____________</span>}
         {look.print && board.kind === "day" && (

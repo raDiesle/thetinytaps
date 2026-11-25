@@ -57,6 +57,40 @@
   text-shadow: 0 0.04em 0 #5a3a2a55;
 }
 
+/* The burst behind a glyph or shape: short streaks of light flying out from its middle as it pops in, fading as they
+   go – a little firework with every press. Each streak is its own small layer; its tail fades into the page. */
+.tw-burst {
+  position: absolute;
+  width: 0;
+  height: 0;
+}
+
+.tw-spark {
+  position: absolute;
+  left: 0;
+  top: -3px;
+  height: 6px;
+  border-radius: 3px;
+  background: linear-gradient(90deg, transparent, var(--c) 65%, #fff);
+  transform-origin: 0 50%;
+  will-change: transform, opacity;
+  animation: tw-spark 0.9s cubic-bezier(0.2, 0.7, 0.3, 1) 0.08s both;
+}
+
+@keyframes tw-spark {
+  0% {
+    transform: rotate(var(--a)) translateX(0) scaleX(0.4);
+    opacity: 1;
+  }
+  70% {
+    opacity: 1;
+  }
+  100% {
+    transform: rotate(var(--a)) translateX(var(--d)) scaleX(0.6);
+    opacity: 0;
+  }
+}
+
 /* A digit's shapes round its number: each pops in a moment after the one before, so they can be counted. */
 .tw-thing {
   position: absolute;
@@ -126,7 +160,8 @@
     animation-timing-function: steps(1, end);
   }
 
-  .tw-sparkle {
+  .tw-sparkle,
+  .tw-burst {
     display: none;
   }
 

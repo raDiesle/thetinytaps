@@ -118,6 +118,9 @@ export const rewardChartIdeas: IdeaArea = {
       title: "Eigenes Foto als Aufgabenbild",
       text: "Ein Foto vom eigenen Töpfchen, der eigenen Zahnbürste oder Kita-Tür als Bild einer Aufgabe – erkennt ein Zweijähriger am besten. Bleibt nur auf dem Gerät (IndexedDB), auch im Ausdruck.",
       effort: "M",
+      done: true,
+      partial:
+        "Gebaut (25. November 2026): Im Fenster jeder Karte des Plans und jeder Aufgabe der Tafel (Tippen oder ⚙️) steht oben „Eigenes Foto“ – „Foto wählen“ öffnet die Dateiauswahl (auf dem Handy auch die Kamera), danach „Anderes Foto“ und „Ohne Foto“, das das Bild zurückbringt. Das Foto steht als quadratischer Ausschnitt an der Stelle des Bildes: auf dem Bildschirm, im A4-Druck (im Graudruck grau), auf den Ausschneidekarten, dem Fotoabzug der Karten, dem Poster und der Urkunde. Gespeichert wie das Foto des Kindes: verkleinert, ohne Ortsangaben, nur in der IndexedDB; gelöscht mit „Ohne Foto“, dem Tausch der Karte, einem selbst getippten Emoji oder der Tafel. Datenschutzerklärung und Suchtexte in allen sieben Sprachen ergänzt. Bewusst weggelassen: ein Foto für die Belohnung und den großen Tag des Countdowns (die Idee nennt Aufgaben).",
     },
     {
       id: "T-14",
@@ -253,6 +256,127 @@ export const rewardChartIdeas: IdeaArea = {
       text: "Ein Sticker wird mit einem leisen Patsch angedrückt, sonst nichts. Ist die Tafel voll, öffnet sich langsam die Geschenkbox mit der Belohnung – statt Herzen, Sterne und Noten aufsteigen zu lassen. Gehört zu A-30.",
       why: "Die Freude gehört zur Belohnung selbst, nicht zu Formen drumherum.",
       effort: "S",
+    },
+    {
+      id: "T-30",
+      emoji: "🧒",
+      title: "Foto des Kindes auf der Tafel und dem Plan",
+      text: "Eltern laden beim Gestalten ein Foto ihres Kindes hoch und legen es auf die Tafel oder den Plan: oben links, oben rechts oder neben die Überschrift. Es sieht aus wie ein aufgeklebter Abzug und steht im Ausdruck genau so da. Bleibt nur auf dem Gerät.",
+      why: "Das Kind erkennt sich und weiß: Das ist meine Tafel. Für das Poster (T-32) macht das Foto die Tafel zu einem Bild, das man gern aufhängt.",
+      effort: "M",
+      done: true,
+      partial:
+        "Gebaut (November 2026): ein blasser ＋-Platz neben dem Zeichen der Überschrift öffnet die Dateiauswahl (auf dem Handy auch die Kamera); das Foto trägt ⚙️ und 🗑️ wie eine Karte, ⚙️ wählt den Platz (oben links, oben rechts, neben der Überschrift) und ein anderes Foto. Als Abzug mit weißem Rand, schief und mit Klebestreifen, im Graudruck grau; in einer Ecke rücken die Karten darunter. Verkleinert auf 1200 px, als JPEG ohne Ortsangaben nur in der IndexedDB des Browsers gespeichert, gelöscht mit der Tafel oder 🗑️; Datenschutzerklärung und Suchtexte in allen sieben Sprachen ergänzt. Bewusst weggelassen: die unteren Ecken, dort stehen schon Belohnung, Ziel und Zähler. Noch nicht geprüft: das Foto auf dem Fotoabzug der Karten.",
+    },
+    {
+      id: "T-31",
+      emoji: "🔀",
+      title: "Im Assistenten wählen: Karten ausschneiden oder alles fest gedruckt",
+      text: "Am Ende von „＋ Neu“ und unter „🖨️ Drucken“ zwei große Bildknöpfe statt einer Liste von Optionen: „✂️ Karten zum Ausschneiden“ (wie heute: A4 oder Fotoabzug, Klett, die Karten wandern) und „🖼️ Alles fest auf einem Bild“ (der ganze Plan mit allen Karten an ihrem Platz, als A4 oder als Fotoposter, T-32; der Pfeil oder ein Stift zeigt, was dran ist). Je Knopf ein Satz, was es heißt: „mehr Bastelarbeit, die Karten lassen sich umstecken“ gegen „nichts zu schneiden, hängt sofort“. Die Wahl stellt die passenden Voreinstellungen (fest: keine Schnittlinien, keine Kartenseite, „Pfeil wandert“).",
+      why: "Heute muss man die Fotoabzug-Karten, A4, Ausschneidebogen und „Pfeil wandert“ / „Karte wandert“ selbst zusammensuchen. Viele Eltern wollen gar nicht basteln – sie sollen das am Anfang klar wählen können und dann nur noch das sehen, was zu ihrem Weg gehört.",
+      effort: "M",
+      done: true,
+      partial:
+        "Gebaut (25. November 2026): unter „🖨️ Drucken“ von Tafel und Plan zwei große Bildknöpfe, „🖼️ Alles fest auf einem Bild“ (nichts zu schneiden, A4 oder Fotoposter) und „✂️ Karten zum Ausschneiden“ (Klett, die Karten wandern), je mit einem Satz (`PrintWayChoice`, `PrintOptions.way`, `PlanPrintOptions.way`). Fest heißt: keine Sticker- und Kartenseiten, kein Fotoabzug der Karten, beim Plan kein „Jetzt“-Feld; ein Plan mit Pfeil kennt nur den festen Weg, einer mit „Jetzt“-Feld nur die Karten. Bewusst anders als gedacht: kein eigener Schritt am Ende von „＋ Neu“ – der Assistent ist das Blatt selbst (ChartEditor), und die Wahl gehört dahin, wo gedruckt wird; der Druck-Stempel des Assistenten nennt das Fotoposter.",
+    },
+    {
+      id: "T-32",
+      emoji: "🖼️",
+      title: "Als Fotoposter bestellen",
+      text: "Die fertige Tafel oder der Plan als ein JPG im genauen Seitenverhältnis eines Posterformats, das jede Drogerie und jeder Fotodienst anbietet (vollflächig auf Fotopapier, z. B. Fuji Crystal DP II): 20 × 30 cm (klein, ein Tagesplan an der Tür; 1575 × 2362 px bei 200 dpi, 3,7 MP), 30 × 40 cm (Standard, eine Woche; 2126 × 2835 px bei 180 dpi, 6 MP) und 40 × 60 cm (groß, ein Monat oder Plan und Tafel zusammen; 2362 × 3543 px bei 150 dpi, 8,4 MP) – jeweils über dem, was die Dienste mindestens empfehlen (2, 3 und 4 MP). 50 × 75 cm (13 MP) bleibt weg: zu groß für ein Kinderzimmer und für die Leinwand (canvas) alter Handys. Hoch oder quer nach der Tafel, nichts Wichtiges näher als 5 mm am Rand (der Rand wird beim Belichten beschnitten). Dazu „💾 Speichern“ / „📤 Teilen“ wie beim Fotoabzug und eine kurze Anleitung: Datei beim Fotodienst hochladen, Format wählen, „matt“ (spiegelt nicht, weniger Fingerabdrücke), nicht zuschneiden lassen. Auf deutschen Seiten ein Link zu einem Beispiel-Anbieter (shopLinks.tsx). Auf Englisch die üblichen Zollformate (8 × 12″, 12 × 16″, 16 × 24″, also 2 : 3 und 3 : 4 wie hier).",
+      why: "Ein Fotoposter ist fest, abwischbar, ohne Laminieren und in Fotoqualität – sieht im Kinderzimmer aus wie gekauft, kostet aber nur ein paar Euro, und die Bilder sind dieselben wie auf dem Tablet. Kein anderer Tafel-Generator gibt eine Datei genau für ein Posterformat aus.",
+      effort: "M",
+      done: true,
+      partial:
+        "Gebaut (25. November 2026): „Als Fotoposter“ in beiden Druckfeldern (`poster.ts`, `PosterPrint.tsx`) – dasselbe Blatt, auf der kurzen Seite wie A4 gesetzt und mit html-to-image als JPG gezeichnet: 20 × 30 (200 dpi), 30 × 40 (180 dpi, voreingestellt) und 40 × 60 cm (150 dpi), hoch oder quer nach der Tafel, auf Englisch in Zoll (8 × 12″ …). Vorschau mit dem 5-mm-Rand gestrichelt, „💾 Speichern“ / „📤 Teilen“ und eine Anleitung in vier Schritten (matt, „ganzes Bild“, nicht zuschneiden; dm, Rossmann, CEWE, Pixum nur auf Deutsch genannt). Weggelassen: ein Link zu einem Beispiel-Anbieter, weil keiner geprüft war – kommt mit einem Beispiel des Nutzers in shopLinks.tsx.",
+    },
+    {
+      id: "T-33",
+      emoji: "✨",
+      title: "Poster-Look: hochwertiger, mit mehr Schmuck",
+      text: "Auf Fotopapier trägt die Tafel mehr als auf dem Tintendrucker: ein gemalter Hintergrund je Farbthema (Aquarell-Himmel, Wiese, Sternennacht – Gemini, 2K, durch die Bilder-Warteschlange), ein Rahmen aus Ranken, Wimpeln oder Wolken, die Überschrift auf einem Band, Tapsi und die Fuchs- und Bärenkinder am Rand, die Karten mit weichem Schatten wie aufgeklebte Fotos, eine feine Papier- oder Leinenstruktur. Bleibt dasselbe Blatt (BoardSheet / PlanSheet) wie auf dem Bildschirm, nur mit einer Schmuck-Ebene drumherum, die die Vorschau auch zeigt. Die Kartenbilder werden dafür in höherer Auflösung gebraucht (heute mindestens 600 px; bei 30 × 40 ist eine Karte etwa 7 cm, also gut 800 px bei 300 dpi) – sie kommen mit in die Warteschlange.",
+      why: "Ein Poster hängt monatelang an der Wand und wird angesehen wie ein Bild. Fotodruck zeigt Verläufe, Strukturen und feine Linien, die auf A4 aus dem Tintendrucker verschwimmen oder Tinte kosten.",
+      effort: "L",
+      done: true,
+      partial:
+        "Gebaut (25. November 2026): eine Schmuck-Ebene um dasselbe Blatt (`posterDecor.tsx`): Rahmen aus Ranken, Wimpeln oder Wolken, die Überschrift auf einem Band, die Blätter mit weichem Schatten, Bilder wie aufgeklebt und eine feine Papierstruktur; bis die gemalten Hintergründe je Farbthema da sind (fünf Bilder `poster-<thema>` in der Bilder-Warteschlange), trägt ein weicher Verlauf des Themas. „Ohne (wie auf A4)“ bleibt wählbar. Bewusst weggelassen: Tapsi und die Fuchs- und Bärenkinder am Rand – Maskottchen nur, wo sie etwas tun, nie als Schmuck (CLAUDE.md). Die Kartenbilder (768 px) reichen bei 30 × 40 für gut 270 dpi; wo ein Bild zu klein wird, warnt T-37.",
+    },
+    {
+      id: "T-34",
+      emoji: "🖊️",
+      title: "Das feste Poster benutzen: Rahmen und abwischbarer Stift",
+      text: "Für das Poster ohne lose Karten eine Anleitung, wie die Sterne draufkommen: im Bilderrahmen mit Acrylglas (bruchsicher, gleiche Größe wie das Poster) mit einem Whiteboard-Stift auf dem Glas abhaken und jeden Montag abwischen; oder Sticker direkt auf das matte Fotopapier; oder kleine Magnete, wenn das Poster an einer Magnetwand hängt. Im Plan zeigt eine Wäscheklammer oder ein Magnet am Rahmen auf die Karte, die dran ist. Die Tafel druckt dann leere Felder, die groß genug für einen Stern mit dem Stift sind.",
+      why: "Ohne diese Antwort fragen Eltern sich, wie man ein festes Poster jede Woche neu benutzt. Rahmen mit Acrylglas machen es abwischbar und kindersicher, ganz ohne Klett und kleine Teile.",
+      effort: "S",
+      done: true,
+      partial:
+        "Gebaut (25. November 2026): die Poster-Anleitung sagt, wie das feste Poster jede Woche neu benutzt wird – im Bilderrahmen mit Acrylglas mit einem Whiteboard-Stift abhaken und abwischen, ohne Rahmen Sticker direkt auf das matte Papier; beim Plan zeigt eine Wäscheklammer am Rahmen, was dran ist. Die festen Blätter drucken ihre Felder so groß wie auf A4. Bewusst weggelassen: kleine Magnete – sie sind für Kinder unter drei eine Verschluckungsgefahr (Recherche „belohnungstafel“).",
+    },
+    {
+      id: "T-35",
+      emoji: "↔️",
+      title: "Panorama-Poster für den Tagesplan in einer Reihe",
+      text: "Der Tagesplan in einer langen Reihe von Karten als Panorama 30 × 90 cm (1772 × 5315 px bei 150 dpi, 9,4 MP): über dem Bett, im Flur oder an der Garderobe auf Kinderhöhe. „Früh & Abend“ als zwei Reihen übereinander auf 40 × 120 cm, oder zwei Panoramen. Das Format nur anbieten, wenn der Plan „Ganzer Tag“ mit 5 bis 10 Karten ist.",
+      why: "Ein Tagesplan liest sich von links nach rechts wie ein Weg – das Panorama ist seine natürliche Form, und Fotodienste bieten es zum gleichen Papier an.",
+      effort: "S",
+      done: true,
+      partial:
+        "Gebaut (25. November 2026): ein Tagesplan „Jetzt – Dann“ mit fünf bis zehn Karten in einer Reihe bekommt das Panorama 30 × 90 cm (150 dpi), „Früh & Abend“ mit zwei Reihen 40 × 120 cm (120 dpi), immer quer (`posterFormatsFor`, `poster.test.ts`).",
+    },
+    {
+      id: "T-36",
+      emoji: "⏳",
+      title: "Quadratisches Poster für Countdown und Sammel-Weg",
+      text: "„Wie oft noch schlafen?“ und der Weg zur Belohnung als Quadrat 30 × 30 cm (2126 × 2126 px bei 180 dpi): der Weg schlängelt sich über das ganze Bild zum großen Tag oder zur Belohnung in der Mitte oder Ecke.",
+      why: "Ein Weg und ein Countdown haben keine Zeilen und Spalten – im Quadrat bleibt kein leerer Streifen, wie ihn ein schmaler Weg auf einem Hochformat lässt.",
+      effort: "S",
+      done: true,
+      partial:
+        "Gebaut (25. November 2026): der Countdown und eine Sammel-Tafel bekommen zusätzlich das Quadrat 30 × 30 cm (180 dpi); der Weg verteilt sich dort wie auf dem Bildschirm (`snakeLayout`), ohne eigenes Layout.",
+    },
+    {
+      id: "T-37",
+      emoji: "🔍",
+      title: "Schärfe prüfen, bevor bestellt wird",
+      text: "Die Vorschau warnt, wenn ein eigenes Bild (das Foto des Kindes T-30, ein Aufgabenfoto T-13) für das gewählte Posterformat zu klein ist („Das Foto wird bei 40 × 60 cm unscharf – 30 × 40 cm passt“), und schlägt das größte Format vor, in dem alles scharf bleibt. Zeigt außerdem den 5-mm-Rand, der beim Belichten wegfällt, als gestrichelte Linie.",
+      why: "Ein unscharfes Poster merkt man erst nach Lieferung und Bezahlung. Fotodienste warnen nur grob nach Megapixeln des ganzen Bildes, nicht nach einem kleinen Foto darin.",
+      effort: "S",
+      done: true,
+      partial:
+        "Gebaut (25. November 2026): beim Zeichnen werden alle Bilder auf dem Blatt gemessen (Pixel gegen gedruckte Breite); liegt eines unter 100 dpi, sagt die Vorschau, welches (das Foto des Kindes beim Namen) und nennt das größte Format derselben Form, in dem alles scharf bleibt – oder bittet um ein größeres Foto (`blurriest`, `largestSharp`). Der 5-mm-Rand ist in der Vorschau gestrichelt. Noch nicht mit einem echten kleinen Foto im Browser angesehen.",
+    },
+    {
+      id: "T-38",
+      emoji: "🛋️",
+      title: "Vorschau an der Wand: wie groß ist 30 × 40?",
+      text: "Neben den Formaten ein kleines gezeichnetes Kinderzimmer (Tür, Kinderbett, ein Kind von etwa 90 cm, Fuchs- oder Bärenkind nach „Junge / Mädchen“) mit dem Poster in echter Größe daran; ein Tipp auf ein Format lässt es dort wachsen oder schrumpfen.",
+      why: "Zentimeter allein sagen wenig. Ob der Plan auf Augenhöhe des Kindes an die Tür passt oder über die halbe Wand geht, sieht man erst im Vergleich.",
+      effort: "S",
+      done: true,
+      partial:
+        "Gebaut (25. November 2026): neben den Formaten ein gezeichnetes Kinderzimmer (Tür, Bett, ein Kind von etwa 90 cm nach „Junge / Mädchen“) mit dem Poster in echter Größe an der Wand; ein anderes Format ändert seine Größe dort.",
+    },
+    {
+      id: "T-39",
+      emoji: "🧩",
+      title: "Plan und Tafel zusammen auf einem Poster",
+      text: "Ein Poster 40 × 60 cm, oben der Tagesplan mit seinen Bildkarten, unten die Wochentafel mit den Sternen dazu (z. B. Abendroutine oben, „7 Abende im eigenen Bett“ unten), mit einem gemeinsamen Titel und dem Foto des Kindes.",
+      why: "Eltern nutzen beides oft für dasselbe Ziel; ein Bild an der Wand ist ordentlicher als zwei Zettel, und das große Format hat Platz dafür.",
+      effort: "M",
+      done: true,
+      partial:
+        "Gebaut (25. November 2026): auf 40 × 60 cm wählt „Auf dasselbe Poster“ eine zweite Tafel oder einen Plan; das Poster steht dann hoch, der Plan oben, die Tafel darunter, jedes Blatt so, wie es auf dem Bildschirm aussieht (das Foto des Kindes kommt mit seinem Blatt). Bei den anderen Größen sagt eine Zeile, dass beides auf 40 × 60 passt. Bewusst weggelassen: ein gemeinsamer Titel – jedes Blatt behält seine eigene Überschrift, statt dass ein Poster-Layout eigens dafür entsteht.",
+    },
+    {
+      id: "T-40",
+      emoji: "🎄",
+      title: "Jahreszeiten-Schmuck für das Poster",
+      text: "Für den Poster-Look (T-33) Rahmen zur Jahreszeit oder zum Anlass: Herbstlaub, Schnee und Lichterkette im Advent, Ostereier, Geburtstagsgirlande. Einmal im Monat neu bestellt, wird die Monatstafel so zu einem Kalenderblatt, das man nach dem Monat aufheben kann.",
+      why: "Eine Monatstafel als Poster ist ein Andenken an das, was das Kind geschafft hat – mit dem Schmuck des Monats erkennt man es später wieder.",
+      effort: "M",
+      done: true,
+      partial:
+        "Gebaut (25. November 2026): zu den Rahmen fürs ganze Jahr Ostern, Geburtstag, Herbst und Advent (Lichterkette, Schnee); voreingestellt ist der Rahmen der Jahreszeit (`seasonalDecor`: Ostern im März und April, Herbst von September bis November, Advent im Dezember, sonst Ranken).",
     },
   ],
 };

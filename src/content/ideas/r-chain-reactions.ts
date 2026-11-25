@@ -128,6 +128,7 @@ export const chainReactionIdeas: IdeaArea = {
       text: "Eine kurze Maschine mit drei Lücken. Antippen einer Lücke wechselt reihum das Teil: Domino, Rampe, Feder. Jede Mischung funktioniert, und die Kette klingt jedes Mal anders.",
       why: "Erstes Bauen wie bei der Kugelbahn (X-08), jetzt für die Maschinen.",
       effort: "L",
+      rejected: true,
     },
     {
       id: "R-15",
@@ -136,6 +137,7 @@ export const chainReactionIdeas: IdeaArea = {
       text: "Zu jeder Maschine zeigt der Eltern-Startbildschirm eine kleine Version zum Nachbauen mit Dingen aus dem Haus: Bücher als Dominos, Klopapierrolle als Rampe, eine Murmel, ein Topf als Gong.",
       why: "Vom Bildschirm in die echte Welt; gemeinsames Bauen mit den Eltern.",
       effort: "S",
+      rejected: true,
     },
     {
       id: "R-16",
@@ -144,6 +146,7 @@ export const chainReactionIdeas: IdeaArea = {
       text: "Dieselbe Idee zu besonderen Zeiten: im Winter ein Schneeball, der beim Rollen wächst und unten ein Schneemann wird; im Herbst Kastanien und Blätterhaufen; zum Geburtstag gehen am Ende die Kerzen an und ein Geschenk springt auf.",
       why: "Neuer Reiz zu besonderen Tagen, mit wenig neuer Logik.",
       effort: "M",
+      rejected: true,
     },
   ],
 };

@@ -1,14 +1,11 @@
 import type { OwnTime } from "./time";
 
 /**
- * What runs down while the child watches: a train going to the station, an apple tree harvested into a cart, an hourglass, a
- * caterpillar eating a leaf, a flower growing (H-53), a candle, the sunrise (H-54), a red disc, a pizza eaten slice by slice (H-47), a children's
+ * What runs down while the child watches: an apple tree harvested into a cart, an hourglass, a caterpillar eating a leaf, a flower growing (H-53), a candle, the sunrise (H-54), a red disc, a pizza eaten slice by slice (H-47), a children's
  * digital alarm clock counting down (H-70), a jar filling with marbles from a pegboard (H-149) – or „Abwechseln“ (H-52),
- * two to four children taking turns, turn after turn, at an hourglass, on a seesaw (H-109), a marble run (H-117) or a
- * race track.
+ * two to four children taking turns, turn after turn, at an hourglass, on a marble run (H-117) or a race track.
  */
 export type TimerPicture =
-  | "train"
   | "apple"
   | "sand"
   | "caterpillar"
@@ -19,7 +16,6 @@ export type TimerPicture =
   | "pizza"
   | "clock"
   | "tidy"
-  | "boxes"
   | "blocks"
   | "tunnel"
   | "jump"
@@ -27,11 +23,11 @@ export type TimerPicture =
   | TurnPicture;
 
 /**
- * The pictures of taking turns, which run on without end: the hourglass between the children's cushions, the seesaw
- * (H-109; Tennis, H-71, was taken out), the Kugelbahn, whose marble rolls into the next child's cup (H-117), and the
+ * The pictures of taking turns, which run on without end: the hourglass between the children's cushions (Tennis,
+ * H-71, and the Wippe, H-109, were taken out), the Kugelbahn, whose marble rolls down its run once each turn (H-117), and the
  * Rennstrecke, a lap of a race track for each child's turn.
  */
-export type TurnPicture = "swap" | "seesaw" | "marblerun" | "race";
+export type TurnPicture = "swap" | "marblerun" | "race";
 
 /** How many children take turns in every picture of taking turns (H-115; all of them since 25 November 2026), chosen behind ⚙️. */
 export type TurnCount = 2 | 3 | 4;

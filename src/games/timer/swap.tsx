@@ -2,7 +2,7 @@ import { memo, useId, useState, type CSSProperties } from "react";
 import { MASCOT_COLORS } from "@/components/Mascot";
 import { useRunClock } from "./pause";
 import { PlayerPatch } from "./players";
-import { HOURGLASS_BOX, Hourglass, Layer, SAND_FLOOR, STAGE_H, STAGE_W } from "./scenes";
+import { Bleed, HOURGLASS_BOX, Hourglass, Layer, SAND_FLOOR, STAGE_H, STAGE_W } from "./scenes";
 import type { PlayerLook, Players, TurnChild, TurnCount } from "./settings";
 
 export type { TurnChild } from "./settings";
@@ -20,7 +20,7 @@ export type { TurnChild } from "./settings";
 
 const INK = "#3b2a20";
 
-/** The fox's or the bear's side, where a picture has only two (the Wippe's seats, the Rennstrecke's first two). */
+/** The fox's or the bear's side, where a picture has only two (the Rennstrecke's first two). */
 export type Holder = "fox" | "bear";
 
 /** Every child that can take turns, in their order; two to four of them play, from the first. */
@@ -145,7 +145,7 @@ const CUSHION_FOOT = 20;
 /**
  * A child's floor cushion, round and soft, in its colours with its animal's ears sewn on – no face, so it stays a
  * cushion and never a drawn animal standing by – and its photo or name on its front. Drawn into an svg, its bottom's
- * middle at (`x`, `y`), `w` wide: the Wippe puts it on its seats.
+ * middle at (`x`, `y`), `w` wide (the card's drawing).
  */
 export function Cushion({ kind, x, y, w, look }: { kind: TurnChild; x: number; y: number; w: number; look?: PlayerLook }) {
   return (
@@ -177,13 +177,15 @@ export const SwapBackdrop = memo(function SwapBackdrop({ kids }: { kids: readonl
   return (
     <Layer x={0} y={0} w={STAGE_W} h={STAGE_H} className="tm-back">
       <svg viewBox={`0 0 ${STAGE_W} ${STAGE_H}`} preserveAspectRatio="none">
-        <rect width={STAGE_W} height={STAGE_H} fill="#e6f4ea" />
-        <rect y={SWAP_FLOOR - 16} width={STAGE_W} height={STAGE_H} fill="#d9a066" />
-        <path d={`M0 ${SWAP_FLOOR - 16} H${STAGE_W}`} stroke="#a8743f" strokeWidth="6" />
-        <ellipse cx="800" cy={SWAP_FLOOR + 10} rx="640" ry="44" fill="#91a7ff" opacity="0.6" />
-        {kids.map((kind, i) => (
-          <Lamp key={kind} kind={kind} x={xs[i]} w={lampW(w)} />
-        ))}
+        <Bleed>
+          <rect width={STAGE_W} height={STAGE_H} fill="#e6f4ea" />
+          <rect y={SWAP_FLOOR - 16} width={STAGE_W} height={STAGE_H} fill="#d9a066" />
+          <path d={`M0 ${SWAP_FLOOR - 16} H${STAGE_W}`} stroke="#a8743f" strokeWidth="6" />
+          <ellipse cx="800" cy={SWAP_FLOOR + 10} rx="640" ry="44" fill="#91a7ff" opacity="0.6" />
+          {kids.map((kind, i) => (
+            <Lamp key={kind} kind={kind} x={xs[i]} w={lampW(w)} />
+          ))}
+        </Bleed>
       </svg>
     </Layer>
   );
@@ -290,7 +292,7 @@ export function SwapShades({ count, lit }: { count: TurnCount; lit: readonly boo
   );
 }
 
-/** The soft shade over one strip of the room, from `from` to `to`: the Wippe shades its halves with it too. */
+/** The soft shade over one strip of the room, from `from` to `to`. */
 export function SwapShade({ from, to, on }: { from: number; to: number; on: boolean }) {
   return <Layer x={from} y={0} w={to - from} h={STAGE_H} className={`tm-swap-shade${on ? " tm-on" : ""}`} />;
 }

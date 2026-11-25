@@ -25,6 +25,7 @@ import {
   shelfSpot,
   slotBoard,
   SLOTS,
+  SONG_HANDOVER,
   SWITCH,
   TRACK_H,
   TRACK_W,
@@ -152,13 +153,14 @@ test("the barrier stands on row 2 with room for a long row of waiting marbles be
 // Each world ends in a stretch of its own (`trackStretches.ts`): the same checks for every one of them.
 
 /** Seconds a marble takes along `routes`, rolling as `TrackLevel` rolls it. */
-function seconds(rs: Route[]) {
+function seconds(rs: Route[], until?: (r: Route, s: number) => boolean) {
   const dt = 1 / 120;
   let t = 0;
   let v = 0;
   for (const r of rs) {
     let s = 0;
     while (s < r.total) {
+      if (until?.(r, s)) return t;
       const zone = r.zones.find((z) => s >= z.s0 && s < z.s1);
       v = zone?.speed ?? rolled(v, pointAt(r, s).slope, dt);
       s += v * dt;
@@ -215,12 +217,16 @@ describe.each(Object.entries(STRETCHES))("the %s stretch", (name, stretch) => {
   });
 
   test("a round with things let out promptly takes about a minute", () => {
-    // Six things, one let out every two seconds and the barrier opened at once: the first waits at the barrier, the
-    // last comes about ten seconds later and rolls on down. The right way of the switch is the shorter one.
+    // Six things, each let out two seconds after the one before but not before that one has played its line of the
+    // song on row 1 (K-11): the last comes five such gaps later and rolls on down. The right way of the switch is the
+    // shorter one.
     const seq = built.sections.map((sec) =>
       sec.kind === "fixed" ? sec.route : sec.kind === "spot" ? built.pieces[sec.spot][DEFAULT_BUILD[sec.spot]] : built.ways.right,
     );
-    const round = 10 + seconds(seq.slice(0, built.gate.section)) + 1.1 + seconds(seq.slice(built.gate.section)) + 0.8;
+    const handover = (r: Route, s: number) => r.events.some((e) => e.event.kind === "note" && e.event.bar === SONG_HANDOVER && e.s <= s);
+    const gap = Math.max(2, 0.38 + seconds(seq, handover));
+    expect(gap, name).toBeLessThan(3.2);
+    const round = (BASKET_FULL - 1) * gap + seconds(seq.slice(0, built.gate.section)) + 1.1 + seconds(seq.slice(built.gate.section)) + 0.8;
     expect(round, name).toBeGreaterThan(55);
     expect(round, name).toBeLessThan(65);
   });

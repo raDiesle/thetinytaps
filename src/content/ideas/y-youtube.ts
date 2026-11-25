@@ -67,6 +67,9 @@ export const youtubeIdeas: IdeaArea = {
       text: "Das ganze Zähneputzen als Video zum Mitputzen, rund 2 Minuten: das Zahnputzlied singt die Schritte, das Kind im Spiegel putzt oben, unten, vorn, hinten, die kleinen Monster verschwinden, am Ende das lachende Gesicht mit strahlenden Zähnen. Als Junge und als Mädchen je eine Fassung. Das Lied gibt es schon in mehreren Sprachen, also auch das Video. Kapitelmarken in der Beschreibung für jeden Schritt.",
       why: "„Zähne putzen Video für Kinder“ und „Zahnputzlied“ werden auf YouTube sehr viel gesucht, und das Video hilft wirklich: Das Kind putzt beim Zuschauen mit.",
       effort: "M",
+      done: true,
+      partial:
+        "Gebaut am 21. November 2026 als `/management/video-zaehne/` (`TeethVideo.tsx` im geteilten `VideoRecorder`, Y-25): die ganze Routine einmal – Geschichte mit den Süßigkeiten, Waschbecken, die sieben gesungenen Schritte, das Ende – auf der 16 : 9-Bühne, nur das Bild, nichts gezählt. Sprache und Kind (Junge oder Mädchen) folgen dem Regal, Morgen oder Abend wählt man auf der Seite; wo es das Lied in einer Sprache nicht gibt, sagt die Seite, welches singt. Untertitel kommen von selbst (Y-26). Offen sind nur die Kapitelmarken der Schritte (Y-32).",
     },
     {
       id: "Y-07",
@@ -75,6 +78,9 @@ export const youtubeIdeas: IdeaArea = {
       text: "Der Gang aufs Töpfchen als Video, wie im Spiel: Hose runter, hinsetzen, das Warte-Lied, Spülen, Händewaschen, die kleine Feier am Ende. Gedacht für den Moment, in dem das Kind gerade muss oder sich nicht traut, also kurz (1–2 Minuten) und mit einer langen Warte-Fassung (5 Minuten Warte-Lied zum Sitzenbleiben).",
       why: "„Töpfchen Video“ und „potty training video for toddlers“ sind starke Suchen, und die lange Fassung löst ein echtes Problem: sitzen bleiben, bis es klappt.",
       effort: "M",
+      done: true,
+      partial:
+        "Gebaut als `/management/video-toepfchen/` mit Y-21 bis Y-24: die ganze Geschichte (Pipi, Kaka oder beides), Sitzen über 1, 2 oder 3 Durchläufe des Warte-Lieds (etwa 2, 4 oder 6 Minuten, die lange Warte-Fassung), „Nur Sitzen“ als Töpfchen-Lied und „Heute kommt nichts – macht nichts!“, mit Kapitelmarken und Untertiteln. Eine kurze Fassung von 1–2 Minuten, die nach dem ersten Refrain endet, ist Y-30.",
     },
     {
       id: "Y-08",
@@ -115,6 +121,9 @@ export const youtubeIdeas: IdeaArea = {
       text: "Ein Werkzeug wie `bun run perf` und `bun run previews`: Es spielt ein Spiel nach einem festen Ablauf in Headless Chrome durch (Tippen, Warten, nächster Schritt), in 1920×1080 bei 60 Bildern pro Sekunde, und nimmt Bild für Bild auf. Ein Aufnahme-Modus blendet aus, was nicht ins Video gehört (DevTag, ✕, Vollbild-Zettel, ⚙️, Mauszeiger). Der Ablauf eines Videos steht als Datei im Repo, so lässt sich jedes Video nach einer Änderung am Spiel und in jeder Sprache neu erzeugen.",
       why: "Ohne Werkzeug ist jedes Video Handarbeit und nach der nächsten Änderung am Spiel veraltet; mit ihm kostet ein neues Video und jede Sprache nur einen Befehl.",
       effort: "L",
+      done: true,
+      partial:
+        "Anders gebaut als gedacht: `bun run video intro` und `bun run video outro` (`tools/video.ts`) zeigen in Headless Chrome jedes Bild zu seiner genauen Sekunde und machen ein MP4 in 1920 × 1080 bei 60 Bildern – nie ein verlorenes Bild, in jeder Sprache mit `--sprache`. Die Spiele selbst laufen in Echtzeit (CSS-Animationen, Lieder) und werden daher mit dem geteilten `VideoRecorder` (Y-25) als Tab in Chrome aufgenommen: Jede Video-Seite unter /management/ spielt ihren festen Ablauf und blendet alles aus, was nicht ins Bild gehört; ein Video in einer anderen Sprache ist 🌐 umstellen und noch einmal aufnehmen. Was fehlt – dass die Spiel-Videos ohne Hand in Headless Chrome entstehen –, ist Y-37.",
     },
     {
       id: "Y-13",
@@ -123,6 +132,9 @@ export const youtubeIdeas: IdeaArea = {
       text: "In der Vorschau ist alles stumm (`silent.ts`), und nie darf beim Testen ein Ton auf dem Gerät erklingen. Das Werkzeug aus Y-12 schreibt deshalb mit, welche Aufnahme, welches Lied und welches Geräusch wann beginnt (alle laufen schon durch `core.ts` und `speak()`), und mischt die Tonspur danach aus den Dateien zusammen (ffmpeg), statt Lautsprecher mitzuschneiden. Synthetisierte Geräusche rendert es mit einem `OfflineAudioContext` in eine Datei. Gleich laut wie in der App (`songGain`, `EFFECTS_GAIN`, Limiter), auf −14 LUFS für YouTube.",
       why: "Saubere Tonspur ohne Raumhall und ohne dass je etwas laut spielt – und dieselbe Mischung in jeder Sprache.",
       effort: "L",
+      done: true,
+      partial:
+        "Für Intro und Abspann gebaut: Ihr Ton liegt als Zeitplan vor (`src/video/sound.ts`, `introSound.ts`), spielt in der Vorschau stumm durch den einen `AudioContext` und wird für `bun run video` mit einem `OfflineAudioContext` in eine Datei gerendert – es erklingt nichts. Die Spiel-Videos nehmen den Ton des Tabs auf (Chrome „Tab-Audio teilen“), also nur, wenn ein Erwachsener die Aufnahme selbst startet, nie während Claude testet. Die Tonspur der Spiel-Videos aus den Dateien zu mischen und auf −14 LUFS zu bringen, gehört zu Y-37.",
     },
     {
       id: "Y-14",
@@ -131,6 +143,9 @@ export const youtubeIdeas: IdeaArea = {
       text: "Intro (Y-01, Y-02) und Abspann (Y-04, Y-05) als Remotion-Komposition in React, aus denselben Bildern und Zeichnungen wie die App (Regal, Bücher, `Logo`, `Mascot`), mit den Aufnahmen aus Y-12 dazwischen. Text und Stimme je Sprache als Eingabe, so entsteht jede Fassung von selbst. Remotion und seinen Browser in einem eigenen Ordner mit eigenen Paketen halten, damit die App schlank bleibt und `bunfig.toml`s Regeln (keine Install-Skripte, keine Pakete im Vorbeigehen) gelten.",
       why: "Ein Intro, das wirklich überall gleich aussieht, ohne Videoschnitt-Programm – und neue Spiele im Abspann kommen von selbst dazu.",
       effort: "L",
+      done: true,
+      partial:
+        "Ohne Remotion gebaut (22. November 2026): Intro (`src/video/intro/`) und Abspann (`src/video/outro/`) sind Seiten der App aus ihren eigenen Teilen (Regal, Bücher, `Logo`, die Bilder der Spiele), und `bun run video` rendert sie Bild für Bild (Y-12) – kein zweites Paket mit eigenem Browser, `bunfig.toml`s Regeln bleiben unberührt. Der Abspann ist in jedem Video derselbe, einmal je Sprache gerendert (Y-04, Y-05); neue Spiele kommen über die Bilder der Menüs von selbst hinein.",
     },
     {
       id: "Y-15",
@@ -334,6 +349,14 @@ export const youtubeIdeas: IdeaArea = {
       text: "Die Mitsing-Helfer (H-134 bis H-138) als eigene Reihe auf dem Kanal: die Countdown-Timer mit Lied in jeder Länge und unter jedem Timer-Bild („5 Minute Timer with Music – Clean Up with Tapsi“), Hände waschen als Video und als Short, Aufräumen, Anziehen und der ruhige Gute-Nacht-Ablauf. Aufgenommen im geteilten `VideoRecorder` wie Zähne putzen und Aufs Töpfchen, so entsteht jedes Video samt Sprache und Länge ohne Schnitt, und das Vorschaubild ist ein gemaltes Bild aus dem Helfer selbst (H-141) mit den Wörtern der Reihe darauf (fester Aufbau aus Y-16) – ohne ein weiteres Gemini-Bild zu bezahlen.",
       why: "Jedes Lied wird so mehrfach zum Video: Sieben Countdown-Lieder unter zwanzig Timer-Bildern in fünf Längen sind Hunderte mögliche Videos, von denen man die besten auswählt. Qualität statt Masse heißt dabei: wenige hochladen, die gut aussehen, und die Titel nach dem, was Eltern suchen (Länge und Zweck, Recherche „youtube-suchen“).",
       effort: "M",
+    },
+    {
+      id: "Y-37",
+      emoji: "🤖",
+      title: "Spiel-Videos ohne Hand: Headless aufnehmen, Ton aus den Dateien mischen",
+      text: "Was von Y-12 und Y-13 übrig ist: Die Video-Seiten der Spiele (Zähne putzen, Aufs Töpfchen, Hände waschen) laufen bisher nur, wenn ein Erwachsener in Chrome auf Aufnehmen drückt und den Tab teilt – je Sprache, Kind und Länge einmal. `bun run video zaehne --sprache es --kind maedchen` soll sie wie Intro und Abspann in Headless Chrome Bild für Bild machen: die Seite bekommt eine eigene Uhr (`?render`, wie `src/video/frames.tsx`), an der Animationen, Ablauf und Lied hängen, und schreibt mit, welche Aufnahme, welches Lied und welches Geräusch wann beginnt; das Werkzeug mischt die Tonspur danach aus den Dateien (ffmpeg, `OfflineAudioContext` für die synthetisierten), gleich laut wie in der App und auf −14 LUFS für YouTube. Erst lohnend, wenn viele Fassungen gebraucht werden (Y-17, Y-36).",
+      why: "Sieben Sprachen mal Junge und Mädchen mal Längen sind Dutzende Aufnahmen von Hand; mit dem Werkzeug ist jede ein Befehl, nach jeder Änderung am Spiel neu und ohne verlorenes Bild.",
+      effort: "L",
     },
   ],
 };

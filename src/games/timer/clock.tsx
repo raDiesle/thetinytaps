@@ -195,7 +195,7 @@ function Part({
 const ClockBackdrop = memo(function ClockBackdrop() {
   return (
     <Layer x={0} y={0} w={STAGE_W} h={STAGE_H} className="tm-back">
-      <Draw w={STAGE_W} h={STAGE_H}>
+      <Draw w={STAGE_W} h={STAGE_H} bleed>
         <rect width={STAGE_W} height={STAGE_H} fill="#dcecff" />
         {[
           [180, 160],

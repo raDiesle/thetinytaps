@@ -175,6 +175,13 @@ export function PrivacyPage() {
           (Service Worker).
         </p>
         <p>
+          Wenn Sie ein Foto Ihres Kindes auf die Belohnungstafel oder den Tagesplan legen, oder ein eigenes Foto als Bild einer Aufgabe oder Karte (etwa vom
+          Töpfchen oder der Zahnbürste), wird es schon im Browser verkleinert und neu gespeichert, wobei Angaben wie Aufnahmeort und Kamera aus der Datei
+          fallen, und dann nur in der Datenbank Ihres Browsers auf diesem Gerät abgelegt (IndexedDB). Das Foto wird nie gesendet – nicht an uns, nicht an die
+          Statistik und an niemanden sonst. Es wird gelöscht, wenn Sie es auf der Tafel wegnehmen (🗑️ oder „Ohne Foto“), die Karte tauschen oder die Tafel
+          löschen.
+        </p>
+        <p>
           Das alles bleibt auf Ihrem Gerät und wird nicht an uns oder andere übertragen. Sie können es jederzeit löschen, indem Sie in Ihrem Browser die
           Website-Daten von www.funforboth.com löschen. Rechtsgrundlage ist § 25 Abs. 2 Nr. 2 TDDDG: Das Speichern ist nötig, damit die Spiele so funktionieren,
           wie Sie es gewählt haben.

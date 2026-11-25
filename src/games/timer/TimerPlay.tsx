@@ -6,7 +6,7 @@ import { PlayOptions } from "@/components/PlayOptions";
 import { SettingsGroup } from "@/components/SettingControls";
 import { DEV } from "@/lib/buildInfo";
 import { type Texts, useAppLanguage, useT } from "@/lib/language";
-import { playBlow, playMunch, playWhistle } from "@/lib/realSounds";
+import { playBlow, playMunch } from "@/lib/realSounds";
 import {
   loadRecordings,
   playBeeps,
@@ -18,7 +18,6 @@ import {
   playClonk,
   playDing,
   playDrops,
-  playHop,
   playCrack,
   playKnock,
   playLeaves,
@@ -40,21 +39,20 @@ import { useTimers } from "@/lib/timers";
 import { useWakeLock } from "@/lib/wakeLock";
 import { AppleScene } from "./apples";
 import { BlocksScene, blocksPlan, MAX_BLOCKS } from "./blocks";
-import { BoxesScene, boxesPlan, PER_BOX } from "./boxes";
 import { MAX_DIG, TunnelScene, tunnelPlan } from "./tunnel";
 import { JumpScene, jumpPlan, MAX_MOVES } from "./jump";
 import { JarScene, jarPlan, MAX_MARBLES } from "./jar";
-import { FINAL_NOTES, FinalLight, finalMs, TimeBar, TimeBarChoice } from "./bar";
+import { FINAL_NOTES, FinalLight, finalMs, TimeBar, TimeBarChoice, TimeUp } from "./bar";
 import { CaterpillarScene } from "./caterpillar";
 import { ClockScene } from "./clock";
 import { isTurns, nextPicture, OTHER_TIME, PICTURES, tomorrowAt } from "./content";
 import { TimerCardArt } from "./cardArt";
 import { DiscScene } from "./disc";
 import { FlowerScene } from "./flower";
-import { appleTimes, haltMs, ladybugLaps, MAX_APPLES, pieceMoments, soonMs, TRAIN_PIECES, trainSteps } from "./pieces";
+import { appleTimes, ladybugLaps, MAX_APPLES, pieceMoments, soonMs } from "./pieces";
 import { PauseControls, RunClockProvider, usePausableClock, useRunClock } from "./pause";
 import { PizzaScene, SLICES } from "./pizza";
-import { CandleBackdrop, candlePlan, Candles, Hourglass, Layer, RAIL_Y, RailAhead, SandBackdrop, TRAIN, Train, TrainBackdrop, TrainStops } from "./scenes";
+import { CandleBackdrop, candlePlan, Candles, Hourglass, SandBackdrop } from "./scenes";
 import type { Players, TimeShown, TimerPicture, TimerSettings, TurnCount } from "./settings";
 import { noteRoom, TimeShownChoice, TimeShownNote } from "./shown";
 import { SunsetScene } from "./sunset";
@@ -95,9 +93,9 @@ function planMs(settings: TimerSettings, dev = devMs()): number | "past" {
 type Phase = "running" | "blow" | "done";
 
 /**
- * The timer: one picture runs down for the minutes a grown-up set, with no numbers for the child – the train rolls to
- * the station, the sand runs through the hourglass, the candle burns down. Every tap or key gets an answer (steam and
- * a whistle, twinkling, the flame flaring). At the end a friendly tune, then „Nochmal“ and
+ * The timer: one picture runs down for the minutes a grown-up set, with no numbers for the child – the red disc
+ * shrinks, the sand runs through the hourglass, the candle burns down. Every tap or key gets an answer (twinkling, the
+ * flame flaring, a munch). At the end a friendly tune, then „Nochmal“ and
  * „Weiter“ (the next picture, the same minutes).
  */
 export function TimerPlay({
@@ -346,13 +344,12 @@ function TimerRun({
   }, [lines, language, say]);
   useEffect(() => hush, []);
 
-  // Piece by piece (H-45): many apples landing in the cart, the train's stops on the track – each with its plop or its bell.
+  // Piece by piece (H-45): many apples landing in the cart, the pizza's slices – each with its plop or its munch.
   const moments = useMemo(() => {
     if (picture === "apple")
       return appleTimes(total, MAX_APPLES)
         .harvest.slice(0, -1)
         .map((h) => h.land);
-    if (picture === "train") return pieceMoments(total, TRAIN_PIECES, haltMs(total, TRAIN_PIECES));
     if (picture === "pizza") return pieceMoments(total, SLICES);
     // A candle burnt down lights the fuse to the next one, which fizzes as the spark runs.
     if (picture === "candle")
@@ -364,8 +361,6 @@ function TimerRun({
       return tidyTimes(total, MAX_TOYS)
         .slice(0, -1)
         .map((t) => t.land);
-    // Five Boxes (H-120): each toy landing in its box, and each lid shutting but the last, whose shutting is the end.
-    if (picture === "boxes") return boxMoments(total, PER_BOX).map((m) => m.at);
     // The block house (H-125): each block landing on its place, the last one being the end's.
     if (picture === "blocks")
       return blocksPlan(total, MAX_BLOCKS)
@@ -433,7 +428,6 @@ function TimerRun({
           if (picture === "apple") playPlop();
           else if (picture === "pizza") playMunch();
           else if (picture === "tidy") playClonk();
-          else if (picture === "boxes") (boxMoments(total, PER_BOX)[nextMoment.current - 1]?.lid ? playKnock : playClonk)();
           else if (picture === "blocks") playKnock(520);
           else if (picture === "tunnel") playCrack();
           else if (picture === "candle") playSizzle();
@@ -482,8 +476,7 @@ function TimerRun({
       return () => clearTimeout(timer);
     }
     if (phase === "done") {
-      if (picture === "train") playWhistle();
-      else if (picture === "apple") playPlop();
+      if (picture === "apple") playPlop();
       else if (picture === "caterpillar") playTwinkle();
       else if (picture === "sand" || picture === "disc") playChime();
       else if (picture === "flower") playTwinkle();
@@ -491,7 +484,6 @@ function TimerRun({
       else if (picture === "pizza") playYum();
       else if (picture === "clock") playBeeps();
       else if (picture === "tidy") playClonk();
-      else if (picture === "boxes") playKnock();
       else if (picture === "blocks") playChime();
       else if (picture === "tunnel") playTwinkle();
       else if (picture === "jump") playPlop();
@@ -509,8 +501,8 @@ function TimerRun({
   }, [phase, picture, say, lines]);
 
   /**
-   * A tap or a key: steam and a whistle, twinkling sand, the flame flaring – and what is still left lights up softly
-   * (H-51: the rail to the station, the sand on top, the wax, the slices), so the child can look how long it still is.
+   * A tap or a key: twinkling sand, the flame flaring, a munch – and what is still left lights up softly
+   * (H-51: the sand on top, the wax, the slices), so the child can look how long it still is.
    * After the end, soft ripples where it was.
    */
   const answer = useCallback(
@@ -521,8 +513,7 @@ function TimerRun({
       }
       glow(x, y);
       setPoke((n) => n + 1);
-      if (picture === "train") playWhistle();
-      else if (picture === "sand") playTwinkle();
+      if (picture === "sand") playTwinkle();
       // The leaves rustle; once the blossoms are out, the bees buzz.
       else if (picture === "apple") (now() - (endsAt - total) < appleTimes(total, MAX_APPLES).grown ? playLeaves : playBuzz)();
       else if (picture === "caterpillar" || picture === "pizza") playMunch();
@@ -531,8 +522,6 @@ function TimerRun({
       else if (picture === "clock") playClick();
       // The crane's motor whirrs.
       else if (picture === "tidy") playWhirr();
-      // The toys still on the floor giggle with a little hop.
-      else if (picture === "boxes") playHop();
       // The little car's engine hums.
       // The blocks still in the jumble give a soft knock.
       else if (picture === "blocks") playKnock(880);
@@ -578,11 +567,12 @@ function TimerRun({
         role="img"
         aria-label={name ? t(name) : undefined}
       >
-        <div className={`tm-stage tm-${phase}${far ? " tm-far" : ""}`} style={stageStyle(picture, total)}>
+        <div className={`tm-stage tm-${phase}${far ? " tm-far" : ""}`} style={stageStyle(total)}>
           <SceneParts picture={picture} phase={phase} total={total} set={set} poke={poke} startedAt={endsAt - total} />
           {phase === "done" && <div className="tm-done-light" />}
         </div>
         {final && <FinalLight endsAt={endsAt} />}
+        {phase !== "running" && <TimeUp />}
         {bar && <TimeBar startedAt={endsAt - total} total={total} soon={soon} final={final && phase === "running"} glow={poke} done={phase !== "running"} />}
         {/* The alarm clock shows the time left on its own screen, so it needs no note in the corner; once the time is up the note stays at 0:00. */}
         <TimeShownNote shown={alarm ? "off" : shown} endsAt={endsAt} total={total} up={phase !== "running"} />
@@ -607,23 +597,9 @@ function TimerRun({
   );
 }
 
-/**
- * Five Boxes' moments with a sound, in time order: each toy landing in its box (a clonk) and each lid shutting (a knock),
- * but the last lid's, which is the end's own sound.
- */
-function boxMoments(total: number, count: number): { at: number; lid: boolean }[] {
-  const { toys, lids } = boxesPlan(total, count);
-  return [...toys.map((t) => ({ at: t.hop.land, lid: false })), ...lids.slice(0, -1).map((l) => ({ at: l.shut, lid: true }))].sort((a, b) => a.at - b.at);
-}
-
-/** The stage's lengths for the CSS: the run's, its seconds, the train's way, and the train's own keyframes when it halts. */
-export function stageStyle(picture: TimerPicture, total: number) {
-  const stepped = picture === "train";
-  return {
-    "--tm-ms": `${total}ms`,
-    "--tm-train": `${((TRAIN.stop - TRAIN.w - TRAIN.x) / TRAIN.w) * 100}%`,
-    ...(stepped && { "--tm-roll": "tm-roll-steps", "--tm-shine": "tm-shine-steps" }),
-  } as CSSProperties;
+/** The stage's lengths for the CSS: the run's. */
+export function stageStyle(total: number) {
+  return { "--tm-ms": `${total}ms` } as CSSProperties;
 }
 
 /**
@@ -651,23 +627,11 @@ export function SceneParts({
 }) {
   return (
     <>
-      {picture === "train" && (
-        <>
-          <TrainBackdrop />
-          <TrainStepKeyframes total={total} stops={TRAIN_PIECES} />
-          <TrainStops pieces={TRAIN_PIECES} />
-          <RailAhead glow={poke} />
-          <Layer x={TRAIN.x} y={RAIL_Y - TRAIN.h + 6} w={TRAIN.w} h={TRAIN.h} className="tm-train tm-move">
-            <Train puff={poke} />
-          </Layer>
-        </>
-      )}
       {picture === "apple" && <AppleScene count={MAX_APPLES} total={total} glow={poke} />}
       {picture === "caterpillar" && <CaterpillarScene glow={poke} startedAt={startedAt} total={total} done={phase === "done"} still={still} />}
       {picture === "disc" && <DiscScene glow={poke} total={total} set={set} />}
       {picture === "pizza" && <PizzaScene glow={poke} />}
       {picture === "tidy" && <TidyScene count={MAX_TOYS} total={total} glow={poke} />}
-      {picture === "boxes" && <BoxesScene count={PER_BOX} total={total} glow={poke} />}
       {picture === "blocks" && <BlocksScene count={MAX_BLOCKS} total={total} glow={poke} />}
       {picture === "tunnel" && <TunnelScene count={MAX_DIG} total={total} glow={poke} />}
       {picture === "jump" && <JumpScene count={MAX_MOVES} total={total} glow={poke} />}
@@ -688,22 +652,5 @@ export function SceneParts({
         </>
       )}
     </>
-  );
-}
-
-/**
- * The train's way stop by stop (H-45) as keyframes made for this run, since how many stops there are and when it halts
- * depends on the time set: it rolls each stretch, eases into the stop and stands there before rolling on. The rail ahead
- * shines in step with it. The stage names them in `--tm-roll` and `--tm-shine`.
- */
-function TrainStepKeyframes({ total, stops }: { total: number; stops: number }) {
-  const steps = trainSteps(total, stops, haltMs(total, stops));
-  const frames = (name: string, at: (part: number) => string) =>
-    `@keyframes ${name} {${steps.map((s) => `${(s.at * 100).toFixed(3)}% { transform: ${at(s.part)}; animation-timing-function: ease-in-out; }`).join(" ")}}`;
-  return (
-    <style>
-      {frames("tm-roll-steps", (part) => `translateX(calc(var(--tm-train) * ${part}))`)}
-      {frames("tm-shine-steps", (part) => `scaleX(${1 - part})`)}
-    </style>
   );
 }

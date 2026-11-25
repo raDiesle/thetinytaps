@@ -47,7 +47,7 @@ export function TimeBar({
   done?: boolean;
   tone?: string;
 }) {
-  // The animations start where the clock is: from the run's start (later than now while a turn's toy still hops), and
+  // The animations start where the clock is: from the run's start (later than now while a turn is still about to begin), and
   // again when the page comes back or has finished turning, since animations stand still while a page turns.
   // On the run's clock, so a pause holds it where it is and it goes on from there.
   const { now } = useRunClock();
@@ -109,6 +109,22 @@ export function FinalLight({ endsAt }: { endsAt: number }) {
   const { now } = useRunClock();
   const [ms] = useState(() => Math.max(0, endsAt - now()));
   return <div className="tm-final-light" style={{ "--tm-final-ms": `${ms}ms` } as CSSProperties} />;
+}
+
+/**
+ * The time is up, seen from across the room (user request, 25 November 2026): the whole picture turns golden – every
+ * colour changes at once, so even a glance from afar tells running from over – and a thick golden frame lights up round
+ * the screen and breathes slowly while the end is shown. Still layers – the tint by its blends, the frame breathing by
+ * `opacity` –, never a flash; the picture's own end runs on beneath them.
+ */
+export function TimeUp() {
+  return (
+    <>
+      <div className="tm-up-tint" />
+      <div className="tm-up-warm" />
+      <div className="tm-up-frame" />
+    </>
+  );
 }
 
 /** The choice behind ⚙️ while a timer runs: the bar along the bottom, or not. */

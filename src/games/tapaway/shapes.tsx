@@ -13,7 +13,7 @@ const LINE = "#5a3a2a";
 export function ShapeView({ shape, color }: { shape: ShapeKind; color: string }) {
   return (
     <svg viewBox="-50 -50 100 100" role="presentation">
-      <g fill={color} stroke={LINE} strokeWidth="4" strokeLinejoin="round">
+      <g fill={color} stroke={LINE} strokeWidth="3" strokeLinejoin="round">
         {shape === "star" && <path d="M0 -44 L12 -14 L44 -12 L19 9 L28 40 L0 22 L-28 40 L-19 9 L-44 -12 L-12 -14 Z" />}
         {shape === "heart" && (
           <path d="M0 38 C-30 18 -44 2 -44 -16 C-44 -32 -32 -42 -19 -42 C-9 -42 -3 -36 0 -28 C3 -36 9 -42 19 -42 C32 -42 44 -32 44 -16 C44 2 30 18 0 38 Z" />

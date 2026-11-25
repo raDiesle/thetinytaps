@@ -37,6 +37,7 @@ test("the Datenschutzerklärung names what the site uses", () => {
     [/geolocation\./, "Standort"],
     [/speechSynthesis/, "Sprachausgabe"],
     [/localStorage/, "Local Storage"],
+    [/indexedDB\./, "IndexedDB"],
     [/serviceWorker/, "Service Worker"],
   ];
   for (const [use, named] of uses) if (use.test(code)) expect(privacy, `${use} is used, so the Datenschutzerklärung names „${named}“`).toContain(named);
