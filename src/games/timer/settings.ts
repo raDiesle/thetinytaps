@@ -1,14 +1,11 @@
 import type { OwnTime } from "./time";
 
 /**
- * What runs down while the child watches: a train going to the station, an apple tree harvested into a cart, an hourglass, a
- * caterpillar eating a leaf, a flower growing (H-53), a candle, the sunrise (H-54), a red disc, a pizza eaten slice by slice (H-47), a children's
+ * What runs down while the child watches: an apple tree harvested into a cart, an hourglass, a caterpillar eating a leaf, a flower growing (H-53), a candle, the sunrise (H-54), a red disc, a pizza eaten slice by slice (H-47), a children's
  * digital alarm clock counting down (H-70), a jar filling with marbles from a pegboard (H-149) – or „Abwechseln“ (H-52),
- * two children taking turns with a toy, turn after turn, the same on a seesaw (H-109), or two to four children on a
- * marble run (H-117).
+ * two to four children taking turns, turn after turn, at an hourglass, on a marble run (H-117) or a race track.
  */
 export type TimerPicture =
-  | "train"
   | "apple"
   | "sand"
   | "caterpillar"
@@ -19,7 +16,6 @@ export type TimerPicture =
   | "pizza"
   | "clock"
   | "tidy"
-  | "boxes"
   | "blocks"
   | "tunnel"
   | "jump"
@@ -27,17 +23,34 @@ export type TimerPicture =
   | TurnPicture;
 
 /**
- * The pictures of taking turns, which run on without end: the toy between two cushions, the seesaw carrying it
- * (H-109; Tennis, H-71, was taken out), the Kugelbahn, whose marble rolls into the next child's cup (H-117), and the
+ * The pictures of taking turns, which run on without end: the hourglass between the children's cushions (Tennis,
+ * H-71, and the Wippe, H-109, were taken out), the Kugelbahn, whose marble rolls down its run once each turn (H-117), and the
  * Rennstrecke, a lap of a race track for each child's turn.
  */
-export type TurnPicture = "swap" | "seesaw" | "marblerun" | "race";
+export type TurnPicture = "swap" | "marblerun" | "race";
 
-/** How many children take turns on the Kugelbahn (H-115), chosen behind ⚙️. */
+/** How many children take turns in every picture of taking turns (H-115; all of them since 25 November 2026), chosen behind ⚙️. */
 export type TurnCount = 2 | 3 | 4;
 
-/** The toy the two children take turns with in „Abwechseln“, picked behind ⚙️. */
-export type SwapToy = "bobbycar" | "doll" | "ball";
+/**
+ * The children taking turns, left to right in the order of their turns: the fox's and the bear's, then a rabbit's and a
+ * frog's – each with its colours and its animal's ears on its cushion, cup, mat or helmet.
+ */
+export type TurnChild = "fox" | "bear" | "rabbit" | "frog";
+
+/**
+ * Who a child taking turns really is, set by a grown-up behind ⚙️ (user request, 25 November 2026): its name, or a
+ * photo picked on the device – kept only in this browser, made small (`photoFromFile`), never sent anywhere.
+ */
+export interface PlayerLook {
+  /** The child's name, shown on its place and in „Wer ist dran?“. */
+  name?: string;
+  /** A small square photo of the child as a data URL (JPEG), shown on its place instead of the name. */
+  photo?: string;
+}
+
+/** The children's names and photos, by their place in the turns. */
+export type Players = Partial<Record<TurnChild, PlayerLook>>;
 
 /**
  * How the time left shows in the picture's bottom right corner (user requests, November 2026): as minutes and seconds
@@ -58,10 +71,10 @@ export interface TimerSettings {
   own: OwnTime | null;
   /** Whether that own time is the one chosen, instead of `seconds`. Per visit like `seconds`, never stored. */
   useOwn: boolean;
-  /** The toy in „Abwechseln“ (H-52). */
-  toy: SwapToy;
-  /** How many children take turns on the Kugelbahn (H-115). */
+  /** How many children take turns in the pictures of taking turns (H-115), two by default. */
   kids: TurnCount;
+  /** The names and photos a grown-up gave the children taking turns. */
+  players: Players;
   /**
    * The time left in the picture's corner, chosen behind ⚙️ while it runs. Named anew whenever the default changes
    * (`shown`, then `showTime` held the old default for everyone who had played before), so the new one reaches them too.
@@ -76,8 +89,8 @@ export const DEFAULT_TIMER_SETTINGS: TimerSettings = {
   seconds: 300,
   own: null,
   useOwn: false,
-  toy: "bobbycar",
   kids: 2,
+  players: {},
   timeNote: "digits",
   bar: true,
 };

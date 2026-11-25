@@ -1,7 +1,6 @@
 import { describe, expect, test } from "bun:test";
 import { BALL_R, type Pt } from "./path";
 import {
-  autoTake,
   BASKET,
   BASKET_FULL,
   BASKET_IN,
@@ -25,12 +24,12 @@ import {
   shelfSpot,
   slotBoard,
   SLOTS,
+  SONG_HANDOVER,
   SWITCH,
   TRACK_H,
   TRACK_W,
   TURNS,
 } from "./track";
-import { SORT_COLORS, TUBE_FULL } from "./colors";
 import { COLOR_END, STRETCHES } from "./trackStretches";
 
 // The run is many hand-placed numbers; these checks catch a marble that would
@@ -152,13 +151,14 @@ test("the barrier stands on row 2 with room for a long row of waiting marbles be
 // Each world ends in a stretch of its own (`trackStretches.ts`): the same checks for every one of them.
 
 /** Seconds a marble takes along `routes`, rolling as `TrackLevel` rolls it. */
-function seconds(rs: Route[]) {
+function seconds(rs: Route[], until?: (r: Route, s: number) => boolean) {
   const dt = 1 / 120;
   let t = 0;
   let v = 0;
   for (const r of rs) {
     let s = 0;
     while (s < r.total) {
+      if (until?.(r, s)) return t;
       const zone = r.zones.find((z) => s >= z.s0 && s < z.s1);
       v = zone?.speed ?? rolled(v, pointAt(r, s).slope, dt);
       s += v * dt;
@@ -215,12 +215,16 @@ describe.each(Object.entries(STRETCHES))("the %s stretch", (name, stretch) => {
   });
 
   test("a round with things let out promptly takes about a minute", () => {
-    // Six things, one let out every two seconds and the barrier opened at once: the first waits at the barrier, the
-    // last comes about ten seconds later and rolls on down. The right way of the switch is the shorter one.
+    // Six things, the child letting out each two seconds after the one before but not before that one has played its
+    // line of the song on row 1 (K-11): the last comes five such gaps later and rolls on down. The right way of the switch is the
+    // shorter one.
     const seq = built.sections.map((sec) =>
       sec.kind === "fixed" ? sec.route : sec.kind === "spot" ? built.pieces[sec.spot][DEFAULT_BUILD[sec.spot]] : built.ways.right,
     );
-    const round = 10 + seconds(seq.slice(0, built.gate.section)) + 1.1 + seconds(seq.slice(built.gate.section)) + 0.8;
+    const handover = (r: Route, s: number) => r.events.some((e) => e.event.kind === "note" && e.event.bar === SONG_HANDOVER && e.s <= s);
+    const gap = Math.max(2, 0.38 + seconds(seq, handover));
+    expect(gap, name).toBeLessThan(3.2);
+    const round = (BASKET_FULL - 1) * gap + seconds(seq.slice(0, built.gate.section)) + 1.1 + seconds(seq.slice(built.gate.section)) + 0.8;
     expect(round, name).toBeGreaterThan(55);
     expect(round, name).toBeLessThan(65);
   });
@@ -230,34 +234,4 @@ test("every world's stretch is its own", () => {
   const all = Object.values(STRETCHES);
   const shapes = all.map((st) => st.parts.map((p) => `${Math.round(p.pts[p.pts.length - 1].x)},${Math.round(p.pts[p.pts.length - 1].y)}`).join(" "));
   expect(new Set(shapes).size).toBe(all.length);
-});
-
-// After the child's first tap a round runs to its end by itself (user request, 24 November 2026): the shelf lets out
-// one thing after the other until enough are on their way to end it – and never more than it takes.
-describe("things leave the shelf by themselves", () => {
-  test("the basket: the next thing in turn until six are on their way", () => {
-    const lands: { color: string }[] = [];
-    while (autoTake(lands) === "next") lands.push({ color: "any" });
-    expect(lands.length).toBe(BASKET_FULL);
-  });
-
-  test("the colour run: each colour once, then one tube filled", () => {
-    const sort = { colors: SORT_COLORS.map((c) => c.fill), full: TUBE_FULL };
-    const lands: { color: string }[] = [];
-    for (let next = autoTake(lands, sort); next !== null; next = autoTake(lands, sort)) {
-      expect(typeof next).toBe("number");
-      lands.push({ color: sort.colors[next as number] });
-    }
-    expect(new Set(lands.slice(0, 3).map((l) => l.color)).size).toBe(3);
-    expect(lands.length).toBe(TUBE_FULL + sort.colors.length - 1);
-  });
-
-  test("what the child let out counts too", () => {
-    const sort = { colors: SORT_COLORS.map((c) => c.fill), full: TUBE_FULL };
-    const blue = sort.colors[2];
-    const lands = [...Array(TUBE_FULL - 1)].map(() => ({ color: blue }));
-    expect(autoTake(lands, sort)).toBe(0);
-    expect(autoTake([...lands, { color: blue }], sort)).toBeNull();
-    expect(autoTake([...Array(BASKET_FULL)].map(() => ({ color: blue })))).toBeNull();
-  });
 });

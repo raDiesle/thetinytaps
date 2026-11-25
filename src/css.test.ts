@@ -199,16 +199,21 @@ test("app-wide z-index layers take a --z-… name defined in base.css", () => {
 // The poster of „Magic Keys“ on the shelf stood taped onto the back panel above a toy keyboard, laid out in its place:
 // the shelf's perspective drew it towards the middle, behind the book beside it, and the keyboard looked like a till.
 // Then it leant on the panel from the board, which looked wrong too (user feedback, 24 November 2026). It is stuck flat
-// on the panel, nothing in front of it, and moved back over its place by what `usePosterPlace` measures.
-test("the shelf's poster is stuck flat on the back panel over its own place", () => {
+// on the panel, nothing in front of it, and moved back over its place by what `usePosterPlace` measures. With its foot
+// on the board, the board's front hid its lower tape and it looked cut off (user feedback, 25 November 2026): it hangs in
+// the middle between the boards (`--poster-y`), and against the wall the wall hid its left tape: `POSTER_MARGIN` keeps
+// room for the tape (about 0.15 of its width past each corner) and a little more on every side.
+test("the shelf's poster is stuck flat on the back panel over its own place, clear of the boards, the wall and its neighbour", () => {
   const css = readFileSync("src/styles/bookshelf-books.css", "utf8").replace(/\/\*[\s\S]*?\*\//g, "");
   const rules = [...css.matchAll(/([^{}]*\.shelf-poster(?![\w-])[^{}]*)\{([^}]*)\}/g)].map(([, , body]) => body);
   expect(rules.length).toBeGreaterThan(0);
   for (const body of rules) expect(body).not.toMatch(/rotate/);
   const placed = rules.filter((body) => /transform:/.test(body));
   expect(placed.length).toBeGreaterThan(0);
-  for (const body of placed) expect(body).toMatch(/translateZ\(calc\(var\(--d\) \* -0\.8[^)]*\)\) translateX\(var\(--poster-x[^)]*\)\) scale\(/);
+  for (const body of placed)
+    expect(body).toMatch(/translateZ\(calc\(var\(--d\) \* -0\.8[^)]*\)\) translateX\(var\(--poster-x[^)]*\)\) translateY\(var\(--poster-y[^)]*\)\) scale\(/);
   const shelf = readFileSync("src/components/Bookshelf.tsx", "utf8");
   expect(shelf).toMatch(/usePosterPlace\(link\)/);
+  expect(Number(shelf.match(/const POSTER_MARGIN = ([\d.]+);/)?.[1])).toBeGreaterThanOrEqual(0.2);
   expect(shelf).not.toMatch(/ToyKeyboard|shelf-toy-body/);
 });

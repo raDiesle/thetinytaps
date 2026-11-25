@@ -40,8 +40,13 @@ export const HUNDRED: EnglishFirst = {
   ru: "сто!",
 };
 
-/** The elevator panel's arrows, read out only: a whole ten up, or back to the ten before. */
-export const JUMP_TEXTS = {
-  up: { en: "Next ten", de: "Nächster Zehner", zh: "下一个十", hi: "अगले दस", es: "Siguiente decena", ar: "العشرة التالية", ru: "Следующий десяток" },
-  down: { en: "Ten back", de: "Zehner zurück", zh: "退回十个", hi: "दस पीछे", es: "Decena anterior", ar: "العشرة السابقة", ru: "Десяток назад" },
-} satisfies Record<string, EnglishFirst>;
+/** The small plus beside the next row, read out only: lay the rest of this ten and go on at the next. */
+export const ADD_ROW_TEXT: EnglishFirst = {
+  en: "Next ten",
+  de: "Nächster Zehner",
+  zh: "下一个十",
+  hi: "अगले दस",
+  es: "Siguiente decena",
+  ar: "العشرة التالية",
+  ru: "Следующий десяток",
+};

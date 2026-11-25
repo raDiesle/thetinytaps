@@ -505,22 +505,50 @@
   flex: 1;
   flex-direction: column;
   justify-content: center;
-  gap: 0.2em;
   align-self: center;
   height: 98%;
   padding: 0 calc(var(--bh) * var(--lean-clear, 0) + var(--pull, 0px)) 0 0;
-  color: #5b3a1c;
-  font-family: Georgia, "Times New Roman", serif;
+  color: #3d2208;
+  /*
+   * Clear rounded letters, upright and of some weight, so every line reads plainly (user feedback, 25 November 2026:
+   * the small italic serif under the first line was hard to read); a light lower lip still makes them look cut in.
+   */
+  font-family: var(--font-rounded);
   font-size: calc(var(--bh) * 0.078);
-  font-style: italic;
-  line-height: 1.15;
+  font-weight: 500;
+  line-height: 1.2;
   text-align: center;
   text-wrap: balance;
-  text-shadow:
-    0 1px 0 #f6dcaecc,
-    0 -1px 0 #2a170866;
+  text-shadow: 0 1px 0 #fff4dccc;
   transform: translate(var(--sx), var(--sy)) translateZ(calc(var(--d) * -0.97 + 2px));
   pointer-events: none;
+}
+
+/*
+ * The carved words together, only as wide and tall as they are, with a brighter light on the panel round them, so what
+ * a visitor should see first stands out (user request, November 2026): one even light over all of their lines, a
+ * rounded box a little bigger than the words, blurred so it fades out softly beyond them, well inside the compartment.
+ * Lighting the whole compartment it reached the post and was cut off there, and an ellipse round the words ended too
+ * hard and left their corners dim (user feedback, 25 November 2026; `shelfGlow.test.ts`). Still, like the other light:
+ * painted once.
+ */
+.shelf-carving-text {
+  position: relative;
+  display: flex;
+  flex-direction: column;
+  gap: 0.2em;
+  align-self: center;
+  max-width: 100%;
+}
+
+.shelf-carving-text::before {
+  position: absolute;
+  inset: -0.5em -0.7em;
+  z-index: -1;
+  border-radius: 2em;
+  background: #fff3d4d0;
+  filter: blur(1.25em);
+  content: "";
 }
 
 /*
@@ -565,8 +593,7 @@
 
 .shelf-carving-more {
   padding: 0.1em 0.4em;
-  font-style: italic;
-  font-weight: 700;
+  font-weight: 600;
   text-decoration: underline;
   text-decoration-thickness: 0.08em;
   text-underline-offset: 0.18em;
@@ -584,16 +611,13 @@
  */
 .shelf-carving-big {
   font-size: 1.45em;
-  font-weight: 700;
-  font-style: normal;
+  font-weight: 650;
   color: #9a2814;
-  text-shadow:
-    0 1.5px 0 #fbe6bef0,
-    0 -1px 0 #3a0f0699;
+  text-shadow: 0 1.5px 0 #fbe6bef0;
 }
 
 .shelf-carving-words {
-  color: #4a2a0e;
+  color: #3d2208;
 }
 
 /*
@@ -609,16 +633,16 @@
   padding-top: max(0px, calc(var(--bh) * 1.04 - var(--ch) * 0.7));
 }
 
-.room-scene[data-plan="wide"] .shelf-carving > * {
-  --fit: clamp(calc(var(--bh) * 0.078), min(6cqw, 9cqh), calc(var(--bh) * 0.15));
+.room-scene[data-plan="wide"] .shelf-carving-text > * {
+  --fit: clamp(calc(var(--bh) * 0.085), min(7.2cqw, 10cqh), calc(var(--bh) * 0.15));
 }
 
-.room-scene[data-plan="wide"] .shelf-carving > .shelf-carving-big {
+.room-scene[data-plan="wide"] .shelf-carving-text > .shelf-carving-big {
   font-size: calc(var(--fit) * 1.45);
 }
 
-.room-scene[data-plan="wide"] .shelf-carving > .shelf-carving-words,
-.room-scene[data-plan="wide"] .shelf-carving > .home-menu {
+.room-scene[data-plan="wide"] .shelf-carving-text > .shelf-carving-words,
+.room-scene[data-plan="wide"] .shelf-carving-text > .home-menu {
   font-size: max(var(--fit), 8px);
 }
 
@@ -822,8 +846,8 @@
 
 /*
  * A toy's place among the picture books (`ShelfToy`, `Category.toy`): `TOY_SPAN` picture books wide, as tall as its
- * poster (`ToyPoster`), which is stuck flat onto the back panel with its foot on the board (user feedback, 24 November
- * 2026: never leaning, nothing in front of it). The place itself stays in the row, unseen, and is what is tapped.
+ * poster (`ToyPoster`), which is stuck flat onto the back panel, in the middle between the boards and clear of both
+ * (user feedback, 24 and 25 November 2026: never leaning, nothing in front of it, never cut off by a board). The place itself stays in the row, unseen, and is what is tapped.
  */
 .shelf-row > .shelf-toy {
   --bw: calc(var(--bh) * 0.82 * 0.6); /* `TOY_SPAN` picture books */
@@ -856,14 +880,15 @@
 }
 
 /*
- * The poster: paper stuck flat onto the back panel, its foot where the board meets it. Seen on the panel it would lie
- * smaller and nearer the shelf's middle – behind the book beside it –, so `usePosterPlace` moves it back over its place
- * and grows it (`--poster-x`, `--poster-k`). Tape holds three corners; the fourth (top right) curls away, its paper's
+ * The poster: paper stuck flat onto the back panel, in the middle between the boards. Seen on the panel it would lie
+ * smaller and nearer the shelf's middle – behind the book beside it –, so `usePosterPlace` moves it back over its place,
+ * lifts it clear of the board (`--poster-y`) and grows it as far as the compartment's height allows (`--poster-x`,
+ * `--poster-k`). Tape holds three corners; the fourth (top right) curls away, its paper's
  * back seen. Still, like everything on the shelf.
  */
 .shelf-poster {
   --curl: calc(var(--pw) * 0.16);
-  transform: translateZ(calc(var(--d) * -0.8 + 2px)) translateX(var(--poster-x, 0px)) scale(var(--poster-k, 1));
+  transform: translateZ(calc(var(--d) * -0.8 + 2px)) translateX(var(--poster-x, 0px)) translateY(var(--poster-y, 0px)) scale(var(--poster-k, 1));
   filter: drop-shadow(0 calc(var(--pw) * 0.015) calc(var(--pw) * 0.02) #2a170866);
 }
 
@@ -871,7 +896,7 @@
    first measure must not slide it in). */
 .shelf-toy.pressed > .shelf-poster {
   transition: transform 0.12s ease-out;
-  transform: translateZ(calc(var(--d) * -0.8 + 2px)) translateX(var(--poster-x, 0px)) scale(calc(var(--poster-k, 1) * 0.96));
+  transform: translateZ(calc(var(--d) * -0.8 + 2px)) translateX(var(--poster-x, 0px)) translateY(var(--poster-y, 0px)) scale(calc(var(--poster-k, 1) * 0.96));
 }
 
 .shelf-poster-paper {

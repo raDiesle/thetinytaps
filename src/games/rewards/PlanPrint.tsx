@@ -3,14 +3,18 @@ import { Choice, SettingsGroup, Toggle } from "@/components/SettingControls";
 import { type Localized, useT } from "@/lib/language";
 import { NO_LINKED } from "./board";
 import { NOW_WAYS, THEME_BY_ID, THEMES } from "./catalog";
-import { distinctSteps, type Plan } from "./plan";
+import { usePhotoUrls } from "./ChildPhoto";
+import { counting, dayPartsOf, distinctSteps, partIn, type Plan, stepsOn } from "./plan";
 import { PlanSheet, type PlanLook, useStepLabel } from "./PlanSheet";
 import { MIN_CARD_MM, type PhotoFormat } from "./photo";
 import { PhotoPrint } from "./PhotoPrint";
 import { itemPicture, ItemPic } from "./pictures";
-import { A4, CutCardPages, InkChoice, PRINT_WORDS, Preview } from "./PrintPanel";
+import { type PosterOptions, posterFormatsFor } from "./poster";
+import { type PosterCompanion, PosterPrint } from "./PosterPrint";
+import { A4, CutCardPages, InkChoice, PRINT_WORDS, PrintWayChoice, Preview } from "./PrintPanel";
 import { RitualPages } from "./RitualCard";
 import { type Ritual, ritualOf } from "./rituals";
+import type { PrintWay } from "./settings";
 import { VelcroLink } from "./shopLinks";
 
 /** How a plan is printed. */
@@ -22,6 +26,10 @@ export interface PlanPrintOptions {
   cards: boolean;
   /** The photo size the cards are laid out on; missing in options saved before photo prints. */
   photo?: PhotoFormat["id"];
+  /** How the plan is made at home (T-31); missing: as `planWay` tells. */
+  way?: PrintWay;
+  /** The photo poster's size, decoration and companion (T-32). */
+  poster?: PosterOptions;
 }
 
 /** Over the print options of a plan whose days differ: only the day on screen is printed. */
@@ -54,6 +62,35 @@ const CARDS_NOTE: Localized = {
 export const printsCards = (plan: Plan): "never" | "always" | "choice" =>
   plan.view === "countdown" ? "never" : plan.view !== "day" ? "choice" : plan.nowField ? "always" : "never";
 
+/**
+ * A plan's way (T-31): the one chosen where its view has cards to make, else fixed – a plan with the „Jetzt“ field starts
+ * with its cards, every other one fixed on its sheet.
+ */
+export const planWay = (plan: Plan, options: PlanPrintOptions): PrintWay =>
+  printsCards(plan) === "never" ? "fixed" : (options.way ?? (printsCards(plan) === "always" ? "cards" : "fixed"));
+
+/** The plan as made the fixed way: every card on the sheet, the paper arrow showing the one to do, nothing to cut out. */
+export const fixedPlan = (plan: Plan): Plan => (plan.nowField ? { ...plan, nowField: false } : plan);
+
+/** A photo service prints in colour. */
+const POSTER_LOOK: PlanLook = { print: true, color: true };
+
+/** A plan as it stands on a poster, in colour, laid out for the box it gets. */
+export const planPosterSheet = (plan: Plan, day: Date) => (aspect: number) => (
+  <PlanSheet plan={fixedPlan(plan)} ticks={undefined} linked={NO_LINKED} today={day} day={day} look={POSTER_LOOK} aspect={aspect} />
+);
+
+/** The most cards in one part of the day shown: whether a day fits a panorama (T-35). */
+function mostCards(plan: Plan, day: Date): number {
+  const parts = dayPartsOf(plan);
+  const counts = new Map<string, number>();
+  for (const step of stepsOn(plan, day)) {
+    const part = partIn(step, parts) ?? "";
+    counts.set(part, (counts.get(part) ?? 0) + 1);
+  }
+  return Math.max(0, ...counts.values());
+}
+
 /** Under a Countdown's print: what the nights on paper are for. */
 const COUNTDOWN_NOTE: Localized = {
   de: "Gedruckt werden die Nächte ab heute. Jeden Morgen klebt Ihr Kind einen Stern in den Kreis der Nacht oder malt ihn aus – so sieht es, wie der große Tag näher kommt.",
@@ -80,23 +117,71 @@ export const planOrientation = (plan: Plan, options: PlanPrintOptions, day: Date
  * a marker is only its sheet: every card is printed on it, so there are no cards to make (`printsCards`).
  */
 export function PlanPrint({
-  plan,
+  plan: shown,
   day,
   options,
+  companions,
   onChange,
 }: {
   plan: Plan;
   day: Date;
   options: PlanPrintOptions;
+  /** The other charts that may share the big poster with it (T-39). */
+  companions: PosterCompanion[];
   onChange: (patch: Partial<PlanPrintOptions>) => void;
 }) {
   const t = useT();
   const label = useStepLabel();
+  // The cards' own photos (T-13), read from this device for the photo prints' canvas.
+  const photos = usePhotoUrls(distinctSteps(shown).flatMap((step) => (step.photo ? [step.photo] : [])));
+  const offered = printsCards(shown) !== "never";
+  const way = planWay(shown, options);
+  // Fixed: the plan printed with every card on its sheet, whatever it shows on screen.
+  const plan = way === "fixed" ? fixedPlan(shown) : shown;
   const orientation = planOrientation(plan, options, day);
-  const pages = <PlanPages plan={plan} day={day} options={options} orientation={orientation} />;
-  const cards = printsCards(plan);
+  const cards = way === "fixed" ? "never" : printsCards(plan);
+  const pages = <PlanPages plan={plan} day={day} options={options} cards={cards} orientation={orientation} />;
+  const theme = THEME_BY_ID.get(plan.theme) ?? THEMES[0];
+  const poster = (
+    <PosterPrint
+      formats={posterFormatsFor({ kind: "plan", view: plan.view, parts: dayPartsOf(plan), cards: mostCards(plan, day) })}
+      orientation={orientation}
+      theme={theme}
+      name={t({
+        en: "day-plan-poster",
+        de: "tagesplan-poster",
+        zh: "日程表-海报",
+        hi: "दिन-की-योजना-पोस्टर",
+        es: "plan-del-dia-poster",
+        ar: "خطة-اليوم-ملصق",
+        ru: "план-дня-постер",
+      })}
+      sheet={planPosterSheet(plan, day)}
+      companions={companions}
+      plan={!counting(plan)}
+      options={options.poster ?? {}}
+      onChange={(patch) => onChange({ poster: { ...options.poster, ...patch } })}
+    />
+  );
   return (
     <section className="settings rw-print-panel">
+      {offered && (
+        <SettingsGroup
+          title={t({
+            en: "Your way",
+            de: "Ihr Weg",
+            zh: "您的方式",
+            hi: "आपका तरीका",
+            es: "Su manera",
+            ar: "طريقتكم",
+            ru: "Ваш способ",
+          })}
+        >
+          <PrintWayChoice way={way} onChange={(next) => onChange({ way: next })} />
+        </SettingsGroup>
+      )}
+      {/* The fixed way's best print first: the photo poster; the cut-out way's: the cards as photo prints. */}
+      {way === "fixed" && poster}
       {cards !== "never" && (
         <PhotoPrint
           title={t({
@@ -117,9 +202,12 @@ export function PlanPrint({
             ar: "كل صورة في الخطة مرة واحدة، من كل الأيام، كبطاقة للوحة فيلكرو.",
             ru: "Каждая картинка плана по одному разу, со всех дней, – карточкой для доски на липучках.",
           })}
-          cards={distinctSteps(plan).map((step) => ({ emoji: step.emoji, picture: itemPicture(step, "task"), label: label(step) }))}
+          cards={distinctSteps(plan).map((step) => {
+            const own = step.photo ? photos.get(step.photo) : undefined;
+            return { emoji: step.emoji, picture: own ?? itemPicture(step, "task"), ...(own ? { photo: true } : {}), label: label(step) };
+          })}
           min={MIN_CARD_MM}
-          theme={THEME_BY_ID.get(plan.theme) ?? THEMES[0]}
+          theme={theme}
           name={t({
             de: "tagesplan-karten",
             en: "day-plan-cards",
@@ -173,7 +261,11 @@ export function PlanPrint({
         <p className="setting-note">
           {plan.view !== "week" && !plan.same && `${t(SHOWN_DAY)} `}
           {/* A marker's plan: nothing to cut out; the „Jetzt“ field's: its cards always come, the note says why. */}
-          {t(plan.view === "countdown" ? COUNTDOWN_NOTE : cards === "never" ? NOW_WAYS[0].note : cards === "always" ? NOW_WAYS[1].note : CARDS_NOTE)}
+          {plan.view === "countdown"
+            ? t(COUNTDOWN_NOTE)
+            : plan.view === "day"
+              ? t(cards === "never" ? NOW_WAYS[0].note : NOW_WAYS[1].note)
+              : cards !== "never" && t(CARDS_NOTE)}
           {cards !== "never" && <VelcroLink />}
         </p>
         <button type="button" className="rw-print-button" onClick={() => window.print()}>
@@ -181,6 +273,7 @@ export function PlanPrint({
         </button>
       </SettingsGroup>
       <Preview orientation={orientation}>{pages}</Preview>
+      {way === "cards" && poster}
       {createPortal(<div className="rw-print-root">{pages}</div>, document.body)}
     </section>
   );
@@ -196,14 +289,26 @@ export const ritualsOf = (plan: Plan): Ritual[] => [
 ];
 
 /** The printed pages: the plan, then its pictures as cards to cut out (CutCardPages), then its rituals' words. */
-function PlanPages({ plan, day, options, orientation }: { plan: Plan; day: Date; options: PlanPrintOptions; orientation: "landscape" | "portrait" }) {
+function PlanPages({
+  plan,
+  day,
+  options,
+  cards: wanted,
+  orientation,
+}: {
+  plan: Plan;
+  day: Date;
+  options: PlanPrintOptions;
+  /** Whether cards to cut out come with it (`printsCards`, none on the fixed way). */
+  cards: "never" | "always" | "choice";
+  orientation: "landscape" | "portrait";
+}) {
   const label = useStepLabel();
   const landscape = orientation === "landscape";
   const width = landscape ? A4.long : A4.short;
   const height = landscape ? A4.short : A4.long;
   const look: PlanLook = { print: true, color: options.color };
   const theme = THEME_BY_ID.get(plan.theme) ?? THEMES[0];
-  const wanted = printsCards(plan);
   const cards =
     wanted === "always" || (wanted === "choice" && options.cards)
       ? distinctSteps(plan).map((step) => ({ key: step.id, picture: <ItemPic item={step} lines={!look.color} />, label: label(step) }))

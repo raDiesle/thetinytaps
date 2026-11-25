@@ -18,9 +18,10 @@ export const UNFINISHED_LABEL: Localized = {
 export const PREVIEW_SIZE = { width: 480, height: 320 } as const;
 
 /**
- * The class a card adds whose picture fills it with the name lying on it in a small paper box (`GameShell
- * labelOnPicture`, Kettenreaktion's machines, user request, November 2026). Every other card shows its framed picture
- * above its name, never under it (user feedback, November 2026: pictures lay over the words).
+ * The class a card with a preview picture adds: every such card in every menu looks alike – the framed picture on
+ * top, as big as the card's room allows, and the name in one line under it, never broken and never on the picture
+ * (user feedback, 25 November 2026, from Lebendige Welten's menus: names lay on Kettenreaktion's pictures and broke
+ * beside small pictures on a phone). `useFitGrid` shrinks every name of a menu alike until the longest fits.
  */
 export const pictureCard = (picture: string | undefined) => (picture ? " picture-card" : "");
 
@@ -70,13 +71,13 @@ export function GameCard({ href, emoji, picture, title, id }: GameCardProps) {
   if (href) {
     return (
       // The page starts loading as the finger lands or a mouse comes over it, not only once the tap is done.
-      <Link to={href} className="game-card" data-mode={id} {...loadOnIntent(href)} onClick={turnPage}>
+      <Link to={href} className={`game-card${pictureCard(picture)}`} data-mode={id} {...loadOnIntent(href)} onClick={turnPage}>
         {content}
       </Link>
     );
   }
   return (
-    <div className="game-card disabled" aria-disabled>
+    <div className={`game-card disabled${pictureCard(picture)}`} aria-disabled>
       {content}
       <span className="badge">{t({ de: "bald", ru: "скоро", en: "soon", zh: "即将推出", hi: "जल्द ही", es: "pronto", ar: "قريبًا" })}</span>
     </div>

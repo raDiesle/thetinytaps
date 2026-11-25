@@ -1,28 +1,34 @@
 import { memo, useCallback, useEffect, useMemo, useState, type CSSProperties } from "react";
-import { Mascot, MASCOT_COLORS, MascotHead } from "@/components/Mascot";
+import { BODY, Mascot, MASCOT_COLORS, MASCOT_INK, MascotHead } from "@/components/Mascot";
 import { loadRealSounds, playEngine } from "@/lib/realSounds";
 import { playCountNote, playDing, playHop } from "@/lib/sfx";
 import { type Frame, keyframes } from "./keyframes";
 import { useRunClock } from "./pause";
-import { INK, Layer, STAGE_H, STAGE_W } from "./scenes";
-import type { Holder } from "./swap";
+import { ownName, PlayerPatch } from "./players";
+import { Bleed, INK, Layer, STAGE_H, STAGE_W } from "./scenes";
+import type { PlayerLook, Players, TurnChild } from "./settings";
+import { KID_LOOK } from "./swap";
 
-// Rennstrecke (user request, 24 November 2026): the fox child and the bear child take turns driving a kart round a
-// race track shaped like an eight, one lap a turn. The track lies on a meadow seen from a grandstand's height: its
-// front loop big and near, its back loop far off in the picture's depth, the way from one to the other crossing over
-// a bridge – so the way is as long as the picture allows. The kart waits on the chequered start and finish line in
-// front, the start light beside it turns red, then yellow, then green, and the child whose turn it is drives one lap
-// the whole turn long, at an even pace with a short start and stop, and stops on the line as the turn ends. Then it
-// hops out to its mat in the infield, the other child hops in from its own, the light counts down again and off it
-// goes. Whose turn it is shows across the room: that child sits in the kart (the other stands still on its mat), its
-// face is on the big screen behind the track, and the road it has driven this lap is painted in its colour. The kart
-// is a small HTML layer on keyframes written for the turn (its place, size and heading on the track), its heading
-// turning inside it; the driver bobs and the exhaust puffs at a steady pace, so even a ten-minute lap plainly moves.
+// Rennstrecke (user request, 24 November 2026): two to four children – the fox's, the bear's, a rabbit's and a frog's
+// (25 November 2026) – take turns driving a kart round a race track shaped like an eight, one lap a turn. The track
+// lies on a meadow seen from a grandstand's height: its front loop big and near, its back loop far off in the
+// picture's depth, the way from one to the other crossing over a bridge – so the way is as long as the picture allows.
+// The kart waits on the chequered start and finish line in front, the start light behind it turns red, then yellow,
+// then green, and the child whose turn it is drives one lap the whole turn long, at an even pace with a short start and
+// stop, and stops on the line as the turn ends. Then it hops out to its mat in the infield, the next child hops in
+// from its own, the light counts down again and off it goes. Whose turn it is shows across the room: that child sits
+// in the kart (the others stand still on their mats, in a row in the order of their turns), its face or its photo is
+// on the big screen behind the track, and the road it has driven this lap is painted in its colour. The kart is a
+// small HTML layer on keyframes written for the turn (its place, size and heading on the track), its heading turning
+// inside it; the driver bobs and the exhaust puffs at a steady pace, so even a ten-minute lap plainly moves.
 
 // ---------------------------------------------------------------------------------------------------------------
 // The view: ground points (x across, z away from us, both in ground units) seen from above the near edge. Everything
 // at depth z is drawn `sizeAt(z)` as big as at z = 0, and squashed to `TILT` of its depth, the same everywhere, so a
 // kart drawn from above only needs to be turned, squashed and scaled.
+
+/** A child's look with its photo alone. */
+const photoOnly = (photo: string): PlayerLook => ({ photo });
 
 /** Where the ground meets the sky, far away. */
 const HORIZON = 80;
@@ -213,20 +219,47 @@ function within(from: number, to: number, on: "ground" | "deck"): [number, numbe
 // ---------------------------------------------------------------------------------------------------------------
 // What stands where.
 
-/** Each child's mat in the near loop's infield, and its colours: its colour on the track, the bar's (`tm-bar` tones). */
-export const RACE_KIDS: Record<Holder, { x: number; z: number; suit: string; suitShade: string; mat: string; paint: string; light: string }> = {
-  fox: { x: -300, z: 210, suit: "#4dabf7", suitShade: "#1c7ed6", mat: "#ffc078", paint: "#f76707", light: "#ffe8cc" },
-  bear: { x: 320, z: 210, suit: "#ffd43b", suitShade: "#f59f00", mat: "#d8b48c", paint: "#9c6334", light: "#f3e3cf" },
+/** Each child's colours: its racing suit, its mat and its colour on the track and the screen (the bar's `tm-bar` tones). */
+export const RACE_KIDS: Record<TurnChild, { suit: string; suitShade: string; mat: string; paint: string; light: string }> = {
+  fox: { suit: "#4dabf7", suitShade: "#1c7ed6", mat: "#ffc078", paint: "#f76707", light: "#ffe8cc" },
+  bear: { suit: "#ffd43b", suitShade: "#f59f00", mat: "#d8b48c", paint: "#9c6334", light: "#f3e3cf" },
+  rabbit: { suit: KID_LOOK.rabbit.body, suitShade: KID_LOOK.rabbit.shade, mat: KID_LOOK.rabbit.light, paint: KID_LOOK.rabbit.shade, light: "#e7f5ff" },
+  frog: { suit: KID_LOOK.frog.shade, suitShade: "#2b8a3e", mat: KID_LOOK.frog.light, paint: KID_LOOK.frog.shade, light: "#ebfbee" },
 };
+
+/**
+ * Where the children's mats lie in the near loop's infield, in a row in the order of their turns, by how many play:
+ * across (ground units) at the depth `MAT.z`, each `MAT.r` round. None lies behind the start light's post in the middle
+ * (its lamps would cover a child's chest), so with three and four children two stand on a side, as close as their mats
+ * allow and clear of the road; the kart starting in front stands between the inner two.
+ */
+export const MAT_XS: Record<2 | 3 | 4, readonly number[]> = {
+  2: [-300, 320],
+  3: [-345, -165, 320],
+  4: [-350, -170, 170, 350],
+};
+
+/** The mats' depth and size (ground units). */
+export const MAT = { z: 210, r: 88 } as const;
+
+/** Where the mat of `kind` lies among `kids` playing (ground units). */
+export function matOf(kids: readonly TurnChild[], kind: TurnChild) {
+  const xs = MAT_XS[Math.min(4, Math.max(2, kids.length)) as 2 | 3 | 4];
+  return { x: xs[Math.max(0, kids.indexOf(kind))] ?? 0, z: MAT.z };
+}
 
 /** A child's standing figure, in ground units at its mat (the Mascot's 2 : 3). */
 const KID = { w: 136, h: 204 } as const;
 
 /** The start light's post in the infield behind the start line, and how high its lamps hang. */
-const POST = { x: 0, z: 170, h: 147 } as const;
+export const POST = { x: 0, z: 170, h: 147 } as const;
 
-/** The chequered flag's pole between the start line and the fox child's mat, and how tall it is. */
-const FLAG = { x: -175, z: 105, h: 112 } as const;
+/**
+ * The chequered flag on a short pole on the start light's box, its left end: how tall (pole and all, ground units at
+ * the post). It stood on a pole of its own in the infield until 25 November 2026, where the third and fourth child's
+ * mats lie now; up there it covers no child, nor the kart waiting on the line.
+ */
+const FLAG = { h: 72, w: 92 } as const;
 
 /** The kart's box (stage units at the front straight): the kart's middle stands at `cx`, `cy` in it. */
 const CAR = { w: 240, h: 300, cx: 120, cy: 180 } as const;
@@ -247,7 +280,7 @@ function layerAt(k: number) {
   if (p.up > 2) return Z.over;
   const from = POINTS[TRACK.under].at - 60;
   if (p.at >= from && p.at <= from + 520) return Z.under;
-  return p.z < RACE_KIDS.fox.z - 10 ? Z.near : Z.over;
+  return p.z < MAT.z - 10 ? Z.near : Z.over;
 }
 
 // ---------------------------------------------------------------------------------------------------------------
@@ -385,18 +418,46 @@ function Grandstand({ x, w }: { x: number; w: number }) {
   );
 }
 
-/** A child's mat in the infield: a round rug in its colour with a white rim. */
-function Mat({ kind }: { kind: Holder }) {
-  const look = RACE_KIDS[kind];
-  const q = project(look.x, look.z);
+/**
+ * Where a child's photo or name lies on its mat: at the mat's front, between the child's feet and the rim, so the child
+ * standing there never covers it and it is seen while the child drives too.
+ */
+export function patchAt(mat: { x: number; z: number }) {
+  const q = project(mat.x, mat.z);
+  const r = 24 * q.s;
+  return { x: q.x, y: q.y + r + 1, r };
+}
+
+/** A child's mat in the infield: a round rug in its colour with a white rim, and its photo or name at its front. */
+function Mat({ kind, at, look }: { kind: TurnChild; at: { x: number; z: number }; look: PlayerLook | undefined }) {
+  const c = RACE_KIDS[kind];
+  const q = project(at.x, at.z);
+  const patch = patchAt(at);
   return (
     <g>
-      <ellipse cx={q.x} cy={q.y} rx={88 * q.s} ry={88 * q.s * TILT} fill="#f8f9fa" stroke={INK} strokeWidth="3" />
-      <ellipse cx={q.x} cy={q.y} rx={74 * q.s} ry={74 * q.s * TILT} fill={look.mat} />
-      <ellipse cx={q.x} cy={q.y} rx={40 * q.s} ry={40 * q.s * TILT} fill={look.paint} opacity="0.35" />
+      <ellipse cx={q.x} cy={q.y} rx={MAT.r * q.s} ry={MAT.r * q.s * TILT} fill="#f8f9fa" stroke={INK} strokeWidth="3" />
+      <ellipse cx={q.x} cy={q.y} rx={(MAT.r - 14) * q.s} ry={(MAT.r - 14) * q.s * TILT} fill={c.mat} />
+      <ellipse cx={q.x} cy={q.y} rx={40 * q.s} ry={40 * q.s * TILT} fill={c.paint} opacity="0.35" />
+      <PlayerPatch look={look} x={patch.x} y={patch.y} r={patch.r} color={c.paint} />
     </g>
   );
 }
+
+/** The mats of the children playing, each with its photo or name. Drawn once for them (`memo`). */
+const RaceMats = memo(
+  function RaceMats({ kids, players }: { kids: readonly TurnChild[]; players?: Players }) {
+    return (
+      <Layer x={0} y={0} w={STAGE_W} h={STAGE_H} className="tm-race-mats">
+        <svg viewBox={`0 0 ${STAGE_W} ${STAGE_H}`} preserveAspectRatio="none">
+          {kids.map((kind) => (
+            <Mat key={kind} kind={kind} at={matOf(kids, kind)} look={players?.[kind]} />
+          ))}
+        </svg>
+      </Layer>
+    );
+  },
+  (a, b) => a.kids.join() === b.kids.join() && a.players === b.players,
+);
 
 /** The sky, the trees far off, the meadow mown in stripes, the grandstands, the big screen's frame and the track on the ground. Drawn once. */
 export const RaceGround = memo(function RaceGround() {
@@ -406,63 +467,66 @@ export const RaceGround = memo(function RaceGround() {
   return (
     <Layer x={0} y={0} w={STAGE_W} h={STAGE_H} className="tm-race-ground">
       <svg viewBox={`0 0 ${STAGE_W} ${STAGE_H}`} preserveAspectRatio="none">
-        <defs>
-          <linearGradient id="tm-race-sky" x1="0" y1="0" x2="0" y2="1">
-            <stop offset="0" stopColor="#74c0fc" />
-            <stop offset="1" stopColor="#d0ebff" />
-          </linearGradient>
-        </defs>
-        <rect width={STAGE_W} height={HORIZON + 40} fill="url(#tm-race-sky)" />
-        <path d={`M0 ${HORIZON + 6} Q200 40 420 ${HORIZON - 4} T860 ${HORIZON - 8} T1280 ${HORIZON - 2} T${STAGE_W} 56 V${HORIZON + 30} H0 Z`} fill="#8ce99a" />
-        {bands.map((b) => (
-          <rect key={b.i} x="0" y={b.y0} width={STAGE_W} height={b.y1 - b.y0 + 0.5} fill={b.i % 2 ? "#69c26b" : "#77cc77"} />
-        ))}
-        {Array.from({ length: 26 }, (_, i) => (
-          <circle
-            key={i}
-            cx={i * 64 + 10}
-            cy={HORIZON + 8 + (i % 3) * 3}
-            r={22 + (i % 4) * 5}
-            fill={i % 2 ? "#2f9e44" : "#37b24d"}
-            stroke={INK}
-            strokeWidth="2"
+        <Bleed>
+          <defs>
+            <linearGradient id="tm-race-sky" x1="0" y1="0" x2="0" y2="1">
+              <stop offset="0" stopColor="#74c0fc" />
+              <stop offset="1" stopColor="#d0ebff" />
+            </linearGradient>
+          </defs>
+          <rect width={STAGE_W} height={HORIZON + 40} fill="url(#tm-race-sky)" />
+          <path
+            d={`M0 ${HORIZON + 6} Q200 40 420 ${HORIZON - 4} T860 ${HORIZON - 8} T1280 ${HORIZON - 2} T${STAGE_W} 56 V${HORIZON + 30} H0 Z`}
+            fill="#8ce99a"
           />
-        ))}
-        <Grandstand x={300} w={360} />
-        <Grandstand x={940} w={360} />
-        {/* The big screen's legs and frame; the face in it is a layer of its own. */}
-        <g stroke={INK} strokeWidth="3" strokeLinejoin="round">
-          <rect x={SCREEN.x + 30} y={SCREEN.y + SCREEN.h - 4} width="14" height="44" fill="#868e96" />
-          <rect x={SCREEN.x + SCREEN.w - 44} y={SCREEN.y + SCREEN.h - 4} width="14" height="44" fill="#868e96" />
-          <rect x={SCREEN.x} y={SCREEN.y} width={SCREEN.w} height={SCREEN.h} rx="10" fill="#343a40" />
-          <rect x={SCREEN.x + 10} y={SCREEN.y + 10} width={SCREEN.w - 20} height={SCREEN.h - 20} rx="4" fill="#1d2a3a" />
-        </g>
-        {/* Trees and bushes in the infields. */}
-        <Bush x={-380} z={1300} />
-        <Bush x={420} z={1280} />
-        <Bush x={0} z={1250} />
-        <Bush x={-60} z={330} />
-        <Bush x={60} z={420} />
-        {/* The run-off, the kerbs and the road; the stretch over the bridge is the bridge's. */}
-        {STRETCHES.ground.flatMap(([a, b]) =>
-          pieces(a, b).map(([c, d]) => <polygon key={`o${a}-${c}`} points={band(c, d, -ROAD - KERB - RUNOFF, ROAD + KERB + RUNOFF)} fill="#c3d69b" />),
-        )}
-        {STRETCHES.ground.map(([a, b]) => (
-          <Kerbs key={`k${a}`} from={a} to={b} />
-        ))}
-        {STRETCHES.ground.map(([a, b]) => (
-          <Road key={`r${a}`} from={a} to={b} />
-        ))}
-        {/* The bridge's shadow across the road under it. */}
-        <polygon points={shadow} fill="#1b1f23" opacity="0.28" transform="translate(6 10)" />
-        <StartLine />
-        <Tyres x={-1150} z={1340} />
-        <Tyres x={1150} z={1340} />
-        <Tyres x={0} z={1720} />
-        <Tyres x={680} z={250} />
-        <Tyres x={-680} z={250} />
-        <Mat kind="fox" />
-        <Mat kind="bear" />
+          {bands.map((b) => (
+            <rect key={b.i} x="0" y={b.y0} width={STAGE_W} height={b.y1 - b.y0 + 0.5} fill={b.i % 2 ? "#69c26b" : "#77cc77"} />
+          ))}
+          {Array.from({ length: 26 }, (_, i) => (
+            <circle
+              key={i}
+              cx={i * 64 + 10}
+              cy={HORIZON + 8 + (i % 3) * 3}
+              r={22 + (i % 4) * 5}
+              fill={i % 2 ? "#2f9e44" : "#37b24d"}
+              stroke={INK}
+              strokeWidth="2"
+            />
+          ))}
+          <Grandstand x={300} w={360} />
+          <Grandstand x={940} w={360} />
+          {/* The big screen's legs and frame; the face in it is a layer of its own. */}
+          <g stroke={INK} strokeWidth="3" strokeLinejoin="round">
+            <rect x={SCREEN.x + 30} y={SCREEN.y + SCREEN.h - 4} width="14" height="44" fill="#868e96" />
+            <rect x={SCREEN.x + SCREEN.w - 44} y={SCREEN.y + SCREEN.h - 4} width="14" height="44" fill="#868e96" />
+            <rect x={SCREEN.x} y={SCREEN.y} width={SCREEN.w} height={SCREEN.h} rx="10" fill="#343a40" />
+            <rect x={SCREEN.x + 10} y={SCREEN.y + 10} width={SCREEN.w - 20} height={SCREEN.h - 20} rx="4" fill="#1d2a3a" />
+          </g>
+          {/* Trees and bushes in the infields. */}
+          <Bush x={-380} z={1300} />
+          <Bush x={420} z={1280} />
+          <Bush x={0} z={1250} />
+          <Bush x={-60} z={330} />
+          <Bush x={60} z={420} />
+          {/* The run-off, the kerbs and the road; the stretch over the bridge is the bridge's. */}
+          {STRETCHES.ground.flatMap(([a, b]) =>
+            pieces(a, b).map(([c, d]) => <polygon key={`o${a}-${c}`} points={band(c, d, -ROAD - KERB - RUNOFF, ROAD + KERB + RUNOFF)} fill="#c3d69b" />),
+          )}
+          {STRETCHES.ground.map(([a, b]) => (
+            <Kerbs key={`k${a}`} from={a} to={b} />
+          ))}
+          {STRETCHES.ground.map(([a, b]) => (
+            <Road key={`r${a}`} from={a} to={b} />
+          ))}
+          {/* The bridge's shadow across the road under it. */}
+          <polygon points={shadow} fill="#1b1f23" opacity="0.28" transform="translate(6 10)" />
+          <StartLine />
+          <Tyres x={-1150} z={1340} />
+          <Tyres x={1150} z={1340} />
+          <Tyres x={0} z={1720} />
+          <Tyres x={680} z={250} />
+          <Tyres x={-680} z={250} />
+        </Bleed>
       </svg>
     </Layer>
   );
@@ -524,11 +588,10 @@ export const RaceBridge = memo(function RaceBridge() {
   );
 });
 
-/** The start light's post with its three lamps side by side, and the chequered flag's pole. Drawn once; the lamps' light and the flag are layers of their own. */
+/** The start light's post with its three lamps side by side. Drawn once; the lamps' light and the flag on top are layers of their own. */
 export const RacePost = memo(function RacePost() {
   const q = project(POST.x, POST.z);
   const box = lampBox();
-  const f = project(FLAG.x, FLAG.z);
   return (
     <Layer x={0} y={0} w={STAGE_W} h={STAGE_H} className="tm-race-post">
       <svg viewBox={`0 0 ${STAGE_W} ${STAGE_H}`} preserveAspectRatio="none">
@@ -538,7 +601,6 @@ export const RacePost = memo(function RacePost() {
         {LAMPS.map((color, i) => (
           <circle key={color} cx={lampX(i)} cy={box.y + box.h / 2} r={box.r} fill="#495057" stroke="#212529" strokeWidth="2" />
         ))}
-        <ellipse cx={f.x} cy={f.y} rx={14 * f.s} ry={14 * f.s * TILT} fill="#1b1f23" opacity="0.25" />
       </svg>
     </Layer>
   );
@@ -547,8 +609,15 @@ export const RacePost = memo(function RacePost() {
 /** The start light's lamps from the left: red, yellow, green. */
 const LAMPS = ["#ff4d4d", "#ffd43b", "#51cf66"] as const;
 
+/** The chequered flag's layer on the start light's box: its pole stands on the box's left end, the cloth flying to the right over the box. */
+export function flagBox() {
+  const box = lampBox();
+  const s = sizeAt(POST.z);
+  return { x: box.x + 6 * s, y: box.y - FLAG.h * s, w: FLAG.w * s, h: FLAG.h * s };
+}
+
 /** The start light's box on its post: low enough to stay clear of the roads crossing behind it, high enough over the driver's head. */
-function lampBox() {
+export function lampBox() {
   const q = project(POST.x, POST.z);
   const w = 132 * q.s;
   const h = 48 * q.s;
@@ -601,42 +670,308 @@ function Kart({ low }: { low?: boolean }) {
   );
 }
 
-/** A child at the wheel, seen from the front: its racing suit in its colour, its paws on the wheel and its head. */
-function Driver({ kind }: { kind: Holder }) {
-  const look = RACE_KIDS[kind];
-  const fur = MASCOT_COLORS[kind];
+// ---------------------------------------------------------------------------------------------------------------
+// The rabbit child and the frog child, the third and fourth to take turns: drawn like the shared fox and bear children
+// (`Mascot.tsx`, which draws only those two) – a round head facing us with eyes a little below its middle, a warm brown
+// iris with two lights, rosy cheeks, the plum-brown line round everything, a soft pear of a body with chubby arms and
+// round paws – and dressed: dungarees in the child's colour, the rabbit's blue, the frog's green.
+
+/** The two animals `Mascot` doesn't draw. */
+type Animal = "rabbit" | "frog";
+
+/** The rabbit's and the frog's colours: fur (skin), its far side, light on it, the pale belly and muzzle, the ears' inside, and their clothes. */
+const ANIMAL: Record<Animal, { fur: string; shade: string; light: string; pale: string; paleShade: string; earIn: string; cloth: string; clothShade: string }> =
+  {
+    rabbit: {
+      fur: "#e9ecef",
+      shade: "#c4cad1",
+      light: "#ffffff",
+      pale: "#ffffff",
+      paleShade: "#dee2e6",
+      earIn: KID_LOOK.rabbit.earIn,
+      cloth: KID_LOOK.rabbit.body,
+      clothShade: KID_LOOK.rabbit.shade,
+    },
+    frog: {
+      fur: "#8ce99a",
+      shade: "#51cf66",
+      light: "#d3f9d8",
+      pale: "#ebfbee",
+      paleShade: "#c3e6cb",
+      earIn: KID_LOOK.frog.earIn,
+      cloth: KID_LOOK.frog.shade,
+      clothShade: "#2b8a3e",
+    },
+  };
+
+const isAnimal = (kind: TurnChild): kind is Animal => kind === "rabbit" || kind === "frog";
+
+/** A child's paw colour, for its paws on the wheel. */
+const pawOf = (kind: TurnChild) => (isAnimal(kind) ? ANIMAL[kind].fur : MASCOT_COLORS[kind].paw);
+
+/** One eye as the mascots' are: a warm brown iris round a dark pupil, a thin line round it, a big and a small light. */
+function Eye({ cx, cy, rx, ry }: { cx: number; cy: number; rx: number; ry: number }) {
   return (
-    <svg viewBox="0 0 120 150">
-      <path d="M22 150 Q18 112 34 98 Q60 88 86 98 Q102 112 98 150 Z" fill={look.suit} stroke={INK} strokeWidth="4" strokeLinejoin="round" />
-      <path d="M60 96 V150" stroke={look.suitShade} strokeWidth="6" />
-      <path d="M30 108 Q22 132 40 140 M90 108 Q98 132 80 140" fill="none" stroke={look.suit} strokeWidth="13" strokeLinecap="round" />
-      <path d="M30 108 Q22 132 40 140 M90 108 Q98 132 80 140" fill="none" stroke={INK} strokeWidth="3" strokeLinecap="round" opacity="0.6" />
-      <ellipse cx="60" cy="142" rx="30" ry="9" fill="#343a40" stroke={INK} strokeWidth="3" />
-      <circle cx="40" cy="139" r="7" fill={fur.paw} stroke={INK} strokeWidth="2.5" />
-      <circle cx="80" cy="139" r="7" fill={fur.paw} stroke={INK} strokeWidth="2.5" />
-      <g transform="translate(8 2) scale(1.04)">
-        <MascotHead kind={kind} child mouth="open" />
+    <g>
+      <ellipse cx={cx} cy={cy} rx={rx} ry={ry} fill="#6b3a20" />
+      <ellipse cx={cx} cy={cy + ry * 0.12} rx={rx * 0.62} ry={ry * 0.64} fill="#1f110b" />
+      <ellipse cx={cx} cy={cy} rx={rx} ry={ry} fill="none" stroke={MASCOT_INK} strokeWidth="1.2" />
+      <circle cx={cx + rx * 0.3} cy={cy - ry * 0.36} r={rx * 0.42} fill="#fff" />
+      <circle cx={cx - rx * 0.36} cy={cy + ry * 0.38} r={rx * 0.17} fill="#fff" opacity="0.85" />
+    </g>
+  );
+}
+
+/** The rabbit's head: round, its two long ears standing up behind it (up to y −18), a small pink nose, two front teeth. */
+const RABBIT_HEAD = "M50 26 C73 26 87 41 87 60 C87 79 71 91 50 91 C29 91 13 79 13 60 C13 41 27 26 50 26 Z";
+
+/** The frog's head: wide and low, two round bumps on top with its eyes in them. */
+const FROG_HEAD =
+  "M50 92 C26 92 7 82 7 65 C7 55 10 48 16 43 C12 28 21 17 31 17 C40 17 47 24 48 32 Q50 34 52 32 C53 24 60 17 69 17 C79 17 88 28 84 43 C90 48 93 55 93 65 C93 82 74 92 50 92 Z";
+
+/**
+ * The rabbit's or the frog's head facing us in `MascotHead`'s 100 × 100 box, a child's: smiling, or laughing with its
+ * mouth open (driving, cheering).
+ */
+function AnimalHead({ kind, open = false }: { kind: Animal; open?: boolean }) {
+  const c = ANIMAL[kind];
+  const line = { stroke: MASCOT_INK, strokeWidth: 3.2, strokeLinejoin: "round" as const };
+  if (kind === "rabbit") {
+    const ear = (side: 1 | -1) => `rotate(${side * 12} ${50 + side * 14} 30)`;
+    return (
+      <g>
+        {([-1, 1] as const).map((side) => (
+          <g key={side} transform={ear(side)}>
+            <ellipse cx={50 + side * 14} cy="6" rx="10.5" ry="24" fill={c.fur} {...line} />
+            <ellipse cx={50 + side * 14} cy="8" rx="5" ry="18" fill={c.earIn} />
+          </g>
+        ))}
+        <path d={RABBIT_HEAD} fill={c.fur} />
+        <path d="M74 32 C84 40 88 52 87 62 C86 78 72 90 54 91 C70 84 80 72 80 58 C80 47 78 39 74 32 Z" fill={c.shade} opacity="0.7" />
+        <ellipse cx="42" cy="39" rx="14" ry="7" fill={c.light} opacity="0.7" />
+        <ellipse cx="43.5" cy="70" rx="8.5" ry="6.5" fill={c.pale} stroke={c.paleShade} strokeWidth="1.2" />
+        <ellipse cx="56.5" cy="70" rx="8.5" ry="6.5" fill={c.pale} stroke={c.paleShade} strokeWidth="1.2" />
+        <path d={RABBIT_HEAD} fill="none" {...line} />
+        <ellipse cx="26" cy="67" rx="6" ry="3.8" fill="#ff8f8f" opacity="0.5" />
+        <ellipse cx="74" cy="67" rx="6" ry="3.8" fill="#ff8f8f" opacity="0.5" />
+        <path d="M30 45 Q35.5 42 41 44.5 M70 45 Q64.5 42 59 44.5" fill="none" stroke={c.shade} strokeWidth="2.4" strokeLinecap="round" />
+        <Eye cx={36} cy={55} rx={6} ry={6.9} />
+        <Eye cx={64} cy={55} rx={6} ry={6.9} />
+        <g fill={c.paleShade}>
+          <circle cx="40" cy="70" r="0.9" />
+          <circle cx="38" cy="73" r="0.9" />
+          <circle cx="60" cy="70" r="0.9" />
+          <circle cx="62" cy="73" r="0.9" />
+        </g>
+        {open ? (
+          <>
+            <path d="M44 70 Q50 72 56 70 C55.5 81 44.5 81 44 70 Z" fill="#7a2c2e" stroke={MASCOT_INK} strokeWidth="1.8" strokeLinejoin="round" />
+            <path d="M46.5 77 Q50 74.5 53.5 77 Q52.5 79 50 79 Q47.5 79 46.5 77 Z" fill="#f07b85" />
+            <rect x="47.4" y="70.6" width="5.2" height="4.4" rx="1" fill="#fff" stroke={MASCOT_INK} strokeWidth="1" />
+          </>
+        ) : (
+          <>
+            <rect x="47.4" y="70.4" width="5.2" height="5" rx="1" fill="#fff" stroke={MASCOT_INK} strokeWidth="1.1" />
+            <path d="M50 70.6 V75" stroke={MASCOT_INK} strokeWidth="0.8" />
+            <path
+              d="M50 66.5 L50 70.4 M44.5 70.4 Q47.5 73.5 50 70.4 Q52.5 73.5 55.5 70.4"
+              fill="none"
+              stroke={MASCOT_INK}
+              strokeWidth="2"
+              strokeLinecap="round"
+            />
+          </>
+        )}
+        <path d="M45.5 62.5 Q50 60.5 54.5 62.5 Q53 67 50 67.5 Q47 67 45.5 62.5 Z" fill="#f783ac" stroke={MASCOT_INK} strokeWidth="1.6" strokeLinejoin="round" />
+        <ellipse cx="48.6" cy="62.8" rx="1.5" ry="0.8" fill="#fff" opacity="0.75" />
+      </g>
+    );
+  }
+  return (
+    <g>
+      <path d={FROG_HEAD} fill={c.fur} />
+      <path d="M80 44 C88 50 92 58 92 66 C92 81 75 91 54 92 C72 85 84 76 85 64 C85 56 83 50 80 44 Z" fill={c.shade} opacity="0.7" />
+      <ellipse cx="50" cy="48" rx="16" ry="6" fill={c.light} opacity="0.6" />
+      <path d="M50 92 C34 92 22 86 18 76 C30 82 70 82 82 76 C78 86 66 92 50 92 Z" fill={c.pale} opacity="0.9" />
+      <path d={FROG_HEAD} fill="none" {...line} />
+      {/* The bumps' rims round the eyes, and light on them. */}
+      <circle cx="31" cy="32" r="11.5" fill={c.light} opacity="0.55" />
+      <circle cx="69" cy="32" r="11.5" fill={c.light} opacity="0.55" />
+      <Eye cx={31} cy={32} rx={8} ry={8.8} />
+      <Eye cx={69} cy={32} rx={8} ry={8.8} />
+      <ellipse cx="21" cy="68" rx="6.5" ry="4" fill="#ff8f8f" opacity="0.5" />
+      <ellipse cx="79" cy="68" rx="6.5" ry="4" fill="#ff8f8f" opacity="0.5" />
+      <circle cx="45.5" cy="57" r="1.5" fill={MASCOT_INK} />
+      <circle cx="54.5" cy="57" r="1.5" fill={MASCOT_INK} />
+      {open ? (
+        <>
+          <path d="M30 65 Q50 69 70 65 C66 85 34 85 30 65 Z" fill="#7a2c2e" stroke={MASCOT_INK} strokeWidth="2" strokeLinejoin="round" />
+          <path d="M41 77 Q50 72 59 77 Q56 81 50 81 Q44 81 41 77 Z" fill="#f07b85" />
+        </>
+      ) : (
+        <path d="M29 66 Q50 82 71 66" fill="none" stroke={MASCOT_INK} strokeWidth="2.6" strokeLinecap="round" />
+      )}
+    </g>
+  );
+}
+
+/** One of the rabbit's or frog's arms from the shoulder through the elbow to a round paw, chubby, with the line round it. */
+function AnimalArm({ from, via, to, kind }: { from: [number, number]; via: [number, number]; to: [number, number]; kind: Animal }) {
+  const c = ANIMAL[kind];
+  const d = `M${from[0]} ${from[1]} Q${via[0]} ${via[1]} ${to[0]} ${to[1]}`;
+  const turn = (Math.atan2(to[1] - via[1], to[0] - via[0]) * 180) / Math.PI - 90;
+  return (
+    <>
+      <path d={d} stroke={MASCOT_INK} strokeWidth="29" fill="none" strokeLinecap="round" />
+      <path d={d} stroke={c.fur} strokeWidth="21" fill="none" strokeLinecap="round" />
+      <g transform={`translate(${to[0]} ${to[1]}) rotate(${+turn.toFixed(1)})`}>
+        <circle r="14" fill={c.fur} stroke={MASCOT_INK} strokeWidth="4" />
+        <circle cx="-4" cy="-4.5" r="3.4" fill="#fff" opacity="0.3" />
+        <path d="M-4.5 13 L-4 8.5 M4.5 13 L4 8.5" stroke={c.shade} strokeWidth="2" strokeLinecap="round" />
+      </g>
+    </>
+  );
+}
+
+/** One foot at `x`: the rabbit's long one with a pink pad, the frog's wide one with three round toes. */
+function AnimalFoot({ x, kind }: { x: number; kind: Animal }) {
+  const c = ANIMAL[kind];
+  if (kind === "rabbit")
+    return (
+      <g>
+        <ellipse cx={x} cy="284" rx="27" ry="13.5" fill={c.fur} stroke={MASCOT_INK} strokeWidth="4" />
+        <ellipse cx={x} cy="288" rx="11" ry="5.5" fill={c.earIn} />
+      </g>
+    );
+  return (
+    <g stroke={MASCOT_INK} strokeWidth="3.5">
+      {[-17, 0, 17].map((d) => (
+        <circle key={d} cx={x + d} cy="291" r="7" fill={c.fur} />
+      ))}
+      <ellipse cx={x} cy="283" rx="24" ry="11.5" fill={c.fur} strokeWidth="4" />
+    </g>
+  );
+}
+
+/** The arms of `Mascot`'s child, hanging or raised in a cheer. */
+const ARMS = {
+  stand: [
+    { from: [58, 178], via: [40, 210], to: [46, 238] },
+    { from: [142, 178], via: [160, 210], to: [154, 238] },
+  ],
+  cheer: [
+    { from: [60, 176], via: [34, 152], to: [30, 114] },
+    { from: [140, 176], via: [166, 152], to: [170, 114] },
+  ],
+} satisfies Record<string, { from: [number, number]; via: [number, number]; to: [number, number] }[]>;
+
+/** The rabbit child or the frog child standing and facing us in `Mascot`'s 200 × 300 box, in dungarees in its colour; cheering with both arms up. */
+function AnimalKid({ kind, cheer }: { kind: Animal; cheer?: boolean }) {
+  const c = ANIMAL[kind];
+  return (
+    <svg viewBox="0 0 200 300" overflow="visible">
+      <ellipse cx="100" cy="292" rx="66" ry="7" fill="#3a2418" opacity="0.14" />
+      {kind === "rabbit" && <circle cx="153" cy="248" r="16" fill={c.light} stroke={MASCOT_INK} strokeWidth="4" />}
+      <AnimalFoot x={78} kind={kind} />
+      <AnimalFoot x={122} kind={kind} />
+      <path d={BODY} fill={c.fur} />
+      <path d="M130 152 C151 168 159 196 157 222 C155 247 144 267 121 275 C138 252 144 226 142 200 C140 180 136 164 130 152 Z" fill={c.shade} opacity="0.7" />
+      <path d="M100 160 C120 160 133 176 134 196 L66 196 C67 176 80 160 100 160 Z" fill={c.pale} />
+      {/* The dungarees: trousers over the body's lower half, the bib and its straps, two yellow buttons and a pocket. */}
+      <path d="M43 208 C39 248 58 278 100 279 C142 278 161 248 157 208 Z" fill={c.cloth} />
+      <path d="M118 212 C126 232 126 256 112 272 C138 264 150 240 152 214 Z" fill={c.clothShade} opacity="0.6" />
+      <rect x="72" y="178" width="56" height="34" fill={c.cloth} />
+      <path d="M72 210 V178 H128 V210 M43 208 H72 M128 208 H157" fill="none" stroke={MASCOT_INK} strokeWidth="3.5" strokeLinejoin="round" />
+      <path d="M77 180 L66 154 M123 180 L134 154" stroke={MASCOT_INK} strokeWidth="11" strokeLinecap="round" />
+      <path d="M77 180 L66 154 M123 180 L134 154" stroke={c.cloth} strokeWidth="6" strokeLinecap="round" />
+      <rect x="89" y="186" width="22" height="15" rx="3" fill="none" stroke={c.clothShade} strokeWidth="2.5" />
+      <circle cx="80" cy="186" r="4.2" fill="#ffd43b" stroke={MASCOT_INK} strokeWidth="2" />
+      <circle cx="120" cy="186" r="4.2" fill="#ffd43b" stroke={MASCOT_INK} strokeWidth="2" />
+      <path d={BODY} fill="none" stroke={MASCOT_INK} strokeWidth="4.5" strokeLinejoin="round" />
+      {(cheer ? ARMS.cheer : ARMS.stand).map((arm) => (
+        <AnimalArm key={arm.from.join()} {...arm} kind={kind} />
+      ))}
+      <g transform="translate(32.5 28) scale(1.35)">
+        <AnimalHead kind={kind} open={cheer} />
       </g>
     </svg>
   );
 }
 
-/** The face of the child driving on the big screen behind the track: both are there, the one driving shows. */
-export function RaceScreen({ holder }: { holder: Holder }) {
+/** A child standing on its mat: the shared fox or bear child, or the rabbit or frog child. Drawn once for its pose. */
+const KidFigure = memo(function KidFigure({ kind, cheer }: { kind: TurnChild; cheer?: boolean }) {
+  return isAnimal(kind) ? <AnimalKid kind={kind} cheer={cheer} /> : <Mascot kind={kind} child pose={cheer ? "cheer" : "stand"} />;
+});
+
+/** A child's head in `MascotHead`'s box, laughing: the shared fox's or bear's, or the rabbit's or frog's. */
+function LaughingHead({ kind }: { kind: TurnChild }) {
+  return isAnimal(kind) ? <AnimalHead kind={kind} open /> : <MascotHead kind={kind} child mouth="open" />;
+}
+
+/** A child at the wheel, seen from the front: its racing suit in its colour, its paws on the wheel and its head. Drawn once. */
+const Driver = memo(function Driver({ kind }: { kind: TurnChild }) {
+  const look = RACE_KIDS[kind];
+  const paw = pawOf(kind);
+  return (
+    // The rabbit's ears reach past the box's top.
+    <svg viewBox="0 0 120 150" overflow="visible">
+      <path d="M22 150 Q18 112 34 98 Q60 88 86 98 Q102 112 98 150 Z" fill={look.suit} stroke={INK} strokeWidth="4" strokeLinejoin="round" />
+      <path d="M60 96 V150" stroke={look.suitShade} strokeWidth="6" />
+      <path d="M30 108 Q22 132 40 140 M90 108 Q98 132 80 140" fill="none" stroke={look.suit} strokeWidth="13" strokeLinecap="round" />
+      <path d="M30 108 Q22 132 40 140 M90 108 Q98 132 80 140" fill="none" stroke={INK} strokeWidth="3" strokeLinecap="round" opacity="0.6" />
+      <ellipse cx="60" cy="142" rx="30" ry="9" fill="#343a40" stroke={INK} strokeWidth="3" />
+      <circle cx="40" cy="139" r="7" fill={paw} stroke={INK} strokeWidth="2.5" />
+      <circle cx="80" cy="139" r="7" fill={paw} stroke={INK} strokeWidth="2.5" />
+      <g transform="translate(8 2) scale(1.04)">
+        <LaughingHead kind={kind} />
+      </g>
+    </svg>
+  );
+});
+
+/** Where a child's head sits on the screen (its 200 × 98 box): the rabbit's a little smaller, so its ears stay on the screen. */
+const SCREEN_HEAD: Record<TurnChild, string> = {
+  fox: "translate(58 6) scale(0.84)",
+  bear: "translate(58 6) scale(0.84)",
+  rabbit: "translate(64 15) scale(0.72)",
+  frog: "translate(58 4) scale(0.84)",
+};
+
+/** One child on the big screen: its photo if a grown-up picked one, else its laughing face, and its name on the band below if written. */
+const ScreenFace = memo(function ScreenFace({ kind, look }: { kind: TurnChild; look: PlayerLook | undefined }) {
+  const c = RACE_KIDS[kind];
+  const name = ownName(look);
+  return (
+    <svg viewBox="0 0 200 98" preserveAspectRatio="none">
+      <rect width="200" height="98" fill={c.light} />
+      <rect y="78" width="200" height="20" fill={c.paint} />
+      {Array.from({ length: 10 }, (_, i) => (
+        <rect key={i} x={i * 20} y={i % 2 ? 0 : 8} width="10" height="8" fill="#212529" opacity="0.8" />
+      ))}
+      {look?.photo ? (
+        // Only the photo: the name stands on the band below.
+        <PlayerPatch look={photoOnly(look.photo)} x={100} y={42} r={30} color={c.paint} />
+      ) : (
+        <g transform={SCREEN_HEAD[kind]}>
+          <LaughingHead kind={kind} />
+        </g>
+      )}
+      {name && (
+        <text x="100" y="88.5" textAnchor="middle" dominantBaseline="central" fontSize="14" fontWeight="800" fill="#fff">
+          {name}
+        </text>
+      )}
+    </svg>
+  );
+});
+
+/** The child driving on the big screen behind the track: every child playing is there, the one driving shows. */
+export function RaceScreen({ kids, holder, players }: { kids: readonly TurnChild[]; holder: TurnChild; players?: Players }) {
   return (
     <>
-      {(["fox", "bear"] as const).map((kind) => (
+      {kids.map((kind) => (
         <Layer key={kind} x={SCREEN.x + 10} y={SCREEN.y + 10} w={SCREEN.w - 20} h={SCREEN.h - 20} className={`tm-race-face${holder === kind ? " tm-on" : ""}`}>
-          <svg viewBox="0 0 200 98" preserveAspectRatio="none">
-            <rect width="200" height="98" fill={RACE_KIDS[kind].light} />
-            <rect y="78" width="200" height="20" fill={RACE_KIDS[kind].paint} />
-            {Array.from({ length: 10 }, (_, i) => (
-              <rect key={i} x={i * 20 + (i % 2) * 0} y={i % 2 ? 0 : 8} width="10" height="8" fill="#212529" opacity="0.8" />
-            ))}
-            <g transform="translate(58 6) scale(0.84)">
-              <MascotHead kind={kind} child mouth="open" />
-            </g>
-          </svg>
+          <ScreenFace kind={kind} look={players?.[kind]} />
         </Layer>
       ))}
     </>
@@ -730,9 +1065,8 @@ function kartFrames(plan: RacePlan) {
 }
 
 /** A child's standing figure at its mat: its box on the stage, and where the kart's seat lies from it (its offset and size). */
-function kidBox(kind: Holder) {
-  const look = RACE_KIDS[kind];
-  const q = project(look.x, look.z);
+export function kidBox(at: { x: number; z: number }) {
+  const q = project(at.x, at.z);
   const w = KID.w * q.s;
   const h = KID.h * q.s;
   const seat = kartAt(0);
@@ -750,8 +1084,22 @@ function kidBox(kind: Holder) {
  * A child's figure on its mat. In a turn with a changeover the child who drove before (`out`) stands in the kart and
  * hops out to its mat, and the child whose turn it is hops from its mat into the kart, where it is the driver then.
  */
-function Kid({ kind, name, plan, role, cheer }: { kind: Holder; name?: string; plan?: RacePlan; role: "out" | "in" | "wait" | "drive"; cheer?: boolean }) {
-  const box = kidBox(kind);
+function Kid({
+  kind,
+  at,
+  name,
+  plan,
+  role,
+  cheer,
+}: {
+  kind: TurnChild;
+  at: { x: number; z: number };
+  name?: string;
+  plan?: RacePlan;
+  role: "out" | "in" | "wait" | "drive";
+  cheer?: boolean;
+}) {
+  const box = kidBox(at);
   let style: CSSProperties | undefined;
   let rules = "";
   if (plan && name && (role === "out" || role === "in")) {
@@ -777,7 +1125,7 @@ function Kid({ kind, name, plan, role, cheer }: { kind: Holder; name?: string; p
     <>
       {rules && <style>{rules}</style>}
       <Layer x={box.x} y={box.y} w={box.w} h={box.h} className="tm-race-kid" style={style}>
-        <Mascot kind={kind} child pose={cheer ? "cheer" : "stand"} />
+        <KidFigure kind={kind} cheer={cheer} />
       </Layer>
     </>
   );
@@ -787,7 +1135,7 @@ function Kid({ kind, name, plan, role, cheer }: { kind: Holder; name?: string; p
  * The kart with its driver: standing on the start line (`plan` absent: before the turns, or at the end), or driving the
  * turn's lap on its keyframes. In a turn with a changeover the seat is empty until the child whose turn it is has hopped in.
  */
-function RaceKart({ holder, name, plan, still }: { holder: Holder; name?: string; plan?: RacePlan; still?: boolean }) {
+function RaceKart({ holder, name, plan, still }: { holder: TurnChild; name?: string; plan?: RacePlan; still?: boolean }) {
   const frames = useMemo(() => (plan ? kartFrames(plan) : null), [plan]);
   const timing = plan ? `${plan.ms}ms linear var(--tm-race-delay) both` : "";
   const start = kartAt(0);
@@ -855,8 +1203,7 @@ function Lights({ name, plan, done }: { name?: string; plan?: RacePlan; done: bo
     if (!plan || !name) return { opacity: done ? (lamp === 2 ? 1 : 0) : lamp === 0 ? 1 : 0 };
     return { animation: `${name}-lamp${lamp} ${timing}` };
   };
-  const f = project(FLAG.x, FLAG.z);
-  const flag = { x: f.x - 4 * f.s, y: f.y - FLAG.h * f.s, w: 92 * f.s, h: FLAG.h * f.s };
+  const flag = flagBox();
   let rules = "";
   if (plan && name) {
     const yellow = plan.swap + plan.lights / 2;
@@ -900,7 +1247,7 @@ function Lights({ name, plan, done }: { name?: string; plan?: RacePlan; done: bo
         </Layer>
       ))}
       <Layer x={flag.x} y={flag.y} w={flag.w} h={flag.h} className="tm-race-flag" style={plan && name ? { animation: `${name}-flag ${timing}` } : undefined}>
-        <svg viewBox={`0 0 92 ${FLAG.h}`}>
+        <svg viewBox={`0 0 ${FLAG.w} ${FLAG.h}`}>
           <path d={`M4 4 V${FLAG.h}`} stroke={INK} strokeWidth="5" strokeLinecap="round" />
           <circle cx="4" cy="4" r="4.5" fill="#ffd43b" stroke={INK} strokeWidth="2" />
           <path d="M6 7 Q32 -1 56 9 T89 10 V44 Q66 38 46 44 T6 42 Z" fill="#f8f9fa" stroke={INK} strokeWidth="3.5" strokeLinejoin="round" />
@@ -945,16 +1292,18 @@ export interface RaceTurn {
  * start light, the children and the kart. Keyed by the turn, so each reads once how long ago it began.
  */
 function Lap({
+  kids,
   holder,
-  other,
+  prev,
   turn,
   done,
   poke,
   elapsed,
   quiet,
 }: {
-  holder: Holder;
-  other: Holder;
+  kids: readonly TurnChild[];
+  holder: TurnChild;
+  prev: TurnChild | null;
   turn: RaceTurn | null;
   done: boolean;
   poke: number;
@@ -1013,47 +1362,58 @@ function Lap({
       {plan && poke > 0 && <Paint key={`g${poke}`} from={k} to={SAMPLES} on="ground" fill="#fff3bf" className="tm-race-ahead" />}
       {plan && poke > 0 && <Paint key={`d${poke}`} from={k} to={SAMPLES} on="deck" fill="#fff3bf" className="tm-race-ahead" />}
       <Lights name={name} plan={plan} done={done} />
-      <Kid kind={other} name={name} plan={plan} role={swapping ? "out" : "wait"} cheer={done} />
-      <Kid kind={holder} name={name} plan={plan} role={swapping ? "in" : "drive"} />
+      {kids.map((kind) => {
+        // The child whose turn it is hops in (or sits in the kart already), the one who drove before hops out, the others wait and cheer at the end.
+        const role = kind === holder ? (swapping ? "in" : "drive") : swapping && kind === prev ? "out" : "wait";
+        return <Kid key={kind} kind={kind} at={matOf(kids, kind)} name={name} plan={plan} role={role} cheer={done && role === "wait"} />;
+      })}
       <RaceKart holder={holder} name={name} plan={plan} still={done} />
     </div>
   );
 }
 
 /**
- * The Rennstrecke on the stage: `holder` drives (or waits on the start line before the turns), `other` stands on its
- * mat; `turn` is the lap under way (null before the turns and at the end), `done` the end, where the child on its mat
- * cheers. `poke` counts the taps, each lighting the way still to go (H-51). `elapsed` puts a card's lap at that moment;
- * `quiet` keeps a card silent.
+ * The Rennstrecke on the stage for `kids` (2–4, in turn order), each with its mat: `holder` drives (or waits on the
+ * start line before the turns), `prev` drove the turn before and hops out at its start (null on the first), the others
+ * stand on their mats; `turn` is the lap under way (null before the turns and at the end), `done` the end, where the
+ * children on their mats cheer. `players` holds the photos and names grown-ups gave the children, shown on their mats
+ * and on the big screen. `poke` counts the taps, each lighting the way still to go (H-51). `elapsed` puts a card's lap
+ * at that moment; `quiet` keeps a card silent.
  */
 export function RaceScene({
+  kids,
   holder,
-  other,
+  prev,
   turn,
   done,
   poke,
   elapsed,
   quiet,
+  players,
 }: {
-  holder: Holder;
-  other: Holder;
+  kids: readonly TurnChild[];
+  holder: TurnChild;
+  prev: TurnChild | null;
   turn: RaceTurn | null;
   done: boolean;
   poke: number;
   elapsed?: number;
   quiet?: boolean;
+  players?: Players;
 }) {
   useEffect(() => loadRealSounds([playEngine]), []);
   return (
     <div className="tm-race">
       <RaceGround />
-      <RaceScreen holder={holder} />
+      <RaceMats kids={kids} players={players} />
+      <RaceScreen kids={kids} holder={holder} players={players} />
       <RaceBridge />
       <RacePost />
       <Lap
-        key={`${turn?.name ?? (done ? "done" : "wait")}-${holder}`}
+        key={`${turn?.name ?? (done ? "done" : "wait")}-${holder}-${kids.join()}`}
+        kids={kids}
         holder={holder}
-        other={other}
+        prev={prev}
         turn={turn}
         done={done}
         poke={poke}

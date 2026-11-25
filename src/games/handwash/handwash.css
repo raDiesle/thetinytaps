@@ -1,7 +1,8 @@
 /* Hände waschen. Every motion goes with the song to come (112 BPM, one beat 0.536 s, `--beat`): durations are beats,
    nothing loops faster than one. Every keyframe animates only transform, opacity or filter of an HTML layer, never
    something inside an svg (root CLAUDE.md, phones must keep up). States that last over several steps (sleeves up,
-   water on, wet, foam) are classes on the stage with transitions; what moves within a step runs on its `at-<step>`. */
+   water on, wet, foam, how each hand is seen) are classes on the stage with transitions; what moves within a step runs
+   on its `at-<step>`. A hand's place in a step is its `.hw-pose`, turned round its wrist; its motion there is `.hw-rub`. */
 
 .hw-play {
   position: absolute;
@@ -9,7 +10,7 @@
   overflow: hidden;
   container-type: size;
   /* Above and below the picture (held upright) the wall's tiles and the counter go on. */
-  background: linear-gradient(#e8f6ff 0 30%, #f1e7da 30%);
+  background: linear-gradient(#dff0fb 0 30%, #f2e8db 30%);
 }
 
 /* The 16 : 9 picture, as big as the screen allows while both hands with the tap and the pump stay whole:
@@ -79,21 +80,34 @@
   z-index: 3;
 }
 
+/* The hand lying on top of the other: the left one in these steps (the right one is on top by default). */
+.at-palms .hw-left,
+.at-backs2 .hw-left,
+.at-between .hw-left,
+.at-rinse .hw-left {
+  z-index: 4;
+}
+
 .hw-pose,
 .hw-rub,
 .hw-mirror,
+.hw-view,
 .hw-wet,
-.hw-foam {
+.hw-foam,
+.hw-dirt {
   position: absolute;
   inset: 0;
 }
 
+/* Turned round the wrist, which lies at (170, 480) of the hand's 340 × 700 units. */
 .hw-pose {
+  transform-origin: 50% 68.6%;
   transition: transform calc(var(--beat) * 1.5) ease-in-out;
   will-change: transform;
 }
 
 .hw-rub {
+  transform-origin: 50% 68.6%;
   will-change: transform;
 }
 
@@ -104,7 +118,7 @@
 .hw-hand-art,
 .hw-foam-art,
 .hw-wet-art,
-.hw-sleeve-art {
+.hw-dirt-art {
   position: absolute;
   inset: 0;
   display: block;
@@ -112,100 +126,157 @@
   height: 100%;
 }
 
-.hw-sleeve-art {
-  position: static;
+/* Each view of a hand is a layer of its own; the step shows one (`l-<view>`, `r-<view>`). */
+.hw-view {
+  opacity: 0;
+  transition: opacity calc(var(--beat) * 0.5) ease;
 }
 
-/* Where the hands are held in each step. */
-.at-wet .hw-left .hw-pose,
-.at-rinse .hw-left .hw-pose {
-  transform: translate(13%, -5%) rotate(9deg);
+.l-back .hw-left .v-back,
+.l-palm .hw-left .v-palm,
+.l-backSpread .hw-left .v-backSpread,
+.l-palmSpread .hw-left .v-palmSpread,
+.r-back .hw-right .v-back,
+.r-palm .hw-right .v-palm,
+.r-backSpread .hw-right .v-backSpread,
+.r-palmSpread .hw-right .v-palmSpread {
+  opacity: 1;
 }
 
-.at-wet .hw-right .hw-pose,
-.at-rinse .hw-right .hw-pose {
-  transform: translate(-13%, -5%) rotate(-9deg);
+/* Where the hands are held in each step (`translate` in % of the hand's box: 340 units across, 700 down). */
+.at-sleeves .hw-left .hw-pose {
+  transform: translate(8%, 0);
 }
 
-/* The right hand goes over to the pump. */
+.at-sleeves .hw-right .hw-pose {
+  transform: translate(-8%, 0);
+}
+
+/* The left hand presses the pump, the right one holds its palm under the nozzle. */
+.at-soap .hw-left .hw-pose {
+  transform: translate(-124%, -58%) rotate(60deg);
+}
+
 .at-soap .hw-right .hw-pose {
-  transform: translate(36%, -24%) rotate(-14deg);
+  transform: translate(-84%, -42.6%) rotate(-20deg);
 }
 
+/* Palm on palm: the left hand lies on the right one's palm, lower and crossed, so the palm below is seen too. */
 .at-palms .hw-left .hw-pose {
-  transform: translate(17%, -2%) rotate(7deg);
+  transform: translate(47%, 5.7%) rotate(14deg);
 }
 
 .at-palms .hw-right .hw-pose {
-  transform: translate(-17%, -2%) rotate(-7deg);
+  transform: translate(-45.6%, -10%) rotate(-14deg);
 }
 
-.at-backs .hw-left .hw-pose,
-.at-between .hw-left .hw-pose,
-.at-thumbs .hw-left .hw-pose,
-.at-tips .hw-left .hw-pose {
-  transform: translate(12%, 0) rotate(4deg);
+/* Over a back and between the fingers: the hand on top lies lower and crossed, its fingers between the other's. */
+.at-backs .hw-left .hw-pose {
+  transform: translate(47%, -10%) rotate(10deg);
 }
 
 .at-backs .hw-right .hw-pose {
-  transform: translate(-36%, 6%) rotate(-24deg);
+  transform: translate(-47%, 4.3%) rotate(-12deg);
 }
 
+.at-backs2 .hw-left .hw-pose,
+.at-between .hw-left .hw-pose {
+  transform: translate(47%, 4.3%) rotate(12deg);
+}
+
+.at-backs2 .hw-right .hw-pose,
 .at-between .hw-right .hw-pose {
-  transform: translate(-30%, -3%) rotate(-10deg);
+  transform: translate(-47%, -10%) rotate(-10deg);
 }
 
-.at-thumbs .hw-right .hw-pose {
-  transform: translate(-26%, 8%) rotate(-32deg);
+/* Water on: the right hand at the lever, the left one waiting beside the stream to feel it. */
+.at-water .hw-left .hw-pose {
+  transform: translate(12%, 10%) rotate(12deg);
 }
 
-.at-tips .hw-right .hw-pose {
-  transform: translate(-24%, -12%) rotate(-40deg);
+.at-water .hw-right .hw-pose,
+.at-off .hw-right .hw-pose {
+  transform: translate(19%, -30%) rotate(-35deg);
 }
 
+/* Rinsing: palm on palm again, under the stream. */
+.at-rinse .hw-left .hw-pose {
+  transform: translate(47%, 17%) rotate(14deg);
+}
+
+.at-rinse .hw-right .hw-pose {
+  transform: translate(-45.6%, 1.4%) rotate(-14deg);
+}
+
+.at-off .hw-left .hw-pose {
+  transform: translate(4%, 4%);
+}
+
+/* Into the towel hanging on the right. */
 .at-towel .hw-left .hw-pose {
-  transform: translate(6%, 0);
+  transform: translate(203%, -11.4%) rotate(4deg);
 }
 
 .at-towel .hw-right .hw-pose {
-  transform: translate(-6%, 0);
+  transform: translate(126.5%, -10%) rotate(-4deg);
 }
 
-/* The rubbing: each step its own movement, two beats a stroke, starting and ending where the hand is held. */
-.at-palms .hw-right .hw-rub,
-.at-rinse .hw-right .hw-rub {
-  animation: hw-rub-updown calc(var(--beat) * 2) ease-in-out infinite;
+/* The motion within a step, starting and ending where the hand is held. */
+.at-soap .hw-left .hw-rub {
+  animation: hw-press var(--beat) ease-in-out calc(var(--beat) * 1.6) 2;
 }
 
 .at-palms .hw-left .hw-rub,
 .at-rinse .hw-left .hw-rub {
-  animation: hw-rub-updown calc(var(--beat) * 2) ease-in-out infinite reverse;
-}
-
-.at-backs .hw-right .hw-rub,
-.at-tips .hw-right .hw-rub {
   animation: hw-rub-circle calc(var(--beat) * 2) linear infinite;
 }
 
-.at-between .hw-right .hw-rub {
+.at-palms .hw-right .hw-rub,
+.at-rinse .hw-right .hw-rub {
+  animation: hw-rub-circle calc(var(--beat) * 2) linear infinite reverse;
+}
+
+.at-backs .hw-right .hw-rub,
+.at-backs2 .hw-left .hw-rub,
+.at-between .hw-left .hw-rub {
   animation: hw-rub-slide calc(var(--beat) * 2) ease-in-out infinite;
 }
 
-.at-thumbs .hw-right .hw-rub {
-  transform-origin: 30% 55%;
-  animation: hw-rub-twist calc(var(--beat) * 2) ease-in-out infinite;
+.at-between .hw-right .hw-rub {
+  animation: hw-rub-slide calc(var(--beat) * 2) ease-in-out infinite reverse;
 }
 
-@keyframes hw-rub-updown {
+.at-water .hw-left .hw-rub {
+  animation: hw-feel calc(var(--beat) * 10) ease-in-out forwards;
+}
+
+.at-water .hw-right .hw-rub {
+  animation: hw-turn calc(var(--beat) * 10) ease-in-out forwards;
+}
+
+.at-off .hw-left .hw-rub {
+  animation: hw-shake calc(var(--beat) / 2) ease-in-out calc(var(--beat) * 1.5) 4;
+}
+
+.at-off .hw-right .hw-rub {
+  animation: hw-press var(--beat) ease-in-out calc(var(--beat) * 0.6) 1;
+}
+
+.at-towel .hw-hand .hw-rub {
+  animation: hw-dry calc(var(--beat) * 10) ease-in-out forwards;
+}
+
+.at-towel .hw-right .hw-rub {
+  animation-direction: reverse;
+}
+
+@keyframes hw-press {
   0%,
   100% {
     transform: none;
   }
-  25% {
-    transform: translateY(-4%);
-  }
-  75% {
-    transform: translateY(4%);
+  50% {
+    transform: translateY(2.5%) scale(0.98);
   }
 }
 
@@ -215,13 +286,13 @@
     transform: none;
   }
   25% {
-    transform: translate(4%, -2%);
+    transform: translate(5%, -2%) rotate(-3deg);
   }
   50% {
     transform: translate(0, -4%);
   }
   75% {
-    transform: translate(-4%, -2%);
+    transform: translate(-5%, -2%) rotate(3deg);
   }
 }
 
@@ -230,53 +301,150 @@
   100% {
     transform: none;
   }
-  25% {
-    transform: translate(-3%, 3%);
-  }
-  75% {
-    transform: translate(3%, -3%);
+  50% {
+    transform: translateY(-6%);
   }
 }
 
-@keyframes hw-rub-twist {
+/* The left hand's fingers go into the stream: cold! back out with a shiver; once it is warm they go in again and stay. */
+@keyframes hw-feel {
+  0%,
+  28% {
+    transform: none;
+  }
+  36%,
+  40% {
+    transform: translate(16%, -2%);
+  }
+  44% {
+    transform: translate(-3%, 2%) rotate(-3deg);
+  }
+  47% {
+    transform: translate(-3%, 2%) rotate(2deg);
+  }
+  50%,
+  62% {
+    transform: translate(-3%, 2%);
+  }
+  72%,
+  100% {
+    transform: translate(16%, -2%);
+  }
+}
+
+/* The right hand lifts the lever towards the cold blue dot, and later turns it towards the warm red one. */
+@keyframes hw-turn {
+  0% {
+    transform: none;
+  }
+  10%,
+  44% {
+    transform: translate(6%, -1%) rotate(4deg);
+  }
+  56%,
+  100% {
+    transform: translate(-4%, 0) rotate(-3deg);
+  }
+}
+
+/* Wet hands shaken over the basin. */
+@keyframes hw-shake {
   0%,
   100% {
     transform: none;
   }
   25% {
-    transform: rotate(-9deg);
+    transform: rotate(-5deg);
   }
   75% {
-    transform: rotate(9deg);
+    transform: rotate(5deg);
   }
 }
 
-/* The sleeves are pushed up the arm, towards the viewer, in the first step. */
+/* Rubbing inside the towel while it lies round the hands. */
+@keyframes hw-dry {
+  0%,
+  25% {
+    transform: none;
+  }
+  32%,
+  48%,
+  64% {
+    transform: translateY(-3%);
+  }
+  40%,
+  56%,
+  72% {
+    transform: translateY(3%);
+  }
+  80%,
+  100% {
+    transform: none;
+  }
+}
+
+/* The sleeves are pushed up the arm, towards the child, and rolled at their edge. */
 .hw-sleeve {
   position: absolute;
   left: 0;
   width: 100%;
   top: 62.86%;
   height: 37.14%;
-  /* Down over the wrist at first, where the picture shows it whole even on a phone, under the bar. */
-  transform: translateY(-38%);
-  transition: transform calc(var(--beat) * 3) ease-in-out calc(var(--beat) * 0.5);
+  /* Down over the wrist at first. */
+  transform: translateY(-30%);
   will-change: transform;
 }
 
+.hw-sleeve-art,
+.hw-roll-art {
+  display: block;
+  width: 100%;
+  height: 100%;
+}
+
+.rolling .hw-sleeve,
 .sleeves-up .hw-sleeve {
-  transform: translateY(60%);
+  transform: translateY(55%);
+}
+
+.rolling .hw-sleeve {
+  transition: transform calc(var(--beat) * 2.5) ease-in-out calc(var(--beat) * 0.5);
+}
+
+.hw-roll {
+  position: absolute;
+  inset: 0;
+  opacity: 0;
+  transform: translateY(-6%) scaleY(0.6);
+  transform-origin: 50% 0;
+}
+
+.rolling .hw-roll,
+.sleeves-up .hw-roll {
+  opacity: 1;
+  transform: translateY(-6%);
+}
+
+.rolling .hw-roll {
+  transition:
+    opacity calc(var(--beat) * 1.5) ease calc(var(--beat) * 1),
+    transform calc(var(--beat) * 1.5) ease calc(var(--beat) * 1);
+}
+
+/* The dirt of playing goes bit by bit with the rubbing (`--dirt`), the last of it with the rinse. */
+.hw-dirt {
+  opacity: var(--dirt, 1);
+  transition: opacity calc(var(--beat) * 8) ease;
 }
 
 .hw-wet {
   opacity: 0;
-  transition: opacity calc(var(--beat) * 3) ease;
+  transition: opacity calc(var(--beat) * 5) ease calc(var(--beat) * 2);
 }
 
 .wet .hw-wet {
   opacity: 1;
-  transition-duration: calc(var(--beat) * 2);
-  transition-delay: var(--beat);
+  transition: opacity calc(var(--beat) * 2) ease calc(var(--beat) * 4);
 }
 
 .hw-dab {
@@ -284,8 +452,8 @@
   opacity: 0;
   transform: scale(0.4);
   transition:
-    opacity 0.3s,
-    transform 0.3s;
+    opacity calc(var(--beat) * 3),
+    transform calc(var(--beat) * 3);
 }
 
 .hw-dab > svg {
@@ -294,20 +462,22 @@
   height: 100%;
 }
 
-/* The soap lands once the pump was pressed. */
+/* The soap lands in the palm once the pump was pressed. */
 .dab .hw-dab {
   opacity: 1;
   transform: none;
-  transition-delay: calc(var(--beat) * 2.4);
+  transition:
+    opacity 0.3s calc(var(--beat) * 2.6),
+    transform 0.3s calc(var(--beat) * 2.6);
 }
 
-/* The foam grows over the first rubbing step and stays until it is rinsed off. */
+/* The foam grows with the rubbing, stays until the rinse and goes under the water. */
 .hw-foam {
   opacity: 0;
-  transform: scale(0.55);
+  transform: scale(0.6);
   transition:
-    opacity calc(var(--beat) * 5) ease,
-    transform calc(var(--beat) * 5) ease;
+    opacity calc(var(--beat) * 7) ease,
+    transform calc(var(--beat) * 7) ease;
   will-change: transform, opacity;
 }
 
@@ -317,158 +487,58 @@
   transition-duration: calc(var(--beat) * 8);
 }
 
-/* ---- The dirt monsters ---- */
+/* ---- The tap, the water and the pump ---- */
 
-.hw-monster {
-  position: absolute;
-}
-
-.hw-monster-body,
-.hw-monster-art {
-  display: block;
-  width: 100%;
-  height: 100%;
-}
-
-.hw-monster.gone {
-  opacity: 0;
-  visibility: hidden;
-}
-
-/* The monster of this step dances to the beat for two beats, then dissolves in the foam. */
-.hw-monster.active .hw-monster-body {
-  animation:
-    hw-monster-jelly var(--beat) ease-in-out 2,
-    hw-monster-dissolve calc(var(--beat) * 4) ease-in calc(var(--beat) * 2) forwards;
-}
-
-.hw-monster.tickled .hw-monster-body {
-  animation: hw-monster-giggle calc(var(--beat) / 2) ease-in-out 4;
-}
-
-@keyframes hw-monster-jelly {
-  0%,
-  100% {
-    transform: none;
-  }
-  30% {
-    transform: scale(1.15, 0.85);
-  }
-  60% {
-    transform: scale(0.92, 1.08);
-  }
-}
-
-@keyframes hw-monster-dissolve {
-  0% {
-    transform: none;
-    opacity: 1;
-    filter: none;
-  }
-  25% {
-    transform: scale(1.2, 0.75);
-    opacity: 1;
-  }
-  100% {
-    transform: translateY(-30%) scale(0.6, 1.5);
-    opacity: 0;
-    filter: blur(4px);
-  }
-}
-
-@keyframes hw-monster-giggle {
-  0%,
-  100% {
-    transform: none;
-  }
-  50% {
-    transform: rotate(10deg) scale(1.05);
-  }
-}
-
-.hw-grain {
-  position: absolute;
-  left: 43%;
-  top: 43%;
-  width: 14%;
-  height: 14%;
-  border-radius: 50%;
-  background: var(--grain);
-  opacity: 0;
-  animation: hw-grain calc(var(--beat) * 3) ease-out calc(var(--beat) * 2.5) forwards;
-}
-
-.hw-grain.foam {
-  background: #fff;
-  box-shadow: inset 0 0 0 1px #b7dcef;
-}
-
-@keyframes hw-grain {
-  0% {
-    opacity: 0;
-    transform: none;
-  }
-  15% {
-    opacity: 1;
-  }
-  100% {
-    opacity: 0;
-    transform: translate(var(--dx), var(--dy)) scale(0.4);
-  }
-}
-
-/* The clean hands shine: white glints coming and going slowly, one after the other. */
-.hw-glint {
-  position: absolute;
-  opacity: 0;
-  border-radius: 50%;
-  background: radial-gradient(circle, #fff 0 16%, rgb(255 255 255 / 60%) 30%, rgb(200 235 255 / 0%) 65%);
-}
-
-.clean .hw-glint {
-  animation: hw-glint calc(var(--beat) * 4) ease-in-out infinite backwards;
-}
-
-@keyframes hw-glint {
-  0%,
-  100% {
-    opacity: 0;
-    transform: scale(0.4);
-  }
-  50% {
-    opacity: 0.95;
-    transform: none;
-  }
-}
-
-/* ---- The tap, the water, the pump and the towel ---- */
-
+/* Upright is off; lifted and turned towards the red dot is warm, towards the blue one cold. */
 .hw-lever {
   z-index: 1;
   transform-origin: 50% 65%;
-  transition: transform calc(var(--beat) * 0.75) ease;
+  transition: transform var(--beat) ease;
 }
 
 .water-on .hw-lever {
-  transform: rotate(-38deg);
+  transform: rotate(-16deg);
 }
 
+.at-water .hw-lever {
+  animation: hw-lever-temp calc(var(--beat) * 10) ease-in-out forwards;
+}
+
+.at-off .hw-lever {
+  transition-delay: calc(var(--beat) * 0.6);
+}
+
+@keyframes hw-lever-temp {
+  0% {
+    transform: none;
+  }
+  10%,
+  44% {
+    transform: rotate(32deg);
+  }
+  56%,
+  100% {
+    transform: rotate(-16deg);
+  }
+}
+
+/* The stream lies under the hands: where a hand is held into it, the water lands on the hand. */
 .hw-stream {
-  z-index: 4;
+  z-index: 1;
   opacity: 0;
-  transform-origin: 50% 0;
-  transition:
-    opacity 0.35s,
-    transform var(--beat) ease;
+  transition: opacity 0.35s;
 }
 
 .water-on .hw-stream {
   opacity: 1;
 }
 
-/* With the hands under it the water lands on them. */
-.hands-under .hw-stream {
-  transform: scaleY(0.36);
+.at-water .hw-stream {
+  transition-delay: var(--beat);
+}
+
+.at-off .hw-stream {
+  transition-delay: calc(var(--beat) * 1.2);
 }
 
 .hw-stream-clip {
@@ -479,10 +549,14 @@
   background: rgb(170 220 250 / 45%);
 }
 
-.hw-stream-flow {
+.hw-stream-flow,
+.hw-stream-cold {
   position: absolute;
   left: 0;
   right: 0;
+}
+
+.hw-stream-flow {
   top: -100%;
   height: 200%;
   background: repeating-linear-gradient(
@@ -495,7 +569,8 @@
   will-change: transform;
 }
 
-.water-on .hw-stream-flow {
+.water-on .hw-stream-flow,
+.at-off .hw-stream-flow {
   animation: hw-flow var(--beat) linear infinite;
 }
 
@@ -505,14 +580,42 @@
   }
 }
 
+/* While the lever stands at cold, the water runs blue. */
+.hw-stream-cold {
+  top: 0;
+  bottom: 0;
+  background: rgb(40 120 230 / 70%);
+  opacity: 0;
+}
+
+.at-water .hw-stream-cold {
+  animation: hw-cold calc(var(--beat) * 10) ease-in-out forwards;
+}
+
+@keyframes hw-cold {
+  0%,
+  8% {
+    opacity: 0;
+  }
+  14%,
+  46% {
+    opacity: 1;
+  }
+  58%,
+  100% {
+    opacity: 0;
+  }
+}
+
 .hw-splash {
   z-index: 1;
   opacity: 0;
   transition: opacity 0.35s;
 }
 
-.water-on:not(.hands-under) .hw-splash {
+.at-water .hw-splash {
   opacity: 1;
+  transition-delay: calc(var(--beat) * 1.2);
 }
 
 .hw-pump-head {
@@ -520,52 +623,203 @@
 }
 
 .at-soap .hw-pump-head {
-  animation: hw-pump var(--beat) ease-in-out calc(var(--beat) * 1.5) 2;
+  animation: hw-pump var(--beat) ease-in-out calc(var(--beat) * 1.6) 2;
 }
 
 @keyframes hw-pump {
   50% {
-    transform: translateY(14%);
+    transform: translateY(16%);
   }
 }
 
-.hw-towel {
-  z-index: 5;
-  transform: translateX(150%);
+/* ---- The towel: its free side folds round the hands, lies on them while they rub, and opens again ---- */
+
+.hw-towel-wrap {
+  z-index: 6;
+  opacity: 0;
+  transform: scaleX(0.06);
+  transform-origin: 100% 50%;
 }
 
-.at-towel .hw-towel {
-  animation: hw-towel calc(var(--beat) * 6) ease-in-out forwards;
+.at-towel .hw-towel-wrap {
+  animation: hw-wrap calc(var(--beat) * 10) ease-in-out forwards;
 }
 
-@keyframes hw-towel {
-  0% {
-    transform: translateX(150%);
+@keyframes hw-wrap {
+  0%,
+  14% {
+    opacity: 0;
+    transform: scaleX(0.06);
   }
   18% {
+    opacity: 1;
+  }
+  26% {
     transform: none;
   }
-  30% {
-    transform: translateX(-3%);
-  }
-  42% {
-    transform: translateX(3%);
-  }
-  54% {
-    transform: translateX(-3%);
-  }
+  34%,
+  50%,
   66% {
-    transform: translateX(2%);
+    transform: translateY(-1.5%);
+  }
+  42%,
+  58%,
+  74% {
+    transform: translateY(1.5%);
   }
   80% {
+    opacity: 1;
     transform: none;
   }
+  90%,
   100% {
-    transform: translateX(150%);
+    opacity: 0;
+    transform: scaleX(0.06);
   }
 }
 
-/* ---- The bar: one groove per step, the rubbing's five together in green ---- */
+/* ---- The painted pictures of the home, seen through the child's eyes, each with a slow camera move ---- */
+
+.hw-pic {
+  position: absolute;
+  inset: 0;
+  z-index: 7;
+  overflow: hidden;
+  opacity: 0;
+  pointer-events: none;
+  transition: opacity var(--beat) ease;
+}
+
+.at-call .p-ruf,
+.at-stool .p-bad,
+.at-stool .p-hocker,
+.at-run .p-essen {
+  opacity: 1;
+}
+
+/* Up the stool halfway through its step. */
+.at-stool .p-hocker {
+  transition-delay: calc(var(--beat) * 4);
+}
+
+.hw-pic-img {
+  position: absolute;
+  inset: 0;
+  display: block;
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  will-change: transform;
+}
+
+/* Mama calls from the doorway: the eye turns to her. */
+.at-call .p-ruf .hw-pic-img {
+  transform-origin: 66% 40%;
+  animation: hw-look calc(var(--beat) * 8) ease-out forwards;
+}
+
+/* Walking into the bathroom, towards the basin. */
+.at-stool .p-bad .hw-pic-img {
+  transform-origin: 50% 55%;
+  animation: hw-walk calc(var(--beat) * 4.5) ease-in forwards;
+}
+
+/* Climbing the stool: the picture rises a step. */
+.at-stool .p-hocker .hw-pic-img {
+  animation: hw-climb calc(var(--beat) * 4) ease-in-out calc(var(--beat) * 4) both;
+}
+
+/* Running to the table, step by step, until the child arrives. */
+.at-run .p-essen .hw-pic-img {
+  transform-origin: 50% 60%;
+  animation: hw-run calc(var(--beat) * 6) linear forwards;
+}
+
+@keyframes hw-look {
+  from {
+    transform: none;
+  }
+  to {
+    transform: scale(1.14);
+  }
+}
+
+@keyframes hw-walk {
+  0% {
+    transform: none;
+  }
+  25% {
+    transform: scale(1.03) translateY(-0.6%);
+  }
+  50% {
+    transform: scale(1.06);
+  }
+  75% {
+    transform: scale(1.09) translateY(-0.6%);
+  }
+  100% {
+    transform: scale(1.12);
+  }
+}
+
+@keyframes hw-climb {
+  0% {
+    transform: scale(1.08) translateY(-3%);
+  }
+  45% {
+    transform: scale(1.08) translateY(1%);
+  }
+  100% {
+    transform: scale(1.08) translateY(3%);
+  }
+}
+
+@keyframes hw-run {
+  0% {
+    transform: none;
+  }
+  12% {
+    transform: scale(1.03) translateY(-1.2%);
+  }
+  24% {
+    transform: scale(1.06);
+  }
+  36% {
+    transform: scale(1.09) translateY(-1.2%);
+  }
+  48% {
+    transform: scale(1.12);
+  }
+  60% {
+    transform: scale(1.15) translateY(-1.2%);
+  }
+  72%,
+  100% {
+    transform: scale(1.17);
+  }
+}
+
+/* In the dev server, until a picture is made: a sheet naming the step and the file it waits for. */
+.hw-pic-missing {
+  display: grid;
+  place-content: center;
+  gap: 0.5em;
+  padding: 1em;
+  text-align: center;
+  font:
+    600 clamp(14px, 3cqw, 32px) / 1.3 system-ui,
+    sans-serif;
+  color: #6b5a44;
+  background: repeating-linear-gradient(45deg, #f7efe2 0 24px, #f1e6d4 24px 48px);
+}
+
+.hw-pic-missing small {
+  font-weight: 400;
+  font-size: 0.6em;
+  opacity: 0.7;
+}
+
+/* ---- The bar: one groove per step, the rubbing's four together in green ---- */
 
 .hw-bar {
   position: absolute;

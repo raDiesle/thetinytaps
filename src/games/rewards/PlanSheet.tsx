@@ -8,6 +8,7 @@ import { useRewardLabel } from "./BoardSheet";
 import { DAY_NAMES, MARK_BY_ID, MARKS, type NightLook, nightLookOf, PLAN_TEMPLATES, SLOT_BY_ID, type Slot, STEP_BY_ID, THEME_BY_ID, THEMES } from "./catalog";
 import { DaySign, type DaySignSet, PARTS_OF, SLOT_EMOJI } from "./daySigns";
 import { ItemPic, MarkPic, NightPic, SheetStrip } from "./pictures";
+import { ChildPhoto, photoHead, photoInCorner } from "./ChildPhoto";
 import { SheetTitle, titleMarkOf } from "./SheetTitle";
 import { RewardActions, SheetAction } from "./SheetAction";
 import {
@@ -176,13 +177,19 @@ export function PlanSheet({
   const editing = edit && !look.print;
   const props: StepsProps = { plan, ticks: shown, linked, today, day, look, fresh, counts: counting(plan), edit: editing };
 
+  // The child's photo (user request, November 2026): in a corner of the head, which grows to hold it, or beside the heading.
+  const head = photoHead(plan.photo);
+  const corner = photoInCorner(plan.photo);
+  const photo = <ChildPhoto photo={plan.photo} editing={editing} />;
+
   return (
     <div
       className={`rw-sheet pl-sheet pl-view-${plan.view}${look.print ? " rw-on-paper" : ""}${grey ? " rw-grey" : ""}${editing ? " pl-editing" : ""}`}
       style={style}
     >
       {look.print && look.color && <SheetStrip theme={theme} />}
-      <header className="rw-head">
+      <header className={head.className} style={head.style}>
+        {corner && photo}
         <SheetTitle
           title={title}
           own={!!plan.title.trim()}
@@ -190,6 +197,7 @@ export function PlanSheet({
           mark={titleMarkOf(plan.titleMark, undefined)}
           editing={editing}
           onTitle={onTitle}
+          photo={corner ? undefined : photo}
         />
         {sub && <span className="rw-blank">{sub}</span>}
         {/* No reward by default, and none takes room on the sheet (user feedback, November 2026): while it is made a

@@ -75,6 +75,8 @@ export const marblesIdeas: IdeaArea = {
       why: "Wählen aus wenigen Bildern; nebenbei schwer und leicht, schnell und langsam.",
       effort: "M",
       done: true,
+      partial:
+        "Gebaut. Vom 24. bis 25. November 2026 ließ das Regal nach dem ersten Tippen alle zwei Sekunden das nächste Ding von selbst los; das sah aus, als ließe ein Tippen mehrere Kugeln fallen. Seit dem 25. November lässt jedes Tippen genau ein Ding los, und nichts rollt mehr von selbst.",
     },
     {
       id: "K-08",
@@ -83,6 +85,7 @@ export const marblesIdeas: IdeaArea = {
       text: "Finger auf den Trichter halten: Die Kugel wächst wie ein Luftballon, bis man loslässt. Kleine Kugeln flitzen und klingen hell, große rollen gemütlich, klingen tief und schubsen die Wippe kräftig. Nie zu groß – irgendwann rollt sie von allein los.",
       why: "Halten und Loslassen bekommt eine sichtbare Bedeutung; groß und klein zum Hören.",
       effort: "S",
+      rejected: true,
     },
     {
       id: "K-09",
@@ -91,6 +94,7 @@ export const marblesIdeas: IdeaArea = {
       text: "Die Kugeln aus dem Korb wollen wieder nach oben. Das Kind dreht eine große Kurbel (im Kreis wischen) oder tippt mehrmals, und ein Paternoster trägt die Kugeln Stück für Stück zurück zum Start. Oben angekommen rollen sie von allein wieder los. Für die ganz Kleinen reicht jedes Tippen für eine Stufe.",
       why: "Kurbeln lieben Kleinkinder; die Bahn läuft endlos, weil das Kind sie selbst in Gang hält.",
       effort: "M",
+      rejected: true,
     },
     {
       id: "K-10",
@@ -108,6 +112,9 @@ export const marblesIdeas: IdeaArea = {
       text: "Die Xylophon-Stäbe sind so gestimmt, dass jede Kugel die nächste Zeile eines bekannten Liedes spielt („Alle meine Entchen“, „Hänschen klein“). Viele Kugeln hintereinander ergeben das ganze Lied, am Ende tanzen alle Teile der Bahn.",
       why: "Das Kind erkennt das Lied und will „noch eine, damit es weitergeht“.",
       effort: "S",
+      partial:
+        "Die acht Stäbe von Reihe 1 spielen auf jeder Kugelbahn ein Lied: Jedes Ding, das darüber rollt, spielt die nächste Zeile, gleichmäßig im Takt (dort rollt es mit fester Geschwindigkeit). Auf Deutsch „Alle meine Entchen“, in allen anderen Sprachen „Twinkle, Twinkle, Little Star“ (小星星, „Estrellita“). Die nächste Kugel kommt von selbst erst, wenn die Zeile davor fast fertig ist, sodass die Zeilen ohne Überlappen aufeinander folgen. Nach der letzten Zeile schwingt, wackelt und leuchtet jedes Teil der Bahn einmal mit einem leisen Glitzerklang. Eine Runde dauert dadurch etwa 60–64 statt 56–60 Sekunden.",
+      done: true,
     },
     {
       id: "K-12",
@@ -128,6 +135,8 @@ export const marblesIdeas: IdeaArea = {
       why: "Wo ich tippe, startet die Kugel – das versteht schon ein 2-Jähriger. Jedes Fach ist ein Gewinn.",
       effort: "M",
       done: true,
+      partial:
+        "Gebaut. Seit dem 25. November 2026 lässt jedes Tippen genau eine Kugel fallen und keine fällt mehr von selbst (vom 24. November an kam die nächste von selbst, sobald keine mehr fiel).",
     },
     {
       id: "K-14",
@@ -136,6 +145,7 @@ export const marblesIdeas: IdeaArea = {
       text: "Mit dem Lagesensor: Das Tablet leicht neigen, und die Kugeln rollen auf einem offenen Brett in die Richtung, in die es kippt, an Glocken und Tieren vorbei. Es gibt keine Löcher, in die man fallen kann. Eltern erlauben den Sensor einmal (auf dem iPad nötig).",
       why: "Der ganze Körper steuert mit; ein völlig anderes Gefühl als Tippen.",
       effort: "M",
+      rejected: true,
     },
     {
       id: "K-15",
@@ -152,6 +162,7 @@ export const marblesIdeas: IdeaArea = {
       text: "Im Umfall-Level wählt das Kind vorher aus drei Bildern, was als Nächstes in die Reihe kommt (Buch, Flasche, Bauklotz …); es plumpst an seinen Platz. Dann Antippen irgendwo in der Reihe: Ab dort fällt alles um. Nach oben wischen stellt alles wie im Rückwärts-Film wieder auf.",
       why: "Eigene Reihe, eigener Startpunkt – und das Zurückspulen ist für Kinder ein eigener Spaß.",
       effort: "M",
+      rejected: true,
     },
     {
       id: "K-17",
@@ -160,6 +171,7 @@ export const marblesIdeas: IdeaArea = {
       text: "Zwei gleiche Bahnen mit je einem großen Knopf, für Geschwister oder Kind und Mama. Kommen zwei Kugeln fast gleichzeitig unten an, gibt es ein gemeinsames Fest. Kein Wettrennen, kein Erster – beide Körbe jubeln gleich.",
       why: "Gemeinsam spielen am selben Gerät, ohne Streit ums Tippen.",
       effort: "M",
+      rejected: true,
     },
     {
       id: "K-18",
@@ -196,6 +208,7 @@ export const marblesIdeas: IdeaArea = {
       text: "Zur Weiche am Ende von Reihe 3 (K-01) kommen zwei weitere mit dickem Hebel, weiter oben auf der Bahn, so dass eine Kugel mehrere Wege nehmen kann: über das Xylophon, über Trommel und Glocke oder an den Prallkissen hinunter.",
       why: "Mehr Wege machen das Umlegen spannender: das Kind sieht, dass seine Wahl den Weg bestimmt.",
       effort: "M",
+      rejected: true,
     },
     {
       id: "K-22",
@@ -204,6 +217,7 @@ export const marblesIdeas: IdeaArea = {
       text: "Der Zaubertunnel (K-06) kann eine Kugel auch als zwei kleine Kugeln herauslassen, die nebeneinander weiterrollen und unten wieder eine werden.",
       why: "Eine Überraschung mehr im Tunnel, die Kinder zum Staunen bringt.",
       effort: "S",
+      rejected: true,
     },
     {
       id: "K-23",
@@ -212,6 +226,7 @@ export const marblesIdeas: IdeaArea = {
       text: "Die sechs Plätze der Kugelbahn (K-12) wechseln reihum auch Looping und Trommel, nicht nur Glocke, Trampolin, Trichter und Wasserrad. Für Ältere: die Teile aus einer Leiste am Rand in die Lücken ziehen (mit der Maus; ein Finger tippt).",
       why: "Mehr Teile machen mehr Mischungen; das Ziehen ist der nächste Schritt für Größere.",
       effort: "M",
+      rejected: true,
     },
   ],
 };

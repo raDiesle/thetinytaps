@@ -4,14 +4,19 @@ Route `/kettenreaktion/` (`/kugelbahn/`, its old address and then the marble run
 was a game of its own for a while and is the first level here again, so marble run and machines are one game on the home menu.
 
 Twenty-one levels in turn, each about a minute long, beginning with the one picked on the start screen; after each one the shared `GameEnd` with „Nochmal“ as the drawn round arrow and „Weiter“ as the next level's picture (any key goes on; after the last level the first), and at any moment the level can be paused and skipped from there (see Pause and skip).
-**After the tap that starts it, every level runs to its end by itself** (user request, 24 November 2026: „alle Level
+**After the tap that starts it, every machine runs to its end by itself** (user request, 24 November 2026: „alle Level
 sollen von selbst durchlaufen, nur am Anfang sind Klicks nötig“): nothing on the way waits for another tap – no machine
-holds at a stop, the Wasserbahn's gates after the first open by themselves, the marble runs' barrier stays up, their
-switch flips itself and their shelf lets out the next thing every `AUTO_RELEASE_MS` (`autoTake`), and the Nagelbrett
-drops its next marble by itself once none falls (`AUTO_DROP_MS`). The child may still join in everywhere – every tap
-answers – but never has to. There is no choice for it either: „Mitmachen“ (👆 Kind tippt / 🔄 Von selbst) over the cards
-was taken out with this, and „Von selbst“ is how every level plays. A new level keeps to it: one tap to start, then it
-plays through; never a place that waits for the child, nor an option to bring one back (`track.test.ts`).
+holds at a stop, the Wasserbahn's gates after the first open by themselves, the marble runs' barrier stays up and their
+switch flips itself. The child may still join in everywhere – every tap answers – but never has to. There is no choice
+for it either: „Mitmachen“ (👆 Kind tippt / 🔄 Von selbst) over the cards was taken out with this. A new machine keeps
+to it: one tap to start, then it plays through; never a place that waits for the child, nor an option to bring one back.
+**But one tap lets out exactly one ball, in every level, and no ball leaves by itself** (user decision, 25 November
+2026: the marble runs' shelf let out the next thing every two seconds after the first tap, and on the first level it
+looked as if one tap on a phone had dropped several marbles; asked, the user chose one ball per tap over the levels
+running through). So the marble runs and the Nagelbrett wait for a tap for each ball: once a run is empty its camera
+goes back up to the shelf (`LOOK_UP_AFTER_MS`), and once no marble falls the Nagelbrett's hint marks the top again, each
+with the shared `TapHint`. A key is one tap too (`useAnyKey` skips a held key's repeats). `oneBallPerTap.test.ts` fails
+when anything a level's frame step reaches lets a ball out; a new level that lets out balls joins its list.
 Only the level's end waits: `GameEnd`'s „Weiter“ is never pressed for the child – the next level never starts by itself
 (user decision, 24 November 2026, asked when the levels began to run through).
 One ball in the goal is enough for a level's trophy (user decision, November 2026): where several balls are played (the
@@ -48,12 +53,12 @@ Before → after the rebuild of 22 November 2026, in seconds:
 | Hatschi-Kette (`sneeze`)      | 25–26            | 57.9–58.4         | `plannedSeconds`, every row of animals (`sneeze.test.ts`)                                             |
 | Wasserbahn (`water`)          | 29.0             | 59.0              | sum of its stretches, the child tapping at once (`water.test.ts`)                                     |
 | Nagelbrett (`pegs`)           | ~30 (10 marbles) | 61.0 (20 marbles) | seeded simulation of 30 rounds, one marble at a time (a tap a second: 13.0 → 24.7); no test bounds it |
-| Klingende Kugelbahn (`track`) | ~35.6            | 57.8              | whole round simulated in `track.test.ts`                                                              |
-| Farbenbahn (`colortrack`)     | ~35.6            | 57.6              | as above                                                                                              |
-| Schneebahn (`snowtrack`)      | ~35.6            | 56.2              | as above                                                                                              |
-| Weltraumbahn (`spacetrack`)   | ~35.6            | 59.0              | as above                                                                                              |
-| Wasserrutsche (`slidetrack`)  | ~35.6            | 59.9              | as above                                                                                              |
-| Baustellen-Bahn (`sitetrack`) | ~35.6            | 56.7              | as above                                                                                              |
+| Klingende Kugelbahn (`track`) | ~35.6            | 61.9              | whole round simulated in `track.test.ts` (+4 s on 25 November 2026 for the song, K-11)                |
+| Farbenbahn (`colortrack`)     | ~35.6            | 61.7              | as above                                                                                              |
+| Schneebahn (`snowtrack`)      | ~35.6            | 60.3              | as above                                                                                              |
+| Weltraumbahn (`spacetrack`)   | ~35.6            | 63.1              | as above                                                                                              |
+| Wasserrutsche (`slidetrack`)  | ~35.6            | 64.0              | as above                                                                                              |
+| Baustellen-Bahn (`sitetrack`) | ~35.6            | 60.8              | as above                                                                                              |
 
 ## Pause and skip
 
@@ -128,10 +133,10 @@ Kettenreaktion follows the app language (home page): start screen, the level nam
 
 ## Levels to join in
 
-Three levels aren't one-tap machines but let the child join in along the way – and run to their end by themselves all the same. Like every level here, their first-tap hints
+Three levels aren't one-tap machines but let the child join in along the way. Hatschi-Kette and Wasserbahn run to their end by themselves all the same; the Nagelbrett drops a marble for each tap only (see the top). Like every level here, their first-tap hints
 are the shared `TapHint`, still until the child has waited a few seconds.
 
-„Nagelbrett“ (`PegsLevel.tsx`, numbers and physics in `pegs.ts`, K-13): an upright wooden board with seven staggered rows of nails over five bins, each with an animal waiting in it (five of frog, cow, dog, duck, cat and pig, shuffled each round). Wherever the child taps, only the x counts: a marble pops in at the top above it and falls, bouncing from nail to nail (circle against nail with a bounce and a small random push, so none balances on a nail; side walls and dividers). Each nail it hits glows and plinks a pentatonic note, higher rows higher (`playPlink`). A star spinner turns among the nails and flicks marbles aside, and after the fourth marble a ladybug crawls to and fro along a vine (buzz) as a moving bumper, only while marbles fall. A tap on a bin drops a marble above that bin; a key drops at its place along its keyboard row (`keySpot`, by `KeyboardEvent.code`), other keys at a random place. At most 12 marbles fall at once. In the bin the animal hops and calls, and the marble rolls to its place in a small pile (5 + 4; one more pops in sparkles); at a bin's third marble its animal does its own trick, at the fifth it climbs onto its pile. Once none falls, the next drops by itself at a random place `AUTO_DROP_MS` later, so the board fills without another tap. After twenty marbles every animal does its trick once more in turn with a trill, and the level ends 3 s later (about a minute dropping one marble at a time, about 25 s with a tap a second). Everything moves in the frame loop with no CSS animations, so the board is still before the first tap (a still marble at the top, marked by the `TapHint`) and again once all marbles lie. `pegs.test.ts` drops hundreds of marbles, with the star turning and the ladybug crawling, to check none gets stuck and all bins can be reached: run it after moving nails, bins, the star or the vine.
+„Nagelbrett“ (`PegsLevel.tsx`, numbers and physics in `pegs.ts`, K-13): an upright wooden board with seven staggered rows of nails over five bins, each with an animal waiting in it (five of frog, cow, dog, duck, cat and pig, shuffled each round). Wherever the child taps, only the x counts: a marble pops in at the top above it and falls, bouncing from nail to nail (circle against nail with a bounce and a small random push, so none balances on a nail; side walls and dividers). Each nail it hits glows and plinks a pentatonic note, higher rows higher (`playPlink`). A star spinner turns among the nails and flicks marbles aside, and after the fourth marble a ladybug crawls to and fro along a vine (buzz) as a moving bumper, only while marbles fall. A tap on a bin drops a marble above that bin; a key drops at its place along its keyboard row (`keySpot`, by `KeyboardEvent.code`), other keys at a random place. At most 12 marbles fall at once. In the bin the animal hops and calls, and the marble rolls to its place in a small pile (5 + 4; one more pops in sparkles); at a bin's third marble its animal does its own trick, at the fifth it climbs onto its pile. Each tap or key drops one marble, none drops by itself (25 November 2026; from 24 November until then the next dropped by itself once none fell): while none falls the `TapHint` marks the top again. After twenty marbles every animal does its trick once more in turn with a trill, and the level ends 3 s later (about a minute dropping one marble at a time, about 25 s with a tap a second). Everything moves in the frame loop with no CSS animations, so the board is still before the first tap (a still marble at the top, marked by the `TapHint`) and again once all marbles lie. `pegs.test.ts` drops hundreds of marbles, with the star turning and the ladybug crawling, to check none gets stuck and all bins can be reached: run it after moving nails, bins, the star or the vine.
 
 „Hatschi-Kette“ (`SneezeLevel.tsx`, layout and timing in `sneeze.ts`, R-09, about 58 s): eight animals sit on a meadow facing us, small to big – always the mouse first and the cow and the elephant last, five of chick, duck, rabbit, cat, dog, pig and sheep in between (`pickAnimals`) – with a big tree at the end. A tap lets a feather float down onto the mouse's nose: „ha… ha…“ (head back, eyes squeezing, nose twitching) and HATSCHI – a little cloud with whoosh lines and glittering droplets flies to the next animal's cheek. Its fur ruffles, it makes its own sound and sneezes in turn, a bit bigger and louder (`playHa(size)`/`playHatschi(size)` in `sfx/animals.ts`, size 0 for the mouse to 1 for the elephant). The camera walks along and steps back for the elephant, whose sneeze through its raised trunk blows every leaf off the tree. In its first part it counts its own state frame by frame, because joining in changes the timing: a tap on an animal going „ha…“ makes it sneeze at once, one that has sneezed sniffs or giggles, one still waiting says hello. Any other tap or key moves the chain on one step.
 Then a second part past the tree (`PART2`, `acornAt`, `beeAt`, `kiteAt`; a pure function of the seconds since it began): a squirrel chatters and drops its acorn, which bounces three times into a puffball (puff); its spores drift to a sleeping tortoise's nose, it sneezes and pulls into its shell, the shell hops to a beehive's stool, three bees come out and the first flies through four dandelion clocks; the seeds float up under a sleeping cloud, which wakes, sneezes and blows a gust; the gust lifts a kite whose tail tickles a scarecrow until he sneezes his hat off and the straw out. The hat lands crooked and everyone laughs, each animal of the row with its own move (mouse and pig tip back, birds flap, the rabbit's ears go up, cat and sheep puff up, the dog shakes, the cow's bell swings, the elephant's ears flap), and the level is done. There a tap jumps to the next moment in `PART2_STEPS` and marks the sounds it skipped as played, silently; each thing answers a tap with its own sound, and tapped during its „ha…“ it sneezes early. The second part's sound keys are prefixed `p2:`. Every animal is drawn facing us in its own units (100 high, standing on y 0) and scaled to its `height`; the line width is set on its group so all animals get the same lines. `sneeze.test.ts` checks the row order, that animals don't overlap, and that a round without joining in takes 56–64 s for every row of animals.
@@ -282,12 +287,31 @@ trampoline, bell, funnel by default), passes under the barrier, rides the seesaw
 (zigzag down past bumpers, or the left way over its own xylophone), loops the loop,
 hops over three drums, knocks five chimes and plays a whole scale on the second xylophone; then it runs the wooden run's lower wall (helix tower, step lifter,
 tipping troughs, see Every run's lower wall) and drops into the basket.
-A full basket raises the flag and ends the level (the round arrow / the next level's picture; any key goes on). After the first thing the shelf lets out the next by
-itself every two seconds until enough are on their way to fill the basket (`autoTake`). A first marble alone takes about
-45 s, the whole round about 58 s. Tapping a spot swaps its part (bell, trampoline, funnel, paddle wheel), always.
+A full basket raises the flag and ends the level (the round arrow / the next level's picture; any key goes on). Each tap
+or key lets out one thing, and nothing leaves the shelf by itself (25 November 2026; from 24 November until then the
+shelf let out the next every two seconds): once nothing is on the run, the camera goes back up to the shelf after
+`LOOK_UP_AFTER_MS`, quietly, and the hint marks the next thing to tap. A first marble alone takes about 46 s, a round
+about 62 s when the child lets out the next thing every two seconds, once the one before has played its line of the song. Tapping a spot swaps its part (bell, trampoline, funnel, paddle wheel), always.
 On a computer a yellow space-bar button sits at the bottom in the middle, and Space rebuilds the run to the next
 of all its builds, counting like a car's mileage: the first spot takes its next part, and each time it is back at the first
 part the next spot moves on too (`rebuildNext`).
+
+„Kugel-Lied“ (K-11, `song.ts`, in every world of the run): the eight bars of row 1 – four on 1a, four on 1b after the
+first spot – play a song, one line per thing: the first thing to reach bar 0 takes line 1, the next line 2, and so on
+round the song (`singBar`). Each bar strikes the line's next beat (`songBeat`): a note that rings on through the held
+beats after it, or on a held beat only the bar lights up. Over those bars a thing rolls at the even `SONG_SPEED` (times
+its `pace`), so the beat is steady at a little under a quarter of a second (rolling downhill it was 0.15 s, too fast for
+a tune); the iron ball plays its line two octaves deeper and slower, the tennis ball still hops. A thing let out once the one
+before has struck bar `SONG_HANDOVER` starts its line on the beat after the last one ends (let out every two seconds,
+lines sounded half into each other); since each thing waits for its own tap (see the top), a child tapping fast hears
+lines overlap – that is the child's play, never held back. When the song's last line is through,
+every part of the run sways, swings or flashes once at the same moment with a soft twinkle (`dance`), nothing rising.
+German children hear „Alle meine Entchen“ (five lines), every other app language „Twinkle, Twinkle, Little Star“ (six
+lines; 小星星, „Estrellita“, the alphabet song), both traditional tunes; a tap on a bar still plays the bar's own note.
+- A song's line has exactly eight beats, one per bar, and starts on a note (`song.test.ts`); a new song for a language
+  goes into `songFor`, written in the eight-beat grid with `null` for held beats.
+- Anything that slows row 1 or changes what lies between the shelf and bar 0 changes when the next line comes: check it
+  in `track.test.ts`, whose round must stay 55–65 s.
 
 „Was rollt denn da?“ (K-07, always on): a shelf over the first row holds
 three of five things (marble, tennis ball, iron ball, apple, soap bubble; `ROLLER` in `track.ts`); tapping one flies it into

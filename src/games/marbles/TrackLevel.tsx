@@ -25,7 +25,8 @@ import { COLOR_TRACK } from "./colorTrack";
 import { type ColorSort, INK, TrackLook, type TrackTheme } from "./trackTheme";
 import { BALL_R, type Pt } from "./path";
 import { useDevice } from "@/lib/device";
-import { useT } from "@/lib/language";
+import { useAppLanguage, useT } from "@/lib/language";
+import { songBeat, songFor } from "./song";
 import { shuffle } from "@/lib/random";
 import {
   playBoing,
@@ -39,6 +40,7 @@ import {
   playKnock,
   playPlop,
   playPop,
+  playSongNote,
   playSqueak,
   playSwirl,
   playThump,
@@ -48,8 +50,8 @@ import {
 } from "@/lib/sfx";
 import { loadRealSounds } from "@/lib/realSounds";
 import {
+  BAR_STEP,
   BARS,
-  autoTake,
   BASKET_FULL,
   BASKET_SLOTS,
   buildRoutes,
@@ -58,6 +60,8 @@ import {
   DRUMS,
   HOPPER,
   LEDGE,
+  SONG_BARS,
+  SONG_SPEED,
   LEFT1,
   LEFT2,
   PIECES,
@@ -147,11 +151,12 @@ const PEEK_MS = 1700;
 /** The switch flips by itself this long after a marble has taken a way (K-01), so the next one takes the other. */
 const AUTO_FLIP_MS = 700;
 /**
- * After the child's first tap the next thing leaves the shelf by itself this long after the one before, until enough are
- * on their way to fill the basket or a tube: the round runs to its end with no more taps (user request, 24 November
- * 2026), and the child may still let out more.
+ * One tap lets out one thing, never more, and nothing leaves the shelf by itself (user decision, 25 November 2026: the
+ * shelf letting out the next every two seconds looked as if one tap dropped several marbles). Once nothing is on the
+ * run any more and the basket isn't full, the camera goes back up to the shelf this long after, where the hint marks
+ * the next thing to tap.
  */
-const AUTO_RELEASE_MS = 2000;
+const LOOK_UP_AFTER_MS = 2500;
 
 /**
  * What the magic tunnel does to a marble (K-06), in turn from a random start,
@@ -213,6 +218,8 @@ interface Marble {
   look: BallLook;
   /** When it was tapped and hopped (K-03). */
   nudged: number;
+  /** The line of the song it plays on row 1 (K-11), counted from the round's first; -1 before its first bar. */
+  line: number;
   /** Picked from the shelf: it flies from there into the hopper, starting at `at`. */
   fly: { from: Pt; at: number } | null;
   /** Distance rolled in all, for the tennis ball's hops. */
@@ -328,6 +335,9 @@ function Run({ sound, say, onDone, onGoal, look }: LevelProps & { look: TrackThe
   const drums = useRef(never(DRUMS.length));
   const chimes = useRef(never(CHIMES.length));
   const looped = useRef(-Infinity);
+  /** The song row 1 plays (K-11), the one children of the app language know, and the next line to give out. */
+  const song = songFor(useAppLanguage().id);
+  const songLine = useRef(0);
   const tilt = useRef(SEESAW.rest);
   const seesawTapped = useRef(-Infinity);
   const basketTapped = useRef(-Infinity);
@@ -358,8 +368,8 @@ function Run({ sound, say, onDone, onGoal, look }: LevelProps & { look: TrackThe
   const { touchOnly } = useDevice();
   /** When a finger last tapped the barrier (K-02), which always stays up: nothing waits behind it for a tap. */
   const gateTapped = useRef(-Infinity);
-  /** When the last thing left the shelf, for the next to follow by itself (`AUTO_RELEASE_MS`). */
-  const releasedAt = useRef(-Infinity);
+  /** Since when nothing is on the run (ms; Infinity while something is), for the camera to go back up (`LOOK_UP_AFTER_MS`). */
+  const emptySince = useRef(Infinity);
   /** The switch (K-01): the way it is set to, its flap's angle, when a marble last knocked the flap, and when it flips by itself. */
   const way = useRef<Way>("right");
   const flap = useRef(FLAP_UP);
@@ -383,6 +393,41 @@ function Run({ sound, say, onDone, onGoal, look }: LevelProps & { look: TrackThe
   const playBar = (i: number, t: number, kind: Roller = "marble") => {
     bars.current[i] = t;
     sound(() => (kind === "iron" ? playDeepNote(i) : playCountNote(i)));
+  };
+
+  /**
+   * „Kugel-Lied“ (K-11): a thing reaching the first bar of row 1 takes the song's next line, and each bar it rolls over
+   * plays that line's next beat – a note ringing as long as it is held, or, on a held beat, only the bar lights up. Over
+   * these bars it rolls at an even speed (`SONG_SPEED`), so the beat is steady; something heavy plays the line deep.
+   * After the bar of the song's last line the whole run dances once (`dance`).
+   */
+  const singBar = (bar: number, t: number, m: Marble) => {
+    if (bar === 0 || m.line < 0) m.line = songLine.current++;
+    bars.current[bar] = t;
+    const lines = song.lines;
+    const line = lines[m.line % lines.length];
+    const beat = songBeat(line, bar);
+    if (beat) {
+      const beatS = BAR_STEP / (SONG_SPEED * ROLLER[m.kind].pace);
+      sound(() => playSongNote(beat.freq, beat.beats * beatS, m.kind === "iron"));
+    }
+    if (bar === SONG_BARS - 1 && m.line % lines.length === lines.length - 1) dance(t);
+  };
+
+  /** The song is over: every part of the run sways, swings, flashes or hops once at the same moment, with a soft twinkle. */
+  const dance = (t: number) => {
+    stirred.current = t;
+    bars.current.fill(t);
+    drums.current.fill(t);
+    chimes.current.fill(t);
+    cues.current.fill(t);
+    for (const spot of spots.current) spot.hit = t;
+    seesawTapped.current = t;
+    basketTapped.current = t;
+    gateTapped.current = t;
+    flapHit.current = t;
+    looped.current = t;
+    sound(playTwinkle);
   };
 
   const playDrum = (i: number, t: number) => {
@@ -423,7 +468,8 @@ function Run({ sound, say, onDone, onGoal, look }: LevelProps & { look: TrackThe
     const kind = m.kind;
     switch (event.kind) {
       case "note":
-        playBar(event.bar, t, kind);
+        if (event.bar < SONG_BARS) singBar(event.bar, t, m);
+        else playBar(event.bar, t, kind);
         break;
       case "bell":
         spots.current[event.slot].hit = t;
@@ -615,7 +661,7 @@ function Run({ sound, say, onDone, onGoal, look }: LevelProps & { look: TrackThe
     now.current = t;
     const onWheel = SLOTS.map(() => false);
     let onSeesaw = false;
-    releaseNext(t);
+    backToShelf(t);
     if (t >= flipAt.current) {
       flipAt.current = Infinity;
       flip();
@@ -659,7 +705,8 @@ function Run({ sound, say, onDone, onGoal, look }: LevelProps & { look: TrackThe
       const pt = here?.seesaw ? seesawSpot((m.s - here.s0) / (here.s1 - here.s0), tilt.current) : pointAt(route, m.s).pt;
       if (here?.seesaw) onSeesaw = true;
       else if (here?.kind === "wheel") onWheel[spotOf(m.section)] = true;
-      m.hop += ((!here && spotOf(m.section) < 0 ? 1 : 0) - m.hop) * Math.min(1, dt * 10);
+      // The tennis ball hops along the rows, also over the song's bars, which only set an even speed (K-11).
+      m.hop += (((!here || here.kind === "note") && spotOf(m.section) < 0 ? 1 : 0) - m.hop) * Math.min(1, dt * 10);
       m.spin += (pt.x - m.x) / kind.r;
       m.x = pt.x;
       const k = (t - m.nudged) / NUDGE_MS;
@@ -706,12 +753,17 @@ function Run({ sound, say, onDone, onGoal, look }: LevelProps & { look: TrackThe
     );
   });
 
-  /** After the child's first tap, the next thing leaves the shelf by itself every `AUTO_RELEASE_MS`, as `autoTake` says. */
-  const releaseNext = (t: number) => {
-    if (done.current || nextId.current === 0 || t - releasedAt.current < AUTO_RELEASE_MS) return;
-    const next = autoTake([...landed.current, ...marbles.current.filter((m) => m.kind !== "bubble")], look.sort);
-    if (next === "next") open();
-    else if (next !== null) take(next);
+  /**
+   * Nothing leaves the shelf by itself: once the run is empty and the basket not yet full, the camera goes back up to the
+   * shelf a moment later (`LOOK_UP_AFTER_MS`), quietly, where the hint waits for the next tap.
+   */
+  const backToShelf = (t: number) => {
+    if (done.current || nextId.current === 0 || marbles.current.length > 0 || lookingUp.current) {
+      emptySince.current = Infinity;
+      return;
+    }
+    if (emptySince.current === Infinity) emptySince.current = t;
+    else if (t - emptySince.current >= LOOK_UP_AFTER_MS) lookUp(false);
   };
 
   /**
@@ -737,12 +789,12 @@ function Run({ sound, say, onDone, onGoal, look }: LevelProps & { look: TrackThe
     return gliding(from.y, top) || from.h !== cam.h;
   };
 
-  /** The ⬆ button (or the up arrow key): back up to the shelf, to let out the next thing. */
-  const lookUp = () => {
+  /** The ⬆ button (or the up arrow key, or the run being empty): back up to the shelf, to let out the next thing. */
+  const lookUp = (whoosh = true) => {
     if (lookingUp.current) return;
     lookingUp.current = true;
     followFrom.current = nextId.current;
-    sound(playWhoosh);
+    if (whoosh) sound(playWhoosh);
   };
 
   /** Lets a thing into the run at the hopper, or first flies it there from the shelf. */
@@ -750,13 +802,13 @@ function Run({ sound, say, onDone, onGoal, look }: LevelProps & { look: TrackThe
     const id = nextId.current++;
     const start = from ?? HOPPER;
     lookingUp.current = false;
-    releasedAt.current = levelNow();
     marbles.current.push({
       id,
       kind,
       color: color ?? BRIGHT_COLORS[id % BRIGHT_COLORS.length],
       look: "plain",
       nudged: -Infinity,
+      line: -1,
       fly: from ? { from, at: levelNow() } : null,
       dist: 0,
       hop: 0,

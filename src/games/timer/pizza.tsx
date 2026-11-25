@@ -5,7 +5,7 @@ import { Draw, INK, Layer, LeftGlow, STAGE_H, STAGE_W } from "./scenes";
 // 12 o'clock, as the Kita's disc gets smaller – what is still on the board is the time left. Each slice is a small
 // layer of its own, cut to its wedge (a still `clip-path`), lifted off towards its side and gone at its time: a CSS
 // animation with its moment as `animation-delay`, so React only plays the munch then (`pieceMoments`). Every second a
-// little steam rises from the pizza (H-63).
+// little steam rises from another place on the pizza, in another look and size (H-63, `STEAM`).
 
 /** The pizza: its middle and radius. */
 export const PIZZA = { cx: 700, cy: 445, r: 270 } as const;
@@ -45,7 +45,7 @@ export function slice(i: number) {
 const Kitchen = memo(function Kitchen() {
   return (
     <Layer x={0} y={0} w={STAGE_W} h={STAGE_H} className="tm-back">
-      <Draw w={STAGE_W} h={STAGE_H}>
+      <Draw w={STAGE_W} h={STAGE_H} bleed>
         <defs>
           <pattern id="tm-cloth" width="80" height="80" patternUnits="userSpaceOnUse">
             <rect width="80" height="80" fill="#fff" />
@@ -171,12 +171,105 @@ function Slice({ i, glow }: { i: number; glow: number }) {
   );
 }
 
-/** A little steam rising from the pizza every second (H-63). */
+/** How steam looks at one moment: three wavy lines, one curl, two wisps side by side, or a soft little cloud. */
+export type SteamKind = "wisps" | "curl" | "twin" | "cloud";
+
+/** How many places steam rises from, one after the other, a second apart (H-63). */
+export const STEAM_SPOTS = 8;
+
+/** How long one round of all places takes: each place steams once in it, in its own second. */
+export const STEAM_ROUND_S = STEAM_SPOTS;
+
+/**
+ * Where steam rises and how (user feedback, November 2026: one puff always in the middle looked the same for an hour):
+ * each second at another place on the pizza, jumping across it rather than creeping round, and each place in a look
+ * and size of its own – and every second time it comes round in another look. `angle` and `radius` on the pizza as
+ * for `TOPPINGS`, `size` its height in stage units, `beat` the second of the round it steams in, `sway` how far it
+ * drifts sideways as it rises (in % of its width), `kinds` its two looks taking turns.
+ */
+export const STEAM = Array.from({ length: STEAM_SPOTS }, (_, i) => {
+  // The looks by beat, the first round and the second: never the same look twice in a row, round the turn too.
+  const first: SteamKind[] = ["wisps", "cloud", "curl", "twin", "cloud", "wisps", "twin", "curl"];
+  const second: SteamKind[] = ["twin", "curl", "wisps", "cloud", "curl", "twin", "cloud", "twin"];
+  const beat = (i * 3) % STEAM_SPOTS;
+  return {
+    angle: ((i + 0.45 + ((i * 37) % 10) / 40) / STEAM_SPOTS) * 2 * Math.PI,
+    radius: PIZZA.r * [0.62, 0.3, 0.7, 0.45, 0.66, 0.36, 0.56, 0.72][i],
+    size: [230, 150, 200, 260, 130, 215, 175, 160][i],
+    // Three places on between two beats: the steam jumps over the pizza (3 and 8 share no factor, so every place comes once).
+    beat,
+    sway: [-14, 10, 16, -10, -18, 12, -8, 14][i],
+    kinds: [first[beat], second[beat]] as const,
+  };
+});
+
+/** One look of steam drawn in a box of 100 × 100, rising from the middle of its foot. */
+function SteamArt({ kind }: { kind: SteamKind }) {
+  const lines =
+    kind === "wisps"
+      ? ["M28 96 C14 78 42 64 28 44 C18 30 34 20 30 8", "M50 96 C36 74 64 58 50 36 C40 22 56 12 52 2", "M72 96 C58 78 86 64 72 44 C62 30 78 20 74 8"]
+      : kind === "curl"
+        ? ["M50 98 C26 82 74 66 50 50 C30 38 40 16 58 18 C72 20 70 38 56 36"]
+        : kind === "twin"
+          ? ["M38 96 C24 78 52 62 38 42 C28 28 46 18 40 6", "M62 90 C76 74 48 60 62 44 C72 32 56 24 62 14"]
+          : [];
+  if (kind === "cloud")
+    return (
+      <Draw w={100} h={100}>
+        <g fill="#fff" stroke={INK} strokeOpacity="0.18" strokeWidth="3" opacity="0.92">
+          <circle cx="50" cy="80" r="15" />
+          <circle cx="36" cy="58" r="17" />
+          <circle cx="62" cy="50" r="19" />
+          <circle cx="46" cy="30" r="15" />
+          <circle cx="60" cy="16" r="10" />
+        </g>
+      </Draw>
+    );
+  return (
+    <Draw w={100} h={100}>
+      <g fill="none" strokeLinecap="round" strokeLinejoin="round">
+        {lines.map((d) => (
+          <path key={`o${d}`} d={d} stroke={INK} strokeOpacity="0.16" strokeWidth="13" />
+        ))}
+        {lines.map((d) => (
+          <path key={d} d={d} stroke="#fff" strokeWidth="8" />
+        ))}
+      </g>
+    </Draw>
+  );
+}
+
+/**
+ * Steam rising from the pizza (H-63): every second at another place, in another look and size (`STEAM`). Each place is
+ * a small layer of its own, standing on the slice it rises from and gone with it, so no steam rises from the bare
+ * board; its two looks take turns, each a beat of its own (`tm-beat`) moving by transform and opacity only.
+ */
 function Steam() {
   return (
-    <Layer x={PIZZA.cx - 40} y={PIZZA.cy - 100} w={80} h={80}>
-      <div className="tm-chug tm-beat tm-steam-puff" />
-    </Layer>
+    <>
+      {STEAM.map((spot, i) => {
+        const p = at(spot.angle, spot.radius);
+        const w = spot.size * 0.8;
+        const piece = Math.floor((spot.angle / (2 * Math.PI)) * SLICES);
+        const style = {
+          animationDelay: `calc(var(--tm-ms) * ${(piece + 1) / SLICES} - ${SLICE_SECONDS}s)`,
+          "--tm-sway": `${spot.sway}%`,
+        } as CSSProperties;
+        return (
+          <Layer key={i} x={p.x - w / 2} y={p.y - spot.size} w={w} h={spot.size} className="tm-pz-steam" style={style}>
+            {spot.kinds.map((kind, k) => (
+              <div
+                key={kind}
+                className={`tm-beat tm-pz-puff tm-pz-${kind}`}
+                style={{ animationDelay: `${spot.beat + k * STEAM_ROUND_S}s`, animationDuration: `${2 * STEAM_ROUND_S}s` }}
+              >
+                <SteamArt kind={kind} />
+              </div>
+            ))}
+          </Layer>
+        );
+      })}
+    </>
   );
 }
 

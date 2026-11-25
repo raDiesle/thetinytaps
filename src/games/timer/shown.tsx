@@ -92,18 +92,31 @@ export function digitsEm(total: number): number {
   return [...digits(total)].reduce((w, ch) => w + (ch === ":" ? COLON_EM : DIGIT_EM), 0);
 }
 
-/** The play area's class and width for the note in the corner, so the bar along the bottom ends beside it. */
-export function noteRoom(shown: TimeShown, total: number): { className: string; style: CSSProperties } {
-  return shown === "digits" ? { className: " tm-note-digits", style: { "--tm-note-em": digitsEm(total) } as CSSProperties } : { className: "", style: {} };
+/** How big the whole length after the time left is, against the note's digits (`TotalTime`). */
+const TOTAL_SCALE = 0.6;
+
+/** How wide the whole length after the time left is, in ems of the note's digits: a gap, a slash and its digits, smaller. */
+export function totalEm(total: number): number {
+  return 0.3 + (0.5 + digitsEm(total)) * TOTAL_SCALE;
+}
+
+/**
+ * The play area's class and width for the note in the corner, so the bar along the bottom ends beside it – with the
+ * whole length after the time left where `withTotal` (taking turns).
+ */
+export function noteRoom(shown: TimeShown, total: number, withTotal = false): { className: string; style: CSSProperties } {
+  const em = digitsEm(total) + (withTotal ? totalEm(total) : 0);
+  return shown === "digits" ? { className: " tm-note-digits", style: { "--tm-note-em": em } as CSSProperties } : { className: "", style: {} };
 }
 
 /**
  * The time left to `endsAt`, shown as `shown` says (nothing when off); `total` is the whole run, which sets what a tally
  * mark stands for: a share of it (`percentMarks`), or a stretch of time (`markUnit`). Once the time is up (`up`) it
  * stays, as 0:00 in red, blinking (user request, 23 November 2026: the end should be plain to see, in every timer) –
- * in digits also where marks were shown, since no marks left says less than 0:00.
+ * in digits also where marks were shown, since no marks left says less than 0:00. With `withTotal` (taking turns, user
+ * request, 25 November 2026) the digits have the whole turn's length beside them, smaller: „3:12 / 5:00“.
  */
-export function TimeShownNote({ shown, endsAt, total, up }: { shown: TimeShown; endsAt: number; total: number; up?: boolean }) {
+export function TimeShownNote({ shown, endsAt, total, up, withTotal }: { shown: TimeShown; endsAt: number; total: number; up?: boolean; withTotal?: boolean }) {
   // On the run's clock, so it stands still while the timer is paused.
   const clock = useRunClock();
   const [now, setNow] = useState(clock.now);
@@ -119,14 +132,16 @@ export function TimeShownNote({ shown, endsAt, total, up }: { shown: TimeShown; 
   const left = up ? 0 : endsAt - now;
   if (up || left <= 0)
     return (
-      <div className="tm-shown tm-shown-digits tm-shown-up" aria-hidden>
+      <div className={`tm-shown tm-shown-digits tm-shown-up${withTotal ? " tm-shown-with-total" : ""}`} aria-hidden>
         <Digits text={digits(0)} total={total} />
+        {withTotal && <TotalTime total={total} />}
       </div>
     );
   const unit = shown === "percent" ? total / percentMarks(total) : markUnit(total);
   return (
-    <div className={`tm-shown tm-shown-${shown === "percent" ? "marks" : shown}`} aria-hidden>
+    <div className={`tm-shown tm-shown-${shown === "percent" ? "marks" : shown}${withTotal && shown === "digits" ? " tm-shown-with-total" : ""}`} aria-hidden>
       {shown === "digits" ? <Digits text={digits(left)} total={total} /> : <Tally count={marksLeft(left, unit)} slots={marksLeft(total, unit)} />}
+      {withTotal && shown === "digits" && <TotalTime total={total} />}
     </div>
   );
 }
@@ -142,4 +157,9 @@ function Digits({ text, total }: { text: string; total: number }) {
       ))}
     </b>
   );
+}
+
+/** The whole length beside the time left, smaller and lighter: „/ 5:00“. */
+function TotalTime({ total }: { total: number }) {
+  return <i className="tm-shown-total">/ {digits(total)}</i>;
 }

@@ -1,4 +1,4 @@
-import { useEffect, useRef, useState } from "react";
+import { type CSSProperties, useEffect, useRef, useState } from "react";
 import { createPortal } from "react-dom";
 import { useLocation, useNavigate } from "react-router";
 import { useT } from "@/lib/language";
@@ -7,8 +7,9 @@ import { preloadPage } from "@/lib/preloadPages";
 
 /*
  * The way from the bookshelf into the trophy room (user request, November 2026): a little wooden board in 3D with a big
- * golden cup on it, sitting in the bottom right corner of the picture books' compartment with three nails in its corners
- * and reaching left into it, over the books spine out there. A little in the cup glints now and then, as a trophy does in a
+ * golden cup on it, sitting in the bottom right corner of a compartment with three nails in its corners: on a wide
+ * shelf the speaker's at the bottom of the right column, beside the speaker (user request, 25 November 2026), on an
+ * upright one the picture books', reaching left over the books spine out there. A little in the cup glints now and then, as a trophy does in a
  * game (user request, November 2026: the small cup in a doorway above the loudspeaker was hardly recognised). A tap
  * turns the eye to the right – the room's wall comes round with a door in it (MuseumDoorway) –, the door opens and one
  * walks in. Before the first trophy there is nothing behind it, so the sign isn't there either.
@@ -17,8 +18,11 @@ import { preloadPage } from "@/lib/preloadPages";
 /** How long the walk from the shelf into the trophy room takes; `museum-door-*` in bookshelf.css run exactly this long. */
 const DOORWAY_MS = 1900;
 
-/** The sign, the compartment's bottom right corner – its post at `left`, its floor at `top` – in px in the shelf. */
-export function TrophySign({ left, top }: { left: number; top: number }) {
+/**
+ * The sign, the compartment's bottom right corner – its post at `left`, its floor at `top` – in px in the shelf, and its
+ * width where that compartment sets it (`size`, beside the speaker); else the books' height does (`--trophy-sign`).
+ */
+export function TrophySign({ left, top, size }: { left: number; top: number; size?: number }) {
   const t = useT();
   const navigate = useNavigate();
   const { search } = useLocation();
@@ -33,7 +37,7 @@ export function TrophySign({ left, top }: { left: number; top: number }) {
       <button
         type="button"
         className="shelf-trophy-sign"
-        style={{ left, top }}
+        style={{ left, top, ...(size && { "--trophy-sign": `${size}px` }) } as CSSProperties}
         aria-label={label}
         title={label}
         onPointerDown={(e) => {

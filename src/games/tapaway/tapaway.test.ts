@@ -1,9 +1,23 @@
 import { describe, expect, test } from "bun:test";
 import { readFileSync } from "node:fs";
-import { SURPRISE } from "@/games/letters/Surprises";
+import { FIREWORK_KINDS, SURPRISE } from "@/games/letters/Surprises";
 import { freeSpot, type Placed } from "./place";
 import { SHAPES } from "./shapes";
-import { MAX_POPS, MAX_SPARKLES, POP_COLORS, POP_GAP_MS, POP_MS, RIPPLE_GAP_MS, SPARKLE_GAP_MS, SPARKLE_MS, TAP_AWAY_SURPRISES } from "./TapAwayPlay";
+import {
+  GLYPH_SHARE,
+  MAX_POPS,
+  MAX_SPARKLES,
+  POP_COLORS,
+  POP_GAP_MS,
+  POP_MS,
+  POP_SPARKS,
+  RIPPLE_GAP_MS,
+  SHAPE_SHARE,
+  SPARKLE_GAP_MS,
+  SPARKLE_MS,
+  SURPRISE_SHARE,
+  TAP_AWAY_SURPRISES,
+} from "./TapAwayPlay";
 
 const css = readFileSync(new URL("./tapaway.css", import.meta.url), "utf8");
 
@@ -57,6 +71,27 @@ describe("Magic Keys shows several things at once, yet never a storm", () => {
   test("its shapes and colours are distinct", () => {
     expect(new Set(SHAPES).size).toBe(SHAPES.length);
     expect(new Set(POP_COLORS).size).toBe(POP_COLORS.length);
+  });
+});
+
+// User feedback, 25 November 2026: the letters, shapes and surprises looked chunky („klobig“) – they stay small, so
+// several stand light on the page; and more fireworks, so over half the surprises are one and every press bursts.
+describe("Magic Keys stays light and full of fireworks", () => {
+  test("letters, shapes and surprises stay small shares of the page", () => {
+    expect(GLYPH_SHARE).toBeLessThanOrEqual(0.24);
+    expect(SHAPE_SHARE).toBeLessThanOrEqual(0.16);
+    expect(SURPRISE_SHARE).toBeLessThanOrEqual(0.32);
+  });
+
+  test("over half of its surprises are fireworks", () => {
+    const bag = TAP_AWAY_SURPRISES.bag ?? [];
+    const fireworks = bag.filter((k) => (FIREWORK_KINDS as readonly string[]).includes(k)).length;
+    expect(fireworks / bag.length).toBeGreaterThan(0.5);
+  });
+
+  test("every letter, digit and shape bursts with a few sparks, never a storm", () => {
+    expect(POP_SPARKS).toBeGreaterThanOrEqual(6);
+    expect(POP_SPARKS * MAX_POPS).toBeLessThanOrEqual(120);
   });
 });
 

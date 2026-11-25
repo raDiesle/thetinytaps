@@ -10,6 +10,8 @@ export interface PhotoCard {
   emoji: string;
   /** Drawn instead of the emoji where there is one (`pictures.tsx`). */
   picture?: string;
+  /** The picture is the grown-up's own photo (T-13): cut square from its middle with soft corners, never squeezed. */
+  photo?: boolean;
   label?: string;
 }
 
@@ -369,7 +371,18 @@ function drawPhoto(cards: PhotoCard[], images: Map<string, HTMLImageElement>, fo
     ctx.textAlign = "center";
     ctx.textBaseline = "middle";
     const image = card.picture ? images.get(card.picture) : undefined;
-    if (image) {
+    if (image && card.photo) {
+      // An own photo fills its square above the word, its middle kept, as on the sheet.
+      const box = side * (card.label ? 0.66 : 0.8);
+      const top = card.label ? y + side * 0.08 : y + (side - box) / 2;
+      const crop = Math.min(image.naturalWidth, image.naturalHeight);
+      ctx.save();
+      ctx.beginPath();
+      ctx.roundRect(x + (side - box) / 2, top, box, box, box * 0.12);
+      ctx.clip();
+      ctx.drawImage(image, (image.naturalWidth - crop) / 2, (image.naturalHeight - crop) / 2, crop, crop, x + (side - box) / 2, top, box, box);
+      ctx.restore();
+    } else if (image) {
       // The picture in a square above the word (or in the middle without one), as big as it fits.
       const box = side * (card.label ? 0.66 : 0.8);
       const scale = Math.min(box / image.naturalWidth, box / image.naturalHeight);

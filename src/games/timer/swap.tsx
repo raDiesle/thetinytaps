@@ -1,133 +1,251 @@
 import { memo, useId, useState, type CSSProperties } from "react";
 import { MASCOT_COLORS } from "@/components/Mascot";
-import type { Localized } from "@/lib/language";
 import { useRunClock } from "./pause";
-import { HOURGLASS_BOX, Hourglass, Layer, SAND_FLOOR, STAGE_H, STAGE_W } from "./scenes";
-import type { SwapToy } from "./settings";
+import { PlayerPatch } from "./players";
+import { Bleed, HOURGLASS_BOX, Hourglass, Layer, SAND_FLOOR, STAGE_H, STAGE_W } from "./scenes";
+import type { PlayerLook, Players, TurnChild, TurnCount } from "./settings";
 
-// Abwechseln (H-52): a toy lies on the fox child's cushion while the hourglass runs; when it is empty the toy hops over
-// to the bear child's cushion and the hourglass turns itself over – back and forth until a grown-up stops it.
-// The hourglass is the Sanduhr's own (`Hourglass`, user request, November 2026: one drawing, not two). Whose turn it
-// is shows at once from afar (user feedback, November 2026: the toy beside a small cushion was not clear enough): a
-// lamp over that child's cushion is on and lights it, the other side lies in soft shade, and the toy sits on the lit
-// cushion. Who begins is drawn by the lamps at the start, clicking on and off in turn, slower and slower, until one
-// stays on – fair, so no grown-up has to decide. The children themselves are not drawn: the drawn fox and bear standing
-// there looked odd (user feedback, November 2026); the cushions in the fox's and the bear's colours are their places.
+export type { TurnChild } from "./settings";
+
+// Abwechseln (H-52): two to four children take turns, the hourglass in the middle running one turn and turning itself
+// over for the next. Each child's place is a floor cushion in its colours with its animal's ears sewn on, big and plain
+// to see (user feedback, 25 November 2026: a toy car sitting on the fox's cushion looked like a car on its head and hid
+// its ears, so the toy went). Whose turn it is shows at once from afar: the lamp over that child's cushion is on and
+// lights it, every other place lies in shade, and the cushion whose turn it is puffs itself up and pricks up its ears
+// as the turn begins („Ohren spitzen“), while the waiting ones sit lower with their ears relaxed. A grown-up may give
+// each child its name or photo behind ⚙️, which the cushion then carries on its front like a photo cushion
+// (`PlayerPatch`). The hourglass is the Sanduhr's own (`Hourglass`, user request, November 2026: one drawing, not
+// two), smaller where three or four cushions share the floor. The children themselves are not drawn: the drawn fox and
+// bear standing there looked odd (user feedback, November 2026); the cushions are their places.
 
 const INK = "#3b2a20";
 
-/** Who has the toy: the fox child (left) or the bear child (right). */
+/** The fox's or the bear's side, where a picture has only two (the Rennstrecke's first two). */
 export type Holder = "fox" | "bear";
-
-/**
- * The children taking turns on the Kugelbahn (H-115, two to four), left to right in the order of their turns: the fox's
- * and the bear's as in Abwechseln, then a rabbit's and a frog's – each a cup in its own colour with its animal's ears.
- */
-export type TurnChild = Holder | "rabbit" | "frog";
 
 /** Every child that can take turns, in their order; two to four of them play, from the first. */
 export const TURN_CHILDREN: readonly TurnChild[] = ["fox", "bear", "rabbit", "frog"];
 
+/** The children's colours: the fox's and the bear's from the mascots, a blue rabbit and a green frog (the Kugelbahn's too). */
+export const KID_LOOK: Record<TurnChild, { body: string; shade: string; light: string; ear: string; earIn: string; lamp: string }> = {
+  fox: {
+    body: MASCOT_COLORS.fox.fur,
+    shade: MASCOT_COLORS.fox.shade,
+    light: MASCOT_COLORS.fox.light,
+    ear: MASCOT_COLORS.fox.fur,
+    earIn: MASCOT_COLORS.fox.earIn,
+    lamp: "#f08c00",
+  },
+  bear: {
+    body: MASCOT_COLORS.bear.fur,
+    shade: MASCOT_COLORS.bear.shade,
+    light: MASCOT_COLORS.bear.light,
+    ear: MASCOT_COLORS.bear.fur,
+    earIn: MASCOT_COLORS.bear.earIn,
+    lamp: "#8d5a3b",
+  },
+  rabbit: { body: "#4dabf7", shade: "#1c7ed6", light: "#a5d8ff", ear: "#f8f9fa", earIn: "#ffc9de", lamp: "#1c7ed6" },
+  frog: { body: "#51cf66", shade: "#2f9e44", light: "#b2f2bb", ear: "#51cf66", earIn: "#d3f9d8", lamp: "#2f9e44" },
+};
+
 /** The floor the cushions and the hourglass stand on: the Sanduhr's. */
 export const SWAP_FLOOR = SAND_FLOOR;
 
-/** The two children's places: the middles of their cushions, the same way left and right of the hourglass, and the cushions' width. */
-export const SWAP_SEATS = { fox: 390, bear: 1210, w: 250 } as const;
+/**
+ * Where the children sit with `count` of them: the middles of their cushions left to right in the order of their
+ * turns, the cushions' width, and how big the hourglass in the middle is. Two sit either side of a full-size hourglass;
+ * three or four share the floor with a smaller one, the first half of them left of it, the rest right – all within
+ * x 200–1400, which a tablet's 4 : 3 cut shows (`timer.test.ts`).
+ */
+export function swapPlaces(count: TurnCount) {
+  if (count === 2) return { xs: [390, 1210], w: 250, glass: 1 };
+  if (count === 3) return { xs: [345, 553, 1175], w: 196, glass: 0.7 };
+  return { xs: [355, 568, 1032, 1245], w: 190, glass: 0.6 };
+}
 
-/** The toy's size, and where its bottom lies: on a cushion, sunk into it a little, or in front of the hourglass while the lamps draw. */
-export const TOY = { w: 200, h: 162, onCushion: SWAP_FLOOR - 44, waiting: SWAP_FLOOR + 22 } as const;
+/** The hourglass's box on the floor at its size (`glass`): it shrinks towards the middle of its foot. */
+export function glassBox(glass: number) {
+  const B = HOURGLASS_BOX;
+  const w = B.w * glass;
+  const h = (SWAP_FLOOR - B.y) * glass;
+  return { x: 800 - w / 2, y: SWAP_FLOOR - h, w, h };
+}
 
-/** The lamps hanging over the cushions: where the shade's rim is, and how wide the light is there and on the floor. */
-export const LAMP = { rim: 190, top: 120, w: 110, floorW: 380 } as const;
-
-/** The edges of the two sides that lie in shade while it is not that child's turn: up to the hourglass's frame. */
-const SHADE = { fox: HOURGLASS_BOX.x, bear: HOURGLASS_BOX.x + HOURGLASS_BOX.w } as const;
+/** The lamps hanging over the cushions: where the shade's rim is, and how high it hangs. */
+export const LAMP = { rim: 190, top: 120 } as const;
 
 /**
- * A child's floor cushion, round and soft, in the fox's or the bear's colours with that animal's ears sewn on (pointed
- * or round) – no face, so it stays a cushion and never a drawn animal standing by. Its bottom's middle at (`x`, `y`),
- * `w` wide: by default on the floor at the child's place (`SWAP_SEATS`); the Wippe puts it on its seats.
+ * The strips of the room that lie in shade while it is not that child's turn: from the stage's edge or the hourglass
+ * to halfway to the next cushion. The hourglass itself belongs to no one and is never shaded.
  */
-export function Cushion({ kind, x = SWAP_SEATS[kind], y = SWAP_FLOOR + 6, w = SWAP_SEATS.w }: { kind: Holder; x?: number; y?: number; w?: number }) {
-  const c = MASCOT_COLORS[kind];
-  const k = w / 184;
+export function shadeStrips(count: TurnCount) {
+  const { xs, glass } = swapPlaces(count);
+  const g = glassBox(glass);
+  return xs.map((x, i) => {
+    const leftSide = x < 800;
+    const before = xs[i - 1];
+    const after = xs[i + 1];
+    const from = before !== undefined && before < 800 === leftSide ? (before + x) / 2 : leftSide ? 0 : g.x + g.w;
+    const to = after !== undefined && after < 800 === leftSide ? (x + after) / 2 : leftSide ? g.x : STAGE_W;
+    return { from, to };
+  });
+}
+
+/** The ears of a child's cushion, in its own units (184 wide, its bottom's middle at 0 0): big, so they're seen from afar. */
+function CushionEars({ kind }: { kind: TurnChild }) {
+  const c = KID_LOOK[kind];
   return (
-    <g transform={`translate(${x} ${y}) scale(${k})`}>
-      <ellipse cx="0" cy="4" rx="96" ry="14" fill="#000" opacity="0.14" />
+    <g strokeLinejoin="round">
       {[-1, 1].map((side) =>
         kind === "fox" ? (
-          <g key={side} strokeLinejoin="round">
-            <path d={`M${side * 26} -66 L${side * 50} -114 L${side * 66} -58 Z`} fill={c.fur} stroke={INK} strokeWidth="5" />
-            <path d={`M${side * 38} -70 L${side * 50} -98 L${side * 56} -66 Z`} fill={c.earIn} />
+          <g key={side}>
+            <path d={`M${side * 20} -60 L${side * 52} -138 L${side * 76} -50 Z`} fill={c.ear} stroke={INK} strokeWidth="5" />
+            <path d={`M${side * 36} -66 L${side * 52} -112 L${side * 62} -60 Z`} fill={c.earIn} />
+          </g>
+        ) : kind === "bear" ? (
+          <g key={side}>
+            <circle cx={side * 54} cy="-82" r="30" fill={c.ear} stroke={INK} strokeWidth="5" />
+            <circle cx={side * 54} cy="-82" r="15" fill={c.earIn} />
+          </g>
+        ) : kind === "rabbit" ? (
+          <g key={side} transform={`rotate(${side * 12} ${side * 30} -70)`}>
+            <ellipse cx={side * 30} cy="-130" rx="22" ry="66" fill={c.ear} stroke={INK} strokeWidth="5" />
+            <ellipse cx={side * 30} cy="-126" rx="10" ry="48" fill={c.earIn} />
           </g>
         ) : (
           <g key={side}>
-            <circle cx={side * 48} cy="-78" r="22" fill={c.fur} stroke={INK} strokeWidth="5" />
-            <circle cx={side * 48} cy="-78" r="11" fill={c.earIn} />
+            <circle cx={side * 46} cy="-84" r="30" fill={c.ear} stroke={INK} strokeWidth="5" />
+            <circle cx={side * 46} cy="-88" r="16" fill="#fff" stroke={INK} strokeWidth="3" />
+            <circle cx={side * 46 + side * 3} cy="-86" r="7" fill={INK} />
           </g>
         ),
       )}
-      <path d="M-88 -14 C-96 -70 -50 -84 0 -84 C50 -84 96 -70 88 -14 C60 2 -60 2 -88 -14 Z" fill={c.fur} stroke={INK} strokeWidth="5" strokeLinejoin="round" />
+    </g>
+  );
+}
+
+/** A cushion's soft body with its seam and shine, and the child's photo or name on its front. */
+function CushionBody({ kind, look }: { kind: TurnChild; look?: PlayerLook }) {
+  const c = KID_LOOK[kind];
+  return (
+    <g>
+      <ellipse cx="0" cy="4" rx="96" ry="14" fill="#000" opacity="0.14" />
+      <path d="M-88 -14 C-96 -70 -50 -84 0 -84 C50 -84 96 -70 88 -14 C60 2 -60 2 -88 -14 Z" fill={c.body} stroke={INK} strokeWidth="5" strokeLinejoin="round" />
       <path d="M-70 -30 C-30 -18 30 -18 70 -30" fill="none" stroke={c.shade} strokeWidth="4" strokeDasharray="10 8" />
-      <ellipse cx="-30" cy="-64" rx="26" ry="9" fill={c.light} opacity="0.8" />
+      <ellipse cx="-44" cy="-66" rx="22" ry="8" fill={c.light} opacity="0.8" />
+      <PlayerPatch look={look} x={0} y={-46} r={34} color={c.shade} />
+    </g>
+  );
+}
+
+/** How far above a cushion's bottom its tallest ears reach, in its units (the rabbit's), and below it its shadow. */
+const CUSHION_TOP = 200;
+const CUSHION_FOOT = 20;
+
+/**
+ * A child's floor cushion, round and soft, in its colours with its animal's ears sewn on – no face, so it stays a
+ * cushion and never a drawn animal standing by – and its photo or name on its front. Drawn into an svg, its bottom's
+ * middle at (`x`, `y`), `w` wide (the card's drawing).
+ */
+export function Cushion({ kind, x, y, w, look }: { kind: TurnChild; x: number; y: number; w: number; look?: PlayerLook }) {
+  return (
+    <g transform={`translate(${x} ${y}) scale(${w / 184})`}>
+      <CushionEars kind={kind} />
+      <CushionBody kind={kind} look={look} />
     </g>
   );
 }
 
 /** A lamp hanging from the ceiling over a cushion, switched off (its light is a layer of its own, `SwapLight`). */
-function Lamp({ kind }: { kind: Holder }) {
-  const x = SWAP_SEATS[kind];
-  const { rim, top, w } = LAMP;
+function Lamp({ kind, x, w }: { kind: TurnChild; x: number; w: number }) {
+  const { rim, top } = LAMP;
   return (
     <g strokeLinejoin="round">
       <path d={`M${x} 0 V${top}`} stroke={INK} strokeWidth="5" />
       <circle cx={x} cy={rim + 4} r="20" fill="#fff9db" stroke={INK} strokeWidth="4" />
-      <path
-        d={`M${x - 22} ${top} H${x + 22} L${x + w / 2} ${rim} H${x - w / 2} Z`}
-        fill={kind === "fox" ? "#f08c00" : "#8d5a3b"}
-        stroke={INK}
-        strokeWidth="5"
-      />
+      <path d={`M${x - 22} ${top} H${x + 22} L${x + w / 2} ${rim} H${x - w / 2} Z`} fill={KID_LOOK[kind].lamp} stroke={INK} strokeWidth="5" />
     </g>
   );
 }
 
-/** A playroom with a rug and the lamps hanging over the children's places; drawn once. */
-export const SwapBackdrop = memo(function SwapBackdrop() {
+/** The width of a lamp's shade over a cushion `w` wide. */
+const lampW = (w: number) => w * 0.44;
+
+/** A playroom with a rug and a lamp hanging over each child's place; drawn once for that many children. */
+export const SwapBackdrop = memo(function SwapBackdrop({ kids }: { kids: readonly TurnChild[] }) {
+  const { xs, w } = swapPlaces(kids.length as TurnCount);
   return (
     <Layer x={0} y={0} w={STAGE_W} h={STAGE_H} className="tm-back">
       <svg viewBox={`0 0 ${STAGE_W} ${STAGE_H}`} preserveAspectRatio="none">
-        <rect width={STAGE_W} height={STAGE_H} fill="#e6f4ea" />
-        <rect y={SWAP_FLOOR - 16} width={STAGE_W} height={STAGE_H} fill="#d9a066" />
-        <path d={`M0 ${SWAP_FLOOR - 16} H${STAGE_W}`} stroke="#a8743f" strokeWidth="6" />
-        <ellipse cx="800" cy={SWAP_FLOOR + 10} rx="640" ry="44" fill="#91a7ff" opacity="0.6" />
-        <Lamp kind="fox" />
-        <Lamp kind="bear" />
-      </svg>
-    </Layer>
-  );
-});
-
-/** The two cushions, in front of the lamps' light so it never washes them out; drawn once. */
-export const SwapCushions = memo(function SwapCushions() {
-  const top = SWAP_FLOOR - 180;
-  return (
-    <Layer x={0} y={top} w={STAGE_W} h={220}>
-      <svg viewBox={`0 ${top} ${STAGE_W} 220`}>
-        <Cushion kind="fox" />
-        <Cushion kind="bear" />
+        <Bleed>
+          <rect width={STAGE_W} height={STAGE_H} fill="#e6f4ea" />
+          <rect y={SWAP_FLOOR - 16} width={STAGE_W} height={STAGE_H} fill="#d9a066" />
+          <path d={`M0 ${SWAP_FLOOR - 16} H${STAGE_W}`} stroke="#a8743f" strokeWidth="6" />
+          <ellipse cx="800" cy={SWAP_FLOOR + 10} rx="640" ry="44" fill="#91a7ff" opacity="0.6" />
+          {kids.map((kind, i) => (
+            <Lamp key={kind} kind={kind} x={xs[i]} w={lampW(w)} />
+          ))}
+        </Bleed>
       </svg>
     </Layer>
   );
 });
 
 /**
- * The light of one lamp: the bulb glowing, a warm cone down to the cushion and a pool of light round it. On while it
- * is that child's turn (or while the lamps draw who begins), fading in and out as a whole (`opacity`).
+ * One child's cushion as a layer of its own, its ears another inside it: while it is that child's turn (`on`) the
+ * cushion puffs itself up and its ears stand up tall („Ohren spitzen“), with a little wiggle as the turn begins; while
+ * it waits it sits a little lower with its ears relaxed – still plainly seen. Both move by `transform` only.
  */
-export function SwapLight({ kind, on }: { kind: Holder; on: boolean }) {
-  const x = SWAP_SEATS[kind];
-  const { rim, w, floorW } = LAMP;
+export const SwapSeat = memo(function SwapSeat({ kind, x, w, on, look }: { kind: TurnChild; x: number; w: number; on: boolean; look?: PlayerLook }) {
+  const k = w / 184;
+  const top = SWAP_FLOOR + 6 - CUSHION_TOP * k;
+  const h = (CUSHION_TOP + CUSHION_FOOT) * k;
+  const view = `-110 ${-CUSHION_TOP} 220 ${CUSHION_TOP + CUSHION_FOOT}`;
+  const left = x - 110 * k;
+  const origin = (from: number) => `50% ${(((CUSHION_TOP - from) / (CUSHION_TOP + CUSHION_FOOT)) * 100).toFixed(1)}%`;
+  return (
+    <Layer
+      x={left}
+      y={top}
+      w={220 * k}
+      h={h}
+      className={`tm-seat${on ? " tm-on" : ""}`}
+      style={{ "--tm-seat-foot": origin(0), "--tm-seat-ear-base": origin(60) } as CSSProperties}
+    >
+      <div className="tm-seat-puff">
+        <div className="tm-seat-ears">
+          <svg viewBox={view}>
+            <CushionEars kind={kind} />
+          </svg>
+        </div>
+        <svg viewBox={view}>
+          <CushionBody kind={kind} look={look} />
+        </svg>
+      </div>
+    </Layer>
+  );
+});
+
+/** Every child's cushion, the one whose turn it is puffed up (`lit`), each with its photo or name (`players`). */
+export function SwapCushions({ kids, lit, players }: { kids: readonly TurnChild[]; lit: readonly boolean[]; players: Players }) {
+  const { xs, w } = swapPlaces(kids.length as TurnCount);
+  return (
+    <>
+      {kids.map((kind, i) => (
+        <SwapSeat key={kind} kind={kind} x={xs[i]} w={w} on={lit[i]} look={players[kind]} />
+      ))}
+    </>
+  );
+}
+
+/**
+ * The light of one lamp: the bulb glowing, a warm cone down to the cushion and a pool of light round it. On while it
+ * is that child's turn, fading in and out as a whole (`opacity`).
+ */
+export function SwapLight({ x, w, on }: { x: number; w: number; on: boolean }) {
+  const { rim } = LAMP;
+  const shade = lampW(w);
+  const floorW = w * 1.5;
   const left = x - floorW / 2 - 40;
   const width = floorW + 80;
   const top = rim - 30;
@@ -142,7 +260,7 @@ export function SwapLight({ kind, on }: { kind: Holder; on: boolean }) {
             <stop offset="1" stopColor="#ffec99" stopOpacity="0.45" />
           </linearGradient>
         </defs>
-        <path d={`M${x - w / 2 + 6} ${rim} L${x + w / 2 - 6} ${rim} L${x + floorW / 2} ${SWAP_FLOOR + 10} H${x - floorW / 2} Z`} fill={`url(#${id})`} />
+        <path d={`M${x - shade / 2 + 6} ${rim} L${x + shade / 2 - 6} ${rim} L${x + floorW / 2} ${SWAP_FLOOR + 10} H${x - floorW / 2} Z`} fill={`url(#${id})`} />
         <ellipse cx={x} cy={SWAP_FLOOR + 10} rx={floorW / 2 + 30} ry="34" fill="#fff3bf" opacity="0.8" />
         <circle cx={x} cy={rim + 4} r="34" fill="#fff9db" opacity="0.7" />
         <circle cx={x} cy={rim + 4} r="20" fill="#fffbe6" stroke={INK} strokeWidth="4" />
@@ -151,112 +269,70 @@ export function SwapLight({ kind, on }: { kind: Holder; on: boolean }) {
   );
 }
 
-/**
- * The soft shade over one side of the room while it is the other child's turn (or the other lamp's, while they draw):
- * up to the hourglass's frame, or up to `edge` where the two sides meet (the Wippe: its middle).
- */
-export function SwapShade({ kind, on, edge }: { kind: Holder; on: boolean; edge?: number }) {
-  const right = edge ?? SHADE.bear;
-  const x = kind === "fox" ? 0 : right;
-  const w = kind === "fox" ? (edge ?? SHADE.fox) : STAGE_W - right;
-  return <Layer x={x} y={0} w={w} h={STAGE_H} className={`tm-swap-shade tm-swap-shade-${kind}${on ? " tm-on" : ""}`} />;
+/** Every child's lamp, the one whose turn it is on. */
+export function SwapLights({ count, lit }: { count: TurnCount; lit: readonly boolean[] }) {
+  const { xs, w } = swapPlaces(count);
+  return (
+    <>
+      {xs.map((x, i) => (
+        <SwapLight key={x} x={x} w={w} on={lit[i]} />
+      ))}
+    </>
+  );
+}
+
+/** The shade over each child's strip of the room while it is not that child's turn (`lit` false). */
+export function SwapShades({ count, lit }: { count: TurnCount; lit: readonly boolean[] }) {
+  return (
+    <>
+      {shadeStrips(count).map(({ from, to }, i) => (
+        <SwapShade key={from} from={from} to={to} on={!lit[i]} />
+      ))}
+    </>
+  );
+}
+
+/** The soft shade over one strip of the room, from `from` to `to`. */
+export function SwapShade({ from, to, on }: { from: number; to: number; on: boolean }) {
+  return <Layer x={from} y={0} w={to - from} h={STAGE_H} className={`tm-swap-shade${on ? " tm-on" : ""}`} />;
 }
 
 /**
- * The hourglass running one turn – the Sanduhr's own: the top heap sinks, the bottom one rises over `ms`, from
- * `startedAt` on, so it shows the turn's real time even when drawn later (a phone waking up). `flip` turns it over as it
- * comes, the full bottom going up – the hourglass turning itself over for the next child. Both are read once, as it
- * comes: give each turn its own `key`. While `waiting` (the lamps still draw who begins) it stands full, the sand still.
+ * The hourglass running one turn – the Sanduhr's own, at its size (`glass`): the top heap sinks, the bottom one rises
+ * over `ms`, from `startedAt` on, so it shows the turn's real time even when drawn later (a phone waking up). `flip`
+ * turns it over as it comes, the full bottom going up – the hourglass turning itself over for the next child. Both are
+ * read once, as it comes: give each turn its own `key`. While `waiting` (the page still turning) it stands full, the
+ * sand still.
  */
-export function SwapHourglass({ ms, startedAt, flip, waiting, glow }: { ms: number; startedAt: number; flip: boolean; waiting: boolean; glow: number }) {
+export function SwapHourglass({
+  ms,
+  startedAt,
+  flip,
+  waiting,
+  glow,
+  glass = 1,
+}: {
+  ms: number;
+  startedAt: number;
+  flip: boolean;
+  waiting: boolean;
+  glow: number;
+  glass?: number;
+}) {
   const clock = useRunClock();
   const [delay] = useState(() => (waiting ? 0 : Math.max(0, clock.now() - startedAt)));
   const [flipped] = useState(flip);
   return (
-    <Hourglass
-      running={!waiting}
-      glow={glow}
-      className={`tm-swap-glass${flipped ? " tm-flip" : ""}${waiting ? " tm-wait" : ""}`}
-      style={{ "--tm-ms": `${ms}ms`, "--tm-delay": `${-delay}ms` } as CSSProperties}
-    />
-  );
-}
-
-/** The toys a grown-up can pick behind ⚙️, in their order there. */
-export const SWAP_TOYS: { id: SwapToy; emoji: string; name: Localized }[] = [
-  {
-    id: "bobbycar",
-    emoji: "🚗",
-    name: { de: "Bobbycar", en: "Ride-on car", zh: "扭扭车", hi: "खिलौना कार", es: "Correpasillos", ar: "سيارة الأطفال", ru: "Каталка" },
-  },
-  { id: "doll", emoji: "🪆", name: { de: "Puppe", en: "Doll", zh: "娃娃", hi: "गुड़िया", es: "Muñeca", ar: "الدمية", ru: "Кукла" } },
-  { id: "ball", emoji: "⚽", name: { de: "Ball", en: "Ball", zh: "球", hi: "गेंद", es: "Pelota", ar: "الكرة", ru: "Мяч" } },
-];
-
-/** The toy's drawing, in 160 × 130 units scaled to its layer, standing on its bottom edge. */
-export function ToyDrawing({ toy }: { toy: SwapToy }) {
-  if (toy === "bobbycar")
-    return (
-      <svg viewBox="0 0 160 130">
-        <path
-          d="M14 88 C10 60 30 52 56 52 H96 L112 30 H130 L126 56 C146 60 152 74 148 90 Z"
-          fill="#e03131"
-          stroke={INK}
-          strokeWidth="5"
-          strokeLinejoin="round"
-        />
-        <path d="M118 30 V14 M108 14 H130" stroke={INK} strokeWidth="6" strokeLinecap="round" />
-        <rect x="52" y="40" width="40" height="16" rx="7" fill="#c92a2a" stroke={INK} strokeWidth="4" />
-        <circle cx="138" cy="70" r="7" fill="#ffd43b" stroke={INK} strokeWidth="3" />
-        {[40, 120].map((cx) => (
-          <g key={cx}>
-            <circle cx={cx} cy="104" r="22" fill="#343a40" stroke={INK} strokeWidth="4" />
-            <circle cx={cx} cy="104" r="9" fill="#f8f9fa" />
-          </g>
-        ))}
-      </svg>
-    );
-  if (toy === "doll")
-    return (
-      <svg viewBox="0 0 160 130">
-        <path d="M54 126 L64 70 H96 L106 126 Z" fill="#cc5de8" stroke={INK} strokeWidth="5" strokeLinejoin="round" />
-        <path d="M58 82 L40 104 M102 82 L120 104" stroke={INK} strokeWidth="10" strokeLinecap="round" />
-        <path d="M58 82 L40 104 M102 82 L120 104" stroke="#ffd8a8" strokeWidth="5" strokeLinecap="round" />
-        <circle cx="80" cy="44" r="30" fill="#ffd8a8" stroke={INK} strokeWidth="5" />
-        <path d="M50 42 C50 14 110 14 110 42 C104 28 94 24 80 26 C66 24 56 28 50 42 Z" fill="#f59f00" stroke={INK} strokeWidth="4" strokeLinejoin="round" />
-        <circle cx="70" cy="46" r="4" fill={INK} />
-        <circle cx="90" cy="46" r="4" fill={INK} />
-        <path d="M72 58 Q80 64 88 58" stroke={INK} strokeWidth="3.5" fill="none" strokeLinecap="round" />
-        <circle cx="64" cy="56" r="5" fill="#ffa8a8" opacity="0.8" />
-        <circle cx="96" cy="56" r="5" fill="#ffa8a8" opacity="0.8" />
-      </svg>
-    );
-  return (
-    <svg viewBox="0 0 160 130">
-      <circle cx="80" cy="72" r="54" fill="#fff" stroke={INK} strokeWidth="5" />
-      <path d="M80 50 L101 65 L93 90 H67 L59 65 Z" fill="#343a40" />
-      <path d="M80 50 V20 M101 65 L130 56 M93 90 L110 116 M67 90 L50 116 M59 65 L30 56" stroke="#343a40" strokeWidth="5" />
-    </svg>
-  );
-}
-
-/** Where the toy is: on a child's cushion, or in front of the hourglass while the lamps draw who begins. */
-export type ToyPlace = Holder | "middle";
-
-/**
- * The toy, sitting on the cushion of the child whose turn it is. It travels by `transform` (a CSS transition), and
- * hops up on its way (`hop`, a new number for every move), so the move is seen and heard from afar.
- */
-export function Toy({ toy, place, hop = 0 }: { toy: SwapToy; place: ToyPlace; hop?: number }) {
-  const x = (p: ToyPlace) => (p === "middle" ? 800 : SWAP_SEATS[p]);
-  const bottom = place === "middle" ? TOY.waiting : TOY.onCushion;
-  const dx = ((x(place) - x("fox")) / TOY.w) * 100;
-  const dy = ((bottom - TOY.onCushion) / TOY.h) * 100;
-  return (
-    <Layer x={x("fox") - TOY.w / 2} y={TOY.onCushion - TOY.h} w={TOY.w} h={TOY.h} className="tm-toy tm-move" style={{ transform: `translate(${dx}%, ${dy}%)` }}>
-      <div key={hop} className={hop ? "tm-toy-hop" : undefined}>
-        <ToyDrawing toy={toy} />
-      </div>
-    </Layer>
+    <div
+      className="tm-swap-glass-size"
+      style={{ transform: glass === 1 ? undefined : `scale(${glass})`, transformOrigin: `50% ${(SWAP_FLOOR / STAGE_H) * 100}%` }}
+    >
+      <Hourglass
+        running={!waiting}
+        glow={glow}
+        className={`tm-swap-glass${flipped ? " tm-flip" : ""}${waiting ? " tm-wait" : ""}`}
+        style={{ "--tm-ms": `${ms}ms`, "--tm-delay": `${-delay}ms` } as CSSProperties}
+      />
+    </div>
   );
 }
