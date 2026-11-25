@@ -28,8 +28,14 @@ const FLAT_ASPECT = 2.4;
  */
 const MIN_PICTURE = 120;
 const MIN_PICTURE_PHONE = 84;
-/** Cards with a picture may grow taller than other cards: the picture is what is looked at. */
+/**
+ * Cards with a picture may grow taller than other cards: the picture is what is looked at. Only a big screen keeps them
+ * below this; on a phone or tablet they take all the room there is (user request, November 2026: two or three cards on
+ * a tablet left a third of the room under and beside them empty).
+ */
 const MAX_PICTURE_ROW = 280;
+/** A screen whose shorter side is below this is a phone's or a tablet's (an iPad Pro is 1024), where cards with a picture are never capped. */
+export const TABLET_SCREEN = 1050;
 /** The card's paper round its picture, on each side; matches `--pic-pad` in `book.css`. */
 const PICTURE_PAD = 8;
 const PICTURE_PAD_PHONE = 6;
@@ -109,10 +115,19 @@ export function packGroups(sizes: number[], columns: number, reserve = 0): { pla
 /**
  * Columns and row height that give `count` cards the most room; with `groups` (their sizes) every group keeps together.
  * `shape` is how much wider than tall the cards look best, when it isn't the usual (cards that are a picture), or
- * `PICTURE_CARDS` for cards with a preview picture above their name, which get the biggest pictures.
+ * `PICTURE_CARDS` for cards with a preview picture above their name, which get the biggest pictures – on a big screen
+ * (`bigScreen`) no taller than `MAX_PICTURE_ROW`.
  */
-export function bestFit(count: number, width: number, height: number, phone: boolean, groups?: number[], shape?: number | typeof PICTURE_CARDS): Fit | null {
-  if (shape === PICTURE_CARDS) return bestPictureFit(count, width, height, phone, groups);
+export function bestFit(
+  count: number,
+  width: number,
+  height: number,
+  phone: boolean,
+  groups?: number[],
+  shape?: number | typeof PICTURE_CARDS,
+  bigScreen = true,
+): Fit | null {
+  if (shape === PICTURE_CARDS) return bestPictureFit(count, width, height, phone, groups, bigScreen ? MAX_PICTURE_ROW : Infinity);
   const aspect = shape;
   const minRow = phone ? MIN_ROW_PHONE : MIN_ROW;
   const minWidth = phone ? MIN_WIDTH_PHONE : aspect ? MIN_PICTURE_WIDTH : MIN_WIDTH;
@@ -138,7 +153,7 @@ export function bestFit(count: number, width: number, height: number, phone: boo
 }
 
 /** The grid of `bestFit` for cards with a preview picture above their name: the one with the widest pictures. */
-function bestPictureFit(count: number, width: number, height: number, phone: boolean, groups?: number[]): Fit | null {
+function bestPictureFit(count: number, width: number, height: number, phone: boolean, groups: number[] | undefined, maxRow: number): Fit | null {
   const gap = phone ? GAP_PHONE : GAP;
   let best: Fit | null = null;
   let bestSize = 0;
@@ -148,7 +163,7 @@ function bestPictureFit(count: number, width: number, height: number, phone: boo
       const rows = lines.reduce((a, b) => a + b, 0);
       const labels = groups ? lines.length * ((phone ? LABEL_PHONE : LABEL) + gap) : 0;
       const cardWidth = (width - (columns - 1) * gap) / columns;
-      const row = Math.min((height - labels - (rows - 1) * gap) / rows, MAX_PICTURE_ROW);
+      const row = Math.min((height - labels - (rows - 1) * gap) / rows, maxRow);
       const size = pictureWidth(cardWidth, row, phone);
       if (size < (phone ? MIN_PICTURE_PHONE : MIN_PICTURE)) continue;
       // A bigger picture wins; of two alike (within a pixel), the one with fewer empty cells.
@@ -242,7 +257,8 @@ export function useFitGrid(count: number, groups?: number[], shape?: number | ty
       // An open settings panel grows the page below the cards; they keep their size.
       if (page.querySelector(":is(.panel-button, .panel-icon)[aria-expanded='true']")) return;
       const phone = isPhone();
-      const next = bestFit(count, list.clientWidth, roomFor(list, page), phone, groups, shape);
+      const big = Math.min(window.innerWidth, window.innerHeight) >= TABLET_SCREEN;
+      const next = bestFit(count, list.clientWidth, roomFor(list, page), phone, groups, shape, big);
       setFit((prev) => (prev?.columns === next?.columns && prev?.row === next?.row && prev?.reserve === next?.reserve ? prev : next));
     };
     measure();

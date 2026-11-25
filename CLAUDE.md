@@ -714,7 +714,11 @@ A game may give it before its end where reaching the goal once is enough (Ketten
   under it – never beside a small picture on a flat card, never broken into lines, never on the picture (Kettenreaktion's
   names lay on its pictures in paper boxes, `labelOnPicture`, taken out). `useFitGrid(…, PICTURE_CARDS)` picks the grid
   with the biggest pictures and shrinks all names of a menu alike until the longest fits (`fitNames`); where all cards
-  at once would leave pictures too small to make out (`MIN_PICTURE`), the menu scrolls instead (`fitGrid.test.ts`). A cut shows what the game is about, close enough to be recognised and whole: the figure and the thing
+  at once would leave pictures too small to make out (`MIN_PICTURE`), the menu scrolls instead (`fitGrid.test.ts`). On a phone or tablet (shorter
+  side below `TABLET_SCREEN`) the cards take all the room down to the families' floor, never capped at a height, and a
+  table of contents measures where its lines begin (`--toc-top`, `BookContents`) rather than guessing it from the
+  ribbon, with a name strip of one line: no room given away (user request, November 2026; only a big screen keeps
+  `MAX_PICTURE_ROW`). A cut shows what the game is about, close enough to be recognised and whole: the figure and the thing
   it is about (an animal with the right food and at least one wrong one), the letter, picture and word together, the
   number with all its things, several sock pairs on the line, a dancer mid-move (`WHOLE`, `ALONE`, `PLAYS` – a moment
   played into the game first, never only its empty start). A new game, level, scene or card runs it

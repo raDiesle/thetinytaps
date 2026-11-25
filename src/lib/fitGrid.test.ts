@@ -80,6 +80,16 @@ describe("cards with a preview picture", () => {
     expect(pictureWidth((969 - 2 * 24) / 3, fit?.row ?? 0, false)).toBeGreaterThan(280);
   });
 
+  test("take all the room on a phone or tablet, and stop growing only on a big screen", () => {
+    // „Wie geht's dir?“ on a tablet: two cards, 969 × 390 px of room. Capped, their pictures were 333 px wide with a
+    // third of the room left empty under and beside them (user request, November 2026).
+    const tablet = bestFit(2, 969, 390, false, undefined, PICTURE_CARDS, false);
+    const big = bestFit(2, 969, 390, false, undefined, PICTURE_CARDS, true);
+    expect(tablet?.row).toBe(390);
+    expect(big?.row).toBe(280);
+    expect(pictureWidth((969 - 24) / 2, tablet?.row ?? 0, false)).toBeGreaterThan(450);
+  });
+
   test("scroll rather than shrink their pictures past recognising", () => {
     // Kettenreaktion's 21 machines on a phone on its side: all at once only as pictures about 54 px wide.
     expect(bestFit(21, 805, 222, true, undefined, PICTURE_CARDS)).toBeNull();

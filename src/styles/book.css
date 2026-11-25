@@ -365,7 +365,9 @@
   .toc-line {
     height: auto;
     max-height: 100%;
-    --toc-name-h: max(24px, 10cqw);
+    /* One line of name (its font below, at a line height of 1.15) with the page number beside it: no more, so the
+       picture keeps every pixel above it (10cqw left a wide line's picture 18 px lower than the room allowed). */
+    --toc-name-h: max(24px, 1.45 * max(15px, min(6.4cqw, 9cqh)));
     --toc-pic-h: min(100cqh - var(--toc-name-h) - 3cqw, 94cqw / 1.5);
     flex-wrap: wrap;
     align-content: start;
