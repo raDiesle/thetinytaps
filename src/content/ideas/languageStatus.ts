@@ -285,7 +285,7 @@ export const LANGUAGE_STATUS: LanguageStatusRow[] = [
   },
   {
     href: "/haende-waschen/",
-    note: "Hände waschen (H-136, 22. November 2026), Englisch zuerst und gleich in allen sieben Sprachen: Name, Satz fürs Regal (names.ts), die Namen der Schritte in der Leiste (steps.ts) und die Beschreibung des Bilds. Auf dem Bild steht nichts, und gesprochen wird nichts. Das gesungene Lied fehlt noch in allen Sprachen (H-142, mit Suno wie das Zahnputzlied); bis dahin spielt eine Platzhalter-Melodie.",
+    note: "Hände waschen (H-136, 22. November 2026), Englisch zuerst und gleich in allen sieben Sprachen: Name, Satz fürs Regal (names.ts), die Namen der Schritte in der Leiste (steps.ts, seit 25. November 2026 dreizehn Schritte vom Ruf zum Essen bis zum Lauf zum Tisch) und die Beschreibung des Bilds. Auf dem Bild steht nichts, und gesprochen wird nichts. Das gesungene Lied fehlt noch in allen Sprachen (H-142, mit Suno wie das Zahnputzlied); bis dahin spielt eine Platzhalter-Melodie.",
     languages: { de: "done", en: "done", zh: "done", hi: "done", es: "done", ar: "done", ru: "done" },
   },
   {

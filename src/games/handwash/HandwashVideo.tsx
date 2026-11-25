@@ -22,7 +22,7 @@ export function HandwashVideo() {
   return (
     <VideoRecorder
       title="Hände waschen fürs Video"
-      about="Spielt das ganze Händewaschen einmal durch – Ärmel hoch, Wasser, Seife, die fünf Reibe-Schritte mit den Schmutzmonstern, abspülen, abtrocknen, glänzen – nur das Bild im Format 16 : 9, ohne Leiste oder Knöpfe. Noch ohne Lied: Bis es mit Suno gemacht ist (H-142), spielt eine Platzhalter-Melodie, ein Video ist also nur ein Test des Bilds. Sprache und Kind stellt man im Regal um (🌐 und die Sticker)."
+      about="Spielt das ganze Händewaschen einmal durch – Mama ruft zum Essen, ins Bad und auf den Tritt, Ärmel hoch, Seife aus dem Spender, eine Hand seift die andere ein (Handflächen, Handrücken, zwischen den Fingern), Wasser an und die Wärme fühlen, abspülen, Wasser aus, die Hände ins Handtuch, und ab zum Essen – nur das Bild im Format 16 : 9, ohne Leiste oder Knöpfe. Noch ohne Lied: Bis es mit Suno gemacht ist (H-142), spielt eine Platzhalter-Melodie, ein Video ist also nur ein Test des Bilds. Sprache und Kind stellt man im Regal um (🌐 und die Sticker)."
       facts={[
         ["Sprache", languageName],
         ["Kind", figure === "girl" ? "Mädchen" : "Junge"],
