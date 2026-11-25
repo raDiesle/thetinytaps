@@ -53,7 +53,7 @@ import { appleTimes, ladybugLaps, MAX_APPLES, pieceMoments, soonMs } from "./pie
 import { PauseControls, RunClockProvider, usePausableClock, useRunClock } from "./pause";
 import { PizzaScene, SLICES } from "./pizza";
 import { CandleBackdrop, candlePlan, Candles, Hourglass, SandBackdrop } from "./scenes";
-import type { SwapToy, TimeShown, TimerPicture, TimerSettings, TurnCount } from "./settings";
+import type { Players, TimeShown, TimerPicture, TimerSettings, TurnCount } from "./settings";
 import { noteRoom, TimeShownChoice, TimeShownNote } from "./shown";
 import { SunsetScene } from "./sunset";
 import { SwapRun } from "./SwapPlay";
@@ -101,17 +101,17 @@ type Phase = "running" | "blow" | "done";
 export function TimerPlay({
   settings,
   onPicture,
-  onToy,
   onKids,
+  onPlayers,
   onShown,
   onBar,
 }: {
   settings: TimerSettings;
   onPicture: (picture: TimerPicture) => void;
-  /** A grown-up picks another toy for „Abwechseln“ behind ⚙️. */
-  onToy: (toy: SwapToy) => void;
-  /** A grown-up sets how many children take turns on the Kugelbahn behind ⚙️. */
+  /** A grown-up sets how many children take turns behind ⚙️. */
   onKids: (kids: TurnCount) => void;
+  /** A grown-up gives the children taking turns their names or photos behind ⚙️. */
+  onPlayers: (players: Players) => void;
   /** A grown-up has the time left shown in the picture, or not, behind ⚙️. */
   onShown: (shown: TimeShown) => void;
   /** A grown-up has the bar along the bottom shown, or not, behind ⚙️. */
@@ -123,7 +123,7 @@ export function TimerPlay({
     onPicture(picture);
     again();
   };
-  return <TimerStart key={run} settings={settings} onAgain={again} onPicture={pick} onToy={onToy} onKids={onKids} onShown={onShown} onBar={onBar} />;
+  return <TimerStart key={run} settings={settings} onAgain={again} onPicture={pick} onKids={onKids} onPlayers={onPlayers} onShown={onShown} onBar={onBar} />;
 }
 
 /**
@@ -134,16 +134,16 @@ function TimerStart({
   settings,
   onAgain,
   onPicture,
-  onToy,
   onKids,
+  onPlayers,
   onShown,
   onBar,
 }: {
   settings: TimerSettings;
   onAgain: () => void;
   onPicture: (picture: TimerPicture) => void;
-  onToy: (toy: SwapToy) => void;
   onKids: (kids: TurnCount) => void;
+  onPlayers: (players: Players) => void;
   onShown: (shown: TimeShown) => void;
   onBar: (bar: boolean) => void;
 }) {
@@ -192,10 +192,10 @@ function TimerStart({
         turnMs={turn}
         totalMs={until ? (total === "past" ? 0 : total) : undefined}
         until={until}
-        toy={settings.toy}
-        onToy={onToy}
         kids={settings.kids}
         onKids={onKids}
+        players={settings.players}
+        onPlayers={onPlayers}
         timeShown={settings.timeNote}
         onShown={onShown}
         bar={settings.bar}

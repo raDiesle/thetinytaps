@@ -4,8 +4,8 @@ import { playKnock } from "@/lib/sfx";
 import { type Frame, keyframes } from "./keyframes";
 import { useRunClock } from "./pause";
 import { Bleed, INK, Layer, STAGE_H, STAGE_W } from "./scenes";
-import type { TurnCount } from "./settings";
-import type { TurnChild } from "./swap";
+import { PlayerPatch } from "./players";
+import type { PlayerLook, Players, TurnChild, TurnCount } from "./settings";
 
 // Kugelbahn (H-117 with H-115; reworked on 25 November 2026, user request: a basket at the top and one at the bottom on
 // one side of the board, a crank at its side, and as a marble has run in, the crank turns, the board turns over and the
@@ -576,8 +576,8 @@ function CupEars({ kind, x, w }: { kind: TurnChild; x: number; w: number }) {
   );
 }
 
-/** A whole cup: its ears, its rim with the dark inside, its body with a pale band round it and a soft shine. */
-function CupArt({ kind, x, w }: { kind: TurnChild; x: number; w: number }) {
+/** A whole cup: its ears, its rim with the dark inside, its body with a pale band round it, a soft shine and the child's photo or name. */
+function CupArt({ kind, x, w, player }: { kind: TurnChild; x: number; w: number; player?: PlayerLook }) {
   const look = CUP_LOOK[kind];
   const rx = w / 2;
   const ry = w * 0.13;
@@ -603,6 +603,7 @@ function CupArt({ kind, x, w }: { kind: TurnChild; x: number; w: number }) {
         transform="translate(0 3)"
         opacity="0.9"
       />
+      <PlayerPatch look={player} x={x} y={band - 4} r={w * 0.16} color={look.shade} />
     </g>
   );
 }
@@ -615,14 +616,14 @@ const CUP_H = CUP.bottom + 30 - CUP_TOP;
  * One child's place: its glow of light behind it and its cup, each a small layer of its own. `on`, the child whose turn
  * it is: the glow shines warm round the cup; otherwise the cup lies dimmed in the shade.
  */
-const Place = memo(function Place({ kind, x, w, on }: { kind: TurnChild; x: number; w: number; on: boolean }) {
+const Place = memo(function Place({ kind, x, w, on, player }: { kind: TurnChild; x: number; w: number; on: boolean; player?: PlayerLook }) {
   const half = w / 2 + 40;
   return (
     <>
       <Layer x={x - w * 0.95} y={CUP.rim - 250} w={w * 1.9} h={420} className={`tm-mr-glow${on ? " tm-on" : ""}`} />
       <Layer x={x - half} y={CUP_TOP} w={2 * half} h={CUP_H} className={`tm-mr-cup${on ? " tm-on" : ""}`}>
         <svg viewBox={`${x - half} ${CUP_TOP} ${2 * half} ${CUP_H}`}>
-          <CupArt kind={kind} x={x} w={w} />
+          <CupArt kind={kind} x={x} w={w} player={player} />
         </svg>
       </Layer>
     </>
@@ -663,11 +664,13 @@ function strips(count: TurnCount) {
   return xs.map((x, i) => ({ x: i === 0 ? 0 : (xs[i - 1] + x) / 2, right: i === xs.length - 1 ? STAGE_W : (x + xs[i + 1]) / 2 }));
 }
 
+const NO_PLAYERS: Players = {};
+
 /**
  * The Kugelbahn on the stage for the children `kids` (two to four, left to right): `lit` says whose place and strip of
  * the room is lit (the child whose turn it is, or everyone at the end), `turn` the turn going on (the board turning
  * over and the marble rolling down; null: still, the marble in the bottom basket), and `poke` counts the taps, each
- * lighting the basket the marble goes to (H-51).
+ * lighting the basket the marble goes to (H-51); `players` the children's photos and names, on their cups' fronts.
  */
 export function MarbleScene({
   kids,
@@ -675,12 +678,15 @@ export function MarbleScene({
   turn,
   poke,
   quiet,
+  players = NO_PLAYERS,
 }: {
   kids: readonly TurnChild[];
   lit: readonly boolean[];
   turn: MarbleTurn | null;
   poke: number;
   quiet?: boolean;
+  /** The children's photos and names, on their cups' fronts. */
+  players?: Players;
 }) {
   const count = kids.length as TurnCount;
   const xs = CUP_XS[count];
@@ -696,7 +702,7 @@ export function MarbleScene({
       <Run key={turn?.name ?? "still"} turn={turn} quiet={quiet} />
       {poke > 0 && <Layer key={poke} x={BASKET.x - 130} y={REST_BOTTOM - 130} w={260} h={260} className="tm-mr-goal" />}
       {kids.map((kind, i) => (
-        <Place key={kind} kind={kind} x={xs[i]} w={CUP_W[count]} on={lit[i]} />
+        <Place key={kind} kind={kind} x={xs[i]} w={CUP_W[count]} on={lit[i]} player={players[kind]} />
       ))}
     </>
   );

@@ -1,8 +1,9 @@
 import { memo, useLayoutEffect, useRef, useState } from "react";
 import { MarbleScene } from "./marbleRun";
 import { RaceScene } from "./race";
-import { DEFAULT_TIMER_SETTINGS, type SwapToy, type TimerPicture, type TurnCount } from "./settings";
-import { SwapBackdrop, SwapCushions, SwapHourglass, SwapLight, SwapShade, TURN_CHILDREN, Toy } from "./swap";
+import { DEFAULT_TIMER_SETTINGS, type Players, type TimerPicture, type TurnCount } from "./settings";
+import { SwapBackdrop, SwapCushions, SwapHourglass, SwapLights, SwapShades, swapPlaces, TURN_CHILDREN } from "./swap";
+
 import { SceneParts, stageStyle } from "./TimerPlay";
 
 /**
@@ -50,19 +51,21 @@ function holdAt(card: HTMLElement | null, at: number) {
  * the picture is the button, no words on it; the middle rather than the end, user feedback, November 2026) – the tree
  * full of apples with the cart under them, the hourglass half run, the leaf half eaten. It is the very drawing
  * of a run (`SceneParts`, started `MIDDLE` of it ago – `LATER` for a few), stopped at that moment by `holdAt`. „Abwechseln“ shows the fox
- * child's lamp on, the toy on its cushion and the hourglass half run; the Kugelbahn the fox child's cup in its glow and
- * the marble halfway down the run, with as many cups as children set (`kids`, else three, so a
- * card standing alone shows it is for more than two).
+ * child's lamp on, its cushion puffed up with its ears pricked and the hourglass half run; the Kugelbahn the fox child's
+ * cup in its glow and the marble halfway down the run; the Rennstrecke the fox child's kart – each with as many children
+ * as set (`kids`, two by default) and their names or photos (`players`).
  */
 export const TimerCardArt = memo(function TimerCardArt({
   picture,
-  toy = DEFAULT_TIMER_SETTINGS.toy,
-  kids = 3,
+  kids = DEFAULT_TIMER_SETTINGS.kids,
+  players = DEFAULT_TIMER_SETTINGS.players,
 }: {
   picture: TimerPicture;
-  toy?: SwapToy;
   kids?: TurnCount;
+  players?: Players;
 }) {
+  const children = TURN_CHILDREN.slice(0, kids);
+  const firstLit = children.map((_, i) => i === 0);
   const at = CARD_MS * (LATER[picture] ?? MIDDLE);
   const [startedAt] = useState(() => Date.now() - at);
   const card = useRef<HTMLSpanElement>(null);
@@ -71,33 +74,35 @@ export const TimerCardArt = memo(function TimerCardArt({
     <span className="tm-card-art" aria-hidden ref={card}>
       {picture === "swap" ? (
         <span className="tm-stage">
-          <SwapBackdrop />
-          <SwapLight kind="fox" on />
-          <SwapCushions />
-          <SwapShade kind="bear" on />
-          <SwapHourglass ms={CARD_MS} startedAt={startedAt + at} flip={false} waiting={false} glow={0} />
-          <Toy toy={toy} place="fox" />
+          <SwapBackdrop kids={children} />
+          <SwapLights count={kids} lit={firstLit} />
+          <SwapCushions kids={children} lit={firstLit} players={players} />
+          <SwapShades count={kids} lit={firstLit} />
+          <SwapHourglass ms={CARD_MS} startedAt={startedAt + at} flip={false} waiting={false} glow={0} glass={swapPlaces(kids).glass} />
         </span>
       ) : picture === "race" ? (
         <span className="tm-stage">
           <RaceScene
+            kids={children}
             holder="fox"
-            other="bear"
+            prev={null}
             turn={{ name: "tm-race-card", startedAt: startedAt + at, ms: CARD_MS, handover: false }}
             done={false}
             poke={0}
             elapsed={at}
             quiet
+            players={players}
           />
         </span>
       ) : picture === "marblerun" ? (
         <span className="tm-stage">
           <MarbleScene
-            kids={TURN_CHILDREN.slice(0, kids)}
-            lit={TURN_CHILDREN.slice(0, kids).map((_, i) => i === 0)}
+            kids={children}
+            lit={firstLit}
             turn={{ name: `tm-mr-card-${kids}`, startedAt: startedAt + at, ms: CARD_MS }}
             poke={0}
             quiet
+            players={players}
           />
         </span>
       ) : (
