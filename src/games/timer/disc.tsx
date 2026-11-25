@@ -32,7 +32,7 @@ const CASE = DISC.face + 56;
 const DiscBackdrop = memo(function DiscBackdrop() {
   return (
     <Layer x={0} y={0} w={STAGE_W} h={STAGE_H} className="tm-back">
-      <Draw w={STAGE_W} h={STAGE_H}>
+      <Draw w={STAGE_W} h={STAGE_H} bleed>
         <defs>
           <pattern id="tm-disc-wall" width="90" height="90" patternUnits="userSpaceOnUse">
             <rect width="90" height="90" fill="#fff4e0" />

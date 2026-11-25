@@ -239,7 +239,7 @@ const TidyBackdrop = memo(function TidyBackdrop() {
   const floor = 540;
   return (
     <Layer x={0} y={0} w={STAGE_W} h={STAGE_H} className="tm-back">
-      <Draw w={STAGE_W} h={STAGE_H}>
+      <Draw w={STAGE_W} h={STAGE_H} bleed>
         <rect width={STAGE_W} height={floor} fill="#e3f0fb" />
         {/* A soft pattern of dots on the wallpaper. */}
         {Array.from({ length: 9 }, (_, row) =>
@@ -277,7 +277,7 @@ const TidyBackdrop = memo(function TidyBackdrop() {
   );
 });
 
-/** One toy in a 100 × 100 box standing on its bottom edge; Five Boxes (`boxes.tsx`) draws its toys with it too. */
+/** One toy in a 100 × 100 box standing on its bottom edge. */
 export function ToyArt({ kind }: { kind: ToyKind }) {
   const line = { stroke: INK, strokeWidth: 4, strokeLinejoin: "round" as const };
   let art: ReactNode;

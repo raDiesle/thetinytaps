@@ -4,7 +4,7 @@ import { loadRealSounds, playEngine } from "@/lib/realSounds";
 import { playCountNote, playDing, playHop } from "@/lib/sfx";
 import { type Frame, keyframes } from "./keyframes";
 import { useRunClock } from "./pause";
-import { INK, Layer, STAGE_H, STAGE_W } from "./scenes";
+import { Bleed, INK, Layer, STAGE_H, STAGE_W } from "./scenes";
 import type { Holder } from "./swap";
 
 // Rennstrecke (user request, 24 November 2026): the fox child and the bear child take turns driving a kart round a
@@ -406,63 +406,68 @@ export const RaceGround = memo(function RaceGround() {
   return (
     <Layer x={0} y={0} w={STAGE_W} h={STAGE_H} className="tm-race-ground">
       <svg viewBox={`0 0 ${STAGE_W} ${STAGE_H}`} preserveAspectRatio="none">
-        <defs>
-          <linearGradient id="tm-race-sky" x1="0" y1="0" x2="0" y2="1">
-            <stop offset="0" stopColor="#74c0fc" />
-            <stop offset="1" stopColor="#d0ebff" />
-          </linearGradient>
-        </defs>
-        <rect width={STAGE_W} height={HORIZON + 40} fill="url(#tm-race-sky)" />
-        <path d={`M0 ${HORIZON + 6} Q200 40 420 ${HORIZON - 4} T860 ${HORIZON - 8} T1280 ${HORIZON - 2} T${STAGE_W} 56 V${HORIZON + 30} H0 Z`} fill="#8ce99a" />
-        {bands.map((b) => (
-          <rect key={b.i} x="0" y={b.y0} width={STAGE_W} height={b.y1 - b.y0 + 0.5} fill={b.i % 2 ? "#69c26b" : "#77cc77"} />
-        ))}
-        {Array.from({ length: 26 }, (_, i) => (
-          <circle
-            key={i}
-            cx={i * 64 + 10}
-            cy={HORIZON + 8 + (i % 3) * 3}
-            r={22 + (i % 4) * 5}
-            fill={i % 2 ? "#2f9e44" : "#37b24d"}
-            stroke={INK}
-            strokeWidth="2"
+        <Bleed>
+          <defs>
+            <linearGradient id="tm-race-sky" x1="0" y1="0" x2="0" y2="1">
+              <stop offset="0" stopColor="#74c0fc" />
+              <stop offset="1" stopColor="#d0ebff" />
+            </linearGradient>
+          </defs>
+          <rect width={STAGE_W} height={HORIZON + 40} fill="url(#tm-race-sky)" />
+          <path
+            d={`M0 ${HORIZON + 6} Q200 40 420 ${HORIZON - 4} T860 ${HORIZON - 8} T1280 ${HORIZON - 2} T${STAGE_W} 56 V${HORIZON + 30} H0 Z`}
+            fill="#8ce99a"
           />
-        ))}
-        <Grandstand x={300} w={360} />
-        <Grandstand x={940} w={360} />
-        {/* The big screen's legs and frame; the face in it is a layer of its own. */}
-        <g stroke={INK} strokeWidth="3" strokeLinejoin="round">
-          <rect x={SCREEN.x + 30} y={SCREEN.y + SCREEN.h - 4} width="14" height="44" fill="#868e96" />
-          <rect x={SCREEN.x + SCREEN.w - 44} y={SCREEN.y + SCREEN.h - 4} width="14" height="44" fill="#868e96" />
-          <rect x={SCREEN.x} y={SCREEN.y} width={SCREEN.w} height={SCREEN.h} rx="10" fill="#343a40" />
-          <rect x={SCREEN.x + 10} y={SCREEN.y + 10} width={SCREEN.w - 20} height={SCREEN.h - 20} rx="4" fill="#1d2a3a" />
-        </g>
-        {/* Trees and bushes in the infields. */}
-        <Bush x={-380} z={1300} />
-        <Bush x={420} z={1280} />
-        <Bush x={0} z={1250} />
-        <Bush x={-60} z={330} />
-        <Bush x={60} z={420} />
-        {/* The run-off, the kerbs and the road; the stretch over the bridge is the bridge's. */}
-        {STRETCHES.ground.flatMap(([a, b]) =>
-          pieces(a, b).map(([c, d]) => <polygon key={`o${a}-${c}`} points={band(c, d, -ROAD - KERB - RUNOFF, ROAD + KERB + RUNOFF)} fill="#c3d69b" />),
-        )}
-        {STRETCHES.ground.map(([a, b]) => (
-          <Kerbs key={`k${a}`} from={a} to={b} />
-        ))}
-        {STRETCHES.ground.map(([a, b]) => (
-          <Road key={`r${a}`} from={a} to={b} />
-        ))}
-        {/* The bridge's shadow across the road under it. */}
-        <polygon points={shadow} fill="#1b1f23" opacity="0.28" transform="translate(6 10)" />
-        <StartLine />
-        <Tyres x={-1150} z={1340} />
-        <Tyres x={1150} z={1340} />
-        <Tyres x={0} z={1720} />
-        <Tyres x={680} z={250} />
-        <Tyres x={-680} z={250} />
-        <Mat kind="fox" />
-        <Mat kind="bear" />
+          {bands.map((b) => (
+            <rect key={b.i} x="0" y={b.y0} width={STAGE_W} height={b.y1 - b.y0 + 0.5} fill={b.i % 2 ? "#69c26b" : "#77cc77"} />
+          ))}
+          {Array.from({ length: 26 }, (_, i) => (
+            <circle
+              key={i}
+              cx={i * 64 + 10}
+              cy={HORIZON + 8 + (i % 3) * 3}
+              r={22 + (i % 4) * 5}
+              fill={i % 2 ? "#2f9e44" : "#37b24d"}
+              stroke={INK}
+              strokeWidth="2"
+            />
+          ))}
+          <Grandstand x={300} w={360} />
+          <Grandstand x={940} w={360} />
+          {/* The big screen's legs and frame; the face in it is a layer of its own. */}
+          <g stroke={INK} strokeWidth="3" strokeLinejoin="round">
+            <rect x={SCREEN.x + 30} y={SCREEN.y + SCREEN.h - 4} width="14" height="44" fill="#868e96" />
+            <rect x={SCREEN.x + SCREEN.w - 44} y={SCREEN.y + SCREEN.h - 4} width="14" height="44" fill="#868e96" />
+            <rect x={SCREEN.x} y={SCREEN.y} width={SCREEN.w} height={SCREEN.h} rx="10" fill="#343a40" />
+            <rect x={SCREEN.x + 10} y={SCREEN.y + 10} width={SCREEN.w - 20} height={SCREEN.h - 20} rx="4" fill="#1d2a3a" />
+          </g>
+          {/* Trees and bushes in the infields. */}
+          <Bush x={-380} z={1300} />
+          <Bush x={420} z={1280} />
+          <Bush x={0} z={1250} />
+          <Bush x={-60} z={330} />
+          <Bush x={60} z={420} />
+          {/* The run-off, the kerbs and the road; the stretch over the bridge is the bridge's. */}
+          {STRETCHES.ground.flatMap(([a, b]) =>
+            pieces(a, b).map(([c, d]) => <polygon key={`o${a}-${c}`} points={band(c, d, -ROAD - KERB - RUNOFF, ROAD + KERB + RUNOFF)} fill="#c3d69b" />),
+          )}
+          {STRETCHES.ground.map(([a, b]) => (
+            <Kerbs key={`k${a}`} from={a} to={b} />
+          ))}
+          {STRETCHES.ground.map(([a, b]) => (
+            <Road key={`r${a}`} from={a} to={b} />
+          ))}
+          {/* The bridge's shadow across the road under it. */}
+          <polygon points={shadow} fill="#1b1f23" opacity="0.28" transform="translate(6 10)" />
+          <StartLine />
+          <Tyres x={-1150} z={1340} />
+          <Tyres x={1150} z={1340} />
+          <Tyres x={0} z={1720} />
+          <Tyres x={680} z={250} />
+          <Tyres x={-680} z={250} />
+          <Mat kind="fox" />
+          <Mat kind="bear" />
+        </Bleed>
       </svg>
     </Layer>
   );

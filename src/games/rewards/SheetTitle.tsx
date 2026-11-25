@@ -1,3 +1,4 @@
+import type { ReactNode } from "react";
 import { useT } from "@/lib/language";
 import { NO_TITLE_MARK } from "./board";
 import { MARK_BY_ID } from "./catalog";
@@ -13,7 +14,8 @@ export const titleMarkOf = (titleMark: string | undefined, own: string | undefin
  * A chart's heading, the same on a board and a plan (user feedback, November 2026): while it is made it is typed right
  * where it stands, its automatic title as the placeholder – so no field for the child's name is needed – and its sign
  * before it is a tap of its own (`data-edit="title-mark"`), to change it or take it away. Without a sign a pale ＋ keeps
- * its place while the chart is made, never on paper.
+ * its place while the chart is made, never on paper. `photo` is the child's photo where it stands beside the heading
+ * (`ChildPhoto`), or its pale ＋ place while the chart is made.
  */
 export function SheetTitle({
   title,
@@ -22,6 +24,7 @@ export function SheetTitle({
   mark,
   editing,
   onTitle,
+  photo,
 }: {
   /** The heading shown. */
   title: string;
@@ -33,6 +36,8 @@ export function SheetTitle({
   mark?: ReturnType<typeof titleMarkOf>;
   editing: boolean;
   onTitle?: (title: string) => void;
+  /** The photo of the child beside the heading, after its sign. */
+  photo?: ReactNode;
 }) {
   const t = useT();
   const heading = t({ de: "Überschrift", en: "Heading", zh: "标题", hi: "शीर्षक", es: "Título", ar: "العنوان", ru: "Заголовок" });
@@ -75,6 +80,7 @@ export function SheetTitle({
           {mark ? <MarkPic mark={mark} /> : "＋"}
         </span>
       )}
+      {photo}
       {editing && onTitle ? (
         <input
           className="rw-title rw-title-input"

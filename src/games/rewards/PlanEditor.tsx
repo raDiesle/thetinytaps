@@ -206,7 +206,7 @@ export function PlanEditor({
                       ar: "صورة (إيموجي)",
                       ru: "Картинка (эмодзи)",
                     })}
-                    onChange={(e) => setStep(step.id, { emoji: e.target.value })}
+                    onChange={(e) => setStep(step.id, { emoji: e.target.value, photo: undefined })}
                   />
                   <input
                     type="text"

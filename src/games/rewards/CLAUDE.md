@@ -67,10 +67,44 @@ numbered unless „Karten nummerieren“ under „Weitere Einstellungen“ says 
 (`defaultDraft`): its cards in one line („Ganzer Tag“), no signs, a Zähler of 1 and no reward; a Zeitraum keeps
 name, colours and reward (`draftInSpan`; the Woche with a Zähler is the board Vorlage „woche“'s tasks, the same every
 day), „✓ Tafel anlegen“ / „✓ Plan anlegen“ makes it. The wizard's head (`.rw-wizard-head`, sticky on top) holds, from
-the left, that button big and yellow, „Abbrechen“ and the stamp „🖨️ Zum Ausdrucken – auf A4 oder als Fotoabzug“ – the
+the left, that button big and yellow, „Abbrechen“ and the stamp „🖨️ Zum Ausdrucken – auf A4, als Fotoabzug oder als Fotoposter“ – the
 editor's buttons all start on the left (user feedback, November 2026). No note explains the Zeitraum: its picture
 buttons say it (the note with an arrow went, user feedback, November 2026). Opened on a template from the
 gallery it starts on that template. While the wizard is open nothing on top or below belongs to the chart behind it.
+
+**A photo of the child** (user request, November 2026) goes on any board or plan, every Zeitraum: while the chart is
+made a pale ＋ place with a drawn portrait stands beside the heading's sign (`ChildPhoto`, `data-edit="add-photo"`), and
+a tap on it opens the file picker (`accept="image/*"`) – the one way in. Once there the photo is a print with a white
+rim, a little askew, held by a strip of tape, still (no animation), greyed with the rest in the grey print; it carries
+⚙️ and 🗑️ like a card, and ⚙️ (or a tap on it) opens its window: its place – **oben links** (default), **oben rechts**
+or **neben der Überschrift** (`PhotoPlace`, each a small drawn sheet) – and „Anderes Foto wählen“. Nothing else, never a
+second way to do what the sheet does. In a corner the photo makes the head as tall as itself (`photoHead`,
+`.rw-head-portrait-*`), so the cards are set out below it and never lie under it; beside the heading it is small and
+sits in the title's line. The place is data on the chart (`Board.photo`, `Plan.photo`, optional, so old charts need
+nothing), so screen, editor and both A4 orientations draw it from the same sheet, and a later export can too. No
+bottom corners: the sheets' feet hold the reward, the goal and the Zähler. **The photo never leaves the device**: it is
+read with its EXIF orientation, shrunk to `PHOTO_MAX_SIDE` and re-encoded as JPEG in a canvas (which drops EXIF: place,
+camera, time), kept in IndexedDB by a random key (`photoStore.ts`, the one file that touches IndexedDB), and shown by an
+object URL – never in a URL or address, `localStorage`, a log, `track()` or a picture prompt (`chartPhoto.test.ts`
+checks the sources). 🗑️ takes it from the chart (↶ brings it back while the editor is open); `RewardsGame` deletes every
+stored photo no saved chart names, but only while neither the wizard nor „Gestalten“ is open, so undo still finds it –
+deleting a chart, 🗑️ on the photo or „Abbrechen“ in the wizard deletes the file. A Zeitraum keeps the photo
+(`draftInSpan`). The Datenschutzerklärung names it (IndexedDB, `tracking.test.ts`). Its classes are `rw-portrait*`:
+`rw-photo*` belongs to the photo prints (`PhotoPrint`).
+
+**An own photo for a task or card** (T-13: the child's own potty, toothbrush or Kita door, which a two-year-old knows
+best): the window a card of a plan or a task of a board opens (a tap or its ⚙️) starts with „Eigenes Foto“ –
+„Foto wählen“ (a drawn camera, `CameraSign`) opens the same file picker as the child's photo, and once there „Anderes
+Foto“ and „Ohne Foto“, which brings the picture back (`OwnPhotoPicks`, `withCardPhoto`, `withTaskPhoto`). The file
+picker knows where a photo goes by `photoFor` in `ChartEditor` (null: the child's). The card keeps its name, stars and
+place; only its key is new on it (`PlanStep.photo`, `BoardTask.photo`, a key in the same store, read by the same
+`photoStore`). `ItemPic` draws it wherever the picture stood – screen, A4, cut-out cards, poster, Urkunde – as a square
+cut of its middle with soft corners (`.rw-item-photo`, grey on a grey print), its place empty while it is read and the
+picture or emoji where it is not on this device; the photo prints draw it on their canvas the same way
+(`PhotoCard.photo`, `usePhotoUrls` in `PlanPrint`). Swapping the card, „Ohne Foto“ or an emoji typed under „Weitere
+Einstellungen“ takes it off, and `photoKeysOf` keeps every task's and card's photo when the store is cleaned – a new
+place that can hold a photo key joins it there, or its photo is deleted at the next visit (`chartPhoto.test.ts`). Only
+tasks and cards have one: not the reward nor the Countdown's big day (the idea names tasks).
 
 The page is one tall page of the book that carries everything and scrolls with it (user feedback,
 November 2026): `<Sky />` lies in the page's box (`position: absolute`), not fixed to the window, the text for search
@@ -120,6 +154,11 @@ targets) – keep it that way.
   (`tinytaps.rewards.stars.v1`), so changing a board never loses them. The first board has the fixed id `erste`, so
   its stars stay before anything was saved.
 - `SheetTitle.tsx` – the heading of a board and a plan alike, typed on the sheet, with its sign (`titleMarkOf`).
+- `chartPhoto.ts` – the photo of the child on a chart as data (`ChartPhoto` on `Board.photo` and `Plan.photo`: its
+  key, `place`, frame `ratio`), its places (`PHOTO_PLACES`), the size it is shrunk to and its keys, pure functions;
+  `photoStore.ts` – the photos themselves in IndexedDB (`tinytaps-photos`), shrunk and re-encoded first
+  (`shrinkPhoto`), `keepOnlyPhotos`; `ChildPhoto.tsx` – the photo on the sheet (or its pale ＋ place while the chart
+  is made) and `photoHead`, the head's room for it (below).
 - `BoardSheet.tsx` – the sheet itself, used for screen and print alike: week grid, a month as calendar, table or
   four week blocks (`MonthCalendar`, `MonthTable`, `MonthBlocks`), day cards or a snaking path
   (`snakeLayout`) to the reward, and the goal below. Sized in container units (`cq*`), so it fits any box.
@@ -222,6 +261,25 @@ files, so a phone hands it to the photo app or a shop's app). Below it the guide
 save, order like holiday photos (matt, „ganzes Bild“), cut and round the corners, 20 mm Velcro dots (soft side on the
 card), safety. The Tagesplan shows it first, before A4; the board after its A4 page.
 
+**Two ways** (T-31, `PrintWayChoice` in `PrintPanel.tsx`, `PrintOptions.way`, `PlanPrintOptions.way`): „🖼️ Alles fest
+auf einem Bild“ (nothing to cut: no sticker or card pages, no photo print of cards, a plan without the „Jetzt“ field)
+and „✂️ Karten zum Ausschneiden“. A chart's old options pick its way until one is chosen (stickers or cards on: cards).
+A plan that can only be one (`printsCards`: a marker's plan fixed, the field's cards) shows no choice.
+
+**Fotoposter** (T-32 to T-40; `poster.ts` the formats and arithmetic, `posterDecor.tsx` the frames, `PosterPrint.tsx`
+the panel): the very sheet of screen and A4, laid out with its short side at 210 mm (`layoutSize`) in an offscreen
+stage (`.rw-poster-stage`, portalled to `body`) and rasterized by `html-to-image` (imported when needed) into a JPG at
+the format's pixels – 20 × 30, 30 × 40 (default), 40 × 60, a panorama 30 × 90 / 40 × 120 for a day in one or two rows,
+a square 30 × 30 for a Countdown and a collecting board (`posterFormatsFor`). English names them in inches. It redraws
+once the stage has stood still `SETTLE_MS` (the child's photo arrives later from IndexedDB). Round it a frame of the
+season by default (`seasonalDecor`) or all year, the heading on a ribbon, the sheet lifted with a shadow; the painted
+grounds `poster-<theme>` wait in the picture queue, a gradient of the theme meanwhile. On 40 × 60 another chart may
+join it (T-39, `PosterCompanion`, built in `RewardsGame`): the poster stands upright, the plan above, the board below.
+The preview dashes the `POSTER_SAFE_MM` margin, warns where a picture prints under `SHARP_DPI` and names the largest
+sharp format (`blurriest`, `largestSharp`), and a drawn child's room shows the poster at true size beside a child of
+90 cm (`PosterWall`, the figure by „Junge / Mädchen“). Then „💾 Speichern“ / „📤 Teilen“ and the guide: order matte as
+„ganzes Bild“, an acrylic frame and a whiteboard marker or stickers, a clothes peg for a plan.
+
 ## Rules
 
 - No punishment, ever: a star is never taken away by the board, only undone right after a mistake; a missed day stays
@@ -235,7 +293,19 @@ card), safety. The Tagesplan shows it first, before A4; the board after its A4 p
   (`rewards.test.ts` checks `reviewPeriods`).
 - Few tasks: the editor advises one to three and allows `MAX_TASKS`; templates use at most three.
 - The child's name stays in localStorage only – never in a URL, a log or a picture prompt.
-- What is printed and what is on screen come from the same `BoardSheet`; never give print its own layout.
+- What is printed and what is on screen come from the same `BoardSheet`; never give print its own layout. The photo
+  poster too: it rasterizes that sheet with a decoration round it, never a poster layout of its own – a new poster idea
+  is a layer round the sheet (`posterDecor.tsx`) or a size (`POSTER_FORMATS`, checked in `poster.test.ts`).
+- No fox, bear or Tapsi as decoration on a poster (T-33 asked for them at the edge): mascots stand only where they do
+  something (root `CLAUDE.md`); the poster's room may draw the child as the measure of size (`Mascot.test.ts`).
+- A row of choices styled for itself overrides the shared `.choice` as `.choice.rw-…`: its legend floats left
+  (`start-screen.css`), and big picture buttons wrapped beside it until `.choice.rw-print-ways` set it on a line of its own.
+- html-to-image copies an svg's children without their stylesheet: a collecting board's dotted way (`fill: none` by
+  class) came out as a black shape. `inlineSvgStyles` writes their computed styles on for the drawing and takes them
+  off again; a new style an svg on the sheet needs from CSS joins `SVG_STYLES`. Look at the poster of every Zeitraum
+  after changing a sheet's svg.
+- The poster is drawn only after the stage stands still, and a hidden Browser pane throttles its timers: „wird
+  gezeichnet“ standing for seconds there is no bug – wait, or look with the pane shown.
 - Defaults are the same on every load: no random id in anything `rewardsDefaults` gives, since an unsaved
   default is rebuilt on each load and stars are keyed by board and task id (a random task id once lost the stars).
 - The views and the ready-made boards are clear from the first visit, never behind a menu: a first visit opens the

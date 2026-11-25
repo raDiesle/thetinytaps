@@ -35,6 +35,7 @@ const MASCOT_DRAWINGS = [
   "src/games/scenes/winterbaustelle/people.tsx",
   "src/games/timer/jumpFox.tsx",
   "src/games/timer/race.tsx",
+  "src/games/rewards/PosterPrint.tsx",
 ];
 
 /** Pieces of the old flat heads (triangle ears, an egg of a head), copied from file to file before. */
@@ -83,6 +84,8 @@ describe("the shared fox and bear", () => {
       "src/games/tower/Kid.tsx": "Counting Tower: the child hopping onto every block of the house and up from floor to floor",
       "src/games/timer/race.tsx":
         "Timer's Rennstrecke: the child whose turn comes next, waiting on its mat at the line, hopping into the kart as the other hops out",
+      "src/games/rewards/PosterPrint.tsx":
+        "Belohnungstafel's photo poster: the child of about 90 cm beside the poster on the drawn wall, for grown-ups the measure of its size (T-38)",
     };
     for await (const file of new Bun.Glob("src/**/*.tsx").scan(".")) {
       if (file.endsWith("Mascot.tsx")) continue;

@@ -1,24 +1,29 @@
 import { memo, useCallback, useEffect, useId, useMemo, useRef, useState, useSyncExternalStore, type CSSProperties } from "react";
 import { PROD } from "@/lib/buildInfo";
 import { pick, shuffle } from "@/lib/random";
-import { playHoot, playQuack, playTweet } from "@/lib/realSounds";
+import { playCroak, playGiggle, playHoot, playQuack, playTweet } from "@/lib/realSounds";
 import {
   playBlub,
   playBoing,
   playChimeNote,
+  playClick,
   playCrack,
   playCrackle,
   playDing,
   playDrops,
   playFirework,
+  playHeartbeat,
+  playHop,
   playInflate,
   playMusicbox,
   playPlop,
   playPop,
+  playPuff,
   playRip,
   playSizzle,
   playSplash,
   playSwirl,
+  playTrill,
   playTwinkle,
   playWhirr,
   playWhoosh,
@@ -28,6 +33,7 @@ import { useTimers } from "@/lib/timers";
 import { ART_KINDS, type ArtKind, type ArtParams, ArtView, artParams, CanvasArt } from "./SurpriseArt";
 import { BabyDrawing, EGG_BABIES, type EggBaby, GIFT_TOYS, type GiftToy, ToyDrawing } from "./SurpriseFigures";
 import { CANVAS_KINDS, CANVAS_SECONDS, type CanvasKind, type CanvasParams, canvasParams } from "./surpriseCanvas";
+import { TOY_KINDS, type ToyKind, type ToyParams, ToyView, toyParams } from "./SurpriseToys";
 import "./surprises.css";
 
 // Frei tippen's surprises (user request, November 2026): every key that is no letter or number, and every tap beside
@@ -38,10 +44,13 @@ import "./surprises.css";
 // (`SurpriseFigures.tsx`; user request, November 2026).
 
 /** The kinds of surprise; they take turns in a shuffled order, never the same twice in a row. */
-export const SURPRISE_KINDS = ["firework", "gift", "egg", "balloons", "flowers", "bubbles", ...ART_KINDS, ...CANVAS_KINDS] as const;
+export const SURPRISE_KINDS = ["firework", "gift", "egg", "balloon", "flower", "bubbles", ...ART_KINDS, ...TOY_KINDS, ...CANVAS_KINDS] as const;
 
 /** One kind of surprise. */
 export type SurpriseKind = (typeof SURPRISE_KINDS)[number];
+
+/** The kinds that are fireworks: „Zaubertasten“ brings them more often (`TAP_AWAY_SURPRISES.bag`). */
+export const FIREWORK_KINDS = ["firework", "skyrocket", "starburst", "wheel", "fountain", "sparkler", "swirl"] as const satisfies readonly SurpriseKind[];
 
 /** How surprises are kept from piling up while a child hammers keys (`surprises.test.ts` keeps them few). */
 export const SURPRISE = {
@@ -54,20 +63,28 @@ export const SURPRISE = {
     firework: 2400,
     gift: 2700,
     egg: 2900,
-    balloons: 3200,
-    flowers: 2900,
-    bubbles: 2700,
+    balloon: 2900,
+    flower: 2900,
+    bubbles: 2800,
     comet: 2400,
     snowflake: 2800,
     mandala: 2800,
     splash: 2700,
     pinwheel: 2700,
-    balls: 3000,
+    ball: 3000,
+    butterfly: 2900,
+    jack: 2900,
+    heart: 2500,
+    cloud: 2900,
+    frog: 2800,
+    fish: 2700,
     // A canvas kind stays a moment longer than its loop runs, so the loop always ends by itself first.
     skyrocket: CANVAS_SECONDS.skyrocket * 1000 + 200,
     fountain: CANVAS_SECONDS.fountain * 1000 + 200,
     swirl: CANVAS_SECONDS.swirl * 1000 + 200,
     sparkler: CANVAS_SECONDS.sparkler * 1000 + 200,
+    wheel: CANVAS_SECONDS.wheel * 1000 + 200,
+    starburst: CANVAS_SECONDS.starburst * 1000 + 200,
   } satisfies Record<SurpriseKind, number>,
 };
 
@@ -94,26 +111,33 @@ type Params =
   | { kind: "firework"; rise: number; bursts: Burst[] }
   | { kind: "gift"; box: string; ribbon: string; dots: boolean; thing: GiftToy; tint: string; lidX: number; lidTurn: number }
   | { kind: "egg"; shell: string; mark: string; pattern: "dots" | "zigzag" | "stripes" | "speckles"; baby: EggBaby; topX: number; topTurn: number }
-  | { kind: "balloons"; balloons: { x: number; color: string; drift: number; turn: number; dur: number }[]; rise: number }
-  | { kind: "flowers"; flowers: { x: number; height: number; petals: number; color: string; heart: string; pointy: boolean; delay: number }[] }
+  | { kind: "balloon"; color: string; turn: number }
+  | { kind: "flower"; height: number; petals: number; color: string; heart: string; pointy: boolean }
   | { kind: "bubbles"; bubbles: { x: number; y: number; size: number; dx: number; dy: number; dur: number; delay: number }[] }
   | ArtParams
+  | ToyParams
   | CanvasParams;
 
 const isArt = (kind: SurpriseKind): kind is ArtKind => (ART_KINDS as readonly string[]).includes(kind);
 const isCanvas = (kind: SurpriseKind): kind is CanvasKind => (CANVAS_KINDS as readonly string[]).includes(kind);
+const isToy = (kind: SurpriseKind): kind is ToyKind => (TOY_KINDS as readonly string[]).includes(kind);
 
 /** One surprise on screen: where (px in the layer), how big, and how it was drawn this time. */
 export type Surprise = { id: number; x: number; y: number; size: number } & Params;
 
-/** Draws this time's look of `kind`: everything random is decided here, so drawing it again changes nothing. */
-function makeParams(kind: SurpriseKind, size: number, y: number): Params {
+/**
+ * Draws this time's look of `kind`: everything random is decided here, so drawing it again changes nothing. Each is
+ * one thing right at its spot – one balloon, one flower, one ball – and what comes in many (bubbles, sparks) gathers
+ * round the spot instead of drifting off (user feedback, 25 November 2026; `surprises.test.ts`).
+ */
+export function surpriseParams(kind: SurpriseKind, size: number): Params {
   if (isArt(kind)) return artParams(kind);
+  if (isToy(kind)) return toyParams(kind);
   if (isCanvas(kind)) return canvasParams(kind);
   switch (kind) {
     case "firework": {
       const palette = pick(PALETTES);
-      const pattern = pick(["ring", "peony", "double", "spiral", "willow", "triple", "heart", "star", "saturn"] as const);
+      const pattern = pick(["ring", "peony", "double", "spiral", "willow", "nested", "heart", "star", "saturn"] as const);
       const shape = pick(["dot", "dot", "star", "diamond", "sparkle"] as const);
       const ring = (n: number, r: number, colors: string[], stagger = 0, jitter = 0): Spark[] =>
         Array.from({ length: n }, (_, i) => {
@@ -171,11 +195,12 @@ function makeParams(kind: SurpriseKind, size: number, y: number): Params {
                 ? [burst(ring(n, 0.6, palette, 20))]
                 : pattern === "willow"
                   ? [burst(ring(n, 0.5, ["#ffc300", "#ffb000", "#ff8c00"]), 0, 0, 0, 0.45, 1.6)]
-                  : pattern === "triple"
-                    ? [
-                        burst(ring(10, 0.28, palette), -0.3, 0.05, 0),
-                        burst(ring(10, 0.28, palette), 0.28, -0.12, 220),
-                        burst(ring(10, 0.26, palette), 0, 0.22, 440),
+                  : pattern === "nested"
+                    ? // Three rings one after the other round the same spot, small to big – never bursts side by side.
+                      [
+                        burst(ring(8, 0.22, [palette[0]]), 0, 0, 0),
+                        burst(ring(12, 0.42, [palette[1]]), 0, 0, 220),
+                        burst(ring(16, 0.62, [palette[2] ?? palette[0]]), 0, 0, 440),
                       ]
                     : pattern === "heart"
                       ? [burst(figure(26, 0.55, heart, ["#ff3d5a", "#ff4fb8"]), 0, 0, 0, 0.06)]
@@ -205,50 +230,36 @@ function makeParams(kind: SurpriseKind, size: number, y: number): Params {
         topX: rand(-0.35, 0.35),
         topTurn: pick([-1, 1]) * rand(25, 50),
       };
-    case "balloons": {
-      const count = pick([1, 2, 3]);
-      const colors = shuffle(BRIGHT);
+    case "balloon":
+      return { kind, color: pick(BRIGHT), turn: pick([-1, 1]) * rand(4, 10) };
+    case "flower":
       return {
         kind,
-        rise: -Math.max(size * 0.3, Math.min(y - size * 0.35, size * 1.3)),
-        balloons: Array.from({ length: count }, (_, i) => ({
-          x: (i - (count - 1) / 2) * size * 0.32 + rand(-8, 8),
-          color: colors[i],
-          drift: rand(-0.25, 0.25) * size,
-          turn: rand(-12, 12),
-          dur: rand(2.6, 3.0),
-        })),
+        height: rand(0.42, 0.55) * size,
+        petals: Math.round(rand(5, 8)),
+        color: pick(BRIGHT),
+        heart: pick(["#ffd23f", "#8a5a2b", "#fff3b0"]),
+        pointy: Math.random() < 0.4,
       };
-    }
-    case "flowers": {
-      const count = pick([1, 2, 3]);
-      const colors = shuffle(BRIGHT);
-      return {
-        kind,
-        flowers: Array.from({ length: count }, (_, i) => ({
-          x: (i - (count - 1) / 2) * size * 0.38,
-          height: rand(0.4, 0.65) * size,
-          petals: Math.round(rand(5, 8)),
-          color: colors[i],
-          heart: pick(["#ffd23f", "#8a5a2b", "#fff3b0"]),
-          pointy: Math.random() < 0.4,
-          delay: i * 0.15,
-        })),
-      };
-    }
     case "bubbles": {
+      // A cluster round the spot: each bubble comes out where the finger landed, drifts only a little and pops there.
       const count = Math.round(rand(5, 8));
+      const start = rand(0, Math.PI * 2);
       return {
         kind,
-        bubbles: Array.from({ length: count }, () => ({
-          x: rand(-0.25, 0.25) * size,
-          y: rand(-0.15, 0.15) * size,
-          size: rand(0.14, 0.3) * size,
-          dx: rand(-0.75, 0.75) * size,
-          dy: -rand(0.5, 1.1) * size,
-          dur: rand(1.6, 2.3),
-          delay: rand(0, 0.35),
-        })),
+        bubbles: Array.from({ length: count }, (_, i) => {
+          const a = start + (i / count) * Math.PI * 2 + rand(-0.3, 0.3);
+          const r = i === 0 ? 0 : rand(0.14, 0.32) * size;
+          return {
+            x: Math.cos(a) * r,
+            y: Math.sin(a) * r,
+            size: (i === 0 ? rand(0.26, 0.32) : rand(0.12, 0.22)) * size,
+            dx: Math.cos(a) * rand(0.02, 0.06) * size,
+            dy: Math.sin(a) * rand(0.02, 0.06) * size,
+            dur: rand(1.7, 2.3),
+            delay: i * 0.06,
+          };
+        }),
       };
     }
   }
@@ -297,6 +308,19 @@ function createSurpriseStore(): SurpriseStore {
 export interface SurpriseLimits {
   gapMs: number;
   maxAtOnce: number;
+  /** What one shuffled bag holds, a kind listed twice coming twice as often: every kind once by default. */
+  bag?: readonly SurpriseKind[];
+}
+
+/**
+ * A shuffled bag of `kinds` with no kind twice in a row, nor first when it was just shown (`last`): shuffled again
+ * until it fits, which a bag with a few kinds twice or three times does within a few tries.
+ */
+export function shuffledBag(kinds: readonly SurpriseKind[], last?: SurpriseKind): SurpriseKind[] {
+  const fits = (bag: readonly SurpriseKind[]) => bag[0] !== last && bag.every((k, i) => i === 0 || k !== bag[i - 1]);
+  let bag = shuffle(kinds);
+  for (let i = 0; i < 200 && !fits(bag); i++) bag = shuffle(kinds);
+  return bag;
 }
 
 /**
@@ -309,7 +333,7 @@ export function useSurprises(limits: SurpriseLimits = SURPRISE) {
   const [store] = useState(createSurpriseStore);
   useEffect(() => () => store.dispose(), [store]);
   const { later } = useTimers();
-  const { gapMs, maxAtOnce } = limits;
+  const { gapMs, maxAtOnce, bag: kinds = SURPRISE_KINDS } = limits;
   const gate = useMemo(() => spaced(gapMs), [gapMs]);
   const extras = useMemo(() => spaced(EXTRA_SOUND_GAP_MS), []);
   const bag = useRef<SurpriseKind[]>([]);
@@ -318,21 +342,17 @@ export function useSurprises(limits: SurpriseLimits = SURPRISE) {
 
   /** The next kind from a shuffled bag; a new bag never starts with the kind just shown. */
   const nextKind = useCallback(() => {
-    if (bag.current.length === 0) {
-      let next = shuffle(SURPRISE_KINDS);
-      if (next[0] === last.current.kind) next = [...next.slice(1), next[0]];
-      bag.current = next;
-    }
+    if (bag.current.length === 0) bag.current = shuffledBag(kinds, last.current.kind);
     const kind = bag.current.shift() as SurpriseKind;
     last.current.kind = kind;
     return kind;
-  }, []);
+  }, [kinds]);
 
   const spawn = useCallback(
     (x: number, y: number, size: number) => {
       if (store.current().length >= maxAtOnce || !gate.pass()) return false;
       const kind = nextKind();
-      const params = makeParams(kind, size, y);
+      const params = surpriseParams(kind, size);
       const extra = extras.pass();
       let babySound: (() => void) | undefined;
       if (params.kind === "gift") {
@@ -360,11 +380,12 @@ export function useSurprises(limits: SurpriseLimits = SURPRISE) {
           later(playCrack, 1150);
           if (extra) later(babySound ?? playTwinkle, 1450);
           break;
-        case "balloons":
+        case "balloon":
+          // It pops at 80 % of `ft-balloon` (surprises.css).
           playInflate();
-          later(playPop, Math.min(...params.balloons.map((b) => b.dur)) * 830);
+          later(playPop, BALLOON_POP_MS);
           break;
-        case "flowers":
+        case "flower":
           playPlop();
           later(playTwinkle, 600);
           break;
@@ -392,13 +413,42 @@ export function useSurprises(limits: SurpriseLimits = SURPRISE) {
         case "pinwheel":
           playWhirr();
           break;
-        case "balls": {
-          // The first ball lands at a third of its fall (`ft-ball` in surprises.css), the second bounce a while later.
-          const first = 2.5 * 0.3 * 1000 + params.balls[0].delay * 1000;
+        case "ball": {
+          // The ball lands at a third of its fall (`ft-ball` in surprises.css), the second bounce a while later.
+          const first = 2.5 * 0.3 * 1000;
           later(playBoing, first);
           if (extra) later(playBoing, first + 2.5 * 0.32 * 1000);
           break;
         }
+        case "butterfly":
+          playTrill();
+          if (extra) later(playTwinkle, 1200);
+          break;
+        case "jack":
+          playClick();
+          later(playBoing, 500);
+          if (extra) later(playGiggle, 900);
+          break;
+        case "heart":
+          // Its two „bumbum“ come as the heart swells (`ft-heart`, from 0.4 s).
+          playPlop();
+          later(playHeartbeat, 400);
+          break;
+        case "cloud":
+          playPuff();
+          later(playDrops, 700);
+          break;
+        case "frog":
+          // It jumps at 28 % of `ft-frog` (2.7 s), lands at 55 % and croaks as its throat puffs up (58 %).
+          playPlop();
+          later(() => playHop(0.73), 750);
+          later(playCroak, 1570);
+          break;
+        case "fish":
+          // It leaps out at 15 % of `ft-fish-arc` (2.7 s) and dives back in at 56 %.
+          playSplash();
+          later(playPlop, 1510);
+          break;
         case "skyrocket":
           playFirework(0.55, extra && params.burst !== "glitter");
           if (extra && params.burst === "glitter") later(playCrackle, 700);
@@ -414,6 +464,15 @@ export function useSurprises(limits: SurpriseLimits = SURPRISE) {
         case "sparkler":
           playSizzle();
           if (extra) later(playTwinkle, 1900);
+          break;
+        case "wheel":
+          playWhirr();
+          later(playSizzle, 200);
+          break;
+        case "starburst":
+          // Its bang comes at once, right where it was opened; the crackle as its stars go out.
+          playFirework(0.05, false);
+          if (extra) later(playCrackle, 1000);
           break;
       }
       return true;
@@ -453,10 +512,11 @@ const SurpriseView = memo(function SurpriseView({ s }: { s: Surprise }) {
       {s.kind === "firework" && <Firework s={s} />}
       {s.kind === "gift" && <Gift s={s} />}
       {s.kind === "egg" && <Egg s={s} />}
-      {s.kind === "balloons" && <Balloons s={s} />}
-      {s.kind === "flowers" && <Flowers s={s} />}
+      {s.kind === "balloon" && <Balloon s={s} />}
+      {s.kind === "flower" && <Flower s={s} />}
       {s.kind === "bubbles" && <Bubbles s={s} />}
       {isArt(s.kind) && <ArtView s={s as ArtParams} size={s.size} />}
+      {isToy(s.kind) && <ToyView s={s as ToyParams} />}
       {isCanvas(s.kind) && <CanvasArt s={s as CanvasParams} size={s.size} />}
     </div>
   );
@@ -594,67 +654,59 @@ function Egg({ s }: { s: Extract<Surprise, { kind: "egg" }> }) {
   );
 }
 
-function Balloons({ s }: { s: Extract<Surprise, { kind: "balloons" }> }) {
+/** When the balloon pops, in ms: 80 % of its 2.8 s (`ft-balloon` in surprises.css). */
+const BALLOON_POP_MS = 2240;
+
+function Balloon({ s }: { s: Extract<Surprise, { kind: "balloon" }> }) {
   return (
     <>
-      {s.balloons.map((b, i) => (
-        <svg
-          key={i}
-          className="ft-balloon"
-          viewBox="0 0 60 110"
-          role="presentation"
-          style={vars({ "--bx": `${b.x}px`, "--drift": `${b.drift}px`, "--rise": `${s.rise}px`, "--turn": `${b.turn}deg`, "--dur": `${b.dur}s` })}
-        >
-          <path d="M30 62 C30 74 24 82 32 92 C38 100 28 104 30 110" fill="none" stroke="#5a3a2a" strokeWidth="1.5" />
-          <ellipse cx="30" cy="32" rx="26" ry="30" fill={b.color} stroke="#5a3a2a" strokeWidth="2" />
-          <path d="M25 66 L30 60 L35 66 Z" fill={b.color} stroke="#5a3a2a" strokeWidth="1.5" />
-          <ellipse cx="20" cy="20" rx="6" ry="10" fill="#ffffff77" transform="rotate(25 20 20)" />
-        </svg>
-      ))}
+      <svg className="ft-balloon" viewBox="0 0 60 110" role="presentation" style={vars({ "--turn": `${s.turn}deg` })}>
+        <path d="M30 62 C30 74 24 82 32 92 C38 100 28 104 30 110" fill="none" stroke="#5a3a2a" strokeWidth="1.5" />
+        <ellipse cx="30" cy="32" rx="26" ry="30" fill={s.color} stroke="#5a3a2a" strokeWidth="2" />
+        <path d="M25 66 L30 60 L35 66 Z" fill={s.color} stroke="#5a3a2a" strokeWidth="1.5" />
+        <ellipse cx="20" cy="20" rx="6" ry="10" fill="#ffffff77" transform="rotate(25 20 20)" />
+      </svg>
+      {/* As it pops, a few scraps of it fly off round the spot. */}
+      {Array.from({ length: 7 }, (_, i) => {
+        const a = (i / 7) * Math.PI * 2;
+        return (
+          <span
+            key={i}
+            className="ft-balloon-bit"
+            style={vars({ "--c": s.color, "--x": `${Math.cos(a) * s.size * 0.28}px`, "--y": `${Math.sin(a) * s.size * 0.28 - s.size * 0.12}px` })}
+          />
+        );
+      })}
     </>
   );
 }
 
-function Flowers({ s }: { s: Extract<Surprise, { kind: "flowers" }> }) {
+function Flower({ s }: { s: Extract<Surprise, { kind: "flower" }> }) {
   return (
-    <>
-      {s.flowers.map((f, i) => (
-        <div key={i} className="ft-flower" style={vars({ left: `${f.x}px`, "--h": `${f.height}px`, "--delay": `${f.delay}s` })}>
-          <svg className="ft-stem" viewBox="0 0 40 100" preserveAspectRatio="none" role="presentation">
-            <rect x="17" y="0" width="6" height="100" rx="3" fill="#3e9b3a" />
-            <path d="M20 62 C8 54 4 46 2 40 C12 42 18 50 20 62 Z" fill="#5cc254" />
-            <path d="M20 78 C32 70 36 62 38 56 C28 58 22 66 20 78 Z" fill="#5cc254" />
-          </svg>
-          <svg className="ft-head" viewBox="-50 -50 100 100" role="presentation">
-            {Array.from({ length: f.petals }, (_, p) =>
-              f.pointy ? (
-                <path
-                  key={p}
-                  d="M0 -6 C10 -18 8 -36 0 -46 C-8 -36 -10 -18 0 -6 Z"
-                  fill={f.color}
-                  stroke="#5a3a2a"
-                  strokeWidth="1.5"
-                  transform={`rotate(${(p * 360) / f.petals})`}
-                />
-              ) : (
-                <ellipse
-                  key={p}
-                  cx="0"
-                  cy="-26"
-                  rx="13"
-                  ry="20"
-                  fill={f.color}
-                  stroke="#5a3a2a"
-                  strokeWidth="1.5"
-                  transform={`rotate(${(p * 360) / f.petals})`}
-                />
-              ),
-            )}
-            <circle r="13" fill={f.heart} stroke="#5a3a2a" strokeWidth="1.5" />
-          </svg>
-        </div>
-      ))}
-    </>
+    <div className="ft-flower" style={vars({ "--h": `${s.height}px` })}>
+      <svg className="ft-stem" viewBox="0 0 40 100" preserveAspectRatio="none" role="presentation">
+        <rect x="17" y="0" width="6" height="100" rx="3" fill="#3e9b3a" />
+        <path d="M20 62 C8 54 4 46 2 40 C12 42 18 50 20 62 Z" fill="#5cc254" />
+        <path d="M20 78 C32 70 36 62 38 56 C28 58 22 66 20 78 Z" fill="#5cc254" />
+      </svg>
+      <svg className="ft-head" viewBox="-50 -50 100 100" role="presentation">
+        {Array.from({ length: s.petals }, (_, p) =>
+          s.pointy ? (
+            <path
+              key={p}
+              d="M0 -6 C10 -18 8 -36 0 -46 C-8 -36 -10 -18 0 -6 Z"
+              fill={s.color}
+              stroke="#5a3a2a"
+              strokeWidth="1.5"
+              transform={`rotate(${(p * 360) / s.petals})`}
+            />
+          ) : (
+            <ellipse key={p} cx="0" cy="-26" rx="13" ry="20" fill={s.color} stroke="#5a3a2a" strokeWidth="1.5" transform={`rotate(${(p * 360) / s.petals})`} />
+          ),
+        )}
+        <circle r="13" fill={s.heart} stroke="#5a3a2a" strokeWidth="1.5" />
+      </svg>
+    </div>
   );
 }
 

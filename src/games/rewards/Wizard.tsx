@@ -93,13 +93,13 @@ function PrintBadge() {
         <strong>{t({ de: "Zum Ausdrucken", en: "To print", zh: "可打印", hi: "प्रिंट के लिए", es: "Para imprimir", ar: "للطباعة", ru: "Для печати" })}</strong>{" "}
         <span className="rw-print-badge-more">
           {t({
-            de: "auf A4 oder als Fotoabzug – oder hier am Bildschirm abhaken",
-            en: "on A4 or as a photo print – or tick it off here on screen",
-            zh: "打印在纸上或冲印成照片——也可以直接在屏幕上打勾",
-            hi: "कागज़ पर या फ़ोटो प्रिंट के रूप में – या यहीं स्क्रीन पर निशान लगाएँ",
-            es: "en A4 o como copia fotográfica, o márquela aquí en la pantalla",
-            ar: "على الورق أو كصورة مطبوعة – أو ضعوا العلامات هنا على الشاشة",
-            ru: "на A4 или фотоотпечатком – или отмечайте прямо на экране",
+            de: "auf A4, als Fotoabzug oder als Fotoposter – oder hier am Bildschirm abhaken",
+            en: "on A4, as a photo print or as a photo poster – or tick it off here on screen",
+            zh: "打印在纸上、冲印成照片或做成照片海报——也可以直接在屏幕上打勾",
+            hi: "कागज़ पर, फ़ोटो प्रिंट या फ़ोटो पोस्टर के रूप में – या यहीं स्क्रीन पर निशान लगाएँ",
+            es: "en A4, como copia fotográfica o como póster fotográfico, o márquela aquí en la pantalla",
+            ar: "على الورق أو كصورة مطبوعة أو كملصق صور – أو ضعوا العلامات هنا على الشاشة",
+            ru: "на A4, фотоотпечатком или фотопостером – или отмечайте прямо на экране",
           })}
         </span>{" "}
         <span className="rw-print-badge-ink">

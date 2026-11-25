@@ -5,6 +5,7 @@ import { type BoardReward, cellKey, type LinkedDays, newId, type StarLog, weekda
 import { type LinkedGame, type PlanTemplate, type PlanView, type Slot, STEP_BY_ID } from "./catalog";
 import { type DayParts, type DaySignSet, PARTS_OF } from "./daySigns";
 import { ritualOf } from "./rituals";
+import type { ChartPhoto } from "./chartPhoto";
 
 // A Tagesplan (a picture schedule, „Strukturtafel“): the steps of each day in their order, and which of today's
 // are done. Plain data and pure functions like board.ts; the ticks share its star log, keyed by plan id.
@@ -18,6 +19,8 @@ export interface PlanStep {
   label?: string;
   /** The catalogue task or activity it came from. */
   catalog?: string;
+  /** Key of the grown-up's own photo of it in `photoStore` (T-13), shown in place of its picture or emoji. */
+  photo?: string;
   /** Its game ticks it by itself (Zähne putzen, Aufs Töpfchen). */
   linked?: LinkedGame;
   /** The time of day of a linked step: only a brushing in the morning ticks a morning routine's teeth. */
@@ -43,6 +46,8 @@ export interface Plan {
   title: string;
   /** The sign before the heading: a mark's id; missing or `NO_TITLE_MARK`: none. */
   titleMark?: string;
+  /** The photo of the child on the sheet and where it sits (`chartPhoto.ts`); missing: none. The picture itself stays in `photoStore`. */
+  photo?: ChartPhoto;
   /** Seven lists of steps, Monday first; with `same` only the first one, for every day. */
   days: PlanStep[][];
   /** Every day the same steps (a morning routine), or each weekday its own (a week with Kita). */
@@ -586,14 +591,15 @@ export function withSame(plan: Plan, same: boolean, weekdayIndex: number): Plan 
 
 /**
  * Every different card of a plan, for the page of cards to cut out: once each – or as often as one day has it, as
- * „Mein Tag“ has the teeth card in the morning and the evening, both on the board at once.
+ * „Mein Tag“ has the teeth card in the morning and the evening, both on the board at once. A card with an own photo
+ * (T-13) is another card than the same one without.
  */
 export function distinctSteps(plan: Plan): PlanStep[] {
   const kept = new Map<string, number>();
   return plan.days.flatMap((day) => {
     const inDay = new Map<string, number>();
     return day.filter((step) => {
-      const key = `${step.emoji}|${step.label ?? step.catalog ?? ""}`;
+      const key = `${step.emoji}|${step.photo ?? ""}|${step.label ?? step.catalog ?? ""}`;
       const n = (inDay.get(key) ?? 0) + 1;
       inDay.set(key, n);
       if (n <= (kept.get(key) ?? 0)) return false;

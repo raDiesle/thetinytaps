@@ -13,12 +13,21 @@
   background: #2b2d5c;
 }
 
-/* A 16:9 stage covering the screen, its middle in the middle; the drawings keep what matters well inside it. */
+/* A 16:9 stage covering the screen, its middle in the middle of the room above the bar (`--tm-room`, none without it);
+   the drawings keep what matters within x 200–1400 and y 80–820. On a screen wider than 16:9 (a phone on its side) a
+   stage as wide as the screen cut a third of that band's top off (the hourglass's and the red disc's tops, user
+   feedback, 25 November 2026): there it is never wider than lets y 80–820 fit whole above the bar (`--tm-fit`), the
+   backdrops' mirrored edges fill the strips beside it (`Bleed` in `scenes.tsx`), and it still reaches the screen's
+   bottom edge (`top`'s second value). `timer.test.ts` checks the sizes. */
 .tm-stage {
+  --tm-room: 0px;
+  --tm-cover: max(100cqw, calc((100cqh + var(--tm-room)) * 16 / 9));
+  --tm-fit: calc((100cqh - var(--tm-room)) * 1600 / 740);
+  --tm-stage-w: min(var(--tm-cover), var(--tm-fit));
   position: absolute;
   left: 50%;
-  top: 50%;
-  width: max(100cqw, calc(100cqh * 16 / 9));
+  top: max(calc(50% - var(--tm-room) / 2), calc(100% - var(--tm-stage-w) * 9 / 32));
+  width: var(--tm-stage-w);
   aspect-ratio: 16 / 9;
   transform: translate(-50%, -50%);
 }
@@ -36,40 +45,6 @@
 
 .tm-move {
   will-change: transform;
-}
-
-/* Zug zum Bahnhof: the train rolls from its start to the buffers; at the end it stands there. */
-/* With its stops (H-45) the stage names this run's keyframes in --tm-roll and --tm-shine (`TrainStepKeyframes`). */
-.tm-train {
-  animation: var(--tm-roll, tm-roll) var(--tm-ms) linear forwards;
-}
-
-.tm-done .tm-train {
-  animation: none;
-  transform: translateX(var(--tm-train));
-}
-
-@keyframes tm-roll {
-  to {
-    transform: translateX(var(--tm-train));
-  }
-}
-
-.tm-steam {
-  transform-box: fill-box;
-  transform-origin: 50% 100%;
-  animation: tm-steam 1.2s ease-out forwards;
-}
-
-@keyframes tm-steam {
-  from {
-    opacity: 0.95;
-    transform: translateY(10px) scale(0.4);
-  }
-  to {
-    opacity: 0;
-    transform: translateY(-70px) scale(1.5);
-  }
 }
 
 /* Sanduhr: the top's sand sinks out through the neck, the bottom heap rises; the stream runs while it does. Each bulb's
@@ -430,8 +405,7 @@
   }
 }
 
-/* Every second a small, soft step (H-63), so a long time never looks stuck: the train's wheels turn once and a puff of
-   steam rises, the sand pours through the hourglass's neck, a drop of wax runs a little further. Each is a small
+/* Every second a small, soft step (H-63), so a long time never looks stuck: the sand pours through the hourglass's neck, a drop of wax runs a little further. Each is a small
    layer of its own moving by transform and opacity; at the end they stand still. */
 .tm-beat {
   position: absolute;
@@ -442,45 +416,6 @@
 .tm-blow .tm-beat {
   animation: none;
   opacity: 0;
-}
-
-.tm-done .tm-wheel,
-.tm-blow .tm-wheel {
-  opacity: 1;
-}
-
-.tm-wheel {
-  animation: tm-turn 1s ease-in-out infinite;
-}
-
-.tm-wheel svg {
-  display: block;
-  width: 100%;
-  height: 100%;
-}
-
-@keyframes tm-turn {
-  to {
-    transform: rotate(1turn);
-  }
-}
-
-.tm-chug {
-  border-radius: 50%;
-  background: #fff;
-  opacity: 0;
-  animation: tm-chug 1s ease-out infinite;
-}
-
-@keyframes tm-chug {
-  from {
-    opacity: 0.9;
-    transform: translateY(30%) scale(0.35);
-  }
-  to {
-    opacity: 0;
-    transform: translateY(-110%) scale(1.15);
-  }
 }
 
 .tm-drop {
@@ -528,28 +463,7 @@
   }
 }
 
-/* Where it came from and where it goes (H-64): the rail ahead of the train shines and shrinks towards the buffers as
-   the train rolls on; the wax that ran down spreads on the holder. */
-.tm-rail-shine {
-  position: absolute;
-  inset: 0;
-  border-radius: 4px;
-  background: linear-gradient(#ffffff, #c5d0da 45%, #8d9aa6);
-  transform-origin: 100% 50%;
-  animation: var(--tm-shine, tm-shine) var(--tm-ms) linear forwards;
-}
-
-.tm-done .tm-rail-shine {
-  animation: none;
-  transform: scaleX(0);
-}
-
-@keyframes tm-shine {
-  to {
-    transform: scaleX(0);
-  }
-}
-
+/* The wax that ran down spreads on the holder (H-64). */
 .tm-puddle {
   position: absolute;
   inset: 0;
@@ -1624,18 +1538,22 @@
   background: linear-gradient(to left, rgb(28 30 70 / 0.6) 75%, rgb(28 30 70 / 0.22));
 }
 
-/* Kugelbahn (H-117 with H-115): the strip of the room of the child whose turn it is is lit warm, every other one lies
-   in the same plain shade as Abwechseln's waiting side, so whose turn it is shows across the room. The marble rolls on
-   keyframes written for the turn (`tm-mr-…-go`, its spin inside it `-spin`); the flap over the next child's cup hangs
-   open, a marble lying in a cup shows at once as the rolling one lands there and fades out as a new round starts. */
+/* Kugelbahn (H-117 with H-115, marbleRun.tsx): the strip of the room of the child whose turn it is is lit warm, every
+   other one lies in the same plain shade as Abwechseln's waiting side, and the child's cup stands in a warm glow of
+   light while the others are dimmed – each a small layer of its own, changing only as the turn does. The board turns
+   over round its axle (`-board`, a scale of its own layer), the crank winds once (`-crank`), the baskets hanging on
+   their pins go up and down with it and the top one tips (`-up`, `-down`), and the marble rolls (`-go`, its spin
+   inside it `-spin`): keyframes written for the turn. */
 .tm-mr-light,
-.tm-mr-shade {
+.tm-mr-shade,
+.tm-mr-glow {
   opacity: 0;
-  transition: opacity 0.35s ease-out;
+  transition: opacity 0.5s ease-out;
 }
 
 .tm-mr-light.tm-on,
-.tm-mr-shade.tm-on {
+.tm-mr-shade.tm-on,
+.tm-mr-glow.tm-on {
   opacity: 1;
 }
 
@@ -1644,27 +1562,45 @@
 }
 
 .tm-mr-shade {
-  background: rgb(28 30 70 / 0.6);
+  background: rgb(28 30 70 / 0.62);
 }
 
+/* The light round the cup of the child whose turn it is: plain from across the room. */
+.tm-mr-glow {
+  border-radius: 50%;
+  background: radial-gradient(closest-side, rgb(255 248 200 / 0.95), rgb(255 214 90 / 0.7) 45%, rgb(255 200 60 / 0.3) 72%, transparent);
+}
+
+/* The other children's cups lie in the shade; the cup whose child's turn it is shines in its own colours, with a
+   golden rim round it. Dimmed, never see-through: at half opacity the wall showed through the cup. Its filter
+   changes only as the turn does. */
+.tm-mr-cup {
+  filter: brightness(0.6) saturate(0.6) drop-shadow(0 0 0 transparent) drop-shadow(0 0 0 transparent);
+  transition: filter 0.5s ease-out;
+}
+
+.tm-mr-cup.tm-on {
+  filter: brightness(1) saturate(1) drop-shadow(0 0 0.4cqh #ffd43b) drop-shadow(0 0 1.2cqh rgb(255 212 59 / 0.8));
+}
+
+.tm-mr-board,
+.tm-mr-crank,
+.tm-mr-basket,
 .tm-mr-roll,
-.tm-mr-spin,
-.tm-mr-rest > div {
+.tm-mr-spin {
   will-change: transform;
 }
 
+.tm-mr-board svg,
+.tm-mr-crank svg,
+.tm-mr-basket svg,
+.tm-mr-cup svg,
 .tm-mr-roll svg,
 .tm-mr-spin,
-.tm-mr-spin svg,
-.tm-mr-rest > div,
-.tm-mr-rest svg {
+.tm-mr-spin svg {
   display: block;
   width: 100%;
   height: 100%;
-}
-
-.tm-mr-rest > div {
-  position: relative;
 }
 
 .tm-mr-shine {
@@ -1672,43 +1608,7 @@
   inset: 0;
 }
 
-.tm-mr-rest {
-  opacity: 0;
-  transition: opacity 0.6s ease-out;
-}
-
-.tm-mr-rest.tm-on {
-  opacity: 1;
-  transition: none;
-}
-
-/* The first marble of a round given anew drops from the rail's hole into the first child's cup. */
-.tm-mr-drop {
-  animation: tm-mr-drop 0.7s ease-in both;
-}
-
-@keyframes tm-mr-drop {
-  from {
-    transform: translateY(calc(-1 * var(--tm-mr-fall)));
-  }
-}
-
-.tm-mr-gate {
-  transform-origin: 8% 50%;
-  transition: transform 0.6s ease-in-out;
-}
-
-.tm-mr-gate.tm-open {
-  transform: rotate(80deg);
-}
-
-.tm-mr-gate svg {
-  display: block;
-  width: 100%;
-  height: 100%;
-}
-
-/* A tap lights the cup the marble goes to for a moment (H-51). */
+/* A tap lights the basket the marble goes to for a moment (H-51). */
 .tm-mr-goal {
   border-radius: 50%;
   background: radial-gradient(closest-side, rgb(255 246 190 / 0.95), rgb(255 230 140 / 0.55) 65%, transparent);
@@ -1717,7 +1617,6 @@
   animation: tm-left 1.6s ease-out;
 }
 
-.tm-done .tm-mr-roll,
 .tm-done .tm-mr-goal {
   display: none;
 }
@@ -1902,187 +1801,6 @@
   50% {
     transform: translateY(-70%);
   }
-}
-
-/* Wippe (H-109): the plank turns round its pivot as one layer, back and forth for ever, one turn each way (`--tm-ms`,
-   started `--tm-delay` ago), and the chick walks along it by an animation as long (`tm-saw-walk-*`), so its weight and
-   the tilt go together; it turns back the plank's turn and stays upright. Two names of the same keyframes, so the
-   motion starts anew whenever the turns do (`round`). Before the turns run and at the end it turns slowly to its place
-   instead. */
-.tm-saw,
-.tm-saw-upright,
-.tm-saw-walk {
-  transition: transform 1.2s ease-in-out;
-}
-
-.tm-saw-a {
-  animation: tm-saw-a var(--tm-ms) linear var(--tm-delay) infinite var(--tm-saw-dir) both;
-}
-
-.tm-saw-b {
-  animation: tm-saw-b var(--tm-ms) linear var(--tm-delay) infinite var(--tm-saw-dir) both;
-}
-
-.tm-saw-upright.tm-saw-a {
-  animation-name: tm-saw-back-a;
-}
-
-.tm-saw-upright.tm-saw-b {
-  animation-name: tm-saw-back-b;
-}
-
-.tm-saw-walk.tm-saw-a {
-  animation-name: tm-saw-walk-a;
-}
-
-.tm-saw-walk.tm-saw-b {
-  animation-name: tm-saw-walk-b;
-}
-
-@keyframes tm-saw-a {
-  from {
-    transform: rotate(var(--tm-tilt));
-  }
-  to {
-    transform: rotate(calc(-1 * var(--tm-tilt)));
-  }
-}
-
-@keyframes tm-saw-b {
-  from {
-    transform: rotate(var(--tm-tilt));
-  }
-  to {
-    transform: rotate(calc(-1 * var(--tm-tilt)));
-  }
-}
-
-@keyframes tm-saw-back-a {
-  from {
-    transform: rotate(calc(-1 * var(--tm-tilt)));
-  }
-  to {
-    transform: rotate(var(--tm-tilt));
-  }
-}
-
-@keyframes tm-saw-back-b {
-  from {
-    transform: rotate(calc(-1 * var(--tm-tilt)));
-  }
-  to {
-    transform: rotate(var(--tm-tilt));
-  }
-}
-
-/* While the fox child's seat sinks (forwards) the chick walks from the bear's end to the fox's. */
-@keyframes tm-saw-walk-a {
-  from {
-    transform: translateX(var(--tm-reach));
-  }
-  to {
-    transform: translateX(calc(-1 * var(--tm-reach)));
-  }
-}
-
-@keyframes tm-saw-walk-b {
-  from {
-    transform: translateX(var(--tm-reach));
-  }
-  to {
-    transform: translateX(calc(-1 * var(--tm-reach)));
-  }
-}
-
-.tm-saw-walker {
-  position: absolute;
-}
-
-.tm-saw-walk,
-.tm-saw-upright,
-.tm-saw-face {
-  position: absolute;
-  inset: 0;
-}
-
-.tm-saw-upright {
-  transform-origin: 50% 100%;
-}
-
-.tm-saw-chick-body,
-.tm-saw-leg {
-  position: absolute;
-}
-
-.tm-saw-chick-body {
-  inset: 0;
-}
-
-.tm-saw-walker svg {
-  display: block;
-  width: 100%;
-  height: 100%;
-}
-
-/* Its steps go on at their own pace however long the turn (user request, 21 November 2026: on a long turn the seesaw
-   must still be seen moving): each leg swings round its hip, the two in turn, and the body bobs at every step. */
-.tm-saw-leg {
-  transform-origin: 50% 8%;
-}
-
-.tm-saw-walking .tm-saw-leg {
-  animation: tm-saw-step 0.7s ease-in-out infinite alternate;
-}
-
-.tm-saw-walking .tm-saw-leg-far {
-  animation-delay: -0.7s;
-}
-
-.tm-saw-walking .tm-saw-chick-body {
-  animation: tm-saw-hop 0.7s ease-in-out infinite;
-}
-
-@keyframes tm-saw-step {
-  from {
-    transform: rotate(-26deg);
-  }
-  to {
-    transform: rotate(26deg);
-  }
-}
-
-@keyframes tm-saw-hop {
-  50% {
-    transform: translateY(-5%);
-  }
-}
-
-/* Warm sun over the side whose turn it is, fading in and out with it. */
-.tm-saw-sun {
-  opacity: 0;
-  transition: opacity 0.35s ease-out;
-}
-
-.tm-saw-sun.tm-on {
-  opacity: 1;
-}
-
-.tm-saw-sun-fox {
-  background: radial-gradient(ellipse 70% 60% at 45% 55%, rgb(255 240 170 / 0.5), rgb(255 240 170 / 0.2) 55%, transparent 85%);
-}
-
-.tm-saw-sun-bear {
-  background: radial-gradient(ellipse 70% 60% at 55% 55%, rgb(255 240 170 / 0.5), rgb(255 240 170 / 0.2) 55%, transparent 85%);
-}
-
-.tm-saw-goal {
-  position: absolute;
-  inset: 0;
-  border-radius: 50%;
-  background: radial-gradient(closest-side, rgb(255 246 190 / 0.95), rgb(255 230 140 / 0.55) 65%, transparent);
-  opacity: 0;
-  pointer-events: none;
-  animation: tm-left 1.6s ease-out;
 }
 
 /* Boxes the sun, the moon, the stalk and what is still to grow move in, cut off where the hills or the soil begin. */
@@ -2436,9 +2154,76 @@
   }
 }
 
-.tm-steam-puff {
+/* The pizza's steam (H-63): each place a small layer standing on its slice and fading with it; inside, its two looks
+   take turns, each rising once in its own second of a round of 2 × STEAM_ROUND_S (`pizza.tsx` sets delay and length),
+   then waiting unseen. Wavy lines stretch up as they rise, a cloud swells; all drift a little sideways (`--tm-sway`). */
+.tm-pz-steam {
+  animation: tm-pz-steam-gone 0.6s linear both;
+}
+
+.tm-done .tm-pz-steam {
+  animation: none;
+  opacity: 0;
+}
+
+@keyframes tm-pz-steam-gone {
+  to {
+    opacity: 0;
+  }
+}
+
+.tm-pz-puff {
   inset: 0;
   opacity: 0;
+  transform-origin: 50% 100%;
+  animation: tm-pz-wisp 16s ease-out infinite;
+}
+
+.tm-pz-cloud {
+  animation-name: tm-pz-cloud;
+}
+
+.tm-pz-puff svg {
+  display: block;
+  width: 100%;
+  height: 100%;
+  overflow: visible;
+}
+
+@keyframes tm-pz-wisp {
+  0% {
+    opacity: 0;
+    transform: translateY(25%) scale(0.7, 0.35);
+  }
+  3% {
+    opacity: 0.9;
+  }
+  12% {
+    opacity: 0;
+    transform: translate(var(--tm-sway), -45%) scale(1, 1.15);
+  }
+  100% {
+    opacity: 0;
+    transform: translate(var(--tm-sway), -45%) scale(1, 1.15);
+  }
+}
+
+@keyframes tm-pz-cloud {
+  0% {
+    opacity: 0;
+    transform: translateY(20%) scale(0.3);
+  }
+  3% {
+    opacity: 0.85;
+  }
+  12% {
+    opacity: 0;
+    transform: translate(var(--tm-sway), -50%) scale(1.2);
+  }
+  100% {
+    opacity: 0;
+    transform: translate(var(--tm-sway), -50%) scale(1.2);
+  }
 }
 
 .tm-to-grow .tm-left-glow {
@@ -2472,6 +2257,70 @@
 @keyframes tm-done-light {
   to {
     opacity: 1;
+  }
+}
+
+/* The time is up, seen from across the room (`TimeUp`, user request, 25 November 2026): every colour of the picture
+   turns golden by one still tint, and a thick golden frame lights up round the screen and breathes slowly while the
+   end is shown – two layers, the frame animated by `opacity` only. Under the corner's note and the end's buttons. */
+.tm-up-tint,
+.tm-up-warm,
+.tm-up-frame {
+  position: absolute;
+  inset: 0;
+  z-index: 1;
+  pointer-events: none;
+  opacity: 0;
+  will-change: opacity;
+  animation: tm-up-in 0.9s ease-out forwards;
+}
+
+/* Every colour takes the gold's hue, and the light ones (a white dial, a pale wall) turn golden too. */
+.tm-up-tint {
+  background: #ffae1f;
+  mix-blend-mode: color;
+}
+
+.tm-up-warm {
+  background: #ffd47a;
+  mix-blend-mode: multiply;
+}
+
+/* Inside the book's paper margin (`--frame`), which would hide it. */
+.tm-up-frame {
+  --tm-up-band: clamp(16px, 5vmin, 44px);
+  inset: var(--frame, 0px);
+  border: var(--tm-up-band) solid #ffd84a;
+  border-radius: calc(var(--tm-up-band) * 0.5);
+  /* Lighter than the tinted picture, so it stands out of it: a bright line inside and light glowing inwards. */
+  box-shadow:
+    0 0 0 2px #e07b00,
+    inset 0 0 0 3px #fff8dc,
+    inset 0 0 calc(var(--tm-up-band) * 2) calc(var(--tm-up-band) * 0.5) rgb(255 228 120 / 0.85);
+  animation:
+    tm-up-in 0.9s ease-out forwards,
+    tm-up-breathe 2.4s ease-in-out 0.9s infinite;
+}
+
+@keyframes tm-up-in {
+  to {
+    opacity: 1;
+  }
+}
+
+@keyframes tm-up-breathe {
+  0%,
+  100% {
+    opacity: 1;
+  }
+  50% {
+    opacity: 0.55;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .tm-up-frame {
+    animation: tm-up-in 0.9s ease-out forwards;
   }
 }
 
@@ -2512,6 +2361,23 @@
 
 .tm-shown b > .tm-colon {
   width: 0.34em;
+}
+
+/* Taking turns, the whole turn's length stands beside the time left, smaller and lighter, on the same line
+   (`TotalTime`, `totalEm`). */
+.tm-shown-with-total {
+  display: flex;
+  align-items: baseline;
+  gap: calc(var(--tm-note-font) * 0.3);
+}
+
+.tm-shown-total {
+  font-size: calc(var(--tm-note-font) * 0.6);
+  font-style: normal;
+  font-weight: 700;
+  font-variant-numeric: tabular-nums;
+  white-space: nowrap;
+  opacity: 0.6;
 }
 
 /* The time is up (user request, 23 November 2026: plain to see in every timer): the note stays at 0:00, red, and
@@ -2723,22 +2589,20 @@
   transform: rotate(calc(var(--tm-side) * 24deg));
 }
 
-/* A toy hopping into its box (`hop.tsx`: Five Boxes): three layers inside each other, across, up and down, and its
-   size from its foot, each on keyframes written for the run; while it waits its turn it wiggles a second at a time. At
-   the end each stands where it landed. */
+/* Layers on keyframes written for the run (the Block House's cursor, the Treasure Tunnel's pickaxe, Up to the Moon's
+   fox, the Marble Jar's marbles), nested where a way is across, up and down and a size; what waits its turn wiggles a
+   second at a time (`.tm-hop-wait`). At the end each stands where it landed. */
 .tm-hop {
   will-change: transform;
   animation: var(--tm-anim) var(--tm-ms) linear both;
 }
 
 .tm-hop-y,
-.tm-hop-s,
 .tm-hop-wait {
   position: absolute;
   inset: 0;
 }
 
-.tm-hop-s,
 .tm-hop-wait {
   transform-origin: 50% 100%;
 }
@@ -2772,29 +2636,6 @@
 }
 
 .tm-done .tm-hop {
-  transform: var(--tm-end);
-}
-
-/* Five Boxes (H-120, boxes.tsx): each box's lid folds over its hinge, the half behind the toys shrinking to its edge,
-   then the half in front of them growing from it until it lies shut on the opening. */
-.tm-boxes-lid {
-  transform-origin: 50% 100%;
-  will-change: transform;
-  animation: var(--tm-anim) var(--tm-ms) linear both;
-}
-
-.tm-boxes-label {
-  position: absolute;
-}
-
-.tm-boxes-label > svg {
-  display: block;
-  width: 100%;
-  height: 100%;
-}
-
-.tm-done .tm-boxes-lid {
-  animation: none;
   transform: var(--tm-end);
 }
 
@@ -3676,12 +3517,11 @@
 }
 
 /* With the bar, the stage's middle moves up into the room above it, so the bar lies under what matters instead of over
-   its foot (it hid the candles' holders on a phone): only on a phone wider than 16:9 a strip is cut off at top and
-   bottom alike. The stage still reaches the screen's bottom edge (a dark strip showed under the bar on a tablet), so
+   its foot (it hid the candles' holders on a phone); on a phone wider than 16:9 the stage narrows instead (see
+   `.tm-stage`). The stage still reaches the screen's bottom edge (a dark strip showed under the bar on a tablet), so
    it is that much taller there, and a 4:3 tablet still shows x 200–1400 whole. */
 .tm-with-bar .tm-stage {
-  top: calc(50% - var(--tm-bar-room) / 2);
-  width: max(100cqw, calc((100cqh + var(--tm-bar-room)) * 16 / 9));
+  --tm-room: var(--tm-bar-room);
 }
 
 .tm-bar {
@@ -3738,16 +3578,9 @@
   --tm-bar-b: #15aabf;
 }
 
-.tm-play[data-picture="tidy"] .tm-bar,
-.tm-play[data-picture="train"] .tm-bar {
+.tm-play[data-picture="tidy"] .tm-bar {
   --tm-bar-a: #a5d8ff;
   --tm-bar-b: #339af0;
-}
-
-.tm-play[data-picture="boxes"] .tm-bar {
-  --tm-bar-a: #d0bfff;
-  --tm-bar-b: #9775fa;
-  --tm-bar-flag: #fcc419;
 }
 
 .tm-play[data-picture="jar"] .tm-bar {
