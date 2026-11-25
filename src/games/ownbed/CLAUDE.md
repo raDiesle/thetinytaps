@@ -41,7 +41,10 @@ In the morning Tapsi climbs into the big bed for the cuddle – they love Tapsi 
   („dritt“), and every other page there from that picture – look at it hardest before the rest are made: one big double
   bed, two separate grown-up foxes (Mama's flower, Papa's glasses), Tapsi between them. The door of Tapsi's room is not
   in the reference picture: pages about it point at the picture's right edge, never draw a door into the room.
-- **Not published yet**: its 21 pictures wait in the picture queue (`OWN_BED_PICTURE_QUEUE`, made in a Claude cloud
-  session with `/paid-queue`); until then the built site leaves the story out of the book's choice (`storyBook`) and its
-  page for search engines is in `WAITING_PATHS` (noindex, out of the sitemap). What is left once they are made stands in
-  each entry's `after`.
+- **Published** on 25 November 2026, once its 21 pictures were made in a Claude cloud session (`MADE` in
+  `ownBedPictures.ts`, the queue empty). Abstillen's living room has Tapsi on the rug: told only „leave every other place
+  empty“, Gemini drew a second Tapsi there beside the one on Mama's lap, and one between Mama and Papa beside the one hugged at
+  the bed: so a page that leaves a place where its reference has Tapsi says that place is empty (`PLACES.<place>.empty`,
+  `ownBed.test.ts`), and a hug says who stands and who sits. A grown-up lying on the rug is said to lie stretched
+  out, the whole body on the floor along the bed: „lies on the rug and reaches up“ came back as a kneeling Papa with a
+  second small fox head in his arms.

@@ -387,8 +387,8 @@ export const SEO_TEXTS: PageSeo[] = [
     path: "/grosses-bett/",
     title: "Im großen Bett schlafen – eine Geschichte",
     description:
-      "Eine Vorlesegeschichte in Kapiteln vom Gitterbett ins große Bett: Tapsi der Fuchs hilft beim Aufbauen, schläft mit Hase und Mondlicht ein und ist morgens stolz.",
-    text: "Eine Geschichte zum Vorlesen, Kapitel für Kapitel, wenn das Gitterbett zu klein wird und ein großes Bett kommt. Tapsi der Fuchs stößt beim Strecken mit den Füßen ans Ende und klettert über die Stäbe, und Papa ist gleich da. Mama schaut mit Tapsi ein Bilderbuch an und erzählt, dass das große Bett genau dort stehen wird, wo jetzt das Gitterbett steht, und dass der Kuschelhase, die kleine gelbe Decke und ihr Lied mitkommen. Tapsi sucht die blaue Bettwäsche aus, sagt dem Gitterbett Tschüss und danke, reicht Papa beim Aufbauen die Bretter und macht mit Mama das Bett. Ein kleines Gitter hält Tapsi im Bett, ein Nachtlicht in Mondform leuchtet, und das erste Schlafen im großen Bett ist ein Mittagsschlaf. Am Abend ist alles wie immer – Schlafanzug, Zähne, Geschichte, Lied –, und Papa verspricht nachzuschauen und kommt auch. Steht Tapsi nachts auf, bringt Papa Tapsi ruhig zurück, so oft es nötig ist. Mama sitzt beim Einschlafen auf einem Stühlchen am Bett und rückt jeden Abend ein Stück weiter zur Tür, und am Morgen freuen sich alle mit Tapsi. Danach zieht Tapsis Bärenfreund Bruno aus dem Bett der Eltern in sein eigenes, und nach einem bösen Traum kommt Mama sofort, hört zu und bleibt. Ohne Schimpfen, ohne Schreienlassen, ohne Stickerplan. Auf der ersten Seite steht, wie viele Bilder die Geschichte hat und wie lange sie ungefähr dauert, und gelesen wird immer von vorn; unter jedem Bild steht der Satz zum Vorlesen, und jedes Tippen blättert weiter.",
+      "Zwei Vorlesegeschichten in Kapiteln mit Tapsi dem Fuchs: vom Gitterbett ins große Bett und aus dem Elternbett ins eigene – mit Hase, Mondlicht und viel Nähe.",
+    text: "Eine Geschichte zum Vorlesen, Kapitel für Kapitel, wenn das Gitterbett zu klein wird und ein großes Bett kommt. Tapsi der Fuchs stößt beim Strecken mit den Füßen ans Ende und klettert über die Stäbe, und Papa ist gleich da. Mama schaut mit Tapsi ein Bilderbuch an und erzählt, dass das große Bett genau dort stehen wird, wo jetzt das Gitterbett steht, und dass der Kuschelhase, die kleine gelbe Decke und ihr Lied mitkommen. Tapsi sucht die blaue Bettwäsche aus, sagt dem Gitterbett Tschüss und danke, reicht Papa beim Aufbauen die Bretter und macht mit Mama das Bett. Ein kleines Gitter hält Tapsi im Bett, ein Nachtlicht in Mondform leuchtet, und das erste Schlafen im großen Bett ist ein Mittagsschlaf. Am Abend ist alles wie immer – Schlafanzug, Zähne, Geschichte, Lied –, und Papa verspricht nachzuschauen und kommt auch. Steht Tapsi nachts auf, bringt Papa Tapsi ruhig zurück, so oft es nötig ist. Mama sitzt beim Einschlafen auf einem Stühlchen am Bett und rückt jeden Abend ein Stück weiter zur Tür, und am Morgen freuen sich alle mit Tapsi. Danach zieht Tapsis Bärenfreund Bruno aus dem Bett der Eltern in sein eigenes, und nach einem bösen Traum kommt Mama sofort, hört zu und bleibt. Ohne Schimpfen, ohne Schreienlassen, ohne Stickerplan. Das Buch „Bett“ beginnt mit einer Wahl: diese Geschichte oder eine zweite für Familien, deren Kind aus dem Elternbett ins eigene Bett zieht – mit dem Kissen, das nach Zuhause riecht, offener Tür, Papa, der jeden Abend ein Stück weiter weg sitzt, und Morgenkuscheln im großen Bett. Bei jeder steht, wie viele Bilder sie hat und wie lange sie ungefähr dauert, und gelesen wird immer von vorn; unter jedem Bild steht der Satz zum Vorlesen, und jedes Tippen blättert weiter.",
   },
   {
     path: "/grosses-bett/eigenes-bett/",
@@ -568,10 +568,7 @@ export const SEO_TEXTS: PageSeo[] = [
  * Another address of a published game whose content players can't see yet – a story of a book whose pictures are still
  * in the queue: its texts wait here like an unfinished game's, out of the search pages and `noindex` until it shows.
  */
-const WAITING_PATHS: string[] = [
-  // „Tapsi's Own Bed“ (src/games/ownbed, 24 November 2026): its pictures wait in the queue (OWN_BED_PICTURE_QUEUE).
-  "/grosses-bett/eigenes-bett/",
-];
+const WAITING_PATHS: string[] = [];
 
 /** Every page that should be found: all but the games still being built (`Game.unfinished`), which no one is to find yet. */
 export const SEO_PAGES: PageSeo[] = SEO_TEXTS.filter((page) => !isUnfinished(page.path) && !WAITING_PATHS.includes(page.path));

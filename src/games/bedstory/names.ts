@@ -42,11 +42,11 @@ export const BED_STORY_KIND: EnglishFirst = {
 
 /** Its line for grown-ups. */
 export const BED_STORY_BLURB: EnglishFirst = {
-  en: "From the cot into a big bed, in chapters",
-  de: "Vom Gitterbett ins große Bett, in Kapiteln",
-  zh: "从小床搬进大床——分章节讲",
-  hi: "पालने से बड़े बिस्तर तक – अध्यायों में",
-  es: "De la cuna a la cama grande, en capítulos",
-  ar: "من السرير الصغير إلى الكبير – على فصول",
-  ru: "Из кроватки в большую кровать – по главам",
+  en: "Out of the cot and the parents' bed",
+  de: "Aus Gitterbett und Elternbett ins eigene",
+  zh: "从小床、从爸妈的床，搬到自己的床",
+  hi: "पालने और मम्मी-पापा के बिस्तर से अपने तक",
+  es: "De la cuna y la cama de papás a la propia",
+  ar: "من سرير الطفل وسرير الوالدين إلى سريره",
+  ru: "Из кроватки и кровати родителей – в свою",
 };

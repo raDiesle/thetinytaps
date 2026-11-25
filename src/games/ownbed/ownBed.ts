@@ -233,7 +233,7 @@ export const OWN_BED_STORY: OwnBedChapter[] = [
         light: "abend",
         cast: ["tapsi", "papa"],
         picture:
-          "Tapsi in pyjamas lies in the bed under the blue blanket with the plush bunny, eyes closing; Papa lies on the blue rug right beside the bed with a cushion under his head and reaches up to hold Tapsi's paw. The moon night light glows.",
+          "Tapsi in pyjamas lies in the bed under the blue blanket with the plush bunny, eyes closing; Papa lies stretched out on the blue rug in front of the bed, his whole long body on the floor along the bed, his head on a cushion, propped on one elbow, his other arm reaching up onto the blanket where he holds Tapsi's paw. The moon night light glows.",
       },
     ],
   },
@@ -283,7 +283,7 @@ export const OWN_BED_STORY: OwnBedChapter[] = [
         light: "nacht",
         cast: ["tapsi", "mama", "papa"],
         picture:
-          "Tapsi in pyjamas stands beside the big double bed on Mama's side, holding the plush bunny; Mama in her nightgown sits up on the edge of the bed and wraps Tapsi in a warm hug, calm and kind; Papa in pyjamas sleeps on in his half of the bed.",
+          "Tapsi in pyjamas stands on the floor beside the big double bed on Mama's side, holding the plush bunny; Mama in her nightgown sits on the edge of the bed, her feet on the floor, and leans down to hug the standing Tapsi with both arms, calm and kind; Papa in pyjamas sleeps on in his half of the bed.",
       },
       {
         id: "zurueck",

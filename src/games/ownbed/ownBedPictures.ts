@@ -28,16 +28,31 @@ const PARENTS_ROOM =
  * The picture every page of a place is drawn from, who was where in it and what of it belongs to another moment: a page
  * drawn from it keeps them there unless told that those places are empty now (Tapsis Milchkette, Kita-Start).
  */
-const PLACES: Record<Place, { ref: string; was: string; shows: Cast[] }> = {
+/**
+ * Where the reference picture has Tapsi that a page may leave: said empty on every page whose picture text doesn't put
+ * anyone there (`unless`). Told only „leave every other place empty“, Gemini kept the reference's Tapsi there beside the
+ * one the page asked for – on Abstillen's rug, and between Mama and Papa in their bed.
+ */
+type EmptyPlace = { text: string; unless: RegExp };
+
+const PLACES: Record<Place, { ref: string; was: string; shows: Cast[]; empty?: EmptyPlace }> = {
   elternzimmer: {
     ref: pictureFile(FIRST),
     was: "Tapsi sleeps between Mama and Papa in the big bed",
     shows: ["tapsi", "mama", "papa"],
+    empty: {
+      text: "The place between Mama and Papa in the bed is empty: no fox child lies or sits in the bed – Tapsi is in this picture only once, where this page says.",
+      unless: /\bbetween\b/,
+    },
   },
   wohnzimmer: {
     ref: "src/games/milkchain/bilder/kette-fragen-nicht.webp",
     was: "Tapsi plays with blocks on the rug and Mama sits on the green sofa with a cup – the blocks and the cup are gone now",
     shows: ["tapsi", "mama"],
+    empty: {
+      text: "The round rug in the middle of the floor is completely empty: nobody sits on it, there is no fox on the floor at all – Tapsi is in this picture only once, where this page says.",
+      unless: /\brug\b/,
+    },
   },
   kinderzimmer: {
     ref: "src/games/bedstory/bilder/bett-machen.webp",
@@ -127,6 +142,7 @@ export function promptOf(page: OwnBedPage): string {
       ? ""
       : `In that reference picture ${place.was}: that was another moment. Draw each character only where this page says, and leave every other place empty – no second character, no tail left lying on the floor or the furniture.`,
     absent(page),
+    place.empty && !first && !place.empty.unless.test(page.picture) ? place.empty.text : "",
     LIGHT[page.light],
     castOf(page),
     ...thingsOf(page),
@@ -159,7 +175,25 @@ export function ownBedPicture(page: OwnBedPage): QueuedPicture {
 }
 
 /** The pages whose pictures are made (`bilder/eigen-<id>.webp`); the others wait in the queue. */
-const MADE = new Set<string>([]);
+const MADE = new Set<string>([
+  "dritt",
+  "morgens",
+  "kissen",
+  "hase",
+  "offen",
+  "mittag",
+  "geschafft",
+  "ritual",
+  "weiter",
+  "tuer",
+  "raus",
+  "zurueck",
+  "zudecken",
+  "aufwachen",
+  "eng",
+  "kuscheln",
+  "lieb",
+]);
 
 /** Every picture of the story still to make. */
 export const OWN_BED_PICTURE_QUEUE: QueuedPicture[] = OWN_BED_PAGES.filter((p) => !MADE.has(p.id)).map(ownBedPicture);

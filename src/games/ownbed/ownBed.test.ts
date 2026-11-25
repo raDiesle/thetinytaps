@@ -111,6 +111,15 @@ describe("Tapsi's Own Bed", () => {
     }
   });
 
+  // The references have Tapsi on Abstillen's rug and between Mama and Papa: pages with Tapsi elsewhere came back with a
+  // second Tapsi there.
+  test("a page that leaves the reference's place of Tapsi says that place is empty", () => {
+    for (const page of OWN_BED_PAGES.filter((p) => p.place === "wohnzimmer" && !/\brug\b/.test(p.picture)))
+      expect(ownBedPicture(page).prompt, page.id).toContain("rug in the middle of the floor is completely empty");
+    for (const page of OWN_BED_PAGES.filter((p) => p.place === "elternzimmer" && p.id !== FIRST && !/\bbetween\b/.test(p.picture)))
+      expect(ownBedPicture(page).prompt, page.id).toContain("place between Mama and Papa in the bed is empty");
+  });
+
   test("every picture of a bed keeps whoever lies in it safely inside", () => {
     for (const page of OWN_BED_PAGES) if (/\bbed\b/.test(page.picture)) expect(ownBedPicture(page).prompt, page.id).toContain(SAFE_BED);
   });
