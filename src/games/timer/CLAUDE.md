@@ -99,7 +99,11 @@ taken out (user request, November 2026). The pictures:
   time it is back at the top, clockwise from 12 o'clock with a plink (H-67, `ladybugLaps`: the rounds fit the time
   exactly; beyond 30 minutes a dot every second or third round, so they go round once at most, `MAX_DOTS`).
 - „Pizza“ 🍕 (`pizza.tsx`, H-47's children's way): 24 slices on a wooden board, one lifted off towards its side at each
-  24th of the time from 12 o'clock round, with a munch (spaced) (`SLICES`, `pieceMoments`); a little steam rises every second.
+  24th of the time from 12 o'clock round, with a munch (spaced) (`SLICES`, `pieceMoments`). Every second steam rises
+  from another of eight places on it (`STEAM`), jumping across the pizza (three places on per beat), each place in its
+  own size and two looks taking turns – three wavy lines, a curl, two wisps, a little cloud –, standing on its slice
+  and gone with it, so no steam rises from the bare board (user feedback, November 2026: one puff in the middle every
+  second looked the same for an hour).
   Each slice is a small layer cut to its wedge by a still `clip-path`, so a tap lights exactly the slices left.
 - „Wecker“ ⏰ (`clock.tsx`, H-70, user request, November 2026): a children's digital radio alarm clock on the bedside
   table – a chunky, rounded turquoise case with a big yellow snooze bar on top, little feet, a star and a heart sticker,
@@ -427,6 +431,11 @@ and the shared `Layer`, `Draw`, `LeftGlow`), `timer.css`, `content.ts`
   dish, the pizza's mixed toppings lying across the cuts (`TOPPINGS`, drawn by every slice near them and cut by its
   wedge) – and in quiet texture of the backdrop (wallpaper, floorboards, a table's grain, all in `.tm-back`), never a
   new thing standing beside it (see „A picture makes sense as it is“). Still drawings stay `memo`, painted once.
+- **The step every second varies where it can** (user feedback from the Pizza, November 2026): where it is a thing
+  rising or appearing on the picture (steam, a puff, a twinkle) rather than a part turning in its place (a wheel, the
+  sand's stream), it comes at another place each second, in other looks and sizes, never the same puff from the same
+  spot for the whole run – each place still a small layer of its own moving by transform and opacity
+  (`timer.test.ts` checks the pizza's steam).
 - **The end is plain to see and hear**: the picture's own last step, then children cheering, a warm light over the
   picture and the trophy at the end – for every picture, Abwechseln's clock time too. Never a storm of confetti.
 - **That the time is up shows from across the room** (user request, 25 November 2026: „deutlich auch von weiter weg“,
