@@ -16,7 +16,10 @@ in bundles of five that go one by one – „Striche in %“, a full row of `MAX
 for a short time (`percentMarks`), or „Striche in Zeit“, each mark 1 s up to 15 min (`markUnit`, at most
 `MAX_MARKS`) – or „Aus“. Once the time is up the note shows a red „0:00“ blinking softly (`up` of `TimeShownNote`,
 `.tm-shown-up`), also where tally marks were chosen, and the Wecker's digits turn red and blink alike (`.tm-clock-on`),
-until the end is left – only „Aus“ keeps the corner empty.
+until the end is left – only „Aus“ keeps the corner empty. In the Abwechseln group (Abwechseln, Wippe,
+Kugelbahn, Rennstrecke) the digits always stand with the whole turn's length beside them, smaller and paler („3:12 /
+5:00“, `TimeShownNote withTotal`, `noteRoom(…, true)`; user request, 25 November 2026), so grown-ups see how long each
+turn is.
 The start screen's cards are the pictures themselves as they look halfway through a run, with no words on them (user
 request, November 2026; the middle rather than the end, user feedback, November 2026; `TimerCardArt` in `cardArt.tsx`,
 `GameMode.art`): the very drawing of a run (`SceneParts`), cut as for 5 minutes and started half of it ago, every
@@ -305,22 +308,30 @@ taken out (user request, November 2026). The pictures:
   welches Kind gerade dran ist“, two to four children): the last in the Abwechseln group, run by the same `SwapRun`,
   which takes turns among `turnChildren` (`TURN_CHILDREN`: fox, bear, rabbit, frog, the first `kids` of them, set behind
   ⚙️ „Wie viele Kinder?“, `settings.kids`; Abwechseln and the Wippe keep fox and bear). A wooden marble run hangs on the
-  playroom's wall: a jar of marbles at its top left, four zigzag ramps (`RUN`, `RAMPS`) with round end pieces, and a
-  bottom rail running right to left over the children's cups (`CUP_XS`, `CUP_W` per count), a hole with a flap and a
-  funnel over each. The marble is the time: the whole turn long one marble rolls down at an even pace into the cup of
-  the child whose turn comes next, its flap hanging open, and falls in as the turn ends (`marblePlan`: the fall a fixed
-  quick moment, the rolling the rest; it spins at least half a turn a second however long the turn, and knocks softly
-  at each end piece on the run's clock). Its way is two small layers on keyframes written for the turn
-  (`tm-mr-<round>-<turn>-<wake>-go`/`-spin`, a new name for a new turn, a grown-up's new start and the page coming back).
+  playroom's wall, a board turning on an axle (`AXLE_Y`, `BOARD`): a basket hangs on a pin at its top left and one at
+  its bottom left (`BASKET`), four zigzag ramps (`RUN`, `RAMPS`) with round end pieces run between them, and a crank
+  sits on the board's right side (`CRANK`); the children's cups stand on the floor below (`CUP_XS`, `CUP_W` per count).
+  The marble is the time (user request, 25 November 2026: „oben unten ein Korb, eine Kurbel an der Seite vom Brett“):
+  the whole turn long one marble rolls down at an even pace from the top basket into the bottom one (it spins at least
+  half a turn a second however long the turn, and knocks softly at each end piece on the run's clock). At the change
+  the crank winds once round, the board turns over about its axle (a scale of its own layer from 1 to −1), the full
+  basket rises in front while the empty one sinks behind, and the top basket tips the marble onto the first ramp, which
+  then rolls down again for the next child (`marblePlan`: flip, tip, roll and the fall into the basket, its phases
+  sized by the turn's length). Every part is a small layer of its own on keyframes written for the turn
+  (`tm-mr-<round>-<turn>-<wake>-board`/`-crank`/`-up`/`-down`/`-go`/`-spin`, a new name for a new turn, a grown-up's new
+  start and the page coming back); between turns (paused before the start) the marble lies still in the bottom basket.
+  **The run is drawn symmetric about the axle** (`marbleWay`, `timer.test.ts`), so the board turned over is the same
+  picture and the next turn starts where the flip ended – a new ramp, peg or basket keeps it so. The baskets hang
+  upright on their pins and never turn over with the board. There is one marble only: the H-115 marbles left lying in
+  each cup until everyone had a turn went with this rebuild (one marble can't stay in a cup and run on).
   The cups are the children's places (in the mascots' colours for fox and bear, blue with long ears for the rabbit,
-  green with eye bumps for the frog, no faces), each drawn as back and front with the marbles lying between them. Whose
-  turn it is shows across the room: that child's strip of the room (halfway to the next cups) is lit warm, every other
-  one lies in Abwechseln's dark shade, and the bar along the bottom takes that child's colour (`data-tone`). Who had a
-  turn (H-115): the marble that fell into a child's cup stays there until every child has had a turn (`heldMarbles`),
-  then the cups are empty again and the new round's first marble lies in the first child's; a new turn's marble comes
-  in another colour (`MARBLE_COLORS`). The first turn begins with a marble dropping into the fox child's cup (`DROP_MS`).
-  „Wer ist dran?“ names all children (`KID_NAMES`); changing the number goes on with the child whose turn it is if it
-  still plays, else with the first. A tap lights the cup the marble goes to. The rabbit's and the frog's „Tauschen! …“
+  green with eye bumps for the frog, no faces). Whose turn it is shows across the room (user request, 25 November
+  2026: „aufleuchten oder deutlicher machen, wer gerade dran ist“): that child's strip of the room is lit warm, its cup
+  stands in a round glow with a golden rim (`.tm-mr-glow`, `.tm-mr-cup.tm-on`), every other strip lies in Abwechseln's
+  dark shade with its cup dimmed – by a filter, never by opacity, which let the wall show through the cup – and the bar
+  along the bottom takes that child's colour (`data-tone`). „Wer ist dran?“ names all children (`KID_NAMES`); changing
+  the number goes on with the child whose turn it is if it still plays, else with the first. A tap lights the bottom
+  basket the marble rolls into. The rabbit's and the frog's „Tauschen! …“
   (`MORE_TURN_TO` in `marbleNames.ts`) were written English first and translated at once; they wait for their recording
   (silent until then).
 - „Rennstrecke“ 🏎️ (`race.tsx`, H-150, user request, 24 November 2026: a long track in a figure eight, start and

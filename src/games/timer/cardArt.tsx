@@ -1,5 +1,5 @@
 import { memo, useLayoutEffect, useRef, useState } from "react";
-import { MARBLE_COLORS, MarbleScene } from "./marbleRun";
+import { MarbleScene } from "./marbleRun";
 import { RaceScene } from "./race";
 import { DEFAULT_TIMER_SETTINGS, type SwapToy, type TimerPicture, type TurnCount } from "./settings";
 import { SAW, Seesaw, SeesawBackdrop, SeesawStand, SeesawSun } from "./seesaw";
@@ -53,8 +53,8 @@ function holdAt(card: HTMLElement | null, at: number) {
  * full of apples with the cart under them, the train halfway to the station, the leaf half eaten. It is the very drawing
  * of a run (`SceneParts`, started `MIDDLE` of it ago – `LATER` for a few), stopped at that moment by `holdAt`. „Abwechseln“ shows the fox
  * child's lamp on, the toy on its cushion and the hourglass half run; the Wippe the fox child's side in the sun, its seat
- * on its way down with the chick walking over to it; the Kugelbahn the fox child's strip lit, a marble in its cup and the
- * next one halfway down the run to the bear child's cup, with as many cups as children set (`kids`, else three, so a
+ * on its way down with the chick walking over to it; the Kugelbahn the fox child's cup in its glow and the marble
+ * halfway down the run, with as many cups as children set (`kids`, else three, so a
  * card standing alone shows it is for more than two).
  */
 export const TimerCardArt = memo(function TimerCardArt({
@@ -106,9 +106,7 @@ export const TimerCardArt = memo(function TimerCardArt({
           <MarbleScene
             kids={TURN_CHILDREN.slice(0, kids)}
             lit={TURN_CHILDREN.slice(0, kids).map((_, i) => i === 0)}
-            held={TURN_CHILDREN.slice(0, kids).map((_, i) => (i === 0 ? MARBLE_COLORS[0] : null))}
-            open={1}
-            rolling={{ name: `tm-mr-card-${kids}`, to: 1, startedAt: startedAt + at, ms: CARD_MS, color: MARBLE_COLORS[1] }}
+            turn={{ name: `tm-mr-card-${kids}`, startedAt: startedAt + at, ms: CARD_MS }}
             poke={0}
             quiet
           />
