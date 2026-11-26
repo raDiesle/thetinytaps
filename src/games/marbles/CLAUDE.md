@@ -265,9 +265,9 @@ Then a second part past the tree (`PART2`, `acornAt`, `beeAt`, `kiteAt`; a pure 
     from the scenario's waits: collecting a trace between two stretches takes seconds, and the Raketenstart's „Mitte“
     lay at about 40–50 s (the UFO) while A-49 was written for 24–37 s (the capsule). `KETTEN_SCAN=1 LEVELS=<id>
     TIMES=…` then lists what still changes in the machine's svg at those seconds. `--trace` tells which layer is
-    rastered how much: count a level's tiles by layer and tile id (`tools/rasterArea.ts`), since Chrome reuses tile ids
-    in every layer – counted by id alone, a trace of the Licht-Kette rastering 332 screens counted 392, a tile taking
-    the size of another layer's (A-42). `--profile` names each function with its line and column in the built chunk
+    rastered how much: a tile is found by its address and layer (`tools/perfTrace.ts`), since Chrome
+    reuses a tile's address in every layer – counted by address alone, the Licht-Kette's night looked like the cost
+    (A-42) and the runs' start swung from 21 to 39 (A-41). `--profile` names each function with its line and column in the built chunk
     (one long line in `out/static/`), so a function of the level is found there by its column.
 
 ## Working on machines
@@ -430,9 +430,13 @@ takes a `look`); other things keep their look and an animal looks out for them.
   too. A piece only mounted while it shows (puffs, drops, the rainbow's flash) needs no `rest`; `trackPieces.test.ts`
   fails on a piece with neither. A piece is a portal, and React sends a portal's events up
   through the tree it was written in: never put it inside a `data-tap` group, or one tap sets its cue off twice – give
-  the piece its own `data-tap` beside the group. A wobbling part still drawn in the big svg (the seesaw, the funnel, the
-  walls' bumpers, A-39) costs about 100 ms of painting a second on the old phone while it moves: turn it into a piece
-  when `bun run perf ketten-<run>` finds its stretch over.
+  the piece its own `data-tap` beside the group. The parts the first rows hit are pieces while they stir (A-41, 26
+  November 2026): the spots' bell (swinging round its hook) and funnel (shaking by `scale`), the walls' bumpers and the
+  seesaw's plank – each a wobble or glide that painted the whole wall in every frame of the run's start. A wobble's
+  piece rests once the wobble is exactly 0, `wobbleSeconds(damp)` after the hit (`level.ts`), never at a guessed
+  number of seconds, or it switches back to the wall while still moving and the wall paints again. A wobbling part
+  still drawn in the big svg costs about 100 ms of painting a second on the old phone while it moves: turn it into a
+  piece when `bun run perf ketten-<run>` finds its stretch over.
 - `track.css`: its styles (classes `run-`). While it is on, the background music is off (the run
   plays its own notes and scales).
 - Shared with the machines: `path.ts` (line, quad, arc), `parts.tsx` (Ball, Rail, BAR_COLORS) and `level.ts` (useFrames,

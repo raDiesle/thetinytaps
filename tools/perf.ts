@@ -3,7 +3,7 @@ import { tmpdir } from "node:os";
 import { join } from "node:path";
 import { type Cdp, evaluate, launchChrome, open, siteUrl, sleep } from "./chrome";
 import { type Budget, BUDGET, DEVICES, type Device, type Part, SCENARIOS, type Scenario, type Step } from "./perfScenarios";
-import { type RasterTraceEvent, rasteredPixels } from "./rasterArea";
+import { rasteredPixels, type TraceEvent } from "./perfTrace";
 
 // `bun run perf`: plays every game in headless Chrome as an old Android phone would (a slow CPU, a small screen
 // with many pixels) and measures how smoothly its animations run, in the Chrome on the computer (tools/chrome.ts).
@@ -223,14 +223,6 @@ const percentile = (values: number[], p: number) => {
   const sorted = [...values].sort((a, b) => a - b);
   return sorted[Math.min(sorted.length - 1, Math.floor(sorted.length * p))];
 };
-
-interface TraceEvent {
-  name: string;
-  ph: string;
-  dur?: number;
-  tid: number;
-  args?: RasterTraceEvent["args"];
-}
 
 /**
  * Records Chrome's trace while `during` runs: where painting (main thread) and rastering (its helper threads) take time,

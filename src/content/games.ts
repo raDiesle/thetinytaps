@@ -190,7 +190,7 @@ export const CATEGORIES: Category[] = [
         blurb: HAIR_STORY_BLURB,
       },
       {
-        // The book „Bed“ (named „Big Bed“ until 24 November 2026) beside „Hair Washing“ (idea H-106, 21 November 2026):
+        // The book „Sleep Tight“ (named „Big Bed“ until 24 November 2026, „Bed“ until 26 November 2026) beside „Hair Washing“ (idea H-106, 21 November 2026):
         // „Tapsi's Big Bed“, a story in chapters along the steps the guides give for moving a small child from the cot
         // into a bed of its own (src/games/bedstory), English first. Its pictures were made on 21 November 2026, and it
         // was published on the user's word on 23 November 2026.

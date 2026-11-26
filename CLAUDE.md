@@ -325,10 +325,13 @@ In a fresh worktree run `bun install` first.
   `bun run perf` measures it: it plays each game in headless
   Chrome as a ten-year-old Android phone (6× slower CPU, 640×360 at 3× pixels) and fails a stretch over the budget
   (`tools/perfScenarios.ts`: p95 frame ≤ 34 ms, ≤ 0.5 frames over 50 ms a second, main thread ≤ 60 % busy, and ≤ 30
-  screens of pixels rastered anew a second – the GPU's work, which a gaming phone's 120 Hz screen doubles; counted per
-  layer's tiles, `tools/rasterArea.ts`, since Chrome reuses tile ids in every layer). Until
+  screens of pixels rastered anew a second – the GPU's work, which a gaming phone's 120 Hz screen doubles). Until
   November 2026 it rastered at 1× and counted the idle seconds of collecting its trace into every stretch, so it found
-  nothing while the user's phone stuttered: when a phone stutters and the tool says it's fine, doubt the tool first. A stretch that
+  nothing while the user's phone stuttered: when a phone stutters and the tool says it's fine, doubt the tool first.
+  Until 26 November 2026 it also sized each rastered tile by its memory address alone, which Chrome reuses for tiles of
+  other layers and sizes, so the screens rastered a second swung 21–39 on the same code and could read half the truth
+  (A-41): a tile is now found by address and layer in the snapshot after its raster (`tools/perfTrace.ts`,
+  `perfTrace.test.ts`), and raster numbers from before that date in `tools/perf-history/` don't compare with later ones. A stretch that
   starts with a tap also counts the frames before the motion, where the next page is drawn while the screen stays still,
   and whether it catches them depends on when its counter starts: before blaming a motion, compare where the stutters
   fall with when it starts (in „Buch aus dem Regal nehmen“ all of them fell in the 0.2 s before the book lifts, and

@@ -22,7 +22,7 @@ import { SLIDE_TRACK } from "./slideTrack";
 import { SNOW_TRACK } from "./snowTrack";
 import { SPACE_TRACK } from "./spaceTrack";
 import { COLOR_TRACK } from "./colorTrack";
-import { PieceRoom, SETTLED_S } from "./trackPieces";
+import { Piece as Layer, PieceRoom, SETTLED_S } from "./trackPieces";
 import { type ColorSort, INK, TrackLook, type TrackTheme } from "./trackTheme";
 import { BALL_R, type Pt } from "./path";
 import { useDevice } from "@/lib/device";
@@ -1017,11 +1017,20 @@ function Run({ sound, say, onDone, onGoal, look }: LevelProps & { look: TrackThe
                 strokeWidth="3"
                 strokeLinejoin="round"
               />
-              <g transform={`translate(${SEESAW.cx} ${SEESAW.cy}) rotate(${tilt.current})`}>
-                <rect x={-SEESAW.half} y="-7" width={SEESAW.half * 2} height="14" rx="7" fill="#ffb703" stroke={INK} strokeWidth="3" />
-                <rect x={-SEESAW.half + 6} y="-33" width="30" height="26" rx="6" fill="#ff5d73" stroke={INK} strokeWidth="3" />
-              </g>
-              <circle cx={SEESAW.cx} cy={SEESAW.cy} r="6" fill={INK} />
+              {/* The plank is a layer of its own while it tips or swings back, turned as a whole: tipping in the wall's svg
+                had the phone paint the wall's bands again in every frame of it (A-41). Its pin turns with it, unchanged. */}
+              <Layer
+                layer="back"
+                rest={!gliding(tilt.current * 1000, SEESAW.rest * 1000) && !gliding(tilt.current * 1000, SEESAW.tipped * 1000)}
+                box={{ x: SEESAW.cx - SEESAW.half - 8, y: SEESAW.cy - 40, w: SEESAW.half * 2 + 16, h: 52 }}
+                turn={{ deg: tilt.current, x: SEESAW.cx, y: SEESAW.cy }}
+              >
+                <g transform={`translate(${SEESAW.cx} ${SEESAW.cy})`}>
+                  <rect x={-SEESAW.half} y="-7" width={SEESAW.half * 2} height="14" rx="7" fill="#ffb703" stroke={INK} strokeWidth="3" />
+                  <rect x={-SEESAW.half + 6} y="-33" width="30" height="26" rx="6" fill="#ff5d73" stroke={INK} strokeWidth="3" />
+                  <circle r="6" fill={INK} />
+                </g>
+              </Layer>
             </g>
 
             {/* The barrier before the funnel, always up: a tap rings it (K-02) */}

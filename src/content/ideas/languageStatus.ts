@@ -98,11 +98,11 @@ export const LANGUAGE_STATUS: LanguageStatusRow[] = [
         files: ["src/games/timer/tunnelNames.ts"],
       },
       {
-        label: "🚀 Up to the Moon",
-        languages: { de: "done", en: "done", zh: "done", hi: "done", es: "done", ar: "done", ru: "done" },
+        label: "🛗 Lift to the Top",
+        languages: { de: "text", en: "text", zh: "text", hi: "text", es: "text", ar: "text", ru: "text" },
         recorded: true,
-        note: "Das dritte Spiel-Video-Bild und das erste, das keine Klötzchenwelt ist: ein Jump'n'Run nach oben, in dem ein kleiner Hüpfer vom Grund eines Sees bis zum Mond schwimmt, hüpft, klettert und fliegt und am Ende in eine Torte springt (H-127, jump.tsx; am 23. November 2026 neu gebaut statt „Hop to the Flag“), Englisch zuerst geschrieben und gleich in alle Sprachen übersetzt: sein Name „Up to the Moon“ („Hoch bis zum Mond“) und seine zwei Sätze am Anfang und am Ende (jumpNames.ts). Beide Sätze am 23. November 2026 von ElevenLabs gesprochen mit den Klonen von Tapsis Stimme im zweiten Konto: Englisch, Chinesisch, Hindi, Spanisch und Arabisch mit „Tapsi Coach (Klon)“, Deutsch mit „Tapsi Coach (Klon de)“, Russisch mit „Tapsi Coach (Klon ru)“ – beide Sätze eines Bildes aus einer Stimme, wie bei den anderen Bildern. Die Texte für Suchmaschinen nennen es in allen sieben Sprachen.",
-        files: ["src/games/timer/jumpNames.ts"],
+        note: "Ein Hochhaus mit einem großen gläsernen Aufzug, der Stockwerk für Stockwerk nach oben fährt, während rote Punktziffern wie in einem echten Aufzug die Stockwerke hochzählen; oben geht die Tür auf und auf dem Dach wird eine Fahne gehisst (H-127, lift.tsx, Wunsch 26. November 2026, statt „Up to the Moon“ mit dem Fuchskind). Englisch zuerst geschrieben und gleich in alle Sprachen übersetzt: sein Name „Lift to the Top“ („Mit dem Aufzug nach oben“) und seine zwei Sätze am Anfang und am Ende (liftNames.ts). Die Sätze warten auf ihre Aufnahmen (die von „Up to the Moon“ passen nicht mehr). Die Texte für Suchmaschinen nennen es in allen sieben Sprachen.",
+        files: ["src/games/timer/liftNames.ts"],
       },
       {
         label: "🫙 Marble Jar",
@@ -243,7 +243,7 @@ export const LANGUAGE_STATUS: LanguageStatusRow[] = [
   },
   {
     href: "/grosses-bett/",
-    note: "Das Buch „Bett“ (bis 24. November 2026 „Großes Bett“) mit zwei Geschichten in Kapiteln, gewählt auf seiner ersten Seite (StoryChoice), die Tapsis Stimme vorliest; unten rechts über ▶ schaltet ein Lautsprecher sie für Erwachsene aus, die selbst vorlesen. Der Name des Buchs (names.ts) ist in allen sieben Sprachen da.",
+    note: "Das Buch „Schlaf gut“ (bis 24. November 2026 „Großes Bett“, bis 26. November 2026 „Bett“) mit zwei Geschichten in Kapiteln, gewählt auf seiner ersten Seite (StoryChoice), die Tapsis Stimme vorliest; unten rechts über ▶ schaltet ein Lautsprecher sie für Erwachsene aus, die selbst vorlesen. Der Name des Buchs (names.ts) ist in allen sieben Sprachen da.",
     parts: [
       {
         label: "🛏️ Tapsi's Big Bed",
