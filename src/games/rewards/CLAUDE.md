@@ -24,7 +24,8 @@ Countdown (H-05, user request, November 2026) – the wizard on its kind where n
 26 November 2026; the shelf's part is documented with `Bookshelf.tsx`): a tap opens `/tagesplan/` with the router state
 `OPEN_EDITOR` (`openEditor.ts`, which imports nothing, so the home page's chunk never pulls in this page), and the page
 opens straight in the editor – the wizard where nothing is made yet, else „Gestalten“ on the chart shown
-(`opensEditor`). Without that state (the teeth card's return, a search visitor, a link) the page opens on the chart as
+(`opensEditor`). The wizard opened so starts on „Mein Tag“ like every first visit, though its Zähler makes the quick
+row mark „Belohnungstafel“ – never a Zeitplan without stars instead (user decision, 26 November 2026). Without that state (the teeth card's return, a search visitor, a link) the page opens on the chart as
 before. Once a tab or the wizard showed another chart, the address no longer picks (`chosen` in `RewardsGame`). Nothing
 remembers which was shown last.
 
