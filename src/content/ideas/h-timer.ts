@@ -573,5 +573,15 @@ export const timerIdeas: IdeaArea = {
       partial:
         "Gebaut am 24. November 2026 als Bild „Rennstrecke“ in der Gruppe Abwechseln (race.tsx): eine Achterstrecke in Perspektive, deren hintere Schleife weit in den Hintergrund reicht, mit Brücke über der Kreuzung, rot-weißen Randsteinen, Reifenstapeln, Tribünen und einer Großbildleinwand, die das Gesicht des Kinds zeigt, das gerade fährt. Fuchskind und Bärenkind fahren abwechselnd ein Kart, jeweils eine ganze Runde so lang wie die Zeit: Die Startampel schaltet Rot, Gelb, Grün, das Kart rollt los, ruckelt und pufft, die gefahrene Strecke färbt sich in der Farbe des Kinds, und in den letzten Sekunden winkt die Zielflagge. An der Ziellinie hüpft das Kind aus dem Kart auf seine Matte und das wartende hüpft hinein. Ein Tippen lässt den Rest der Runde aufleuchten. Es sagt dieselben Sätze wie Abwechseln. Nur sein Name ist neuer Text, Englisch zuerst und gleich in alle sieben Sprachen übersetzt (raceNames.ts).",
     },
+    // User request, 26 November 2026: „ein timer, bei dem man groß einen baum sieht, der dann mit einer säge gefällt
+    // wird“.
+    {
+      id: "H-151",
+      emoji: "🪚",
+      title: "Baum fällen: eine Säge sägt den großen Baum durch",
+      text: "Ein Timer-Bild, das fast ganz von einem großen Baum ausgefüllt wird: dicker Stamm, breite Krone, vielleicht ein Vogelnest darin. Unten am Stamm steckt eine Säge, die die ganze Zeit gleichmäßig hin und her sägt; der Schnitt wird Stück für Stück tiefer, Sägespäne rieseln auf einen Haufen, der wächst. In den letzten Sekunden knarzt der Baum, neigt sich und fällt am Ende langsam und weich ins Gras – ein Rumms, ein paar Blätter wirbeln, dann liegt er da und zeigt seine Jahresringe.",
+      why: "Wie tief der Schnitt schon ist, sieht ein Kind von Weitem, und das Sägen ist eine ruhige, gleichmäßige Bewegung, die auch bei langen Zeiten zeigt, dass es weitergeht. Das Fallen am Ende ist ein großes, klares Ereignis: „Wenn der Baum umfällt, ist es so weit.“ Offen zu entscheiden: wer sägt – die Säge allein, ein Fuchs oder Bär als Holzfäller in Rolle, oder statt einer Säge ein Biber, der den Stamm durchnagt – und ob ein gefällter Baum kleinen Kindern traurig vorkommt (etwa ein kleiner Setzling, der am Ende daneben steht).",
+      effort: "M",
+    },
   ],
 };
