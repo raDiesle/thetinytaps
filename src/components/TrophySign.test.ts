@@ -31,3 +31,20 @@ test("the trophy sign is a wooden board in the corner with three nails", () => {
   const nails = css.match(/\.shelf-trophy-sign::before \{([^}]*)\}/)?.[1] ?? "";
   expect(nails.match(/var\(--head\)/g)?.length).toBe(3);
 });
+
+// On a wide shelf the sign is nailed into the top left corner of the speaker's compartment, so the speaker below it can
+// stand big (user request, 26 November 2026): it hangs down from the board above, never lifted by its own height.
+test("on a wide shelf the trophy sign hangs in the speaker's top left corner", () => {
+  const top = css.match(/\.shelf-trophy-sign\[data-from="top"\] \{([^}]*)\}/)?.[1] ?? "";
+  expect(top).toMatch(/translate: calc\(var\(--post\)[^)]*\) calc\(var\(--edge\)[^)]*\);/);
+  expect(css).not.toMatch(/shelf-trophy-sign ~ \.shelf-box \.shelf-cell\.music/);
+});
+
+// „Wer spielt?“ on the stickers' right wall runs across it in lines: written down the slanted wall its letters came out
+// a few pixels thin, and a padding in cq units on the wall – itself a container – measured the room and left no width.
+test("„Wer spielt?“ runs across the right wall, never down it", () => {
+  const wall = css.match(/\.shelf-ask-wall \{([^}]*)\}/)?.[1] ?? "";
+  const words = css.match(/\.shelf-ask-wall \.shelf-figure-ask \{([^}]*)\}/)?.[1] ?? "";
+  expect(words).not.toContain("writing-mode");
+  expect(wall).not.toMatch(/padding[^;]*cq/);
+});

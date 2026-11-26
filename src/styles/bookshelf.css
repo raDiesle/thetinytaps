@@ -254,40 +254,62 @@
 }
 
 .room-globe-sea {
-  fill: #6fb6dc;
+  fill: #4fa6d6;
 }
 
 .room-globe-land {
-  fill: #8cc46a;
+  fill: #86c063;
   stroke: #4f7f3a;
-  stroke-width: 1.2;
+  stroke-width: 1;
 }
 
 .room-globe-lines {
   fill: none;
-  stroke: #ffffffa6;
-  stroke-width: 1.3;
+  stroke: #ffffff80;
+  stroke-width: 0.9;
 }
 
-.room-globe-shine {
+.room-globe-rim {
   fill: none;
-  stroke: #ffffffcc;
-  stroke-width: 3;
+  stroke: #bfe6ff;
+  stroke-opacity: 0.55;
+  stroke-width: 2;
+  stroke-linecap: round;
 }
 
 .room-globe-outline {
   fill: none;
   stroke: var(--ink);
-  stroke-width: 2.5;
+  stroke-width: 2.2;
 }
 
-.room-globe-ring {
+.room-globe-ring,
+.room-globe-pin {
+  stroke: #5e4214;
+  stroke-width: 1;
+}
+
+.room-globe-pin {
+  fill: #e0b85c;
+}
+
+.room-globe-arm {
   fill: none;
-  stroke: #c79a3c;
-  stroke-width: 4;
+  stroke: #b8892f;
+  stroke-width: 3.6;
+  stroke-linecap: round;
 }
 
-.room-globe-pin,
+.room-globe-foot,
+.room-globe-foot-top {
+  stroke: #3d2a1c;
+  stroke-width: 1.4;
+}
+
+.room-globe-foot-top {
+  fill: #c99460;
+}
+
 .room-globe-plate {
   fill: #e0b85c;
   stroke: #7a5a1f;
@@ -980,37 +1002,47 @@
 
 /*
  * The stickers on the back panel of their compartment under the hourglass (wide shelf, user request, 26 November 2026):
- * „Wer spielt?“ over the two side by side, moved like what is stuck on a back panel (`--sx`, `--sy`).
+ * one above the other, each whole with its ♀ or ♂, moved like what is stuck on a back panel (`--sx`, `--sy`). They
+ * stand a little left of the middle, since the right wall hides the back panel's right edge and the signs stick out at
+ * the right.
  */
 .shelf-back-stuck {
   position: absolute;
-  inset: 6% 0;
-  display: flex;
-  flex-direction: column;
-  align-items: center;
+  inset: 4% 0;
   container-type: size;
   transform: translate(var(--sx), var(--sy)) translateZ(calc(var(--d) * -0.97 + 2px));
 }
 
-.shelf-back-stuck .shelf-figure-ask {
-  position: static;
-  flex: none;
-  padding: 0 2cqw;
-  font-size: min(17cqw, 18cqh);
-  white-space: normal;
-  text-wrap: balance;
-}
-
 .shelf-back-stuck .room-stickers {
-  flex: 1;
-  flex-direction: row;
-  gap: 10cqw;
-  height: auto;
-  min-height: 0;
+  flex-direction: column;
+  gap: 8cqh;
+  translate: -12cqw 0;
 }
 
 .shelf-back-stuck .room-sticker {
-  --s: min(38cqw, 62cqh);
+  --s: min(38cqh, 44cqw);
+}
+
+/*
+ * „Wer spielt?“ on the right wall of the stickers' compartment, big, across the wall from its front to its back in one
+ * or two lines – the wall is deep and tall, while the back panel has room only for the heads (user request, 26 November
+ * 2026). Seen at a slant the letters come out narrow like a condensed face, yet as tall as they are: running down the
+ * wall they were flattened to a few pixels.
+ */
+.shelf-ask-wall {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+}
+
+/* Its room from the wall's edges is the words' own margin: on the wall, a container, a padding would measure the room. */
+.shelf-ask-wall .shelf-figure-ask {
+  position: static;
+  margin: 0 7cqw;
+  font-size: min(19cqw, 21cqh);
+  line-height: 1.1;
+  white-space: normal;
+  text-wrap: balance;
 }
 
 .shelf-cell.language .room-globe svg {
@@ -1018,22 +1050,21 @@
 }
 
 /*
- * On a wide shelf the speaker stands against the shelf's right wall (user request, 26 November 2026) and the trophy
- * room's sign at its left, its left edge against the wall there (`trophySignAt`, `data-from="left"`); the speaker is as
- * wide as the room the sign leaves. The sign comes before the shelf's box in the page and is only there once a trophy is
- * won; without it the speaker still stands at the right wall.
+ * On a wide shelf the speaker stands big against the shelf's right wall and the trophy room's sign is nailed into the
+ * compartment's top left corner above it (`trophySignAt`, `data-from="top"`; user request, 26 November 2026: beside
+ * each other on the board both were small).
  */
 .room-scene[data-plan="wide"] .shelf-cell.music .shelf-thing {
   justify-content: flex-end;
   padding-right: calc(var(--cw) * 0.04);
 }
 
-.room-scene[data-plan="wide"] .shelf-trophy-sign ~ .shelf-box .shelf-cell.music .room-speaker svg {
-  height: min(calc(var(--ch) * 0.5), calc(var(--cw) * 0.34 / 0.72));
+.room-scene[data-plan="wide"] .shelf-cell.music .room-speaker svg {
+  height: min(calc(var(--ch) * 0.64), calc(var(--cw) * 0.8 / 0.72));
 }
 
-.shelf-trophy-sign[data-from="left"] {
-  translate: calc(var(--post) * 0.15) calc(-100% - var(--edge));
+.shelf-trophy-sign[data-from="top"] {
+  translate: calc(var(--post) * 0.15) calc(var(--edge) * 0.5);
 }
 
 /* ----- The front of the frame: the planks between compartments, the posts, the top board, the plinth ----- */
