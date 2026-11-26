@@ -608,9 +608,15 @@ A game may give it before its end where reaching the goal once is enough (Ketten
   is much bigger than a page's corner (`--corner`; a shelf stamped small in gold, then a small label with a squat shelf,
   were not seen), and where a wide screen leaves a broad margin beside the table of contents it lies in that margin
   right next to the lines, as big as the margin allows (in the far corner it stayed small, with empty room between it
-  and the lines). It never lies over a card, a line, a title or the text below: it scrolls with the paper, and where it
-  hangs above the lines the menu's head grows down past it (`--ribbon-reach`, `--menu-pad`) – making it bigger means
-  keeping that room free with it (`MenuTop.test.ts`).
+  and the lines). It never lies over a card, a title or the text below: it scrolls with the paper, and where it
+  hangs above the cards the menu's head grows down past it (`--ribbon-reach`, `--menu-pad`) – making it bigger means
+  keeping that room free with it (`MenuTop.test.ts`). The one exception is a book's table of contents on a phone or
+  tablet (shorter side below `TABLET_SCREEN`, narrower than the wide screens that lay it beside the lines): there the
+  lines take the whole page, from right under its top margin (a tablet's title) to its foot and out to its sides, and
+  the ribbon, moved close to the page's outer edge, and the fullscreen note lie over the first row's corners, so the
+  games' pictures come out as big as they can (user request, 26 November 2026; a phone's pictures grew from 125 to 210
+  px wide at 844×390). A line wastes no room round its picture there either: thin paper round it and its name in one
+  line, all names shrunk alike (`fitNames`).
   Only what is drawn of a corner is tapped, never the empty rest of its square, which reaches the first line. No round arrow stands beside the title for it (`MenuTop.test.ts`), the sun or a room's window step aside, and nothing
   else goes into that corner. Every way back inside a book is that corner: while playing, the ✕ that leaves is the
   same corner at the top left with a ✕ on it (`PageCornerArt`), tapped or held just like the ✕ – held, it lifts further
