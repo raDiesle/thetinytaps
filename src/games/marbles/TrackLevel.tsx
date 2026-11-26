@@ -22,6 +22,7 @@ import { SLIDE_TRACK } from "./slideTrack";
 import { SNOW_TRACK } from "./snowTrack";
 import { SPACE_TRACK } from "./spaceTrack";
 import { COLOR_TRACK } from "./colorTrack";
+import { PieceRoom } from "./trackPieces";
 import { type ColorSort, INK, TrackLook, type TrackTheme } from "./trackTheme";
 import { BALL_R, type Pt } from "./path";
 import { useDevice } from "@/lib/device";
@@ -345,6 +346,9 @@ function Run({ sound, say, onDone, onGoal, look }: LevelProps & { look: TrackThe
   const peek = useRef({ at: -Infinity, animal: look.peekers[0] });
   const [magicStart] = useState(() => Math.floor(Math.random() * MAGIC.length));
   const svg = useRef<SVGSVGElement>(null);
+  // Where the moving pieces of the world's stretch land, behind and in front of the rolling things (`Piece`).
+  const [backPieces, setBackPieces] = useState<HTMLDivElement | null>(null);
+  const [frontPieces, setFrontPieces] = useState<HTMLDivElement | null>(null);
   const done = useRef(false);
   const now = useRef(levelNow());
   /** The top of the view and its height, in the wall's coordinates. */
@@ -921,6 +925,7 @@ function Run({ sound, say, onDone, onGoal, look }: LevelProps & { look: TrackThe
   const unit = (Number(cameraLayer(box.current, WALL, { x: 0, y: cam.y, w: VIEW_W, h: cam.h }).width) || VIEW_W) / VIEW_W;
   const layerStyle = cameraLayer(box.current, WALL, { x: 0, y: cam.y, w: VIEW_W, h: cam.h });
   const at = cameraPoint(box.current, WALL, { x: 0, y: cam.y, w: VIEW_W, h: cam.h });
+  const pieceRoom = { back: backPieces, front: frontPieces, unit, top: TOP_ROOM };
   return (
     <div
       className="run-level"
@@ -932,234 +937,241 @@ function Run({ sound, say, onDone, onGoal, look }: LevelProps & { look: TrackThe
       }}
     >
       <TrackLook.Provider value={look}>
-        <svg ref={svg} className="marble-camera" viewBox={layerBox} style={layerStyle} aria-label={label}>
-          <look.Backdrop />
+        <PieceRoom.Provider value={pieceRoom}>
+          {/* The world's backdrop (pegboard, stars, bricks, …), a layer of its own drawn once: inside the svg below, every
+            wobbling bar or rocking part had the phone raster its pattern again round it (perf, 26 November 2026) */}
+          <svg className="marble-camera" viewBox={layerBox} style={layerStyle} aria-hidden>
+            <look.Backdrop />
+          </svg>
+          <svg ref={svg} className="marble-camera" viewBox={layerBox} style={layerStyle} aria-label={label}>
+            {/* The boards the spots sit on */}
+            {SLOTS.map((slot, i) => (
+              <SpotBoard key={i} slot={slot} />
+            ))}
 
-          {/* The boards the spots sit on */}
-          {SLOTS.map((slot, i) => (
-            <SpotBoard key={i} slot={slot} />
-          ))}
+            {/* Rows 1a and 1b with the xylophone */}
+            <Xylophone row={ROW1A} ages={barAges} onTap={tapBar} />
+            <Xylophone row={ROW1B} ages={barAges} onTap={tapBar} />
 
-          {/* Rows 1a and 1b with the xylophone */}
-          <Xylophone row={ROW1A} ages={barAges} onTap={tapBar} />
-          <Xylophone row={ROW1B} ages={barAges} onTap={tapBar} />
-
-          {/* The ledge, the walls the marble turns at, and the rows */}
-          <TrackRail a={{ x: LEDGE.x0, y: LEDGE.y }} b={{ x: LEDGE.x1, y: LEDGE.y }} />
-          {routes.turns.map((turn, i) => (
-            <Wall key={i} turn={turn} index={i} age={age(bumps.current[i])} />
-          ))}
-          <TrackRail a={{ x: ROW2.from.x + 10, y: ROW2.from.y - 1 }} b={ROW2.to} />
-          <TrackRail a={{ x: ROW2B.from.x + 12, y: ROW2B.from.y - 1 }} b={ROW2B.to} />
-          {[...ZIGS, ROW4, LEFT2, ROW5, ROW5B, ROW6, ROW7, ROW8].map((row, i) => (
-            <TrackRail key={i} a={inset(row.from, row, 10)} b={row.to} />
-          ))}
-          <Xylophone row={LEFT1} ages={barAges} onTap={tapBar} />
-          <g
-            data-tap
-            onPointerDown={(e) => {
-              tapped(e);
-              looped.current = levelNow();
-              sound(playWhoosh);
-            }}
-          >
-            <Loop age={age(looped.current)} />
-          </g>
-          {DRUMS.map((_, i) => (
+            {/* The ledge, the walls the marble turns at, and the rows */}
+            <TrackRail a={{ x: LEDGE.x0, y: LEDGE.y }} b={{ x: LEDGE.x1, y: LEDGE.y }} />
+            {routes.turns.map((turn, i) => (
+              <Wall key={i} turn={turn} index={i} age={age(bumps.current[i])} />
+            ))}
+            <TrackRail a={{ x: ROW2.from.x + 10, y: ROW2.from.y - 1 }} b={ROW2.to} />
+            <TrackRail a={{ x: ROW2B.from.x + 12, y: ROW2B.from.y - 1 }} b={ROW2B.to} />
+            {[...ZIGS, ROW4, LEFT2, ROW5, ROW5B, ROW6, ROW7, ROW8].map((row, i) => (
+              <TrackRail key={i} a={inset(row.from, row, 10)} b={row.to} />
+            ))}
+            <Xylophone row={LEFT1} ages={barAges} onTap={tapBar} />
             <g
-              key={i}
               data-tap
               onPointerDown={(e) => {
                 tapped(e);
-                playDrum(i, levelNow());
+                looped.current = levelNow();
+                sound(playWhoosh);
               }}
             >
-              <Drum i={i} age={age(drums.current[i])} />
+              <Loop age={age(looped.current)} />
             </g>
-          ))}
-          <Chimes
-            ages={chimes.current.map(age)}
-            onTap={(i, e) => {
-              tapped(e);
-              playChimeAt(i, levelNow());
-            }}
-          />
-          <Xylophone row={ROW9} ages={barAges} onTap={tapBar} />
-
-          {/* The world's own stretch down the lower wall: its rails, and its towers, hills and things */}
-          {look.stretch.rails.map((row, i) => (
-            <TrackRail key={i} a={inset(row.from, row, 10)} b={row.to} />
-          ))}
-          <StretchArt layer="back" ages={cueAges} onTap={tapCue} />
-
-          {SLOTS.map((_, i) => spot(i, "back"))}
-
-          {/* Seesaw; a tap tips it */}
-          <g
-            data-tap
-            onPointerDown={(e) => {
-              tapped(e);
-              seesawTapped.current = levelNow();
-              sound(playBoing);
-            }}
-          >
-            <rect x={SEESAW.cx - SEESAW.half - 10} y={SEESAW.cy - 70} width={SEESAW.half * 2 + 20} height="140" fill="transparent" />
-            <path
-              d={`M${SEESAW.cx} ${SEESAW.cy} L${SEESAW.cx - 34} ${SEESAW.cy + 62} L${SEESAW.cx + 34} ${SEESAW.cy + 62} Z`}
-              fill="#8a5a2b"
-              stroke={INK}
-              strokeWidth="3"
-              strokeLinejoin="round"
-            />
-            <g transform={`translate(${SEESAW.cx} ${SEESAW.cy}) rotate(${tilt.current})`}>
-              <rect x={-SEESAW.half} y="-7" width={SEESAW.half * 2} height="14" rx="7" fill="#ffb703" stroke={INK} strokeWidth="3" />
-              <rect x={-SEESAW.half + 6} y="-33" width="30" height="26" rx="6" fill="#ff5d73" stroke={INK} strokeWidth="3" />
-            </g>
-            <circle cx={SEESAW.cx} cy={SEESAW.cy} r="6" fill={INK} />
-          </g>
-
-          {/* The barrier before the funnel, always up: a tap rings it (K-02) */}
-          <g
-            data-tap
-            onPointerDown={(e) => {
-              tapped(e);
-              ringGate(levelNow());
-            }}
-          >
-            <Gate rang={age(gateTapped.current)} />
-          </g>
-
-          {/* The switch at the end of row 3: a tap flips it (K-01) */}
-          <g
-            data-tap
-            onPointerDown={(e) => {
-              tapped(e);
-              flip();
-            }}
-          >
-            <Switch angle={flap.current + wobble(age(flapHit.current), 7, 30, 7)} />
-          </g>
-
-          {/* Row 3, and the back of the end at the bottom (with the flag, the snowman, …) */}
-          <TrackRail a={{ x: ROW3.from.x - 16, y: ROW3.from.y - 1 }} b={ROW3.to} />
-          <g data-tap onPointerDown={tapBasket}>
-            <look.End layer="back" {...end} />
-          </g>
-
-          {/* An animal looks out of the tunnel, from behind its roof */}
-          <Peek animal={peek.current.animal} age={(t - peek.current.at) / PEEK_MS} />
-
-          <g data-tap onPointerDown={tapBasket}>
-            {landed.current.map((l, i) => {
-              const k = Math.min(1, (t - l.at) / landMs);
-              // A thing that becomes part of the end (a snowman's ball) is gone once it is there.
-              if (look.absorb && k >= 1) return null;
-              const bounce = (k < 1 ? 0 : wobble((t - l.at - landMs) / 1000, 6, 20, 8)) + wobble(basketAge - i * 0.06, 22, 16, 6);
-              const hop = look.sort?.hop(l.from, l.to, k);
-              const x = hop?.x ?? l.from.x + (l.to.x - l.from.x) * k;
-              const y =
-                (hop?.y ?? l.from.y + (l.to.y - l.from.y) * k * k) - Math.abs(bounce) - (ROLLER[l.kind].r - BALL_R) - (look.pileLift?.(end.fullAge) ?? 0);
-              return <RollerBody key={l.id} kind={l.kind} color={l.color} look={l.look} x={x} y={y} spin={0} grow={1} />;
-            })}
-          </g>
-          {/* On a computer the keys 1, 2 and 3 under the shelf; behind the marbles rolling past */}
-          {!touchOnly && <ShelfKeys held={held.current} onTake={take} />}
-        </svg>
-        {/* Each thing rolling on the run is a small layer of its own, moved by a transform: moving inside the big svg made a phone paint all of it again in every frame (A-29) */}
-        <div className="marble-camera run-layer" style={layerStyle}>
-          {marbles.current.map((m) => {
-            const k = (t - m.nudged) / NUDGE_MS;
-            // Riding a chair or a bucket (`carry`), or shrinking into a wormhole and growing out of it (`scale`).
-            const zone = m.fly ? undefined : zoneAt(routeOf(m), m.s);
-            const along = zone ? Math.min(1, Math.max(0, (m.s - zone.s0) / (zone.s1 - zone.s0))) : 0;
-            const size = zone?.scale ? zone.scale[0] + (zone.scale[1] - zone.scale[0]) * along : 1;
-            const Carrier = zone?.carry ? look.Carrier : undefined;
-            return (
-              <svg
-                key={m.id}
-                className="run-marble"
+            {DRUMS.map((_, i) => (
+              <g
+                key={i}
                 data-tap
-                viewBox={`${-MARBLE_PAD} ${-MARBLE_PAD} ${2 * MARBLE_PAD} ${2 * MARBLE_PAD}`}
-                style={{
-                  width: 2 * MARBLE_PAD * unit,
-                  height: 2 * MARBLE_PAD * unit,
-                  transform: `translate3d(${(m.x - MARBLE_PAD) * unit}px, ${(m.y + TOP_ROOM - MARBLE_PAD) * unit}px, 0)`,
-                }}
-                aria-hidden
                 onPointerDown={(e) => {
                   tapped(e);
-                  nudge(m, levelNow());
+                  playDrum(i, levelNow());
                 }}
               >
-                <circle r="56" fill="transparent" />
-                {Carrier && <Carrier layer="back" />}
-                <RollerBody
-                  kind={m.kind}
-                  color={m.color}
-                  look={m.look}
-                  x={0}
-                  y={0}
-                  spin={m.spin + (k >= 0 && k < 1 ? 4 * Math.PI * k : 0)}
-                  grow={Math.min(1, m.dist / runLength)}
-                  scale={m.fly ? SHELF.scale - (SHELF.scale - 1) * Math.min(1, (t - m.fly.at) / FLY_MS) : size}
-                />
-                {Carrier && <Carrier layer="front" />}
-              </svg>
-            );
-          })}
-          {pops.current.length > 0 && (
-            <svg className="marble-camera" viewBox={layerBox} style={layerStyle} aria-hidden>
-              {pops.current.map((p) => (
-                <BubblePop key={p.id} x={p.x} y={p.y} age={(t - p.at) / POP_MS} />
-              ))}
-            </svg>
-          )}
-        </div>
-        <svg className="marble-camera run-layer" viewBox={layerBox} style={layerStyle} aria-hidden>
-          {/* In front of the marbles */}
-          <Hopper />
-          {SLOTS.map((_, i) => spot(i, "front"))}
-          <g
-            data-tap
-            onPointerDown={(e) => {
-              tapped(e);
-              peekOut(levelNow());
-            }}
-          >
-            <Tunnel />
-          </g>
-          <StretchArt layer="front" ages={cueAges} onTap={tapCue} />
-          <g data-tap onPointerDown={tapBasket}>
-            <look.End layer="front" {...end} />
-          </g>
-          {glitters.current.map((g) => (
-            <Sparkles key={g.id} x={g.x} y={g.y} age={(t - g.at) / GLITTER_MS} />
-          ))}
-
-          {/* Where a tap swaps the part: the whole board, with a wrench in the corner */}
-          {SLOTS.map((slot, i) => {
-            const b = slotBoard(slot);
-            const pending = spots.current[i].pending;
-            const wx = slot.dir > 0 ? b.x + b.w - 30 : b.x + 30;
-            return (
-              <g key={i} className="run-spot-tap" data-tap onPointerDown={(e) => swap(i, e)}>
-                <rect x={b.x} y={b.y} width={b.w} height={b.h} rx="28" fill="transparent" />
-                <circle cx={wx} cy={b.y + 30} r="24" fill="#fff8e8" stroke="#c48a4d" strokeWidth="3" />
-                <text x={wx} y={b.y + 41} fontSize="28" textAnchor="middle" className={pending ? "run-wrench busy" : "run-wrench"}>
-                  🔧
-                </text>
+                <Drum i={i} age={age(drums.current[i])} />
               </g>
-            );
-          })}
+            ))}
+            <Chimes
+              ages={chimes.current.map(age)}
+              onTap={(i, e) => {
+                tapped(e);
+                playChimeAt(i, levelNow());
+              }}
+            />
+            <Xylophone row={ROW9} ages={barAges} onTap={tapBar} />
 
-          <Shelf
-            things={shelf.current}
-            filled={filled.current}
-            colors={look.sort?.colors ?? shelf.current.map(() => BRIGHT_COLORS[nextId.current % BRIGHT_COLORS.length])}
-            t={t}
-            onTake={take}
-          />
-        </svg>
+            {/* The world's own stretch down the lower wall: its rails, and its towers, hills and things */}
+            {look.stretch.rails.map((row, i) => (
+              <TrackRail key={i} a={inset(row.from, row, 10)} b={row.to} />
+            ))}
+            <StretchArt layer="back" ages={cueAges} onTap={tapCue} />
+
+            {SLOTS.map((_, i) => spot(i, "back"))}
+
+            {/* Seesaw; a tap tips it */}
+            <g
+              data-tap
+              onPointerDown={(e) => {
+                tapped(e);
+                seesawTapped.current = levelNow();
+                sound(playBoing);
+              }}
+            >
+              <rect x={SEESAW.cx - SEESAW.half - 10} y={SEESAW.cy - 70} width={SEESAW.half * 2 + 20} height="140" fill="transparent" />
+              <path
+                d={`M${SEESAW.cx} ${SEESAW.cy} L${SEESAW.cx - 34} ${SEESAW.cy + 62} L${SEESAW.cx + 34} ${SEESAW.cy + 62} Z`}
+                fill="#8a5a2b"
+                stroke={INK}
+                strokeWidth="3"
+                strokeLinejoin="round"
+              />
+              <g transform={`translate(${SEESAW.cx} ${SEESAW.cy}) rotate(${tilt.current})`}>
+                <rect x={-SEESAW.half} y="-7" width={SEESAW.half * 2} height="14" rx="7" fill="#ffb703" stroke={INK} strokeWidth="3" />
+                <rect x={-SEESAW.half + 6} y="-33" width="30" height="26" rx="6" fill="#ff5d73" stroke={INK} strokeWidth="3" />
+              </g>
+              <circle cx={SEESAW.cx} cy={SEESAW.cy} r="6" fill={INK} />
+            </g>
+
+            {/* The barrier before the funnel, always up: a tap rings it (K-02) */}
+            <g
+              data-tap
+              onPointerDown={(e) => {
+                tapped(e);
+                ringGate(levelNow());
+              }}
+            >
+              <Gate rang={age(gateTapped.current)} />
+            </g>
+
+            {/* The switch at the end of row 3: a tap flips it (K-01) */}
+            <g
+              data-tap
+              onPointerDown={(e) => {
+                tapped(e);
+                flip();
+              }}
+            >
+              <Switch angle={flap.current + wobble(age(flapHit.current), 7, 30, 7)} />
+            </g>
+
+            {/* Row 3, and the back of the end at the bottom (with the flag, the snowman, …) */}
+            <TrackRail a={{ x: ROW3.from.x - 16, y: ROW3.from.y - 1 }} b={ROW3.to} />
+            <g data-tap onPointerDown={tapBasket}>
+              <look.End layer="back" {...end} />
+            </g>
+
+            {/* An animal looks out of the tunnel, from behind its roof */}
+            <Peek animal={peek.current.animal} age={(t - peek.current.at) / PEEK_MS} />
+
+            <g data-tap onPointerDown={tapBasket}>
+              {landed.current.map((l, i) => {
+                const k = Math.min(1, (t - l.at) / landMs);
+                // A thing that becomes part of the end (a snowman's ball) is gone once it is there.
+                if (look.absorb && k >= 1) return null;
+                const bounce = (k < 1 ? 0 : wobble((t - l.at - landMs) / 1000, 6, 20, 8)) + wobble(basketAge - i * 0.06, 22, 16, 6);
+                const hop = look.sort?.hop(l.from, l.to, k);
+                const x = hop?.x ?? l.from.x + (l.to.x - l.from.x) * k;
+                const y =
+                  (hop?.y ?? l.from.y + (l.to.y - l.from.y) * k * k) - Math.abs(bounce) - (ROLLER[l.kind].r - BALL_R) - (look.pileLift?.(end.fullAge) ?? 0);
+                return <RollerBody key={l.id} kind={l.kind} color={l.color} look={l.look} x={x} y={y} spin={0} grow={1} />;
+              })}
+            </g>
+            {/* On a computer the keys 1, 2 and 3 under the shelf; behind the marbles rolling past */}
+            {!touchOnly && <ShelfKeys held={held.current} onTake={take} />}
+          </svg>
+          {/* Each thing rolling on the run is a small layer of its own, moved by a transform: moving inside the big svg made a phone paint all of it again in every frame (A-29) */}
+          <div className="marble-camera run-layer" style={layerStyle}>
+            <div ref={setBackPieces} className="run-pieces" />
+            {marbles.current.map((m) => {
+              const k = (t - m.nudged) / NUDGE_MS;
+              // Riding a chair or a bucket (`carry`), or shrinking into a wormhole and growing out of it (`scale`).
+              const zone = m.fly ? undefined : zoneAt(routeOf(m), m.s);
+              const along = zone ? Math.min(1, Math.max(0, (m.s - zone.s0) / (zone.s1 - zone.s0))) : 0;
+              const size = zone?.scale ? zone.scale[0] + (zone.scale[1] - zone.scale[0]) * along : 1;
+              const Carrier = zone?.carry ? look.Carrier : undefined;
+              return (
+                <svg
+                  key={m.id}
+                  className="run-marble"
+                  data-tap
+                  viewBox={`${-MARBLE_PAD} ${-MARBLE_PAD} ${2 * MARBLE_PAD} ${2 * MARBLE_PAD}`}
+                  style={{
+                    width: 2 * MARBLE_PAD * unit,
+                    height: 2 * MARBLE_PAD * unit,
+                    transform: `translate3d(${(m.x - MARBLE_PAD) * unit}px, ${(m.y + TOP_ROOM - MARBLE_PAD) * unit}px, 0)`,
+                  }}
+                  aria-hidden
+                  onPointerDown={(e) => {
+                    tapped(e);
+                    nudge(m, levelNow());
+                  }}
+                >
+                  <circle r="56" fill="transparent" />
+                  {Carrier && <Carrier layer="back" />}
+                  <RollerBody
+                    kind={m.kind}
+                    color={m.color}
+                    look={m.look}
+                    x={0}
+                    y={0}
+                    spin={m.spin + (k >= 0 && k < 1 ? 4 * Math.PI * k : 0)}
+                    grow={Math.min(1, m.dist / runLength)}
+                    scale={m.fly ? SHELF.scale - (SHELF.scale - 1) * Math.min(1, (t - m.fly.at) / FLY_MS) : size}
+                  />
+                  {Carrier && <Carrier layer="front" />}
+                </svg>
+              );
+            })}
+            <div ref={setFrontPieces} className="run-pieces" />
+            {pops.current.length > 0 && (
+              <svg className="marble-camera" viewBox={layerBox} style={layerStyle} aria-hidden>
+                {pops.current.map((p) => (
+                  <BubblePop key={p.id} x={p.x} y={p.y} age={(t - p.at) / POP_MS} />
+                ))}
+              </svg>
+            )}
+          </div>
+          <svg className="marble-camera run-layer" viewBox={layerBox} style={layerStyle} aria-hidden>
+            {/* In front of the marbles */}
+            <Hopper />
+            {SLOTS.map((_, i) => spot(i, "front"))}
+            <g
+              data-tap
+              onPointerDown={(e) => {
+                tapped(e);
+                peekOut(levelNow());
+              }}
+            >
+              <Tunnel />
+            </g>
+            <StretchArt layer="front" ages={cueAges} onTap={tapCue} />
+            <g data-tap onPointerDown={tapBasket}>
+              <look.End layer="front" {...end} />
+            </g>
+            {glitters.current.map((g) => (
+              <Sparkles key={g.id} x={g.x} y={g.y} age={(t - g.at) / GLITTER_MS} />
+            ))}
+
+            {/* Where a tap swaps the part: the whole board, with a wrench in the corner */}
+            {SLOTS.map((slot, i) => {
+              const b = slotBoard(slot);
+              const pending = spots.current[i].pending;
+              const wx = slot.dir > 0 ? b.x + b.w - 30 : b.x + 30;
+              return (
+                <g key={i} className="run-spot-tap" data-tap onPointerDown={(e) => swap(i, e)}>
+                  <rect x={b.x} y={b.y} width={b.w} height={b.h} rx="28" fill="transparent" />
+                  <circle cx={wx} cy={b.y + 30} r="24" fill="#fff8e8" stroke="#c48a4d" strokeWidth="3" />
+                  <text x={wx} y={b.y + 41} fontSize="28" textAnchor="middle" className={pending ? "run-wrench busy" : "run-wrench"}>
+                    🔧
+                  </text>
+                </g>
+              );
+            })}
+
+            <Shelf
+              things={shelf.current}
+              filled={filled.current}
+              colors={look.sort?.colors ?? shelf.current.map(() => BRIGHT_COLORS[nextId.current % BRIGHT_COLORS.length])}
+              t={t}
+              onTake={take}
+            />
+          </svg>
+        </PieceRoom.Provider>
       </TrackLook.Provider>
       {/* Before the first tap and after ⬆: the shared hint on the middle thing on the shelf says „tap me“ */}
       {(!started || lookingUp.current) && <TapHint key={`shelf${nextId.current}`} {...worldHint(at, SHELF_SPOT)} side="right" />}

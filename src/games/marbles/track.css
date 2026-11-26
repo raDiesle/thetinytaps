@@ -164,3 +164,20 @@
   overflow: visible;
   will-change: transform;
 }
+
+/* The hosts of a stretch's moving pieces (`Piece`), behind and in front of the rolling things. */
+.run-pieces {
+  position: absolute;
+  inset: 0;
+}
+
+/* A moving piece of a stretch: a small layer of its own, so what it does never paints the wall's big svgs again. */
+.run-piece {
+  position: absolute;
+}
+
+.run-piece-art {
+  position: absolute;
+  overflow: visible;
+  will-change: transform;
+}

@@ -43,6 +43,7 @@ import {
   type Slot,
   type Turn,
 } from "./track";
+import { Piece as Layer } from "./trackPieces";
 
 /** The flag springs up out of the full basket; then the level is done. */
 const FLAG_MS = 500;
@@ -326,15 +327,20 @@ export const Xylophone = still(function Xylophone({ row, ages, onTap }: { row: R
         const age = ages[bar.i];
         const cx = bar.x + bar.w / 2;
         const dip = age >= 0 && age < 1 ? 5 * decay(age * 10) : 0;
+        const cy = rowY(row, cx) + BALL_R + 9;
+        // Each bar a small layer of its own: a bar dipping and lighting up inside the run's big svg had a phone paint
+        // all of that svg again in every frame while a marble rolled over the row (perf, 26 November 2026).
         return (
-          <g key={bar.i} transform={`translate(${cx} ${rowY(row, cx) + BALL_R + 9 + dip}) rotate(${slope})`} data-tap onPointerDown={(e) => onTap(bar.i, e)}>
-            {/* Taller than the bar, so a small finger finds it */}
-            <rect x={-bar.w / 2 + 2} y={-62} width={bar.w - 4} height={100} fill="transparent" />
-            <rect x={-bar.w / 2} y={-9} width={bar.w} height={18} rx={6} fill={BAR_COLORS[bar.i % BAR_COLORS.length]} stroke={INK} strokeWidth="3" />
-            <rect x={-bar.w / 2} y={-9} width={bar.w} height={18} rx={6} fill="#fff" opacity={age >= 0 && age < 1 ? 0.7 * decay(age * 6) : 0} />
-            <circle cx={-bar.w / 2 + 10} cy="0" r="3" fill="#fff8" />
-            <circle cx={bar.w / 2 - 10} cy="0" r="3" fill="#fff8" />
-          </g>
+          <Layer key={bar.i} layer="back" box={{ x: cx - bar.w / 2 - 12, y: cy - 70, w: bar.w + 24, h: 124 }}>
+            <g transform={`translate(${cx} ${cy + dip}) rotate(${slope})`} data-tap onPointerDown={(e) => onTap(bar.i, e)}>
+              {/* Taller than the bar, so a small finger finds it */}
+              <rect x={-bar.w / 2 + 2} y={-62} width={bar.w - 4} height={100} fill="transparent" />
+              <rect x={-bar.w / 2} y={-9} width={bar.w} height={18} rx={6} fill={BAR_COLORS[bar.i % BAR_COLORS.length]} stroke={INK} strokeWidth="3" />
+              <rect x={-bar.w / 2} y={-9} width={bar.w} height={18} rx={6} fill="#fff" opacity={age >= 0 && age < 1 ? 0.7 * decay(age * 6) : 0} />
+              <circle cx={-bar.w / 2 + 10} cy="0" r="3" fill="#fff8" />
+              <circle cx={bar.w / 2 - 10} cy="0" r="3" fill="#fff8" />
+            </g>
+          </Layer>
         );
       })}
       <TrackRail a={at(last.x + last.w + 4)} b={hi} />
@@ -453,8 +459,8 @@ export const Spot = still(function Spot({
       break;
     }
     case "wheel":
-      body = layer === "back" ? <PaddleWheel slot={slot} angle={angle} /> : null;
-      break;
+      // A layer of its own, which grows round the slot's middle (the wheel's) by itself.
+      return layer === "back" ? <PaddleWheel slot={slot} angle={angle} grow={k} /> : null;
   }
   if (!body) return null;
   return <g transform={`translate(${m.x} ${m.y}) scale(${k}) translate(${-m.x} ${-m.y})`}>{body}</g>;
@@ -578,22 +584,38 @@ export const Hopper = still(function Hopper() {
   );
 });
 
-function PaddleWheel({ slot, angle }: { slot: Slot; angle: number }) {
+/** The paddle wheel, drawn once round its middle (all round, so it may turn whole) and turned as a layer of its own. */
+const PaddleWheelArt = memo(function PaddleWheelArt({ slot }: { slot: Slot }) {
   const WHEEL = wheelIn(slot);
-  const deg = (angle * 180) / Math.PI;
   return (
     <g transform={`translate(${WHEEL.cx} ${WHEEL.cy})`}>
       <circle r={WHEEL.r} fill="#bde9ff88" stroke={INK} strokeWidth="4" />
-      <g transform={`rotate(${deg})`}>
-        {Array.from({ length: 8 }, (_, i) => (
-          <g key={i} transform={`rotate(${i * 45})`}>
-            <line x1="14" y1="0" x2={WHEEL.r - 4} y2="0" stroke="#3a86ff" strokeWidth="9" strokeLinecap="round" />
-            <rect x={WHEEL.r - 30} y="-5" width="26" height="22" rx="4" fill="#00b4d8" stroke={INK} strokeWidth="2.5" />
-          </g>
-        ))}
-      </g>
+      {Array.from({ length: 8 }, (_, i) => (
+        <g key={i} transform={`rotate(${i * 45})`}>
+          <line x1="14" y1="0" x2={WHEEL.r - 4} y2="0" stroke="#3a86ff" strokeWidth="9" strokeLinecap="round" />
+          <rect x={WHEEL.r - 30} y="-5" width="26" height="22" rx="4" fill="#00b4d8" stroke={INK} strokeWidth="2.5" />
+        </g>
+      ))}
       <circle r="18" fill="#ffb703" stroke={INK} strokeWidth="4" />
     </g>
+  );
+});
+
+/**
+ * The wheel turning (`angle`, radians) and popping up (`grow`) as a small layer of its own: turning inside the run's big
+ * svg, it had a phone paint all of that svg again in every frame while it spun and slowly stopped (perf, 26 November 2026).
+ */
+function PaddleWheel({ slot, angle, grow }: { slot: Slot; angle: number; grow: number }) {
+  const WHEEL = wheelIn(slot);
+  const r = WHEEL.r + 6;
+  return (
+    <Layer
+      layer="back"
+      box={{ x: WHEEL.cx - r, y: WHEEL.cy - r, w: 2 * r, h: 2 * r }}
+      turn={{ deg: (angle * 180) / Math.PI, x: WHEEL.cx, y: WHEEL.cy, scale: grow }}
+    >
+      <PaddleWheelArt slot={slot} />
+    </Layer>
   );
 }
 

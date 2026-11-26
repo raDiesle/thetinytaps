@@ -150,13 +150,14 @@ function chainLevel(id: (typeof KETTEN_LEVELS)[number]): Scenario {
   const run = RUN_LEVELS.has(id);
   const type = id === "pegs" ? { keys: ["a", "s", "d", "f", "g", "h", "j"], every: 1500 } : run ? undefined : { keys: [" "], every: 2500 };
   const middle: Step[] = run ? [{ wait: 12000 }] : [1, 2, 3].flatMap(() => [{ wait: 4000 }, ...key(" ")]);
+  // A marble run's own lower wall (the orbit round the planet, the helix tower, the chair lift, …) begins about half a
+  // minute after the first tap, after both stretches above: nobody measured it, and the Weltraumbahn stuttered on a
+  // gaming phone while things circled its planet (user feedback, 26 November 2026).
+  const lower: Scenario["parts"] = run ? [{ label: "Unten", ms: 14000 }] : [];
   return {
     name: `ketten-${id}`,
     path: `/kettenreaktion/${id}/`,
-    parts: [
-      { label: "Anfang", before: [{ wait: 1500 }, ...start], ms: 10000, type },
-      { label: "Mitte", before: middle, ms: 10000, type },
-    ],
+    parts: [{ label: "Anfang", before: [{ wait: 1500 }, ...start], ms: 10000, type }, { label: "Mitte", before: middle, ms: 10000, type }, ...lower],
   };
 }
 

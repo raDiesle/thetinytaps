@@ -1,7 +1,7 @@
 // „Weltraumbahn“ (K-18): the marble run in space. Planets, a ringed planet, the
 // moon, a smiling star and a comet roll on glowing rails down to a little moon,
 // and when everything has landed there, shooting stars fly over it. On the way
-// down the lower wall they orbit a big planet and go through a wormhole.
+// down the lower wall they orbit a big planet once and go through a wormhole.
 
 import { memo, type PointerEvent, useId } from "react";
 import { playBeam, playBoing, playPing, playPlink, playPop, playRumble, playSwirl, playThump, playTrill, playTwinkle, playWhoosh } from "@/lib/sfx";
@@ -9,7 +9,8 @@ import { VIEW_W, wobble, decay } from "./level";
 import { STAR_POINTS } from "./parts";
 import { BALL_R, type Pt } from "./path";
 import { BASKET, TRACK_H } from "./track";
-import { ORBIT, ORBIT_IN, railPath, sample, SPACE_CUES, STRETCHES, UNDER, WORMHOLE } from "./trackStretches";
+import { Piece } from "./trackPieces";
+import { ORBIT, ORBIT_CUES, ORBIT_IN, railPath, sample, SPACE_CUES, STRETCHES, UNDER, WORMHOLE } from "./trackStretches";
 import { type EndProps, INK, type StretchArtProps, type ThingProps, type TrackTheme } from "./trackTheme";
 
 const GOLD = "#ffd23f";
@@ -185,11 +186,11 @@ function MoonEnd({ layer, fullAge, tapAge }: EndProps) {
   );
 }
 
-/** The big striped planet the things orbit, with a friendly face; it rocks a little each time one comes round. */
-function Planet({ rock }: { rock: number }) {
+/** The big striped planet the things orbit, with a friendly face, drawn still: its `Piece` rocks it. */
+function Planet() {
   const { cx, cy, planet: r } = ORBIT;
   return (
-    <g transform={`rotate(${rock} ${cx} ${cy + r})`}>
+    <g>
       <circle cx={cx} cy={cy} r={r} fill="#ff9f1c" stroke={INK} strokeWidth="5" />
       <path d={`M${cx - r + 8} ${cy - 40} Q${cx} ${cy - 62} ${cx + r - 8} ${cy - 40}`} fill="none" stroke="#ffd166" strokeWidth="16" strokeLinecap="round" />
       <path d={`M${cx - r + 4} ${cy + 46} Q${cx} ${cy + 26} ${cx + r - 4} ${cy + 46}`} fill="none" stroke="#e76f51" strokeWidth="18" strokeLinecap="round" />
@@ -204,8 +205,25 @@ function Planet({ rock }: { rock: number }) {
   );
 }
 
-/** A swirl of the wormhole at `at`, three arms turning once round when a thing goes in or comes out (`turn` from 0 to 1). */
-function Swirl({ at, turn, dir }: { at: Pt; turn: number; dir: 1 | -1 }) {
+/** The box round the planet, the layer it rocks in. */
+const PLANET_BOX = { x: ORBIT.cx - ORBIT.planet - 6, y: ORBIT.cy - ORBIT.planet - 6, w: 2 * ORBIT.planet + 12, h: 2 * ORBIT.planet + 12 };
+
+/** The planet's upper half, drawn again in front of the things on the far side of their orbit. */
+const FAR_SIDE = { x: ORBIT.cx - ORBIT.planet - 20, y: ORBIT.cy - ORBIT.planet - 20, w: 2 * ORBIT.planet + 40, h: ORBIT.planet + 20 };
+
+/** The planet rocking a little on its bottom each time a thing comes round (`rock` in degrees), as a layer of its own. */
+function RockingPlanet({ layer, rock, onTap }: { layer: "back" | "front"; rock: number; onTap: (e: PointerEvent) => void }) {
+  return (
+    <Piece layer={layer} box={PLANET_BOX} turn={{ deg: rock, x: ORBIT.cx, y: ORBIT.cy + ORBIT.planet }} clip={layer === "front" ? FAR_SIDE : undefined}>
+      <g data-tap onPointerDown={onTap}>
+        <Planet />
+      </g>
+    </Piece>
+  );
+}
+
+/** A swirl of the wormhole at `at`, three arms turning once round when a thing goes in or comes out (`turn` from 0 to 1), in a layer of its own. */
+function Swirl({ at, turn, dir, onTap }: { at: Pt; turn: number; dir: 1 | -1; onTap: (e: PointerEvent) => void }) {
   const arm = (i: number) =>
     sample(24, (u) => {
       const a = dir * (u * 2.2 * Math.PI + (i * 2 * Math.PI) / 3);
@@ -215,13 +233,15 @@ function Swirl({ at, turn, dir }: { at: Pt; turn: number; dir: 1 | -1 }) {
       .map((p, j) => `${j ? "L" : "M"}${p.x.toFixed(1)} ${p.y.toFixed(1)}`)
       .join(" ");
   return (
-    <g transform={`translate(${at.x} ${at.y}) scale(1 0.7) rotate(${dir * 360 * turn})`}>
-      <circle r="64" fill="#2c1f62" stroke="#8e7dff" strokeWidth="4" />
-      {[0, 1, 2].map((i) => (
-        <path key={i} d={arm(i)} fill="none" stroke={["#ff7bd0", "#8e7dff", "#4cc9f0"][i]} strokeWidth="9" strokeLinecap="round" />
-      ))}
-      <circle r="9" fill="#17123a" />
-    </g>
+    <Piece layer="back" box={{ x: at.x - 70, y: at.y - 50, w: 140, h: 100 }}>
+      <g data-tap onPointerDown={onTap} transform={`translate(${at.x} ${at.y}) scale(1 0.7) rotate(${dir * 360 * turn})`}>
+        <circle r="64" fill="#2c1f62" stroke="#8e7dff" strokeWidth="4" />
+        {[0, 1, 2].map((i) => (
+          <path key={i} d={arm(i)} fill="none" stroke={["#ff7bd0", "#8e7dff", "#4cc9f0"][i]} strokeWidth="9" strokeLinecap="round" />
+        ))}
+        <circle r="9" fill="#17123a" />
+      </g>
+    </Piece>
   );
 }
 
@@ -229,30 +249,16 @@ function Swirl({ at, turn, dir }: { at: Pt; turn: number; dir: 1 | -1 }) {
 const swirlTurn = (age: number) => (age < 0 ? 0 : 1 - decay(age * 1.5));
 
 /**
- * The space run's own stretch: a big striped planet with a friendly face, which the things orbit two and a quarter
- * times on a dotted track – behind it on the far side, in front of it on the near side – and a wormhole: a thing
- * rolls into one swirl, is gone, and comes out of the other one far below.
+ * The space run's own stretch: a big striped planet with a friendly face, which the things orbit once (and a quarter
+ * more to come off) on a dotted track – behind it on the far side, in front of it on the near side – and a wormhole: a
+ * thing rolls into one swirl, is gone, and comes out of the other one far below. The planet and the swirls move, so each
+ * is a `Piece`, a layer of its own: rocking inside the wall's svgs, the planet repainted both of them in every frame.
  */
 function SpaceStretch({ layer, ages, onTap }: StretchArtProps) {
-  const lap = Math.min(...[0, 1, 2].map((i) => ages[SPACE_CUES.orbit + i]));
+  const lap = Math.min(...Array.from({ length: ORBIT_CUES }, (_, i) => ages[SPACE_CUES.orbit + i]));
   const rock = wobble(lap, 3, 10, 3);
-  const id = useId();
   const tapPlanet = (e: PointerEvent) => onTap(SPACE_CUES.orbit, e);
-  if (layer === "front") {
-    // The planet's upper half again, in front of the things on the far side of their orbit.
-    return (
-      <g data-tap onPointerDown={tapPlanet}>
-        <defs>
-          <clipPath id={`${id}far`}>
-            <rect x={ORBIT.cx - ORBIT.planet - 20} y={ORBIT.cy - ORBIT.planet - 20} width={2 * ORBIT.planet + 40} height={ORBIT.planet + 20} />
-          </clipPath>
-        </defs>
-        <g clipPath={`url(#${id}far)`}>
-          <Planet rock={rock} />
-        </g>
-      </g>
-    );
-  }
+  if (layer === "front") return <RockingPlanet layer="front" rock={rock} onTap={tapPlanet} />;
   const into = railPath(ORBIT_IN, UNDER, -1);
   return (
     <g>
@@ -272,16 +278,10 @@ function SpaceStretch({ layer, ages, onTap }: StretchArtProps) {
         strokeDasharray="4 18"
         strokeLinecap="round"
       />
-      <g data-tap onPointerDown={tapPlanet}>
-        <Planet rock={rock} />
-      </g>
+      <RockingPlanet layer="back" rock={rock} onTap={tapPlanet} />
       {/* The wormhole's two swirls */}
-      <g data-tap onPointerDown={(e) => onTap(SPACE_CUES.wormIn, e)}>
-        <Swirl at={WORMHOLE.in} turn={swirlTurn(ages[SPACE_CUES.wormIn])} dir={1} />
-      </g>
-      <g data-tap onPointerDown={(e) => onTap(SPACE_CUES.wormOut, e)}>
-        <Swirl at={WORMHOLE.out} turn={swirlTurn(ages[SPACE_CUES.wormOut])} dir={-1} />
-      </g>
+      <Swirl at={WORMHOLE.in} turn={swirlTurn(ages[SPACE_CUES.wormIn])} dir={1} onTap={(e) => onTap(SPACE_CUES.wormIn, e)} />
+      <Swirl at={WORMHOLE.out} turn={swirlTurn(ages[SPACE_CUES.wormOut])} dir={-1} onTap={(e) => onTap(SPACE_CUES.wormOut, e)} />
     </g>
   );
 }

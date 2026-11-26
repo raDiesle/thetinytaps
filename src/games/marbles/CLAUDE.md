@@ -56,7 +56,7 @@ Before → after the rebuild of 22 November 2026, in seconds:
 | Klingende Kugelbahn (`track`) | ~35.6            | 61.9              | whole round simulated in `track.test.ts` (+4 s on 25 November 2026 for the song, K-11)                |
 | Farbenbahn (`colortrack`)     | ~35.6            | 61.7              | as above                                                                                              |
 | Schneebahn (`snowtrack`)      | ~35.6            | 60.3              | as above                                                                                              |
-| Weltraumbahn (`spacetrack`)   | ~35.6            | 63.1              | as above                                                                                              |
+| Weltraumbahn (`spacetrack`)   | ~35.6            | 59.9              | as above (63.1 until the orbit went once round, 26 November 2026)                                     |
 | Wasserrutsche (`slidetrack`)  | ~35.6            | 64.0              | as above                                                                                              |
 | Baustellen-Bahn (`sitetrack`) | ~35.6            | 60.8              | as above                                                                                              |
 
@@ -225,7 +225,7 @@ Then a second part past the tree (`PART2`, `acornAt`, `beeAt`, `kiteAt`; a pure 
     in every frame, and only round its moment (`seen` and a window round `tHoop`): 16 flame paths flickering in every
     frame were most of the Zirkus's 44 screens a second (now 31).
   - `bun run perf ketten-<id>` (`KETTEN_LEVELS` in `tools/perfScenarios.ts`) measures each level's first seconds and
-    its middle; run it for the level after changing what moves in it (`ketten-` runs all 21, about 15 minutes). A
+    its middle, and a marble run its lower wall too („Unten“); run it for the level after changing what moves in it (`ketten-` runs all 21, about 15 minutes). A
     level the scenario keeps playing by keys (the Nagelbrett) must still be running at „Mitte“: at a key every 600 ms its
     twenty marbles were gone before it, and „Mitte“ measured the turn to the next level – look at its `--shots` when a
     number seems too good (A-36).
@@ -364,6 +364,16 @@ takes a `look`); other things keep their look and an animal looks out for them.
   `translate3d` (`.run-marble`, `MARBLE_PAD`), and what lies in front of them is a second big svg. Never draw a moving thing
   inside the big svg (the whole svg is painted again), and a new part with a wobble or flash takes its age as a prop,
   never `t`. `bun run perf kugelbahn` checks it (now about 20 screens/s).
+  **A part that moves or lights up is a `Piece`** (`trackPieces.tsx`; user feedback, 26 November 2026: the Weltraumbahn
+  still stuttered on a gaming phone while things circled its planet): it is drawn in world units like the rest, but lands
+  as a small layer of its own in the run's HTML layer, behind (`back`) or in front of (`front`) the rolling things, and a
+  turn (rocking, spinning, popping up) is a CSS transform of that layer (`turn`, with `scale`), so its drawing stays the
+  same from frame to frame – draw it still (`memo`) and turn it whole, and cut it with `clip` where only part of it lies
+  in front (the planet's far side). The xylophone bars, the paddle wheel, the planet and the swirls are pieces; the
+  backdrop pattern is an svg of its own under the wall, drawn once. A piece lies over the whole wall svg (or under the
+  whole front svg), so make only what nothing on the wall must cover into one. A wobbling part still drawn in the big
+  svg (the seesaw, the funnel, the walls' bumpers, most of the worlds' lower walls) costs about 100 ms of painting a
+  second on the old phone while it moves: turn it into a piece when `bun run perf ketten-<run>` finds its stretch over.
 - `track.css`: its styles (classes `run-`). While it is on, the background music is off (the run
   plays its own notes and scales).
 - Shared with the machines: `path.ts` (line, quad, arc), `parts.tsx` (Ball, Rail, BAR_COLORS) and `level.ts` (useFrames,
@@ -434,9 +444,11 @@ tapping a section's drawing sets it off too.
 - Schneebahn (`snowtrack`): an icy inrun on a wooden scaffold, the ski jump's lip with a whoosh and a puff of snow, the
   landing hill; a chair lift with red stations and turning wheels carries each one up in a chair while it hums; two
   steep banked bobsleigh curves to the snowman.
-- Weltraumbahn (`spacetrack`): a dotted orbit two and a quarter times round a big striped planet with a friendly face
-  (behind it on the far side), a higher note each round while the planet rocks; a wormhole's swirl swallows each thing
-  and a second one far below pops it out; rows to the moon.
+- Weltraumbahn (`spacetrack`): a dotted orbit once round a big striped planet with a friendly face, and a quarter more
+  to come off on its near side (behind it on the far side), a higher note each round while the planet rocks; a
+  wormhole's swirl swallows each thing and a second one far below pops it out; rows to the moon. **Once round only**
+  (user request, 26 November 2026: twice and a quarter was too long, and it stuttered on a gaming phone there) – never
+  more laps again (`ORBIT.laps`, `trackStretches.test.ts`); the round stays within 55–65 s without them.
 - Wasserrutsche (`slidetrack`): a wave slide with four humps, splashing; a diving board that bends and boings; a
   whirlpool basin seen from above, circling two and a quarter times inward behind its see-through wall; the drain glugs
   each thing down a glass pipe; a second wave slide with three humps to the pool.
@@ -449,5 +461,7 @@ Rules:
 - A theme's backdrop and end are placed relative to `TRACK_H`, never at a fixed y, so the wall can grow again.
 - What a thing passes through is drawn in two layers – what it goes into at the back, its near rim in front; a thing
   riding along uses `carry` and `Carrier`, a thing shrinking into the distance `scale`.
-- `bun run perf kugelbahn` measures only the top 12 s of the wooden run: a heavy new section further down is not caught
-  there, so look at it in the preview.
+- `bun run perf ketten-<run>` measures each run's top („Anfang“, „Mitte“) and its lower wall („Unten“, added 26 November
+  2026 after the planet's stutter, which no stretch had caught); `bun run perf kugelbahn` still measures only the top
+  12 s of the wooden run. A heavy new section further down shows in „Unten“; look at its `--shots` too, since the
+  camera has gone back up to the shelf by the end of it.

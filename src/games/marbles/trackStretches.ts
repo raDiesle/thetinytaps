@@ -304,8 +304,14 @@ function snowStretch(): Stretch {
 
 /* ---------- Space: round a planet and through a wormhole ---------- */
 
-/** The orbit round the planet: twice round and a quarter, the far half behind the planet. */
-export const ORBIT = { cx: 640, cy: 2560, rx: 320, ry: 95, planet: 115, laps: 2.25, speed: 440 };
+/**
+ * The orbit round the planet: once round, and a quarter more to come off on its near side; the far half behind the
+ * planet. Once only (user request, 26 November 2026: twice round and a quarter was too long to watch).
+ */
+export const ORBIT = { cx: 640, cy: 2560, rx: 320, ry: 95, planet: 115, laps: 1.25, speed: 440 };
+
+/** How many cues the orbit fires: one each time round, the last at the quarter that leaves it. */
+export const ORBIT_CUES = Math.ceil(ORBIT.laps);
 
 export const orbitAt = (a: number): Pt => ({ x: ORBIT.cx + ORBIT.rx * Math.cos(a), y: ORBIT.cy + ORBIT.ry * Math.sin(a) });
 
@@ -316,14 +322,14 @@ export const ORBIT_IN: Pt[] = quad({ x: 1060, y: 2250 }, { x: ORBIT.cx + ORBIT.r
 export const WORMHOLE = { in: { x: 940, y: 2826 }, out: { x: 360, y: 3200 }, through: 600, swirl: 220 };
 
 /** Cues of the space stretch: each time round the planet, then into and out of the wormhole. */
-export const SPACE_CUES = { orbit: 0, wormIn: 3, wormOut: 4 };
+export const SPACE_CUES = { orbit: 0, wormIn: ORBIT_CUES, wormOut: ORBIT_CUES + 1 };
 
 function spaceStretch(): Stretch {
   const b = new Builder();
   opening(b);
   b.row(ORBIT_IN[0]);
   b.go(ORBIT_IN);
-  const laps = [0, 1, 2].map((i) => [i, Math.min(i + 1, ORBIT.laps)]);
+  const laps = Array.from({ length: ORBIT_CUES }, (_, i) => [i, Math.min(i + 1, ORBIT.laps)]);
   for (const [a, z] of laps)
     b.go(
       sample(Math.round(64 * (z - a)), (k) => orbitAt((a + (z - a) * k) * TAU)),
