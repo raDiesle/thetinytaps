@@ -221,9 +221,20 @@ Then a second part past the tree (`PART2`, `acornAt`, `beeAt`, `kiteAt`; a pure 
       opacity (`RopeRunning`'s `shade(r)`), never a square shade over its whole box;
     - a thing that starts hidden behind a part of the svg (the clown in the cannon) is drawn in the svg until it comes
       out (`tFire`) and only then as a sprite (`BallAndClown`).
+  - **A machine's parts never take the clock**: each is `still(…)` and gets only the numbers it draws (an angle, a
+    glow, which lamp is on, `-1` for „none“), worked out from `t` where the level draws its machine or in a small
+    `…Now` wrapper beside the part (`RobotNow`, `UfoNow`, `CountdownNow` in `SpaceLevel.tsx`), so React skips every part
+    whose numbers stay the same in a frame. A glow that dies away passes its `decay` (exactly 0 at rest), a blinking lamp
+    a boolean (dark while `seen` says it is off the screen), a stretch of smoke a `t` held outside the seconds it shows.
+    Drawn with `t` itself, the Raketenstart's whole machine went through React in every frame while only a few
+    attributes changed: 71–78 % busy on the old phone, 61–62 % once its parts were still and its flying things sprites (A-38). Props are compared one level deep, so a list of things
+    that move (radio waves) is a row of `still` parts, never an array of objects. What flies or bobs on its own across
+    the sky (the Raketenstart's satellite, capsule and radio waves) is a `Sprite` in `over` (`SkyFall`, `RadioWaves`),
+    drawn round its own 0,0 and moved by the sprite, so the machine's big svg is not painted again for it.
   - Decorative flicker (the Zirkus hoop's flames) changes a few times a second (`FLICKER.steps`, a stepped `t`), not
     in every frame, and only round its moment (`seen` and a window round `tHoop`): 16 flame paths flickering in every
-    frame were most of the Zirkus's 44 screens a second (now 31).
+    frame were most of the Zirkus's 44 screens a second (now 31). The Raketenstart's blinking lamps pass only on or off
+    (`blinking`) and its magnet's waves pulse in ten steps a second (`magnetPulse`), so their parts stay still between steps.
   - `bun run perf ketten-<id>` (`KETTEN_LEVELS` in `tools/perfScenarios.ts`) measures each level's first seconds and
     its middle, and a marble run its lower wall too („Unten“); run it for the level after changing what moves in it (`ketten-` runs all 21, about 15 minutes). A
     level the scenario keeps playing by keys (the Nagelbrett) must still be running at „Mitte“: at a key every 600 ms its

@@ -1,7 +1,7 @@
 import { memo, useId, useMemo, type ReactNode } from "react";
 import { MASCOT_COLORS, MascotHead } from "@/components/Mascot";
 import { useT } from "@/lib/language";
-import { VIEW_H, wobble, type LevelProps, decay } from "./level";
+import { VIEW_H, wobble, type LevelProps, decay, SETTLE_S } from "./level";
 import { beside, deg, hop, lerp, seg, svgLine } from "./machineKit";
 import { MachineStage, type WorldLayer } from "./MachineStage";
 import { INK, MARBLE_COLOR, Sparkles } from "./scenery";
@@ -54,7 +54,7 @@ import {
   type Space,
 } from "./space";
 import { BALL_R, type Pt } from "./path";
-import { BAR_COLORS, Ball, FlowingDashes, type ScreenAt, still } from "./parts";
+import { BAR_COLORS, Ball, FlowingDashes, type ScreenAt, Sprite, still } from "./parts";
 
 const SKY_TOP = "#0d1446";
 const SKY_LOW = "#2b3a88";
@@ -90,43 +90,59 @@ export function SpaceLevel(props: LevelProps) {
       level="space"
       start={{ x: DISH.x, y: DISH.y - 6, r: 96 }}
       back={(t) => sky.map((l, i) => (i === 0 || t < 0 ? l : { ...l, className: `${l.className} ${t >= space.tLift ? "party" : "on"}` }))}
-      over={(t, at) => <Current space={space} t={t} at={at} />}
+      over={(t, at) => (
+        <>
+          <Current space={space} t={t} at={at} />
+          <RadioWaves space={space} t={t} at={at} />
+          <SkyFall space={space} t={t} at={at} />
+        </>
+      )}
       {...props}
     >
-      {(t) => {
+      {(t, seen) => {
+        // Every part below is `still` and gets only the numbers it draws, worked out here from the clock: React then
+        // skips every part whose numbers stay the same in a frame. Drawn with the clock itself, the whole machine went
+        // through React in every frame, 72–81 % busy on an old phone while only a few attributes changed (A-38).
         const roo = space.kangarooAt(t);
+        const glows = RINGS.map((_, i) => ringGlow(t - space.ringTimes[i]));
+        const blinking = (x0: number, x1: number, phase: number) => t >= 0 && seen(x0, x1) && Math.sin(t * 5 + phase) > 0;
+        const puff = space.puffAt(t);
+        const mini = space.miniRocketAt(t);
         return (
           <>
             <RingedPlanet x={2350} y={170} />
             <Moon awake={t >= space.tMoonLand} />
-            <MoonLanding space={space} t={t} />
+            {mini && <MoonLanding x={mini.pt.x} y={mini.pt.y} flame={mini.flame} flag={space.flagAt(t)} />}
             <Ground />
             <DishMast />
-            <RingRail space={space} t={t} />
+            <RingRail glows={glows} />
             <Deck />
             <DownRamp space={space} />
-            <Intercom space={space} t={t} />
+            <Intercom pressed={t >= space.tBump && t < space.tBump + 0.35} lit={t >= space.tBump && t < space.tExit} />
             <DomeBack />
             {roo.pt.x < KANGAROO_SPOTS[1].x && <Kangaroo {...roo} />}
             <DomeFront open={space.hatchAt(t)} />
             {roo.pt.x >= KANGAROO_SPOTS[1].x && <Kangaroo {...roo} />}
             <RadioMast />
-            <RadioWaves space={space} t={t} />
-            <Satellite space={space} t={t} />
-            <PipeBack space={space} t={t} />
-            <Robot space={space} t={t} />
-            <Ufo space={space} t={t} />
-            <StationTruss space={space} t={t} />
+            <RadioMoving down={RADIO.press * space.pedalAt(t)} sending={t >= space.tPedal} lit={space.lampTimes.map((l) => t >= l)} />
+            <PipeBack space={space} green={blinking(PANEL.x0, PANEL.x1, 0)} yellow={blinking(PANEL.x0, PANEL.x1, 2)} />
+            <RobotNow space={space} t={seen(ROBOT.cx - 300, ROBOT.cx + 300) ? t : Math.min(t, space.tRobot + SETTLE_S)} />
+            <UfoNow space={space} t={t} />
+            <StationTruss
+              on={t < space.tOff}
+              moduleLamp={blinking(TRUSS.x - 100, TRUSS.x + 100, 0)}
+              jibLamp={blinking(TRUSS.jib1 - 100, TRUSS.jib1 + 100, 2)}
+            />
+            <MagnetWaves pulse={t >= space.tOff ? -1 : t >= 0 && seen(MAGNET.x - 100, MAGNET.x + 100) ? magnetPulse(t) : 0.5} />
             <Mobile spin={space.spinAt(t)} />
-            <Capsule {...space.capsuleAt(t)} />
-            <AirPuff space={space} t={t} />
+            {puff && <AirPuff x={puff.pt.x} y={puff.pt.y} size={puff.size} fade={puff.fade} />}
             <ScopeTripod />
-            <Telescope space={space} t={t} />
-            <LeverBox space={space} t={t} />
+            <Telescope angle={space.scopeAngle(t)} glint={glintAge(t - space.tGlint)} />
+            <LeverBox on={t < space.tLever} tilt={space.leverTilt(t)} />
             <SlotHole />
             <IronBall at={space.ironAt(t)} />
-            <CountdownBoard space={space} t={t} />
-            <LaunchTower angle={space.armAngle(t)} t={t} />
+            <CountdownNow space={space} t={t} />
+            <LaunchTower angle={space.armAngle(t)} lamp={blinking(TOWER.x - 100, TOWER.x + 100, 1)} />
             <Pad />
             <Tank />
             <Hose drop={space.hoseDrop(t)} />
@@ -134,10 +150,10 @@ export function SpaceLevel(props: LevelProps) {
             <MovingThings space={space} t={t} />
 
             <DishFront />
-            <RingFronts space={space} t={t} />
+            <RingFronts glows={glows} />
             <PipeFront space={space} />
-            <Smoke space={space} t={t} />
-            <Sparkles x={ROCKET.x} y={330} age={t - space.tLift - 0.9} n={12} spread={320} />
+            <Smoke space={space} t={Math.min(Math.max(t, space.tIgnite - 1), space.tLift + SMOKE.until + SMOKE.life + 0.1)} />
+            <StillSparkles x={ROCKET.x} y={330} age={sparkleAge(t - space.tLift - 0.9)} n={12} spread={320} />
           </>
         );
       }}
@@ -145,17 +161,21 @@ export function SpaceLevel(props: LevelProps) {
   );
 }
 
+/** The marble, drawn again only when it moves. */
+const StillBall = still(Ball);
+
+/** The marble, the moon rock, the buggy and the rocket, each drawn again only in the frames where it moves. */
 function MovingThings({ space, t }: { space: Space; t: number }) {
   const marble = space.marbleAt(t);
   const buggy = space.buggyAt(t);
+  const rock = space.rockAt(t);
+  const inBeam = space.beamAt(t) > 0 && t < space.tRelease;
   return (
     <g>
-      <Ball color={MARBLE_COLOR} x={marble.pt.x} y={marble.pt.y} spin={marble.spin} />
-      <MoonRock space={space} t={t} />
-      <g transform={`translate(${buggy.pt.x} ${buggy.pt.y}) rotate(${deg(buggy.angle)})`}>
-        <Buggy turned={buggy.turned} bob={buggy.bob} />
-      </g>
-      <Rocket space={space} t={t} />
+      <StillBall color={MARBLE_COLOR} x={marble.pt.x} y={marble.pt.y} spin={marble.spin} />
+      <MoonRock at={rock.pt} spin={rock.spin} glow={inBeam ? 0.3 + 0.15 * Math.sin(t * 10) : -1} />
+      <Buggy at={buggy.pt} angle={buggy.angle} turned={buggy.turned} bob={buggy.bob} />
+      <RocketNow space={space} t={t} />
     </g>
   );
 }
@@ -196,9 +216,8 @@ function Lattice({ x, w, top, bottom = FLOOR }: { x: number; w: number; top: num
   );
 }
 
-/** A little lamp that blinks once the machine runs. */
-function Blinker({ x, y, t, phase = 0, color = "#ff5d73" }: { x: number; y: number; t: number; phase?: number; color?: string }) {
-  const on = t >= 0 && Math.sin(t * 5 + phase) > 0;
+/** A little lamp, lit or not (`blinking` in `SpaceLevel` says which while the machine runs). */
+function Blinker({ x, y, on, color = "#ff5d73" }: { x: number; y: number; on: boolean; color?: string }) {
   return (
     <g>
       {on && <circle cx={x} cy={y} r="16" fill={color} opacity="0.35" />}
@@ -271,7 +290,7 @@ const RingedPlanet = still(function RingedPlanet({ x, y }: { x: number; y: numbe
 });
 
 /** The moon sleeps until the rocket lands on it, then opens its eyes and smiles. */
-function Moon({ awake }: { awake: boolean }) {
+const Moon = still(function Moon({ awake }: { awake: boolean }) {
   const { x, y, r } = MOON;
   return (
     <g transform={`translate(${x} ${y})`}>
@@ -295,7 +314,7 @@ function Moon({ awake }: { awake: boolean }) {
       <path d={awake ? "M-14 16 Q-2 34 10 16" : "M-10 20 Q-2 26 6 20"} fill="none" stroke={INK} strokeWidth="4" strokeLinecap="round" />
     </g>
   );
-}
+});
 
 const CRATERS = [180, 640, 1150, 1700, 2300, 2650, 3420, 4000, 4460, 5000, 5360, 6000, 6400, 7000, 7450, 7900, 8300];
 
@@ -386,25 +405,28 @@ function MetalRail({ a, b }: { a: Pt; b: Pt }) {
   );
 }
 
-/** A ring around the rail at `x`, tilted with it; `half` is the half behind the marble or the one in front of it. */
-function Ring({ x, color, age, half }: { x: number; color: string; age: number; half: "back" | "front" }) {
+/** How bright a ring glows `age` seconds after the marble passed it, from 1 down to exactly 0; -1 before it is lit. */
+const ringGlow = (age: number) => (age >= 0 ? decay(age * 3) : -1);
+
+/** A ring around the rail at `x`, tilted with it; `half` is the half behind the marble or the one in front of it. `glow` from `ringGlow`. */
+function Ring({ x, color, glow, half }: { x: number; color: string; glow: number; half: "back" | "front" }) {
   const slope = deg(Math.atan2(RAMP.to.y - RAMP.from.y, RAMP.to.x - RAMP.from.x));
-  const lit = age >= 0;
+  const lit = glow >= 0;
   const d = half === "back" ? "M0 -40 A14 40 0 0 0 0 40" : "M0 -40 A14 40 0 0 1 0 40";
   return (
     <g transform={`translate(${x} ${rampY(x)}) rotate(${slope})`}>
-      {half === "back" && lit && <ellipse rx="34" ry="56" fill={color} opacity={0.2 + 0.4 * decay(age * 3)} />}
+      {half === "back" && lit && <ellipse rx="34" ry="56" fill={color} opacity={0.2 + 0.4 * glow} />}
       <path d={d} fill="none" stroke={INK} strokeWidth="11" strokeLinecap="round" />
       <path d={d} fill="none" stroke={lit ? color : "#4a4f7d"} strokeWidth="6" strokeLinecap="round" />
       {half === "front" && lit && (
-        <path d="M3 -30 A10 30 0 0 1 9 -6" fill="none" stroke="#fff" strokeWidth="3" strokeLinecap="round" opacity={0.5 + 0.5 * decay(age * 3)} />
+        <path d="M3 -30 A10 30 0 0 1 9 -6" fill="none" stroke="#fff" strokeWidth="3" strokeLinecap="round" opacity={0.5 + 0.5 * glow} />
       )}
     </g>
   );
 }
 
 /** The rail on its two legs, and the back halves of the glowing rings. */
-function RingRail({ space, t }: { space: Space; t: number }) {
+const RingRail = still(function RingRail({ glows }: { glows: number[] }) {
   const legY = (x: number) => rampY(x) + BALL_R + 14;
   return (
     <g>
@@ -412,26 +434,26 @@ function RingRail({ space, t }: { space: Space; t: number }) {
         <rect key={x} x={x - 8} y={legY(x)} width="16" height={FLOOR - legY(x)} rx="4" fill={STEEL} stroke={INK} strokeWidth="3" />
       ))}
       {RINGS.map((ring, i) => (
-        <Ring key={i} x={ring.x} color={BAR_COLORS[i]} age={t - space.ringTimes[i]} half="back" />
+        <Ring key={i} x={ring.x} color={BAR_COLORS[i]} glow={glows[i]} half="back" />
       ))}
       <MetalRail a={{ x: RAMP.from.x - 24, y: rampY(RAMP.from.x - 24) }} b={RAMP.to} />
     </g>
   );
-}
+});
 
 /** The front halves of the rings the marble rolls through; each one lights up as it passes. */
-function RingFronts({ space, t }: { space: Space; t: number }) {
+const RingFronts = still(function RingFronts({ glows }: { glows: number[] }) {
   return (
     <g>
       {RINGS.map((ring, i) => (
-        <Ring key={i} x={ring.x} color={BAR_COLORS[i]} age={t - space.ringTimes[i]} half="front" />
+        <Ring key={i} x={ring.x} color={BAR_COLORS[i]} glow={glows[i]} half="front" />
       ))}
     </g>
   );
-}
+});
 
-/** The panel the pipe is clamped to, with blinking lights, and the inside of the pipe behind the marble. */
-function PipeBack({ space, t }: { space: Space; t: number }) {
+/** The panel the pipe is clamped to, with its two blinking lights, and the inside of the pipe behind the marble. */
+const PipeBack = still(function PipeBack({ space, green, yellow }: { space: Space; green: boolean; yellow: boolean }) {
   const { x0, x1, top } = PANEL;
   const inside = space.pipe.filter((p) => p.x <= x1);
   return (
@@ -440,12 +462,12 @@ function PipeBack({ space, t }: { space: Space; t: number }) {
       {Array.from({ length: 5 }, (_, i) => (
         <circle key={i} cx={x0 + 16} cy={top + 30 + i * 60} r="4" fill={DARK_STEEL} />
       ))}
-      <Blinker x={x1 - 26} y={top + 26} t={t} color={GLOW} />
-      <Blinker x={x1 - 56} y={top + 26} t={t} phase={2} color="#ffd23f" />
+      <Blinker x={x1 - 26} y={top + 26} on={green} color={GLOW} />
+      <Blinker x={x1 - 56} y={top + 26} on={yellow} color="#ffd23f" />
       <path d={svgLine(inside)} fill="none" stroke="#bde9ff" strokeWidth={2 * BALL_R + 12} strokeLinecap="round" strokeLinejoin="round" opacity="0.18" />
     </g>
   );
-}
+});
 
 /** The front of the see-through pipe: its two edges, a shine and the clamps that hold it to the panel. */
 const PipeFront = still(function PipeFront({ space }: { space: Space }) {
@@ -520,12 +542,40 @@ const DownRamp = still(function DownRamp({ space }: { space: Space }) {
   );
 });
 
-/** The robot sleeps until the marble presses its button; then it wakes, pushes the buggy and waves. */
-function Robot({ space, t }: { space: Space; t: number }) {
-  const age = t - space.tRobot;
-  const awake = age >= 0;
-  const blink = awake && Math.floor(t * 4) % 2 === 0;
-  const nod = wobble(age, 8, 12, 2.5);
+/** The robot at the machine's `t` seconds: works out what it shows and draws it only when that changes. */
+function RobotNow({ space, t }: { space: Space; t: number }) {
+  const awake = t >= space.tRobot;
+  return (
+    <Robot
+      awake={awake}
+      blink={awake && Math.floor(t * 4) % 2 === 0}
+      lights={awake ? Math.floor(t * 6) % 3 : -1}
+      nod={wobble(t - space.tRobot, 8, 12, 2.5)}
+      back={space.backArm(t)}
+      front={space.frontArm(t)}
+    />
+  );
+}
+
+/**
+ * The robot sleeps until the marble presses its button; then it wakes, pushes the buggy and waves. `lights` is which of
+ * its three chest lights is on (-1 none), `back` and `front` its arms' angles.
+ */
+const Robot = still(function Robot({
+  awake,
+  blink,
+  lights,
+  nod,
+  back,
+  front,
+}: {
+  awake: boolean;
+  blink: boolean;
+  lights: number;
+  nod: number;
+  back: number;
+  front: number;
+}) {
   const arm = (angle: number, x: number) => (
     <g transform={`translate(${x} -100) rotate(${angle})`}>
       <rect x="-8" y="0" width="16" height={ARM.len} rx="8" fill="#ff8c42" stroke={INK} strokeWidth="3" />
@@ -535,7 +585,7 @@ function Robot({ space, t }: { space: Space; t: number }) {
   return (
     <g transform={`translate(${ROBOT.cx} ${DECK.y})`}>
       <rect x={-ROBOT.half - ROBOT.button + (awake ? 6 : 0)} y="-30" width={ROBOT.button + 10} height="16" rx="6" fill="#ff3b3b" stroke={INK} strokeWidth="3" />
-      {arm(space.backArm(t), -40)}
+      {arm(back, -40)}
       <rect x={-ROBOT.half} y="-34" width={ROBOT.half * 2} height="34" rx="17" fill="#5b6489" stroke={INK} strokeWidth="3.5" />
       {[-32, 0, 32].map((x) => (
         <circle key={x} cx={x} cy="-17" r="10" fill={STEEL} stroke={INK} strokeWidth="2.5" />
@@ -543,7 +593,7 @@ function Robot({ space, t }: { space: Space; t: number }) {
       <rect x="-44" y="-112" width="88" height="80" rx="14" fill="#8fd3ff" stroke={INK} strokeWidth="4" />
       <rect x="-28" y="-98" width="56" height="34" rx="7" fill="#3d4a7a" stroke={INK} strokeWidth="2.5" />
       {[0, 1, 2].map((i) => (
-        <circle key={i} cx={-16 + i * 16} cy="-81" r="5" fill={awake && Math.floor(t * 6 + i) % 3 === 0 ? BAR_COLORS[i * 2] : "#5a4a7a"} />
+        <circle key={i} cx={-16 + i * 16} cy="-81" r="5" fill={(lights + i) % 3 === 0 && lights >= 0 ? BAR_COLORS[i * 2] : "#5a4a7a"} />
       ))}
       <rect x="-10" y="-124" width="20" height="14" fill={DARK_STEEL} stroke={INK} strokeWidth="2.5" />
       <g transform={`rotate(${nod} 0 -124)`}>
@@ -564,13 +614,16 @@ function Robot({ space, t }: { space: Space; t: number }) {
         )}
         <path d={awake ? "M-14 -138 Q0 -128 14 -138" : "M-10 -136 L10 -136"} fill="none" stroke={INK} strokeWidth="3.5" strokeLinecap="round" />
       </g>
-      {arm(-space.frontArm(t), ARM.x - ROBOT.cx)}
+      {arm(-front, ARM.x - ROBOT.cx)}
     </g>
   );
-}
+});
 
-/** The moon buggy with a little alien at the wheel, drawn standing on its wheels with the middle between them at (0, 0), facing right. */
-function Buggy({ turned, bob }: { turned: number; bob: number }) {
+/**
+ * The moon buggy with a little alien at the wheel, standing on its wheels with the middle between them at `at`, tipped
+ * by `angle` (radians), facing right.
+ */
+const Buggy = still(function Buggy({ at, angle, turned, bob }: { at: Pt; angle: number; turned: number; bob: number }) {
   const r = BUGGY.wheelR;
   const wheel = (x: number) => (
     <g transform={`translate(${x} ${-r}) rotate(${deg(turned / r)})`}>
@@ -582,7 +635,7 @@ function Buggy({ turned, bob }: { turned: number; bob: number }) {
     </g>
   );
   return (
-    <g>
+    <g transform={`translate(${at.x} ${at.y}) rotate(${deg(angle)})`}>
       <g transform={`translate(0 ${-Math.abs(bob)})`}>
         <line x1="-62" y1="-64" x2="-72" y2="-128" stroke={INK} strokeWidth="3.5" />
         <path d="M-72 -128 L-44 -120 L-70 -110 Z" fill="#ffd23f" stroke={INK} strokeWidth="2.5" strokeLinejoin="round" />
@@ -606,7 +659,7 @@ function Buggy({ turned, bob }: { turned: number; bob: number }) {
       {wheel(BUGGY.wheelX)}
     </g>
   );
-}
+});
 
 /* ---------- Station truss, mobile, switch and magnet ---------- */
 
@@ -646,10 +699,12 @@ function Current({ space, t, at }: { space: Space; t: number; at: ScreenAt }) {
   );
 }
 
-/** The space-station truss: a mast with a round module on top, a long beam with solar wings, the power cable and the magnet. */
-function StationTruss({ space, t }: { space: Space; t: number }) {
+/**
+ * The space-station truss: a mast with a round module on top, a long beam with solar wings, the power cable and the
+ * magnet, `on` until the switch is thrown; `moduleLamp` and `jibLamp` are its two blinking lamps.
+ */
+const StationTruss = still(function StationTruss({ on, moduleLamp, jibLamp }: { on: boolean; moduleLamp: boolean; jibLamp: boolean }) {
   const { x, w, jibY, jib0, jib1 } = TRUSS;
-  const on = t < space.tOff;
   const n = Math.round((jib1 - jib0) / 44);
   const zig = Array.from({ length: n + 1 }, (_, i) => ({ x: jib0 + ((jib1 - jib0) * i) / n, y: i % 2 ? jibLow : jibY }));
   const cable = CABLE;
@@ -699,8 +754,8 @@ function StationTruss({ space, t }: { space: Space; t: number }) {
       {[-44, 0, 44].map((dx) => (
         <circle key={dx} cx={x + dx} cy={module.top + 22} r="10" fill="#bde9ff" stroke={INK} strokeWidth="3" />
       ))}
-      <Blinker x={module.x0 + 8} y={module.top + 4} t={t} />
-      <Blinker x={jib1} y={jibY - 12} t={t} phase={2} />
+      <Blinker x={module.x0 + 8} y={module.top + 4} on={moduleLamp} />
+      <Blinker x={jib1} y={jibY - 12} on={jibLamp} />
       {/* The power cable from the switch to the magnet */}
       <path d={svgLine(cable)} fill="none" stroke={INK} strokeWidth="8" strokeLinejoin="round" />
       <path d={svgLine(cable)} fill="none" stroke={on ? "#ffd23f" : "#9a8a50"} strokeWidth="4" strokeLinejoin="round" />
@@ -714,25 +769,36 @@ function StationTruss({ space, t }: { space: Space; t: number }) {
       />
       <line x1={MAGNET.x} y1={jibLow + 16} x2={MAGNET.x} y2={drop} stroke={INK} strokeWidth="8" />
       <line x1={MAGNET.x} y1={jibLow + 16} x2={MAGNET.x} y2={drop} stroke={on ? "#ffd23f" : "#9a8a50"} strokeWidth="4" />
-      <Magnet on={on} t={t} />
+      <Magnet />
     </g>
   );
-}
+});
 
-/** A red horseshoe magnet, upside down; while it is on, little waves come off its ends. */
-function Magnet({ on, t }: { on: boolean; t: number }) {
+/**
+ * How strongly the magnet's waves show `t` seconds into the machine. A decoration, so it pulses in steps, ten a second,
+ * rather than in every frame (like the Zirkus hoop's flames).
+ */
+const magnetPulse = (t: number) => 0.5 + 0.3 * Math.sin((Math.floor(t * 10) / 10) * 8);
+
+/** The little waves coming off the magnet's ends while it is on, at `pulse` opacity (-1: none). */
+const MagnetWaves = still(function MagnetWaves({ pulse }: { pulse: number }) {
+  if (pulse < 0) return null;
   const { x, y } = MAGNET;
-  const pulse = 0.5 + 0.3 * Math.sin(Math.max(0, t) * 8);
+  return (
+    <g fill="none" stroke="#fff3a0" strokeWidth="3.5" strokeLinecap="round" opacity={pulse}>
+      <path d={`M${x - 52} ${y + 6} Q${x - 70} ${y + 36} ${x - 44} ${y + 62}`} />
+      <path d={`M${x + 52} ${y + 6} Q${x + 70} ${y + 36} ${x + 44} ${y + 62}`} />
+      <path d={`M${x - 64} ${y - 2} Q${x - 90} ${y + 36} ${x - 58} ${y + 76}`} />
+      <path d={`M${x + 64} ${y - 2} Q${x + 90} ${y + 36} ${x + 58} ${y + 76}`} />
+    </g>
+  );
+});
+
+/** A red horseshoe magnet, upside down. */
+function Magnet() {
+  const { x, y } = MAGNET;
   return (
     <g>
-      {on && (
-        <g fill="none" stroke="#fff3a0" strokeWidth="3.5" strokeLinecap="round" opacity={pulse}>
-          <path d={`M${x - 52} ${y + 6} Q${x - 70} ${y + 36} ${x - 44} ${y + 62}`} />
-          <path d={`M${x + 52} ${y + 6} Q${x + 70} ${y + 36} ${x + 44} ${y + 62}`} />
-          <path d={`M${x - 64} ${y - 2} Q${x - 90} ${y + 36} ${x - 58} ${y + 76}`} />
-          <path d={`M${x + 64} ${y - 2} Q${x + 90} ${y + 36} ${x + 58} ${y + 76}`} />
-        </g>
-      )}
       <path
         d={`M${x - 48} ${y} L${x - 48} ${y - 28} A48 28 0 0 1 ${x + 48} ${y - 28} L${x + 48} ${y} L${x + 20} ${y} L${x + 20} ${y - 28} A20 10 0 0 0 ${x - 20} ${y - 28} L${x - 20} ${y} Z`}
         fill="#ff3b3b"
@@ -747,7 +813,7 @@ function Magnet({ on, t }: { on: boolean; t: number }) {
   );
 }
 
-function IronBall({ at }: { at: Pt }) {
+const IronBall = still(function IronBall({ at }: { at: Pt }) {
   const r = IRON.r;
   return (
     <g transform={`translate(${at.x} ${at.y})`}>
@@ -756,7 +822,7 @@ function IronBall({ at }: { at: Pt }) {
       <circle cx="-11" cy="-12" r="8" fill="#fff" opacity="0.65" />
     </g>
   );
-}
+});
 
 function PlanetBody({ p, scale }: { p: Planet; scale: number }) {
   const r = p.r;
@@ -801,7 +867,7 @@ function PlanetBody({ p, scale }: { p: Planet; scale: number }) {
 }
 
 /** The mobile: a sun on a cord from the truss, two crossed bars and four planets on strings, turning by `spin` radians. */
-function Mobile({ spin }: { spin: number }) {
+const Mobile = still(function Mobile({ spin }: { spin: number }) {
   const { cx, barY, sun } = MOBILE;
   const spots = PLANETS.map((p) => ({ p, ...planetSpot(p, spin) }));
   const end = (s: (typeof spots)[number]) => ({ x: s.x, y: barY + 8 * s.z });
@@ -846,14 +912,13 @@ function Mobile({ spin }: { spin: number }) {
       {sorted.filter((s) => s.z >= 0).map(planet)}
     </g>
   );
-}
+});
 
-/** The switch box: its handle tips over when the earth knocks it, and the light turns from green to red. */
-function LeverBox({ space, t }: { space: Space; t: number }) {
-  const on = t < space.tLever;
+/** The switch box: its handle tips over by `tilt` when the earth knocks it, and the light turns from green to red. */
+const LeverBox = still(function LeverBox({ on, tilt }: { on: boolean; tilt: number }) {
   return (
     <g>
-      <g transform={`translate(${LEVER.x} ${LEVER.y}) rotate(${space.leverTilt(t)})`}>
+      <g transform={`translate(${LEVER.x} ${LEVER.y}) rotate(${tilt})`}>
         <rect x="-5" y={-LEVER.len} width="10" height={LEVER.len} rx="4" fill={STEEL} stroke={INK} strokeWidth="2.5" />
         <circle cy={-LEVER.len} r={LEVER.knob} fill="#ff3b3b" stroke={INK} strokeWidth="3" />
         <circle cx="-4" cy={-LEVER.len - 4} r="3.5" fill="#fff" opacity="0.8" />
@@ -861,10 +926,10 @@ function LeverBox({ space, t }: { space: Space; t: number }) {
       <rect x={LEVER.x - 34} y={FLOOR - 36} width="68" height="36" rx="8" fill="#8e7dff" stroke={INK} strokeWidth="3.5" />
       <circle cx={LEVER.x} cy={LEVER.y} r="5" fill={INK} />
       <circle cx={LEVER.x + 21} cy={FLOOR - 16} r="6" fill={on ? GLOW : "#ff5d73"} stroke={INK} strokeWidth="2" />
-      <circle cx={LEVER.x - 21} cy={FLOOR - 16} r="6" fill={on ? "#5a4a7a" : "#5a4a7a"} stroke={INK} strokeWidth="2" />
+      <circle cx={LEVER.x - 21} cy={FLOOR - 16} r="6" fill="#5a4a7a" stroke={INK} strokeWidth="2" />
     </g>
   );
-}
+});
 
 /* ---------- Telescope, UFO and moon rock ---------- */
 
@@ -900,12 +965,16 @@ const ScopeTripod = memo(function ScopeTripod() {
   );
 });
 
-/** The telescope's tube on its mount: it looks down at the mobile until the earth bonks it, then swings round to the sky, and its lens glints. */
-function Telescope({ space, t }: { space: Space; t: number }) {
+/** How long the telescope's lens has glinted, `age` seconds after its glint began; -1 before and after it. */
+const glintAge = (age: number) => (age >= 0 && age < 1.2 ? age : -1);
+
+/**
+ * The telescope's tube on its mount, turned to `angle`: it looks down at the mobile until the earth bonks it, then
+ * swings round to the sky, and its lens glints (`glint` from `glintAge`).
+ */
+const Telescope = still(function Telescope({ angle, glint }: { angle: number; glint: number }) {
   const { pivot, front, back, lens } = SCOPE;
-  const angle = space.scopeAngle(t);
   const tip = scopeTip(angle);
-  const glint = t - space.tGlint;
   return (
     <g>
       <g transform={`translate(${pivot.x} ${pivot.y}) rotate(${angle})`}>
@@ -934,19 +1003,55 @@ function Telescope({ space, t }: { space: Space; t: number }) {
       )}
     </g>
   );
-}
+});
 
 const UFO_LIGHTS = [-60, -30, 0, 30, 60];
 
-/** The UFO with a little one-eyed alien under its glass dome, and its beam down to the ground while it is on. */
-function Ufo({ space, t }: { space: Space; t: number }) {
+/** The UFO at the machine's `t` seconds, while it is in the picture: works out what it shows and draws that. */
+function UfoNow({ space, t }: { space: Space; t: number }) {
   const ufo = space.ufoAt(t);
   if (!ufo) return null;
   const { pt, scale, tilt, waving, look } = ufo;
   const beam = space.beamAt(t);
+  return (
+    <Ufo
+      pt={pt}
+      scale={scale}
+      tilt={tilt}
+      look={look}
+      beam={beam}
+      rise={beam > 0 ? t * 0.7 : 0}
+      hand={waving ? { x: 22 + 3 * Math.sin(t * 14), y: -44 + 4 * Math.abs(Math.sin(t * 7)) } : { x: 18, y: -16 }}
+      light={Math.floor(t * 6) % UFO_LIGHTS.length}
+    />
+  );
+}
+
+/**
+ * The UFO with a little one-eyed alien under its glass dome, and its beam down to the ground while it is on (`beam`,
+ * its rings `rise` up it); `hand` is where the alien's hand is, `light` which of the rim's lights is on.
+ */
+const Ufo = still(function Ufo({
+  pt,
+  scale,
+  tilt,
+  look,
+  beam,
+  rise,
+  hand,
+  light,
+}: {
+  pt: Pt;
+  scale: number;
+  tilt: number;
+  look: Pt;
+  beam: number;
+  rise: number;
+  hand: Pt;
+  light: number;
+}) {
   const top = pt.y + UFO_BELOW;
   const rings = beam > 0 ? [0, 1, 2, 3] : [];
-  const hand = waving ? { x: 22 + 3 * Math.sin(t * 14), y: -44 + 4 * Math.abs(Math.sin(t * 7)) } : { x: 18, y: -16 };
   return (
     <g>
       {beam > 0 && (
@@ -955,7 +1060,7 @@ function Ufo({ space, t }: { space: Space; t: number }) {
           <path d={`M${pt.x - 12} ${top} L${pt.x + 12} ${top} L${pt.x + 46} ${FLOOR} L${pt.x - 46} ${FLOOR} Z`} fill="#fffbd0" opacity="0.35" />
           {rings.map((i) => {
             // Rings of light running up the beam.
-            const f = (t * 0.7 + i / rings.length) % 1;
+            const f = (rise + i / rings.length) % 1;
             const y = lerp(FLOOR, top, f);
             const half = lerp(90, 24, f);
             return <ellipse key={i} cx={pt.x} cy={y} rx={half} ry={half * 0.18} fill="none" stroke="#fffbd0" strokeWidth="3" opacity={0.8 * (1 - f)} />;
@@ -985,7 +1090,7 @@ function Ufo({ space, t }: { space: Space; t: number }) {
         <path d="M-80 -2 Q0 -18 80 -2" fill="none" stroke="#ff5d73" strokeWidth="5" />
         <path d="M-60 -10 Q-30 -16 -10 -16" fill="none" stroke="#fff" strokeWidth="3" strokeLinecap="round" opacity="0.8" />
         {UFO_LIGHTS.map((x, i) => {
-          const on = Math.floor(t * 6) % UFO_LIGHTS.length === i;
+          const on = light === i;
           return (
             <circle
               key={x}
@@ -1002,7 +1107,7 @@ function Ufo({ space, t }: { space: Space; t: number }) {
       </g>
     </g>
   );
-}
+});
 
 const ROCK_SHAPE = Array.from({ length: 9 }, (_, i) => {
   const a = (i / 9) * 2 * Math.PI;
@@ -1010,13 +1115,11 @@ const ROCK_SHAPE = Array.from({ length: 9 }, (_, i) => {
   return { x: r * Math.cos(a), y: r * Math.sin(a) * 0.9 };
 });
 
-/** The lumpy moon rock with a pink crystal, which sparkles while it is in the UFO's beam. */
-function MoonRock({ space, t }: { space: Space; t: number }) {
-  const { pt, spin } = space.rockAt(t);
-  const inBeam = space.beamAt(t) > 0 && t < space.tRelease;
+/** The lumpy moon rock with a pink crystal at `at`, turned by `spin`, which sparkles while it is in the UFO's beam (`glow`, -1 when not). */
+const MoonRock = still(function MoonRock({ at, spin, glow }: { at: Pt; spin: number; glow: number }) {
   return (
-    <g transform={`translate(${pt.x} ${pt.y})`}>
-      {inBeam && <circle r={ROCK.r + 12} fill="#fff3a0" opacity={0.3 + 0.15 * Math.sin(t * 10)} />}
+    <g transform={`translate(${at.x} ${at.y})`}>
+      {glow >= 0 && <circle r={ROCK.r + 12} fill="#fff3a0" opacity={glow} />}
       <g transform={`rotate(${spin})`}>
         <path d={`${svgLine(ROCK_SHAPE)} Z`} fill="#b7aed6" stroke={INK} strokeWidth="3" strokeLinejoin="round" />
         <circle cx="-7" cy="5" r="5" fill="#968cbf" />
@@ -1026,7 +1129,7 @@ function MoonRock({ space, t }: { space: Space; t: number }) {
       </g>
     </g>
   );
-}
+});
 
 /* ---------- Countdown board ---------- */
 
@@ -1037,15 +1140,23 @@ const SlotHole = memo(function SlotHole() {
   return <ellipse cx={SLOT.x} cy={BOARD.y - SLOT.h} rx={SLOT.w / 2 - 6} ry="10" fill="#10163a" stroke={INK} strokeWidth="3" />;
 });
 
-/** The board wakes up when the iron ball drops into its slot, then counts down: three lamps one after the other, then all green for the start. */
-function CountdownBoard({ space, t }: { space: Space; t: number }) {
-  // The word on the screen at lift-off, as the voice says it (`t` is the time here).
-  const liftWord = useT()({ de: "START!", en: "LIFTOFF!", zh: "发射！", hi: "उड़ान!", es: "¡DESPEGUE!", ar: "انطلاق!", ru: "ПУСК!" });
-  const { x, y, w, h } = BOARD;
+/** The countdown board at the machine's `t` seconds: works out what it shows and draws it only when that changes. */
+function CountdownNow({ space, t }: { space: Space; t: number }) {
   const step = space.countAt(t);
   const awake = t >= space.tWake;
   const tStep = step === 0 ? 0 : step === 4 ? space.tLift : space.tCount[step - 1];
-  const popUp = 1 + 0.35 * decay((t - tStep) * 8);
+  return <CountdownBoard step={step} awake={awake} popUp={1 + 0.35 * decay((t - tStep) * 8)} dot={awake && step === 0 ? Math.floor(t * 5) % 3 : -1} />;
+}
+
+/**
+ * The board wakes up when the iron ball drops into its slot, then counts down: three lamps one after the other, then
+ * all green for the start. `step` is how far it counted (0–4), `popUp` how big its number pops up, `dot` which of the
+ * waiting dots lights (-1 none).
+ */
+const CountdownBoard = still(function CountdownBoard({ step, awake, popUp, dot }: { step: number; awake: boolean; popUp: number; dot: number }) {
+  // The word on the screen at lift-off, as the voice says it.
+  const liftWord = useT()({ de: "START!", en: "LIFTOFF!", zh: "发射！", hi: "उड़ान!", es: "¡DESPEGUE!", ar: "انطلاق!", ru: "ПУСК!" });
+  const { x, y, w, h } = BOARD;
   const cx = x + w / 2;
   const screen = { y: y + 82, h: h - 104 };
   const cy = screen.y + screen.h / 2;
@@ -1080,8 +1191,7 @@ function CountdownBoard({ space, t }: { space: Space; t: number }) {
       })}
       <rect x={x + 40} y={screen.y} width={w - 80} height={screen.h} rx="12" fill="#10163a" stroke={INK} strokeWidth="3" />
       {awake && <rect x={x + 46} y={screen.y + 6} width={w - 92} height={screen.h - 12} rx="8" fill={GLOW} opacity="0.08" />}
-      {step === 0 &&
-        [-1, 0, 1].map((i) => <circle key={i} cx={cx + i * 36} cy={cy} r="8" fill={awake && Math.floor(t * 5) % 3 === i + 1 ? GLOW : "#2e3a70"} />)}
+      {step === 0 && [-1, 0, 1].map((i) => <circle key={i} cx={cx + i * 36} cy={cy} r="8" fill={dot === i + 1 ? GLOW : "#2e3a70"} />)}
       {step > 0 && (
         <text
           x={cx}
@@ -1099,17 +1209,18 @@ function CountdownBoard({ space, t }: { space: Space; t: number }) {
       )}
     </g>
   );
-}
+});
 
 /* ---------- Launch tower, fuel tank, rocket ---------- */
 
-function LaunchTower({ angle, t }: { angle: number; t: number }) {
+/** The launch tower, its blinking `lamp` on top and its arm to the rocket turned by `angle`. */
+const LaunchTower = still(function LaunchTower({ angle, lamp }: { angle: number; lamp: boolean }) {
   const len = ROCKET.x - ROCKET.w / 2 - TOWER_ARM.x;
   return (
     <g>
       <Lattice x={TOWER.x} w={TOWER.w} top={TOWER.top} />
       <rect x={TOWER.x - TOWER.w / 2 - 14} y={TOWER.top - 16} width={TOWER.w + 28} height="18" rx="5" fill="#ffb703" stroke={INK} strokeWidth="3" />
-      <Blinker x={TOWER.x} y={TOWER.top - 30} t={t} phase={1} />
+      <Blinker x={TOWER.x} y={TOWER.top - 30} on={lamp} />
       <rect x={TOWER.x - TOWER.w / 2 - 22} y={FLOOR - 22} width={TOWER.w + 44} height="22" rx="5" fill={DARK_STEEL} stroke={INK} strokeWidth="3" />
       <g transform={`translate(${TOWER_ARM.x} ${TOWER_ARM.y}) rotate(${angle})`}>
         <line x1="4" y1="-40" x2={len - 6} y2="-40" stroke={STEEL} strokeWidth="4" />
@@ -1121,7 +1232,7 @@ function LaunchTower({ angle, t }: { angle: number; t: number }) {
       <circle cx={TOWER_ARM.x} cy={TOWER_ARM.y} r="8" fill={DARK_STEEL} stroke={INK} strokeWidth="3" />
     </g>
   );
-}
+});
 
 const Pad = memo(function Pad() {
   const { x0, x1 } = PAD;
@@ -1152,7 +1263,7 @@ const Tank = memo(function Tank() {
 });
 
 /** The fuel hose from the tank to the rocket; `drop` goes from 0 (plugged in) to 1 (lying on the ground). */
-function Hose({ drop }: { drop: number }) {
+const Hose = still(function Hose({ drop }: { drop: number }) {
   const { from, plug, dropped } = HOSE;
   const tip = hop(plug, dropped, 30, drop);
   const bend = {
@@ -1168,20 +1279,29 @@ function Hose({ drop }: { drop: number }) {
       <circle cx={tip.x} cy={tip.y} r="11" fill={DARK_STEEL} stroke={INK} strokeWidth="3" />
     </g>
   );
-}
+});
 
-/** The rocket with a bear astronaut at the window (the app's bear in a white space suit, D-18); it lifts off on its flame. */
-function Rocket({ space, t }: { space: Space; t: number }) {
-  const clip = useId();
-  const { w, h, nose } = ROCKET;
-  const half = w / 2;
+/** The rocket at the machine's `t` seconds, until it has flown out of the picture. */
+function RocketNow({ space, t }: { space: Space; t: number }) {
   const rise = space.rocketRise(t);
   // Flown out of the picture, it is gone: its flame flickered and the bear waved there for ever, unseen (perf).
   if (rise >= ROCKET_RISE) return null;
-  const top = -30 - h;
-  const waving = t >= space.tCount[0];
+  const size = space.flameAt(t);
   // The gloved paw waves beside the cheek, clear of the ear.
-  const paw = waving ? { x: 20 + 3 * Math.sin(t * 12), y: -WINDOW_UP + 6 - 5 * Math.abs(Math.sin(t * 6)) } : { x: 12, y: -WINDOW_UP + 18 };
+  const paw = t >= space.tCount[0] ? { x: 20 + 3 * Math.sin(t * 12), y: -WINDOW_UP + 6 - 5 * Math.abs(Math.sin(t * 6)) } : { x: 12, y: -WINDOW_UP + 18 };
+  return <Rocket rise={rise} flame={Math.max(size, 0)} flicker={size > 0 ? 1 + 0.12 * Math.sin(t * 41) + 0.08 * Math.sin(t * 23) : 1} paw={paw} />;
+}
+
+/**
+ * The rocket with a bear astronaut at the window (the app's bear in a white space suit, D-18), lifted by `rise`; it
+ * lifts off on its flame (`flame` its size, 0 when off, `flicker` its length's flicker), and `paw` is where the bear's
+ * gloved paw is.
+ */
+const Rocket = still(function Rocket({ rise, flame, flicker, paw }: { rise: number; flame: number; flicker: number; paw: Pt }) {
+  const clip = useId();
+  const { w, h, nose } = ROCKET;
+  const half = w / 2;
+  const top = -30 - h;
   const plugY = HOSE.plug.y - ROCKET.bottom;
   const fin = (s: number) => (
     <path
@@ -1194,7 +1314,7 @@ function Rocket({ space, t }: { space: Space; t: number }) {
   );
   return (
     <g transform={`translate(${ROCKET.x} ${ROCKET.bottom - rise})`}>
-      <Flame size={space.flameAt(t)} t={t} />
+      <Flame size={flame} flicker={flicker} />
       {fin(-1)}
       {fin(1)}
       <path d="M-34 -32 L34 -32 L46 0 L-46 0 Z" fill={DARK_STEEL} stroke={INK} strokeWidth="3.5" strokeLinejoin="round" />
@@ -1246,17 +1366,17 @@ function Rocket({ space, t }: { space: Space; t: number }) {
       />
     </g>
   );
-}
+});
 
 /** The bear astronaut's head, drawn once: the rocket moves it but never changes it. */
 const BearFace = memo(function BearFace() {
   return <MascotHead kind="bear" mouth="grin" />;
 });
 
-/** The flame under the rocket, flickering; `size` is 0 when the engine is off. */
-function Flame({ size, t }: { size: number; t: number }) {
+/** The flame under the rocket, its length times `flicker`; `size` is 0 when the engine is off. */
+function Flame({ size, flicker }: { size: number; flicker: number }) {
   if (size <= 0) return null;
-  const len = 200 * size * (1 + 0.12 * Math.sin(t * 41) + 0.08 * Math.sin(t * 23));
+  const len = 200 * size * flicker;
   const wide = 36 + 10 * size;
   return (
     <g>
@@ -1273,12 +1393,17 @@ function Flame({ size, t }: { size: number; t: number }) {
   );
 }
 
-/** Clouds of smoke: a few puffs while the engine warms up, big ones rolling sideways at the start, and a trail after the rocket. */
-function Smoke({ space, t }: { space: Space; t: number }) {
+/** The smoke's puffs: one every `every` seconds from the ignition until `until` seconds after lift-off, each `life` seconds long. */
+const SMOKE = { life: 2.6, every: 0.09, until: 2.2 };
+
+/**
+ * Clouds of smoke: a few puffs while the engine warms up, big ones rolling sideways at the start, and a trail after the
+ * rocket. Nothing shows before the ignition or once the last puff is gone, so `SpaceLevel` holds `t` there.
+ */
+const Smoke = still(function Smoke({ space, t }: { space: Space; t: number }) {
   const puffs = [];
-  const life = 2.6;
-  const every = 0.09;
-  for (let i = 0; space.tIgnite + i * every <= Math.min(t, space.tLift + 2.2); i++) {
+  const { life, every } = SMOKE;
+  for (let i = 0; space.tIgnite + i * every <= Math.min(t, space.tLift + SMOKE.until); i++) {
     const te = space.tIgnite + i * every;
     const age = t - te;
     if (age > life) continue;
@@ -1301,15 +1426,19 @@ function Smoke({ space, t }: { space: Space; t: number }) {
     puffs.push(<circle key={i} cx={x} cy={y} r={r} fill="#f4f5fb" stroke="#b9bdd6" strokeWidth="3" opacity={fade} />);
   }
   return <g>{puffs}</g>;
-}
+});
+
+/** The sparkles round the rocket at lift-off, drawn again only while they change. */
+const StillSparkles = still(Sparkles);
+
+/** How old the lift-off's sparkles are, `age` seconds after they began; -1 while there are none (`Sparkles` lasts 3 s). */
+const sparkleAge = (age: number) => (age >= 0 && age <= 3 ? age : -1);
 
 /* ---------- The intercom, the glass dome with the space kangaroo, the radio mast, the satellite and its capsule ---------- */
 
 /** The intercom on its post: a box with a speaker grille and a lamp that lights when the buggy presses its button. */
-function Intercom({ space, t }: { space: Space; t: number }) {
+const Intercom = still(function Intercom({ pressed, lit }: { pressed: boolean; lit: boolean }) {
   const { x, r, post, h, y } = INTERCOM;
-  const pressed = t >= space.tBump && t < space.tBump + 0.35;
-  const lit = t >= space.tBump && t < space.tExit;
   const box = { x0: x - 34, y0: FLOOR - h - 60, w: 68, h: 60 };
   return (
     <g>
@@ -1333,7 +1462,7 @@ function Intercom({ space, t }: { space: Space; t: number }) {
       <circle cx={box.x0 + 52} cy={box.y0 + 30} r="8" fill={lit ? GLOW : "#5a4a7a"} stroke={INK} strokeWidth="2.5" />
     </g>
   );
-}
+});
 
 /** The inside of the glass dome behind the kangaroo: its floor ring and a soft round cushion. It never changes, so it is drawn once. */
 const DomeBack = memo(function DomeBack() {
@@ -1348,7 +1477,7 @@ const DomeBack = memo(function DomeBack() {
 });
 
 /** The glass over the kangaroo, its steel ribs, and the tunnel out to the hatch, which slides up by `open` (0–1). */
-function DomeFront({ open }: { open: number }) {
+const DomeFront = still(function DomeFront({ open }: { open: number }) {
   const { x, r, tunnel0, x1, door } = HUT;
   const top = FLOOR - door;
   return (
@@ -1377,13 +1506,13 @@ function DomeFront({ open }: { open: number }) {
       </g>
     </g>
   );
-}
+});
 
 const ROO = "#d9944f";
 const ROO_LIGHT = "#f6d6a8";
 
 /** The space kangaroo in its bubble helmet, its feet at `pt`, facing right; asleep it droops its ears, `crouch` (0–1) bends it down for a hop, `lean` tips it forward. */
-function Kangaroo({ pt, awake, crouch, lean }: { pt: Pt; awake: boolean; crouch: number; lean: number }) {
+const Kangaroo = still(function Kangaroo({ pt, awake, crouch, lean }: { pt: Pt; awake: boolean; crouch: number; lean: number }) {
   const squash = 1 - 0.16 * crouch;
   const ear = awake ? 0 : -55;
   return (
@@ -1421,7 +1550,7 @@ function Kangaroo({ pt, awake, crouch, lean }: { pt: Pt; awake: boolean; crouch:
       <rect x="-6" y="-62" width="40" height="8" rx="4" fill="#ff5d73" stroke={INK} strokeWidth="2.5" transform="rotate(14 14 -58)" />
     </g>
   );
-}
+});
 
 /** The radio mast: a lattice with an antenna on top. It never changes, so it is drawn once. */
 const RadioMast = memo(function RadioMast() {
@@ -1445,13 +1574,9 @@ const RadioMast = memo(function RadioMast() {
   );
 });
 
-/** The mast's moving parts: the pedal pressed down, the lamps lighting one after the other, the glowing antenna tip and the radio waves. */
-function RadioWaves({ space, t }: { space: Space; t: number }) {
-  const { x, top, pedal, pedalW, pedalH, press } = RADIO;
-  const down = press * space.pedalAt(t);
-  const sending = t >= space.tPedal;
-  const waves = space.waveAt(t);
-  const dir = deg(Math.atan2(SAT.y - top, SAT.x - x));
+/** The mast's moving parts: the pedal pressed `down`, the lamps lighting one after the other (`lit`) and the antenna tip glowing while `sending`. */
+const RadioMoving = still(function RadioMoving({ down, sending, lit }: { down: number; sending: boolean; lit: boolean[] }) {
+  const { x, top, pedal, pedalW, pedalH } = RADIO;
   return (
     <g>
       <rect x={pedal - pedalW / 2 - 6} y={FLOOR - 10} width={pedalW + 12} height="10" rx="3" fill={DARK_STEEL} stroke={INK} strokeWidth="3" />
@@ -1465,39 +1590,72 @@ function RadioWaves({ space, t }: { space: Space; t: number }) {
         strokeWidth="3"
       />
       <rect x={pedal - pedalW / 2 - 4} y={FLOOR - pedalH + down} width={pedalW + 8} height="10" rx="5" fill="#3ec300" stroke={INK} strokeWidth="3" />
-      {RADIO_LAMPS.map((y, i) => {
-        const lit = t >= space.lampTimes[i];
-        return (
-          <g key={y}>
-            {lit && <circle cx={x} cy={y} r="22" fill={LAMP_COLORS[i]} opacity="0.35" />}
-            <circle cx={x} cy={y} r="11" fill={lit ? LAMP_COLORS[i] : "#5a4a7a"} stroke={INK} strokeWidth="3" />
-          </g>
-        );
-      })}
+      {RADIO_LAMPS.map((y, i) => (
+        <g key={y}>
+          {lit[i] && <circle cx={x} cy={y} r="22" fill={LAMP_COLORS[i]} opacity="0.35" />}
+          <circle cx={x} cy={y} r="11" fill={lit[i] ? LAMP_COLORS[i] : "#5a4a7a"} stroke={INK} strokeWidth="3" />
+        </g>
+      ))}
       {sending && <circle cx={x} cy={top} r="20" fill={GLOW} opacity="0.3" />}
       <circle cx={x} cy={top} r="10" fill={sending ? GLOW : "#ffd23f"} stroke={INK} strokeWidth="3" />
-      {waves.map(({ pt, k }, i) => {
-        const R = 18 + 22 * k;
-        return (
-          <g key={i} transform={`translate(${pt.x} ${pt.y}) rotate(${dir})`} opacity={1 - 0.5 * k}>
-            <path d={`M0 ${-R} A${R} ${R} 0 0 1 0 ${R}`} fill="none" stroke={INK} strokeWidth="9" strokeLinecap="round" />
-            <path d={`M0 ${-R} A${R} ${R} 0 0 1 0 ${R}`} fill="none" stroke={GLOW} strokeWidth="5" strokeLinecap="round" />
-          </g>
-        );
-      })}
     </g>
+  );
+});
+
+/** Which way the radio waves travel, from the mast's top to the satellite, in degrees. */
+const WAVE_DIR = deg(Math.atan2(SAT.y - RADIO.top, SAT.x - RADIO.x));
+
+/**
+ * The radio-wave arcs on their way from the mast up to the satellite, each a small layer of its own over the machine
+ * (`Sprite`): drawn in the machine's svg they crossed a tall band of it in every frame (perf, A-38).
+ */
+function RadioWaves({ space, t, at }: { space: Space; t: number; at: ScreenAt }) {
+  return space.waveAt(t).map(({ pt, k }, i) => (
+    <Sprite key={i} at={at} x={pt.x} y={pt.y} pad={50} angle={(WAVE_DIR * Math.PI) / 180}>
+      <RadioWave k={k} />
+    </Sprite>
+  ));
+}
+
+/** One radio-wave arc, round 0, 0, facing right; `k` (0–1) is how far it has come, so it grows and fades. */
+const RadioWave = still(function RadioWave({ k }: { k: number }) {
+  const R = 18 + 22 * k;
+  return (
+    <g opacity={1 - 0.5 * k}>
+      <path d={`M0 ${-R} A${R} ${R} 0 0 1 0 ${R}`} fill="none" stroke={INK} strokeWidth="9" strokeLinecap="round" />
+      <path d={`M0 ${-R} A${R} ${R} 0 0 1 0 ${R}`} fill="none" stroke={GLOW} strokeWidth="5" strokeLinecap="round" />
+    </g>
+  );
+});
+
+/**
+ * The satellite and the capsule it drops, as small layers of their own over the machine (`Sprite`): the satellite
+ * bobbing high in the sky and the capsule floating all the way down to the ground changed a tall column of the
+ * machine's svg in every frame, and the phone rastered bands as wide as the screen all down it (perf, A-38).
+ */
+function SkyFall({ space, t, at }: { space: Space; t: number; at: ScreenAt }) {
+  const { awake, wings } = space.satAt(t);
+  // It bobs for a few seconds once awake, then floats still: bobbing for ever kept the phone painting it (perf).
+  const bob = awake ? 4 * Math.sin((t - space.tSatWake) * 3) * (1 - seg(t, space.tSatWake + 4, space.tSatWake + 6)) : 0;
+  const { pt, chute, sway } = space.capsuleAt(t);
+  return (
+    <>
+      <Sprite at={at} x={SAT.x} y={SAT.y + bob} pad={SAT.wing + 40}>
+        <Satellite awake={awake} wings={wings} />
+      </Sprite>
+      <Sprite at={at} x={pt.x} y={pt.y - CAPSULE.h} pad={CAPSULE_PAD} angle={(sway * Math.PI) / 180}>
+        <Capsule chute={chute} />
+      </Sprite>
+    </>
   );
 }
 
-/** The little satellite in the sky: asleep until the radio waves reach it, then it opens its eyes and unfolds its solar wings. */
-function Satellite({ space, t }: { space: Space; t: number }) {
-  const { x, y, wing } = SAT;
-  const { awake, wings } = space.satAt(t);
+/** The little satellite in the sky, round 0, 0: asleep until the radio waves reach it, then it opens its eyes and unfolds its solar wings (`wings`, 0–1). */
+const Satellite = still(function Satellite({ awake, wings }: { awake: boolean; wings: number }) {
+  const { wing } = SAT;
   const reach = lerp(18, wing, wings);
-  // It bobs for a few seconds once awake, then floats still: bobbing for ever kept the phone painting it (perf).
-  const bob = awake ? 4 * Math.sin((t - space.tSatWake) * 3) * (1 - seg(t, space.tSatWake + 4, space.tSatWake + 6)) : 0;
   return (
-    <g transform={`translate(${x} ${y + bob})`}>
+    <g>
       {[-1, 1].map((s) => {
         const x0 = s * 30;
         const x1 = s * (30 + reach);
@@ -1534,17 +1692,20 @@ function Satellite({ space, t }: { space: Space; t: number }) {
       <rect x="-12" y="26" width="24" height="8" rx="3" fill={DARK_STEEL} stroke={INK} strokeWidth="2.5" />
     </g>
   );
-}
+});
 
 const CHUTE_COLORS = ["#ff5d73", "#fff", "#ff5d73", "#fff", "#ff5d73"];
 
-/** The capsule, its bottom's middle at `pt`, and its striped parachute open by `chute` (0–1), swaying `sway` degrees. */
-function Capsule({ pt, chute, sway }: { pt: Pt; chute: number; sway: number }) {
+/** How far the capsule's sprite reaches round the top of the capsule, where it hangs from its parachute and sways: up to the open canopy. */
+const CAPSULE_PAD = 220;
+
+/** The capsule with its striped parachute open by `chute` (0–1), drawn round the top of the capsule, the point it sways about. */
+const Capsule = still(function Capsule({ chute }: { chute: number }) {
   const { half, h, nozzle } = CAPSULE;
   const canopyY = -h - 40 - 90 * chute;
   const cw = 90 * chute;
   return (
-    <g transform={`translate(${pt.x} ${pt.y}) rotate(${sway} 0 ${-h})`}>
+    <g transform={`translate(0 ${h})`}>
       {chute > 0.02 && (
         <g>
           {[-1, -0.35, 0.35, 1].map((s) => (
@@ -1574,15 +1735,12 @@ function Capsule({ pt, chute, sway }: { pt: Pt; chute: number; sway: number }) {
       <rect x={-12} y={-h - 6} width="24" height="8" rx="3" fill={DARK_STEEL} stroke={INK} strokeWidth="2.5" />
     </g>
   );
-}
+});
 
-/** The puff of air from the capsule's nozzle, a small cloud growing on its way to the earth and fading there. */
-function AirPuff({ space, t }: { space: Space; t: number }) {
-  const puff = space.puffAt(t);
-  if (!puff) return null;
-  const { pt, size, fade } = puff;
+/** The puff of air from the capsule's nozzle at `x`, `y`, a small cloud growing (`size`) on its way to the earth and fading (`fade`) there. */
+const AirPuff = still(function AirPuff({ x, y, size, fade }: { x: number; y: number; size: number; fade: number }) {
   return (
-    <g transform={`translate(${pt.x} ${pt.y}) scale(${size})`} opacity={0.9 * (1 - fade)}>
+    <g transform={`translate(${x} ${y}) scale(${size})`} opacity={0.9 * (1 - fade)}>
       {[
         { x: -14, y: 4, r: 14 },
         { x: 4, y: -6, r: 16 },
@@ -1592,16 +1750,12 @@ function AirPuff({ space, t }: { space: Space; t: number }) {
       ))}
     </g>
   );
-}
+});
 
-/** Far away and small, the rocket coming down on the moon, and the flag that pops out once it has landed. */
-function MoonLanding({ space, t }: { space: Space; t: number }) {
-  const mini = space.miniRocketAt(t);
-  if (!mini) return null;
-  const flag = space.flagAt(t);
-  const { pt, flame } = mini;
+/** Far away and small, the rocket coming down on the moon at `x`, `y` on its `flame`, and the `flag` that pops out once it has landed. */
+const MoonLanding = still(function MoonLanding({ x, y, flame, flag }: { x: number; y: number; flame: number; flag: number }) {
   return (
-    <g transform={`translate(${pt.x} ${pt.y}) scale(1.5)`}>
+    <g transform={`translate(${x} ${y}) scale(1.5)`}>
       {flame > 0 && <path d={`M-7 0 Q0 ${26 * flame} 7 0 Z`} fill="#ff8c42" stroke={INK} strokeWidth="2" />}
       {flag > 0 && (
         <g>
@@ -1614,4 +1768,4 @@ function MoonLanding({ space, t }: { space: Space; t: number }) {
       <circle cy="-30" r="4" fill="#bde9ff" stroke={INK} strokeWidth="1.5" />
     </g>
   );
-}
+});

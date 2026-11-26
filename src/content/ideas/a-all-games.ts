@@ -339,6 +339,9 @@ export const allGamesIdeas: IdeaArea = {
       text: "Messung vom 26. November 2026 (`bun run perf ketten-space --profile`): 72–81 % beschäftigt, 42 Bildschirme pro Sekunde neu gemalt. Je Bild ändern sich nur etwa drei Attribute, die Zeit geht aber in React selbst (renderWithHooks, updateProperties, propagateParentContextChanges): jeder Uhrtakt zeichnet den ganzen Maschinenbaum in `src/games/marbles/SpaceLevel.tsx` neu. Lösung: was sich nie bewegt in `memo`-Teile oder in die feste Hintergrundebene (`back`) legen, so dass nur Mobile, UFO, Lampen, Satellit und Rakete der Uhr folgen – und diese als kleine eigene Ebenen (`Sprite`), damit sie das große Maschinen-svg nicht neu malen lassen. Rahmen von `bun run perf`: höchstens 60 % beschäftigt, höchstens 30 Bildschirme pro Sekunde neu gemalt, langsamstes Zwanzigstel ≤ 34 ms. Vorher `main` am selben Tag gleich messen (die Zahlen schwanken), danach die Regeln in `src/games/marbles/CLAUDE.md` nachführen.",
       why: "Kleinkinder spielen oft auf alten Handys der Eltern; dort sehen sie das Spiel ruckeln.",
       effort: "M",
+      done: true,
+      partial:
+        "Umgesetzt am 26. November 2026: jedes Teil der Raketenstart-Maschine ist ein `still`-Teil, das nur die Zahlen bekommt, die es zeichnet (Winkel, Leuchten, welche Lampe an ist), Blinklampen nur an oder aus, der Magnet pulsiert in zehn Stufen pro Sekunde; Satellit, Kapsel und Funkwellen fliegen als eigene Ebenen (`Sprite`). Gemessen am selben Tag (`bun run perf ketten-space`): Anfang 71 → 61 % beschäftigt, Mitte 78 → 62 % und 41,8 → 32,8 Bildschirme pro Sekunde; React braucht statt 22–26 % nur noch 12–13 % der Zeit, die Weltraum-Murmelbahn sank von 62 auf 57–61 %. Was noch knapp über dem Rahmen liegt, ist A-49.",
     },
     {
       id: "A-39",
@@ -417,6 +420,14 @@ export const allGamesIdeas: IdeaArea = {
       emoji: "🐢",
       title: "Leistung: Weltraumbahn und Murmelbahnen auf dem eigenen Handy prüfen",
       text: "Zum Prüfen durch dich: am 26. November 2026 wurden nach der Rückmeldung „ruckelt auf einem Gaming-Handy, z. B. Weltraumbahn, wenn der Ball um den Planeten kreist“ Planet, Wirbel, Xylophon-Stäbe und Schaufelrad zu eigenen Ebenen, und der Ball kreist nur noch einmal um den Planeten. Gemessen wurde das nur im nachgebildeten alten Handy (das Malen am Planeten sank von 320 auf etwa 130 ms pro Sekunde). Bitte auf dem Gaming-Handy die Weltraumbahn bis zum Ende und zwei, drei andere Bahnen spielen und sagen, wo es noch ruckelt – sein 120-Hz-Bildschirm verdoppelt die Arbeit der Grafik, so dass dort mehr auffällt als im Messwerkzeug.",
+      why: "Kleinkinder spielen oft auf alten Handys der Eltern; dort sehen sie das Spiel ruckeln.",
+      effort: "S",
+    },
+    {
+      id: "A-49",
+      emoji: "🐢",
+      title: "Leistung: Raketenstart – das Malen in der Mitte noch knapp über dem Rahmen",
+      text: "Nach A-38 (26. November 2026) geht im Raketenstart kaum noch Zeit in React (12–13 %), aber die Mitte ist mit 62 % beschäftigt und 32,8 Bildschirmen pro Sekunde noch knapp über dem Rahmen, der Anfang mit 61 %. Die Zeit liegt fast ganz im Malen (über 40 %): was sich in der Mitte noch im großen Maschinen-svg bewegt – Pedal, Lampen und Antenne des Funkmasts, das Känguru, der Luftstoß, das Mobile –, lässt das ganze svg neu malen. Zuerst mit `bun run perf ketten-space --trace` nachsehen, welche Ebene wie oft gemalt wird, dann die größten davon wie Satellit und Kapsel als `Sprite` in `over` legen (`SkyFall` in `src/games/marbles/SpaceLevel.tsx`) und im Vorschaufenster bei 844×390 prüfen, dass sie vor oder hinter den anderen Teilen liegen wie vorher. Rahmen von `bun run perf`: höchstens 60 % beschäftigt, höchstens 30 Bildschirme pro Sekunde neu gemalt, langsamstes Zwanzigstel ≤ 34 ms. Vorher `main` am selben Tag gleich messen.",
       why: "Kleinkinder spielen oft auf alten Handys der Eltern; dort sehen sie das Spiel ruckeln.",
       effort: "S",
     },
