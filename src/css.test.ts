@@ -217,3 +217,16 @@ test("the shelf's poster is stuck flat on the back panel over its own place, cle
   expect(Number(shelf.match(/const POSTER_MARGIN = ([\d.]+);/)?.[1])).toBeGreaterThanOrEqual(0.2);
   expect(shelf).not.toMatch(/ToyKeyboard|shelf-toy-body/);
 });
+
+// The poster's name is a few px tall on a phone: a dark outline and a coloured shadow round red letters smeared it into
+// a blur nobody could read (user feedback, 26 November 2026). It is plain ink on the paper, and the picture takes only
+// the room the name leaves, so a name on two lines never pushes it past the paper's foot.
+test("the shelf's poster names its game in plain ink, its picture in the room left", () => {
+  const css = readFileSync("src/styles/bookshelf-books.css", "utf8").replace(/\/\*[\s\S]*?\*\//g, "");
+  const title = [...css.matchAll(/([^{}]*\.shelf-poster-title[^{}]*)\{([^}]*)\}/g)].map(([, , body]) => body).join("\n");
+  expect(title).toMatch(/color:/);
+  expect(title).not.toMatch(/text-stroke|text-shadow/);
+  const picture = css.match(/\.shelf-poster-picture\s*\{([^}]*)\}/)?.[1] ?? "";
+  expect(picture).toMatch(/flex: 1 1 0/);
+  expect(picture).toMatch(/min-height: 0/);
+});
