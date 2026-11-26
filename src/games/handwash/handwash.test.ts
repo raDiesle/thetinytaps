@@ -58,4 +58,23 @@ describe("Hände waschen", () => {
       for (const prop of props) expect(`${name}: ${prop}`).toMatch(/: (transform|opacity|filter|animation-timing-function)$/);
     }
   });
+
+  test("the game's own class names carry its prefix, so no style of the menus or another game reaches them", () => {
+    // Short modifiers (v-, f-, p-) only ever stand beside an hw- class. A bar segment called „room“ took the bookshelf room's full height (November 2026).
+    const read = (file: string) => readFileSync(new URL(file, import.meta.url), "utf8");
+    const source = ["./HandwashPlay.tsx", "./hands.tsx", "./sink.tsx"].map(read).join("\n");
+    const literals = [...source.matchAll(/className=(?:"([^"]*)"|\{`([^`]*)`\})/g)].map((m) => (m[1] ?? m[2]).replace(/\$\{[^}]*\}/g, " "));
+    const words = literals.flatMap((l) => l.split(/\s+/)).filter((w) => w && !w.endsWith("-"));
+    for (const word of words) expect(word).toMatch(/^(hw-[\w-]+|[vfp]-\w+|past|now|paused|video)$/);
+    const kinds = source.match(/const segmentKind = [^;]*;/)?.[0] ?? "";
+    const named = [...kinds.matchAll(/"([^"]+)"/g)].map((m) => m[1]);
+    expect(named.length).toBe(3);
+    for (const name of named) expect(name).toMatch(/^hw-seg-/);
+  });
+
+  test("a tap on the picture pauses, and the controls are Zähne putzen's: pause, start again, the bar, the time", () => {
+    const play = readFileSync(new URL("./HandwashPlay.tsx", import.meta.url), "utf8");
+    expect(play).toMatch(/className=\{`hw-stage[\s\S]{0,400}onPointerDown=\{[\s\S]{0,200}togglePause\(\)/);
+    for (const part of ["hw-controls", "hw-progress", "hw-time", "hw-paused", "ControlIcon"]) expect(play).toContain(part);
+  });
 });
