@@ -414,9 +414,13 @@ takes a `look`); other things keep their look and an animal looks out for them.
   too. A piece only mounted while it shows (puffs, drops, the rainbow's flash) needs no `rest`; `trackPieces.test.ts`
   fails on a piece with neither. A piece is a portal, and React sends a portal's events up
   through the tree it was written in: never put it inside a `data-tap` group, or one tap sets its cue off twice – give
-  the piece its own `data-tap` beside the group. A wobbling part still drawn in the big svg (the seesaw, the funnel, the
-  walls' bumpers, A-39) costs about 100 ms of painting a second on the old phone while it moves: turn it into a piece
-  when `bun run perf ketten-<run>` finds its stretch over.
+  the piece its own `data-tap` beside the group. The parts the first rows hit are pieces while they stir (A-41, 26
+  November 2026): the spots' bell (swinging round its hook) and funnel (shaking by `scale`), the walls' bumpers and the
+  seesaw's plank – each a wobble or glide that painted the whole wall in every frame of the run's start. A wobble's
+  piece rests once the wobble is exactly 0, `wobbleSeconds(damp)` after the hit (`level.ts`), never at a guessed
+  number of seconds, or it switches back to the wall while still moving and the wall paints again. A wobbling part
+  still drawn in the big svg costs about 100 ms of painting a second on the old phone while it moves: turn it into a
+  piece when `bun run perf ketten-<run>` finds its stretch over.
 - `track.css`: its styles (classes `run-`). While it is on, the background music is off (the run
   plays its own notes and scales).
 - Shared with the machines: `path.ts` (line, quad, arc), `parts.tsx` (Ball, Rail, BAR_COLORS) and `level.ts` (useFrames,
