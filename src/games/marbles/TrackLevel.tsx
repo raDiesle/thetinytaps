@@ -22,7 +22,7 @@ import { SLIDE_TRACK } from "./slideTrack";
 import { SNOW_TRACK } from "./snowTrack";
 import { SPACE_TRACK } from "./spaceTrack";
 import { COLOR_TRACK } from "./colorTrack";
-import { PieceRoom } from "./trackPieces";
+import { PieceRoom, SETTLED_S } from "./trackPieces";
 import { type ColorSort, INK, TrackLook, type TrackTheme } from "./trackTheme";
 import { BALL_R, type Pt } from "./path";
 import { useDevice } from "@/lib/device";
@@ -181,9 +181,6 @@ const TOP_ROOM = 160;
 const WALL = { x: 0, y: -TOP_ROOM, w: VIEW_W, h: TRACK_H + TOP_ROOM };
 /** With the camera's top lower than this on the wall, the shelf is cut off, and the ⬆ button shows. */
 const UP_SHOWN_BELOW = 40;
-
-/** Seconds since a hit, held at `SETTLED_S`: by then every wobble and flash is over, so a part nobody hit stops changing and `still` can skip it. */
-const SETTLED_S = 8;
 
 /** Half the side, in world units, of the small layer a rolling thing is drawn in: its tap circle (56) and a bit more, since the layer shows what lies outside it too. */
 const MARBLE_PAD = 60;

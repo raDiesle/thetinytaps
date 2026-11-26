@@ -378,13 +378,32 @@ takes a `look`); other things keep their look and an animal looks out for them.
   **A part that moves or lights up is a `Piece`** (`trackPieces.tsx`; user feedback, 26 November 2026: the Weltraumbahn
   still stuttered on a gaming phone while things circled its planet): it is drawn in world units like the rest, but lands
   as a small layer of its own in the run's HTML layer, behind (`back`) or in front of (`front`) the rolling things, and a
-  turn (rocking, spinning, popping up) is a CSS transform of that layer (`turn`, with `scale`), so its drawing stays the
-  same from frame to frame – draw it still (`memo`) and turn it whole, and cut it with `clip` where only part of it lies
-  in front (the planet's far side). The xylophone bars, the paddle wheel, the planet and the swirls are pieces; the
-  backdrop pattern is an svg of its own under the wall, drawn once. A piece lies over the whole wall svg (or under the
-  whole front svg), so make only what nothing on the wall must cover into one. A wobbling part still drawn in the big
-  svg (the seesaw, the funnel, the walls' bumpers, most of the worlds' lower walls) costs about 100 ms of painting a
-  second on the old phone while it moves: turn it into a piece when `bun run perf ketten-<run>` finds its stretch over.
+  turn (rocking, spinning, popping up) is a CSS transform of that layer (`turn`: `deg` and `scale`, `dx`/`dy` to lift or
+  bob it, `sy` to squash a turning thing seen at a slant into its ellipse), and a flash coming and going is its `fade`,
+  so its drawing stays the same from frame to frame – draw it still (`memo`) and turn it whole, and cut it with `clip`
+  where only part of it lies in front (the planet's far side) or where it runs in a frame (the elevator's chain, drawn
+  one link longer than its frame and moved by `dy`). What bends or flies apart (a plank sagging, a puff of snow, drops)
+  can't be turned whole: it is a piece too, whose small layer alone is painted again, and one that comes and goes is
+  only mounted while it shows. The xylophone bars, the paddle wheel and every world's lower wall that moves are pieces
+  (A-40, 26 November 2026: the helix's discs, the lifter's slats and the troughs; the colour run's bells and the
+  rainbow's flash; the chair lift's wheels and the puffs; the whirlpool's swirl, the diving board and the drops; the
+  planks, the chain, its wheels and buckets and the funnels); the backdrop pattern is an svg of its own under the wall,
+  drawn once. A piece lies over the whole wall svg (or under the whole front svg), so make only what nothing on the wall
+  must cover into one, and where a still part of the wall lay over a moving one (the waiting bucket over the elevator's
+  wheel), that still part becomes a piece too, after it. **A piece is a layer only while it moves**: pass `rest` while
+  it lies still, and it is drawn inline in the wall's svg like the rest – every layer costs the compositor in every
+  frame, still or off the screen (A-40: the building site's 26 pieces, all layers for good, kept the run's top a tenth
+  busier, far away from them). But each switch between wall and layer paints the whole wall again, so parts a thing
+  hits one after the other switch together: a stretch's pieces rest while none of its cues stirs
+  (`rest={!anyStirring(ages)}`), a xylophone row's bars while none of its bars dips – one bar at a time made a marble
+  rolling over a row paint the wall twice per bar (A-40, a first try with each part on its own rastered 22–24 screens a
+  second where a stretch was busy). Parts that overlap (the funnels hanging into the next) keep their order that way
+  too. A piece only mounted while it shows (puffs, drops, the rainbow's flash) needs no `rest`; `trackPieces.test.ts`
+  fails on a piece with neither. A piece is a portal, and React sends a portal's events up
+  through the tree it was written in: never put it inside a `data-tap` group, or one tap sets its cue off twice – give
+  the piece its own `data-tap` beside the group. A wobbling part still drawn in the big svg (the seesaw, the funnel, the
+  walls' bumpers, A-39) costs about 100 ms of painting a second on the old phone while it moves: turn it into a piece
+  when `bun run perf ketten-<run>` finds its stretch over.
 - `track.css`: its styles (classes `run-`). While it is on, the background music is off (the run
   plays its own notes and scales).
 - Shared with the machines: `path.ts` (line, quad, arc), `parts.tsx` (Ball, Rail, BAR_COLORS) and `level.ts` (useFrames,

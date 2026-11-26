@@ -4,11 +4,12 @@
 // the lower wall they hop down scaffold planks, ride a bucket elevator up and
 // drop through a rubble chute.
 
-import { memo, useId } from "react";
+import { memo, type PointerEvent, useId } from "react";
 import { playBoing, playClonk, playKnock, playRumble, playSqueak, playThump, playWhirr } from "@/lib/sfx";
 import { VIEW_W, wobble } from "./level";
 import { BALL_R, type Pt } from "./path";
 import { BASKET, TRACK_H } from "./track";
+import { anyStirring, Piece } from "./trackPieces";
 import { CHUTE, ELEVATOR, PLANKS, SITE_CUES, STRETCHES } from "./trackStretches";
 import { type EndProps, INK, type StretchArtProps, type ThingProps, type TrackTheme } from "./trackTheme";
 
@@ -210,18 +211,27 @@ function funnel(i: number) {
 /**
  * The building site's own stretch: a stair of scaffold planks that bend as a thing lands on each, a bucket elevator –
  * a thing drops into a bucket at its bottom and is carried up on the chain, then tipped out at the top – and a rubble
- * chute of hanging funnels that each knock and swing as a thing drops through them into the skip.
+ * chute of hanging funnels that each knock and swing as a thing drops through them into the skip. What moves (the
+ * planks, the chain, its wheels, the buckets, the funnels) is a `Piece` each, a layer of its own only while it moves.
  */
 function SiteStretch({ layer, ages, onTap }: StretchArtProps) {
+  // Its moving parts are layers all together while any of them moves (`anyStirring`): a thing knocks through the planks
+  // and funnels one after the other, and the funnels hang into each other, so their order stays.
+  const still = !anyStirring(ages);
   if (layer === "front") {
-    // The funnels' rims in front of the things dropping through them.
+    // The funnels' rims in front of the things dropping through them, swinging with their funnels.
     return (
       <g pointerEvents="none">
         {Array.from({ length: CHUTE.segments }, (_, i) => {
           const f = funnel(i);
-          const swing = wobble(ages[SITE_CUES.chute + i], 3, 9, 4);
           return (
-            <g key={i} transform={`rotate(${swing} ${CHUTE.x} ${f.top})`}>
+            <Piece
+              key={i}
+              layer="front"
+              rest={still}
+              box={{ x: CHUTE.x - f.wide - 8, y: f.top - 8, w: 2 * f.wide + 16, h: 32 }}
+              turn={{ deg: wobble(ages[SITE_CUES.chute + i], 3, 9, 4), x: CHUTE.x, y: f.top }}
+            >
               <path
                 d={`M${CHUTE.x - f.wide} ${f.top} L${CHUTE.x + f.wide} ${f.top} L${CHUTE.x + f.wide - 2} ${f.top + 16} L${CHUTE.x - f.wide + 2} ${f.top + 16} Z`}
                 fill="#e85d04"
@@ -229,7 +239,7 @@ function SiteStretch({ layer, ages, onTap }: StretchArtProps) {
                 strokeWidth="4"
                 strokeLinejoin="round"
               />
-            </g>
+            </Piece>
           );
         })}
       </g>
@@ -238,17 +248,21 @@ function SiteStretch({ layer, ages, onTap }: StretchArtProps) {
   const ran = Math.min(Math.max(0, ages[SITE_CUES.bucketOn]), BUCKET_S);
   const shift = (ran * ELEVATOR.speed) % LINK;
   const turn = (ran * ELEVATOR.speed * 180) / (Math.PI * 30);
+  const tapOn = (e: PointerEvent) => onTap(SITE_CUES.bucketOn, e);
   const wheel = (y: number) => (
-    <g transform={`rotate(${-turn} ${ELEVATOR.x} ${y})`}>
-      <circle cx={ELEVATOR.x} cy={y} r="30" fill="#adb5bd" stroke={INK} strokeWidth="4" />
-      <path d={`M${ELEVATOR.x - 22} ${y} H${ELEVATOR.x + 22} M${ELEVATOR.x} ${y - 22} V${y + 22}`} stroke={INK} strokeWidth="4" />
-    </g>
+    <Piece layer="back" rest={still} box={{ x: ELEVATOR.x - 34, y: y - 34, w: 68, h: 68 }} turn={{ deg: -turn, x: ELEVATOR.x, y }}>
+      <g data-tap onPointerDown={tapOn}>
+        <circle cx={ELEVATOR.x} cy={y} r="30" fill="#adb5bd" stroke={INK} strokeWidth="4" />
+        <path d={`M${ELEVATOR.x - 22} ${y} H${ELEVATOR.x + 22} M${ELEVATOR.x} ${y - 22} V${y + 22}`} stroke={INK} strokeWidth="4" />
+      </g>
+    </Piece>
   );
   const chainTop = ELEVATOR.top - 30;
   const chainBottom = ELEVATOR.bottom + 40;
+  const links = Math.floor((chainBottom - chainTop) / LINK);
   return (
     <g>
-      {/* The scaffold: a pole down from each plank, and the planks bending a little as a thing lands */}
+      {/* The scaffold: a pole down from each plank, and the planks bending a little as a thing lands, each in a small layer of its own */}
       {PLANKS.map((plank, i) => (
         <rect key={`pole${i}`} x={plank.x0 + 6} y={plank.y} width="12" height={TRACK_H - plank.y} fill="#adb5bd" stroke={INK} strokeWidth="3" />
       ))}
@@ -256,21 +270,23 @@ function SiteStretch({ layer, ages, onTap }: StretchArtProps) {
         const sag = wobble(ages[SITE_CUES.planks + i], 7, 12, 4);
         const top = plank.y - 3;
         return (
-          <g key={i} data-tap onPointerDown={(e) => onTap(SITE_CUES.planks + i, e)}>
-            <path
-              d={`M${plank.x0} ${top} Q${(plank.x0 + plank.x1) / 2} ${top + 2 * sag} ${plank.x1} ${top + 3} V${top + 17} Q${(plank.x0 + plank.x1) / 2} ${top + 16 + 2 * sag} ${plank.x0} ${top + 14} Z`}
-              fill="#d9a066"
-              stroke={INK}
-              strokeWidth="4"
-              strokeLinejoin="round"
-            />
-            <line x1={plank.x0 + 8} y1={top + 8} x2={plank.x1 - 8} y2={top + 10 + sag} stroke="#b07a42" strokeWidth="3" />
-          </g>
+          <Piece key={i} layer="back" rest={still} box={{ x: plank.x0 - 6, y: top - 20, w: plank.x1 - plank.x0 + 12, h: 64 }}>
+            <g data-tap onPointerDown={(e) => onTap(SITE_CUES.planks + i, e)}>
+              <path
+                d={`M${plank.x0} ${top} Q${(plank.x0 + plank.x1) / 2} ${top + 2 * sag} ${plank.x1} ${top + 3} V${top + 17} Q${(plank.x0 + plank.x1) / 2} ${top + 16 + 2 * sag} ${plank.x0} ${top + 14} Z`}
+                fill="#d9a066"
+                stroke={INK}
+                strokeWidth="4"
+                strokeLinejoin="round"
+              />
+              <line x1={plank.x0 + 8} y1={top + 8} x2={plank.x1 - 8} y2={top + 10 + sag} stroke="#b07a42" strokeWidth="3" />
+            </g>
+          </Piece>
         );
       })}
 
-      {/* The bucket elevator: its steel frame, the chain moving up while a bucket rides, its two wheels */}
-      <g data-tap onPointerDown={(e) => onTap(SITE_CUES.bucketOn, e)}>
+      {/* The bucket elevator: its steel frame and the chain's track, still in the wall */}
+      <g data-tap onPointerDown={tapOn}>
         {[-58, 58].map((dx) => (
           <rect key={dx} x={ELEVATOR.x + dx - 7} y={chainTop - 40} width="14" height={TRACK_H - chainTop + 40} fill="#6c757d" stroke={INK} strokeWidth="3" />
         ))}
@@ -279,44 +295,66 @@ function SiteStretch({ layer, ages, onTap }: StretchArtProps) {
           return <line key={i} x1={ELEVATOR.x - 52} y1={y} x2={ELEVATOR.x + 52} y2={y + (i % 2 ? -70 : 70)} stroke="#6c757d" strokeWidth="5" opacity="0.6" />;
         })}
         <rect x={ELEVATOR.x - 12} y={chainTop} width="24" height={chainBottom - chainTop} fill="#3d3d45" stroke={INK} strokeWidth="3" />
-        {Array.from({ length: Math.floor((chainBottom - chainTop) / LINK) }, (_, i) => (
-          <line
-            key={i}
-            x1={ELEVATOR.x - 10}
-            y1={chainBottom - 6 - i * LINK - shift}
-            x2={ELEVATOR.x + 10}
-            y2={chainBottom - 6 - i * LINK - shift}
-            stroke="#adb5bd"
-            strokeWidth="4"
-          />
-        ))}
-        {wheel(chainTop)}
-        {wheel(chainBottom)}
-        {/* A bucket waiting at the bottom, and one tipped out at the top */}
-        <Bucket x={ELEVATOR.x} y={ELEVATOR.bottom} />
       </g>
-      <g data-tap onPointerDown={(e) => onTap(SITE_CUES.bucketOff, e)}>
-        <Bucket x={ELEVATOR.x + 10} y={ELEVATOR.top - 4} tip={60 - wobble(ages[SITE_CUES.bucketOff], 14, 8, 3)} />
-      </g>
+      {/* The chain's links run up while a bucket rides: one still drawing moved by its layer, cut to the chain's track
+          (a link more below it comes into sight as they move up) */}
+      <Piece
+        layer="back"
+        rest={still}
+        box={{ x: ELEVATOR.x - 12, y: chainTop - LINK, w: 24, h: chainBottom - chainTop + 2 * LINK }}
+        clip={{ x: ELEVATOR.x - 12, y: chainTop + 2, w: 24, h: chainBottom - chainTop - 4 }}
+        turn={{ deg: 0, x: ELEVATOR.x, y: chainBottom, dy: -shift }}
+      >
+        {Array.from({ length: links + 1 }, (_, i) => {
+          const y = chainBottom - 6 - (i - 1) * LINK;
+          return <line key={i} x1={ELEVATOR.x - 10} y1={y} x2={ELEVATOR.x + 10} y2={y} stroke="#adb5bd" strokeWidth="4" />;
+        })}
+      </Piece>
+      {wheel(chainTop)}
+      {wheel(chainBottom)}
+      {/* A bucket waiting at the bottom, over the lower wheel, and one tipped out at the top, tipping back as it pours */}
+      <Piece layer="back" rest={still} box={{ x: ELEVATOR.x - BALL_R - 14, y: ELEVATOR.bottom - 10, w: 2 * BALL_R + 28, h: BALL_R + 26 }}>
+        <g data-tap onPointerDown={tapOn}>
+          <Bucket x={ELEVATOR.x} y={ELEVATOR.bottom} />
+        </g>
+      </Piece>
+      <Piece
+        layer="back"
+        rest={still}
+        box={{ x: ELEVATOR.x + 10 - BALL_R - 14, y: ELEVATOR.top - 4 - BALL_R - 14, w: 2 * BALL_R + 28, h: 2 * BALL_R + 28 }}
+        turn={{ deg: 60 - wobble(ages[SITE_CUES.bucketOff], 14, 8, 3), x: ELEVATOR.x + 10, y: ELEVATOR.top - 4 }}
+      >
+        <g data-tap onPointerDown={(e) => onTap(SITE_CUES.bucketOff, e)}>
+          <Bucket x={ELEVATOR.x + 10} y={ELEVATOR.top - 4} />
+        </g>
+      </Piece>
 
       {/* The rubble chute: its funnels hanging on chains from an arm, each swinging as a thing knocks through */}
       <line x1={CHUTE.x} y1={CHUTE.top - 70} x2={CHUTE.x + 170} y2={CHUTE.top - 70} stroke="#ffb703" strokeWidth="14" strokeLinecap="round" />
       <line x1={CHUTE.x + 160} y1={CHUTE.top - 70} x2={CHUTE.x + 160} y2={TRACK_H} stroke="#ffb703" strokeWidth="14" />
       {Array.from({ length: CHUTE.segments }, (_, i) => {
         const f = funnel(i);
-        const swing = wobble(ages[SITE_CUES.chute + i], 3, 9, 4);
+        const top = i === 0 ? CHUTE.top - 74 : f.top - 8;
         return (
-          <g key={i} data-tap onPointerDown={(e) => onTap(SITE_CUES.chute + i, e)} transform={`rotate(${swing} ${CHUTE.x} ${f.top})`}>
-            {i === 0 && <line x1={CHUTE.x + f.wide - 6} y1={f.top} x2={CHUTE.x + 50} y2={CHUTE.top - 70} stroke={INK} strokeWidth="3" />}
-            <path
-              d={`M${CHUTE.x - f.wide} ${f.top} L${CHUTE.x + f.wide} ${f.top} L${CHUTE.x + f.narrow} ${f.bottom} L${CHUTE.x - f.narrow} ${f.bottom} Z`}
-              fill="#f48c06"
-              stroke={INK}
-              strokeWidth="4"
-              strokeLinejoin="round"
-            />
-            <path d={`M${CHUTE.x - f.narrow + 6} ${f.top + 24} V${f.bottom - 8}`} stroke="#ffd166" strokeWidth="5" strokeLinecap="round" opacity="0.7" />
-          </g>
+          <Piece
+            key={i}
+            layer="back"
+            rest={still}
+            box={{ x: CHUTE.x - f.wide - 8, y: top, w: 2 * f.wide + 16, h: f.bottom + 8 - top }}
+            turn={{ deg: wobble(ages[SITE_CUES.chute + i], 3, 9, 4), x: CHUTE.x, y: f.top }}
+          >
+            <g data-tap onPointerDown={(e) => onTap(SITE_CUES.chute + i, e)}>
+              {i === 0 && <line x1={CHUTE.x + f.wide - 6} y1={f.top} x2={CHUTE.x + 50} y2={CHUTE.top - 70} stroke={INK} strokeWidth="3" />}
+              <path
+                d={`M${CHUTE.x - f.wide} ${f.top} L${CHUTE.x + f.wide} ${f.top} L${CHUTE.x + f.narrow} ${f.bottom} L${CHUTE.x - f.narrow} ${f.bottom} Z`}
+                fill="#f48c06"
+                stroke={INK}
+                strokeWidth="4"
+                strokeLinejoin="round"
+              />
+              <path d={`M${CHUTE.x - f.narrow + 6} ${f.top + 24} V${f.bottom - 8}`} stroke="#ffd166" strokeWidth="5" strokeLinecap="round" opacity="0.7" />
+            </g>
+          </Piece>
         );
       })}
     </g>

@@ -10,6 +10,7 @@ import { playQuack, playSplash } from "@/lib/realSounds";
 import { VIEW_W, wobble, decay } from "./level";
 import { BALL_R, type Pt } from "./path";
 import { BASKET, TRACK_H } from "./track";
+import { anyStirring, Piece } from "./trackPieces";
 import { BOARD, DRAIN, railPath, SLIDE_CUES, STRETCHES, sample, UNDER, WAVES, WHIRL, waveAt, whirlAt } from "./trackStretches";
 import { type EndProps, INK, type StretchArtProps, type ThingProps, type TrackTheme } from "./trackTheme";
 
@@ -182,12 +183,16 @@ function PoolEnd({ layer, fullAge, tapAge }: EndProps) {
 function Drops({ x, y, age, size = 1 }: { x: number; y: number; age: number; size?: number }) {
   if (age < 0 || age > 0.7) return null;
   const k = age / 0.7;
+  const reach = 40 * size + 12;
   return (
-    <g opacity={1 - k * k} fill={FOAM} stroke="#1b8fc4" strokeWidth="1.5" pointerEvents="none">
-      {[-1, -0.4, 0.4, 1].map((i) => (
-        <circle key={i} cx={x + i * 40 * size * k} cy={y - 70 * size * k * (1 - k) * (1.2 - Math.abs(i) * 0.4)} r={4 + 3 * size} />
-      ))}
-    </g>
+    // A small layer of its own while it lasts, so the drops never paint the wall's svg again.
+    <Piece layer="back" box={{ x: x - reach, y: y - 30 * size - 12, w: 2 * reach, h: 30 * size + 24 }}>
+      <g opacity={1 - k * k} fill={FOAM} stroke="#1b8fc4" strokeWidth="1.5" pointerEvents="none">
+        {[-1, -0.4, 0.4, 1].map((i) => (
+          <circle key={i} cx={x + i * 40 * size * k} cy={y - 70 * size * k * (1 - k) * (1.2 - Math.abs(i) * 0.4)} r={4 + 3 * size} />
+        ))}
+      </g>
+    </Piece>
   );
 }
 
@@ -212,9 +217,12 @@ function whirlEllipse(grow: number) {
 /**
  * The water slide's own stretch: two long wave slides whose humps splash as a thing goes over them, a diving board
  * that bends and springs back, and a whirlpool – a thing dives into it, circles round and round, closer to the middle
- * each time, and is swallowed by the drain in its middle, which lets it out through a glass pipe below.
+ * each time, and is swallowed by the drain in its middle, which lets it out through a glass pipe below. The swirl, the
+ * board and the drops move, so each is a `Piece`.
  */
 function SlideStretch({ layer, ages, onTap }: StretchArtProps) {
+  // The board and the swirl are layers together while any part of the stretch moves (`anyStirring`).
+  const still = !anyStirring(ages);
   const basin = whirlEllipse(26);
   if (layer === "front") {
     // The basin's near wall in front of the things swimming round, half see-through like water, and the glass pipe.
@@ -247,8 +255,8 @@ function SlideStretch({ layer, ages, onTap }: StretchArtProps) {
             const k = (h - (i === 0 ? 0 : WAVES[0].humps) + 0.25) / w.humps;
             const top = waveAt(w, k);
             return (
-              <g key={h} data-tap onPointerDown={(e) => onTap(humpCue(h), e)}>
-                <circle cx={top.x} cy={top.y + 10} r="34" fill="transparent" />
+              <g key={h}>
+                <circle cx={top.x} cy={top.y + 10} r="34" fill="transparent" data-tap onPointerDown={(e) => onTap(humpCue(h), e)} />
                 <Drops x={top.x} y={top.y + 4} age={ages[humpCue(h)]} size={0.6} />
               </g>
             );
@@ -257,29 +265,51 @@ function SlideStretch({ layer, ages, onTap }: StretchArtProps) {
       ))}
 
       {/* The diving board on its stand, bending at its tip */}
-      <g data-tap onPointerDown={(e) => onTap(SLIDE_CUES.board, e)}>
-        <rect x={BOARD.x0 - 4} y={BOARD.y + UNDER} width="26" height="150" rx="6" fill="#adb5bd" stroke={INK} strokeWidth="4" />
-        <path
-          d={`M${BOARD.x0 - 10} ${BOARD.y + UNDER} Q${(BOARD.x0 + BOARD.x1) / 2} ${BOARD.y + UNDER + 1} ${BOARD.x1 + 8} ${BOARD.y + UNDER + 4 + bend}`}
-          fill="none"
-          stroke={INK}
-          strokeWidth="18"
-          strokeLinecap="round"
-        />
-        <path
-          d={`M${BOARD.x0 - 10} ${BOARD.y + UNDER} Q${(BOARD.x0 + BOARD.x1) / 2} ${BOARD.y + UNDER + 1} ${BOARD.x1 + 8} ${BOARD.y + UNDER + 4 + bend}`}
-          fill="none"
-          stroke="#ffb703"
-          strokeWidth="11"
-          strokeLinecap="round"
-        />
-      </g>
+      <rect
+        x={BOARD.x0 - 4}
+        y={BOARD.y + UNDER}
+        width="26"
+        height="150"
+        rx="6"
+        fill="#adb5bd"
+        stroke={INK}
+        strokeWidth="4"
+        data-tap
+        onPointerDown={(e) => onTap(SLIDE_CUES.board, e)}
+      />
+      {/* The board bends in a small layer of its own */}
+      <Piece layer="back" rest={still} box={{ x: BOARD.x0 - 22, y: BOARD.y + UNDER - 14, w: BOARD.x1 - BOARD.x0 + 44, h: 64 }}>
+        <g data-tap onPointerDown={(e) => onTap(SLIDE_CUES.board, e)}>
+          <path
+            d={`M${BOARD.x0 - 10} ${BOARD.y + UNDER} Q${(BOARD.x0 + BOARD.x1) / 2} ${BOARD.y + UNDER + 1} ${BOARD.x1 + 8} ${BOARD.y + UNDER + 4 + bend}`}
+            fill="none"
+            stroke={INK}
+            strokeWidth="18"
+            strokeLinecap="round"
+          />
+          <path
+            d={`M${BOARD.x0 - 10} ${BOARD.y + UNDER} Q${(BOARD.x0 + BOARD.x1) / 2} ${BOARD.y + UNDER + 1} ${BOARD.x1 + 8} ${BOARD.y + UNDER + 4 + bend}`}
+            fill="none"
+            stroke="#ffb703"
+            strokeWidth="11"
+            strokeLinecap="round"
+          />
+        </g>
+      </Piece>
 
       {/* The whirlpool: its basin, the water and the swirl in it */}
       <g data-tap onPointerDown={(e) => onTap(SLIDE_CUES.splash, e)}>
         <ellipse cx={basin.cx} cy={basin.cy} rx={basin.rx} ry={basin.ry} fill="#fff" stroke={INK} strokeWidth="5" />
         <ellipse cx={basin.cx} cy={basin.cy + 4} rx={basin.rx - 12} ry={basin.ry - 8} fill={WATER} />
-        <g transform={`translate(${basin.cx} ${basin.cy + 6}) scale(1 ${(basin.ry - 8) / (basin.rx - 12)}) rotate(${swirl})`}>
+      </g>
+      {/* The swirl turns in a layer of its own, drawn round and squashed into the basin by its transform */}
+      <Piece
+        layer="back"
+        rest={still}
+        box={{ x: basin.cx - basin.rx, y: basin.cy + 6 - basin.rx, w: 2 * basin.rx, h: 2 * basin.rx }}
+        turn={{ deg: swirl, x: basin.cx, y: basin.cy + 6, sy: (basin.ry - 8) / (basin.rx - 12) }}
+      >
+        <g data-tap onPointerDown={(e) => onTap(SLIDE_CUES.splash, e)} transform={`translate(${basin.cx} ${basin.cy + 6})`}>
           {[0, 1, 2].map((i) => (
             <path
               key={i}
@@ -299,7 +329,7 @@ function SlideStretch({ layer, ages, onTap }: StretchArtProps) {
           ))}
           <circle r="22" fill="#1b8fc4" />
         </g>
-      </g>
+      </Piece>
       <Drops x={whirlAt(0).x} y={whirlAt(0).y} age={ages[SLIDE_CUES.splash]} />
     </g>
   );

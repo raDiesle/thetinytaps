@@ -9,6 +9,22 @@
 import { createContext, type ReactNode, useContext, useId } from "react";
 import { createPortal } from "react-dom";
 
+/** Seconds since a hit, held at `SETTLED_S`: by then every wobble and flash is over, so a part nobody hit stops changing and `still` can skip it. */
+export const SETTLED_S = 8;
+
+/**
+ * True while a part hit `age` seconds ago still moves (`until` seconds after its hit, at most `SETTLED_S`, where the
+ * run holds every age): the time a `Piece` of it is a layer of its own (see `rest`).
+ */
+export const stirring = (age: number, until = SETTLED_S) => age >= 0 && age < Math.min(until, SETTLED_S);
+
+/**
+ * True while any of a stretch's or row's parts still moves. Parts a thing hits one after the other (a row's bars, a
+ * stretch's planks and funnels) are layers all together while this holds: each part going into its layer and back
+ * painted the whole wall twice, and a marble rolling over a row did that at every bar (November 2026).
+ */
+export const anyStirring = (ages: readonly number[], until = SETTLED_S) => ages.some((age) => stirring(age, until));
+
 /** A box of the world, in its units. */
 export interface WorldBox {
   x: number;
@@ -32,12 +48,34 @@ export interface PieceRoomValue {
 /** The run's room for pieces (`Run` in `TrackLevel.tsx`); without it a piece is drawn inline in the svg. */
 export const PieceRoom = createContext<PieceRoomValue | null>(null);
 
-/** A turn of a whole piece: `deg` degrees round the world point `x`, `y`, and grown by `scale` round it (1 if left out). */
+/**
+ * A turn of a whole piece round the world point `x`, `y`: `deg` degrees, grown by `scale` (1 if left out), squashed
+ * upright by `sy` after turning (a swirl seen at a slant turns inside its ellipse) and moved by `dx`, `dy` world units
+ * (a slat lifting, a disc bobbing, a chain running).
+ */
 export interface PieceTurn {
   deg: number;
   x: number;
   y: number;
   scale?: number;
+  sy?: number;
+  dx?: number;
+  dy?: number;
+}
+
+/** The svg transform of a turn, for a piece drawn inline. */
+const svgTurn = (t: PieceTurn) =>
+  `translate(${t.x + (t.dx ?? 0)} ${t.y + (t.dy ?? 0)}) scale(1 ${t.sy ?? 1}) rotate(${t.deg}) scale(${t.scale ?? 1}) translate(${-t.x} ${-t.y})`;
+
+/** The CSS transform of a turn, `u` pixels to a world unit, round the turn's point as the transform's origin. */
+function cssTurn(t: PieceTurn, u: number) {
+  const parts: string[] = [];
+  if (t.dx || t.dy) parts.push(`translate(${(t.dx ?? 0) * u}px, ${(t.dy ?? 0) * u}px)`);
+  if (t.sy !== undefined && t.sy !== 1) parts.push(`scale(1, ${t.sy})`);
+  if (t.deg) parts.push(`rotate(${t.deg}deg)`);
+  if (t.scale !== undefined && t.scale !== 1) parts.push(`scale(${t.scale})`);
+  // Never "none": switching between a transform and none could have the browser drop and rebuild the layer.
+  return parts.length ? parts.join(" ") : "translate(0, 0)";
 }
 
 /**
@@ -45,28 +83,38 @@ export interface PieceTurn {
  * it, or it is cut off), behind (`back`) or in front of (`front`) the rolling things. `turn` turns the whole piece by a
  * transform, so a piece that only rocks or spins never paints again: keep what is drawn inside it the same from frame to
  * frame and turn it this way. `clip` cuts it to a box of the world that stays still while the piece turns (the planet's
- * upper half in front of the things on the far side of their orbit).
+ * upper half in front of the things on the far side of their orbit, a chain running in its frame). `fade` is the whole
+ * piece's opacity (a glow coming and going), another thing the compositor does alone. A piece whose drawing does change
+ * from frame to frame (a board bending, drops flying) is still worth it: only its small layer is painted again.
+ * `rest` draws it inline in the stretch's svg instead, like the rest of the wall: pass it while the part lies still
+ * (`!stirring(age)`). Each layer costs the phone's compositor in every frame, even still and off the screen – the
+ * building site's 26 pieces kept its main thread a tenth busier at the top of the run, far from them (November 2026) –,
+ * while the wall's svg is painted again only once as a part starts moving and once as it stops.
  */
 export function Piece({
   layer,
   box,
   turn,
   clip,
+  fade,
+  rest,
   children,
 }: {
   layer: "back" | "front";
   box: WorldBox;
   turn?: PieceTurn;
   clip?: WorldBox;
+  fade?: number;
+  rest?: boolean;
   children: ReactNode;
 }) {
   const room = useContext(PieceRoom);
   const id = useId();
   const host = room?.[layer];
-  if (!room || !host) {
-    // Inline in the stretch's svg (tests, and the moment before the layer is there).
+  if (!room || !host || rest) {
+    // Inline in the stretch's svg (at rest, in tests, and the moment before the layer is there).
     const turned = (
-      <g transform={turn ? `translate(${turn.x} ${turn.y}) rotate(${turn.deg}) scale(${turn.scale ?? 1}) translate(${-turn.x} ${-turn.y})` : undefined}>
+      <g transform={turn ? svgTurn(turn) : undefined} opacity={fade}>
         {children}
       </g>
     );
@@ -87,7 +135,14 @@ export function Piece({
   return createPortal(
     <div
       className="run-piece"
-      style={{ left: outer.x * u, top: (outer.y + room.top) * u, width: outer.w * u, height: outer.h * u, overflow: clip ? "hidden" : "visible" }}
+      style={{
+        left: outer.x * u,
+        top: (outer.y + room.top) * u,
+        width: outer.w * u,
+        height: outer.h * u,
+        overflow: clip ? "hidden" : "visible",
+        opacity: fade,
+      }}
     >
       <svg
         className="run-piece-art"
@@ -97,7 +152,7 @@ export function Piece({
           top: (box.y - outer.y) * u,
           width: box.w * u,
           height: box.h * u,
-          transform: turn ? `rotate(${turn.deg}deg)${turn.scale !== undefined && turn.scale !== 1 ? ` scale(${turn.scale})` : ""}` : undefined,
+          transform: turn ? cssTurn(turn, u) : undefined,
           transformOrigin: turn ? `${(turn.x - box.x) * u}px ${(turn.y - box.y) * u}px` : undefined,
         }}
         aria-hidden

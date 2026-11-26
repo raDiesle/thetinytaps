@@ -43,7 +43,7 @@ import {
   type Slot,
   type Turn,
 } from "./track";
-import { Piece as Layer } from "./trackPieces";
+import { anyStirring, Piece as Layer } from "./trackPieces";
 
 /** The flag springs up out of the full basket; then the level is done. */
 const FLAG_MS = 500;
@@ -306,6 +306,11 @@ export const Xylophone = still(function Xylophone({ row, ages, onTap }: { row: R
   const bars = BARS.map((bar, i) => ({ ...bar, i })).filter((bar) => bar.row === row);
   const first = bars[0];
   const last = bars[bars.length - 1];
+  // The row's bars are layers together while one of them dips (a marble rolls over all of them, one after the other).
+  const rowStill = !anyStirring(
+    bars.map((bar) => ages[bar.i]),
+    1,
+  );
   const at = (x: number) => ({ x, y: rowY(row, x) });
   // Left to right on the wall, whichever way the marble rolls; the rail reaches a bit past where it comes in.
   const right = row.to.x > row.from.x;
@@ -328,10 +333,10 @@ export const Xylophone = still(function Xylophone({ row, ages, onTap }: { row: R
         const cx = bar.x + bar.w / 2;
         const dip = age >= 0 && age < 1 ? 5 * decay(age * 10) : 0;
         const cy = rowY(row, cx) + BALL_R + 9;
-        // Each bar a small layer of its own: a bar dipping and lighting up inside the run's big svg had a phone paint
+        // Each bar a small layer of its own while it dips and lights up: inside the run's big svg it had a phone paint
         // all of that svg again in every frame while a marble rolled over the row (perf, 26 November 2026).
         return (
-          <Layer key={bar.i} layer="back" box={{ x: cx - bar.w / 2 - 12, y: cy - 70, w: bar.w + 24, h: 124 }}>
+          <Layer key={bar.i} layer="back" rest={rowStill} box={{ x: cx - bar.w / 2 - 12, y: cy - 70, w: bar.w + 24, h: 124 }}>
             <g transform={`translate(${cx} ${cy + dip}) rotate(${slope})`} data-tap onPointerDown={(e) => onTap(bar.i, e)}>
               {/* Taller than the bar, so a small finger finds it */}
               <rect x={-bar.w / 2 + 2} y={-62} width={bar.w - 4} height={100} fill="transparent" />
@@ -779,9 +784,11 @@ const helixRail = (from: number, to: number) =>
  * The wooden run's own stretch: a helix tower the marbles run round four times (a coloured disc on its pole bobs at
  * each round), a step lifter whose wooden slats lift them up one step after the other, and six troughs down the right
  * edge that tip them on from one to the next. Behind the things the tower's pole, its rail and the lifter; in front
- * only the near halves of the helix's rail.
+ * only the near halves of the helix's rail. The discs, the slats and the troughs move, so each is a `Piece`, a layer only while it moves.
  */
 function WoodenStretch({ layer, ages, onTap }: StretchArtProps) {
+  // Its moving parts are layers all together while any of them moves (`anyStirring`).
+  const still = !anyStirring(ages);
   const { post } = useLook();
   const end = helixAt(HELIX.turns * TAU);
   if (layer === "front") {
@@ -810,9 +817,11 @@ function WoodenStretch({ layer, ages, onTap }: StretchArtProps) {
         const y = (helixAt(n * TAU).y + helixAt((n + 1) * TAU).y) / 2 - 10;
         const bob = wobble(ages[WOOD_CUES.helix + n], 10, 16, 4);
         return (
-          <g key={n} data-tap onPointerDown={(e) => onTap(WOOD_CUES.helix + n, e)}>
-            <ellipse cx={HELIX.cx} cy={y - bob} rx="34" ry="12" fill={BAR_COLORS[(n * 2) % BAR_COLORS.length]} stroke={INK} strokeWidth="3.5" />
-          </g>
+          <Layer key={n} layer="back" rest={still} box={{ x: HELIX.cx - 40, y: y - 18, w: 80, h: 36 }} turn={{ deg: 0, x: HELIX.cx, y, dy: -bob }}>
+            <g data-tap onPointerDown={(e) => onTap(WOOD_CUES.helix + n, e)}>
+              <ellipse cx={HELIX.cx} cy={y} rx="34" ry="12" fill={BAR_COLORS[(n * 2) % BAR_COLORS.length]} stroke={INK} strokeWidth="3.5" />
+            </g>
+          </Layer>
         );
       })}
 
@@ -827,19 +836,19 @@ function WoodenStretch({ layer, ages, onTap }: StretchArtProps) {
       {Array.from({ length: LIFTER.steps }, (_, i) => {
         const p = lifterAt(i);
         const up = slatLift(ages[WOOD_CUES.lifter + i]);
+        const slat = { x: p.x - 13, y: p.y + BALL_R + 1, w: 26, h: LIFTER.y0 + 70 - p.y };
         return (
-          <g key={i} data-tap onPointerDown={(e) => onTap(WOOD_CUES.lifter + i, e)}>
-            <rect
-              x={p.x - 13}
-              y={p.y + BALL_R + 1 - up}
-              width="26"
-              height={LIFTER.y0 + 70 - p.y}
-              rx="4"
-              fill={i % 2 ? "#ffb703" : "#f4a259"}
-              stroke={INK}
-              strokeWidth="3"
-            />
-          </g>
+          <Layer
+            key={i}
+            layer="back"
+            rest={still}
+            box={{ x: slat.x - 3, y: slat.y - 3, w: slat.w + 6, h: slat.h + 6 }}
+            turn={{ deg: 0, x: p.x, y: p.y, dy: -up }}
+          >
+            <g data-tap onPointerDown={(e) => onTap(WOOD_CUES.lifter + i, e)}>
+              <rect x={slat.x} y={slat.y} width={slat.w} height={slat.h} rx="4" fill={i % 2 ? "#ffb703" : "#f4a259"} stroke={INK} strokeWidth="3" />
+            </g>
+          </Layer>
         );
       })}
       <rect x={top.x - 14} y={top.y + BALL_R + 1} width="52" height="20" rx="5" fill={post} stroke={INK} strokeWidth="3" />
@@ -853,13 +862,33 @@ function WoodenStretch({ layer, ages, onTap }: StretchArtProps) {
         const tip = dir * wobble(ages[WOOD_CUES.troughs + i], 7, 12, 3.5);
         const d = `M${a.x} ${a.y - 40} L${a.x} ${a.y} L${b.x} ${b.y}`;
         return (
-          <g key={i} data-tap onPointerDown={(e) => onTap(WOOD_CUES.troughs + i, e)}>
-            <rect x={mid.x - 6} y={mid.y} width="12" height="34" fill={post} stroke={INK} strokeWidth="3" />
-            <g transform={`rotate(${tip} ${mid.x} ${mid.y})`} fill="none" strokeLinecap="round" strokeLinejoin="round">
-              <path d={d} stroke={INK} strokeWidth="16" />
-              <path d={d} stroke={BAR_COLORS[(i * 2 + 1) % BAR_COLORS.length]} strokeWidth="9" />
-            </g>
-            <circle cx={mid.x} cy={mid.y} r="6" fill={INK} />
+          <g key={i}>
+            <rect
+              x={mid.x - 6}
+              y={mid.y}
+              width="12"
+              height="34"
+              fill={post}
+              stroke={INK}
+              strokeWidth="3"
+              data-tap
+              onPointerDown={(e) => onTap(WOOD_CUES.troughs + i, e)}
+            />
+            {/* A portal's events still bubble through React's tree: never inside another `data-tap` group, or a tap counts twice */}
+            <Layer
+              layer="back"
+              rest={still}
+              box={{ x: Math.min(a.x, b.x) - 12, y: a.y - 52, w: Math.abs(b.x - a.x) + 24, h: b.y - a.y + 64 }}
+              turn={{ deg: tip, x: mid.x, y: mid.y }}
+            >
+              <g data-tap onPointerDown={(e) => onTap(WOOD_CUES.troughs + i, e)}>
+                <g fill="none" strokeLinecap="round" strokeLinejoin="round">
+                  <path d={d} stroke={INK} strokeWidth="16" />
+                  <path d={d} stroke={BAR_COLORS[(i * 2 + 1) % BAR_COLORS.length]} strokeWidth="9" />
+                </g>
+                <circle cx={mid.x} cy={mid.y} r="6" fill={INK} />
+              </g>
+            </Layer>
           </g>
         );
       })}

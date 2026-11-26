@@ -4,11 +4,12 @@
 // way down the lower wall they fly off a ski jump, ride up a chair lift and race
 // round the icy curves of a bobsleigh run.
 
-import { memo, useId } from "react";
+import { memo, type PointerEvent, useId } from "react";
 import { playBlub, playHop, playLift, playPuff, playRumble, playSleigh, playSlide, playSqueak, playThump, playTwinkle, playWhoosh } from "@/lib/sfx";
 import { VIEW_W, wobble, decay } from "./level";
 import { arc, BALL_R, type Pt } from "./path";
 import { TRACK_H } from "./track";
+import { anyStirring, Piece } from "./trackPieces";
 import { BOB, CHAIRLIFT, INRUN, JUMP, OUTRUN, railPath, SNOW_CUES, STRETCHES, UNDER } from "./trackStretches";
 import { type EndProps, INK, type ThingProps, type StretchArtProps, type TrackTheme } from "./trackTheme";
 
@@ -277,16 +278,30 @@ function SnowmanEnd({ layer, parts, t, fullAge, tapAge }: EndProps) {
   );
 }
 
-/** A puff of snow thrown up at `x`, `y`, `age` seconds ago: three snowballs flying apart and fading. */
+/** A puff of snow thrown up at `x`, `y`, `age` seconds ago: three snowballs flying apart and fading, a small layer of its own while it lasts. */
 function Puff({ x, y, age }: { x: number; y: number; age: number }) {
   if (age < 0 || age > 0.8) return null;
   const k = age / 0.8;
   return (
-    <g opacity={1 - k} fill={SNOW} stroke={SHADE} strokeWidth="2" pointerEvents="none">
-      {[-1, 0, 1].map((i) => (
-        <circle key={i} cx={x + i * 34 * k} cy={y - 34 * Math.sin(Math.PI * Math.min(1, k * 1.4)) - (i === 0 ? 10 * k : 0)} r={9 + 7 * k} />
-      ))}
-    </g>
+    <Piece layer="back" box={{ x: x - 64, y: y - 64, w: 128, h: 84 }}>
+      <g opacity={1 - k} fill={SNOW} stroke={SHADE} strokeWidth="2" pointerEvents="none">
+        {[-1, 0, 1].map((i) => (
+          <circle key={i} cx={x + i * 34 * k} cy={y - 34 * Math.sin(Math.PI * Math.min(1, k * 1.4)) - (i === 0 ? 10 * k : 0)} r={9 + 7 * k} />
+        ))}
+      </g>
+    </Piece>
+  );
+}
+
+/** A wheel of the chair lift's station at `x`, `y`, turning while the lift runs (`age` seconds since a chair set off), as a layer of its own. */
+function LiftWheel({ x, y, age, still, onTap }: { x: number; y: number; age: number; still: boolean; onTap: (e: PointerEvent) => void }) {
+  return (
+    <Piece layer="back" rest={still} box={{ x: x - 24, y: y - 24, w: 48, h: 48 }} turn={{ deg: Math.min(Math.max(age, 0), 9) * 90, x, y }}>
+      <g data-tap onPointerDown={onTap}>
+        <circle cx={x} cy={y} r="20" fill="#e3f1fb" stroke={INK} strokeWidth="4" />
+        <path d={`M${x - 14} ${y} H${x + 14} M${x} ${y - 14} V${y + 14}`} stroke={INK} strokeWidth="3" />
+      </g>
+    </Piece>
   );
 }
 
@@ -302,20 +317,16 @@ const cableY = (x: number) =>
 /**
  * The snow run's own stretch: a ski jump (a wooden inrun on its scaffold, a lip they fly off, and a snowy landing
  * hill with a puff of snow where they land), a chair lift taking them up in a chair on its cable, and a bobsleigh run
- * with two steep icy curves.
+ * with two steep icy curves. The wheels and the puffs of snow move, so each is a `Piece`.
  */
 function SnowStretch({ layer, ages, onTap }: StretchArtProps) {
+  // The lift's wheels are layers while any part of the stretch moves (`anyStirring`).
+  const still = !anyStirring(ages);
   if (layer === "front") return null;
   const ground = JUMP.lip.y + 110;
   const inrun = railPath(INRUN, UNDER, 1);
   const hill = railPath([JUMP.land, JUMP.hillEnd, ...OUTRUN.slice(1)], UNDER, 1);
   const lastHill = OUTRUN[OUTRUN.length - 1];
-  const wheel = (x: number, y: number, age: number) => (
-    <g transform={`rotate(${Math.min(Math.max(age, 0), 9) * 90} ${x} ${y})`}>
-      <circle cx={x} cy={y} r="20" fill="#e3f1fb" stroke={INK} strokeWidth="4" />
-      <path d={`M${x - 14} ${y} H${x + 14} M${x} ${y - 14} V${y + 14}`} stroke={INK} strokeWidth="3" />
-    </g>
-  );
   const bottom = { x: CHAIRLIFT.from.x - 40, y: cableY(CHAIRLIFT.from.x - 40) };
   const top = { x: CHAIRLIFT.to.x + 20, y: cableY(CHAIRLIFT.to.x + 20) };
   return (
@@ -357,8 +368,8 @@ function SnowStretch({ layer, ages, onTap }: StretchArtProps) {
           strokeLinejoin="round"
         />
         <line x1={bottom.x} y1={bottom.y} x2={top.x} y2={top.y} stroke={INK} strokeWidth="5" />
-        {wheel(bottom.x, bottom.y, ages[SNOW_CUES.chairOn])}
       </g>
+      <LiftWheel x={bottom.x} y={bottom.y} age={ages[SNOW_CUES.chairOn]} still={still} onTap={(e) => onTap(SNOW_CUES.chairOn, e)} />
       <g data-tap onPointerDown={(e) => onTap(SNOW_CUES.chairOff, e)}>
         <rect
           x={top.x - 10}
@@ -378,8 +389,8 @@ function SnowStretch({ layer, ages, onTap }: StretchArtProps) {
           strokeWidth="4"
           strokeLinejoin="round"
         />
-        {wheel(top.x, top.y, ages[SNOW_CUES.chairOn])}
       </g>
+      <LiftWheel x={top.x} y={top.y} age={ages[SNOW_CUES.chairOn]} still={still} onTap={(e) => onTap(SNOW_CUES.chairOff, e)} />
       <Puff x={CHAIRLIFT.to.x + 20} y={CHAIRLIFT.to.y + 10} age={ages[SNOW_CUES.chairOff]} />
 
       {/* The bobsleigh run's icy curves, banked on their outer side */}
@@ -389,10 +400,12 @@ function SnowStretch({ layer, ages, onTap }: StretchArtProps) {
         const age = ages[SNOW_CUES.bob + i];
         const out = pts[Math.floor(pts.length / 2)];
         return (
-          <g key={i} data-tap onPointerDown={(e) => onTap(SNOW_CUES.bob + i, e)} fill="none" strokeLinecap="round">
-            <path d={d} stroke={INK} strokeWidth={2 * UNDER + 8} />
-            <path d={d} stroke="#cfe8fa" strokeWidth={2 * UNDER} />
-            <path d={bank} stroke={SNOW} strokeWidth="12" />
+          <g key={i}>
+            <g data-tap onPointerDown={(e) => onTap(SNOW_CUES.bob + i, e)} fill="none" strokeLinecap="round">
+              <path d={d} stroke={INK} strokeWidth={2 * UNDER + 8} />
+              <path d={d} stroke="#cfe8fa" strokeWidth={2 * UNDER} />
+              <path d={bank} stroke={SNOW} strokeWidth="12" />
+            </g>
             <Puff x={out.x + (i === 0 ? 30 : -30)} y={out.y} age={age} />
           </g>
         );

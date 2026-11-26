@@ -12,6 +12,7 @@ import { VIEW_W, wobble, decay } from "./level";
 import { Ball } from "./parts";
 import { BALL_R, type Pt } from "./path";
 import { TRACK_H } from "./track";
+import { anyStirring, Piece } from "./trackPieces";
 import { COLOR_CUES, HOOP_SPOTS, HOOPS, RAINBOW, RAINBOW_DOWN, RAINBOW_RAMP, railPath, STRETCHES, UNDER } from "./trackStretches";
 import { type EndProps, INK, type StretchArtProps, type ThingProps, type TrackTheme } from "./trackTheme";
 
@@ -172,9 +173,11 @@ function Cloud({ x, y }: { x: number; y: number }) {
 /**
  * The colour run's own stretch: six arches in its three colours stand over the two long rows, each with a little bell
  * on top that swings and rings as a marble rolls through; and in the middle a rainbow the marbles roll up and over,
- * its bands lighting up as one comes over the top, its feet on two clouds.
+ * its bands lighting up as one comes over the top, its feet on two clouds. The bells and the flash are `Piece`s.
  */
 function ColorStretch({ layer, ages, onTap }: StretchArtProps) {
+  // The bells are layers all together while any part of the stretch moves (`anyStirring`).
+  const still = !anyStirring(ages);
   if (layer === "front") {
     // The clouds the rainbow stands on lie in front of the marbles rolling onto it and off it.
     const off = UNDER + RAINBOW_BAND * 1.5;
@@ -210,8 +213,13 @@ function ColorStretch({ layer, ages, onTap }: StretchArtProps) {
         {SORT_COLORS.map((c, i) => (
           <path key={c.id} d={rainbowArc(RAINBOW.r - UNDER - RAINBOW_BAND * (i + 0.5) + 2)} stroke={c.fill} strokeWidth={RAINBOW_BAND} />
         ))}
-        {glow > 0 && <path d={rainbowArc(RAINBOW.r - UNDER - RAINBOW_BAND)} stroke="#fff" strokeWidth={RAINBOW_BAND * 3} opacity={glow} />}
       </g>
+      {/* Its flash, a layer of its own that only fades, there only while it shines: in the wall's svg it painted all of it again */}
+      {glow > 0 && (
+        <Piece layer="back" box={{ x: RAINBOW.cx - RAINBOW.r, y: RAINBOW.cy - RAINBOW.r - 20, w: 2 * RAINBOW.r, h: RAINBOW.r - 80 }} fade={glow}>
+          <path d={rainbowArc(RAINBOW.r - UNDER - RAINBOW_BAND)} fill="none" stroke="#fff" strokeWidth={RAINBOW_BAND * 3} pointerEvents="none" />
+        </Piece>
+      )}
       {/* The arches over the rows, each with its bell */}
       {HOOP_SPOTS.map((p, i) => {
         const c = SORT_COLORS[i % SORT_COLORS.length];
@@ -221,24 +229,29 @@ function ColorStretch({ layer, ages, onTap }: StretchArtProps) {
         const top = p.y - HOOPS.ry - 8;
         const foot = p.y + UNDER;
         return (
-          <g key={i} data-tap onPointerDown={(e) => onTap(COLOR_CUES.hoops + i, e)}>
-            <path
-              d={`M${p.x - 36} ${foot} V${top + 36} A36 36 0 0 1 ${p.x + 36} ${top + 36} V${foot}`}
-              fill="none"
-              stroke={INK}
-              strokeWidth="17"
-              strokeLinejoin="round"
-            />
-            <path d={`M${p.x - 36} ${foot} V${top + 36} A36 36 0 0 1 ${p.x + 36} ${top + 36} V${foot}`} fill="none" stroke={c.fill} strokeWidth="10" />
-            <g transform={`rotate(${swing} ${p.x} ${top - 8})`}>
+          <g key={i}>
+            <g data-tap onPointerDown={(e) => onTap(COLOR_CUES.hoops + i, e)}>
               <path
-                d={`M${p.x - 13} ${top - 12} Q${p.x - 12} ${top - 34} ${p.x} ${top - 34} Q${p.x + 12} ${top - 34} ${p.x + 13} ${top - 12} Z`}
-                fill="#ffd23f"
+                d={`M${p.x - 36} ${foot} V${top + 36} A36 36 0 0 1 ${p.x + 36} ${top + 36} V${foot}`}
+                fill="none"
                 stroke={INK}
-                strokeWidth="3"
+                strokeWidth="17"
+                strokeLinejoin="round"
               />
-              <circle cx={p.x} cy={top - 9} r="4" fill={INK} />
+              <path d={`M${p.x - 36} ${foot} V${top + 36} A36 36 0 0 1 ${p.x + 36} ${top + 36} V${foot}`} fill="none" stroke={c.fill} strokeWidth="10" />
             </g>
+            {/* The bell swings as a layer of its own (a portal's events bubble through React's tree, so it is no child of the arch's tap) */}
+            <Piece layer="back" rest={still} box={{ x: p.x - 40, y: top - 60, w: 80, h: 64 }} turn={{ deg: swing, x: p.x, y: top - 8 }}>
+              <g data-tap onPointerDown={(e) => onTap(COLOR_CUES.hoops + i, e)}>
+                <path
+                  d={`M${p.x - 13} ${top - 12} Q${p.x - 12} ${top - 34} ${p.x} ${top - 34} Q${p.x + 12} ${top - 34} ${p.x + 13} ${top - 12} Z`}
+                  fill="#ffd23f"
+                  stroke={INK}
+                  strokeWidth="3"
+                />
+                <circle cx={p.x} cy={top - 9} r="4" fill={INK} />
+              </g>
+            </Piece>
           </g>
         );
       })}
