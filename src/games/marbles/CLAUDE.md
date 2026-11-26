@@ -196,6 +196,10 @@ Then a second part past the tree (`PART2`, `acornAt`, `beeAt`, `kiteAt`; a pure 
     end for ever – but each level lets its own end settle before that (the garden's birds stop singing and its mole
     stops waving at `tQuiet`, the excavator stops humming after its last move). A `wobble()` is exactly 0 once what is
     left of it is under `WOBBLE_REST` of its start (the barn kept turning by 0.0001° until `SETTLE_S`).
+    Something set turning that slows to a stop over seconds (the Raketenstart's mobile) eases out over a fixed time, a
+    cubic of `seg(…)` starting as fast, never `1 - decay(t / slow)` with a slow rate: `decay` reaches 0 only at nine
+    times that rate, and the mobile turned by fractions of a pixel for 30 s, to the level's end, with the phone
+    painting the machine for it (A-49; `space.test.ts`).
     `TIMES=30,40` scans those seconds, `ALL=1` lists every change rather than the first eight.
     Something that keeps turning or wobbling only as an echo of the moment it was set off – a globe still spinning
     behind the lighthouse, wings flapping on a firefly that sits still – comes to rest once its job is done (`GLOBE_SPIN`,
@@ -229,8 +233,14 @@ Then a second part past the tree (`PART2`, `acornAt`, `beeAt`, `kiteAt`; a pure 
     Drawn with `t` itself, the Raketenstart's whole machine went through React in every frame while only a few
     attributes changed: 71–78 % busy on the old phone, 61–62 % once its parts were still and its flying things sprites (A-38). Props are compared one level deep, so a list of things
     that move (radio waves) is a row of `still` parts, never an array of objects. What flies or bobs on its own across
-    the sky (the Raketenstart's satellite, capsule and radio waves) is a `Sprite` in `over` (`SkyFall`, `RadioWaves`),
-    drawn round its own 0,0 and moved by the sprite, so the machine's big svg is not painted again for it.
+    the sky (the Raketenstart's satellite, capsule and radio waves, its UFO with its beam and the moon rock it carries),
+    and what drives or turns for seconds (its moon buggy, its planet mobile), is a `Sprite` in `over` (`SkyFall`,
+    `RadioWaves`, `UfoSky`, `BuggyDriving`, `MobileTurning`), drawn round its own 0,0 and moved and turned by the
+    sprite, so the machine's big svg is not painted again for it; what of it never moves (the mobile's cord) stays in
+    the svg, and a beam reaching from the thing down to the ground is a sprite of its own round a point above the
+    ground, under the thing's sprite (`BeamLight`). Laid over the machine,
+    such a thing passes in front of a crane's jib or a box it once passed behind: look at it at 844×390 and keep it only
+    where that looks right.
   - Decorative flicker (the Zirkus hoop's flames) changes a few times a second (`FLICKER.steps`, a stepped `t`), not
     in every frame, and only round its moment (`seen` and a window round `tHoop`): 16 flame paths flickering in every
     frame were most of the Zirkus's 44 screens a second (now 31). The Raketenstart's blinking lamps pass only on or off
@@ -239,7 +249,10 @@ Then a second part past the tree (`PART2`, `acornAt`, `beeAt`, `kiteAt`; a pure 
     its middle, and a marble run its lower wall too („Unten“); run it for the level after changing what moves in it (`ketten-` runs all 21, about 15 minutes). A
     level the scenario keeps playing by keys (the Nagelbrett) must still be running at „Mitte“: at a key every 600 ms its
     twenty marbles were gone before it, and „Mitte“ measured the turn to the next level – look at its `--shots` when a
-    number seems too good (A-36).
+    number seems too good (A-36) Which seconds of a level a stretch measured is what its `--shots` picture shows, never worked out
+    from the scenario's waits: collecting a trace between two stretches takes seconds, and the Raketenstart's „Mitte“
+    lay at about 40–50 s (the UFO) while A-49 was written for 24–37 s (the capsule). `KETTEN_SCAN=1 LEVELS=<id>
+    TIMES=…` then lists what still changes in the machine's svg at those seconds.
 
 ## Working on machines
 

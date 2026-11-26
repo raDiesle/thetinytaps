@@ -195,6 +195,12 @@ describe("Raketenstart", () => {
     expect(Math.abs((puff?.pt.y ?? 0) - earth.y)).toBeLessThan(2);
   });
 
+  test("the mobile comes to rest before the UFO lets go of the moon rock, not by fractions of a pixel until the end (A-49)", () => {
+    const rest = space.spinAt(space.duration);
+    expect(space.spinAt(space.tRelease)).toBe(rest);
+    expect(space.spinAt(space.tScope + 5)).toBeLessThan(rest - 0.05);
+  });
+
   test("after liftoff the rocket, small far away, lands right on top of the moon", () => {
     expect(space.miniRocketAt(space.tMoonIn - 0.01)).toBeNull();
     expect(space.miniRocketAt(space.tMoonLand)?.pt).toEqual({ x: MOON.x, y: MOON.y - MOON.r });
