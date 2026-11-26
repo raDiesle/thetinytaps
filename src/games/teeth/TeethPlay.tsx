@@ -30,6 +30,7 @@ import { GRIN_VIEW, STEPS, stepText } from "./steps";
 import { sungLanguageFor } from "./sung";
 import { type TeethSymbol, teethSymbol } from "./symbols";
 import { Week } from "./week";
+import { foamStage } from "./foam";
 import voiceFiles from "./stimme/**/*.mp3?glob";
 import "./teeth.css";
 import { useStepAddress } from "@/lib/stepAddress";
@@ -653,6 +654,7 @@ export function TeethPlay({ settings, video }: { settings: TeethSettings; video?
               brush={step && { stops: inStep.map((m) => ({ tooth: m.tooth, spot: m.spot })), at: brushStop, surface: step.surface, motion: step.motion }}
               happy={done}
               dazzled={ending === "cheer"}
+              foam={foamStage(brushed, totalMs, ending)}
               action={action}
               gliding={gliding}
               glide={{ to: target, k: glided }}

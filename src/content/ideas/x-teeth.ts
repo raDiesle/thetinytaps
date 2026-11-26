@@ -58,7 +58,7 @@ export const teethIdeas: IdeaArea = {
       id: "X-18",
       emoji: "💦",
       title: "Ausspucken, nicht ausspülen",
-      text: "Am Ende, vor dem Ausspülen der Bürste, zeigt der Spiegel das Gesicht über dem Waschbecken: die Lippen gespitzt, ein Klecks Schaum fällt ins Becken, ein leises „Ptü“. Kein Becher Wasser zum Mundspülen. Ein Bild mit zwei Takten, ohne Worte im Bild.",
+      text: "Am Ende, vor dem Ausspülen der Bürste, zeigt der Spiegel das Gesicht über dem Waschbecken: die Lippen gespitzt, ein Klecks Schaum fällt ins Becken, ein leises „Ptü“. Kein Becher Wasser zum Mundspülen. Ein Bild mit zwei Takten, ohne Worte im Bild. Der Schaum auf den Lippen (X-31) bleibt dann bis hierher und geht mit dem Ausspucken weg (heute blendet er beim Jubel aus, `foamStage` in foam.ts).",
       why: "Empfohlen wird, den Schaum nur auszuspucken und nicht mit Wasser nachzuspülen, damit das Fluorid an den Zähnen bleibt. Kinder machen nach, was sie sehen – und Ausspucken üben viele Zweijährige erst.",
       effort: "S",
     },
@@ -165,6 +165,9 @@ export const teethIdeas: IdeaArea = {
       text: "Im Spiegel bildet sich beim Putzen nach und nach weißer Zahnpastaschaum: erst ein paar Bläschen an den Borsten, dann ein Rand Schaum an den Mundwinkeln und auf der Unterlippe, so wie bei echtem Putzen. Er bleibt bis zum Ausspucken (X-18) und verschwindet dann. Leise und ruhig, keine Blasen, die aufsteigen oder platzen.",
       why: "Kinder sehen am eigenen Mund im echten Spiegel Schaum und erkennen sich im Spiel wieder. Und mancher Zweijährige erschrickt beim ersten Schaum im Mund – sieht er ihn vorher beim Kind im Spiel, ist er etwas ganz Normales.",
       effort: "S",
+      done: true,
+      partial:
+        "Umgesetzt (26. November 2026): Die Bläschen an den Borsten gab es schon; nach 20 s Putzen kommt Schaum in beide Mundwinkel, nach 40 s auf die Mitte der Unterlippe, nach 65 s mehr davon zu den Winkeln hin – jeder Klecks blendet in zwei Schlägen sanft ein. Da es das Ausspucken (X-18) noch nicht gibt, blendet der Schaum beim Jubel am Ende aus, während der Kopf zurückfährt; kommt X-18, bleibt er bis zum Ausspucken.",
     },
     {
       id: "X-32",
