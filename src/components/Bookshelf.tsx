@@ -229,6 +229,17 @@ function nudge(e: PointerEvent<HTMLElement>) {
   playKnock(book.classList.contains("shelf-lying") ? 420 : 560);
 }
 
+/** „Wer spielt?“, written beside the stickers of the child's figure. */
+const WHO_PLAYS: Localized = {
+  de: "Wer spielt?",
+  ru: "Кто играет?",
+  en: "Who’s playing?",
+  zh: "谁来玩？",
+  hi: "किसकी बारी?",
+  es: "¿Quién juega?",
+  ar: "من يلعب؟",
+};
+
 /** What stands in each of the grown-ups' compartments (the stickers' has nothing on its board: they are on its side). */
 const THINGS: Partial<Record<ShelfThing, () => ReactNode>> = {
   music: () => <RoomSpeaker />,
@@ -646,22 +657,33 @@ function labelOf(cell: ShelfCell, layout: ShelfLayout): Localized | undefined {
 }
 
 /**
- * Where the trophy room's sign is nailed on, the bottom corner of a compartment: on a wide shelf the speaker's, the
- * bottom of the column at the right, at its left with the speaker against the shelf's right wall (user request, 26
- * November 2026: the music box stands at the right wall), sized by that narrow compartment (`size`, `from: "left"`); on
- * an upright shelf, whose things stand in small compartments on top, the bottom right corner of the lowest compartment
- * holding picture books, reaching left into it.
+ * Where the trophy room's sign is nailed on: on a wide shelf in the top left corner of the speaker's compartment, the
+ * bottom of the column at the right, its nails in the post and the board above (`left` and `top` their middles), so the speaker below it at the right wall can be big again (user request, 26
+ * November 2026: beside the speaker on its board both were small), sized by that narrow compartment (`size`, `from:
+ * "top"`); on an upright shelf, whose things stand in small compartments on top, the bottom right corner of the lowest
+ * compartment holding picture books, reaching left into it.
  */
-function trophySignAt(layout: ShelfLayout): { left: number; top: number; size?: number; from?: "left" } {
+function trophySignAt(layout: ShelfLayout): { left: number; top: number; size?: number; from?: "top" } {
   const speaker = layout.upright ? undefined : layout.cells.find((cell) => !cell.books && cell.things?.includes("music"));
-  if (speaker) return { left: speaker.x, top: speaker.y + speaker.h, size: Math.min(speaker.w * TROPHY_BESIDE, speaker.h * 0.62), from: "left" };
+  if (speaker) {
+    // Its nails go on the wood (user feedback, 26 November 2026): the middles of the post at the compartment's left and
+    // of the board above it, where its corner's nails are driven in.
+    const post = layout.planks.find((p) => p.h > p.w && Math.abs(p.x + p.w - speaker.x) < 2 && p.y <= speaker.y && p.y + p.h >= speaker.y);
+    const board = layout.planks.find((p) => p.w > p.h && Math.abs(p.y + p.h - speaker.y) < 2 && p.x <= speaker.x + 1 && p.x + p.w >= speaker.x + 1);
+    return {
+      left: post ? post.x + post.w / 2 : speaker.x,
+      top: board ? board.y + board.h / 2 : speaker.y,
+      size: Math.min(speaker.w * TROPHY_CORNER, speaker.h * 0.36),
+      from: "top",
+    };
+  }
   const pictureBooks = layout.cells.filter((cell) => cell.books?.some((b) => !PLACES[b][0].colour));
   const cell = pictureBooks.sort((a, b) => b.y - a.y || b.x - a.x)[0] ?? layout.cells[layout.cells.length - 1];
   return { left: cell.x + cell.w, top: cell.y + cell.h };
 }
 
-/** The share of the speaker's compartment the trophy sign beside it is wide; the speaker takes what is left at its right. */
-const TROPHY_BESIDE = 0.52;
+/** The share of the speaker's compartment the trophy sign in its top left corner is wide. */
+const TROPHY_CORNER = 0.42;
 
 /** A rectangle of the shelf's plan as a style. */
 const rect = (r: ShelfRect): CSSProperties => ({ left: r.x, top: r.y, width: r.w, height: r.h });
@@ -735,18 +757,32 @@ function Compartment({
         </div>
       )}
       {label && cell.books && <GroupSign name={t(label)} board style={groupWidth(cell, bh, spans)} />}
-      {things.includes("figure") && (
-        // The stickers of the child's figure with „Wer spielt?“ written small right above them (user feedback, November
-        // 2026), in a compartment of their own: on a wide shelf on its back panel, in the right column under the
-        // hourglass (user request, 26 November 2026: squeezed on the helpers' wall they took the books' room, and on a
-        // narrow wall they could hardly be seen); on an upright one on its right wall.
-        <div className={layout.upright ? "shelf-side-stuck" : "shelf-back-stuck"}>
-          <span className="shelf-figure-ask" aria-hidden>
-            {t({ de: "Wer spielt?", ru: "Кто играет?", en: "Who’s playing?", zh: "谁来玩？", hi: "किसकी बारी?", es: "¿Quién juega?", ar: "من يلعب؟" })}
-          </span>
-          <RoomStickers />
-        </div>
-      )}
+      {things.includes("figure") &&
+        (layout.upright ? (
+          // The stickers of the child's figure with „Wer spielt?“ written small right above them (user feedback,
+          // November 2026), on an upright shelf on its compartment's right wall.
+          <div className="shelf-side-stuck">
+            <span className="shelf-figure-ask" aria-hidden>
+              {t(WHO_PLAYS)}
+            </span>
+            <RoomStickers />
+          </div>
+        ) : (
+          // On a wide shelf in a compartment of their own in the right column under the hourglass: the two heads one
+          // above the other on its back panel, whole, and „Wer spielt?“ running down its right wall, the face seen
+          // most of in that narrow compartment (user request, 26 November 2026: over the heads side by side the words
+          // and the heads were cut off).
+          <>
+            <div className="shelf-side-stuck shelf-ask-wall">
+              <span className="shelf-figure-ask" aria-hidden>
+                {t(WHO_PLAYS)}
+              </span>
+            </div>
+            <div className="shelf-back-stuck">
+              <RoomStickers />
+            </div>
+          </>
+        ))}
       {things.map(
         (thing) =>
           THINGS[thing] && (

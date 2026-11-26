@@ -211,6 +211,11 @@ Then a second part past the tree (`PART2`, `acornAt`, `beeAt`, `kiteAt`; a pure 
     times that rate, and the mobile turned by fractions of a pixel for 30 s, to the level's end, with the phone
     painting the machine for it (A-49; `space.test.ts`).
     `TIMES=30,40` scans those seconds, `ALL=1` lists every change rather than the first eight.
+    **Beside the screen counts too**: a phone rasters the big svg half a screen and more beside what it shows, so what
+    swings or rocks on there for long (Gute Nacht's pendulum and rocking chair while the camera stays with the hamster
+    and the moon) is rastered as if on the screen – it was two thirds of that level's middle (A-43). `seen` counts that
+    room as near on purpose; what only swings on after its job holds a fixed moment unless `seen.shown(x0, x1)` (on the
+    screen itself, with `wide`), with a margin round its box, so the jump back to its real moment happens off the screen.
     Something that keeps turning or wobbling only as an echo of the moment it was set off – a globe still spinning
     behind the lighthouse, wings flapping on a firefly that sits still – comes to rest once its job is done (`GLOBE_SPIN`,
     the fireflies' `flying`, and their wings rest while they sit in the lantern), and what turns only while it is on
@@ -236,7 +241,14 @@ Then a second part past the tree (`PART2`, `acornAt`, `beeAt`, `kiteAt`; a pure 
     - over a darkened room (Gute Nacht's `dark`) each sprite carries a shade of its own shape in `NIGHT` at `dark`'s
       opacity (`RopeRunning`'s `shade(r)`), never a square shade over its whole box;
     - a thing that starts hidden behind a part of the svg (the clown in the cannon) is drawn in the svg until it comes
-      out (`tFire`) and only then as a sprite (`BallAndClown`).
+      out (`tFire`) and only then as a sprite (`BallAndClown`);
+    - a thing that moves behind a part that stands still in front of it (the hamster wheel behind its cage's bars) takes
+      that part's piece with it into a sprite on top, clipped to the thing (a disk round the wheel), while the svg leaves
+      the same piece out with a clip of the opposite shape (`BarsHole`); the clip's edge lies on ink (the wheel's rim),
+      so no seam shows. Laid over the veil, sprites that show more than a dot take the darkness as a colour matrix
+      (`Veiled`, exactly what `NIGHT` at `dark`'s opacity does to each pixel, half-clear ones too) rather than a shade
+      drawn after them. Gute Nacht's wheel, hamster, bars and cable car are such sprites only while the rope runs
+      (`ropeMoving`, A-43): the middle went from 41 to 13 screens a second.
   - **A machine's parts never take the clock**: each is `still(…)` and gets only the numbers it draws (an angle, a
     glow, which lamp is on, `-1` for „none“), worked out from `t` where the level draws its machine or in a small
     `…Now` wrapper beside the part (`RobotNow`, `UfoNow`, `CountdownNow` in `SpaceLevel.tsx`), so React skips every part

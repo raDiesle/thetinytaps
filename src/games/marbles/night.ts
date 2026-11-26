@@ -332,6 +332,11 @@ export function buildNight() {
 
   /** How far the door is open (0 shut, 1 wide open). */
   const doorOpen = (t: number) => easeInOut(seg(t, tHour, tHour + 0.5)) - easeInOut(seg(t, tBackEnd, tBackEnd + 0.4));
+  /**
+   * From when the reading corner has done its job – the door shut behind the sleeping cuckoo – and only its pendulum
+   * swings and its chair rocks on: off the screen they hold this moment (A-43).
+   */
+  const tCornerStill = tBackEnd + 0.4;
   /** How far the cuckoo leans into its yawn (0 to 1 and back). */
   const birdLean = (t: number) => hump(seg(t, tBirdYawn, tBirdYawn + YAWN_S));
   /** Where the cuckoo's middle is: hidden in the clock, out on its perch, scooting forward while it yawns. */
@@ -392,6 +397,12 @@ export function buildNight() {
   const carAt = (t: number) => gripAt(CAR_START + ropeRun(t));
   /** How far the wheel (and the pulley on its axle) has turned, in radians, clockwise. */
   const wheelTurn = (t: number) => ropeRun(t) / ROPE.drive.r;
+  /**
+   * Whether the rope runs – the wheel and the pulley on its axle turning, the hamster's feet pattering, the cable car
+   * riding up: while it does, they are sprites of their own over the room (A-43), and before and after it they stand
+   * exactly still in the room's svg.
+   */
+  const ropeMoving = (t: number) => t > tRun && t < tArrive;
   [0.3, 2.5].forEach((d) => at(tRun + d, { sound: playWhirr }));
   at(tRun + 0.1, { sound: squeak });
 
@@ -572,6 +583,7 @@ export function buildNight() {
     tClick,
     tBack,
     tBackEnd,
+    tCornerStill,
     tHamsterWake,
     tDrink,
     tAtWheel,
@@ -610,6 +622,7 @@ export function buildNight() {
     bubbles,
     carAt,
     wheelTurn,
+    ropeMoving,
     shutterTurn,
     beamY,
     asleep,

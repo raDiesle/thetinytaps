@@ -40,9 +40,12 @@ export interface StartSpot {
 /**
  * Whether the world's stretch from `x0` to `x1` is on the screen or near it (`MachineStage`'s `children`); its `wide`
  * is how many world units the screen really shows beyond the view on each side (0 up to 16 : 9), for a level that must
- * know exactly when something has left the screen for good (the Licht-Kette's lava lamp, A-42).
+ * know exactly when something has left the screen for good (the Licht-Kette's lava lamp, A-42). `shown` says whether the
+ * stretch is on the screen itself, with `wide`: what only swings or rocks on beside the screen (a pendulum, a rocking
+ * chair) holds still unless `shown`, since a phone still rasters the room half a screen beside what it shows, and the
+ * „near“ of `seen` reaches that far (Gute Nacht's clock and chair, A-43).
  */
-export type Seen = ((x0: number, x1: number) => boolean) & { wide: number };
+export type Seen = ((x0: number, x1: number) => boolean) & { wide: number; shown: (x0: number, x1: number) => boolean };
 
 /**
  * A part of the world drawn in an svg of its own under (`back`) or over (`front`) the machine's svg, moved by the same
@@ -160,8 +163,10 @@ export function MachineStage({
   // A screen wider than 16 : 9 shows more than the view, so half a view's width on both sides counts as near (up to 32 : 9).
   const w = box.current?.clientWidth || window.innerWidth;
   const h = box.current?.clientHeight || window.innerHeight;
+  const wide = Math.max(0, (w / Math.min(w / VIEW_W, h / VIEW_H) - VIEW_W) / 2);
   const seen: Seen = Object.assign((x0: number, x1: number) => x1 >= camera.current - VIEW_W / 2 && x0 <= camera.current + 1.5 * VIEW_W, {
-    wide: Math.max(0, (w / Math.min(w / VIEW_W, h / VIEW_H) - VIEW_W) / 2),
+    wide,
+    shown: (x0: number, x1: number) => x1 >= camera.current - wide && x0 <= camera.current + VIEW_W + wide,
   });
   const viewBox = `0 0 ${machine.width} ${VIEW_H}`;
   const layer = (l: WorldLayer, key: string) => (
