@@ -81,7 +81,10 @@ its address stays `/drauflos/`.
   (`.shelf-poster-spot`) against the place itself and moves and grows the poster back over it (`--poster-x`,
   `--poster-k`, `POSTER_REACH`) – never a fixed shift in CSS, which was right on one screen only. Anything on the shelf
   stands clear of the books beside it, measured with `getBoundingClientRect` in the page (the tape's boxes against the
-  next cover's left: 5–8 px at 844×390, 390×844, 1024×768, 1280×720 and 1920×1080, the paper's edge about 20 px); `css.test.ts` keeps the poster in its place. The title's size follows its longest word (`--len`), so every
-  language's name fits under the curl. The picture is `src/components/bilder/plakat-<category>.webp`, made by
+  next cover's left: 5–8 px at 844×390, 390×844, 1024×768, 1280×720 and 1920×1080, the paper's edge about 20 px); `css.test.ts` keeps the poster in its place. The title's size follows its longest word (`--len`, each letter
+  `--letter` em wide, more for Cyrillic), so every language's name fits under the curl; it is plain dark red ink, never
+  an outline or a coloured shadow, which at a few px smeared „Zaubertasten“ into a blur (user feedback, 26 November
+  2026; `css.test.ts`), and the picture takes the room the name leaves, so a name on two lines never pushes it past the
+  paper's foot – measure the name's lines and the picture's foot in all seven languages at 844×390 after a change. The picture is `src/components/bilder/plakat-<category>.webp`, made by
   `bun run previews plakat` (`POSTERS` in `tools/previews.ts`): a firework, a letter and a digit with its shapes,
   played with fixed chance so it comes out the same each time – look at it after every change to what the game draws.

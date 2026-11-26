@@ -907,7 +907,7 @@
   align-items: center;
   gap: 3%;
   /* Its name starts below the curled corner, so no letter is folded away. */
-  padding: calc(var(--curl) * 0.75) 6% 0;
+  padding: calc(var(--curl) * 0.75) 4% 0;
   box-sizing: border-box;
   background: linear-gradient(115deg, #fff0 55%, #8a5a2a14 100%), #fffaf0;
   /* The top right corner folded away (`.shelf-poster-curl` is its back). */
@@ -918,21 +918,31 @@
   display: block;
   width: 100%;
   font-family: var(--font-rounded);
-  /* As big as its longest word lets it stand in the width (`--len`, its letters), never cut off. */
-  font-size: min(calc(var(--pw) * 0.15), calc(var(--pw) * 0.86 / (var(--len) * 0.6)));
-  font-weight: 800;
+  /* As big as its longest word lets it stand in the width (`--len`, its letters, each about `--letter` em wide), never
+     cut off. */
+  font-size: min(calc(var(--pw) * 0.17), calc(var(--pw) * 0.9 / (var(--len) * var(--letter, 0.53))));
+  font-weight: 700;
   line-height: 1.05;
   text-align: center;
   text-wrap: balance;
-  color: #e8434b;
-  -webkit-text-stroke: 0.06em #5a3a1e;
-  paint-order: stroke fill;
-  text-shadow: 0 0.06em 0 #f7a21b;
+  /* Plain dark red ink on the paper: the poster is small, and an outline with a coloured shadow round red letters
+     smeared them into an unreadable blur (user feedback, 26 November 2026). */
+  color: #b8222c;
 }
 
+/* Cyrillic letters come from a wider font than Fredoka's Latin ones: „Волшебные“ ran past the paper at the Latin share. */
+:root[lang="ru"] .shelf-poster-title {
+  --letter: 0.7;
+}
+
+/* The picture takes the room the name leaves, square: a name on two lines (Spanish, Russian) pushed a full-width picture
+   past the paper's foot, where it was cut off. */
 .shelf-poster-picture {
   display: block;
-  width: 100%;
+  flex: 1 1 0;
+  min-height: 0;
+  max-width: 100%;
+  margin-bottom: 4%;
   aspect-ratio: 1;
   object-fit: cover;
   border-radius: calc(var(--pw) * 0.025);
