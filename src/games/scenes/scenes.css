@@ -2,7 +2,8 @@
 
 /* ---------- Lebendige Bilder ---------- */
 
-/* Above and below the picture the sky and ground continue, whatever the screen shape. Named `scene-root`, not `.scene`:
+/* Beside or above and below the picture its background continues mirrored (bleed.ts); this sky and ground are only
+   what shows before it is measured. Named `scene-root`, not `.scene`:
    Was gehört zusammen? puts a class „scene“ on its pictures, and this sheet now loads with the game, possibly after its. */
 .scene-root {
   position: absolute;

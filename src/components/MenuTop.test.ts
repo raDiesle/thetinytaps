@@ -112,7 +112,8 @@ test("the way back onto the shelf is the book's ribbon, not a corner", () => {
 
 // The ribbon is big, so a grown-up sees it at once (user feedback, October 2026), and it never lies over a card, a line or
 // the title: the menu's head reaches down past it from the top of the menu's padding (`--menu-pad`, which must be the
-// padding the menus really have), the table of contents counts that room as taken, and it stays left of the head.
+// padding the menus really have), the table of contents counts that room as taken, and it stays left of the head –
+// but for a table of contents on a phone or tablet, see the next test.
 test("the ribbon reaches no further than the room the menus keep free for it", () => {
   const art = read("src/components/PageCornerArt.tsx");
   const [, w, h] = (art.match(/className="page-ribbon-art" viewBox="0 0 (\d+) (\d+)"/) ?? []).map(Number);
@@ -140,6 +141,27 @@ test("the ribbon reaches no further than the room the menus keep free for it", (
   const menuPad = (selector: string) => body(selector).flatMap((b) => b.match(/--menu-pad:\s*(\d+px)/)?.[1] ?? []);
   expect(pad("styles/menus.css", ".home")).toEqual([...menuPad(":root .home"), ...menuPad(":root :is(.home, .start-screen)")]);
   expect(pad("styles/start-screen.css", ".start-screen")).toEqual([...menuPad(":root .start-screen"), ...menuPad(":root :is(.home, .start-screen)")]);
+});
+
+// On a phone or tablet a book's table of contents takes the whole page, and the ribbon and the fullscreen note lie over
+// its first row's corners, so the games' pictures come out as big as they can (user request, 26 November 2026). It is
+// every screen whose shorter side is below `TABLET_SCREEN` and that is narrower than the wide screens laying the ribbon
+// beside the lines – those keep it off them.
+test("on a phone or tablet the table of contents takes the whole page, the ribbon lying over its first line", async () => {
+  const { TABLET_SCREEN } = await import("@/lib/fitGrid");
+  const css = read("src/styles/book.css").replace(/\/\*[\s\S]*?\*\//g, "");
+  const wideFrom = Number(css.match(/@media \(min-width: (\d+)px\) and \(min-height: 600px\) \{\s*:root:has\(\.page-ribbon\):has\(\.toc\) \{/)?.[1]);
+  const block = css.match(
+    /@media ([^{]+)\{\s*:root:has\(\.page-ribbon\):has\(\.toc\) \{([^}]*)\}\s*:root:has\(\.page-ribbon\):has\(\.toc\) \.menu-head \{([^}]*)\}/,
+  );
+  const [, query, root, head] = block ?? [];
+  const below = (px: number) => `${px - 0.02}px`;
+  expect(query?.trim()).toBe(`(max-width: ${below(TABLET_SCREEN)}), (max-width: ${below(wideFrom)}) and (max-height: ${below(TABLET_SCREEN)})`);
+  // Close to the page's outer edge, so it covers as little of the first line as it can.
+  expect(root).toContain("--ribbon-left: calc(var(--page-left) + 2px);");
+  expect(head).toContain("min-height: 0;");
+  // The lines reach down to the page's foot (no strip kept for anything below them).
+  expect(css).toMatch(/:root \.toc \{[^}]*--toc-bottom: calc\(var\(--page-bottom\) \+ 8px\);[^}]*width: 100%;/);
 });
 
 // On a wide screen the ribbon lies in the margin beside the table of contents, as big as that margin allows (user
