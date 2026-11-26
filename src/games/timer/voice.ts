@@ -6,7 +6,7 @@ import type { Holder, TurnChild } from "./swap";
 import { MORE_TURN_TO } from "./marbleNames";
 import { BLOCKS_LINES } from "./blocksNames";
 import { TUNNEL_LINES } from "./tunnelNames";
-import { JUMP_LINES } from "./jumpNames";
+import { LIFT_LINES } from "./liftNames";
 import { JAR_LINES } from "./jarNames";
 import { TIDY_LINES } from "./tidyNames";
 import voiceFiles from "./stimme/**/*.mp3?glob";
@@ -220,7 +220,7 @@ export const PICTURE_LINES: Record<TimedPicture, { start: Texts; end: Texts }> =
   tidy: TIDY_LINES,
   blocks: BLOCKS_LINES,
   tunnel: TUNNEL_LINES,
-  jump: JUMP_LINES,
+  jump: LIFT_LINES,
   jar: JAR_LINES,
 };
 
