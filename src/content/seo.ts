@@ -593,6 +593,7 @@ export const NO_INDEX_PATHS = [
   "/pokale/",
   "/management/bilder/",
   "/management/recherchen/",
+  "/management/lieder/",
   "/management/video-zaehne/",
   "/management/video-haende/",
   "/management/video-intro/",

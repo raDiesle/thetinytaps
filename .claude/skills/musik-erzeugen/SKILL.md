@@ -60,6 +60,14 @@ parts change exactly with the brushing steps, a finale on the end screen.
   choruses are comes from matching one chorus's spectrum (log bands plus onsets, 10 ms frames) against the whole song:
   the repeats scored 0.85–0.93, everything else below 0.75, and their distances give the tempo to the hundredth.
   Whether anything is sung before the first bar: Whisper on that piece alone, padded with silence.
+- **Words for an everyday task stay general** (user feedback, 26 November 2026, on the tidying songs): nobody knows
+  what lies in a child's room, so a tidying song sings of things, everything and its place, following the task itself
+  (look round, carry, peek in corners, the floor shows, nearly done), never of blocks, cars or teddies
+  (`src/content/songDrafts.test.ts`). The same for any helper whose things differ from home to home.
+- **A timer song is built of one-minute blocks**: a chorus singing the minutes left, a verse, an instrumental break.
+  Only the start and the last verse know where in the run they are, so a shorter timer plays the start and then the
+  last blocks – one song covers 1 to 5 minutes, never a song per length. Drafts wait on `/management/lieder/`
+  (`src/content/songDrafts.ts`); the user picks one there before it is made.
 - Suno usually adds a part and an ending (pause + final chord): useful as a finale
   for the end screen.
 - **Download WAV** (best for cutting and converting), otherwise MP3.
