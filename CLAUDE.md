@@ -325,7 +325,8 @@ In a fresh worktree run `bun install` first.
   `bun run perf` measures it: it plays each game in headless
   Chrome as a ten-year-old Android phone (6× slower CPU, 640×360 at 3× pixels) and fails a stretch over the budget
   (`tools/perfScenarios.ts`: p95 frame ≤ 34 ms, ≤ 0.5 frames over 50 ms a second, main thread ≤ 60 % busy, and ≤ 30
-  screens of pixels rastered anew a second – the GPU's work, which a gaming phone's 120 Hz screen doubles). Until
+  screens of pixels rastered anew a second – the GPU's work, which a gaming phone's 120 Hz screen doubles; counted per
+  layer's tiles, `tools/rasterArea.ts`, since Chrome reuses tile ids in every layer). Until
   November 2026 it rastered at 1× and counted the idle seconds of collecting its trace into every stretch, so it found
   nothing while the user's phone stuttered: when a phone stutters and the tool says it's fine, doubt the tool first. A stretch that
   starts with a tap also counts the frames before the motion, where the next page is drawn while the screen stays still,

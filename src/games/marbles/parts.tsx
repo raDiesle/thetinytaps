@@ -53,16 +53,38 @@ export type ScreenAt = (x: number, y: number) => { x: number; y: number; k: numb
  * `2 * pad` world units square round its middle, placed at the world point `x`, `y` by `at` and turned by `angle`
  * (radians) with a CSS transform. The phone then only moves the finished little picture, where the same thing drawn
  * inside the level's big svg had it paint and raster bands as wide as the screen in every frame (perf, November 2026).
- * `children` draw round 0, 0 in world units.
+ * `children` draw round 0, 0 in world units. An `opacity` fades the whole layer, which the compositor does alone, with no
+ * painting (the Licht-Kette's stickers waking, A-42).
  */
-export function Sprite({ at, x, y, pad, angle = 0, children }: { at: ScreenAt; x: number; y: number; pad: number; angle?: number; children: ReactNode }) {
+export function Sprite({
+  at,
+  x,
+  y,
+  pad,
+  angle = 0,
+  opacity,
+  children,
+}: {
+  at: ScreenAt;
+  x: number;
+  y: number;
+  pad: number;
+  angle?: number;
+  opacity?: number;
+  children: ReactNode;
+}) {
   const p = at(x, y);
   const half = pad * p.k;
   return (
     <svg
       className="marble-sprite"
       viewBox={`${-pad} ${-pad} ${2 * pad} ${2 * pad}`}
-      style={{ width: 2 * half, height: 2 * half, transform: `translate3d(${p.x - half}px, ${p.y - half}px, 0)${angle ? ` rotate(${angle}rad)` : ""}` }}
+      style={{
+        width: 2 * half,
+        height: 2 * half,
+        transform: `translate3d(${p.x - half}px, ${p.y - half}px, 0)${angle ? ` rotate(${angle}rad)` : ""}`,
+        opacity,
+      }}
       aria-hidden
     >
       {children}

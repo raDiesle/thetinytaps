@@ -7,7 +7,7 @@ import { loadRealSounds } from "@/lib/realSounds";
 import { type HintSide, TapHint } from "@/components/TapHint";
 
 /** How fast the camera catches up with the action, per second. */
-const CAMERA_FOLLOW = 2.6;
+export const CAMERA_FOLLOW = 2.6;
 
 /**
  * How long a machine's picture may still move after its end, in seconds: then its clock stands and nothing is drawn
@@ -37,8 +37,12 @@ export interface StartSpot {
   side?: HintSide;
 }
 
-/** Whether the world's stretch from `x0` to `x1` is on the screen or near it (`MachineStage`'s `children`). */
-export type Seen = (x0: number, x1: number) => boolean;
+/**
+ * Whether the world's stretch from `x0` to `x1` is on the screen or near it (`MachineStage`'s `children`); its `wide`
+ * is how many world units the screen really shows beyond the view on each side (0 up to 16 : 9), for a level that must
+ * know exactly when something has left the screen for good (the Licht-Kette's lava lamp, A-42).
+ */
+export type Seen = ((x0: number, x1: number) => boolean) & { wide: number };
 
 /**
  * A part of the world drawn in an svg of its own under (`back`) or over (`front`) the machine's svg, moved by the same
@@ -71,6 +75,7 @@ export function MachineStage({
   back,
   over,
   front,
+  top,
   children,
 }: LevelProps & {
   machine: MachineBase;
@@ -85,6 +90,11 @@ export function MachineStage({
   over?: (t: number, at: ReturnType<typeof cameraPoint>, seen: Seen) => ReactNode;
   /** Still or seldom changing parts over the machine, top last; a function of the machine's seconds where it must know them. */
   front?: WorldLayer[] | ((t: number, seen: Seen) => WorldLayer[]);
+  /**
+   * HTML laid over everything, `front` included, like `over`: small things moving for long that must stay in front of
+   * what `front` draws (the Licht-Kette's fireflies over the fairy lights, as `Sprite`s).
+   */
+  top?: (t: number, at: ReturnType<typeof cameraPoint>, seen: Seen) => ReactNode;
   /**
    * Draws the machine at `t` seconds. `seen(x0, x1)` says whether that stretch of the world is on the screen or near it:
    * what moves for ever (flames, blinking lights) passes a still time while it is not, so it changes nothing off screen.
@@ -148,7 +158,11 @@ export function MachineStage({
   const at = cameraPoint(box.current, world, view);
   const cameraStyle = cameraLayer(box.current, world, view);
   // A screen wider than 16 : 9 shows more than the view, so half a view's width on both sides counts as near (up to 32 : 9).
-  const seen: Seen = (x0, x1) => x1 >= camera.current - VIEW_W / 2 && x0 <= camera.current + 1.5 * VIEW_W;
+  const w = box.current?.clientWidth || window.innerWidth;
+  const h = box.current?.clientHeight || window.innerHeight;
+  const seen: Seen = Object.assign((x0: number, x1: number) => x1 >= camera.current - VIEW_W / 2 && x0 <= camera.current + 1.5 * VIEW_W, {
+    wide: Math.max(0, (w / Math.min(w / VIEW_W, h / VIEW_H) - VIEW_W) / 2),
+  });
   const viewBox = `0 0 ${machine.width} ${VIEW_H}`;
   const layer = (l: WorldLayer, key: string) => (
     <svg
@@ -172,6 +186,7 @@ export function MachineStage({
       </svg>
       {over?.(clock.current, at, seen)}
       {fronts?.map((l, i) => layer(l, `front${i}`))}
+      {top?.(clock.current, at, seen)}
       {clock.current < 0 && <TapHint key="start" {...worldHint(at, startSpot)} side={startSpot.side} />}
     </div>
   );
