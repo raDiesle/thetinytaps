@@ -14,6 +14,11 @@ parts change exactly with the brushing steps, a finale on the end screen.
 
 ## What we learned (keep to it)
 
+- **A song belongs to a task, never a general timer or countdown song** (user decision, 26 November 2026: general timer
+  songs for children are nonsense). A sung song carries one thing the child does – tidying up, brushing, washing hands,
+  getting dressed, going to bed – and its verses sing that; never a song that only counts the minutes under any
+  picture (H-134 was rejected for this). Parents search YouTube the same way, by task and length („clean up timer 5
+  minutes“, „timer mit musik zum aufräumen“; study `youtube-timer-themen`).
 - **Instrumental under spoken hints.** Singing under the voice (even quiet) makes both
   hard to follow for a toddler. A **sung song that is itself the hint** works instead:
   one verse per step singing exactly what is shown, the voice then stays silent during

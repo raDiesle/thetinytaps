@@ -377,6 +377,10 @@ and the shared `Layer`, `Draw`, `LeftGlow`), `timer.css`, `content.ts`
 
 ## Rules
 
+- **Music in the Timer belongs to a task** (user decision, 26 November 2026): a timer gets a song only as the song of
+  what the child does meanwhile – the Aufräumlied for tidying up (H-119, H-135) –, never a general countdown song
+  played under any picture (H-134, rejected: „allgemeine Timer-Lieder für Kinder sind Quatsch“). A video of a timer is
+  named by its task and length too („5 Minute Clean Up Timer“), the way parents search (study `youtube-timer-themen`).
 - The row of lengths stays one line on a phone on its side (844×390), with the own time's slip too: when it wraps, the
   last row of cards falls off the screen. A new length means narrower slips (`.tm-lengths`), never a second line.
 - **Progress is seen every second** (user feedback, November 2026): every picture moves a step a second that a child
