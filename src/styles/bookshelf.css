@@ -134,20 +134,35 @@
 
 /* The wooden loudspeaker: the music of all games. */
 .room-speaker svg {
-  height: min(calc(var(--ch) * 0.62), calc(var(--cw) * 0.82 / 0.72));
+  height: min(calc(var(--ch) * 0.62), calc(var(--cw) * 0.86 / 0.8));
   width: auto;
 }
 
 .room-speaker-box {
   fill: #b98552;
   stroke: var(--ink);
-  stroke-width: 2.5;
+  stroke-width: 2.2;
 }
 
 .room-speaker-side {
   fill: #8a5a33;
   stroke: var(--ink);
-  stroke-width: 2;
+  stroke-width: 1.8;
+  stroke-linejoin: round;
+}
+
+.room-speaker-top {
+  fill: #cf9e68;
+  stroke: var(--ink);
+  stroke-width: 1.8;
+  stroke-linejoin: round;
+}
+
+.room-speaker-grain {
+  fill: none;
+  stroke: #5a3414;
+  stroke-opacity: 0.35;
+  stroke-width: 0.8;
 }
 
 .room-speaker-foot {
@@ -156,24 +171,33 @@
 
 .room-speaker-edge {
   fill: none;
-  stroke: #ffffff59;
-  stroke-width: 2;
+  stroke: #ffffff66;
+  stroke-width: 1.6;
+  stroke-linecap: round;
+}
+
+.room-speaker-baffle {
+  fill: #2f262a;
+  stroke: #1d1619;
+  stroke-width: 1.2;
 }
 
 .room-speaker-ring {
-  fill: #3e3236;
-  stroke: var(--ink);
-  stroke-width: 2;
+  stroke: #1d1619;
+  stroke-width: 0.9;
 }
 
-.room-speaker-cone {
-  fill: #5d4c51;
+.room-speaker-surround {
+  fill: #1f181b;
 }
 
 .room-speaker-cap {
-  fill: #7a676c;
-  stroke: #2b2230;
-  stroke-width: 1.2;
+  stroke: #1d1619;
+  stroke-width: 0.6;
+}
+
+.room-speaker-screw {
+  fill: #3a3236;
 }
 
 .room-speaker-light {
@@ -1015,12 +1039,22 @@
 
 .shelf-back-stuck .room-stickers {
   flex-direction: column;
-  gap: 8cqh;
-  translate: -12cqw 0;
+  gap: 10cqh;
+  translate: -8cqw 0;
 }
 
 .shelf-back-stuck .room-sticker {
   --s: min(38cqh, 44cqw);
+}
+
+/*
+ * The ♀ or ♂ sits at the head's top right, over it, so it stays clear of the right wall (user feedback, 26 November
+ * 2026: at the head's right side it was cut off there).
+ */
+.shelf-back-stuck .room-sticker-sign {
+  top: calc(var(--s) * -0.12);
+  right: calc(var(--s) * -0.1);
+  translate: none;
 }
 
 /*
@@ -1050,21 +1084,27 @@
 }
 
 /*
- * On a wide shelf the speaker stands big against the shelf's right wall and the trophy room's sign is nailed into the
+ * On a wide shelf the speaker stands big against the shelf's right wall, its right side flush with it (user feedback, 26
+ * November 2026), and the trophy room's sign is nailed into the
  * compartment's top left corner above it (`trophySignAt`, `data-from="top"`; user request, 26 November 2026: beside
  * each other on the board both were small).
  */
+/* Its right side right against the wall: the front's right edge is the svg's, and nothing lies between it and the wall. */
 .room-scene[data-plan="wide"] .shelf-cell.music .shelf-thing {
   justify-content: flex-end;
-  padding-right: calc(var(--cw) * 0.04);
 }
 
 .room-scene[data-plan="wide"] .shelf-cell.music .room-speaker svg {
-  height: min(calc(var(--ch) * 0.64), calc(var(--cw) * 0.8 / 0.72));
+  height: min(calc(var(--ch) * 0.66), calc(var(--cw) * 0.9 / 0.8));
 }
 
+/*
+ * Nailed onto the frame's front (user feedback, 26 November 2026): its top nails on the board above, its left ones on
+ * the post – `left` and `top` are those planks' middles, and the sign moves up and left by its nails' distance from its
+ * corner (`--nail-at`), so each nail's head lies on the wood.
+ */
 .shelf-trophy-sign[data-from="top"] {
-  translate: calc(var(--post) * 0.15) calc(var(--edge) * 0.5);
+  translate: calc(var(--nail-at) * -1) calc(var(--nail-at) * -1);
 }
 
 /* ----- The front of the frame: the planks between compartments, the posts, the top board, the plinth ----- */
@@ -1255,8 +1295,10 @@
  */
 .shelf-trophy-sign {
   --trophy-sign: clamp(70px, calc(var(--bh) * 0.56), 124px);
-  --nail: max(8px, calc(var(--trophy-sign) * 0.1));
+  --nail: max(5px, calc(var(--trophy-sign) * 0.1));
   --edge: max(3px, calc(var(--trophy-sign) * 0.05));
+  /* How far a nail's middle lies from the sign's edges (`::before`'s inset and half a nail). */
+  --nail-at: calc(var(--trophy-sign) * 0.03 + var(--nail) / 2);
   position: absolute;
   z-index: 3;
   display: grid;

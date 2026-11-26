@@ -20,8 +20,9 @@ const DOORWAY_MS = 1900;
 
 /**
  * The sign, the compartment's bottom right corner – its post at `left`, its floor at `top` – in px in the shelf, or
- * with `from: "top"` its top left corner, the wall at its left and the board above at its top; and its width where that
- * compartment sets it (`size`, the speaker's); else the books' height does (`--trophy-sign`).
+ * with `from: "top"` its top left nail, at the middles of the post (`left`) and the board above (`top`) it is nailed
+ * on; and its width where that compartment sets it (`size`, the speaker's); else the books' height does
+ * (`--trophy-sign`).
  */
 export function TrophySign({ left, top, size, from }: { left: number; top: number; size?: number; from?: "top" }) {
   const t = useT();
