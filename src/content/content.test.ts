@@ -1,6 +1,19 @@
 import { existsSync, readdirSync, readFileSync } from "node:fs";
 import { describe, expect, test } from "bun:test";
-import { CATEGORIES, SHELF, UNFINISHED, bookIdOf, bookPage, categoryHref, categoryOf, hasPage, listedGames, pagesBetween, shelfVolumes } from "./games";
+import {
+  CATEGORIES,
+  SHELF,
+  UNFINISHED,
+  bookIdOf,
+  calendarHref,
+  bookPage,
+  categoryHref,
+  categoryOf,
+  hasPage,
+  listedGames,
+  pagesBetween,
+  shelfVolumes,
+} from "./games";
 import { areaKey, MASCOT_STATUS, IDEA_AREAS, LANGUAGE_STATUS, type LanguageState, languageStateOf, TOP_PICKS } from "./ideas";
 import { keyMatches, keyOf, LANGUAGES, languageFor, letterIndex, toLower } from "./languages";
 import { RESEARCH } from "./research";
@@ -688,7 +701,7 @@ describe("Russian", () => {
 // right of Aufs Töpfchen in that order, „Wie lange warten?“ left of the Belohnungstafel, and the newer helpers after them
 // once they are finished. The Timer is the very first book, top left (user decision, November 2026), and „Abstillen“
 // stands right of it, left of Zähne putzen (user request, November 2026).
-test("the Alltagshelfer stand first on the shelf, the Timer top left, Abstillen and Bye-Bye, Bottle! beside it, the Schnullerfee, Kita-Start, Hair Washing and Bed beside that, Belohnungstafel & Zeitplan tied together right of Aufs Töpfchen", () => {
+test("the Alltagshelfer stand first on the shelf, the Timer top left, Abstillen and Bye-Bye, Bottle! beside it, the Schnullerfee, Kita-Start, Hair Washing and Bed beside that, Belohnungstafel & Zeitplan as one ring calendar right of Aufs Töpfchen", () => {
   expect(CATEGORIES[0].apart).toBe(true);
   expect(SHELF.filter((e) => e.category.id === CATEGORIES[0].id).map((e) => e.href)).toEqual([
     "/timer/",
@@ -702,7 +715,11 @@ test("the Alltagshelfer stand first on the shelf, the Timer top left, Abstillen 
     "/toepfchen/",
     "/belohnungstafel/",
   ]);
-  expect(SHELF[9].game?.volumes?.map((v) => v.href)).toEqual(["/wie-lange-warten/", "/tagesplan/", "/belohnungstafel/"]);
+  // Its three parts stand as one ring-bound calendar opening the Zeitplan's editor (user request, 26 November 2026).
+  expect(SHELF[9].game?.calendar).toBe(true);
+  expect(SHELF[9].game?.volumes?.map((v) => v.href)).toEqual(["/tagesplan/", "/belohnungstafel/", "/wie-lange-warten/"]);
+  expect(calendarHref(SHELF[9].game!)).toBe("/tagesplan/");
+  expect(shelfVolumes(SHELF[9].game!)).toBeUndefined();
   // „Abstillen“ is one book holding both its stories, chosen on its first page (user request, 22 November 2026).
   expect(shelfVolumes(SHELF[1].game!)).toBeUndefined();
 });

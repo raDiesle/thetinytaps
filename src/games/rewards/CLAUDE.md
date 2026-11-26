@@ -10,27 +10,43 @@ row of tabs and one wizard.
 
 ## One page, one wizard
 
-`RewardsGame.tsx` is the page for both. On top the grown-up's boards and plans side by side in one row (boards first),
-„＋ Neu“ and, where the gallery has no room, „🧩 Vorlagen“; above that row only ‹ › to go back in time – no switch of
-views there any more: the view (Tag, Woche, Monat, Countdown, Erst – Dann, Sammeln) is the „Zeitraum“ option of the editor (user
-feedback, November 2026). Beside it the Vorlagen of its kind, grouped under the names of their views; „Gestalten“,
-„Drucken“ (and a board's „Rückblick“) work on the one shown. Each address opens its own kind: `/belohnungstafel/` a board
-or a plan with a Zähler (below), `/tagesplan/` a plan of the day, never a Countdown (so the teeth card's return and a
-search visitor land there), `/wie-lange-warten/` a Countdown (H-05, user request, November 2026) – on the shelf each is a
-book of its own, the three tied with a ribbon in the order „Wie lange warten?“, Zeitplan, Belohnungstafel, the last bound
-in gold by its address (`Game.volumes`, `GOLD` in `Bookshelf.tsx`, user feedback, November 2026), so the book
-named Belohnungstafel opens a board, or the wizard on its kind where none is made yet (below; „Wie lange warten?“ the
-wizard on the Vorlage „Wie oft noch schlafen?“), with the other charts behind it. Once a tab or the wizard showed
-another chart, the address no longer picks (`chosen` in `RewardsGame`). Nothing remembers which was shown last.
+`RewardsGame.tsx` is the page for both. On top the grown-up's boards and plans side by side in one row (boards first)
+and „＋ Neu“; above that row only ‹ › to go back in time – no switch of views there any more: the view (Tag, Woche,
+Monat, Countdown, Erst – Dann, Sammeln) is the „Zeitraum“ option of the editor (user feedback, November 2026). The
+chart takes the page's whole width: **there are no Vorlagen any more** – no gallery beside the chart and no „🧩
+Vorlagen“ button (user request, 26 November 2026); a new chart starts in the wizard, its Zeitraum and the quick choice
+of the three kinds (below) leading to every other. The template data stays in `catalog.ts`: `defaultDraft`,
+`draftInSpan` and `draftOfKind` build charts from it. „Gestalten“, „Drucken“ (and a board's „Rückblick“) work on the one
+shown. Each address opens its own kind: `/belohnungstafel/` a board or a plan with a Zähler (below), `/tagesplan/` a
+plan of the day, never a Countdown (so the teeth card's return and a search visitor land there), `/wie-lange-warten/` a
+Countdown (H-05, user request, November 2026) – the wizard on its kind where none is made yet (a Countdown: `{ kind:
+"countdown" }`), with the other charts behind it. On the shelf the three are **one ring-bound calendar** (user request,
+26 November 2026; the shelf's part is documented with `Bookshelf.tsx`): a tap opens `/tagesplan/` with the router state
+`OPEN_EDITOR` (`openEditor.ts`, which imports nothing, so the home page's chunk never pulls in this page), and the page
+opens straight in the editor – the wizard where nothing is made yet, else „Gestalten“ on the chart shown
+(`opensEditor`). The wizard opened so starts on „Mein Tag“ like every first visit, though its Zähler makes the quick
+row mark „Belohnungstafel“ – never a Zeitplan without stars instead (user decision, 26 November 2026). Without that state (the teeth card's return, a search visitor, a link) the page opens on the chart as
+before. Once a tab or the wizard showed another chart, the address no longer picks (`chosen` in `RewardsGame`). Nothing
+remembers which was shown last.
 
 **One editor, on the chart itself** (`ChartEditor.tsx`, user decision, November 2026: „exakt gleiche Seite für
 Assistent und Seite … alles gleich aussieht und funktioniert“): „＋ Neu“ (`Wizard.tsx`) and „✏️ Gestalten“ are the same
-component, the very sheet that will be used, changed right on it (WYSIWYG). Right above the sheet, in one low row
-(`.rw-sheet-top`), the **Zeitraum** on the left (Tag, Woche, Monat, Countdown, Erst – Dann, Sammeln, `SPANS`; on the page only the views of the
-chart's own kind, since a plan's Tag and a board's Monat are different charts, and none on a Countdown, which is a chart of its own)
-and the colours on the right, close to the sheet they change (user feedback, November 2026: far above it they wasted
-room and seemed to belong elsewhere). Above that, only where a chart has one, a band of options
-(`.rw-options-band`): „Pfeil wandert“ / „Karte wandert“ (only
+component, the very sheet that will be used, changed right on it (WYSIWYG). From the top: the **quick choice of the
+three kinds**, the edit bar, the Zeitraum with the colours, the band of options, the sheet. The quick choice
+(`.rw-chart-kinds`, `CHART_KINDS`, user request, 26 November 2026: the shelf's three books became one calendar, and the
+three functions stay reachable inside the editor) is a row of three paper buttons, each a small ink drawing (`KindPic`,
+in `SpanPic`'s style) with its name – **Zeitplan** (a plan of the day without stars), **Belohnungstafel** (a chart that
+counts stars: a board, or a plan with a Zähler) and **Wie lange warten?** (the Countdown) – named as the shelf named
+their books (`names.ts`). The one being edited (`kindOf`) is marked by the book's highlighter on its name
+(`aria-pressed`). In the wizard a tap turns the draft into that kind (`draftOfKind`: the day's span without a Zähler,
+with one, or the Countdown, keeping name, photo, colours and reward); under „Gestalten“ it shows the chart of that kind
+shown last, in the editor too, or opens the wizard on that kind where none is made (`onKind`, `designKind` in
+`RewardsGame`). Then, right under the edit bar, the **Zeitraum** comes first (user request, 26 November 2026: first the
+Zeitraum, then the Tageszeiten, which belong after it), as the visual first step (`.rw-span-row`, the big picture
+buttons, `SpanPic`): on the left (Tag, Woche, Monat, Countdown, Erst – Dann, Sammeln, `SPANS`; on the page only the
+views of the chart's own kind, since a plan's Tag and a board's Monat are different charts, and none on a Countdown,
+which is a chart of its own), the colours on its right. After it, right above the sheet and only where a chart has
+one, the band of options (`.rw-options-band`): „Pfeil wandert“ / „Karte wandert“ (only
 without a Zähler) – nothing the sheet already does with a tap (user feedback, November
 2026: the Zähler, a 🎁 Belohnung switch, „Tag aufteilen?“ and „Anzahl Karten“ stood there twice and went), and the
 **Tageszeiten** – „Ganzer Tag“ (default), „Früh & Abend“ or „Früh, Mittag & Abend“, one, two or three lines (or a
@@ -69,8 +85,8 @@ name, colours and reward (`draftInSpan`; the Woche with a Zähler is the board V
 day), „✓ Tafel anlegen“ / „✓ Plan anlegen“ makes it. The wizard's head (`.rw-wizard-head`, sticky on top) holds, from
 the left, that button big and yellow, „Abbrechen“ and the stamp „🖨️ Zum Ausdrucken – auf A4, als Fotoabzug oder als Fotoposter“ – the
 editor's buttons all start on the left (user feedback, November 2026). No note explains the Zeitraum: its picture
-buttons say it (the note with an arrow went, user feedback, November 2026). Opened on a template from the
-gallery it starts on that template. While the wizard is open nothing on top or below belongs to the chart behind it.
+buttons say it (the note with an arrow went, user feedback, November 2026). Opened on a kind (`WizardStart`) it
+starts on that kind's first chart. While the wizard is open nothing on top or below belongs to the chart behind it.
 
 **A photo of the child** (user request, November 2026) goes on any board or plan, every Zeitraum: while the chart is
 made a pale ＋ place with a drawn portrait stands beside the heading's sign (`ChildPhoto`, `data-edit="add-photo"`), and
@@ -122,7 +138,9 @@ never just its neighbour's chart.
 # Belohnungstafel
 
 Not a game but a tool for grown-ups that a child taps too: a reward chart the parents design freely and that looks
-the same on screen and on paper (A4 from the browser, also offline). It stands on the home page's shelf as three books, „Zeitplan“, „Wie lange warten?“ and „Belohnungstafel“, tied together with a red ribbon right of Aufs Töpfchen among the „Alltagshelfer“, but has no
+the same on screen and on paper (A4 from the browser, also offline). It stands on the home page's shelf among the
+„Alltagshelfer“ as one ring-bound calendar for the Zeitplan, „Wie lange warten?“ and the Belohnungstafel, which opens the
+editor (above), but has no
 `GameShell`: nothing to start or leave, no play time counted, and `PlaytimeLock` lets it through, so the evening
 brushing's star still lands after the minutes are over. It may become a website of its own one day (T-19), so the
 folder leans on few shared parts (`MenuHead`, `PanelButton`, `SettingControls`, `useStoredSettings`, sfx, tap
@@ -164,7 +182,7 @@ targets) – keep it that way.
   (`snakeLayout`) to the reward, and the goal below. Sized in container units (`cq*`), so it fits any box.
 - `BoardScreen.tsx` – the sheet on screen and the star flow (below).
 - `Editor.tsx` – „✏️ Gestalten“ (and `SlotChips`, how often a day a task gets a star); `PrintPanel.tsx` – „🖨️ Drucken“
-  with the preview and the print pages; `Gallery.tsx` – the Vorlagen as small pictures (`Thumb`) with example stars, grouped by view;
+  with the preview and the print pages; `openEditor.ts` – `OPEN_EDITOR`, the router state of the shelf's calendar;
   `ChartEditor.tsx` – the one editor of „＋ Neu“ and „Gestalten“ (above), `SheetAction.tsx` – its ⚙️ / 🗑️ in a corner, `Wizard.tsx` – „＋ Neu“ around it; `Review.tsx` – „📜 Rückblick“ (and
   `usePeriodLabel`, „Letzte Woche“, shared with the ‹ › on top); `Certificate.tsx` – „🏅 Urkunde“ (below);
   `RewardsGame.tsx` – the page for boards and plans
@@ -188,12 +206,9 @@ label turns yellow while it shows the past, and another board or view starts at 
 row of tabs (a board's tab says the template's name until the board has a heading or a child's name). On phones both
 rows share one line that scrolls sideways, so the board keeps the screen.
 
-Beside the board (≥ 1000 × 600 px) the gallery of Vorlagen: every template as a small picture of the board with its
-example stars, its name, view and one line. A template whose board was made before selects that board (with its
-stars); otherwise it opens the wizard on it (above). In the wizard a task gets its times of day, and the footer stays
-in sight.
+The board takes the page's whole width: no gallery of Vorlagen beside it (taken out, user request, 26 November 2026).
 
-A new board (from a template, the wizard or the default) shows example stars (`Board.examples`, `exampleStars`): the
+A new board (from the wizard or the default) shows example stars (`Board.examples`, `exampleStars`): the
 first two days of a week (Monday and Tuesday, the second short of one), the first four days of a month, all but the
 last card of a day, two on a path – pale, with a line under the board saying so and „Ausblenden“. They are never in
 the log and never printed; the first real star or „Ausblenden“ ends them. An example field is open: a tap gives the real star.
@@ -310,10 +325,15 @@ sharp format (`blurriest`, `largestSharp`), and a drawn child's room shows the p
   default is rebuilt on each load and stars are keyed by board and task id (a random task id once lost the stars).
 - The views and the ready-made boards are clear from the first visit, never behind a menu: a first visit opens the
   wizard on „Mein Tag“ with every Zeitraum named in its first option (parents do ask for months: „belohnungskalender“,
-  „monthly reward chart“), every view has at least one template, and so has every view of a plan (`rewards.test.ts`
-  checks), the gallery lies beside the board where there is room and „🧩 Vorlagen“ is in the first row where there is
-  not, and switching a view never loses stars. The view is an option of the editor, never a row of view pictures or a
-  switch on top of the page (user feedback, November 2026).
+  „monthly reward chart“), every view has at least one template for the Zeitraum to start from, and so has every view
+  of a plan (`rewards.test.ts` checks), and switching a view never loses stars. The view is an option of the editor,
+  never a row of view pictures or a switch on top of the page (user feedback, November 2026). Never bring back a
+  gallery of Vorlagen or a „🧩 Vorlagen“ button (user request, 26 November 2026): the Zeitraum and the quick choice of
+  the three kinds are the ways to another chart, and the chart keeps the page's width (`rewards.test.ts`).
+- The editor's order is fixed (user request, 26 November 2026): the quick choice of the three kinds on top, then the
+  edit bar, then the Zeitraum (with the colours), then the band with the Tageszeiten and their Zeichen, then the sheet.
+  A new option joins the band, never above the Zeitraum. The quick choice's names are the shelf's names of the three
+  (`names.ts`, all seven languages, `rewards.test.ts`).
 - The wizard and „Gestalten“ are one editor (`ChartEditor`), the chart itself changed in place: a new choice joins
   it on the sheet (a tap on what it changes, opening a window of picture cards) or as an option in the band (`.rw-options-band`),
   never as a step, a page or a second editor of its own (user decision, November 2026). Only what needs typing stays
@@ -332,8 +352,8 @@ sharp format (`blurriest`, `largestSharp`), and a drawn child's room shows the p
   needs more weight than it (`.pl-star.pl-star-ghost`), and a size in `padding: %` resolves against the card, not the
   action – size with `var(--rw-act)`.
 - The options draw the eye, as they lead to the other charts grown-ups come for (user feedback, November 2026, replacing
-  „quiet options“): a band of their own, the Zeitraum as big picture buttons (`SpanPic`, the shape of each chart) under
-  its visible name, the chosen one yellow; what a choice means goes into its button in a few words with a visual sign,
+  „quiet options“): the Zeitraum as big picture buttons (`SpanPic`, the shape of each chart) beside its visible name,
+  the chosen one yellow, the first step under the edit bar, the other options in a band of their own after it; what a choice means goes into its button in a few words with a visual sign,
   never a paragraph of notes under it.
 - What sets the charts apart is said where grown-ups decide, not only found deep in an option (user feedback, November
   2026): the black-and-white print, whose every picture has its `-linie` twin drawn to colour in, is named in the
@@ -416,7 +436,7 @@ sharp format (`blurriest`, `largestSharp`), and a drawn child's room shows the p
 - A rule that changes `.rw-page` (its `display`, padding) for one kind of page goes after `.rw-page` in `rewards.css`,
   never into `planner.css`: the two stylesheets load in another order on the dev server than in the build, so a page's
   grid in `planner.css` lost to `.rw-page`'s flex and the cut-out cards stood as tall strips in the preview.
-- A picture loads when it is seen (user request, November 2026): the Vorlagen's small pictures and the chips under the
+- A picture loads when it is seen (user request, November 2026): the chips under the
   folded „Weitere Einstellungen“ stand inside `LazyPictures` (`loading="lazy"`; the folded chips alone were 45 files,
   2 MB, on every first visit). A new place showing many pictures out of sight (a list below the screen, something
   folded) does the same; a chart itself and every print never, so a print misses no picture (`loading.test.tsx`).
@@ -434,12 +454,12 @@ order, left to right and row by row, a row per part of the day where it has two;
 and a paper arrow cut out of card (`PaperArrow`) points up at the card to do from below it and moves on;
 or, as a variant, `nowField`, the card to do stands big on a panel of its own under „Jetzt“, the others smaller under
 „Dann“, and done cards go into the Fertig-Kiste), **Erst – Dann** (pairs of two, each a small board of its own, up to four on a
-page to cut apart) and the **Woche** (a column per day); the **Countdown** (H-41, H-05, „Wie oft noch schlafen?“, its own
-book „Wie lange warten?“ on the shelf) is a chart of its own: one card, the picture of a big day (Geburtstag, Urlaub, Oma
+page to cut apart) and the **Woche** (a column per day); the **Countdown** (H-41, H-05, „Wie oft noch schlafen?“, „Wie lange
+warten?“ in the editor's quick choice) is a chart of its own: one card, the picture of a big day (Geburtstag, Urlaub, Oma
 und Opa), and a field for every night of the waiting – the fox or bear child asleep in its bed (`NIGHT_LOOKS`, picked
 on the sheet, else following „Junge / Mädchen“) with a star field under it like the Belohnungstafel's, which the child
 fills in the morning. Like the Belohnungstafel a tool, not a game: no `GameShell`, `PlaytimeLock` lets it through, and it
-shares the board's page and parts (sheet look, themes, `A4`/`Preview`, the gallery's classes, the star log).
+shares the board's page and parts (sheet look, themes, `A4`/`Preview`, the star log).
 
 ## Files
 
@@ -468,7 +488,7 @@ shares the board's page and parts (sheet look, themes, `A4`/`Preview`, the galle
 - `PlanScreen.tsx` – the sheet on screen and the tick flow (below); `PlanEditor.tsx` – „✏️ Gestalten“;
   `PlanPrint.tsx` – „🖨️ Drucken“: the cards as photo prints (`PhotoPrint`), then A4 with the cards to cut out
   (`CutCardPages`) – what comes besides the sheet is `printsCards`: a marker's plan nothing, the field's always its
-  cards, the other views as chosen; `PlanGallery.tsx` – the templates as small pictures (`PlanThumb`);
+  cards, the other views as chosen;
   `planSettings.ts` – plans, current one, print options
   (`tinytaps.planner.v1`); the page is `RewardsGame.tsx`; `pageParts.tsx` – `useComputer`, `PanelButton`, `Pick` (a picture card to choose in the editor's windows);
   `planner.css` – classes `pl-`.
@@ -525,7 +545,7 @@ beside it close it without a tick. The plan prints every ritual it has as a card
 - Few steps: three to six for two- and three-year-olds, `MAX_STEPS` at most, or `MAX_PART_STEPS` in each part of a day
   in two parts (`stepLimit`); a template and every shape the wizard offers stay within it (`plan.test.ts`).
 - A Countdown is a chart of its own, never a view the Zeitraum switches into or out of on the page (its one card is
-  a day, not a routine), and has its own book and address („Wie lange warten?“, `/wie-lange-warten/`). Everything
+  a day, not a routine), and has its own name and address („Wie lange warten?“, `/wie-lange-warten/`), reached in the editor by the quick choice of the three kinds. Everything
   of it is changed on the sheet (user feedback, November 2026): ＋ after the nights adds one, 🗑️ on a night still to
   come takes one (`withNightsLeft`), ⚙️ on a night picks the picture of every night (`NightDialog`, `NIGHT_LOOKS`), and a
   tap on the big day's card opens its date and picture (`BigDayDialog`) – never in the band. It has no Zähler, no

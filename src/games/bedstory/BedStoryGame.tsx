@@ -45,7 +45,7 @@ const OWN_BED: BookStory = {
 };
 
 /**
- * The book „Bed“, opening like „Abstillen“ on the choice of its stories (`StoryChoice.tsx`, user request, 23 November
+ * The book „Sleep Tight“, opening like „Abstillen“ on the choice of its stories (`StoryChoice.tsx`, user request, 23 November
  * 2026): „Tapsi's Big Bed“ from the cot, and „Tapsi's Own Bed“ out of the parents' bed (user request, 24 November 2026),
  * each slip telling its pictures and minutes, never its chapters. A story whose pictures still wait stays out of the
  * built site (`storyBook`).
@@ -55,7 +55,7 @@ const BOOK = storyBook(BED_STORY_BOOK, "B", [[STORY], [OWN_BED]]);
 /** The browser tab's title on an address of the book: the story's there. */
 export const titleAt = (pathname: string) => BOOK.storyAt(pathname).title;
 
-/** The book „Bed“ with its two stories, read in chapters like the other chapter books (`ChapterBook`), opening at once on its choice. */
+/** The book „Sleep Tight“ with its two stories, read in chapters like the other chapter books (`ChapterBook`), opening at once on its choice. */
 export function BedStoryGame() {
   return <StoryBookGame book={BOOK} />;
 }

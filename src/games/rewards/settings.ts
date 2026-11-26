@@ -62,7 +62,7 @@ export const NO_STARS: StarLog = {};
 /**
  * What the page opens on for the kind its address asks for (`/belohnungstafel/` a board, `/tagesplan/` a plan): that
  * kind's chart where one is made; else, where only the other kind is, that other chart behind the wizard opened on the
- * asked kind's Vorlagen (`wizard`), so the Belohnungstafel's book never just shows a plan (user feedback, November 2026);
+ * asked kind (`wizard`), so the Belohnungstafel's book never just shows a plan (user feedback, November 2026);
  * with nothing made, the wizard alone.
  */
 export function pageStart(wanted: ChartType, made: { board: boolean; plan: boolean }): { type: ChartType; wizard: boolean } {

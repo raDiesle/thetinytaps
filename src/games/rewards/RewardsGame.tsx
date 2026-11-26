@@ -14,14 +14,12 @@ import { useBoardTitle } from "./BoardSheet";
 import { Certificate, CERTIFICATE } from "./Certificate";
 import { photoKeysOf } from "./chartPhoto";
 import { keepOnlyPhotos } from "./photoStore";
-import { type ChartType, MARK_BY_ID, PLAN_TEMPLATES, type PlanTemplate, type Template, TEMPLATES } from "./catalog";
+import { type ChartType, MARK_BY_ID, PLAN_TEMPLATES, TEMPLATES } from "./catalog";
 import { Editor } from "./Editor";
-import { TemplateGallery } from "./Gallery";
 import { loadLinkedDays } from "./linked";
 import { PanelButton, PRINT, useComputer } from "./pageParts";
 import { counting, fromOlder, type Plan, parseRoutineStep, restartDay, starsOf, stepsOn } from "./plan";
 import { PlanEditor } from "./PlanEditor";
-import { PlanGallery } from "./PlanGallery";
 import { PlanPrint, planPosterSheet } from "./PlanPrint";
 import { PlanScreen } from "./PlanScreen";
 import { TODAY, usePlanTitle } from "./PlanSheet";
@@ -29,7 +27,8 @@ import { PLANNER_SETTINGS_KEY, plannerDefaults } from "./planSettings";
 import { boardPosterSheet, PrintPanel } from "./PrintPanel";
 import { EARLIER, LATER, REVIEW, Review, usePeriodLabel, YESTERDAY } from "./Review";
 import { NO_STARS, pageStart, REWARDS_SETTINGS_KEY, REWARDS_STARS_KEY, rewardsDefaults } from "./settings";
-import { ChartEditor } from "./ChartEditor";
+import { ChartEditor, type ChartKind, kindOf } from "./ChartEditor";
+import { opensEditor } from "./openEditor";
 import { type Draft, Wizard, type WizardStart } from "./Wizard";
 import "./rewards.css";
 import "./planner.css";
@@ -47,8 +46,6 @@ export const REWARDS_TITLE: Localized = {
 
 /** „✏️ Gestalten“: the button on top and the heading of the editor below the chart. */
 const DESIGN: Localized = { de: "Gestalten", en: "Design", zh: "设计", hi: "डिज़ाइन", es: "Diseñar", ar: "تصميم", ru: "Оформление" };
-/** „🧩 Vorlagen“: beside the chart, and the button where there is no room for it. */
-const TEMPLATES_LABEL: Localized = { de: "Vorlagen", en: "Templates", zh: "模板", hi: "टेम्पलेट", es: "Plantillas", ar: "القوالب", ru: "Шаблоны" };
 
 type Panel = "print" | "review" | "certificate";
 
@@ -56,24 +53,20 @@ type Panel = "print" | "review" | "certificate";
 const DAYS_BACK = 7;
 const DAYS_AHEAD = 6;
 
-/** The wizard: closed, open on its first step, or on a template picked in the gallery. */
+/** The wizard: closed, open on its first chart, or on one of the three kinds. */
 type WizardState = null | { start?: WizardStart };
 
-/** What an address opens: a board, a plan of the day, or a Countdown to a big day („Wie lange warten?“, H-05). */
-export type PageKind = ChartType | "countdown";
-
-/** The wizard on a new Countdown, where „Wie lange warten?“ opens with none made yet. */
-const COUNTDOWN_TEMPLATE = PLAN_TEMPLATES.find((tpl) => tpl.view === "countdown");
+/** What an address opens: a board, a plan of the day, or a Countdown to a big day („Wie lange warten?“, H-05) – the editor's three kinds. */
+export type PageKind = ChartKind;
 
 /**
  * The Belohnungstafel and the Tagesplan on one page: the grown-up's boards (stars to collect) and plans (the day in
  * pictures) side by side in one row on top, the one chosen as big as the screen allows. „＋ Neu“ opens the wizard,
- * which asks step by step – kind, view, Vorlage, tasks or cards, reward, look – and shows every choice as a picture
- * of what it makes; with nothing made yet (a first visit) the page is the wizard. Above the chart its switch of views (a board's Tag, Woche, Monat and
- * Sammeln, a plan's Tag and Woche) with arrows to earlier days; beside it on wide screens the Vorlagen of its kind. On
- * a computer „Gestalten“ and „Drucken“ lie open below (scroll down); on phones and tablets they open from the buttons
- * on top. Not a game: no GameShell, no play time counted, so the evening routine and its star still work when play
- * time is over. `/tagesplan/` opens the same page on a plan, `/wie-lange-warten/` on a Countdown.
+ * the chart itself changed right on it (`ChartEditor`, the same as „Gestalten“); with nothing made yet (a first visit)
+ * the page is the wizard. Above the chart arrows to earlier days. On a computer „Drucken“ lies open below (scroll
+ * down); on phones and tablets it opens from its button on top. Not a game: no GameShell, no play time counted, so the
+ * evening routine and its star still work when play time is over. `/tagesplan/` opens the same page on a plan,
+ * `/wie-lange-warten/` on a Countdown, and the router state `OPEN_EDITOR` (the shelf's ring calendar) straight in the editor.
  */
 export function RewardsGame({ type: routeType = "board" }: { type?: PageKind }) {
   const t = useT();
@@ -86,8 +79,8 @@ export function RewardsGame({ type: routeType = "board" }: { type?: PageKind }) 
   const [linked] = useState(loadLinkedDays);
   const [panel, setPanel] = useState<Panel | null>(null);
   const [wizardState, setWizard] = useState<WizardState>(null);
-  /** „Gestalten“: the chart changed right on it, with the wizard's own editor. */
-  const [designing, setDesigning] = useState(false);
+  /** „Gestalten“: the chart changed right on it, with the wizard's own editor – at once where the shelf's calendar asks for it. */
+  const [designing, setDesigning] = useState(() => opensEditor(location.state));
   /** Weeks (days, months) back from the current one on a board, days from today on a plan; 0 is now. */
   const [back, setBack] = useState(0);
   const boardTitle = useBoardTitle();
@@ -116,8 +109,7 @@ export function RewardsGame({ type: routeType = "board" }: { type?: PageKind }) 
   const start = waiting
     ? { type: "plan" as const, wizard: !countdownPlan }
     : pageStart(wanted === "board" ? "board" : "plan", { board: !!board || !!rewardPlan, plan: !!currentPlan });
-  const wizard =
-    wizardState ?? (start.wizard ? (waiting && COUNTDOWN_TEMPLATE ? { start: { type: "plan" as const, template: COUNTDOWN_TEMPLATE } } : {}) : null);
+  const wizard = wizardState ?? (start.wizard ? (waiting ? { start: { kind: "countdown" as const } } : {}) : null);
   const type: ChartType = start.type === "board" && !board ? "plan" : start.type;
   const plan = start.type === "board" && !board ? rewardPlan : currentPlan;
   const log = stored.log;
@@ -206,16 +198,17 @@ export function RewardsGame({ type: routeType = "board" }: { type?: PageKind }) 
   };
   // Closing the wizard shows the chart behind it: where none of the kind asked for is made, the other kind's.
   const closeWizard = () => show(waiting && !countdownPlan && !lastPlan ? "board" : type);
-  /** A template from the gallery: the board or plan made from it before, with its stars, or the wizard on it. */
-  const pickTemplate = (template: Template) => {
-    const made = boards.boards.find((b) => b.template === template.id);
-    if (made) showBoard(made.id);
-    else openWizard({ type: "board", template });
-  };
-  const pickPlanTemplate = (template: PlanTemplate) => {
-    const made = allPlans.find((p) => p.template === template.id);
-    if (made) showPlan(made.id);
-    else openWizard({ type: "plan", template });
+  /**
+   * The editor's quick choice under „Gestalten“: the chart of that kind shown last (the current board, else the plan
+   * shown or the newest of the kind), in the editor too – or the wizard on that kind where none is made yet.
+   */
+  const designKind = (kind: ChartKind) => {
+    const planOf = (p: Plan) => kindOf({ type: "plan", plan: p }) === kind;
+    const made = lastPlan && planOf(lastPlan) ? lastPlan : allPlans.findLast(planOf);
+    if (kind === "board" && board) showBoard(board.id);
+    else if (made) showPlan(made.id);
+    else return openWizard({ kind });
+    setDesigning(true);
   };
   /** What the wizard made: it is added and shown. */
   const add = (draft: Draft) => {
@@ -294,12 +287,7 @@ export function RewardsGame({ type: routeType = "board" }: { type?: PageKind }) 
   const review = type === "board" && !!board && board.kind !== "collect";
   const certificate = type === "board" && !!board && board.tasks.length > 0;
   const main = wizard ? (
-    <Wizard
-      key={wizard.start ? `${wizard.start.type}-${wizard.start.template.id}` : "new"}
-      start={wizard.start}
-      onDone={add}
-      onCancel={empty ? undefined : closeWizard}
-    />
+    <Wizard key={wizard.start?.kind ?? "new"} start={wizard.start} onDone={add} onCancel={empty ? undefined : closeWizard} />
   ) : designing && (type === "board" ? board : plan) ? (
     <ChartEditor
       key={type === "board" ? board?.id : plan?.id}
@@ -311,6 +299,7 @@ export function RewardsGame({ type: routeType = "board" }: { type?: PageKind }) 
       linked={linked}
       more={editor || undefined}
       onRemove={remove || undefined}
+      onKind={designKind}
     />
   ) : !computer && panel === "print" ? (
     print
@@ -319,17 +308,7 @@ export function RewardsGame({ type: routeType = "board" }: { type?: PageKind }) 
   ) : panel === "review" && review && board ? (
     <Review board={board} log={log} linked={linked} onClose={() => setPanel(null)} />
   ) : (
-    <div className="rw-main">
-      {screen}
-      <aside className="rw-side" aria-label={t(TEMPLATES_LABEL)}>
-        <h2 className="rw-side-title">{t(TEMPLATES_LABEL)}</h2>
-        {type === "board" ? (
-          <TemplateGallery selected={board?.template} onPick={pickTemplate} />
-        ) : (
-          <PlanGallery selected={plan?.template} onPick={pickPlanTemplate} />
-        )}
-      </aside>
-    </div>
+    <div className="rw-main">{screen}</div>
   );
 
   return (
@@ -408,9 +387,6 @@ export function RewardsGame({ type: routeType = "board" }: { type?: PageKind }) 
               ))}
               <button type="button" className="rw-add" aria-pressed={!!wizard && !wizard.start} onClick={() => openWizard()}>
                 ＋ {t({ de: "Neu", en: "New", zh: "新建", hi: "नया", es: "Nuevo", ar: "جديد", ru: "Создать" })}
-              </button>
-              <button type="button" className="rw-templates-button" onClick={() => openWizard()}>
-                🧩 {t(TEMPLATES_LABEL)}
               </button>
             </nav>
           </div>

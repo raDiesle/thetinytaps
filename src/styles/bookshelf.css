@@ -825,7 +825,10 @@
   white-space: nowrap;
 }
 
-/* Taps go through the shelf's planes (a board's front lies in front of its books) to the books and things. */
+/*
+ * Taps go through the shelf's planes (a board's front lies in front of its books) to the books and things: a new thing to
+ * take joins the list below, or no tap reaches it (the ring calendar did not, November 2026; `shelfLayout.test.ts`).
+ */
 .shelf-box {
   position: absolute;
   inset: 0;
@@ -833,7 +836,7 @@
   pointer-events: none;
 }
 
-.shelf-box :is(.shelf-book, .shelf-toy, .shelf-daily, .room-thing, .shelf-spines > .shelf-spine, .shelf-lying) {
+.shelf-box :is(.shelf-book, .shelf-toy, .shelf-daily, .shelf-calendar, .room-thing, .shelf-spines > .shelf-spine, .shelf-lying) {
   pointer-events: auto;
 }
 
@@ -975,23 +978,62 @@
   transform: rotateY(-90deg) translateZ(1px);
 }
 
+/*
+ * The stickers on the back panel of their compartment under the hourglass (wide shelf, user request, 26 November 2026):
+ * „Wer spielt?“ over the two side by side, moved like what is stuck on a back panel (`--sx`, `--sy`).
+ */
+.shelf-back-stuck {
+  position: absolute;
+  inset: 6% 0;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  container-type: size;
+  transform: translate(var(--sx), var(--sy)) translateZ(calc(var(--d) * -0.97 + 2px));
+}
+
+.shelf-back-stuck .shelf-figure-ask {
+  position: static;
+  flex: none;
+  padding: 0 2cqw;
+  font-size: min(17cqw, 18cqh);
+  white-space: normal;
+  text-wrap: balance;
+}
+
+.shelf-back-stuck .room-stickers {
+  flex: 1;
+  flex-direction: row;
+  gap: 10cqw;
+  height: auto;
+  min-height: 0;
+}
+
+.shelf-back-stuck .room-sticker {
+  --s: min(38cqw, 62cqh);
+}
+
 .shelf-cell.language .room-globe svg {
   height: min(calc(var(--ch) * 0.8), calc(var(--cw) * 0.86 / 0.75));
 }
 
 /*
- * On a wide shelf the trophy room's sign stands at the right of the speaker's compartment (`trophySignAt`), so the
- * speaker moves to its left, beside it, and is as wide as the room the sign leaves (user request, 25 November 2026).
- * The sign comes before the shelf's box in the page and is only there once a trophy is won.
+ * On a wide shelf the speaker stands against the shelf's right wall (user request, 26 November 2026) and the trophy
+ * room's sign at its left, its left edge against the wall there (`trophySignAt`, `data-from="left"`); the speaker is as
+ * wide as the room the sign leaves. The sign comes before the shelf's box in the page and is only there once a trophy is
+ * won; without it the speaker still stands at the right wall.
  */
-.room-scene[data-plan="wide"] .shelf-trophy-sign ~ .shelf-box .shelf-cell.music .shelf-thing {
-  justify-content: flex-start;
-  /* The depth draws it left, towards the room's middle: so it starts a little further in. */
-  padding-left: calc(var(--cw) * 0.07);
+.room-scene[data-plan="wide"] .shelf-cell.music .shelf-thing {
+  justify-content: flex-end;
+  padding-right: calc(var(--cw) * 0.04);
 }
 
 .room-scene[data-plan="wide"] .shelf-trophy-sign ~ .shelf-box .shelf-cell.music .room-speaker svg {
-  height: min(calc(var(--ch) * 0.5), calc(var(--cw) * 0.4 / 0.72));
+  height: min(calc(var(--ch) * 0.5), calc(var(--cw) * 0.34 / 0.72));
+}
+
+.shelf-trophy-sign[data-from="left"] {
+  translate: calc(var(--post) * 0.15) calc(-100% - var(--edge));
 }
 
 /* ----- The front of the frame: the planks between compartments, the posts, the top board, the plinth ----- */

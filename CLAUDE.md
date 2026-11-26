@@ -327,7 +327,11 @@ In a fresh worktree run `bun install` first.
   (`tools/perfScenarios.ts`: p95 frame ≤ 34 ms, ≤ 0.5 frames over 50 ms a second, main thread ≤ 60 % busy, and ≤ 30
   screens of pixels rastered anew a second – the GPU's work, which a gaming phone's 120 Hz screen doubles). Until
   November 2026 it rastered at 1× and counted the idle seconds of collecting its trace into every stretch, so it found
-  nothing while the user's phone stuttered: when a phone stutters and the tool says it's fine, doubt the tool first. A stretch that
+  nothing while the user's phone stuttered: when a phone stutters and the tool says it's fine, doubt the tool first.
+  Until 26 November 2026 it also sized each rastered tile by its memory address alone, which Chrome reuses for tiles of
+  other layers and sizes, so the screens rastered a second swung 21–39 on the same code and could read half the truth
+  (A-41): a tile is now found by address and layer in the snapshot after its raster (`tools/perfTrace.ts`,
+  `perfTrace.test.ts`), and raster numbers from before that date in `tools/perf-history/` don't compare with later ones. A stretch that
   starts with a tap also counts the frames before the motion, where the next page is drawn while the screen stays still,
   and whether it catches them depends on when its counter starts: before blaming a motion, compare where the stutters
   fall with when it starts (in „Buch aus dem Regal nehmen“ all of them fell in the 0.2 s before the book lifts, and
@@ -468,10 +472,11 @@ In a fresh worktree run `bun install` first.
   bouncing. They stand in the trophy room, a page of its own at `/pokale/` (`TrophyMuseum`, user request, November
   2026), never in the bookshelf (between its books a trophy stood as if in the wall) nor in a popup: reached by a little
   wooden board in 3D (grain, bevelled edges, its thickness seen below and right of it) with a big golden cup on it,
-  sitting right in the bottom right corner of a compartment – on a wide shelf the loudspeaker's, at the bottom of the
-  right column, with the loudspeaker moved to its left beside it and both sized by that narrow compartment (user
-  request, 25 November 2026; `trophySignAt`), on an upright one the picture books' lowest – its
-  foot on the board, its right edge against the post, never hanging in the air above the board – held by three nails in
+  sitting in a bottom corner of a compartment – on a wide shelf the loudspeaker's, at the bottom of the right column, in
+  its bottom left corner, its left edge against the post, with the loudspeaker standing against the right wall beside it
+  and both sized by that narrow compartment (user request, 26 November 2026, replacing the speaker at its left;
+  `trophySignAt`, `from: "left"`), on an upright one in the bottom right corner of the picture books' lowest, its right
+  edge against the post – its foot on the board, never hanging in the air above the board – held by three nails in
   its corners (the top two and the bottom left; user request, November 2026: the paper sign hanging there looked flat
   and loose) (`TrophySign`, only once a trophy is won;
   user feedback, November 2026: a small sign with a cup in a doorway above the loudspeaker was hardly recognised – it is
@@ -557,7 +562,7 @@ A game may give it before its end where reaching the goal once is enough (Ketten
   The home page's options for all games are „🎵 Musik“, one tap on its own button, never a menu, „Junge / Mädchen“,
   play time (⏳), the language (🌐) and „Offline spielen“ (things standing in or hanging from the bookshelf, see the
   picture book below).
-- **A figure that stands for the child follows „Junge / Mädchen“** (stickers of a fox girl and a bear boy on a wall inside the shelf, each with a little ♀ / ♂ beside
+- **A figure that stands for the child follows „Junge / Mädchen“** (stickers of a fox girl and a bear boy in a compartment of the shelf (see the picture book below), each with a little ♀ / ♂ beside
   it so it is plain which is which, one tap on either chooses it – user decision, October 2026; `useFigure()` from `src/lib/common.ts`, boy by default): the child of Kleine Abenteuer (`useHero()`),
   the face in Zähne putzen's mirror and story. The girl differs only in hair (pigtails, lashes where only the eyes show)
   and clothes' colours, never in size or poses. Animals (Tapsi, the Gefühle animals), the people in the pictures and the
@@ -637,18 +642,23 @@ A game may give it before its end where reaching the goal once is enough (Ketten
   head as far (user feedback, November 2026) – taken out, a book straightens as it lifts; the category has no page, and its games' way back is the
   shelf. The name on a spine stands in one line, never broken – smaller where it is long (`--len`, by its script's letter width, `--per-letter`), checked in every
   language at 844×390 (user feedback, November 2026). A game with parts of its own address (`Game.volumes`) stands as
-  that many books tied together with a red ribbon and a bow, each opening its part and found by the way back:
-  „Wie lange warten?“ (the Zeitplan's Countdown), Zeitplan and Belohnungstafel, right of Aufs Töpfchen (user feedback, November 2026).
+  that many books tied together with a red ribbon and a bow, each opening its part and found by the way back (`BookBundle`).
   Tied, they are one block: pressed close and standing upright – never leaning, which looked unnatural for tied books –
   and one ribbon runs round all of them with its bow in their middle – never a band on each book, which looked like
-  three small ribbons (user feedback, November 2026). The single books stand thick enough to hit with a finger on a
+  three small ribbons (user feedback, November 2026). The Belohnungstafel's three parts („Zeitplan“, „Belohnungstafel“,
+  „Wie lange warten?“) no longer stand as such books but as **one ring-bound calendar** right of Aufs Töpfchen
+  (`Game.calendar`, `ShelfCalendar`, user request, 26 November 2026): upright on the board, as wide as the three books
+  were (`CALENDAR_SPINES`), its page a day's plan in small pictures with two stars done and the reward under it
+  (`bilder/kalender-*.webp`, small copies of the Tagesplan's own), the three names printed below – one tap takes it out
+  and opens the Zeitplan straight in its editor (`calendarHref`, router state `OPEN_EDITOR`), where a quick row reaches
+  the other two (`src/games/rewards/CLAUDE.md`); every part's way back puts the calendar back. The single books stand thick enough to hit with a finger on a
   phone (`DAILY_SPINE`, widened again in November 2026 when they were still hard to hit), and lean a little differently, as books do.
   Their row is as wide as its board allows, so they grow in height instead: taller than the picture books, as high as
   their compartment lets them be taken out (`DAILY_TALL`), and the picture on each spine takes nearly its whole width,
   since that picture is what a child knows the book by (user feedback, November 2026: books and pictures too small to
   recognise; `shelfLayout.test.ts`). The Alltagshelfer are what parents
-  need most, so they stand first, top left (first in `CATEGORIES`), and that bundle is the eye-catcher of the shelf:
-  glowing brightest, the Belohnungstafel in it bound in gold – still, nothing idles. Every book stands on its board like
+  need most, so they stand first, top left (first in `CATEGORIES`), and the ring calendar is the eye-catcher of the shelf:
+  glowing brightest – still, nothing idles. Every book stands on its board like
   its neighbours, never in a box or pulled out further than they: a slipcase round the two, pulled out and tipped, looked
   as if it floated (user feedback, November 2026). What can be taken is
   plainly unlike what only fills the shelf (user feedback, November 2026): books to take are bright, with paper labels
@@ -1020,15 +1030,15 @@ src/lib/                 speech, sfx (synthesized + recorded sounds), storage, d
   loose around the room (`RoomOptions.tsx`, user feedback, October 2026), on a wide screen all in one column at the
   shelf's right, one compartment over the other (`SIDE_COLUMN`, user decision, November 2026): on top, in the tallest,
   the hourglass (play time, the most needed, yet small in its compartment – user request, 25 November 2026: it was too
-  big), below it a globe with the 🌐 lines and the language's name on its foot (the language – never a light switch), at
-  the bottom a wooden loudspeaker (music, one tap) with the trophy sign beside it (user request, 25 November 2026); the
-  column is narrow (`SIDE_SHARE`, at most 150 px: at 12 % of the room its compartments were too wide, user request,
-  25 November 2026); stickers of the fox girl and
-  the bear boy (the figure) are stuck on the right wall of the big compartment on top, beside the everyday helpers,
-  where they are seen better than in a narrow one (user feedback, November 2026; on an upright screen on the shelf's
-  right inner side), and no books spine out stand against that wall to hide them. „Wer spielt?“ stands small on that same wall
-  right above the first sticker's head, the fox's, in one line (`.shelf-figure-ask`, user feedback, November 2026:
-  carved big into the back panel beside the wall it was too far from the stickers it asks about). The texts that stood below
+  big), right under it the figure's compartment – „Wer spielt?“ with the stickers of the fox girl and the bear boy side
+  by side under it, stuck on its back panel (`.shelf-back-stuck`; user request, 26 November 2026: on the right wall of
+  the helpers' compartment they took the books' room, and squeezed onto a narrow wall or beside the hourglass under the
+  fullscreen sign they were not seen; on an upright screen they stay on the shelf's right inner side) –, then a globe
+  with the 🌐 lines and the language's name on its foot (the language – never a light switch), at the bottom a wooden
+  loudspeaker (music, one tap) standing against the shelf's right wall, the trophy sign at its left (user request, 26
+  November 2026); the column is narrow (`SIDE_SHARE`, at most 150 px: at 12 % of the room its compartments were too
+  wide, user request, 25 November 2026), and narrower still on a phone (`PHONE_SIDE_SHARE`, below 600 px high: user
+  request, 26 November 2026 – the perspective may cut a little off its left side, which shows the room's depth better). The texts that stood below
   the shelf – what the app is (the page's words for search engines, `SeoWords`) and „Ein paar Worte von uns“
   (`ParentsNote`) – open together from „mehr …“ at the end of the carved words, where grown-ups already read (a little
   „i“ book in the shelf was replaced by it, user feedback, November 2026); their text stays in the page unseen while
@@ -1055,7 +1065,7 @@ src/lib/                 speech, sfx (synthesized + recorded sounds), storage, d
   (`LEAN_CLEAR`) –; where the top compartment is tall enough (a tablet), it hangs above the helpers' books instead, clear
   over their tops (`ShelfCell.tall`, `UNDER_SIGN`), and they get its room – only where that makes them clearly wider
   (`ABOVE_GAIN`), since under it they stand lower, and with a breath of room left beside the words (`WORDS_BREATH`;
-  user feedback, November 2026: beside the sign on a tablet the spines were too thin for their pictures) – and the books spine out keep clear of the wall with the stickers (`STICKERS_ROOM`), the foxes on its o stay on the screen (`shelfLayout.test.ts`), and the books spine out fill only the
+  user feedback, November 2026: beside the sign on a tablet the spines were too thin for their pictures) – and the foxes on its o stay on the screen (`shelfLayout.test.ts`), and the books spine out fill only the
   board's right end (`data-leads`). A brighter, still light lies close round the carved words only (`.shelf-carving-text`)
   so they stand out – evenly over every line of the words, never fading out before their last one, and soft at its rim
   (a blurred rounded box: an ellipse round the words ended hard), yet never over the whole compartment, where it reached
