@@ -391,6 +391,9 @@ export const allGamesIdeas: IdeaArea = {
       text: "Messung vom 24. November 2026: Gute Nacht malt in der Mitte 40 Bildschirme pro Sekunde neu (`bun run perf ketten-night`), nachdem Seilknoten und Umlenkrolle schon eigene Ebenen wurden (vorher 47). Übrig sind die Gondel, die am Seil fährt, und das Hamsterrad, die sich beide im großen Maschinen-svg bewegen (`src/games/marbles/NightLevel.tsx`). Lösung: beide als kleine eigene Ebenen (`Sprite`, eine Drehung oder Verschiebung per CSS-transform) aus dem großen svg nehmen, mit `--trace` nachsehen, was danach noch oft gemalt wird. Rahmen von `bun run perf`: höchstens 60 % beschäftigt, höchstens 30 Bildschirme pro Sekunde neu gemalt, langsamstes Zwanzigstel ≤ 34 ms. Vorher `main` am selben Tag gleich messen (die Zahlen schwanken), danach die Regeln in `src/games/marbles/CLAUDE.md` nachführen.",
       why: "Kleinkinder spielen oft auf alten Handys der Eltern; dort sehen sie das Spiel ruckeln.",
       effort: "S",
+      done: true,
+      partial:
+        "Umgesetzt am 26. November 2026: solange das Seil läuft (`ropeMoving`), sind Hamsterrad mit der Rolle an seiner Achse, der rennende Hamster, die Gitterstäbe vor dem Rad und die Gondel eigene kleine Ebenen über dem Raum (`WheelRunning`); Rad und Gondel bewegt nur ihre Transformation, nur die kleine Ebene des Hamsters wird für seine trippelnden Füße neu gemalt. Die Dunkelheit liegt auf ihnen als Farbmatrix (`Veiled`), genau wie der Schleier über dem Raum; davor und danach stehen sie still im großen svg. `--trace` zeigte danach, dass der größte Rest gar nicht im Bild lag: Pendel und Schaukelstuhl der Leseecke schwangen neben dem Bildschirm weiter, und ein Handy rastert den Raum dort mit. Sie halten jetzt still, solange sie nicht auf dem Bildschirm sind (`seen.shown`, `tCornerStill`). Messung (beschäftigt % / Bildschirme pro Sekunde, Anfang · Mitte): vorher 43/29 · 45/41, nachher 45–55/29 · 45/13.",
     },
     {
       id: "A-44",
