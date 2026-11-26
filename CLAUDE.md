@@ -472,11 +472,12 @@ In a fresh worktree run `bun install` first.
   bouncing. They stand in the trophy room, a page of its own at `/pokale/` (`TrophyMuseum`, user request, November
   2026), never in the bookshelf (between its books a trophy stood as if in the wall) nor in a popup: reached by a little
   wooden board in 3D (grain, bevelled edges, its thickness seen below and right of it) with a big golden cup on it,
-  sitting in a bottom corner of a compartment – on a wide shelf the loudspeaker's, at the bottom of the right column, in
-  its bottom left corner, its left edge against the post, with the loudspeaker standing against the right wall beside it
-  and both sized by that narrow compartment (user request, 26 November 2026, replacing the speaker at its left;
-  `trophySignAt`, `from: "left"`), on an upright one in the bottom right corner of the picture books' lowest, its right
-  edge against the post – its foot on the board, never hanging in the air above the board – held by three nails in
+  nailed into a corner of a compartment – on a wide shelf the loudspeaker's, at the bottom of the right column, in its
+  top left corner, its nails' heads on the wood of the post and the board above (placed at their middles and moved up
+  and left by `--nail-at`; user feedback, 26 November 2026: under the board and beside the post the nails held nothing),
+  with the loudspeaker standing big against the right wall below it (user request, 26 November 2026: beside each other
+  on the board both were small; `trophySignAt`, `from: "top"`), on an upright one in the bottom right corner of the picture books' lowest, its right edge against the
+  post – its foot on the board, never hanging in the air above the board – held by three nails in
   its corners (the top two and the bottom left; user request, November 2026: the paper sign hanging there looked flat
   and loose) (`TrophySign`, only once a trophy is won;
   user feedback, November 2026: a small sign with a cup in a doorway above the loudspeaker was hardly recognised – it is
@@ -1030,13 +1031,21 @@ src/lib/                 speech, sfx (synthesized + recorded sounds), storage, d
   loose around the room (`RoomOptions.tsx`, user feedback, October 2026), on a wide screen all in one column at the
   shelf's right, one compartment over the other (`SIDE_COLUMN`, user decision, November 2026): on top, in the tallest,
   the hourglass (play time, the most needed, yet small in its compartment – user request, 25 November 2026: it was too
-  big), right under it the figure's compartment – „Wer spielt?“ with the stickers of the fox girl and the bear boy side
-  by side under it, stuck on its back panel (`.shelf-back-stuck`; user request, 26 November 2026: on the right wall of
-  the helpers' compartment they took the books' room, and squeezed onto a narrow wall or beside the hourglass under the
-  fullscreen sign they were not seen; on an upright screen they stay on the shelf's right inner side) –, then a globe
-  with the 🌐 lines and the language's name on its foot (the language – never a light switch), at the bottom a wooden
-  loudspeaker (music, one tap) standing against the shelf's right wall, the trophy sign at its left (user request, 26
-  November 2026); the column is narrow (`SIDE_SHARE`, at most 150 px: at 12 % of the room its compartments were too
+  big), right under it the figure's compartment – the stickers of the fox girl and the bear boy one above the other on
+  its back panel, each whole with its ♀ or ♂ at the head's top right, over it (at its right side the wall cut it off;
+  `.shelf-back-stuck`), and „Wer spielt?“ big on its right wall, the face
+  seen most of in that narrow compartment, across the wall in one or two lines (`.shelf-ask-wall`; user request, 26
+  November 2026: on the right wall of the helpers' compartment they took the books' room, squeezed onto a narrow wall or
+  beside the hourglass under the fullscreen sign they were not seen, and the words over the heads side by side on the
+  back panel were cut off with them; never write it down a slanted wall, which flattens the letters to a few pixels; on
+  an upright screen words and stickers stay on the shelf's right inner side) –, then a globe drawn round and lit (a
+  shaded ball seen a little from above, curved parallels, a gleam, a brass half ring with its thickness on a turned
+  wooden foot; user request, 26 November 2026: the flat one looked poor) with the 🌐 lines and the language's name on
+  its foot (the language – never a light switch), at the bottom a wooden loudspeaker (music, one tap) standing big
+  against the shelf's right wall, its right side flush with it and drawn as seen from the room's middle – its front,
+  its left side and its top going back, never a right side the wall would hide (user feedback, 26 November 2026) –, the
+  trophy sign nailed into the compartment's top left corner above it (user request,
+  26 November 2026); the column is narrow (`SIDE_SHARE`, at most 150 px: at 12 % of the room its compartments were too
   wide, user request, 25 November 2026), and narrower still on a phone (`PHONE_SIDE_SHARE`, below 600 px high: user
   request, 26 November 2026 – the perspective may cut a little off its left side, which shows the room's depth better). The texts that stood below
   the shelf – what the app is (the page's words for search engines, `SeoWords`) and „Ein paar Worte von uns“
