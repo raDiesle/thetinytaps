@@ -39,3 +39,17 @@ test("the songs name no kinds of toys", () => {
     /\b(blocks?|bricks?|lego|cars?|trucks?|balls?|books?|teddy|teddies|dolls?|puzzles?|crayons?|bausteine?|klötze|autos?|bälle|ball|bücher|buch|kuscheltier\w*|teddys?|puppen?|puzzles?|stifte?)\b/i;
   for (const song of SONG_DRAFTS) for (const { id } of DRAFT_LANGUAGES) expect(lyricsOf(song.words[id]), `${song.id} ${id}`).not.toMatch(toys);
 });
+
+// One tidying song for now, where the child tidies quickly (user decision, 26 November 2026); the calm versions are
+// postponed, not turned down: they stay as drafts with the words that bring them back (H-152), and nothing calm is made.
+test("only fast songs are to be made, the calm ones wait", () => {
+  const made = SONG_DRAFTS.filter((song) => !song.postponed);
+  expect(made.filter((song) => song.ideas.includes("H-119")).length).toBe(1);
+  for (const song of made) {
+    const styles = song.styles.filter((style) => !style.postponed);
+    expect(styles.length, song.id).toBe(1);
+    expect(styles[0].bpm, song.id).toBeGreaterThanOrEqual(120);
+  }
+  for (const reason of SONG_DRAFTS.flatMap((song) => [song.postponed, ...song.styles.map((style) => style.postponed)]).filter(Boolean))
+    expect(reason).toContain("H-152");
+});

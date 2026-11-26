@@ -23,7 +23,7 @@ export const TOOL_GROUPS: { title: string; pages: ToolPage[] }[] = [
         to: "/management/lieder/",
         emoji: "🎶",
         label: "Lieder für Suno",
-        about: "Liedtexte für den Timer zum Lesen und Einfügen: Aufräumlieder und das Countdown-Lied, schnell und ruhig",
+        about: "Liedtexte für den Timer zum Lesen und Einfügen in Suno: das schnelle Aufräumlied und das Countdown-Lied",
         ideas: ["H-119", "H-134"],
       },
       {

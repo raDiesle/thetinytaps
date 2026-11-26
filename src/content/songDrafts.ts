@@ -40,6 +40,8 @@ export interface SongStyle {
   bpm: number;
   /** The one to try first with these words. */
   recommended?: boolean;
+  /** Set when this way of playing it is put aside (see `SongDraft.postponed`); shown folded, not made. */
+  postponed?: string;
   /** „Style of Music“ without its language; the page adds „sung in …“. */
   style: string;
   exclude: string;
@@ -51,6 +53,11 @@ export interface SongDraft {
   emoji: string;
   /** Its name on the page. */
   title: string;
+  /**
+   * Set when the user put the song aside without turning it down: why, and the words that start it again. The page
+   * shows it folded under „Zurückgestellt“, and it is not made with the others.
+   */
+  postponed?: string;
   /** The ideas it belongs to, e.g. "H-119". */
   ideas: string[];
   /** What it is and for which timer, for the user reading it. */
@@ -87,8 +94,13 @@ const CALM: Omit<SongStyle, "recommended"> = {
 const EN_LEFT: SongWords["left"] = ["Five more minutes", "Four more minutes", "Three more minutes", "Two more minutes", "One more minute"];
 const DE_LEFT: SongWords["left"] = ["Noch fünf Minuten", "Noch vier Minuten", "Noch drei Minuten", "Noch zwei Minuten", "Noch eine Minute"];
 
+/** Why the calm versions wait, and the words that bring them back (H-152). */
+const CALM_POSTPONED =
+  "Zurückgestellt am 26. November 2026: Es gibt erst ein Aufräumlied, das schnelle, bei dem das Kind flink aufräumt. Ruhig ist nicht abgelehnt, nur später – wieder aufgenommen mit „mach die ruhige Fassung der Timer-Lieder“ (H-152).";
+
 /**
- * The drafts. Tidying songs stay general (user feedback, 26 November 2026): nobody knows what lies in a child's room,
+ * The drafts. One tidying song for now, the fast one (user decision, 26 November 2026); the calm song and the calm
+ * styles stay here, postponed. Tidying songs stay general (user feedback, 26 November 2026): nobody knows what lies in a child's room,
  * so they sing of „things“, „everything“ and its place, never of blocks, cars or teddies (`songDrafts.test.ts`).
  */
 export const SONG_DRAFTS: SongDraft[] = [
@@ -145,13 +157,17 @@ export const SONG_DRAFTS: SongDraft[] = [
         end: ["Geschafft! Geschafft! Wir sind so weit,", "alles daheim – vorbei die Aufräumzeit!"],
       },
     },
-    styles: [{ ...FAST, recommended: true }, CALM],
+    styles: [
+      { ...FAST, recommended: true },
+      { ...CALM, postponed: CALM_POSTPONED },
+    ],
   },
   {
     id: "alles-hat-ein-zuhaus",
+    postponed: CALM_POSTPONED,
     emoji: "🏡",
     title: "Aufräumlied „Alles hat ein Zuhaus“ (ruhig)",
-    ideas: ["H-119", "H-135"],
+    ideas: ["H-152"],
     about:
       "Das ruhige Aufräumlied für Kinder, die ein flottes Lied eher aufdreht, oder für den Abend: Stück für Stück findet jedes Ding heim, Groß und Klein räumen zusammen, einmal tief atmen, ein leises Fünf bis Eins. Gleicher Aufbau wie das Aufräum-Rennen, nur sanfte Worte.",
     names: { en: "Everything Has a Home", de: "Alles hat ein Zuhaus" },
@@ -185,7 +201,7 @@ export const SONG_DRAFTS: SongDraft[] = [
         end: ["Fertig, fertig, alles fein,", "jetzt darf alles ruhig sein."],
       },
     },
-    styles: [{ ...CALM, recommended: true }, FAST],
+    styles: [{ ...CALM, recommended: true }],
   },
   {
     id: "noch-fuenf-minuten",
@@ -193,7 +209,7 @@ export const SONG_DRAFTS: SongDraft[] = [
     title: "Countdown-Lied „Noch fünf Minuten“ (allgemein)",
     ideas: ["H-134"],
     about:
-      "Das allgemeine Lied für jeden Timer und jedes Bild: Es singt nur, wie viel Zeit noch bleibt, und macht Mut, nie wofür – passt zum Aufräumen, Anziehen, „noch fünf Minuten spielen“ und Warten. Flott und flink („flink wie ein Fuchs“), aber ohne zu drängen. In beiden Tempi gleich gut denkbar.",
+      "Das allgemeine Lied für jeden Timer und jedes Bild: Es singt nur, wie viel Zeit noch bleibt, und macht Mut, nie wofür – passt zum Aufräumen, Anziehen, „noch fünf Minuten spielen“ und Warten. Flott und flink („flink wie ein Fuchs“), aber ohne zu drängen.",
     names: { en: "Five More Minutes", de: "Noch fünf Minuten" },
     words: {
       en: {
@@ -255,7 +271,10 @@ export const SONG_DRAFTS: SongDraft[] = [
         end: ["Die Zeit ist um! Hurra, geschafft!", "Das haben wir zusammen gemacht!"],
       },
     },
-    styles: [{ ...FAST, recommended: true }, CALM],
+    styles: [
+      { ...FAST, recommended: true },
+      { ...CALM, postponed: CALM_POSTPONED },
+    ],
   },
 ];
 
@@ -300,14 +319,14 @@ export const SONG_GUIDE: GuideSection[] = [
       "Jede Minute ist ein Block: Refrain mit der verbleibenden Zeit („Noch drei Minuten …“), eine Strophe, eine Pause zum Weiterräumen. So hört das Kind, wie weit es ist, lange bevor es eine Uhr lesen kann.",
       "Ein Lied von 5 Minuten reicht für 1 bis 5 Minuten: Der Timer spielt immer den Anfang („Aufräumzeit!“) und dann die letzten Blöcke – 3 Minuten beginnen mit „Noch drei Minuten“, 2 Minuten mit „Noch zwei Minuten“. Darum wissen nur der Anfang und die letzte Strophe, wo im Lauf sie stehen; die Strophen dazwischen passen an jede Stelle.",
       "10 Minuten wären ein eigenes Lied mit zehn Blöcken (etwa 8 Minuten erzeugen, dann „Extend“), das dann auch alle Längen von 1 bis 10 Minuten abdeckt. Lange Lieder wiederholen sich bei Suno leicht; erst wenn ein 5-Minuten-Lied gut ist, die Strophen für 10 bis 6 dazuschreiben.",
-      "Kein Lied pro Länge: Das spart Downloads (Pro: 20 im Monat). Zwei Lieder in zwei Tempi in sieben Sprachen wären schon 28.",
+      "Kein Lied pro Länge: Das spart Downloads (Pro: 20 im Monat). Zwei Lieder in sieben Sprachen sind schon 14.",
     ],
   },
   {
     id: "tempo",
     title: "Schnell oder ruhig, und welche Sprachen",
     points: [
-      "Jedes Lied hat zwei Stil-Texte: schnell (128 BPM, Ukulele, Klatschen, wie ein Wettlauf) und ruhig (96 BPM, Gitarre, Marimba, gemütlich). Die Worte bleiben dieselben; ⭐ markiert, womit man anfangen sollte.",
+      "Gemacht wird erst die schnelle Fassung (128 BPM, Ukulele, Klatschen, wie ein Wettlauf): ein Aufräumlied, bei dem das Kind flink aufräumt, und das allgemeine Countdown-Lied (Entscheidung des Nutzers, 26. November 2026). Die ruhige Fassung (96 BPM, Gitarre, Marimba) und das ruhige Aufräumlied „Alles hat ein Zuhaus“ sind zurückgestellt, nicht abgelehnt: Sie stehen eingeklappt unten bzw. unter „Zurückgestellt“ und werden erst mit „mach die ruhige Fassung der Timer-Lieder“ gemacht (H-152).",
       "Das Kind soll flink sein (Wunsch des Nutzers, 26. November 2026): Die schnelle Fassung macht das über die Musik und den Wettlauf mit dem Lied – „Wir sind schneller!“, „flink wie ein Fuchs“ –, nie mit Schimpfen oder „schnell, schnell“.",
       "Die Aufräumlieder sind allgemein (Wunsch des Nutzers, 26. November 2026): Niemand weiß, was im Kinderzimmer liegt, also singen sie von Sachen, Dingen und ihrem Platz, nie von Bausteinen, Autos oder Kuscheltieren.",
       "Die Texte stehen erst auf Englisch (die erste Sprache für Neues) und Deutsch. Sobald ein Lied gewählt ist, schreibt die Session, die es macht, die anderen fünf Sprachen dazu – singbar nachgedichtet, nicht wörtlich übersetzt.",

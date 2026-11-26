@@ -127,8 +127,8 @@ taken out (user request, November 2026). The pictures:
   sways a little every second. A tap makes the motor whirr and lights the toys still on the floor. Its name and lines
   were written English first and translated into every app language on 22 November 2026 (`tidyNames.ts`, their own
   part in `languageStatus.ts`); its lines wait for their recordings. The
-  Aufräumlied (H-119, a fixed five minutes with a Suno song) is an idea of its own, not built; its words, fast and calm,
-  wait on `/management/lieder/` (`src/content/songDrafts.ts`).
+  Aufräumlied (H-119, a fixed five minutes with a Suno song) is an idea of its own, not built; its words („Das Aufräum-Rennen“,
+  one fast song – the calm one is postponed, H-152) wait on `/management/lieder/` (`src/content/songDrafts.ts`).
 - „Block House“ 🧱 (`blocks.tsx`, H-125, user request, 22 November 2026: timers that look like a well-known kind of game
   played by itself, like a video, the first a block-building game for tidying up): on a meadow of square grass a
   jumble of blocks lies in three rows (`JUMBLE`, each a little tilted), beside a house's plan drawn in dashed outlines
