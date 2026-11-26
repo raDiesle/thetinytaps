@@ -243,7 +243,7 @@ export const LANGUAGE_STATUS: LanguageStatusRow[] = [
   },
   {
     href: "/grosses-bett/",
-    note: "Das Buch „Bett“ (bis 24. November 2026 „Großes Bett“) mit zwei Geschichten in Kapiteln, gewählt auf seiner ersten Seite (StoryChoice), die Tapsis Stimme vorliest; unten rechts über ▶ schaltet ein Lautsprecher sie für Erwachsene aus, die selbst vorlesen. Der Name des Buchs (names.ts) ist in allen sieben Sprachen da.",
+    note: "Das Buch „Schlaf gut“ (bis 24. November 2026 „Großes Bett“, bis 26. November 2026 „Bett“) mit zwei Geschichten in Kapiteln, gewählt auf seiner ersten Seite (StoryChoice), die Tapsis Stimme vorliest; unten rechts über ▶ schaltet ein Lautsprecher sie für Erwachsene aus, die selbst vorlesen. Der Name des Buchs (names.ts) ist in allen sieben Sprachen da.",
     parts: [
       {
         label: "🛏️ Tapsi's Big Bed",

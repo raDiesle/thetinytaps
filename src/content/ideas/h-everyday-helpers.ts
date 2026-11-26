@@ -321,5 +321,21 @@ export const everydayHelpersIdeas: IdeaArea = {
       partial:
         "Gebaut am 24. November 2026 als „Tapsi's Own Bed“ (src/games/ownbed): 21 Seiten in acht Kapiteln nach den Schritten der Recherche „grosses-bett“ (Nachtrag), unter /grosses-bett/eigenes-bett/; das Buch heißt jetzt „Bett“ (die Adresse /grosses-bett/ bleibt), in der Wahl stehen „Aus dem Gitterbett“ und „Aus dem Elternbett“. Tapsi schläft zu dritt im großen Bett, es wird eng; Mama erzählt, Tapsi will lieber bleiben und wird gehört, Papa verspricht das Morgenkuscheln; Tapsi trägt das Kissen, das nach Zuhause riecht, ins eigene Bett, Hase und der Mond am Bett, die Tür bleibt offen; Mittagsschlaf zuerst mit Mama auf dem Teppich; abends wie immer, Papa liegt daneben und rückt jeden Abend weiter bis zur Tür; nachts kommt Tapsi herüber und Mama bringt Tapsi ruhig zurück, so oft es nötig ist; morgens Kuscheln im großen Bett. Englisch zuerst, in alle sieben Sprachen übersetzt, Suchtexte in allen sieben. Die 21 Bilder wurden am 25. November 2026 in einer Claude-Cloud-Sitzung mit Gemini gemacht, seitdem ist die Geschichte veröffentlicht; Aufnahmen nur auf Wunsch.",
     },
+    {
+      id: "H-153",
+      emoji: "😴",
+      title: "Schlaf gut: Mittagsschlaf als Geschichte im Buch, ohne Timer",
+      text: "Eine weitere Geschichte im Buch „Schlaf gut“ (/grosses-bett/, gewählt auf seiner ersten Seite wie die beiden Bett-Geschichten, mit eigener Adresse), in Kapiteln, vorgelesen von Tapsis Stimme wie die anderen: Nach dem Mittagessen wird es ruhig, die Vorhänge gehen zu, das Licht im Zimmer wird weich, Hase und die gelbe Decke kommen mit, Mama oder Papa singt dasselbe kurze Lied wie abends. Tapsi ist gar nicht müde und darf einfach liegen und schauen – die Sonnenflecken an der Decke, der Vorhang, der sich leise bewegt –, und irgendwann fallen die Augen zu. Tapsi wacht auf, kuschelt, und dann gibt es etwas zu essen und es geht raus. Kein Timer und keine Uhr (Wunsch des Nutzers, 26. November 2026): Der Mittagsschlaf endet mit dem Aufwachen, nicht mit einer Zeit. Vorher eine Recherche aus Fachstellen und Fachbüchern wie bei „grosses-bett“ (wie lange, bis wann, was hilft beim Einschlafen am Tag).",
+      why: "Mittagsschlaf ist bei Kleinkindern ein täglicher Kampf, und Eltern suchen danach als Lied oder Ritual, nicht als Timer: „nap time timer“ hat auf YouTube kaum eigene Suchen (Recherche „youtube-timer-themen“). Bild, Zimmer, Hase und Lied gibt es schon aus den Bett-Geschichten, so bleibt alles in einem Zimmer und einer Familie.",
+      effort: "M",
+    },
+    {
+      id: "H-154",
+      emoji: "📚",
+      title: "Schlaf gut: Ruhezeit für Kinder, die nicht mehr schlafen, ohne Timer",
+      text: "Eine Geschichte im Buch „Schlaf gut“ für die Zeit, wenn der Mittagsschlaf wegfällt: Tapsi muss nicht mehr schlafen, aber mittags ist Ruhezeit. Tapsi hat einen eigenen Ruheplatz (Kissen, Decke, Hase), einen Korb mit ein paar Büchern und einem Puzzle, leise Stimmen im Haus, und darf allein ruhig spielen oder anschauen. Wie die Zeit vergeht, zeigt das Bild selbst: der Sonnenstreifen wandert langsam über den Teppich, nie eine Uhr. Mama sagt vorher, was gilt („Du musst nicht schlafen, nur ruhig sein“), und die Ruhezeit endet, wenn Mama leise die Tür aufmacht – nicht mit einem Timer (Wunsch des Nutzers, 26. November 2026). Vorher eine Recherche aus Fachstellen und Fachbüchern, wann und wie Kinder vom Mittagsschlaf zur Ruhezeit kommen.",
+      why: "Viele Familien erleben genau diesen Übergang, und auch hier wird kein Timer gesucht („quiet time timer“ ist auf YouTube dünn, Recherche „youtube-timer-themen“), sondern eine Geschichte, die zeigt, wie Ruhe aussieht. Sie passt in dasselbe Zimmer wie die Bett-Geschichten.",
+      effort: "M",
+    },
   ],
 };

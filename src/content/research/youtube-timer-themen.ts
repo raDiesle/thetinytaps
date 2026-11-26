@@ -69,7 +69,7 @@ export const youtubeTimerThemen: Research = {
       emoji: "🌙",
       title: "Schlafen und Ruhe",
       searches: ["bedtime timer for toddlers", "get ready for bed timer", "nap time timer", "quiet time timer", "calm down timer", "schlafenszeit kinder lied"],
-      ideas: ["H-138", "Y-34"],
+      ideas: ["H-138", "H-153", "H-154", "Y-34"],
     },
     {
       emoji: "🏎️",
@@ -100,6 +100,10 @@ export const youtubeTimerThemen: Research = {
     },
   ],
   excluded: [
+    {
+      title: "Timer für Schlafen, Mittagsschlaf und Ruhezeit",
+      why: "Auf YouTube dünn, und Schlafen endet mit dem Einschlafen oder Aufwachen, nicht mit einer Zeit: Die drei kommen ohne Timer als Teile des Buchs „Schlaf gut“ (H-138, H-153, H-154; Wunsch des Nutzers, 26. November 2026).",
+    },
     {
       title: "Ein allgemeines Countdown-Lied für jeden Timer (H-134)",
       why: "Entscheidung des Nutzers, 26. November 2026: Ein Lied ohne Aufgabe ist Quatsch für Kinder; ein Timer-Lied gehört zu einer Aufgabe wie dem Aufräumen. Gesucht wird ohnehin die Aufgabe mit Länge, der allgemeine Timer gehört den Klassenzimmern.",
