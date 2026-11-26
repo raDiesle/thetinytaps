@@ -21,7 +21,7 @@ import {
   WORDS_BLURB,
   WORDS_TITLE,
 } from "@/games/letters/names";
-import { WAIT_BOOK } from "@/games/rewards/names";
+import { REWARD_BOOK, SCHEDULE_BOOK, WAIT_BOOK } from "@/games/rewards/names";
 import { SHADOWS_BLURB, SHADOWS_TITLE } from "@/games/shadows/names";
 import { TOGETHER_BLURB, TOGETHER_TITLE } from "@/games/together/names";
 import type { Texts } from "@/lib/language";
@@ -40,6 +40,12 @@ export interface Game {
    * (`also`), each with its own name on its spine.
    */
   volumes?: Volume[];
+  /**
+   * On the shelf its volumes stand as one ring-bound calendar instead of books tied together (user request, 26 November
+   * 2026: the Belohnungstafel's three books): a picture of a day's plan with its reward on its page and the volumes'
+   * names under it, one tap opening the game's first part to make (`Volume` first in `volumes`, see `calendarHref`).
+   */
+  calendar?: true;
   /**
    * Still being built: it stands neither on the shelf nor in its book and is in no search result or sitemap; only the
    * management page links to it, and its way back leads there (user decision, November 2026). Drop the mark to publish it.
@@ -243,28 +249,14 @@ export const CATEGORIES: Category[] = [
       {
         href: "/belohnungstafel/",
         also: ["/tagesplan/", "/wie-lange-warten/"],
-        // On the shelf books tied together, each opening its own part (user feedback, November 2026): „Wie lange
-        // warten?“ (a Countdown to a big day, H-05), then the Zeitplan, then the Belohnungstafel, which stays bound in gold.
+        // On the shelf one ring-bound calendar (user request, 26 November 2026; before, three books tied together):
+        // a tap opens the Zeitplan's editor, whose quick access reaches the other two parts. Its page names all three,
+        // the Zeitplan first: „Wie lange warten?“ is the Countdown to a big day (H-05).
+        calendar: true,
         volumes: [
+          { href: "/tagesplan/", emoji: "🗓️", title: SCHEDULE_BOOK },
+          { href: "/belohnungstafel/", emoji: "🌟", title: REWARD_BOOK },
           { href: "/wie-lange-warten/", emoji: "🌙", title: WAIT_BOOK },
-          {
-            href: "/tagesplan/",
-            emoji: "🗓️",
-            title: { de: "Zeitplan", en: "Schedule", zh: "时间表", hi: "समय-सारणी", es: "Horario", ar: "الجدول الزمني", ru: "Расписание" },
-          },
-          {
-            href: "/belohnungstafel/",
-            emoji: "🌟",
-            title: {
-              de: "Belohnungstafel",
-              en: "Reward chart",
-              zh: "奖励表",
-              hi: "इनाम चार्ट",
-              es: "Tabla de premios",
-              ar: "لوحة المكافآت",
-              ru: "Таблица наград",
-            },
-          },
         ],
         emoji: "📅",
         title: {
@@ -535,6 +527,8 @@ export const listedGames = (category: Category) => category.games.filter((game) 
  * then stands as the game's own book, untied.
  */
 export function shelfVolumes(game: Game): Volume[] | undefined {
+  // A calendar is one thing on the shelf, opened at its first volume: no book of its own for each.
+  if (game.calendar) return undefined;
   const volumes = game.volumes?.filter((volume) => !volume.unfinished);
   return volumes && volumes.length > 1 ? volumes : undefined;
 }
@@ -564,6 +558,9 @@ export interface ShelfEntry {
   /** The game, for a game's own book. */
   game?: Game;
 }
+
+/** Where a game standing as a calendar opens (`Game.calendar`): its first volume, the Zeitplan's editor for the Belohnungstafel. */
+export const calendarHref = (game: Game) => game.volumes?.[0]?.href ?? game.href;
 
 /** The id of a game's own book, or of one of its volumes: its address without slashes. */
 export const bookIdOf = (href: string) => href.replaceAll("/", "");

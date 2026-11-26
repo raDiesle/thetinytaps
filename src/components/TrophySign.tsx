@@ -19,10 +19,11 @@ import { preloadPage } from "@/lib/preloadPages";
 const DOORWAY_MS = 1900;
 
 /**
- * The sign, the compartment's bottom right corner – its post at `left`, its floor at `top` – in px in the shelf, and its
- * width where that compartment sets it (`size`, beside the speaker); else the books' height does (`--trophy-sign`).
+ * The sign, the compartment's bottom right corner – its post at `left`, its floor at `top` – in px in the shelf, or
+ * with `from: "left"` its bottom left corner, the wall at its left; and its width where that compartment sets it
+ * (`size`, beside the speaker); else the books' height does (`--trophy-sign`).
  */
-export function TrophySign({ left, top, size }: { left: number; top: number; size?: number }) {
+export function TrophySign({ left, top, size, from }: { left: number; top: number; size?: number; from?: "left" }) {
   const t = useT();
   const navigate = useNavigate();
   const { search } = useLocation();
@@ -37,6 +38,7 @@ export function TrophySign({ left, top, size }: { left: number; top: number; siz
       <button
         type="button"
         className="shelf-trophy-sign"
+        data-from={from}
         style={{ left, top, ...(size && { "--trophy-sign": `${size}px` }) } as CSSProperties}
         aria-label={label}
         title={label}

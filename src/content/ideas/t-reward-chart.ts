@@ -51,6 +51,8 @@ export const rewardChartIdeas: IdeaArea = {
       text: "Zähne-Woche, Mein Morgen, Mein Abend, Töpfchen-Woche, Woche mit drei Aufgaben, Zähne-Monat, Monat mit zwei Aufgaben, 5 Sterne bis zum Spielplatz, 7 Nächte im eigenen Bett – als Galerie „Vorlagen“ neben der Tafel, jede ein kleines Bild der Tafel mit Beispiel-Sternen und einer Zeile dazu. Darüber groß der Schalter Tag | Woche | Monat (dieselben Sterne) und daneben Sammeln.",
       effort: "S",
       done: true,
+      partial:
+        "Die Galerie „Vorlagen“ und der Knopf „🧩 Vorlagen“ sind seit dem 26. November 2026 wieder weg (Wunsch des Nutzers): Die Tafel nimmt die ganze Breite, und neue Tafeln entstehen im Editor – erst der Zeitraum, dann die Tageszeiten, oben die Schnellwahl Zeitplan, Belohnungstafel und „Wie lange warten?“. Die Vorlagen bleiben als Startpunkte des Zeitraums.",
     },
     {
       id: "T-06",

@@ -390,12 +390,12 @@
 }
 
 /*
- * The Belohnungstafel's books, parts of one game (`BookBundle`), tied together with a red ribbon and a bow, so they are
+ * A game's books, parts of one game (`BookBundle`; none since the Belohnungstafel became a calendar), tied together with a red ribbon and a bow, so they are
  * read as one thing, and standing on the board like their neighbours: a box round them, pulled out and tipped further,
  * looked as if it floated (user feedback, November 2026). Tied, they are one block: pressed close and standing upright
  * on the board – leaning, tied books looked unnatural (user feedback, November 2026) – and one ribbon runs round all of
  * them – a band on each book looked like three small ribbons (user feedback, November 2026). They are what the eye
- * should find first: the Belohnungstafel bound in gold, all glowing brightest. Still, like everything on the shelf;
+ * should find first, glowing brightest. Still, like everything on the shelf;
  * tied, none moves out under a mouse.
  */
 .shelf-daily-books > .shelf-bundle {
@@ -419,12 +419,6 @@
   box-shadow:
     0 0 0 2px #fff6dccc,
     0 0 calc(var(--bh) * 0.12) calc(var(--bh) * 0.04) #ffd96bd9;
-}
-
-.shelf-bundle > .shelf-daily[data-gold] > .box-front {
-  background:
-    linear-gradient(#0000 3.5%, #fff3b0 3.5% 5.5%, #0000 5.5% 94.5%, #fff3b0 94.5% 96.5%, #0000 96.5%),
-    linear-gradient(90deg, #7a4f0a66, #fff6c780 42%, #ffffff1f 55%, #7a4f0a73), var(--c);
 }
 
 /* Their labels end above the ribbon, which runs at the same height above the board round the whole block. */
@@ -489,6 +483,166 @@
 
 .shelf-bundle > .shelf-daily:focus-visible {
   transform: rotate(var(--lean, 0deg)) rotateX(-6deg);
+}
+
+/*
+ * The Belohnungstafel's ring-bound calendar (`ShelfCalendar`, user request, 26 November 2026): one thing to take in
+ * place of the three books tied together, standing upright on the board, as wide as they stood (`--spines`). Its page
+ * shows a day's plan in small pictures with stars and the reward it leads to, the names of its three parts under it. A
+ * cardboard back behind it, the rings along its top; it glows brightest on the shelf, still.
+ */
+.shelf-calendar {
+  position: relative;
+  display: block;
+  flex: var(--spines) 1 0;
+  min-width: 0;
+  height: calc(var(--sh) * 0.97);
+  color: var(--ink);
+  text-decoration: none;
+  transform-origin: 50% 100%;
+  transform: rotateX(-6deg);
+  transition: transform 0.35s cubic-bezier(0.3, 0.7, 0.4, 1.2);
+  -webkit-tap-highlight-color: transparent;
+}
+
+.shelf-calendar[data-away] {
+  visibility: hidden;
+}
+
+.shelf-daily-books > .shelf-calendar + .shelf-daily {
+  --lean: -6deg;
+  margin-left: calc(var(--bh) * 0.82 * var(--lean-room));
+}
+
+@media (hover: hover) {
+  .shelf-calendar:hover {
+    transform: translateZ(calc(var(--d) * 0.12)) translateY(-2%) rotateX(-11deg);
+  }
+}
+
+.shelf-calendar:focus-visible {
+  outline: none;
+  transform: translateZ(calc(var(--d) * 0.12)) translateY(-2%) rotateX(-11deg);
+}
+
+.shelf-calendar:focus-visible .shelf-calendar-sheet {
+  outline: 4px solid var(--ocean);
+  outline-offset: 2px;
+}
+
+/* The grey board the pages are bound to, a little bigger than they are and leaning back behind them. */
+.shelf-calendar-board {
+  position: absolute;
+  inset: 0 -1.5% 0 1.5%;
+  border-radius: 3px;
+  background: linear-gradient(90deg, #00000026, #0000 30%, #0000001a), #8a7a68;
+  transform-origin: 50% 100%;
+  transform: translateZ(-6px) rotateX(-4deg);
+}
+
+/*
+ * Its page: white paper, the punched rings over its top, what is on it sized by the page (`cqw`, `cqh`) – its own
+ * padding in %, since container units on the container itself measure the next one up.
+ */
+.shelf-book-cover.shelf-calendar-sheet {
+  display: flex;
+  flex-direction: column;
+  align-items: stretch;
+  gap: 0;
+  padding: 14% 7% 5%;
+  overflow: visible;
+  border-radius: 3px;
+  background: linear-gradient(122deg, #ffffff 0 30%, #f7f1e3), #fffdf6;
+  box-shadow:
+    inset 0 0 0 1px #3d304540,
+    0 0 0 2px #fff6dccc,
+    0 0 calc(var(--bh) * 0.12) calc(var(--bh) * 0.04) #ffd96bd9;
+}
+
+.shelf-calendar-rings {
+  position: absolute;
+  top: -3cqh;
+  left: 4%;
+  width: 92%;
+  height: 12cqh;
+  overflow: visible;
+}
+
+/* The day's three cards in a row, each with its star circle under it: two done, the last still open. */
+.shelf-calendar-plan {
+  display: flex;
+  margin-bottom: 4cqh;
+  gap: 3cqw;
+  justify-content: center;
+}
+
+.shelf-calendar-card {
+  display: flex;
+  flex: 1 1 0;
+  flex-direction: column;
+  gap: 1.5cqh;
+  align-items: center;
+  min-width: 0;
+}
+
+.shelf-calendar-card img,
+.shelf-calendar-reward img {
+  display: block;
+  width: 100%;
+  aspect-ratio: 1;
+  object-fit: contain;
+  border-radius: 8%;
+  background: #fff;
+  box-shadow: 0 0 0 1px #3d304533;
+}
+
+.shelf-calendar-star {
+  width: 55%;
+  aspect-ratio: 1;
+  border: max(1px, 1.4cqw) solid #e0b740;
+  border-radius: 50%;
+  background: #fff;
+}
+
+.shelf-calendar-star.done {
+  background: radial-gradient(circle, #ffd54a 0 45%, #f3b81f 46%);
+  border-color: #d39a12;
+}
+
+/* The reward the day leads to, a little bigger, in gold. */
+.shelf-calendar-reward {
+  align-self: center;
+  width: 38%;
+  padding: 2cqw;
+  border-radius: 10%;
+  background: linear-gradient(#fff6cf, #f6d66e);
+  box-shadow: 0 0 0 max(1px, 1cqw) #d9a521;
+}
+
+/* The names of its three parts, one per line, shrunk alike so the longest fits (`--len`). */
+.shelf-calendar-names {
+  display: flex;
+  margin-top: 3cqh;
+  flex: 1 1 0;
+  flex-direction: column;
+  justify-content: flex-end;
+  min-height: 0;
+  font-family: var(--font-display, inherit);
+  font-weight: 800;
+  line-height: 1.15;
+  text-align: center;
+  white-space: nowrap;
+}
+
+.shelf-calendar-names > span {
+  font-size: min(9cqh, 150cqw / var(--longest, 18));
+  overflow: hidden;
+  text-overflow: clip;
+}
+
+/* Taken out (bookTravel.ts), only the page flies: the board stays behind. */
+.bt-book > .shelf-calendar-board {
+  display: none;
 }
 
 /*

@@ -46,7 +46,8 @@ import {
 } from "./board";
 import { snakeLayout } from "./BoardSheet";
 import { dayPartsOf } from "./plan";
-import { defaultDraft, draftInSpan, SPANS } from "./ChartEditor";
+import { CHART_KINDS, defaultDraft, draftInSpan, draftOfKind, kindOf, SPANS } from "./ChartEditor";
+import { OPEN_EDITOR, opensEditor } from "./openEditor";
 import {
   ACTIVITIES,
   CHART_TYPES,
@@ -64,6 +65,7 @@ import {
   THEME_BY_ID,
 } from "./catalog";
 import { CATEGORIES } from "@/content/games";
+import { APP_LANGUAGES } from "@/lib/language";
 import { REWARDS_PICTURE_PROMPTS } from "./bilder/prompts";
 import { itemPicture, markPicture, picture } from "./pictures";
 import { DEFAULT_REWARDS_SETTINGS, pageStart, rewardsDefaults } from "./settings";
@@ -552,6 +554,35 @@ describe("one page for boards and plans", () => {
           span.id,
         ).toBe(true);
     }
+  });
+
+  // One calendar on the shelf opens the editor, whose quick choice on top leads to the three things the page makes
+  // (user request, 26 November 2026): named in every app language, and in the wizard each turns the draft into its kind
+  // – a day's plan without a Zähler, the same with one, a Countdown – keeping name, colours and reward.
+  test("the editor's quick choice names Zeitplan, Belohnungstafel and Wie lange warten? and turns the draft into each", () => {
+    expect(CHART_KINDS.map((kind) => kind.id)).toEqual(["plan", "board", "countdown"]);
+    for (const kind of CHART_KINDS) for (const language of APP_LANGUAGES) expect(kind.label[language], `${kind.id} ${language}`).toBeTruthy();
+    const start = defaultDraft("de");
+    if (start.type !== "plan") throw new Error("Mein Tag is a plan");
+    const named: typeof start = { type: "plan", plan: { ...start.plan, childName: "Lena", theme: "meer", reward: rewardFromCatalog("spielplatz") } };
+    for (const kind of CHART_KINDS) {
+      const made = draftOfKind(kind.id, named, "de");
+      expect(kindOf(made), kind.id).toBe(kind.id);
+      const chart = made.type === "board" ? made.board : made.plan;
+      expect([chart.childName, chart.theme, chart.reward?.catalog], kind.id).toEqual(["Lena", "meer", "spielplatz"]);
+      // From each kind back to every other.
+      for (const back of CHART_KINDS) expect(kindOf(draftOfKind(back.id, made, "de")), `${kind.id} → ${back.id}`).toBe(back.id);
+    }
+  });
+
+  test("the Vorlagen gallery is gone, and the shelf's router state opens the editor", () => {
+    for (const file of ["Gallery.tsx", "PlanGallery.tsx"]) expect(existsSync(`src/games/rewards/${file}`), file).toBe(false);
+    const page = readFileSync("src/games/rewards/RewardsGame.tsx", "utf8");
+    expect(page).not.toMatch(/Vorlagen|rw-side|rw-templates/);
+    expect(opensEditor(OPEN_EDITOR)).toBe(true);
+    for (const state of [null, undefined, {}, { editor: "yes" }, "editor"]) expect(opensEditor(state)).toBe(false);
+    // The shelf imports it: it must not pull the page's code into the home page's chunk.
+    expect(readFileSync("src/games/rewards/openEditor.ts", "utf8")).not.toMatch(/^import /m);
   });
 
   // A week that counts stars looked like a Belohnungstafel before the charts were made one (user feedback, November
