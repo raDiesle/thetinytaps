@@ -28,52 +28,27 @@ import {
 } from "./blocks";
 import { CHEST, CRUMBLE_MS, HILL, MAX_DIG, PICK, pickCorner, ROOM, S as DIG, SPOTS, spotCorner, spotKind, toolFrames, TUNNEL, tunnelPlan } from "./tunnel";
 import {
-  ANCHOR,
-  BASKET,
-  CABIN,
-  CAKE,
-  cameraAt,
-  carFrames,
-  BITS,
-  BURST,
-  DECK,
-  DIVE_SHARE,
-  diveMs,
-  FINAL,
-  GROUND,
-  gearLooks,
-  HOP_MS,
-  hopArc,
-  jumpFrames,
-  jumpPlan,
-  leapsOf,
-  MAX_MOVES,
-  MOON as JUMP_MOON,
-  ORBIT,
-  ORBIT_R,
-  PACE,
-  PLANET,
-  POSE_OF,
-  poseLooks,
-  poseTimeline,
-  RELEASE_Y,
-  RUNNER,
+  CAR,
+  DISPLAY,
+  DOOR as LIFT_DOOR,
+  displayAt,
+  FLAG,
+  FLAG_DROP,
+  FLOORS,
+  floorAt,
+  floorTurnsAt,
+  LEVEL,
+  levelOf,
+  liftAt,
+  liftPlan,
+  PLATE as LIFT_PLATE,
+  POLE,
+  ROOF,
   SHAFT,
-  SHORE,
-  SKYSCRAPER,
-  SPOTS as HOP_SPOTS,
-  squashFrames,
-  STAR,
-  STEPS,
-  starAt,
-  SURFACE,
-  SWAY,
-  swingCount,
-  swingX,
-  TREE,
-  WORLD_H,
-  wayOf,
-} from "./jump";
+  STOREY,
+  TRAVEL,
+  worldFrames,
+} from "./lift";
 import { BITE_R, BUTTERFLY, biteSpot, bodyFront, frontAfter, LEAF, LEAF_FLOOR, leafLeft, leafShape, leafSpan, planBites, REACH } from "./caterpillar";
 import { DISC, DOTS, dotAt } from "./disc";
 import { BOARD, FUNNEL, funnelY, JAR, jarPlan, MARBLE_R as JAR_MARBLE_R, MAX_MARBLES, NAIL_R, NAILS, SLOTS as JAR_SLOTS, TUBE } from "./jar";
@@ -142,7 +117,7 @@ describe("Timer", () => {
     // further up, and had fewer toys and apples.
     const code = await Bun.file(new URL("./TimerPlay.tsx", import.meta.url)).text();
     const counts = [...code.matchAll(/<\w+Scene count=\{([^}]+)\}/g)].map((m) => m[1]);
-    expect(counts.length).toBeGreaterThanOrEqual(6);
+    expect(counts.length).toBeGreaterThanOrEqual(5);
     for (const count of counts) expect(count, count).toMatch(/^[A-Z][A-Z_]*$/);
     expect(code).not.toMatch(/\w+Count\(set\)|perBox\(|pieceCount\(/);
   });
@@ -156,7 +131,7 @@ describe("Timer", () => {
     }
     // The order the user asked for (November 2026; Wecker and Apfelbaum, then Apfelbaum and Kerze swapped and Up to the
     // Moon brought to the start of the second row of five, 25 November 2026): Rote Scheibe, Sanduhr, Apfelbaum, Wecker,
-    // Blume, Up to the Moon, Pizza, Kerze, Tidy Up, and Abwechseln, the Kugelbahn (H-117) and the Rennstrecke last, in a group of their
+    // Blume, Up to the Moon (Lift to the Top since 26 November 2026), Pizza, Kerze, Tidy Up, and Abwechseln, the Kugelbahn (H-117) and the Rennstrecke last, in a group of their
     // own. Tennis (H-71) and the Wippe (H-109) stood there and were taken out (user requests, 21 and 25 November 2026).
     expect(PICTURES.slice(0, 9).map((p) => p.id)).toEqual(["disc", "sand", "apple", "clock", "flower", "jump", "pizza", "candle", "tidy"]);
     expect(PICTURES.slice(-3).map((p) => p.id)).toEqual(["swap", "marblerun", "race"]);
@@ -800,362 +775,76 @@ describe("Timer", () => {
       expect(css, part).toMatch(new RegExp(`\\.tm-done \\.tm-${part}[,\\s{]`));
   });
 
-  test("Up to the Moon: every move at any length, quick hops and slow ways one after the other, then the way down as a fifth of the time, landing as it is up (H-127)", () => {
-    for (const total of [10_000, 60_000, 5 * 60_000, 3 * 3600_000]) {
-      const { first, unit, leap, moves, dive } = jumpPlan(total, MAX_MOVES);
-      // It always climbs the whole way from the lake to the moon, a short time only quicker (user request, 24 November 2026).
-      expect(first).toBe(0);
-      expect(moves).toHaveLength(MAX_MOVES);
-      expect(unit).toBeGreaterThan(0);
-      // User feedback, 23 November 2026: never standing still and then a quick move – each move leaves as the one
-      // before lands, its star caught halfway. A hop is quick, `HOP_MS` a leap (slow leaps looked odd), and the slow
-      // ways – swimming, the lift, the balloons, space – take the time the hops leave, by their pace.
-      expect(leap).toBeLessThanOrEqual(HOP_MS);
-      expect(HOP_MS).toBeLessThanOrEqual(1200);
-      for (const [i, m] of moves.entries()) {
-        expect(m.k).toBe(first + i);
-        expect(m.kind).toBe(HOP_SPOTS[m.k + 1].by!);
-        expect(m.start).toBeCloseTo(i ? moves[i - 1].land : 0);
-        expect(m.star).toBeCloseTo((m.start + m.land) / 2);
-        if (m.kind === "hop") expect(m.land - m.start, `hop ${m.k}`).toBeCloseTo(leapsOf(m.k) * leap);
+  test("Lift to the Top: every floor at every length, a gentle start and stop, arriving a little before the end, the flag going up as it is up (H-127)", () => {
+    // User request, 26 November 2026: one tower, one big lift riding all the way up, its red numbers counting slowly,
+    // then a flag hoisted. Every length rides all twenty floors (the whole story, only faster or slower).
+    for (const total of [10_000, 30_000, 60_000, 5 * 60_000, 10 * 60_000, 3 * 3_600_000]) {
+      const { arrive, doorOpen, flagFrom } = liftPlan(total);
+      expect(arrive, `${total}`).toBeLessThan(total);
+      expect(total - arrive, `${total}`).toBeLessThanOrEqual(Math.min(5000, total * 0.12) + 1e-6);
+      expect(flagFrom).toBeGreaterThan(arrive);
+      expect(doorOpen).toBeGreaterThan(arrive);
+      expect(doorOpen).toBeLessThan(total);
+      expect(liftAt(0, arrive)).toBe(0);
+      expect(liftAt(arrive, arrive)).toBe(TRAVEL);
+      // Rising all the way, never back, with no jump in between.
+      let last = 0;
+      for (let i = 1; i <= 2000; i++) {
+        const now = liftAt((arrive * i) / 2000, arrive);
+        expect(now, `${total} ${i}`).toBeGreaterThanOrEqual(last);
+        expect(now - last, `${total} ${i}`).toBeLessThan(STOREY / 2);
+        last = now;
       }
-      expect(moves.at(-1)!.land).toBeCloseTo(total - diveMs(total));
-      const slow = moves.slice(0, -1).filter((m) => m.kind !== "hop");
-      const per = (m: (typeof moves)[number]) => (m.land - m.start) / (PACE[m.kind as keyof typeof PACE] * (HOP_SPOTS[m.k + 1].slow ?? 1));
-      for (const m of slow) expect(per(m) / per(slow[0]), `move ${m.k}`).toBeCloseTo(1);
-      for (const m of slow) expect(m.land - m.start, `move ${m.k}`).toBeGreaterThan(leap);
-      // The way down is part of the timer, slow enough to see every place it passes (user feedback, 23 November 2026).
-      expect(dive.start).toBeCloseTo(moves.at(-1)!.land);
-      expect(dive.land - dive.start).toBeCloseTo(diveMs(total));
-      expect(diveMs(total)).toBeCloseTo(total * DIVE_SHARE);
-      expect(DIVE_SHARE).toBeGreaterThanOrEqual(0.15);
-      expect(dive.top).toBeGreaterThan(dive.start);
-      expect(dive.release).toBeGreaterThan(dive.top);
-      expect(dive.land).toBe(total);
-      // Most of it under the parachute, at a pace the eye can follow: at five minutes under a screen every 10 seconds.
-      expect(dive.release - dive.top).toBeGreaterThan((dive.land - dive.start) * 0.7);
-      if (total === 5 * 60_000) expect((HOP_SPOTS[MAX_MOVES].y - RELEASE_Y) / 900 / ((dive.release - dive.top) / 1000)).toBeLessThan(0.1);
-      // The keyframes go forward in time, so neither the fox nor the picture ever jumps back.
-      const frames = jumpFrames(first, moves, dive);
-      for (const list of Object.values(frames)) for (let i = 1; i < list.length; i++) expect(list[i].at).toBeGreaterThanOrEqual(list[i - 1].at);
-      for (const g of Object.values(gearLooks(first, moves, dive)))
-        for (let i = 1; i < g.frames.length; i++) expect(g.frames[i].at).toBeGreaterThanOrEqual(g.frames[i - 1].at);
-      // It is on its way all the time: no two keyframes of its way up stand at the same place, and they move evenly
-      // (an even pace, `linear`), so the picture goes up all the way.
-      const climb = frames.upDown.filter((f) => f.at > 0 && f.at <= dive.start);
-      expect(climb.length).toBeGreaterThanOrEqual(moves.length);
-      for (const list of [frames.across, frames.upDown])
-        for (let i = 1; i < list.length; i++)
-          if (list[i].at <= dive.start && list[i].at > list[i - 1].at)
-            expect(list[i].transform !== list[i - 1].transform || frames[list === frames.across ? "upDown" : "across"].some((f) => f.at === list[i].at)).toBe(
-              true,
-            );
-      // The picture follows at an even pace, never up and down with each hop; the fox's way up and down is even too,
-      // but for its hops, which rise slowing to their top and fall from it (user request, 23 November 2026: hopping
-      // up the tree's steps), each with its top between leaving and landing.
-      for (const f of frames.camera.filter((f) => f.at < dive.start)) expect(f.ease ?? "linear").toBe("linear");
-      expect(new Set(frames.upDown.filter((f) => f.at < dive.start).map((f) => f.ease ?? "linear")).size).toBeLessThanOrEqual(3);
-      for (const m of moves.filter((m) => m.kind === "hop"))
-        expect(frames.upDown.filter((f) => f.at > m.start && f.at < m.land && f.ease !== "linear").length, `hop ${m.k}`).toBeGreaterThanOrEqual(1);
-      // Its body bounces like a rubber ball on every hop (user request, 23 November 2026): squashed as it pushes off
-      // and as it lands, stretched as it goes up – and plain again between hops.
-      const squash = frames.squash;
-      for (const m of moves.filter((m) => m.kind === "hop")) {
-        const during = squash.filter((f) => f.at >= m.start && f.at <= m.land);
-        expect(
-          during.some((f) => /scale\(1\.\d+, 0\.\d+\)/.test(f.transform)),
-          `crouch ${m.k}`,
-        ).toBe(true);
-        expect(
-          during.some((f) => /scale\(0\.\d+, 1\.\d+\)/.test(f.transform)),
-          `stretch ${m.k}`,
-        ).toBe(true);
+      // The display counts every floor from 0 to the top, one at a time, each turning before the lift arrives.
+      expect(floorAt(0, arrive)).toBe(0);
+      expect(floorAt(arrive, arrive)).toBe(FLOORS);
+      for (let k = 1; k <= FLOORS; k++) {
+        const at = floorTurnsAt(k, arrive);
+        expect(at, `${total} ${k}`).toBeLessThan(arrive);
+        if (k > 1) expect(at, `${total} ${k}`).toBeGreaterThan(floorTurnsAt(k - 1, arrive));
+        expect(floorAt(at - 1, arrive), `${total} ${k}`).toBe(k - 1);
+        expect(floorAt(at + 1, arrive), `${total} ${k}`).toBe(k);
       }
-      for (const m of slow) expect(squash.filter((f) => f.at > m.start + 400 && f.at < m.land).every((f) => f.transform === "scale(1, 1)")).toBe(true);
+      expect(displayAt(arrive - 1, arrive)).toBe(`${FLOORS}^`);
+      expect(displayAt(arrive, arrive)).toBe(`${FLOORS}`);
+      // The tower's keyframes go the same way as the lift.
+      const frames = worldFrames(arrive);
+      expect(frames[0].transform).toBe(`translateY(${((-TRAVEL / (TRAVEL + 900)) * 100).toFixed(4)}%)`);
+      expect(frames.at(-1)?.transform).toBe("translateY(0.0000%)");
     }
   });
 
-  test("Up to the Moon: a hop squashes, stretches and lands again, its frames in order and its body back to round (H-127)", () => {
-    const frames = squashFrames([
-      { from: 1000, to: 2000 },
-      { from: 2000, to: 3000 },
-    ]);
-    for (let i = 1; i < frames.length; i++) expect(frames[i].at).toBeGreaterThanOrEqual(frames[i - 1].at);
-    expect(frames.at(-1)!.transform).toBe("scale(1, 1)");
-    expect(frames.filter((f) => f.at === 2000).length).toBeGreaterThanOrEqual(1);
+  test("Lift to the Top: the cabin, its display, the top floor and the flag stand where every screen shows them (H-127)", () => {
+    // The cabin stands still in the middle; the floor it stands at reaches its level at the end.
+    expect(levelOf(FLOORS)).toBe(LEVEL);
+    expect(CAR.y + CAR.h).toBe(LEVEL);
+    expect(CAR.x).toBeGreaterThanOrEqual(SHAFT.x);
+    expect(CAR.x + CAR.w).toBeLessThanOrEqual(SHAFT.x + SHAFT.w);
+    // The display lies on the cabin's panel, above its glass.
+    expect(DISPLAY.x).toBeGreaterThan(CAR.x);
+    expect(DISPLAY.x + DISPLAY.w).toBeLessThan(CAR.x + CAR.w);
+    expect(DISPLAY.y).toBeGreaterThan(CAR.y);
+    expect(DISPLAY.y + DISPLAY.h).toBeLessThan(CAR.y + 116);
+    // The landing door is seen through the cabin's glass, its number beside it.
+    expect(LIFT_DOOR.x).toBeGreaterThan(CAR.x);
+    expect(LIFT_DOOR.x + LIFT_DOOR.w).toBeLessThan(LIFT_PLATE.x);
+    expect(LIFT_PLATE.x + LIFT_PLATE.w).toBeLessThan(CAR.x + CAR.w);
+    // The flag, hoisted, stays within a tablet's 4:3 cut and below the top of a phone on its side; it starts down by
+    // the roof, on its pole.
+    expect(FLAG.x).toBeGreaterThanOrEqual(235);
+    expect(FLAG.x + FLAG.w).toBeLessThanOrEqual(RIGHT_EDGE);
+    expect(FLAG.y).toBeGreaterThanOrEqual(80);
+    expect(POLE.top).toBeLessThan(FLAG.y);
+    expect(FLAG.y + FLAG.h + FLAG_DROP).toBeLessThan(POLE.foot);
+    expect(ROOF).toBeLessThan(LEVEL);
   });
 
-  test("Up to the Moon: on every move it is somewhere new each second, never waiting in place (H-127)", () => {
-    const total = 5 * 60_000;
-    const { first, moves, dive } = jumpPlan(total, MAX_MOVES);
-    const { across, upDown } = jumpFrames(first, moves, dive);
-    const value = (list: { at: number; transform: string }[], ms: number) => {
-      const i = list.findIndex((f) => f.at > ms);
-      const [a, b] = [list[i - 1], list[i]];
-      const num = (f: { transform: string }) => Number(f.transform.match(/-?[\d.]+/)![0]);
-      return num(a) + (num(b) - num(a)) * ((ms - a.at) / (b.at - a.at));
-    };
-    for (let ms = 1000; ms < dive.start; ms += 1000) {
-      const moved = Math.abs(value(across, ms) - value(across, ms - 1000)) + Math.abs(value(upDown, ms) - value(upDown, ms - 1000));
-      expect(moved, `second ${ms / 1000}`).toBeGreaterThan(5);
-    }
-  });
-
-  test("Up to the Moon: under the parachute it swings from side to side, staying on a tablet's screen, and drops straight into the cake (H-127)", () => {
-    for (const total of [10_000, 5 * 60_000, 3 * 3600_000]) {
-      const { dive } = jumpPlan(total, MAX_MOVES);
-      const n = swingCount(dive);
-      expect(n).toBeGreaterThanOrEqual(1);
-      expect(n).toBeLessThanOrEqual(60);
-      const from = HOP_SPOTS[MAX_MOVES].x - 50;
-      for (let j = 1; j <= n; j++) {
-        expect(swingX(from, j, n) - RUNNER / 2).toBeGreaterThanOrEqual(235);
-        expect(swingX(from, j, n) + RUNNER / 2).toBeLessThanOrEqual(RIGHT_EDGE);
-      }
-      expect(swingX(from, n, n)).toBe(FINAL.x);
-    }
-    expect(SWAY).toBeGreaterThan(30);
-    expect(RELEASE_Y).toBeLessThan(CAKE.top - 150);
-  });
-
-  test("Up to the Moon: the cake bursts all over as it lands – pieces in every direction, near and far, seen on a tablet's screen (H-127)", () => {
-    expect(BITS.length).toBeGreaterThanOrEqual(20);
-    const shown = cameraAt(FINAL.y);
-    const sides = { left: 0, right: 0, up: 0 };
-    for (const b of BITS) {
-      // On the end's screen (above the bar), and most within what a tablet shows.
-      expect(b.y - b.size / 2 - shown).toBeGreaterThanOrEqual(0);
-      expect(b.y + b.size / 2 - shown).toBeLessThanOrEqual(820);
-      expect(b.x + b.size / 2).toBeLessThanOrEqual(RIGHT_EDGE);
-      if (b.x < BURST.x - 100) sides.left++;
-      if (b.x > BURST.x + 100) sides.right++;
-      if (b.y < BURST.y - 100) sides.up++;
-    }
-    // Only the few lying far left are for a wide screen alone.
-    expect(BITS.filter((b) => b.x - b.size / 2 >= 235).length).toBeGreaterThanOrEqual(BITS.length - 3);
-    expect(sides.left).toBeGreaterThanOrEqual(5);
-    expect(sides.right).toBeGreaterThanOrEqual(10);
-    expect(sides.up).toBeGreaterThanOrEqual(5);
-    // Far as well as near: some fly across the meadow onto the lake.
-    expect(Math.min(...BITS.map((b) => b.x - BURST.x))).toBeLessThan(-550);
-    expect(BITS.filter((b) => b.x < SHORE).length).toBeGreaterThanOrEqual(3);
-  });
-
-  test("Up to the Moon: the way climbs from the lake's floor to the moon, each height its own way to move, and stays on every screen (H-127)", () => {
-    const kinds = HOP_SPOTS.slice(1).map((s) => s.by);
-    // Swimming in the lake, hopping up the tree, the cable car to the skyscraper's window, the glass lift, the balloons
-    // past the clouds, the jetpack in space – in that order (user request, 23 November 2026).
-    expect(kinds.filter((k, i) => k !== kinds[i - 1])).toEqual(["swim", "walk", "hop", "ride", "hop", "lift", "hop", "fly", "jet"]);
-    // Out of the water it walks on the meadow first, then hops (user request, 23 November 2026).
-    const walk = HOP_SPOTS.findIndex((s) => s.by === "walk");
-    expect(HOP_SPOTS[walk].y).toBe(GROUND);
-    expect(HOP_SPOTS[walk].x).toBeGreaterThan(SHORE);
-    expect(HOP_SPOTS[walk + 1].by).toBe("hop");
-    // Swimming, the lift, the balloons and space go slower than walking (user request, 23 November 2026).
-    for (const kind of ["swim", "lift", "fly", "jet"] as const) expect(PACE[kind], kind).toBeGreaterThan(PACE.walk);
-    // It starts under water and ends at the top, going up all the way (a leap never higher than a fox can hop).
-    expect(HOP_SPOTS[0].y).toBeGreaterThan(SURFACE + 300);
-    expect(HOP_SPOTS.at(-1)!.y).toBeLessThan(600);
-    for (let k = 1; k < HOP_SPOTS.length; k++) {
-      const s = HOP_SPOTS[k];
-      expect(s.y - HOP_SPOTS[k - 1].y, `spot ${k}`).toBeLessThanOrEqual(30);
-      if (s.by === "hop") {
-        const way = wayOf(k - 1);
-        for (let j = 1; j < way.length; j++) expect(way[j - 1].y - way[j].y, `hop ${k}, leap ${j}`).toBeLessThanOrEqual(130);
-      }
-    }
-    // A hop's arc rises over its higher end, its top later the higher it goes.
-    const arc = hopArc(STEPS[0], STEPS[1]);
-    expect(arc.y).toBeLessThan(STEPS[1].y);
-    expect(arc.at).toBeGreaterThan(0.5);
-    expect(arc.at).toBeLessThan(1);
-    // Swimming stays in the water, everything after it above.
-    for (const s of HOP_SPOTS) if (s.by === "swim" || s === HOP_SPOTS[0]) expect(s.y).toBeGreaterThan(SURFACE);
-    // Within what a tablet shows (x 200–1400 less the paper's margin), the fox and its stars.
-    for (const s of HOP_SPOTS) {
-      expect(s.x - RUNNER / 2).toBeGreaterThanOrEqual(235);
-      expect(s.x + RUNNER / 2).toBeLessThanOrEqual(RIGHT_EDGE);
-    }
-    for (let k = 0; k < MAX_MOVES; k++) {
-      const star = starAt(k);
-      expect(star.x - STAR / 2).toBeGreaterThanOrEqual(235);
-      expect(star.x + STAR / 2).toBeLessThanOrEqual(RIGHT_EDGE);
-      expect(star.y - STAR / 2).toBeGreaterThanOrEqual(0);
-    }
-    // Nothing stands in the water (user feedback, 23 November 2026: high-rises standing in the lake made no sense): the
-    // tree, the skyscraper and the cake stand on the meadow right of the shore.
-    expect(TREE.x - TREE.half).toBeGreaterThan(SHORE);
-    expect(SKYSCRAPER.x).toBeGreaterThan(SHORE);
-    expect(CAKE.x - CAKE.low / 2).toBeGreaterThan(SHORE);
-    // The trunk's steps go up left and right in turn, like a treehouse's, and every leap onto the trunk lands on one of
-    // them or on the treehouse's floor.
-    STEPS.forEach((st, i) => {
-      expect(Math.sign(st.x - TREE.x)).toBe(i % 2 ? 1 : -1);
-      if (i) expect(st.y).toBeLessThan(STEPS[i - 1].y);
-    });
-    const onTree = HOP_SPOTS.flatMap((s, k) => (k && s.by === "hop" ? wayOf(k - 1).slice(1) : [])).filter(
-      (p) => Math.abs(p.x - TREE.x) <= TREE.half && p.y < GROUND,
-    );
-    expect(onTree.length).toBeGreaterThanOrEqual(STEPS.length);
-    for (const p of onTree) expect(STEPS.some((st) => st.x === p.x && st.y === p.y) || p.y === DECK.y, `${p.x},${p.y}`).toBe(true);
-    expect(HOP_SPOTS.some((s) => s.y === DECK.y && s.x > DECK.left && s.x < DECK.right)).toBe(true);
-    // It rides the basket from the treehouse to the skyscraper's window and the lift in its shaft up to the roof.
-    expect(HOP_SPOTS[BASKET.from].x).toBeGreaterThan(DECK.right);
-    expect(HOP_SPOTS[BASKET.to].x + RUNNER / 2).toBeLessThan(SKYSCRAPER.x + 20);
-    for (let k = CABIN.from; k <= CABIN.to; k++) expect(HOP_SPOTS[k].x).toBe(SHAFT.x);
-    expect(HOP_SPOTS[CABIN.to].y).toBe(SKYSCRAPER.top);
-    expect(HOP_SPOTS.some((s) => s.y === SKYSCRAPER.top && s.x > SKYSCRAPER.x && s.x < SKYSCRAPER.x + SKYSCRAPER.w && s.x !== SHAFT.x)).toBe(true);
-    expect(HOP_SPOTS.at(-1)!.y).toBe(JUMP_MOON.cy - JUMP_MOON.r);
-    // With the jetpack it flies once round the moon before landing on top of it (user request, 23 November 2026):
-    // the way's angle round the moon turns a whole circle, clear of the moon and the planet, on a tablet's screen.
-    const last = HOP_SPOTS.at(-1)!;
-    expect(last.via).toBe(ORBIT);
-    let turned = 0;
-    const angle = (p: { x: number; y: number }) => Math.atan2(p.y - JUMP_MOON.cy, p.x - JUMP_MOON.cx);
-    for (let i = 1; i < ORBIT.length; i++) {
-      let d = angle(ORBIT[i]) - angle(ORBIT[i - 1]);
-      if (d > Math.PI) d -= 2 * Math.PI;
-      if (d < -Math.PI) d += 2 * Math.PI;
-      turned += d;
-    }
-    expect(Math.abs(turned)).toBeGreaterThanOrEqual(2 * Math.PI);
-    expect(ORBIT_R).toBeGreaterThan(JUMP_MOON.r + RUNNER * 0.6);
-    for (const p of ORBIT) {
-      expect(Math.hypot(p.x - PLANET.cx, p.y - PLANET.cy)).toBeGreaterThan(PLANET.r);
-      expect(p.x - RUNNER / 2).toBeGreaterThanOrEqual(235);
-      expect(p.x + RUNNER / 2).toBeLessThanOrEqual(RIGHT_EDGE);
-      expect(p.y - RUNNER).toBeGreaterThanOrEqual(0);
-    }
-    // The cake stands on the meadow, seen whole, and the fox ends in it.
-    expect(CAKE.x - CAKE.low / 2).toBeGreaterThanOrEqual(235);
-    expect(FINAL.x).toBe(CAKE.x);
-    expect(FINAL.y).toBeLessThan(GROUND);
-    expect(FINAL.y).toBeGreaterThan(CAKE.top);
-  });
-
-  test("Up to the Moon: the fox moves as it goes – its own pose for each kind of move, and the cars it rides go along with it (H-127)", () => {
-    for (const total of [10_000, 5 * 60_000]) {
-      const { first, moves, dive } = jumpPlan(total, MAX_MOVES);
-      const line = poseTimeline(moves, dive);
-      const poseAt = (ms: number) => [...line].reverse().find((p) => p.from <= ms)!.pose;
-      for (const m of moves) expect(poseAt((m.start + m.land) / 2), `move ${m.k}`).toBe(POSE_OF[m.kind]);
-      // Leaping off the moon, hanging from the parachute all the way down, dropping into the cake.
-      expect(poseAt((dive.start + dive.top) / 2)).toBe("drop");
-      expect(poseAt((dive.top + dive.release) / 2)).toBe("hang");
-      expect(poseAt(total)).toBe("drop");
-      // Exactly one pose shown at every moment, and only the last one left at the end.
-      const looks = poseLooks(moves, dive, total);
-      const shownAt = (frames: { at: number; css: string }[], ms: number) => [...frames].reverse().find((l) => l.at <= ms)!.css === "opacity: 1";
-      for (const ms of [0, ...moves.map((m) => (m.start + m.land) / 2), (dive.top + dive.release) / 2, total])
-        expect(Object.values(looks).filter((l) => shownAt(l.frames, ms)).length, `at ${ms}`).toBe(1);
-      expect(
-        Object.entries(looks)
-          .filter(([, l]) => l.end === 1)
-          .map(([p]) => p),
-      ).toEqual(["drop"]);
-      // A car waits where the fox gets in, goes with it step for step while it rides, and stays where it got out.
-      for (const car of [BASKET, CABIN]) {
-        const frames = carFrames(car, first, moves);
-        if (first <= car.from) expect(frames[0].transform).toBe("translate(0.00%, 0.00%)");
-        for (const f of frames) expect(f.ease).toBe("linear");
-        const rides = moves.filter((m) => m.k >= car.from && m.k < car.to);
-        expect(frames.length).toBe(1 + rides.length * 2);
-        for (const m of rides) expect(frames.some((f) => f.at === m.land)).toBe(true);
-      }
-    }
-  });
-
-  test("Up to the Moon: the picture follows the fox, keeping it on the screen and never looking past the world's top or bottom (H-127)", () => {
-    for (const s of [...HOP_SPOTS, FINAL]) {
-      const c = cameraAt(s.y);
-      expect(c).toBeGreaterThanOrEqual(0);
-      expect(c).toBeLessThanOrEqual(WORLD_H - 900);
-      // Its feet on the screen, with room above it for the fox and below it above the bar.
-      expect(s.y - c).toBeGreaterThanOrEqual(RUNNER + 80);
-      expect(s.y - c).toBeLessThanOrEqual(820);
-    }
-    expect(cameraAt(HOP_SPOTS[0].y)).toBe(WORLD_H - 900);
-    expect(cameraAt(HOP_SPOTS.at(-1)!.y)).toBe(0);
-    expect(cameraAt(1000)).toBe(1000 - ANCHOR);
-    // The cake is seen at the end, whole.
-    expect(CAKE.top - 40 - cameraAt(FINAL.y)).toBeGreaterThanOrEqual(80);
-  });
-
-  test("Up to the Moon: what it carries comes and goes on its way – the balloons past the clouds, the parachute on the way down (H-127)", () => {
-    const at = (looks: { at: number; css: string }[], ms: number) =>
-      [...looks]
-        .reverse()
-        .find((l) => l.at <= ms)!
-        .css.startsWith("opacity: 1");
-    const balloonsFrom = HOP_SPOTS.findIndex((s) => s.by === "fly") - 1;
-    const jetpackFrom = HOP_SPOTS.findIndex((s) => s.by === "jet") - 1;
-    for (const total of [10_000, 5 * 60_000]) {
-      const { first, moves, dive } = jumpPlan(total, MAX_MOVES);
-      const gear = gearLooks(first, moves, dive);
-      // Started low, the balloons and the jetpack wait for it; started higher up, what it passed is already taken.
-      expect(at(gear["waiting-balloons"].frames, 0)).toBe(first <= balloonsFrom);
-      expect(at(gear["waiting-jetpack"].frames, 0)).toBe(first <= jetpackFrom);
-      expect(at(gear.balloons.frames, 0)).toBe(first > balloonsFrom && first <= jetpackFrom);
-      // The balloons are held all the way from the roof to the highest cloud, then let go.
-      for (const m of moves.filter((m) => m.kind === "fly")) expect(at(gear.balloons.frames, (m.start + m.land) / 2), `move ${m.k}`).toBe(true);
-      for (const m of moves.filter((m) => m.kind === "jet")) expect(at(gear.balloons.frames, m.land), `move ${m.k}`).toBe(false);
-      // What waits is the very thing it takes (user feedback, 23 November 2026: two sets of balloons were seen at
-      // once): the one waiting and the one held are never shown together.
-      for (let ms = 0; ms <= total; ms += total / 2000) {
-        expect(at(gear["waiting-balloons"].frames, ms) && at(gear.balloons.frames, ms), `balloons at ${ms}`).toBe(false);
-      }
-      // The jetpack waits on the highest cloud until the fox has floated in front of it and docked it.
-      const arrive = moves.find((m) => m.k === jetpackFrom - 1);
-      if (arrive) expect(at(gear["waiting-jetpack"].frames, arrive.land)).toBe(true);
-      // At the end nothing is held any more (the jetpack is part of the fox's poses), the parachute let go.
-      for (const g of ["balloons", "parachute", "waiting-balloons", "waiting-jetpack"] as const) {
-        expect(at(gear[g].frames, total), g).toBe(false);
-        expect(gear[g].end).toBe(0);
-      }
-      // The parachute is open all the way down, and only then.
-      expect(at(gear.parachute.frames, dive.start)).toBe(false);
-      expect(at(gear.parachute.frames, dive.top)).toBe(true);
-      expect(at(gear.parachute.frames, (dive.top + dive.release) / 2)).toBe(true);
-    }
-  });
-
-  test("Up to the Moon: the world, the fox and what it carries are layers on CSS animations that stop at the end, with no clip path (H-127)", async () => {
-    const code = await Bun.file(new URL("./jump.tsx", import.meta.url)).text();
+  test("Lift to the Top: what moves is a layer on CSS animations that stand still at the end, with no clip path (H-127)", async () => {
+    const code = await Bun.file(new URL("./lift.tsx", import.meta.url)).text();
     expect(code).not.toMatch(/clip-?[pP]ath/);
-    // Nothing in space looks like a second moon (user feedback, 23 November 2026: a grey half rock was taken out).
-    expect(code).not.toMatch(/asteroid/i);
-    // A caught star's ring and sparkles are one drawing in one layer: a layer per sparkle, 24 stars of eight layers,
-    // kept an old phone's main thread twice as busy (`bun run perf timer-mond`, 23 November 2026).
-    expect(code).not.toMatch(/SPARKS\.map\([^)]*\)\s*=>\s*\(\s*<div/);
-    expect(code).toMatch(/className="tm-jump-burst"/);
-    // The world moves as one layer by a transform, never by a changing viewBox.
-    expect(code).not.toMatch(/viewBox=\{`[^`]*\$\{c/);
+    expect(code).not.toMatch(/Date\.now/);
     const css = await Bun.file(new URL("./timer.css", import.meta.url)).text();
-    for (const part of [
-      "jump-bob",
-      "jump-star",
-      "jump-fade",
-      "jump-cherry",
-      "jump-cake-whole",
-      "jump-cake-smashed",
-      "jump-bits",
-      "jump-bit-x",
-      "jump-bit-y",
-      "jump-bit-spin",
-      "jump-limb",
-      "jump-flame",
-      "jump-burst",
-      "jump-crown",
-      "jump-bird",
-      "jump-wing",
-      "jump-fish",
-      "jump-bubble",
-      "jump-wind",
-      "jump-twinkle",
-      "jump-comet",
-      "hop",
-    ])
-      expect(css, part).toMatch(new RegExp(`\\.tm-done \\.tm-${part}[,\\s{]`));
+    for (const part of ["lift-pulley", "lift-arrow", "hop"]) expect(css, part).toMatch(new RegExp(`\\.tm-done \\.tm-${part}[,\\s{]`));
   });
 
   test("Marble Jar: all sixty marbles at every length, landing in turn, the last as the time is up (H-149)", () => {
@@ -1230,12 +919,11 @@ describe("Timer", () => {
   // User feedback, November 2026: the drawn fox and bear children in the timer's pictures (holding the basket and the
   // hose, blowing out the candle, taking turns) looked odd, and were taken out of every picture. The pictures tell
   // their story by themselves; Abwechseln's children are the real ones, their places two cushions.
-  // The one exception is Up to the Moon's fox (`jumpFox.tsx`): it is the figure doing the run, swimming, hopping and
-  // riding, never one standing by (user request, 23 November 2026), drawn with the shared head – and the Rennstrecke's
-  // two children (`race.tsx`, 24 November 2026), who are the drivers taking turns at the wheel, never standing by.
+  // The one exception is the Rennstrecke's children (`race.tsx`, 24 November 2026), who are the drivers taking turns at
+  // the wheel, never standing by. (Up to the Moon's fox, the other one, went with that picture on 26 November 2026.)
   test("no timer picture draws a fox or bear figure", async () => {
     for await (const file of new Bun.Glob("src/games/timer/*.tsx").scan(".")) {
-      if (file.endsWith("jumpFox.tsx") || file.endsWith("race.tsx")) continue;
+      if (file.endsWith("race.tsx")) continue;
       const code = await Bun.file(file).text();
       expect(/<Mascot(Head)?[\s/>]|MASCOT_COLORS\.\w+\.paw/.test(code) ? `${file} draws a fox or bear` : file).toBe(file);
     }

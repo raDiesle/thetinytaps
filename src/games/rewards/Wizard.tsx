@@ -1,23 +1,14 @@
 import { useState } from "react";
-import type { TargetLanguageId } from "@/content/targetLanguages";
 import { useAppLanguage, useT } from "@/lib/language";
-import { boardFromTemplate, newId } from "./board";
-import type { PlanTemplate, Template } from "./catalog";
-import { ChartEditor, type Draft, defaultDraft } from "./ChartEditor";
+import { type ChartKind, ChartEditor, type Draft, defaultDraft, draftOfKind } from "./ChartEditor";
 import { Editor } from "./Editor";
-import { counting, planFromTemplate } from "./plan";
+import { counting } from "./plan";
 import { PlanEditor } from "./PlanEditor";
 
 export type { Draft } from "./ChartEditor";
 
-/** Where the wizard starts: on a template picked in the gallery beside the board. */
-export type WizardStart = { type: "board"; template: Template } | { type: "plan"; template: PlanTemplate };
-
-/** A draft made from a template, with an id of its own (the template's board made before keeps its stars). */
-const fromStart = (start: WizardStart, language: TargetLanguageId): Draft =>
-  start.type === "board"
-    ? { type: "board", board: { ...boardFromTemplate(start.template, language), id: newId() } }
-    : { type: "plan", plan: planFromTemplate(start.template, language) };
+/** Where the wizard starts: on one of the three kinds (a Countdown where „Wie lange warten?“ has none, a kind the editor's quick choice asked for). */
+export type WizardStart = { kind: ChartKind };
 
 /** Whether a draft can be made as it is: a board needs a task (a collecting board none), a plan a card. */
 const ready = (draft: Draft) =>
@@ -26,15 +17,15 @@ const ready = (draft: Draft) =>
 /**
  * „＋ Neu“, for a Belohnungstafel and a Zeitplan alike: the very chart that will be made, changed right on it with the
  * same `ChartEditor` as „Gestalten“ on the page (user decision, November 2026), so the wizard and the page look and work
- * the same. It starts on „Mein Tag“ – morning and evening on one sheet, three cards each, a star a card and a reward –
- * and its Zeitraum makes it a week, a month, an Erst – Dann or a path to collect on. „✓ Anlegen“ makes it. Opened on a
- * template from the gallery it starts on that template. Without `onCancel` (nothing made yet) it can't be closed: the
- * page has nothing else to show.
+ * the same. It starts on „Mein Tag“ – its cards in one line, a star a card and no reward (`defaultDraft`) –
+ * and its Zeitraum makes it a week, a month, an Erst – Dann or a path to collect on, the quick choice on top a Zeitplan,
+ * a Belohnungstafel or a Countdown. „✓ Anlegen“ makes it. Opened on a kind it starts on that kind's first chart.
+ * Without `onCancel` (nothing made yet) it can't be closed: the page has nothing else to show.
  */
 export function Wizard({ start, onDone, onCancel }: { start?: WizardStart; onDone: (draft: Draft) => void; onCancel?: () => void }) {
   const t = useT();
   const { id: language } = useAppLanguage();
-  const [draft, setDraft] = useState<Draft>(() => (start ? fromStart(start, language) : defaultDraft(language)));
+  const [draft, setDraft] = useState<Draft>(() => (start ? draftOfKind(start.kind, defaultDraft(language), language) : defaultDraft(language)));
   const reward = draft.type === "board" || counting(draft.plan);
   const done = reward
     ? t({ de: "Tafel anlegen", en: "Create chart", zh: "创建奖励表", hi: "चार्ट बनाएँ", es: "Crear tabla", ar: "إنشاء اللوحة", ru: "Создать таблицу" })

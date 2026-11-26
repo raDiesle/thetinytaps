@@ -1,8 +1,10 @@
-# Bed („Tapsi's Big Bed“ and „Tapsi's Own Bed“)
+# Sleep Tight („Tapsi's Big Bed“ and „Tapsi's Own Bed“)
 
 Route `/grosses-bett/` · idea H-106 · research „grosses-bett“.
 
-The book „Bed“ (named „Big Bed“ until 24 November 2026, when its second story came; the address stays `/grosses-bett/`)
+The book „Sleep Tight“ („Schlaf gut“; named „Big Bed“ until 24 November 2026, when its second story came, then „Bed“ until
+26 November 2026, when it became the book of sleeping – night, nap and quiet time, never with a timer (H-138, H-153,
+H-154; user request); the address stays `/grosses-bett/`)
 among the Alltagshelfer, right of „Hair Washing“ (`BED_STORY_BOOK`, a spine book of its own, playing at once). Its first
 story, „Tapsi's Big Bed“ (line „From the cot“, `BED_STORY_KIND`), is about moving from the cot into a bed of one's own, in chapters like „Abstillen“,
 „Schnullerfee“, „Kita-Start“ and „Hair Washing“, read by a grown-up with the child in the days before the big bed comes

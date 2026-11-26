@@ -36,8 +36,8 @@ export function itemPicture(item: Item, kind: "task" | "reward", lines = false):
 export const markPicture = (mark: CatalogMark) => PICTURES.get(`zeichen-${mark.id}`);
 
 /**
- * True where pictures load only once they come near the screen: the small pictures of the Vorlagen (`Thumb`,
- * `PlanThumb`) and the picture chips under the folded „Weitere Einstellungen“ (`ChartEditor`), which alone fetched 45
+ * True where pictures load only once they come near the screen: the picture chips under the folded „Weitere
+ * Einstellungen“ (`ChartEditor`), which alone fetched 45
  * files on every first visit while folded (user request, November 2026: load only what is seen). A chart itself, and
  * every print, loads its pictures at once, so a print never misses one.
  */

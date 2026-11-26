@@ -390,12 +390,12 @@
 }
 
 /*
- * The Belohnungstafel's books, parts of one game (`BookBundle`), tied together with a red ribbon and a bow, so they are
+ * A game's books, parts of one game (`BookBundle`; none since the Belohnungstafel became a calendar), tied together with a red ribbon and a bow, so they are
  * read as one thing, and standing on the board like their neighbours: a box round them, pulled out and tipped further,
  * looked as if it floated (user feedback, November 2026). Tied, they are one block: pressed close and standing upright
  * on the board – leaning, tied books looked unnatural (user feedback, November 2026) – and one ribbon runs round all of
  * them – a band on each book looked like three small ribbons (user feedback, November 2026). They are what the eye
- * should find first: the Belohnungstafel bound in gold, all glowing brightest. Still, like everything on the shelf;
+ * should find first, glowing brightest. Still, like everything on the shelf;
  * tied, none moves out under a mouse.
  */
 .shelf-daily-books > .shelf-bundle {
@@ -419,12 +419,6 @@
   box-shadow:
     0 0 0 2px #fff6dccc,
     0 0 calc(var(--bh) * 0.12) calc(var(--bh) * 0.04) #ffd96bd9;
-}
-
-.shelf-bundle > .shelf-daily[data-gold] > .box-front {
-  background:
-    linear-gradient(#0000 3.5%, #fff3b0 3.5% 5.5%, #0000 5.5% 94.5%, #fff3b0 94.5% 96.5%, #0000 96.5%),
-    linear-gradient(90deg, #7a4f0a66, #fff6c780 42%, #ffffff1f 55%, #7a4f0a73), var(--c);
 }
 
 /* Their labels end above the ribbon, which runs at the same height above the board round the whole block. */
@@ -489,6 +483,225 @@
 
 .shelf-bundle > .shelf-daily:focus-visible {
   transform: rotate(var(--lean, 0deg)) rotateX(-6deg);
+}
+
+/*
+ * The Belohnungstafel's desk calendar (`ShelfCalendar`, user request, 26 November 2026): one thing to take in place of
+ * the three books tied together, as wide as they stood (`--spines`), standing as a tent – its pages leaning back from
+ * the board's front, a cardboard stand leaning forward from behind, both meeting in the rings on top like an upside-down
+ * V, so it plainly stands on its own (`--tilt`: steep enough to see, flat enough to keep within the compartment's depth).
+ * Its page shows the day's „Morning“ and „Afternoon“, two pictures each, on a sunny and a sky-blue band; it glows
+ * brightest on the shelf, still.
+ */
+.shelf-calendar {
+  --tilt: 10deg;
+  /*
+   * Turned a little, its left side forwards, so the stand shows at its left as the V's other leg – further, the tent
+   * reached through the compartment's back wall (`--d`) or its foot over the board's edge.
+   */
+  --turn: 16deg;
+  /* How far the tent reaches back on the board: twice its pages' height times sin(--tilt). */
+  --tent: calc(var(--sh) * 0.97 * 0.35);
+  /* Where the rings' line stands: half the tent back, and more for the turn, so the pages' foot keeps on the board. */
+  --ridge: calc(var(--tent) * -0.5 - var(--sh) * 0.12);
+  position: relative;
+  display: block;
+  flex: var(--spines) 1 0;
+  min-width: 0;
+  height: calc(var(--sh) * 0.97);
+  color: var(--ink);
+  text-decoration: none;
+  transform-style: preserve-3d;
+  transform-origin: 50% 100%;
+  transform: rotateY(var(--turn));
+  transition: transform 0.35s cubic-bezier(0.3, 0.7, 0.4, 1.2);
+  -webkit-tap-highlight-color: transparent;
+}
+
+.shelf-calendar[data-away] {
+  visibility: hidden;
+}
+
+.shelf-daily-books > .shelf-calendar + .shelf-daily {
+  --lean: -6deg;
+  margin-left: calc(var(--bh) * 0.82 * var(--lean-room));
+}
+
+@media (hover: hover) {
+  .shelf-calendar:hover {
+    transform: translateZ(calc(var(--d) * 0.12)) translateY(-2%) rotateY(var(--turn));
+  }
+}
+
+.shelf-calendar:focus-visible {
+  outline: none;
+  transform: translateZ(calc(var(--d) * 0.12)) translateY(-2%) rotateY(var(--turn));
+}
+
+.shelf-calendar:focus-visible .shelf-calendar-sheet {
+  outline: 4px solid var(--ocean);
+  outline-offset: 2px;
+}
+
+/*
+ * The tent's two legs hang from the rings' line, half the tent's depth back: the pages turn their foot forwards onto the
+ * board's front, the stand its foot backwards. 2 % longer than the calendar is high (1 / cos 10°), so both feet reach
+ * the board.
+ */
+.shelf-calendar-front,
+.shelf-calendar-stand {
+  position: absolute;
+  inset: 0 0 auto;
+  height: 102%;
+  transform-style: preserve-3d;
+  transform-origin: 50% 0;
+}
+
+.shelf-calendar-front {
+  transform: translateZ(var(--ridge)) rotateX(var(--tilt));
+}
+
+/*
+ * The stand: cardboard in the calendar's teal linen, a little bigger than the pages, so its edge shows round them as a
+ * board behind; darker in the shadow under the pages, its edge lit.
+ */
+.shelf-calendar-stand {
+  inset-inline: -5%;
+  top: -2%;
+  border-radius: 3px;
+  background: linear-gradient(#00000059, #0000001a 40%, #00000040), repeating-linear-gradient(90deg, #ffffff0d 0 1px, #0000 1px 3px), #2f7f86;
+  box-shadow:
+    inset 0 0 0 1.5px #1d5459,
+    inset -3px 0 0 #6fb3b8;
+  transform: translateZ(var(--ridge)) rotateX(calc(-1 * var(--tilt)));
+}
+
+/* The tent's shadow on the board, lying flat between its two feet. */
+.shelf-calendar-shadow {
+  position: absolute;
+  inset: auto 4% 0;
+  height: var(--tent);
+  background: radial-gradient(closest-side, #00000059, #0000);
+  transform-origin: 50% 100%;
+  transform: translateZ(calc(var(--ridge) + var(--tent) / 2)) rotateX(90deg);
+}
+
+/* The pages turned over the rings hang on the stand's inner side: their cream edge shows between the legs. */
+.shelf-calendar-flipped {
+  position: absolute;
+  inset: 4% 3% 9%;
+  border-radius: 2px;
+  background: linear-gradient(#efe4c8, #d9cba8);
+  box-shadow: 0 2px 0 #c9b98f;
+  transform: translateZ(1px);
+}
+
+/* The pages still to come, under the page shown: their edges peek out along its foot and right side. */
+.shelf-calendar-pages {
+  position: absolute;
+  inset: 0;
+  border-radius: 3px;
+  background: #efe6d0;
+  box-shadow:
+    1px 2px 0 #fffaf0,
+    2px 4px 0 #e2d6b8,
+    3px 6px 0 #fbf4e3,
+    4px 8px 0 #cdbd98;
+  transform: translateZ(-2px);
+}
+
+/*
+ * Its page: warm paper with a red band along the top, under the rings, and the day's two parts below it, filling the
+ * page – what is on it sized by the page (`cqw`, `cqh`), its own padding in %, since container units on the container
+ * itself measure the next one up.
+ */
+.shelf-book-cover.shelf-calendar-sheet {
+  display: flex;
+  flex-direction: column;
+  align-items: stretch;
+  gap: 0;
+  padding: 13% 5% 5%;
+  overflow: visible;
+  border-radius: 3px;
+  background:
+    linear-gradient(#d9483b, #c23a30) top / 100% 11% no-repeat,
+    linear-gradient(122deg, #fffdf6 0 30%, #f8efda);
+  box-shadow:
+    inset 0 0 0 1px #3d304540,
+    0 0 0 2px #fff6dccc,
+    0 0 calc(var(--bh) * 0.12) calc(var(--bh) * 0.04) #ffd96bd9;
+}
+
+.shelf-calendar-rings {
+  position: absolute;
+  top: -3cqh;
+  left: 4%;
+  width: 92%;
+  height: 12cqh;
+  overflow: visible;
+}
+
+/* A part of the day: its name on a band of its colour, its two pictures side by side under it, as big as they fit. */
+.shelf-calendar-part {
+  --band: linear-gradient(#ffe48a, #ffd257);
+  --edge: #e3a91f;
+  display: flex;
+  flex: 1 1 0;
+  flex-direction: column;
+  gap: 1.5cqh;
+  min-height: 0;
+  margin-top: 2.5cqh;
+  padding: 1.5cqh 3cqw 3cqh;
+  border-radius: 4cqw;
+  background: var(--band);
+  box-shadow: inset 0 0 0 max(1px, 0.8cqw) var(--edge);
+}
+
+.shelf-calendar-part[data-part="afternoon"] {
+  --band: linear-gradient(#bfe6ff, #8fcff5);
+  --edge: #4c9fd1;
+}
+
+.shelf-calendar-label {
+  font-family: var(--font-display, inherit);
+  font-size: 9.5cqh;
+  font-weight: 800;
+  line-height: 1;
+  text-align: center;
+  white-space: nowrap;
+  color: #4a2d1a;
+}
+
+.shelf-calendar-part[data-part="afternoon"] .shelf-calendar-label {
+  color: #18435f;
+}
+
+.shelf-calendar-cards {
+  display: flex;
+  flex: 1 1 0;
+  gap: 3cqw;
+  min-height: 0;
+}
+
+.shelf-calendar-card {
+  flex: 1 1 0;
+  min-width: 0;
+  padding: 1.5cqw;
+  border-radius: 3cqw;
+  background: #fffdf8;
+  box-shadow: 0 0.6cqh 0 #00000026;
+}
+
+.shelf-calendar-card img {
+  display: block;
+  width: 100%;
+  height: 100%;
+  object-fit: contain;
+}
+
+/* Taken out (bookTravel.ts), only the page flies: the stand and the pages beneath stay behind. */
+.bt-book > :is(.shelf-calendar-shadow, .shelf-calendar-stand, .shelf-calendar-front) {
+  display: none;
 }
 
 /*

@@ -33,7 +33,6 @@ test("the Belohnungstafel's small and folded pictures load lazily, a chart's and
       </LazyPictures>,
     ),
   ).toContain('loading="lazy"');
-  // The folded „Weitere Einstellungen“ and both galleries' small pictures stand inside it.
+  // The folded „Weitere Einstellungen“ stands inside it.
   expect(read("games/rewards/ChartEditor.tsx")).toMatch(/<LazyPictures value=\{true\}>\{more\}<\/LazyPictures>/);
-  for (const gallery of ["games/rewards/Gallery.tsx", "games/rewards/PlanGallery.tsx"]) expect(read(gallery)).toContain("<LazyPictures value={true}>");
 });

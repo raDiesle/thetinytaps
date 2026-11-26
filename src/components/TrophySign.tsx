@@ -7,9 +7,9 @@ import { preloadPage } from "@/lib/preloadPages";
 
 /*
  * The way from the bookshelf into the trophy room (user request, November 2026): a little wooden board in 3D with a big
- * golden cup on it, sitting in the bottom right corner of a compartment with three nails in its corners: on a wide
- * shelf the speaker's at the bottom of the right column, beside the speaker (user request, 25 November 2026), on an
- * upright one the picture books', reaching left over the books spine out there. A little in the cup glints now and then, as a trophy does in a
+ * golden cup on it, nailed into a compartment's corner with three nails in its corners: on a wide shelf into the top
+ * left corner of the speaker's at the bottom of the right column, over the speaker (user request, 26 November 2026), on
+ * an upright one into the picture books' bottom right corner, reaching left over the books spine out there. A little in the cup glints now and then, as a trophy does in a
  * game (user request, November 2026: the small cup in a doorway above the loudspeaker was hardly recognised). A tap
  * turns the eye to the right – the room's wall comes round with a door in it (MuseumDoorway) –, the door opens and one
  * walks in. Before the first trophy there is nothing behind it, so the sign isn't there either.
@@ -19,10 +19,12 @@ import { preloadPage } from "@/lib/preloadPages";
 const DOORWAY_MS = 1900;
 
 /**
- * The sign, the compartment's bottom right corner – its post at `left`, its floor at `top` – in px in the shelf, and its
- * width where that compartment sets it (`size`, beside the speaker); else the books' height does (`--trophy-sign`).
+ * The sign, the compartment's bottom right corner – its post at `left`, its floor at `top` – in px in the shelf, or
+ * with `from: "top"` its top left nail, at the middles of the post (`left`) and the board above (`top`) it is nailed
+ * on; and its width where that compartment sets it (`size`, the speaker's); else the books' height does
+ * (`--trophy-sign`).
  */
-export function TrophySign({ left, top, size }: { left: number; top: number; size?: number }) {
+export function TrophySign({ left, top, size, from }: { left: number; top: number; size?: number; from?: "top" }) {
   const t = useT();
   const navigate = useNavigate();
   const { search } = useLocation();
@@ -37,6 +39,7 @@ export function TrophySign({ left, top, size }: { left: number; top: number; siz
       <button
         type="button"
         className="shelf-trophy-sign"
+        data-from={from}
         style={{ left, top, ...(size && { "--trophy-sign": `${size}px` }) } as CSSProperties}
         aria-label={label}
         title={label}

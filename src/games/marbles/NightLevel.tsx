@@ -1,4 +1,4 @@
-import { memo, useEffect, useId, useMemo } from "react";
+import { memo, type ReactNode, useEffect, useId, useMemo } from "react";
 import { loadRecordings } from "@/lib/sfx";
 import { VIEW_H, type LevelProps } from "./level";
 import { deg, easeOut, lerp, seg, hump } from "./machineKit";
@@ -87,11 +87,21 @@ export function NightLevel(props: LevelProps) {
       machine={night}
       level="night"
       start={{ x: CRANK.x - 10, y: CRANK.y + 5, r: 70 }}
-      over={(t, at) => <RopeRunning at={at} run={night.wheelTurn(t) * ROPE.drive.r} dark={night.dark(t)} />}
+      over={(t, at) => (
+        <>
+          {night.ropeMoving(t) && <WheelRunning night={night} t={t} at={at} ids={ids} />}
+          <RopeRunning at={at} run={night.wheelTurn(t) * ROPE.drive.r} dark={night.dark(t)} />
+        </>
+      )}
       {...props}
     >
-      {(t) => {
+      {(t, seen) => {
         const end = Math.min(t, night.duration);
+        // Once its job is done, the reading corner's pendulum swings and its chair rocks only while they are on the
+        // screen: beside it a phone still rasters them, and they were most of what the middle rastered (A-43).
+        const corner = t > night.tCornerStill && !seen.shown(CORNER_X0, CORNER_X1) ? night.tCornerStill : t;
+        // While the rope runs, the wheel, the hamster in it and the cable car are sprites in `over` (`WheelRunning`).
+        const running = night.ropeMoving(t);
         return (
           <>
             <SunsetWindow night={night} t={t} ids={ids} />
@@ -104,16 +114,19 @@ export function NightLevel(props: LevelProps) {
             <BasketFront night={night} t={t} />
             <Curtain edge={night.curtainEdge(t)} />
             <ArcLamp night={night} t={t} ids={ids} />
-            <CuckooClock night={night} t={t} ids={ids} />
-            <g transform={`rotate(${deg(night.chairAngle(t))} ${CHAIR.x} ${FLOOR})`}>
+            <CuckooClock night={night} t={corner} ids={ids} />
+            <g transform={`rotate(${deg(night.chairAngle(corner))} ${CHAIR.x} ${FLOOR})`}>
               <RockingChair />
             </g>
             <HamsterNook />
-            <CableCar night={night} t={t} />
-            <Wheel turn={night.wheelTurn(t)} />
+            <CableCar night={night} t={t} running={running} />
+            {!running && <Wheel turn={night.wheelTurn(t)} />}
             <Bottle night={night} t={t} />
-            <Hamster h={night.hamsterAt(t)} />
-            <CageBars />
+            {!running && <Hamster h={night.hamsterAt(t)} />}
+            <BarsHole id={`${ids}-bars-hole`} />
+            <g clipPath={running ? `url(#${ids}-bars-hole)` : undefined}>
+              <CageBars />
+            </g>
             <Cradle night={night} t={t} />
 
             <rect x="-400" y="-200" width={WORLD_W + 800} height={VIEW_H + 400} fill={NIGHT} opacity={night.dark(t)} />
@@ -437,6 +450,10 @@ function StarGlow({ night, t, ids }: { night: Night; t: number; ids: string }) {
 }
 
 /* ---------- Reading corner: rocking chair, cuckoo clock ---------- */
+
+/** The stretch of the room the reading corner's moving parts reach: the chair's rockers and tipped back, the clock with its pendulum. */
+const CORNER_X0 = Math.min(CHAIR.x - 230, CLOCK.x - CLOCK.w / 2) - 20;
+const CORNER_X1 = Math.max(CHAIR.x + 230, CLOCK.x + CLOCK.w / 2) + 20;
 
 /** The rocking chair, standing still; its group is turned round the spot where the rockers touch the floor. */
 const RockingChair = memo(function RockingChair() {
@@ -782,9 +799,9 @@ const CageBars = memo(function CageBars() {
   );
 });
 
-/** The hamster wheel, turned by `turn` radians: its rungs go round as the hamster runs. */
-function Wheel({ turn }: { turn: number }) {
-  const { x, y, r } = WHEEL;
+/** The hamster wheel round `x`, `y` (its place in the room unless given), turned by `turn` radians: its rungs go round as the hamster runs. */
+function Wheel({ x = WHEEL.x, y = WHEEL.y, turn }: { x?: number; y?: number; turn: number }) {
+  const { r } = WHEEL;
   const rungs = 18;
   return (
     <g>
@@ -833,21 +850,31 @@ const STRANDS = [
   { x1: ROPE.drive.x, y1: ROPE.drive.y + ROPE.drive.r, x2: ROPE.turn.x, y2: ROPE.turn.y + ROPE.turn.r, dir: -1 },
 ];
 
-/** The rope loop between the pulley on the wheel's axle and the one by the round window, and the little cable car on it. */
-function CableCar({ night, t }: { night: Night; t: number }) {
+/**
+ * The rope loop between the pulley on the wheel's axle and the one by the round window, and the little cable car on it.
+ * While the rope runs (`running`), the drive pulley and the car are sprites in `WheelRunning` instead.
+ */
+function CableCar({ night, t, running }: { night: Night; t: number; running: boolean }) {
   const { drive, turn } = ROPE;
-  const grip = night.carAt(t);
-  const cabinTop = grip.y + CAR.hanger;
   return (
     <g>
       {/* The turning pulley's bracket on the wall; the pulley itself turns in `RopeRunning` */}
       <path d={`M${turn.x} ${turn.y} L${turn.x - 26} ${turn.y - 26}`} stroke={INK} strokeWidth="7" strokeLinecap="round" />
       <rect x={turn.x - 40} y={turn.y - 40} width="24" height="24" rx="4" fill={DARK_WOOD} stroke={INK} strokeWidth="3" />
-      <Pulley x={drive.x} y={drive.y} r={drive.r} turn={night.wheelTurn(t)} />
+      {!running && <Pulley x={drive.x} y={drive.y} r={drive.r} turn={night.wheelTurn(t)} />}
       {STRANDS.map(({ dir: _, ...s }, i) => (
         <line key={i} {...s} stroke={INK} strokeWidth="3" />
       ))}
-      {/* The car: grip on the rope, hanger, and a red cabin with a window and a roof */}
+      {!running && <Car grip={night.carAt(t)} />}
+    </g>
+  );
+}
+
+/** The cable car hanging from its grip on the rope at `grip`: grip, hanger, and a red cabin with a window and a roof. */
+function Car({ grip }: { grip: Pt }) {
+  const cabinTop = grip.y + CAR.hanger;
+  return (
+    <g>
       <rect x={grip.x - 7} y={grip.y - 6} width="14" height="10" rx="3" fill="#5b4a6e" stroke={INK} strokeWidth="2.5" />
       <line x1={grip.x} y1={grip.y + 2} x2={grip.x} y2={cabinTop + 4} stroke={INK} strokeWidth="4" />
       <rect x={grip.x - CAR.w / 2} y={cabinTop} width={CAR.w} height={CAR.h} rx="9" fill="#e07a5f" stroke={INK} strokeWidth="3.5" />
@@ -895,6 +922,94 @@ function RopeRunning({ at, run, dark }: { at: ScreenAt; run: number; dark: numbe
       <Sprite at={at} x={turn.x} y={turn.y} pad={turn.r + 2} angle={run / turn.r}>
         <Pulley x={0} y={0} r={turn.r} turn={0} />
         {shade(turn.r + 1.75)}
+      </Sprite>
+    </>
+  );
+}
+
+/** How far round the wheel's axle the cage's bars are drawn over the running wheel in its sprite: the rim's middle, where a seam lies on ink. */
+const BARS_OVER_WHEEL = WHEEL.r;
+/** A circle as a path, for a clip with a hole. */
+const circlePath = (x: number, y: number, r: number) => `M${x - r} ${y} a${r} ${r} 0 1 0 ${2 * r} 0 a${r} ${r} 0 1 0 ${-2 * r} 0 Z`;
+
+/** The clip that leaves the running wheel's disk out of the cage's bars in the room's svg: the sprites draw the bars there. */
+const BarsHole = memo(function BarsHole({ id }: { id: string }) {
+  return (
+    <clipPath id={id}>
+      <path
+        d={`M${CAGE.x0 - 40} ${CAGE.top - 40} H${CAGE.x1 + 40} V${CAGE.bottom + 20} H${CAGE.x0 - 40} Z ${circlePath(WHEEL.x, WHEEL.y, BARS_OVER_WHEEL)}`}
+        clipRule="evenodd"
+      />
+    </clipPath>
+  );
+});
+
+/** The night's colour as 0–1 channels, for the veil's colour matrix. */
+const NIGHT_RGB = [1, 3, 5].map((i) => Number.parseInt(NIGHT.slice(i, i + 2), 16) / 255);
+
+/**
+ * Lays the room's darkness over what it wraps inside a sprite, pixel for pixel as the veil (`NIGHT` at `dark`'s
+ * opacity) lies over the room: each colour is mixed towards the night by `dark`, its alpha kept, so a half-clear bar
+ * or an edge comes out just as it would under the veil. A sprite lies over the veil, so without it it would shine.
+ */
+function Veiled({ id, dark, children }: { id: string; dark: number; children: ReactNode }) {
+  if (dark <= 0) return <>{children}</>;
+  const k = 1 - dark;
+  const [r, g, b] = NIGHT_RGB.map((c) => c * dark);
+  return (
+    <>
+      <filter id={id} colorInterpolationFilters="sRGB">
+        <feColorMatrix type="matrix" values={`${k} 0 0 0 ${r} 0 ${k} 0 0 ${g} 0 0 ${k} 0 ${b} 0 0 0 1 0`} />
+      </filter>
+      <g filter={`url(#${id})`}>{children}</g>
+    </>
+  );
+}
+
+/** How far the cabin's middle hangs below its grip on the rope: its sprite is placed there, so it stays small. */
+const CAR_MIDDLE = 38;
+
+/**
+ * While the rope runs (`ropeMoving`), what moves with it – the wheel and the pulley on its axle, the hamster running in
+ * it with the cage's bars in front, the cable car riding up – as sprites over the room, each under the room's darkness
+ * (`Veiled`). The wheel and pulley turn by the sprite's transform alone, the car moves by it, and only the hamster's
+ * little layer is painted again for its pattering feet. Drawn in the room's svg, they had the phone raster bands as wide
+ * as the screen from the wheel up to the window in every frame (perf, 24 November 2026: the middle 40 screens a second,
+ * budget 30; A-43). Before and after the run they are drawn in the svg again, standing still.
+ */
+function WheelRunning({ night, t, at, ids }: { night: Night; t: number; at: ScreenAt; ids: string }) {
+  const dark = night.dark(t);
+  const h = night.hamsterAt(t);
+  const grip = night.carAt(t);
+  return (
+    <>
+      <Sprite at={at} x={WHEEL.x} y={WHEEL.y} pad={WHEEL.r + 3} angle={night.wheelTurn(t)}>
+        <Veiled id={`${ids}-veil-wheel`} dark={dark}>
+          <Pulley x={0} y={0} r={ROPE.drive.r} turn={0} />
+          <Wheel x={0} y={0} turn={0} />
+        </Veiled>
+      </Sprite>
+      <Sprite at={at} x={h.x} y={h.y} pad={52}>
+        <Veiled id={`${ids}-veil-hamster`} dark={dark}>
+          <Hamster h={{ ...h, x: 0, y: 0 }} />
+        </Veiled>
+      </Sprite>
+      <Sprite at={at} x={WHEEL.x} y={WHEEL.y} pad={BARS_OVER_WHEEL}>
+        <Veiled id={`${ids}-veil-bars`} dark={dark}>
+          <clipPath id={`${ids}-bars-wheel`}>
+            <circle cx={WHEEL.x} cy={WHEEL.y} r={BARS_OVER_WHEEL} />
+          </clipPath>
+          <g transform={`translate(${-WHEEL.x} ${-WHEEL.y})`}>
+            <g clipPath={`url(#${ids}-bars-wheel)`}>
+              <CageBars />
+            </g>
+          </g>
+        </Veiled>
+      </Sprite>
+      <Sprite at={at} x={grip.x} y={grip.y + CAR_MIDDLE} pad={48}>
+        <Veiled id={`${ids}-veil-car`} dark={dark}>
+          <Car grip={{ x: 0, y: -CAR_MIDDLE }} />
+        </Veiled>
       </Sprite>
     </>
   );
