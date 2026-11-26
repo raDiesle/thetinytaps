@@ -91,6 +91,16 @@ trophy and the end's buttons (`curtainEndAt`). The bedtime picture goes dark ins
   filter of colouring in is the one shared reference). Cropping an item's svg to its own box measured worse – don't.
   The background's own movements (`<Poke>`, the gust of wind) still repaint it whole; they are short and only on a tap.
   `bun run perf bilder` measures the airport after changing what moves.
+- **The scene fills the whole screen** (user feedback, November 2026: on a phone the picture stood in the middle with
+  plain bands of colour left and right): every picture is drawn 1600 × 1000 and shown whole (`meet`), and the room a
+  screen of another shape leaves beside it (phone on its side) or above and below it (tablet) shows the picture's own
+  background, mirrored at its edges (`bleed.ts`, `MirroredEdges` in `ScenePlay.tsx`; the falling overlay too), in an svg
+  of its own (`scene-mirrors`), so a `<Poke>` or the wind never paints the copies again (inside the background's svg
+  the airport's taps were busy 57–61 % instead of 54–56 %, `bun run perf bilder`). Never
+  zoom in to fill the screen: the items reach every edge of the picture, so some would be cut off. A tap there brings
+  out what lives in that part (`spotAt` takes the nearest edge), colouring paints the point it mirrors
+  (`intoPicture`), and the torch's light goes there too. A background draws nothing beyond its 1600 × 1000 that
+  should be seen – it is clipped to the box, and its mirror takes that room.
 - New picture or many new items: run `/neue-szene` (`.claude/skills/neue-szene/SKILL.md`); it has the full
   guide to depth, keys, drawing style, animations and the browser checks.
 - Two of the hidden surprises are the app's mascots as a family (`MascotFamily` in `hideout.tsx`): the fox or bear

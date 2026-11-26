@@ -15,6 +15,7 @@ import { touchOnly } from "@/lib/device";
 import { tapState } from "@/lib/tapTargets";
 import { preloadScene, SCENE_ENTRIES, scenePath, sceneTitle } from "./catalog";
 import { BOW_AFTER_MS, BOW_KEYFRAMES, BOW_MS, bowFoot, bowOrder, bowStep, curtainEndAt, curtainSoundAt, EVENING_AFTER_MS, layerPoint } from "./curtainCall";
+import { intoPicture, mirrorsFor } from "./bleed";
 import { ARROWS, centre, middleItem, nextInDirection } from "./focus";
 import { HELLO_AFTER_MS, HELLO_AGAIN_MS, HELLO_KEYFRAMES, HELLO_MS, HELLO_VOLUME, helloOrder } from "./hello";
 import { HideoutContext, peekTimes, SURPRISES } from "./hideout";
@@ -110,6 +111,15 @@ function SceneLayer({ scene, className, moving, taps, children }: { scene: Scene
   );
 }
 
+/**
+ * The picture's own drawing `href` (clipped to the picture) again in the room a screen of another shape leaves beside
+ * or above and below it, mirrored at the edge, so the scene fills the whole screen (bleed.ts). Not tapped: a tap there
+ * lands on the picture's root, which brings something to life where it fell.
+ */
+function MirroredEdges({ href, mirrors }: { href: string; mirrors: readonly string[] }) {
+  return mirrors.map((transform) => <use key={transform} href={href} transform={transform} pointerEvents="none" />);
+}
+
 /** Plays `scene` (already in the app language, see localize.ts); the engine's own sentences come from phrases.ts. */
 export function ScenePlay({ scene, settings, onKeys }: { scene: Scene; settings: ScenesSettings; onKeys: (keys: boolean) => void }) {
   // A picture that is not translated completely plays in German, voice and keys included (localize.ts).
@@ -192,6 +202,20 @@ export function ScenePlay({ scene, settings, onKeys }: { scene: Scene; settings:
   // An SVG id without the colons React puts in, so it can go into url(#…).
   const svgId = `scene-${useId().replace(/[^\w-]/g, "")}`;
   const greyId = `${svgId}-grey`;
+  /** The background's mirrored copies the screen's shape asks for, beside or above and below the picture (bleed.ts). */
+  const [mirrors, setMirrors] = useState<readonly string[]>([]);
+  useEffect(() => {
+    const root = sceneRef.current;
+    if (!root) return;
+    const measure = () => {
+      const next = mirrorsFor(scene.width, scene.height, root.clientWidth, root.clientHeight);
+      setMirrors((prev) => (prev.join() === next.join() ? prev : next));
+    };
+    measure();
+    const observer = new ResizeObserver(measure);
+    observer.observe(root);
+    return () => observer.disconnect();
+  }, [scene]);
 
   const questMode = isQuestMode(settings.mode);
   /** „Geräusch-Rätsel“ (B-02): only a sound is the question, and the items sound with its recordings (soundRiddle.ts). */
@@ -449,7 +473,8 @@ export function ScenePlay({ scene, settings, onKeys }: { scene: Scene; settings:
     const matrix = svgRef.current?.getScreenCTM();
     if (!colouring || !matrix) return;
     const { x, y } = new DOMPoint(clientX, clientY).matrixTransform(matrix.inverse());
-    dab(x, y);
+    // Beside the picture its mirrored copy is painted, so the dab is the one at the point it mirrors.
+    dab(...intoPicture(x, y, scene.width, scene.height));
   };
 
   /** Colour mode: a dab at this point of the picture, in picture units. */
@@ -583,7 +608,13 @@ export function ScenePlay({ scene, settings, onKeys }: { scene: Scene; settings:
    */
   const moveLight = (x: number, y: number, started?: string | null) => {
     interacted();
-    lightAt.current = [Math.min(scene.width, Math.max(0, x)), Math.min(scene.height, Math.max(0, y))];
+    // The light goes wherever the screen shows the scene, the mirrored room beside the picture too (bleed.ts).
+    const svg = svgRef.current;
+    const matrix = svg?.getScreenCTM();
+    const shown = svg?.getBoundingClientRect();
+    const [left, top] = matrix && shown ? pointIn(matrix, shown.left, shown.top) : [0, 0];
+    const [right, bottom] = matrix && shown ? pointIn(matrix, shown.right, shown.bottom) : [scene.width, scene.height];
+    lightAt.current = [Math.min(right, Math.max(left, x)), Math.min(bottom, Math.max(top, y))];
     showLight();
     const lit = here(litItems(items, ...lightAt.current, scene.width * TORCH_RADIUS));
     const before = inLight.current;
@@ -855,13 +886,24 @@ export function ScenePlay({ scene, settings, onKeys }: { scene: Scene; settings:
             </mask>
           </defs>
         )}
-        {/* Colour mode: the picture in colour, and its grey copy on top until it is all painted. */}
-        <g id={`${svgId}-bg`}>
-          <scene.Background />
+        <clipPath id={`${svgId}-box`}>
+          <rect width={scene.width} height={scene.height} />
+        </clipPath>
+        <g id={`${svgId}-picture`} clipPath={`url(#${svgId}-box)`}>
+          {/* Colour mode: the picture in colour, and its grey copy on top until it is all painted. */}
+          <g id={`${svgId}-bg`}>
+            <scene.Background />
+          </g>
+          {/* Taps go through the grey copy to the background, whose things move (`<Poke>`). */}
+          {grey && <use href={`#${svgId}-bg`} {...greyCopy} pointerEvents="none" />}
         </g>
-        {/* Taps go through the grey copy to the background, whose things move (`<Poke>`). */}
-        {grey && <use href={`#${svgId}-bg`} {...greyCopy} pointerEvents="none" />}
       </svg>
+      {/* An svg of its own, so a background thing moving (`<Poke>`, the wind) never has the mirrored copies painted again. */}
+      {mirrors.length > 0 && (
+        <SceneLayer scene={scene} className="scene-mirrors">
+          <MirroredEdges href={`#${svgId}-picture`} mirrors={mirrors} />
+        </SceneLayer>
+      )}
       {items.map((item) => {
         const play = plays[item.id];
         const place = item.place;
@@ -908,10 +950,16 @@ export function ScenePlay({ scene, settings, onKeys }: { scene: Scene; settings:
       </SceneLayer>
       {scene.Overlay && (
         <SceneLayer scene={scene} className="scene-overlay">
-          <g id={`${svgId}-overlay`}>
-            <scene.Overlay />
+          <clipPath id={`${svgId}-overlay-box`}>
+            <rect width={scene.width} height={scene.height} />
+          </clipPath>
+          <g id={`${svgId}-overlay-picture`} clipPath={`url(#${svgId}-overlay-box)`}>
+            <g id={`${svgId}-overlay`}>
+              <scene.Overlay />
+            </g>
+            {grey && <use href={`#${svgId}-overlay`} {...greyCopy} />}
           </g>
-          {grey && <use href={`#${svgId}-overlay`} {...greyCopy} />}
+          <MirroredEdges href={`#${svgId}-overlay-picture`} mirrors={mirrors} />
         </SceneLayer>
       )}
       {/* All found: warm evening light over the picture, an HTML layer of its own that only fades in (B-21). */}
