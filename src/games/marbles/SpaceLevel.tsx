@@ -92,9 +92,12 @@ export function SpaceLevel(props: LevelProps) {
       back={(t) => sky.map((l, i) => (i === 0 || t < 0 ? l : { ...l, className: `${l.className} ${t >= space.tLift ? "party" : "on"}` }))}
       over={(t, at) => (
         <>
+          <BuggyDriving space={space} t={t} at={at} />
           <Current space={space} t={t} at={at} />
           <RadioWaves space={space} t={t} at={at} />
           <SkyFall space={space} t={t} at={at} />
+          <MobileTurning space={space} t={t} at={at} />
+          <UfoSky space={space} t={t} at={at} />
         </>
       )}
       {...props}
@@ -106,7 +109,6 @@ export function SpaceLevel(props: LevelProps) {
         const roo = space.kangarooAt(t);
         const glows = RINGS.map((_, i) => ringGlow(t - space.ringTimes[i]));
         const blinking = (x0: number, x1: number, phase: number) => t >= 0 && seen(x0, x1) && Math.sin(t * 5 + phase) > 0;
-        const puff = space.puffAt(t);
         const mini = space.miniRocketAt(t);
         return (
           <>
@@ -127,15 +129,13 @@ export function SpaceLevel(props: LevelProps) {
             <RadioMoving down={RADIO.press * space.pedalAt(t)} sending={t >= space.tPedal} lit={space.lampTimes.map((l) => t >= l)} />
             <PipeBack space={space} green={blinking(PANEL.x0, PANEL.x1, 0)} yellow={blinking(PANEL.x0, PANEL.x1, 2)} />
             <RobotNow space={space} t={seen(ROBOT.cx - 300, ROBOT.cx + 300) ? t : Math.min(t, space.tRobot + SETTLE_S)} />
-            <UfoNow space={space} t={t} />
             <StationTruss
               on={t < space.tOff}
               moduleLamp={blinking(TRUSS.x - 100, TRUSS.x + 100, 0)}
               jibLamp={blinking(TRUSS.jib1 - 100, TRUSS.jib1 + 100, 2)}
             />
             <MagnetWaves pulse={t >= space.tOff ? -1 : t >= 0 && seen(MAGNET.x - 100, MAGNET.x + 100) ? magnetPulse(t) : 0.5} />
-            <Mobile spin={space.spinAt(t)} />
-            {puff && <AirPuff x={puff.pt.x} y={puff.pt.y} size={puff.size} fade={puff.fade} />}
+            <MobileCord />
             <ScopeTripod />
             <Telescope angle={space.scopeAngle(t)} glint={glintAge(t - space.tGlint)} />
             <LeverBox on={t < space.tLever} tilt={space.leverTilt(t)} />
@@ -164,17 +164,12 @@ export function SpaceLevel(props: LevelProps) {
 /** The marble, drawn again only when it moves. */
 const StillBall = still(Ball);
 
-/** The marble, the moon rock, the buggy and the rocket, each drawn again only in the frames where it moves. */
+/** The marble and the rocket, each drawn again only in the frames where it moves. */
 function MovingThings({ space, t }: { space: Space; t: number }) {
   const marble = space.marbleAt(t);
-  const buggy = space.buggyAt(t);
-  const rock = space.rockAt(t);
-  const inBeam = space.beamAt(t) > 0 && t < space.tRelease;
   return (
     <g>
       <StillBall color={MARBLE_COLOR} x={marble.pt.x} y={marble.pt.y} spin={marble.spin} />
-      <MoonRock at={rock.pt} spin={rock.spin} glow={inBeam ? 0.3 + 0.15 * Math.sin(t * 10) : -1} />
-      <Buggy at={buggy.pt} angle={buggy.angle} turned={buggy.turned} bob={buggy.bob} />
       <RocketNow space={space} t={t} />
     </g>
   );
@@ -620,10 +615,21 @@ const Robot = still(function Robot({
 });
 
 /**
- * The moon buggy with a little alien at the wheel, standing on its wheels with the middle between them at `at`, tipped
- * by `angle` (radians), facing right.
+ * The moon buggy as a small layer of its own over the machine (`Sprite`), placed and tipped by its sprite: driving over
+ * the hills in the machine's svg for seven seconds, it had the phone paint the whole machine again in every frame
+ * (perf, A-49).
  */
-const Buggy = still(function Buggy({ at, angle, turned, bob }: { at: Pt; angle: number; turned: number; bob: number }) {
+function BuggyDriving({ space, t, at }: { space: Space; t: number; at: ScreenAt }) {
+  const { pt, angle, turned, bob } = space.buggyAt(t);
+  return (
+    <Sprite at={at} x={pt.x} y={pt.y} pad={140} angle={angle}>
+      <Buggy turned={turned} bob={bob} />
+    </Sprite>
+  );
+}
+
+/** The moon buggy with its alien, round the middle between its wheels on the ground; its wheels turned `turned` along the way, its body bobbing up by `bob`. */
+const Buggy = still(function Buggy({ turned, bob }: { turned: number; bob: number }) {
   const r = BUGGY.wheelR;
   const wheel = (x: number) => (
     <g transform={`translate(${x} ${-r}) rotate(${deg(turned / r)})`}>
@@ -635,7 +641,7 @@ const Buggy = still(function Buggy({ at, angle, turned, bob }: { at: Pt; angle: 
     </g>
   );
   return (
-    <g transform={`translate(${at.x} ${at.y}) rotate(${deg(angle)})`}>
+    <g>
       <g transform={`translate(0 ${-Math.abs(bob)})`}>
         <line x1="-62" y1="-64" x2="-72" y2="-128" stroke={INK} strokeWidth="3.5" />
         <path d="M-72 -128 L-44 -120 L-70 -110 Z" fill="#ffd23f" stroke={INK} strokeWidth="2.5" strokeLinejoin="round" />
@@ -866,7 +872,40 @@ function PlanetBody({ p, scale }: { p: Planet; scale: number }) {
   );
 }
 
-/** The mobile: a sun on a cord from the truss, two crossed bars and four planets on strings, turning by `spin` radians. */
+/** The middle of the mobile's sprite: half way between its bars and the lowest planet's foot. */
+const MOBILE_MID = 622;
+/** How far the mobile's sprite reaches round its middle: Saturn's ring on the outer bar as it swings nearest to us. */
+const MOBILE_PAD = 225;
+
+/** The mobile's cord from the truss down to its sun. It never moves, so it stays in the machine, drawn once. */
+const MobileCord = memo(function MobileCord() {
+  return <line x1={MOBILE.cx} y1={jibLow} x2={MOBILE.cx} y2={MOBILE.sun.y - MOBILE.sun.r} stroke={STEEL} strokeWidth="3" />;
+});
+
+/**
+ * The planet mobile and the puff of air that sets it turning, as small layers of their own over the machine (`Sprite`):
+ * turning in the machine's svg it had the phone paint the whole machine again in every frame for ten seconds (perf,
+ * A-49). Over the machine, its earth lies in front of the telescope's lens as it bonks it.
+ */
+function MobileTurning({ space, t, at }: { space: Space; t: number; at: ScreenAt }) {
+  const puff = space.puffAt(t);
+  return (
+    <>
+      <Sprite at={at} x={MOBILE.cx} y={MOBILE_MID} pad={MOBILE_PAD}>
+        <g transform={`translate(${-MOBILE.cx} ${-MOBILE_MID})`}>
+          <Mobile spin={space.spinAt(t)} />
+        </g>
+      </Sprite>
+      {puff && (
+        <Sprite at={at} x={puff.pt.x} y={puff.pt.y} pad={40}>
+          <AirPuff size={puff.size} fade={puff.fade} />
+        </Sprite>
+      )}
+    </>
+  );
+}
+
+/** The mobile, hanging from its cord: a sun, two crossed bars and four planets on strings, turning by `spin` radians. */
 const Mobile = still(function Mobile({ spin }: { spin: number }) {
   const { cx, barY, sun } = MOBILE;
   const spots = PLANETS.map((p) => ({ p, ...planetSpot(p, spin) }));
@@ -889,7 +928,6 @@ const Mobile = still(function Mobile({ spin }: { spin: number }) {
   return (
     <g>
       {sorted.filter((s) => s.z < 0).map(planet)}
-      <line x1={cx} y1={jibLow} x2={cx} y2={sun.y - sun.r} stroke={STEEL} strokeWidth="3" />
       {bar(spots[0], spots[2])}
       {bar(spots[1], spots[3])}
       <g transform={`translate(${cx} ${sun.y}) rotate(${deg(spin) / 4})`}>
@@ -1005,106 +1043,119 @@ const Telescope = still(function Telescope({ angle, glint }: { angle: number; gl
   );
 });
 
-const UFO_LIGHTS = [-60, -30, 0, 30, 60];
+/** How far below the beam's sprite middle the ground is: the sprite reaches from above the UFO's lamp down past the ground. */
+const BEAM_LOW = 200;
+/** How far the beam's sprite reaches round its middle. */
+const BEAM_PAD = 230;
+/** How far the UFO's sprite reaches round its middle: the saucer's rim and the alien's antenna. */
+const UFO_PAD = 92;
+/** How far the moon rock's sprite reaches round its middle: its crystal and its glow in the beam. */
+const ROCK_PAD = ROCK.r + 18;
 
-/** The UFO at the machine's `t` seconds, while it is in the picture: works out what it shows and draws that. */
-function UfoNow({ space, t }: { space: Space; t: number }) {
+/**
+ * The UFO, its beam and the moon rock it carries, as small layers of their own over the machine (`Sprite`), in the
+ * order they lay in: the beam, the saucer, the rock hanging under it. Drawn in the machine's svg, the beam's rings
+ * running up to the ground changed a tall band of it in every frame while the saucer hovered, carried the rock and
+ * zoomed off, and the phone painted the whole machine again for it (perf, A-49).
+ */
+function UfoSky({ space, t, at }: { space: Space; t: number; at: ScreenAt }) {
   const ufo = space.ufoAt(t);
-  if (!ufo) return null;
-  const { pt, scale, tilt, waving, look } = ufo;
   const beam = space.beamAt(t);
+  const rock = space.rockAt(t);
+  const inBeam = beam > 0 && t < space.tRelease;
   return (
-    <Ufo
-      pt={pt}
-      scale={scale}
-      tilt={tilt}
-      look={look}
-      beam={beam}
-      rise={beam > 0 ? t * 0.7 : 0}
-      hand={waving ? { x: 22 + 3 * Math.sin(t * 14), y: -44 + 4 * Math.abs(Math.sin(t * 7)) } : { x: 18, y: -16 }}
-      light={Math.floor(t * 6) % UFO_LIGHTS.length}
-    />
+    <>
+      {ufo && beam > 0 && (
+        <Sprite at={at} x={ufo.pt.x} y={FLOOR - BEAM_LOW} pad={BEAM_PAD}>
+          <BeamLight top={ufo.pt.y + UFO_BELOW - (FLOOR - BEAM_LOW)} beam={beam} rise={(t * 0.7) % 1} />
+        </Sprite>
+      )}
+      {ufo && (
+        <Sprite at={at} x={ufo.pt.x} y={ufo.pt.y} pad={UFO_PAD} angle={(ufo.tilt * Math.PI) / 180}>
+          <Ufo
+            scale={ufo.scale}
+            look={ufo.look}
+            lamp={beam > 0}
+            hand={ufo.waving ? { x: 22 + 3 * Math.sin(t * 14), y: -44 + 4 * Math.abs(Math.sin(t * 7)) } : { x: 18, y: -16 }}
+            light={Math.floor(t * 6) % UFO_LIGHTS.length}
+          />
+        </Sprite>
+      )}
+      <Sprite at={at} x={rock.pt.x} y={rock.pt.y} pad={ROCK_PAD} angle={(rock.spin * Math.PI) / 180}>
+        <MoonRock glow={inBeam ? 0.3 + 0.15 * Math.sin(t * 10) : -1} />
+      </Sprite>
+    </>
   );
 }
 
 /**
- * The UFO with a little one-eyed alien under its glass dome, and its beam down to the ground while it is on (`beam`,
- * its rings `rise` up it); `hand` is where the alien's hand is, `light` which of the rim's lights is on.
+ * The UFO's beam down to the ground, round a point `BEAM_LOW` above the ground under the UFO: it starts at `top` (in
+ * the same frame, so negative), is as bright as `beam` and its rings of light are `rise` (0–1) of the way up.
  */
-const Ufo = still(function Ufo({
-  pt,
-  scale,
-  tilt,
-  look,
-  beam,
-  rise,
-  hand,
-  light,
-}: {
-  pt: Pt;
-  scale: number;
-  tilt: number;
-  look: Pt;
-  beam: number;
-  rise: number;
-  hand: Pt;
-  light: number;
-}) {
-  const top = pt.y + UFO_BELOW;
-  const rings = beam > 0 ? [0, 1, 2, 3] : [];
+const BeamLight = still(function BeamLight({ top, beam, rise }: { top: number; beam: number; rise: number }) {
+  const low = BEAM_LOW;
+  const rings = [0, 1, 2, 3];
   return (
-    <g>
-      {beam > 0 && (
-        <g opacity={beam}>
-          <path d={`M${pt.x - 24} ${top} L${pt.x + 24} ${top} L${pt.x + 90} ${FLOOR} L${pt.x - 90} ${FLOOR} Z`} fill="#fff3a0" opacity="0.35" />
-          <path d={`M${pt.x - 12} ${top} L${pt.x + 12} ${top} L${pt.x + 46} ${FLOOR} L${pt.x - 46} ${FLOOR} Z`} fill="#fffbd0" opacity="0.35" />
-          {rings.map((i) => {
-            // Rings of light running up the beam.
-            const f = (rise + i / rings.length) % 1;
-            const y = lerp(FLOOR, top, f);
-            const half = lerp(90, 24, f);
-            return <ellipse key={i} cx={pt.x} cy={y} rx={half} ry={half * 0.18} fill="none" stroke="#fffbd0" strokeWidth="3" opacity={0.8 * (1 - f)} />;
-          })}
-          <ellipse cx={pt.x} cy={FLOOR - 2} rx="92" ry="12" fill="#fff3a0" opacity="0.5" />
-        </g>
-      )}
-      <g transform={`translate(${pt.x} ${pt.y}) rotate(${tilt}) scale(${scale})`}>
-        {/* The alien under the dome */}
-        <path d="M-14 -4 Q-16 -20 -10 -24 L10 -24 Q16 -20 14 -4 Z" fill="#b98cff" stroke={INK} strokeWidth="2.5" />
-        <line x1="0" y1="-48" x2="5" y2="-60" stroke={INK} strokeWidth="2.5" />
-        <circle cx="5" cy="-61" r="4" fill="#ff7bd0" stroke={INK} strokeWidth="1.5" />
-        <circle cy="-34" r="16" fill="#b98cff" stroke={INK} strokeWidth="2.5" />
-        <circle cy="-37" r="8" fill="#fff" stroke={INK} strokeWidth="2" />
-        <circle cx={look.x * 3.5} cy={-37 + look.y * 3.5} r="4" fill={INK} />
-        <circle cx={look.x * 3.5 - 1.5} cy={-38.5 + look.y * 3.5} r="1.3" fill="#fff" />
-        <path d="M-6 -26 Q0 -21 6 -26" fill="none" stroke={INK} strokeWidth="2" strokeLinecap="round" />
-        <line x1="10" y1="-14" x2={hand.x} y2={hand.y} stroke={INK} strokeWidth="6" strokeLinecap="round" />
-        <line x1="10" y1="-14" x2={hand.x} y2={hand.y} stroke="#b98cff" strokeWidth="3" strokeLinecap="round" />
-        <circle cx={hand.x} cy={hand.y} r="4.5" fill="#b98cff" stroke={INK} strokeWidth="2" />
-        {/* The glass dome over it */}
-        <path d="M-38 -6 Q-38 -66 0 -66 Q38 -66 38 -6 Z" fill="#bde9ff" opacity="0.3" stroke={INK} strokeWidth="3" />
-        <path d="M-26 -30 Q-24 -52 -8 -58" fill="none" stroke="#fff" strokeWidth="4" strokeLinecap="round" opacity="0.8" />
-        {/* The saucer: rim, blinking lights, and the beam's lamp underneath */}
-        <ellipse cy="14" rx="32" ry="10" fill={beam > 0 ? "#fff3a0" : DARK_STEEL} stroke={INK} strokeWidth="3" />
-        <ellipse rx="82" ry="20" fill={STEEL} stroke={INK} strokeWidth="3.5" />
-        <path d="M-80 -2 Q0 -18 80 -2" fill="none" stroke="#ff5d73" strokeWidth="5" />
-        <path d="M-60 -10 Q-30 -16 -10 -16" fill="none" stroke="#fff" strokeWidth="3" strokeLinecap="round" opacity="0.8" />
-        {UFO_LIGHTS.map((x, i) => {
-          const on = light === i;
-          return (
-            <circle
-              key={x}
-              cx={x}
-              cy={8 - Math.abs(x) * 0.06}
-              r="5.5"
-              fill={on ? "#ffd23f" : BAR_COLORS[i]}
-              stroke={INK}
-              strokeWidth="2"
-              opacity={on ? 1 : 0.75}
-            />
-          );
-        })}
-      </g>
+    <g opacity={beam}>
+      <path d={`M-24 ${top} L24 ${top} L90 ${low} L-90 ${low} Z`} fill="#fff3a0" opacity="0.35" />
+      <path d={`M-12 ${top} L12 ${top} L46 ${low} L-46 ${low} Z`} fill="#fffbd0" opacity="0.35" />
+      {rings.map((i) => {
+        // Rings of light running up the beam.
+        const f = (rise + i / rings.length) % 1;
+        const y = lerp(low, top, f);
+        const half = lerp(90, 24, f);
+        return <ellipse key={i} cy={y} rx={half} ry={half * 0.18} fill="none" stroke="#fffbd0" strokeWidth="3" opacity={0.8 * (1 - f)} />;
+      })}
+      <ellipse cy={low - 2} rx="92" ry="12" fill="#fff3a0" opacity="0.5" />
+    </g>
+  );
+});
+
+const UFO_LIGHTS = [-60, -30, 0, 30, 60];
+
+/**
+ * The UFO with a little one-eyed alien under its glass dome, round its middle and grown to `scale`; its lamp underneath
+ * glows while the beam is on (`lamp`), `hand` is where the alien's hand is, `look` where its eye looks, `light` which
+ * of the rim's lights is on.
+ */
+const Ufo = still(function Ufo({ scale, look, lamp, hand, light }: { scale: number; look: Pt; lamp: boolean; hand: Pt; light: number }) {
+  return (
+    <g transform={`scale(${scale})`}>
+      {/* The alien under the dome */}
+      <path d="M-14 -4 Q-16 -20 -10 -24 L10 -24 Q16 -20 14 -4 Z" fill="#b98cff" stroke={INK} strokeWidth="2.5" />
+      <line x1="0" y1="-48" x2="5" y2="-60" stroke={INK} strokeWidth="2.5" />
+      <circle cx="5" cy="-61" r="4" fill="#ff7bd0" stroke={INK} strokeWidth="1.5" />
+      <circle cy="-34" r="16" fill="#b98cff" stroke={INK} strokeWidth="2.5" />
+      <circle cy="-37" r="8" fill="#fff" stroke={INK} strokeWidth="2" />
+      <circle cx={look.x * 3.5} cy={-37 + look.y * 3.5} r="4" fill={INK} />
+      <circle cx={look.x * 3.5 - 1.5} cy={-38.5 + look.y * 3.5} r="1.3" fill="#fff" />
+      <path d="M-6 -26 Q0 -21 6 -26" fill="none" stroke={INK} strokeWidth="2" strokeLinecap="round" />
+      <line x1="10" y1="-14" x2={hand.x} y2={hand.y} stroke={INK} strokeWidth="6" strokeLinecap="round" />
+      <line x1="10" y1="-14" x2={hand.x} y2={hand.y} stroke="#b98cff" strokeWidth="3" strokeLinecap="round" />
+      <circle cx={hand.x} cy={hand.y} r="4.5" fill="#b98cff" stroke={INK} strokeWidth="2" />
+      {/* The glass dome over it */}
+      <path d="M-38 -6 Q-38 -66 0 -66 Q38 -66 38 -6 Z" fill="#bde9ff" opacity="0.3" stroke={INK} strokeWidth="3" />
+      <path d="M-26 -30 Q-24 -52 -8 -58" fill="none" stroke="#fff" strokeWidth="4" strokeLinecap="round" opacity="0.8" />
+      {/* The saucer: rim, blinking lights, and the beam's lamp underneath */}
+      <ellipse cy="14" rx="32" ry="10" fill={lamp ? "#fff3a0" : DARK_STEEL} stroke={INK} strokeWidth="3" />
+      <ellipse rx="82" ry="20" fill={STEEL} stroke={INK} strokeWidth="3.5" />
+      <path d="M-80 -2 Q0 -18 80 -2" fill="none" stroke="#ff5d73" strokeWidth="5" />
+      <path d="M-60 -10 Q-30 -16 -10 -16" fill="none" stroke="#fff" strokeWidth="3" strokeLinecap="round" opacity="0.8" />
+      {UFO_LIGHTS.map((x, i) => {
+        const on = light === i;
+        return (
+          <circle
+            key={x}
+            cx={x}
+            cy={8 - Math.abs(x) * 0.06}
+            r="5.5"
+            fill={on ? "#ffd23f" : BAR_COLORS[i]}
+            stroke={INK}
+            strokeWidth="2"
+            opacity={on ? 1 : 0.75}
+          />
+        );
+      })}
     </g>
   );
 });
@@ -1115,18 +1166,16 @@ const ROCK_SHAPE = Array.from({ length: 9 }, (_, i) => {
   return { x: r * Math.cos(a), y: r * Math.sin(a) * 0.9 };
 });
 
-/** The lumpy moon rock with a pink crystal at `at`, turned by `spin`, which sparkles while it is in the UFO's beam (`glow`, -1 when not). */
-const MoonRock = still(function MoonRock({ at, spin, glow }: { at: Pt; spin: number; glow: number }) {
+/** The lumpy moon rock with a pink crystal, round its middle (its sprite turns it), which sparkles while it is in the UFO's beam (`glow`, -1 when not). */
+const MoonRock = still(function MoonRock({ glow }: { glow: number }) {
   return (
-    <g transform={`translate(${at.x} ${at.y})`}>
+    <g>
       {glow >= 0 && <circle r={ROCK.r + 12} fill="#fff3a0" opacity={glow} />}
-      <g transform={`rotate(${spin})`}>
-        <path d={`${svgLine(ROCK_SHAPE)} Z`} fill="#b7aed6" stroke={INK} strokeWidth="3" strokeLinejoin="round" />
-        <circle cx="-7" cy="5" r="5" fill="#968cbf" />
-        <circle cx="9" cy="8" r="3.5" fill="#968cbf" />
-        <path d="M2 -16 L8 -30 L14 -16 Z M-4 -14 L-6 -25 L3 -16 Z" fill="#ff9bd7" stroke={INK} strokeWidth="2" strokeLinejoin="round" />
-        <circle cx="-8" cy="-7" r="3" fill="#fff" opacity="0.7" />
-      </g>
+      <path d={`${svgLine(ROCK_SHAPE)} Z`} fill="#b7aed6" stroke={INK} strokeWidth="3" strokeLinejoin="round" />
+      <circle cx="-7" cy="5" r="5" fill="#968cbf" />
+      <circle cx="9" cy="8" r="3.5" fill="#968cbf" />
+      <path d="M2 -16 L8 -30 L14 -16 Z M-4 -14 L-6 -25 L3 -16 Z" fill="#ff9bd7" stroke={INK} strokeWidth="2" strokeLinejoin="round" />
+      <circle cx="-8" cy="-7" r="3" fill="#fff" opacity="0.7" />
     </g>
   );
 });
@@ -1737,10 +1786,10 @@ const Capsule = still(function Capsule({ chute }: { chute: number }) {
   );
 });
 
-/** The puff of air from the capsule's nozzle at `x`, `y`, a small cloud growing (`size`) on its way to the earth and fading (`fade`) there. */
-const AirPuff = still(function AirPuff({ x, y, size, fade }: { x: number; y: number; size: number; fade: number }) {
+/** The puff of air from the capsule's nozzle, round its middle: a small cloud growing (`size`) on its way to the earth and fading (`fade`) there. */
+const AirPuff = still(function AirPuff({ size, fade }: { size: number; fade: number }) {
   return (
-    <g transform={`translate(${x} ${y}) scale(${size})`} opacity={0.9 * (1 - fade)}>
+    <g transform={`scale(${size})`} opacity={0.9 * (1 - fade)}>
       {[
         { x: -14, y: 4, r: 14 },
         { x: 4, y: -6, r: 16 },

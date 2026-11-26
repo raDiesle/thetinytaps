@@ -42,7 +42,7 @@ import {
   playWhoosh,
 } from "@/lib/sfx";
 import { playGiggle, playLaunch } from "@/lib/realSounds";
-import { wobble, decay } from "./level";
+import { wobble } from "./level";
 import {
   along,
   cameraOn,
@@ -458,8 +458,10 @@ export function buildSpace() {
 
   /* The mobile turns; half a turn on, the earth comes round and bonks the telescope's objective. */
   const SPIN = 2.4 * Math.PI;
-  const SPIN_SLOW = 3.4;
-  const spinAt = (t: number) => (t < tSpin ? 0 : SPIN * (1 - decay((t - tSpin) / SPIN_SLOW)));
+  // It slows down along a cubic and stands still SPIN_S after the puff, starting as fast as before: slowing by `decay`
+  // it turned by fractions of a pixel for 30 s, to the level's end, and the phone painted the machine for it (A-49).
+  const SPIN_S = 10;
+  const spinAt = (t: number) => (t < tSpin ? 0 : SPIN * (1 - (1 - seg(t, tSpin, tSpin + SPIN_S)) ** 3));
   const tip0 = scopeTip(SCOPE.rest);
   let u = 0;
   for (; u < 6; u += STEP) {

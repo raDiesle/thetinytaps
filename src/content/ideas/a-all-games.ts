@@ -430,6 +430,17 @@ export const allGamesIdeas: IdeaArea = {
       text: "Nach A-38 (26. November 2026) geht im Raketenstart kaum noch Zeit in React (12–13 %), aber die Mitte ist mit 62 % beschäftigt und 32,8 Bildschirmen pro Sekunde noch knapp über dem Rahmen, der Anfang mit 61 %. Die Zeit liegt fast ganz im Malen (über 40 %): was sich in der Mitte noch im großen Maschinen-svg bewegt – Pedal, Lampen und Antenne des Funkmasts, das Känguru, der Luftstoß, das Mobile –, lässt das ganze svg neu malen. Zuerst mit `bun run perf ketten-space --trace` nachsehen, welche Ebene wie oft gemalt wird, dann die größten davon wie Satellit und Kapsel als `Sprite` in `over` legen (`SkyFall` in `src/games/marbles/SpaceLevel.tsx`) und im Vorschaufenster bei 844×390 prüfen, dass sie vor oder hinter den anderen Teilen liegen wie vorher. Rahmen von `bun run perf`: höchstens 60 % beschäftigt, höchstens 30 Bildschirme pro Sekunde neu gemalt, langsamstes Zwanzigstel ≤ 34 ms. Vorher `main` am selben Tag gleich messen.",
       why: "Kleinkinder spielen oft auf alten Handys der Eltern; dort sehen sie das Spiel ruckeln.",
       effort: "S",
+      done: true,
+      partial:
+        "Umgesetzt am 26. November 2026: UFO mit Lichtstrahl, Mondstein, Mondauto, Planeten-Mobile und Luftstoß sind eigene Ebenen (`Sprite` in `over`: `UfoSky`, `BuggyDriving`, `MobileTurning`), nur die Schnur des Mobiles bleibt im Maschinen-svg; das Mobile steht 10 s nach dem Luftstoß still, statt sich bis zum Ende um Bruchteile eines Pixels zu drehen. Die „Mitte“ der Messung liegt in Wahrheit bei etwa 40–50 s (das UFO), nicht bei Kapsel und Funkmast. Gemessen am selben Tag (`bun run perf ketten-space`): neu gemalt Anfang 28 → 15–17 und Mitte 32–34 → 8,5–9,9 Bildschirme pro Sekunde, das Malen in der Mitte 216–240 → etwa 150 ms pro Sekunde, das Maschinen-svg ändert sich von 25 bis 49 s gar nicht mehr. Beschäftigt bleibt es bei etwa 64 % wie auf `main` (63–65 %): die Zeit liegt nicht mehr im Malen, sondern in Skript, Stil und Ebenen-Aufbau – das ist A-50.",
+    },
+    {
+      id: "A-50",
+      emoji: "🐢",
+      title: "Leistung: Raketenstart – noch etwa 64 % beschäftigt, ohne dass gemalt wird",
+      text: "Nach A-49 (26. November 2026) malt der Raketenstart kaum noch (Anfang 15–17, Mitte 8,5–9,9 Bildschirme pro Sekunde), ist im nachgebildeten alten Handy aber Anfang wie Mitte noch etwa 64 % beschäftigt, gleich wie vorher auf `main`. Ein Trace der Mitte (`bun run perf ketten-space --trace`) zeigt die Zeit in Skript (React geht jedes Bild `children` der Maschine und die Ebenen in `over` durch: `propagateParentContextChanges`, `reconcileChildrenArray`), Stil-Neuberechnung (`UpdateLayoutTree`) und Ebenen-Aufbau (`Layerize`, `Commit`). Zu prüfen: ob die Maschine je Bild nur die Teile neu durchgeht, deren Zahlen sich ändern (z. B. die festen Teile als ein `memo`-Block außerhalb der Uhr), ob weniger, dafür zusammengefasste Ebenen den Ebenen-Aufbau senken, und ob ein Kontext je Bild unnötig viele Kinder anstößt. Rahmen von `bun run perf`: höchstens 60 % beschäftigt, höchstens 30 Bildschirme pro Sekunde, langsamstes Zwanzigstel ≤ 34 ms. Vorher `main` am selben Tag gleich messen.",
+      why: "Kleinkinder spielen oft auf alten Handys der Eltern; dort sehen sie das Spiel ruckeln.",
+      effort: "M",
     },
   ],
 };
