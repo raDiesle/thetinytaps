@@ -89,14 +89,14 @@ export interface Scenario {
 }
 
 /**
- * A fixed chance from here on (`Math.random` replaced by a seeded one): Zaubertasten's surprises are drawn by chance, and
+ * A fixed chance from here on (`Math.random` replaced by a seeded one): Tippzauber's surprises are drawn by chance, and
  * which kinds came swung its smashing stretch between 58 and 70 % busy on the same code (November 2026).
  */
 const FIXED_CHANCE: Step = {
   eval: "(() => { let a = 12345; Math.random = () => { a |= 0; a = (a + 0x6d2b79f5) | 0; let t = Math.imul(a ^ (a >>> 15), 1 | a); t = (t + Math.imul(t ^ (t >>> 7), 61 | t)) ^ t; return ((t ^ (t >>> 14)) >>> 0) / 4294967296; }; })()",
 };
 
-/** Zaubertasten: a finger landing somewhere on the screen every 130 ms, for the next 10 s. */
+/** Tippzauber: a finger landing somewhere on the screen every 130 ms, for the next 10 s. */
 const SMASH = `(() => { const end = performance.now() + 10000; const id = setInterval(() => { const el = document.querySelector(".tw-play"); if (!el || performance.now() > end) return clearInterval(id); const r = el.getBoundingClientRect(); el.dispatchEvent(new PointerEvent("pointerdown", { bubbles: true, clientX: r.x + Math.random() * r.width, clientY: r.y + 60 + Math.random() * (r.height - 60), pointerType: "touch", isPrimary: true })); }, 130); })()`;
 
 /** The first card or start button of a game's start screen. */
@@ -236,7 +236,7 @@ export const SCENARIOS: Scenario[] = [
     ],
   },
   {
-    // Zaubertasten: a hand banging on the keys or the screen brings several letters, digits with their shapes and
+    // Tippzauber: a hand banging on the keys or the screen brings several letters, digits with their shapes and
     // surprises at once (up to `MAX_POPS` and five surprises), each a small layer of its own – far quicker presses than
     // in the other keyboard games, since that is how the toy is played.
     name: "zaubertasten",

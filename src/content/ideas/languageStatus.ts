@@ -366,7 +366,7 @@ export const LANGUAGE_STATUS: LanguageStatusRow[] = [
     href: "/drauflos/",
     recorded: true,
     languages: { de: "done", en: "done", zh: "done", hi: "done", es: "done", ar: "done", ru: "done" },
-    note: "Neu (24. November 2026, L-24), englisch zuerst und gleich in alle sieben Sprachen übersetzt: Name, Zeile, die Aufforderung vor dem ersten Druck („Drück irgendeine Taste!“ / „Tipp irgendwohin!“) und die Texte für Suchmaschinen. Der neue Name „Zaubertasten“ („Magic Keys“) auf dem Plakat über der Tastatur am selben Tag in alle sieben Sprachen. Gesprochen werden nur die Buchstabennamen, aus den Aufnahmen von „Buchstaben & Zahlen“ in jeder Sprache; sonst nur Töne.",
+    note: "Neu (24. November 2026, L-24), englisch zuerst und gleich in alle sieben Sprachen übersetzt: Name, Zeile, die Aufforderung vor dem ersten Druck („Drück irgendeine Taste!“ / „Tipp irgendwohin!“) und die Texte für Suchmaschinen. Der neue Name „Zaubertasten“ („Magic Keys“) auf dem Plakat über der Tastatur am selben Tag in alle sieben Sprachen; am 26. November 2026 umbenannt in „Tippzauber“ („Tap Magic“), da die meisten am Handy tippen, wieder in allen sieben Sprachen samt Suchtiteln. Gesprochen werden nur die Buchstabennamen, aus den Aufnahmen von „Buchstaben & Zahlen“ in jeder Sprache; sonst nur Töne.",
   },
   {
     href: "/bilder/",
