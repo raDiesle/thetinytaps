@@ -18,7 +18,7 @@ import { type WorldId, WorldCardScene } from "@/components/Worlds";
 import { bookIdOf, CATEGORIES, calendarHref, hasPage, SHELF, shelfVolumes } from "@/content/games";
 import { OPEN_EDITOR } from "@/games/rewards/openEditor";
 import { takeOutBook } from "@/lib/bookTravel";
-import { type Localized, type Texts, useAppLanguage, useT } from "@/lib/language";
+import { type EnglishFirst, type Localized, type Texts, useAppLanguage, useT } from "@/lib/language";
 import { LEARNING_GAMES } from "@/lib/sharedTexts";
 import { loadOnIntent, pageCodeSoon } from "@/lib/preloadPages";
 import { playChimeNote, playKnock } from "@/lib/sfx";
@@ -62,8 +62,8 @@ interface ShelfBook {
   spine?: string;
   /** A game standing as several books tied together with a ribbon (`Game.volumes`): those books, spine out. */
   volumes?: ShelfBook[];
-  /** A game standing as one ring-bound calendar (`Game.calendar`): its volumes' names, printed under its picture. */
-  calendar?: Texts[];
+  /** A game standing as one ring-bound desk calendar (`Game.calendar`, `ShelfCalendar`) instead of its volumes' books. */
+  calendar?: boolean;
   /** What the page it opens is told (`navigate`'s state): the calendar opens the Zeitplan right in its editor. */
   state?: unknown;
   /** A toy standing on the board instead of a book (`Category.toy`), narrower than a picture book (`TOY_SPAN`). */
@@ -158,9 +158,7 @@ for (const entry of SHELF) {
       spine: pictures[`spine-${bookIdOf(v.href)}.webp`],
     }),
   );
-  const calendar = entry.game?.calendar
-    ? { href: calendarHref(entry.game), calendar: entry.game.volumes?.map((v) => v.title) ?? [entry.game.title], state: OPEN_EDITOR }
-    : undefined;
+  const calendar = entry.game?.calendar ? { href: calendarHref(entry.game), calendar: true, state: OPEN_EDITOR } : undefined;
   const daily = (n: number): ShelfBook => ({
     ...book,
     colour: DAILY_COLOURS[n % DAILY_COLOURS.length],
@@ -490,7 +488,7 @@ function DailyGroup({
       <span className="shelf-daily-books">
         {books.map((book) =>
           book.calendar ? (
-            <ShelfCalendar key={book.id} book={book} names={book.calendar} onClick={take(book)} />
+            <ShelfCalendar key={book.id} book={book} onClick={take(book)} />
           ) : book.volumes ? (
             <BookBundle key={book.id} volumes={book.volumes} take={take} />
           ) : (
@@ -527,13 +525,16 @@ function BookBundle({ volumes, take }: { volumes: ShelfBook[]; take: (book: Shel
 
 /**
  * The Belohnungstafel's calendar (user request, 26 November 2026: one thing instead of three books tied together): a
- * ring-bound calendar standing on the board, its page showing a day's plan in pictures – breakfast, the playground,
- * brushing teeth, two of them done – and the reward it leads to, with the names of its three parts under it („Zeitplan“,
- * „Belohnungstafel“, „Wie lange warten?“). One tap takes it out and opens the Zeitplan in its editor, whose quick access
- * reaches the other two. Its page is the cover that swings open as it flies (`.shelf-book-cover`, bookTravel.ts). Still,
- * like everything on the shelf, and glowing as the shelf's eye-catcher.
+ * ring-bound desk calendar standing on the board as a tent – its pages leaning back on a cardboard stand behind them,
+ * the two meeting in the rings on top like an upside-down V (user request, 26 November 2026: it should stand and look
+ * 3D). Its page shows a day's plan: „Morning“ and „Afternoon“ written over two of the Tagesplan's pictures each, side by
+ * side and as big as the page allows, on a sunny and a sky-blue band – no reward, no names, no plain white page (same
+ * request: the small pictures with stars and the reward looked boring). One tap takes it out and opens the Zeitplan in
+ * its editor, whose quick access reaches the other two parts. Its page is the cover that swings open as it flies
+ * (`.shelf-book-cover`, bookTravel.ts; the tent's other parts stay behind). Still, like everything on the shelf, and
+ * glowing as the shelf's eye-catcher.
  */
-function ShelfCalendar({ book, names, onClick }: { book: ShelfBook; names: Texts[]; onClick: (e: MouseEvent<HTMLAnchorElement>) => void }) {
+function ShelfCalendar({ book, onClick }: { book: ShelfBook; onClick: (e: MouseEvent<HTMLAnchorElement>) => void }) {
   const t = useT();
   return (
     <Link
@@ -549,23 +550,25 @@ function ShelfCalendar({ book, names, onClick }: { book: ShelfBook; names: Texts
       {...loadOnIntent(book.href)}
       onClick={onClick}
     >
-      <span className="shelf-calendar-board" aria-hidden />
-      <span className="shelf-book-cover shelf-calendar-sheet">
-        <CalendarRings />
-        <span className="shelf-calendar-plan" aria-hidden>
-          {CALENDAR_CARDS.map((card, i) => (
-            <span key={card} className="shelf-calendar-card">
-              <img src={pictures[`kalender-${card}.webp`]} alt="" decoding="async" draggable={false} />
-              <span className={`shelf-calendar-star${i < 2 ? " done" : ""}`} />
+      <span className="shelf-calendar-shadow" aria-hidden />
+      <span className="shelf-calendar-stand" aria-hidden>
+        <span className="shelf-calendar-flipped" />
+      </span>
+      <span className="shelf-calendar-front">
+        <span className="shelf-calendar-pages" aria-hidden />
+        <span className="shelf-book-cover shelf-calendar-sheet">
+          <CalendarRings />
+          {CALENDAR_PARTS.map((part) => (
+            <span key={part.id} className="shelf-calendar-part" data-part={part.id} aria-hidden>
+              <span className="shelf-calendar-label">{t(part.name)}</span>
+              <span className="shelf-calendar-cards">
+                {part.cards.map((card) => (
+                  <span key={card} className="shelf-calendar-card">
+                    <img src={pictures[`kalender-${card}.webp`]} alt="" decoding="async" draggable={false} />
+                  </span>
+                ))}
+              </span>
             </span>
-          ))}
-        </span>
-        <span className="shelf-calendar-reward" aria-hidden>
-          <img src={pictures["kalender-eis.webp"]} alt="" decoding="async" draggable={false} />
-        </span>
-        <span className="shelf-calendar-names" style={{ "--longest": Math.max(...names.map((name) => [...t(name)].length)) } as CSSProperties}>
-          {names.map((name, i) => (
-            <span key={i}>{t(name)}</span>
           ))}
         </span>
       </span>
@@ -573,8 +576,22 @@ function ShelfCalendar({ book, names, onClick }: { book: ShelfBook; names: Texts
   );
 }
 
-/** The cards on the calendar's page, in the day's order: `bilder/kalender-<card>.webp`, small copies of the Tagesplan's own. */
-const CALENDAR_CARDS = ["fruehstueck", "spielplatz", "zaehne"];
+/**
+ * The calendar page's two parts of the day, each with its name and two of the Tagesplan's pictures in the day's order
+ * (`bilder/kalender-<card>.webp`, copies of `src/games/rewards/bilder/`, cut to the figure and 240 px wide).
+ */
+const CALENDAR_PARTS: { id: string; name: EnglishFirst; cards: string[] }[] = [
+  {
+    id: "morning",
+    name: { en: "Morning", de: "Vormittag", zh: "上午", hi: "सुबह", es: "Mañana", ar: "الصباح", ru: "Утро" },
+    cards: ["fruehstueck", "zaehne"],
+  },
+  {
+    id: "afternoon",
+    name: { en: "Afternoon", de: "Nachmittag", zh: "下午", hi: "दोपहर", es: "Tarde", ar: "بعد الظهر", ru: "День" },
+    cards: ["spielplatz", "malen"],
+  },
+];
 
 /** The calendar's metal rings through the punched holes along its top edge. */
 function CalendarRings() {
@@ -641,14 +658,25 @@ function labelOf(cell: ShelfCell, layout: ShelfLayout): Localized | undefined {
 
 /**
  * Where the trophy room's sign is nailed on: on a wide shelf in the top left corner of the speaker's compartment, the
- * bottom of the column at the right, so the speaker below it at the right wall can be big again (user request, 26
+ * bottom of the column at the right, its nails in the post and the board above (`left` and `top` their middles), so the speaker below it at the right wall can be big again (user request, 26
  * November 2026: beside the speaker on its board both were small), sized by that narrow compartment (`size`, `from:
  * "top"`); on an upright shelf, whose things stand in small compartments on top, the bottom right corner of the lowest
  * compartment holding picture books, reaching left into it.
  */
 function trophySignAt(layout: ShelfLayout): { left: number; top: number; size?: number; from?: "top" } {
   const speaker = layout.upright ? undefined : layout.cells.find((cell) => !cell.books && cell.things?.includes("music"));
-  if (speaker) return { left: speaker.x, top: speaker.y, size: Math.min(speaker.w * TROPHY_CORNER, speaker.h * 0.36), from: "top" };
+  if (speaker) {
+    // Its nails go on the wood (user feedback, 26 November 2026): the middles of the post at the compartment's left and
+    // of the board above it, where its corner's nails are driven in.
+    const post = layout.planks.find((p) => p.h > p.w && Math.abs(p.x + p.w - speaker.x) < 2 && p.y <= speaker.y && p.y + p.h >= speaker.y);
+    const board = layout.planks.find((p) => p.w > p.h && Math.abs(p.y + p.h - speaker.y) < 2 && p.x <= speaker.x + 1 && p.x + p.w >= speaker.x + 1);
+    return {
+      left: post ? post.x + post.w / 2 : speaker.x,
+      top: board ? board.y + board.h / 2 : speaker.y,
+      size: Math.min(speaker.w * TROPHY_CORNER, speaker.h * 0.36),
+      from: "top",
+    };
+  }
   const pictureBooks = layout.cells.filter((cell) => cell.books?.some((b) => !PLACES[b][0].colour));
   const cell = pictureBooks.sort((a, b) => b.y - a.y || b.x - a.x)[0] ?? layout.cells[layout.cells.length - 1];
   return { left: cell.x + cell.w, top: cell.y + cell.h };

@@ -289,7 +289,7 @@ In a fresh worktree run `bun install` first.
   padding, gap) they measure the next one up, often the whole window, so size only a container's children with them.
 - CSS is global and each game's CSS arrives only when the game is opened: prefix
   classes and `@keyframes` by game or scene (`el-`, `bs-`), a prefix no other game has (the Counting Tower and
-  Zaubertasten both used `tw-`; `css.test.ts` now fails on a prefixed class two games style); never style another
+  Tippzauber both used `tw-`; `css.test.ts` now fails on a prefixed class two games style); never style another
   game's classes. A game using another game's parts imports that CSS itself. Keyframes a game borrows
   (`pop-in`, `wiggle`, `bob`, …) live in `src/styles/animations.css`, which every page loads – never use
   keyframes from another game's CSS (`css.test.ts` checks it). Game sheets arrive in any order (the shelf preloads
@@ -417,7 +417,7 @@ In a fresh worktree run `bun install` first.
   `celebrate` is left only to a grown-ups' chart filled (Belohnungstafel, Tagesplan). The one place where a key or tap
   is meant to set off a show is Frei tippen, where keys without a letter, number or job, and taps beside the card, open
   a surprise (a firework, a present, an egg hatching, user request, November 2026) – one at a time, never a storm, and
-  never copied into another game's answers (`src/games/letters/CLAUDE.md`) – and „Zaubertasten“ („Magic Keys“), its copy without
+  never copied into another game's answers (`src/games/letters/CLAUDE.md`) – and „Tippzauber“ („Tap Magic“), its copy without
   the card standing as a toy keyboard on the shelf, where every press is such a show (`src/games/tapaway/CLAUDE.md`). `tapFeedback.test.ts` keeps it
   calm, `calmAnswers.test.ts` keeps answers still and `celebrate` out of the games.
 - No wrong answers, no error sounds, nothing to read: pictures, sounds and voice. That means no words in the picture
@@ -473,9 +473,10 @@ In a fresh worktree run `bun install` first.
   2026), never in the bookshelf (between its books a trophy stood as if in the wall) nor in a popup: reached by a little
   wooden board in 3D (grain, bevelled edges, its thickness seen below and right of it) with a big golden cup on it,
   nailed into a corner of a compartment – on a wide shelf the loudspeaker's, at the bottom of the right column, in its
-  top left corner, against the post and right under the board above, with the loudspeaker standing big against the
-  right wall below it (user request, 26 November 2026: beside each other on the board both were small; `trophySignAt`,
-  `from: "top"`), on an upright one in the bottom right corner of the picture books' lowest, its right edge against the
+  top left corner, its nails' heads on the wood of the post and the board above (placed at their middles and moved up
+  and left by `--nail-at`; user feedback, 26 November 2026: under the board and beside the post the nails held nothing),
+  with the loudspeaker standing big against the right wall below it (user request, 26 November 2026: beside each other
+  on the board both were small; `trophySignAt`, `from: "top"`), on an upright one in the bottom right corner of the picture books' lowest, its right edge against the
   post – its foot on the board, never hanging in the air above the board – held by three nails in
   its corners (the top two and the bottom left; user request, November 2026: the paper sign hanging there looked flat
   and loose) (`TrophySign`, only once a trophy is won;
@@ -647,9 +648,15 @@ A game may give it before its end where reaching the goal once is enough (Ketten
   and one ribbon runs round all of them with its bow in their middle – never a band on each book, which looked like
   three small ribbons (user feedback, November 2026). The Belohnungstafel's three parts („Zeitplan“, „Belohnungstafel“,
   „Wie lange warten?“) no longer stand as such books but as **one ring-bound calendar** right of Aufs Töpfchen
-  (`Game.calendar`, `ShelfCalendar`, user request, 26 November 2026): upright on the board, as wide as the three books
-  were (`CALENDAR_SPINES`), its page a day's plan in small pictures with two stars done and the reward under it
-  (`bilder/kalender-*.webp`, small copies of the Tagesplan's own), the three names printed below – one tap takes it out
+  (`Game.calendar`, `ShelfCalendar`, user request, 26 November 2026), as wide as the three books were
+  (`CALENDAR_SPINES`). It stands on the board as a desk calendar does, a tent: its pages lean back from the board's
+  front onto a cardboard stand a little bigger than them, the two meeting in the rings like an upside-down V, turned a
+  little so the stand shows beside the pages (`--tilt`, `--turn`, `--ridge`; user request, 26 November 2026: it should
+  look 3D and stand) – within the compartment's depth (`--d`) and with its foot on the board, so look at it at 844×390,
+  1024×768, 1280×720 and 1920×1080 after changing them. Its page is never plain white: a red band under the rings, then
+  „Morning“ and „Afternoon“ written on a sunny and a sky-blue band, each over two of the Tagesplan's pictures side by
+  side, as big as the page allows (`CALENDAR_PARTS`, `bilder/kalender-*.webp`, cut from `src/games/rewards/bilder/`) –
+  no reward, no stars, no names (same request: small pictures on white paper looked boring) – one tap takes it out
   and opens the Zeitplan straight in its editor (`calendarHref`, router state `OPEN_EDITOR`), where a quick row reaches
   the other two (`src/games/rewards/CLAUDE.md`); every part's way back puts the calendar back. The single books stand thick enough to hit with a finger on a
   phone (`DAILY_SPINE`, widened again in November 2026 when they were still hard to hit), and lean a little differently, as books do.
@@ -669,7 +676,7 @@ A game may give it before its end where reaching the goal once is enough (Ketten
   made of wood so it looks mounted; the small sign alone was hardly seen, nor that it named every book on the board, so
   it grew and got the rail, user feedback, November 2026), and the picture books standing together on one board just so
   by „Lernspiele“ on the board under them (`labelOf`), its rail only under the picture books – a toy standing among
-  them (Zaubertasten's poster) is no learning game and stays outside it (`groupWidth`, user feedback, 25 November 2026); such a sign hangs only a little below its board, never over a
+  them (Tippzauber's poster) is no learning game and stays outside it (`groupWidth`, user feedback, 25 November 2026); such a sign hangs only a little below its board, never over a
   book on the board below (measure it at 844×390, where it comes closest). Before the helpers words carved into the back panel tell grown-ups in short what
   the shelf is for – „Für Groß & Klein“ – then that it is the first step into the digital world taken together, with
   learning games and little helpers for the day – and nothing else: no „Alles kostenlos.“, no „Seite an Seite“, no „die die Kommunikation fördern“, no „von Eltern für Eltern“ (each tried and
@@ -1031,7 +1038,8 @@ src/lib/                 speech, sfx (synthesized + recorded sounds), storage, d
   shelf's right, one compartment over the other (`SIDE_COLUMN`, user decision, November 2026): on top, in the tallest,
   the hourglass (play time, the most needed, yet small in its compartment – user request, 25 November 2026: it was too
   big), right under it the figure's compartment – the stickers of the fox girl and the bear boy one above the other on
-  its back panel, each whole with its ♀ or ♂ (`.shelf-back-stuck`), and „Wer spielt?“ big on its right wall, the face
+  its back panel, each whole with its ♀ or ♂ at the head's top right, over it (at its right side the wall cut it off;
+  `.shelf-back-stuck`), and „Wer spielt?“ big on its right wall, the face
   seen most of in that narrow compartment, across the wall in one or two lines (`.shelf-ask-wall`; user request, 26
   November 2026: on the right wall of the helpers' compartment they took the books' room, squeezed onto a narrow wall or
   beside the hourglass under the fullscreen sign they were not seen, and the words over the heads side by side on the
@@ -1040,7 +1048,9 @@ src/lib/                 speech, sfx (synthesized + recorded sounds), storage, d
   shaded ball seen a little from above, curved parallels, a gleam, a brass half ring with its thickness on a turned
   wooden foot; user request, 26 November 2026: the flat one looked poor) with the 🌐 lines and the language's name on
   its foot (the language – never a light switch), at the bottom a wooden loudspeaker (music, one tap) standing big
-  against the shelf's right wall, the trophy sign nailed into the compartment's top left corner above it (user request,
+  against the shelf's right wall, its right side flush with it and drawn as seen from the room's middle – its front,
+  its left side and its top going back, never a right side the wall would hide (user feedback, 26 November 2026) –, the
+  trophy sign nailed into the compartment's top left corner above it (user request,
   26 November 2026); the column is narrow (`SIDE_SHARE`, at most 150 px: at 12 % of the room its compartments were too
   wide, user request, 25 November 2026), and narrower still on a phone (`PHONE_SIDE_SHARE`, below 600 px high: user
   request, 26 November 2026 – the perspective may cut a little off its left side, which shows the room's depth better). The texts that stood below

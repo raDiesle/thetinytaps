@@ -83,7 +83,7 @@ export interface Category {
   apart?: boolean;
   /**
    * A toy standing on the shelf instead of a book (user request, 24 November 2026): its one game is opened by tapping the
-   * toy – a poster from „Magic Keys“ stuck on the back panel over the board (`ShelfToy` in Bookshelf.tsx; a toy keyboard in front of it
+   * toy – a poster from „Tap Magic“ stuck on the back panel over the board (`ShelfToy` in Bookshelf.tsx; a toy keyboard in front of it
    * looked like a till and was taken out, user feedback, 24 November 2026) –, with no book to take out, no cover and no
    * page of its own; its way back is the shelf.
    */
@@ -281,7 +281,7 @@ export const CATEGORIES: Category[] = [
     ],
   },
   {
-    // „Magic Keys“ (user request, 24 November 2026): a toy for banging on keys, mouse or screen, in no book – it stands
+    // „Tap Magic“ (user request, 24 November 2026): a toy for banging on keys, mouse or screen, in no book – it stands
     // as its poster (`toy`) first on the picture books' board, at its left: at its right end the trophy sign hangs, which
     // hid it.
     id: "drauflos",

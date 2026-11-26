@@ -25,44 +25,77 @@ export function RoomSpeaker() {
   const id = useId();
   return (
     <button type="button" className="room-thing room-speaker" aria-pressed={music.on} aria-label={music.label} title={music.title} onClick={music.toggle}>
-      <svg viewBox="0 0 72 100" aria-hidden>
+      {/*
+       * Seen from the middle of the room on a wide shelf: its front, its left side and its top going back towards the
+       * eye's point, and its right side against the shelf's right wall, the front's right edge right at the svg's edge.
+       */}
+      <svg viewBox="0 0 80 100" aria-hidden>
         <defs>
-          {/* The lamp's light on the box's front, and the cones' hollows. */}
+          {/* The lamp's light on the box's front. */}
           <linearGradient id={`${id}f`} x1="0" y1="0" x2="1" y2="1">
-            <stop offset="0" stopColor="#fff" stopOpacity="0.28" />
-            <stop offset="0.5" stopColor="#fff" stopOpacity="0" />
-            <stop offset="1" stopColor="#000" stopOpacity="0.2" />
+            <stop offset="0" stopColor="#fff" stopOpacity="0.3" />
+            <stop offset="0.45" stopColor="#fff" stopOpacity="0" />
+            <stop offset="1" stopColor="#000" stopOpacity="0.18" />
           </linearGradient>
-          <radialGradient id={`${id}h`} cx="0.42" cy="0.38" r="0.65">
+          {/* The side, darker towards the back. */}
+          <linearGradient id={`${id}d`} x1="1" y1="0" x2="0" y2="0">
             <stop offset="0" stopColor="#000" stopOpacity="0" />
-            <stop offset="0.7" stopColor="#000" stopOpacity="0.15" />
-            <stop offset="1" stopColor="#000" stopOpacity="0.45" />
+            <stop offset="1" stopColor="#000" stopOpacity="0.3" />
+          </linearGradient>
+          {/* Polished metal rings round the cones, lit from above left. */}
+          <linearGradient id={`${id}m`} x1="0" y1="0" x2="1" y2="1">
+            <stop offset="0" stopColor="#f1ece4" />
+            <stop offset="0.45" stopColor="#a69c93" />
+            <stop offset="1" stopColor="#4d453f" />
+          </linearGradient>
+          {/* The cone's hollow, deepest round its cap. */}
+          <radialGradient id={`${id}c`} cx="0.42" cy="0.38" r="0.7">
+            <stop offset="0" stopColor="#7a686e" />
+            <stop offset="0.55" stopColor="#4a3c41" />
+            <stop offset="1" stopColor="#231b1f" />
+          </radialGradient>
+          {/* Domes: the cap and the tweeter, round with a light on them. */}
+          <radialGradient id={`${id}h`} cx="0.36" cy="0.32" r="0.75">
+            <stop offset="0" stopColor="#e6dde0" />
+            <stop offset="0.4" stopColor="#8c7b81" />
+            <stop offset="1" stopColor="#3a2f33" />
           </radialGradient>
         </defs>
-        <ellipse className="room-shade" cx="33" cy="97" rx="30" ry="3" />
-        {/* Its side, seen from the middle of the shelf, and its little feet. */}
-        <path className="room-speaker-side" d="M56 30 L62 33 V90 L56 94 Z" />
-        <path className="room-speaker-foot" d="M10 93 h8 v4 h-8 Z M44 93 h8 v4 h-8 Z" />
-        <rect className="room-speaker-box" x="6" y="28" width="50" height="66" rx="5" />
-        <rect x="6" y="28" width="50" height="66" rx="5" fill={`url(#${id}f)`} />
-        <path className="room-speaker-edge" d="M10 31 H52" />
-        <circle className="room-speaker-ring" cx="31" cy="43" r="7" />
-        <circle className="room-speaker-cone" cx="31" cy="43" r="3" />
-        <circle className="room-speaker-ring" cx="31" cy="72" r="17" />
-        <circle className="room-speaker-cone" cx="31" cy="72" r="11.5" />
-        <circle cx="31" cy="72" r="11.5" fill={`url(#${id}h)`} />
-        <circle className="room-speaker-cap" cx="31" cy="72" r="4.5" />
-        <circle className={`room-speaker-light${music.on ? " on" : ""}`} cx="49" cy="88" r="2.4" />
+        <ellipse className="room-shade" cx="45" cy="97" rx="35" ry="2.8" />
+        <path className="room-speaker-foot" d="M28 92 h7 v5 h-7 Z M70 92 h7 v5 h-7 Z M13 85.5 h5 v3.5 h-5 Z" />
+        {/* Its left side and its top, going back. */}
+        <path className="room-speaker-side" d="M24 34 L11 27 V86 L24 93 Z" />
+        <path d="M24 34 L11 27 V86 L24 93 Z" fill={`url(#${id}d)`} />
+        <path className="room-speaker-grain" d="M14 38 Q17 52 15 66 M19 36 Q21 58 20 84" />
+        <path className="room-speaker-top" d="M24 34 L11 27 H65.8 L78.8 34 Z" />
+        <rect className="room-speaker-box" x="24" y="34" width="54.8" height="59" rx="2" />
+        <rect x="24" y="34" width="54.8" height="59" rx="2" fill={`url(#${id}f)`} />
+        <path className="room-speaker-edge" d="M26.5 36.4 H76.3" />
+        {/* The dark baffle with the tweeter above and the woofer below, their rings held by little screws. */}
+        <rect className="room-speaker-baffle" x="29" y="39" width="44.8" height="49" rx="2" />
+        <circle cx="51.4" cy="50" r="6.6" fill={`url(#${id}m)`} className="room-speaker-ring" />
+        <circle cx="51.4" cy="50" r="3.8" fill={`url(#${id}h)`} />
+        <circle cx="51.4" cy="71.5" r="14.6" fill={`url(#${id}m)`} className="room-speaker-ring" />
+        <circle className="room-speaker-surround" cx="51.4" cy="71.5" r="12.4" />
+        <circle cx="51.4" cy="71.5" r="10.8" fill={`url(#${id}c)`} />
+        <circle cx="51.4" cy="71.5" r="4.4" fill={`url(#${id}h)`} className="room-speaker-cap" />
+        <g className="room-speaker-screw">
+          <circle cx="41.6" cy="61.7" r="0.9" />
+          <circle cx="61.2" cy="61.7" r="0.9" />
+          <circle cx="41.6" cy="81.3" r="0.9" />
+          <circle cx="61.2" cy="81.3" r="0.9" />
+        </g>
+        <circle className={`room-speaker-light${music.on ? " on" : ""}`} cx="70" cy="84.6" r="1.9" />
         {music.on ? (
           // Notes coming out, printed still: they don't move by themselves.
           <g className="room-speaker-notes">
-            <ellipse cx="49" cy="20" rx="4.2" ry="3.2" transform="rotate(-20 49 20)" />
-            <path d="M52.8 19 V4 Q59 6 59 12" />
-            <ellipse cx="62" cy="15" rx="3.2" ry="2.5" transform="rotate(-20 62 15)" />
-            <path d="M65 14 V3" />
+            <ellipse cx="52" cy="20" rx="4.2" ry="3.2" transform="rotate(-20 52 20)" />
+            <path d="M55.8 19 V4 Q62 6 62 12" />
+            <ellipse cx="65" cy="15" rx="3.2" ry="2.5" transform="rotate(-20 65 15)" />
+            <path d="M68 14 V3" />
           </g>
         ) : (
-          <path className="room-speaker-off" d="M50 6 L62 18 M62 6 L50 18" />
+          <path className="room-speaker-off" d="M53 6 L65 18 M65 6 L53 18" />
         )}
       </svg>
     </button>

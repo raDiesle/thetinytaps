@@ -19,7 +19,10 @@ function Stand({ machine, back, front, children }: ComponentProps<typeof real.Ma
   // The stage's clock stands AFTER_END_S after the end, so the line at duration + 20 s shows that moment.
   const T = Math.min(g.__T ?? 0, machine.duration + real.AFTER_END_S);
   const cam = machine.cameraTarget(T);
-  const seen = Object.assign((x0: number, x1: number) => x1 >= cam - VIEW_W / 2 && x0 <= cam + 1.5 * VIEW_W, { wide: 0 });
+  const seen = Object.assign((x0: number, x1: number) => x1 >= cam - VIEW_W / 2 && x0 <= cam + 1.5 * VIEW_W, {
+    wide: 0,
+    shown: (x0: number, x1: number) => x1 >= cam && x0 <= cam + VIEW_W,
+  });
   const b = typeof back === "function" ? back(T, seen) : back;
   const f = typeof front === "function" ? front(T, seen) : front;
   return (

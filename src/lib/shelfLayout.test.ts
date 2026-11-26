@@ -342,7 +342,7 @@ describe("the bookshelf", () => {
   });
 });
 
-// Zaubertasten's poster stands among the picture books but is no learning game: the rail of „Lernspiele“ runs only
+// Tippzauber's poster stands among the picture books but is no learning game: the rail of „Lernspiele“ runs only
 // under the books (user feedback, 25 November 2026).
 test("the rail of a group's sign leaves a toy among its books out", () => {
   const spans = [1, TOY_SPAN, 1, 1];

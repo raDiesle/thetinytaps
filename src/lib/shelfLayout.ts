@@ -480,7 +480,7 @@ function planUpright(width: number, height: number, spans: number[], legs: numbe
 
 /**
  * Where the rail of a group's sign runs under a compartment's books, `bh` high, standing together in its middle with
- * `BOOK_GAP` between them: from the first to the last that belongs to the group – a toy among them (`isToy`, Zaubertasten's
+ * `BOOK_GAP` between them: from the first to the last that belongs to the group – a toy among them (`isToy`, Tippzauber's
  * poster) is no learning game, so the rail of „Lernspiele“ leaves it out (user feedback, 25 November 2026).
  */
 export function railUnder(cell: ShelfCell, bh: number, spans: number[], isToy: (place: number) => boolean): { left: number; width: number } {
