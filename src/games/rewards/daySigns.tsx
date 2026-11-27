@@ -2,9 +2,10 @@ import type { Localized } from "@/lib/language";
 import type { Slot } from "./catalog";
 import { ItemPic } from "./pictures";
 
-// The signs of the times of day on a chart in parts (morning, midday, evening): which set a grown-up picked in the band
-// („Zeichen“), or none – the default, where the rows tell themselves apart by their tints alone (user feedback,
-// November 2026: more signs and pictures to choose from, and none unless chosen).
+// The signs of the times of day on a chart in parts (morning, midday, evening): the Tagesplan's pictures by default
+// (user request, 27 November 2026, replacing „none unless chosen“), changed right on the sheet – 🗑️ hides them, the
+// rows then told apart by their tints alone, and ⇄ „Bild austauschen“ picks another set, a picture or an own photo for
+// one part. Never a choice in the band.
 
 /** How many parts a day has on a chart: the whole day in one, morning and evening, or morning, midday and evening. */
 export type DayParts = 1 | 2 | 3;
@@ -40,6 +41,52 @@ export const DAY_PARTS_CHOICES: { id: DayParts; label: Localized }[] = [
 /** A set of signs for the times of day. */
 export type DaySignSet = "sky" | "sun" | "landscape" | "routine" | "pictures";
 
+/** The signs as a chart keeps them: a set, or `"none"` where 🗑️ hid them; missing: `DEFAULT_SIGN_SET`. */
+export type ChartSigns = DaySignSet | "none";
+
+/** The set a chart shows where none was picked: the Tagesplan's pictures of the fox child. */
+export const DEFAULT_SIGN_SET: DaySignSet = "pictures";
+
+/** The set a chart's signs are drawn from, or `undefined` where they are hidden. */
+export const signSetOf = (signs: ChartSigns | undefined): DaySignSet | undefined => (signs === "none" ? undefined : (signs ?? DEFAULT_SIGN_SET));
+
+/** One part's own sign, picked on the sheet: a picture of the catalogue, or an own photo (its key in `photoStore`). */
+export interface PartSign {
+  emoji: string;
+  catalog?: string;
+  photo?: string;
+}
+
+/** What a chart carries of its signs. */
+export interface WithSigns {
+  /** The set (`DAY_SIGN_SETS`), or `"none"`; missing: `DEFAULT_SIGN_SET`. */
+  signs?: ChartSigns;
+  /** A part's own sign in place of the set's, where one was swapped on the sheet. */
+  partSigns?: Partial<Record<Slot, PartSign>>;
+}
+
+/** The chart with its signs hidden (🗑️), or shown again in the set they had. */
+export const withSignsShown = <T extends WithSigns>(chart: T, shown: boolean): T =>
+  shown ? { ...chart, signs: chart.signs === "none" ? undefined : chart.signs } : { ...chart, signs: "none" };
+
+/** A set picked for one part: every part follows it (a set's signs belong together), own signs given up. */
+export const withSignSet = <T extends WithSigns>(chart: T, set: DaySignSet): T => ({ ...chart, signs: set, partSigns: undefined });
+
+/** One part's own sign (a picture or photo), the others keeping theirs; `undefined` gives the part back to the set. */
+export function withPartSign<T extends WithSigns>(chart: T, part: Slot, sign: PartSign | undefined): T {
+  const { [part]: _old, ...rest } = chart.partSigns ?? {};
+  const partSigns = sign ? { ...rest, [part]: sign } : rest;
+  return { ...chart, signs: chart.signs === "none" ? undefined : chart.signs, partSigns: Object.keys(partSigns).length ? partSigns : undefined };
+}
+
+/** A chart's sign for a part: its own where swapped, else the set's; nothing where the signs are hidden. */
+export function PartSignPic({ chart, part, lines = false }: { chart: WithSigns; part: Slot; lines?: boolean }) {
+  const set = signSetOf(chart.signs);
+  if (!set) return null;
+  const own = chart.partSigns?.[part];
+  return own ? <ItemPic item={own} lines={lines} /> : <DaySign set={set} part={part} lines={lines} />;
+}
+
 /** The emoji of a set drawn by emoji, morning, midday, evening. */
 const EMOJI: Partial<Record<DaySignSet, Record<Slot, string>>> = {
   sun: { morning: "☀️", noon: "🌤️", evening: "🌙" },
@@ -54,7 +101,7 @@ const PICTURE_STEPS: Record<Slot, { emoji: string; catalog: string }> = {
   evening: { emoji: "😴", catalog: "schlafen" },
 };
 
-/** The sets of „Zeichen“, in the order of their switch; „Ohne“ (none) comes before them. */
+/** The sets of signs, in the order a part's window offers them. */
 export const DAY_SIGN_SETS: { id: DaySignSet; label: Localized }[] = [
   { id: "sky", label: { de: "Himmel", en: "Sky", zh: "天空", hi: "आसमान", es: "Cielo", ar: "السماء", ru: "Небо" } },
   { id: "pictures", label: { de: "Bilder", en: "Pictures", zh: "图片", hi: "तस्वीरें", es: "Imágenes", ar: "صور", ru: "Картинки" } },

@@ -71,6 +71,9 @@ test("the open mouth's dark lies between the rows, never round to the lips", () 
   expect(mouth).toMatch(/function cavityPath\(model: MouthModel, all: ReturnType<typeof projectors>\): string/);
   expect(mouth).not.toContain("cheekFold");
   expect(mouth).not.toMatch(/const CHEEK_INSIDE = GUM_FILLS/);
+  // Taut: the outline round both rows' chewing surfaces with only its corners rounded, no bulge beside the last teeth.
+  expect(mouth).toMatch(/return roundedPath\(convexHullOf\(rows\.flat\(\)\), CAVITY_ROUND\);/);
+  expect(mouth).not.toContain("CAVITY_BULGE");
 });
 
 test("in the story the sugar stains the teeth while the monsters grow, as a layer of its own", () => {

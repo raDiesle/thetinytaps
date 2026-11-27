@@ -11,6 +11,7 @@ import {
   cornerStretch,
   glideStretch,
   insideBy,
+  lipSideOnly,
   MIN_FACING,
   NO_STRETCH,
   projectors,
@@ -69,13 +70,10 @@ const GUM_RIM = "#e2577c";
  */
 const CHEEK_INSIDE = "#f27e9c";
 /**
- * How far the dark opening bulges out beside the last teeth, as a share of the way from the upper row's end to the
- * lower's: the cheek stretched between them stays taut, only a little round, never a straight cut (user feedback,
- * November 2026).
+ * How round the opening's corners are, in picture units: small, so the cheek stretched from one row's end to the
+ * other's stays taut (user feedback, November 2026, twice: a bulge out beside the last teeth looked slack).
  */
-const CAVITY_BULGE = 0.14;
-/** How round the opening's corners are, in picture units. */
-const CAVITY_ROUND = 22;
+const CAVITY_ROUND = 12;
 /** Monsters still waiting for a later step only show where their side of the tooth clearly faces out of the mouth. */
 const WAITING_FACING = 0.25;
 /** Small enough that a monster sits on its tooth rather than covering it and its neighbours. */
@@ -425,9 +423,15 @@ function StainedFace({ face, project, seed }: { face: Face; project: Project; se
  * A tooth's own piece of gum: its top, drawn under the tooth, or its walls with their darker rim, drawn over the
  * tooth's foot so it stands in the gum.
  */
+/** Whether a gum's cheek-side or tongue-side wall is there and faces the viewer (`lipSideOnly` leaves the tongue side out). */
+const wallFaces = (gum: MouthModel["gums"][number], kind: "outer" | "inner", project: Project) => {
+  const wall = gum.faces.find((f) => f.kind === kind);
+  return wall !== undefined && project.facing(wall.normal) > MIN_FACING;
+};
+
 function GumFaces({ gum, project, top }: { gum: MouthModel["gums"][number]; project: Project; top: boolean }) {
   const p = project.point;
-  const rims = top ? [] : (["outer", "inner"] as const).filter((kind) => project.facing(surfaceFace(gum.faces, kind).normal) > MIN_FACING);
+  const rims = top ? [] : (["outer", "inner"] as const).filter((kind) => wallFaces(gum, kind, project));
   return (
     <>
       {gum.faces
@@ -622,18 +626,25 @@ export function Mouth({ view, zone, monsters, dirty, brush, happy, spat = false,
     [happy, teethByKey, all],
   );
 
+  // A row tipped to show its chewing surfaces shows no gum on the tongue side of its teeth (`lipSideOnly`); only
+  // brushing the tongue side shows it, where the inner faces grow out of it.
+  const brushingInside = zone?.surface === "inner";
   // The teeth in the order the still picture draws them: jaw by jaw, far teeth first.
   const painted = useMemo(
     () =>
       jawOrder(view).flatMap((jaw) => {
         const project = all[jaw];
         const p = project.point;
+        const lipSideOnlyHere = !brushingInside && (jaw === "lower" ? view.tilt.lower > 0.01 : view.tilt.upper < -0.01);
         return model.teeth
           .filter((t) => t.id.jaw === jaw)
           .sort((a, b) => p(a.center).depth - p(b.center).depth)
-          .map((t) => ({ tooth: t, gum: gumsByKey.get(t.key)!, project }));
+          .map((t) => {
+            const gum = gumsByKey.get(t.key)!;
+            return { tooth: t, gum: lipSideOnlyHere ? lipSideOnly(gum) : gum, project };
+          });
       }),
-    [view, all, model, gumsByKey],
+    [view, all, model, gumsByKey, brushingInside],
   );
 
   // The faces being brushed now turn white in layers of their own (`ToothStain`), so the still picture draws them
@@ -707,7 +718,7 @@ export function Mouth({ view, zone, monsters, dirty, brush, happy, spat = false,
               upper={all.upper}
               lower={all.lower}
               cavity={cavityPath(model, all)}
-              hull={cavityHull(model, all)}
+              around={cavityRows(model, all).flat()}
               tongueUp={tongueUp}
               palateDown={palateDown}
             />
@@ -997,25 +1008,20 @@ export function Mouth({ view, zone, monsters, dirty, brush, happy, spat = false,
 /**
  * The opening into the mouth between the two rows of teeth: the outline round every chewing surface of both jaws,
  * each seen through its own (perhaps tipped) projector. Dark behind the tongue and palate; outside it the cheeks show.
- * Beside the last teeth the cheek is stretched from one row's end to the other's, taut as a band but a little round
- * (`CAVITY_BULGE`, `CAVITY_ROUND`): the opening once went on round to the lips there, with folds of cheek over the gum's
- * end, and the gap between the rows looked odd (user feedback, November 2026).
+ * Beside the last teeth the cheek is stretched from one row's end to the other's, taut as a band, only the corners
+ * rounded (`CAVITY_ROUND`): the opening once went on round to the lips there, with folds of cheek over the gum's end,
+ * and the gap between the rows looked odd; then a bulge out beside the last teeth looked slack (user feedback, November 2026).
  */
 function cavityPath(model: MouthModel, all: ReturnType<typeof projectors>): string {
-  return roundedPath(cavityHull(model, all), CAVITY_ROUND);
+  const rows = cavityRows(model, all);
+  return roundedPath(convexHullOf(rows.flat()), CAVITY_ROUND);
 }
 
-/** The points round the opening (`cavityPath`) before its corners are rounded. */
-function cavityHull(model: MouthModel, all: ReturnType<typeof projectors>) {
-  const rows = (["upper", "lower"] as const).map((jaw) =>
+/** The chewing surfaces' points of both rows on the screen, the upper row's first: the opening (`cavityPath`) lies round them. */
+function cavityRows(model: MouthModel, all: ReturnType<typeof projectors>) {
+  return (["upper", "lower"] as const).map((jaw) =>
     model.teeth.filter((t) => t.id.jaw === jaw).flatMap((t) => surfaceFace(t.faces, "top").points.map(all[jaw].point)),
   );
-  const sides = ([-1, 1] as const).map((s) => {
-    const [up, down] = rows.map((row) => row.reduce((a, b) => (s * b.x > s * a.x ? b : a)));
-    const gap = Math.hypot(down.x - up.x, down.y - up.y);
-    return { x: (up.x + down.x) / 2 + s * CAVITY_BULGE * gap, y: (up.y + down.y) / 2 };
-  });
-  return convexHullOf([...rows.flat(), ...sides]);
 }
 
 /**
@@ -1436,7 +1442,7 @@ function gumOutlines(gum: MouthModel["gums"][number], project: Project, top: boo
   const rims = top
     ? []
     : (["outer", "inner"] as const)
-        .filter((kind) => project.facing(surfaceFace(gum.faces, kind).normal) > MIN_FACING)
+        .filter((kind) => wallFaces(gum, kind, project))
         .map((kind) => `M${gum.rims[kind].map((r) => fmt(project.point(r))).join(" L")}`);
   return { cut, rims };
 }

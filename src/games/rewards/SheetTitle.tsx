@@ -3,6 +3,7 @@ import { useT } from "@/lib/language";
 import { NO_TITLE_MARK } from "./board";
 import { MARK_BY_ID } from "./catalog";
 import { MarkPic } from "./pictures";
+import { PlusSign } from "./SheetAction";
 
 /** The sign before a heading: `titleMark` if set, else the chart's own (a board's mark; a plan has none). */
 export const titleMarkOf = (titleMark: string | undefined, own: string | undefined) => {
@@ -77,7 +78,14 @@ export function SheetTitle({
               : undefined
           }
         >
-          {mark ? <MarkPic mark={mark} /> : "＋"}
+          {mark ? (
+            <MarkPic mark={mark} />
+          ) : (
+            <>
+              <PlusSign />
+              <span className="rw-add-text">{t({ en: "Sign", de: "Zeichen", zh: "标志", hi: "चिह्न", es: "Símbolo", ar: "علامة", ru: "Знак" })}</span>
+            </>
+          )}
         </span>
       )}
       {photo}

@@ -51,7 +51,7 @@ const CLIP_ID = "mouth-inside-clip";
 const THROAT_ID = "mouth-inside-throat";
 
 /**
- * The inside of the open mouth, in the dark opening between the rows (`cavity`, its outline, and `hull`, its points):
+ * The inside of the open mouth, in the dark opening between the rows (`cavity`, its outline round the chewing surfaces `around`):
  * the throat at the back with the soft palate and uvula over it, the tongue in front of it and the hard palate's roof.
  * The tongue is the model's, lying on the floor, where the lower jaw is tipped to show it (`tongueUp`); else only its
  * back is seen as a hump rising behind the lower teeth. The throat hangs from the palate's back edge where the palate
@@ -62,7 +62,7 @@ export function MouthInside({
   upper,
   lower,
   cavity,
-  hull,
+  around,
   tongueUp,
   palateDown,
 }: {
@@ -70,11 +70,11 @@ export function MouthInside({
   upper: Projector;
   lower: Projector;
   cavity: string;
-  hull: Point2[];
+  around: Point2[];
   tongueUp: boolean;
   palateDown: boolean;
 }) {
-  const { x0, x1, y0, y1 } = box(hull);
+  const { x0, x1, y0, y1 } = box(around);
   const cx = (x0 + x1) / 2;
   const w = x1 - x0;
   const palate = model.palate.map(upper.point);

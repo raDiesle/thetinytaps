@@ -27,10 +27,10 @@ import {
   taskSlots,
   weekday,
 } from "./board";
-import { DaySign, type DaySignSet } from "./daySigns";
+import { PartSignPic, signSetOf, type WithSigns } from "./daySigns";
 import { type CatalogMark, DAY_NAMES, MARK_BY_ID, MARKS, REWARD_BY_ID, type Slot, TASK_BY_ID, TEMPLATES, THEME_BY_ID, THEMES } from "./catalog";
 import { ItemPic, MarkPic, Pic, picture, SheetStrip } from "./pictures";
-import { ADD_REWARD, CHANGE_REWARD, RewardActions, SheetAction } from "./SheetAction";
+import { ADD_REWARD, CHANGE_REWARD, PlusSign, RewardActions, SheetAction } from "./SheetAction";
 import { ChildPhoto, photoHead, photoInCorner } from "./ChildPhoto";
 import { SheetTitle, titleMarkOf } from "./SheetTitle";
 
@@ -160,7 +160,7 @@ export function BoardSheet({
   // Grey prints take their colours from .rw-grey; inline ones would win over it.
   const grey = greyPrint(look);
   const style = grey ? undefined : ({ "--rw-paper": theme.paper, "--rw-main": theme.main, "--rw-ink": theme.ink } as CSSProperties);
-  const fieldProps = { mark, look, fresh, example, signs: board.signs };
+  const fieldProps = { mark, look, fresh, example, signs: board as WithSigns };
   const dateFormat = (options: Intl.DateTimeFormatOptions) => new Intl.DateTimeFormat(speechLang, options);
 
   // The child's photo (user request, November 2026): in a corner of the head, which grows to hold it, or beside the heading.
@@ -194,7 +194,7 @@ export function BoardSheet({
         {/* No reward by default, and no room kept for one: only this small tag while the board is made (user feedback, November 2026). */}
         {editing && board.kind !== "collect" && !board.reward && (
           <span className="rw-reward-add" data-edit="reward" role="button" tabIndex={0} title={t(ADD_REWARD)}>
-            ＋ <span aria-hidden>🎁</span> {t({ de: "Belohnung", en: "Reward", zh: "奖励", hi: "इनाम", es: "Premio", ar: "المكافأة", ru: "Награда" })}
+            <PlusSign /> <span aria-hidden>🎁</span> {t({ de: "Belohnung", en: "Reward", zh: "奖励", hi: "इनाम", es: "Premio", ar: "المكافأة", ru: "Награда" })}
           </span>
         )}
       </header>
@@ -268,6 +268,7 @@ function EditTasks({ board }: { board: Board }) {
                     ar: `حذف «${taskLabel(task)}»؟`,
                     ru: `Удалить «${taskLabel(task)}»?`,
                   })}
+                  side="right"
                   data={{ "data-edit": "delete-task", "data-task": task.id }}
                 />
               )}
@@ -284,7 +285,8 @@ function EditTasks({ board }: { board: Board }) {
           aria-label={t({ de: "Aufgabe dazu", en: "Add a task", zh: "添加任务", hi: "काम जोड़ें", es: "Añadir tarea", ar: "إضافة مهمة", ru: "Добавить задание" })}
           title={t({ de: "Aufgabe dazu", en: "Add a task", zh: "添加任务", hi: "काम जोड़ें", es: "Añadir tarea", ar: "إضافة مهمة", ru: "Добавить задание" })}
         >
-          ＋
+          <PlusSign />
+          {t({ en: "Add a task", de: "Aufgabe dazu", zh: "添加任务", hi: "काम जोड़ें", es: "Añadir tarea", ar: "إضافة مهمة", ru: "Добавить задание" })}
         </span>
       )}
     </div>
@@ -296,8 +298,8 @@ const greyPrint = (look: SheetLook) => look.print && !look.color;
 
 interface FieldLook {
   mark: CatalogMark;
-  /** The board's signs of the times of day; none: a field in parts shows no sign. */
-  signs?: DaySignSet;
+  /** The board's signs of the times of day (its `signs` and `partSigns`); hidden: a field in parts shows no sign. */
+  signs?: WithSigns;
   look: SheetLook;
   fresh?: string | null;
   /** Example stars shown, if any. */
@@ -331,9 +333,10 @@ function Field({
       data-tap={look.print ? undefined : tap}
     >
       <span className="rw-ring">
-        {slot && signs && (
-          <span className="rw-slot" aria-hidden>
-            <DaySign set={signs} part={slot} lines={greyPrint(look)} />
+        {slot && signs && signSetOf(signs.signs) && (
+          // While the board is made a tap on a sign opens the part's signs (`data-edit`), where 🗑️ and ⇄ have no room.
+          <span className="rw-slot" aria-hidden data-edit={look.print ? undefined : "part-sign"} data-part={look.print ? undefined : slot}>
+            <PartSignPic chart={signs} part={slot} lines={greyPrint(look)} />
           </span>
         )}
         {state === "filled" ? (
@@ -719,7 +722,7 @@ function CollectWays({
       ))}
       {edit && ways.length < MAX_WAYS && (
         <span className="rw-way-add" data-edit="add" role="button" tabIndex={0}>
-          ＋{" "}
+          <PlusSign />{" "}
           {t({
             de: "Noch ein Weg – für eine andere Aufgabe",
             en: "One more path – for another task",
@@ -810,6 +813,7 @@ function CollectPath({
                 ar: `حذف «${taskLabel(way.task)}» مع طريقها؟`,
                 ru: `Удалить «${taskLabel(way.task)}» вместе с дорожкой?`,
               })}
+              side="right"
               data={{ "data-edit": "delete-task", "data-task": way.task.id }}
             />
           )}
@@ -859,7 +863,7 @@ function CollectPath({
                 ru: "На один кружок меньше",
               })}
             >
-              −
+              <PlusSign minus />
             </span>
           )}
           {way.goal < MAX_COLLECT && (
@@ -880,7 +884,7 @@ function CollectPath({
                 ru: "Ещё один кружок",
               })}
             >
-              ＋
+              <PlusSign />
             </span>
           )}
           <span className="rw-path-hint">{t({ de: "Kreise", en: "Circles", zh: "圆圈", hi: "गोले", es: "Círculos", ar: "الدوائر", ru: "Кружки" })}</span>

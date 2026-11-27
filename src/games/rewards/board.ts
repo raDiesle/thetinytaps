@@ -1,4 +1,4 @@
-import { type DayParts, type DaySignSet, PARTS_OF } from "./daySigns";
+import { type ChartSigns, type DayParts, PARTS_OF, type PartSign } from "./daySigns";
 import { dayKey, weekOf } from "@/lib/days";
 import { type BoardKind, type LinkedGame, REWARD_BY_ID, type Slot, SLOTS, TASK_BY_ID, type Template } from "./catalog";
 import type { TargetLanguageId } from "@/content/targetLanguages";
@@ -75,8 +75,13 @@ export interface Board {
   start?: string;
   /** How a month board is drawn (`MONTH_LOOKS`); missing: the calendar. */
   look?: MonthLook;
-  /** The signs on the fields of the times of day (`DAY_SIGN_SETS`); missing: none, the parts told apart by their tints. */
-  signs?: DaySignSet;
+  /**
+   * The signs of the parts (`DAY_SIGN_SETS`), or `"none"` where 🗑️ hid them, the parts then told apart by their tints;
+   * missing: the Tagesplan's pictures (`DEFAULT_SIGN_SET`).
+   */
+  signs?: ChartSigns;
+  /** A part's own sign (a picture or an own photo), swapped on the sheet in place of the set's. */
+  partSigns?: Partial<Record<Slot, PartSign>>;
 }
 
 /** A month board's time: four weeks without dates, or a calendar month. */

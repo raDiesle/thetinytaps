@@ -1,16 +1,16 @@
 import type { CSSProperties } from "react";
 import { dayKey, weekOf } from "@/lib/days";
-import { type Localized, useAppLanguage, useT } from "@/lib/language";
+import { type EnglishFirst, type Localized, useAppLanguage, useT } from "@/lib/language";
 import { useFigure } from "@/lib/common";
 import { tapState } from "@/lib/tapTargets";
 import { AUTO_TITLES, cellKey, isTemplateTitle, type LinkedDays, weekday } from "./board";
 import { useRewardLabel } from "./BoardSheet";
 import { DAY_NAMES, MARK_BY_ID, MARKS, type NightLook, nightLookOf, PLAN_TEMPLATES, SLOT_BY_ID, type Slot, STEP_BY_ID, THEME_BY_ID, THEMES } from "./catalog";
-import { DaySign, type DaySignSet, PARTS_OF, SLOT_EMOJI } from "./daySigns";
+import { PARTS_OF, PartSignPic, SLOT_EMOJI, signSetOf } from "./daySigns";
 import { ItemPic, MarkPic, NightPic, SheetStrip } from "./pictures";
 import { ChildPhoto, photoHead, photoInCorner } from "./ChildPhoto";
 import { SheetTitle, titleMarkOf } from "./SheetTitle";
-import { ADD_REWARD, RewardActions, SheetAction } from "./SheetAction";
+import { ADD_REWARD, PlusSign, RewardActions, SheetAction } from "./SheetAction";
 import {
   bigDayCome,
   bigDayStep,
@@ -300,14 +300,17 @@ function StepCard({
       {number !== undefined && <span className="pl-number">{number}</span>}
       {edit && <CardActions cell={key} label={label} />}
       {edit && insert && <InsertCard cell={key} axis={insert.axis} first={insert.first} every={every} />}
-      <span className="pl-emoji" aria-hidden>
-        <ItemPic item={step} lines={look.print && !look.color} />
+      <span className="pl-emoji">
+        <CardPicture item={step} lines={look.print && !look.color} swap={edit ? { cell: key, label, every: false } : undefined} />
       </span>
       {(stars > 0 || counts) && <StarFields stars={stars} got={look.print ? 0 : got} edit={edit ? { cell: key } : undefined} />}
       {/* A plain plan's card: its first star turns the plan into one that counts. */}
       {edit && !counts && (
         <span className="pl-star-add" data-edit="stars" data-cell={key} data-by={1} role="button" tabIndex={0} title={t(MORE_STARS)} aria-label={t(MORE_STARS)}>
-          ＋⭐
+          <PlusSign />
+          <span className="pl-star-add-star" aria-hidden>
+            ⭐
+          </span>
         </span>
       )}
       {state === "done" && !stars && (
@@ -399,32 +402,55 @@ function StarStep({ cell, by, off, every = false }: { cell: string; by: 1 | -1; 
       aria-hidden={off}
       title={label}
     >
-      {by > 0 ? "＋" : "−"}
+      <PlusSign minus={by < 0} />
     </span>
   );
 }
 
-/** ⚙️ and 🗑️ in the top corners of a card while it is made – with `every` the week grid's row, every day's card alike. */
+/**
+ * 🗑️ „Löschen“ of a card while it is made, a tab growing out of its frame above its top left corner (user request, 27
+ * November 2026) – with `every` the week grid's row, every day's card alike. Its ⇄ „Bild austauschen“ sits on its
+ * picture (`CardPicture`).
+ */
 function CardActions({ cell, label, every = false }: { cell: string; label: string; every?: boolean }) {
   const t = useT();
-  const where = { "data-cell": cell, "data-every": every ? "" : undefined };
   return (
-    <>
-      <SheetAction
-        act="configure"
-        ask={t({
-          de: "„{name}“ ändern",
-          en: "Change “{name}”",
-          zh: "修改“{name}”",
-          hi: "“{name}” बदलें",
-          es: "Cambiar «{name}»",
-          ar: "تغيير «{name}»",
-          ru: "Изменить «{name}»",
-        }).replace("{name}", label)}
-        data={{ "data-edit": "card", ...where }}
-      />
-      <SheetAction act="delete" ask={t(DELETE_ASK).replace("{name}", label)} data={{ "data-edit": "delete-card", ...where }} />
-    </>
+    <SheetAction
+      act="delete"
+      ask={t(DELETE_ASK).replace("{name}", label)}
+      data={{ "data-edit": "delete-card", "data-cell": cell, "data-every": every ? "" : undefined }}
+    />
+  );
+}
+
+/**
+ * A card's picture; while it is made with ⇄ „Bild austauschen“ on its top right corner, part of the picture (user
+ * request, 27 November 2026: the swap belongs to the picture, not to the card's corner). The box hugs the picture, so
+ * the sign lands on its corner whatever the card's shape.
+ */
+function CardPicture({ item, lines, swap }: { item: PlanStep; lines: boolean; swap?: { cell: string; label: string; every: boolean } }) {
+  const t = useT();
+  return (
+    <span className="pl-pic">
+      <span className="pl-pic-art" aria-hidden>
+        <ItemPic item={item} lines={lines} />
+      </span>
+      {swap && (
+        <SheetAction
+          act="swap"
+          ask={t({
+            de: "„{name}“ austauschen",
+            en: "Swap “{name}”",
+            zh: "更换“{name}”",
+            hi: "“{name}” बदलें",
+            es: "Cambiar «{name}»",
+            ar: "تبديل «{name}»",
+            ru: "Заменить «{name}»",
+          }).replace("{name}", swap.label)}
+          data={{ "data-edit": "card", "data-cell": swap.cell, "data-every": swap.every ? "" : undefined }}
+        />
+      )}
+    </span>
   );
 }
 
@@ -487,22 +513,90 @@ function NoSteps() {
 }
 
 /**
- * A part's sign before its line: the set chosen in the band (`Plan.signs`: a drawn sky, the child's pictures, sun and
- * moon …), big, as it stands for the whole line; its name only read out. Without a set the line has no sign, only its
- * tint. The parts themselves are chosen in the band („Tageszeiten“), never taken away here (user feedback, November 2026).
+ * A part's sign before its line: the Tagesplan's pictures by default, another set or a picture or photo of its own
+ * where one was swapped (`PartSignPic`), big, as it stands for the whole line; its name only read out. While the plan
+ * is made it carries 🗑️, which hides the signs of every part (the lines then told apart by their tints), and ⇄ „Bild
+ * austauschen“ on its top right, which opens the part's signs – a tap on the sign does too (user request, 27 November
+ * 2026: never a „Zeichen“ choice in the band). Hidden, a pale „＋ Zeichen“ keeps its place while the plan is made and
+ * brings them back. The parts themselves are chosen in the band („Tageszeiten“), never taken away here.
  */
-function PartName({ part, set, lines }: { part: Slot; set: DaySignSet; lines: boolean }) {
+function PartName({ plan, part, lines, edit }: { plan: Plan; part: Slot; lines: boolean; edit: boolean }) {
   const t = useT();
   const slot = SLOT_BY_ID.get(part);
   if (!slot) return null;
+  const name = t(slot.label);
+  if (!signSetOf(plan.signs))
+    return edit ? (
+      <span className="pl-part">
+        <span className="pl-part-none" data-edit="show-signs" role="button" tabIndex={0} title={t(SHOW_SIGNS)} aria-label={t(SHOW_SIGNS)}>
+          <PlusSign />
+          <span className="pl-add-text">{t(SIGN_WORD)}</span>
+        </span>
+      </span>
+    ) : null;
   return (
     <span className="pl-part">
-      <span className="pl-part-sign" role="img" aria-label={t(slot.label)} title={t(slot.label)}>
-        <DaySign set={set} part={part} lines={lines} />
+      <span
+        className="pl-part-sign"
+        role={edit ? "button" : "img"}
+        tabIndex={edit ? 0 : undefined}
+        aria-label={name}
+        title={name}
+        data-edit={edit ? "part-sign" : undefined}
+        data-part={edit ? part : undefined}
+      >
+        <PartSignPic chart={plan} part={part} lines={lines} />
       </span>
+      {edit && (
+        <>
+          <SheetAction
+            act="swap"
+            ask={t(SWAP_SIGN).replace("{name}", name)}
+            label={t({ en: "Swap", de: "Tauschen", zh: "更换", hi: "बदलें", es: "Cambiar", ar: "تبديل", ru: "Сменить" })}
+            data={{ "data-edit": "part-sign", "data-part": part }}
+          />
+          <SheetAction act="delete" ask={t(HIDE_SIGNS)} data={{ "data-edit": "hide-signs" }} />
+        </>
+      )}
     </span>
   );
 }
+
+/** The word of a part's sign while the plan is made. */
+export const SIGN_WORD: EnglishFirst = { en: "Sign", de: "Zeichen", zh: "标志", hi: "चिह्न", es: "Símbolo", ar: "علامة", ru: "Знак" };
+
+/** 🗑️ on a part's sign: what it asks under the mouse. */
+const HIDE_SIGNS: EnglishFirst = {
+  en: "Hide the signs of the times of day?",
+  de: "Zeichen der Tageszeiten ausblenden?",
+  zh: "隐藏时段的标志？",
+  hi: "दिन के समय के चिह्न छिपाएँ?",
+  es: "¿Ocultar los símbolos de los momentos del día?",
+  ar: "إخفاء علامات أوقات اليوم؟",
+  ru: "Скрыть знаки времени суток?",
+};
+
+/** The pale place of hidden signs: what a tap does. */
+const SHOW_SIGNS: EnglishFirst = {
+  en: "Show the signs of the times of day",
+  de: "Zeichen der Tageszeiten zeigen",
+  zh: "显示时段的标志",
+  hi: "दिन के समय के चिह्न दिखाएँ",
+  es: "Mostrar los símbolos de los momentos del día",
+  ar: "إظهار علامات أوقات اليوم",
+  ru: "Показать знаки времени суток",
+};
+
+/** ⇄ on a part's sign; `{name}` is the part („Morgens“). */
+const SWAP_SIGN: EnglishFirst = {
+  en: "Swap the sign of “{name}”",
+  de: "Zeichen für „{name}“ austauschen",
+  zh: "更换“{name}”的标志",
+  hi: "“{name}” का चिह्न बदलें",
+  es: "Cambiar el símbolo de «{name}»",
+  ar: "تبديل علامة «{name}»",
+  ru: "Сменить знак «{name}»",
+};
 
 /** „Karte dazu“: the ＋ of a place to add a card, also what it reads out. */
 const ADD_CARD: Localized = {
@@ -514,6 +608,33 @@ const ADD_CARD: Localized = {
   ar: "إضافة بطاقة",
   ru: "Добавить карточку",
 };
+
+/** The few words at every place that adds a card: „Schritt hinzufügen“ (user request, 27 November 2026). */
+const ADD_STEP: EnglishFirst = {
+  en: "Add a step",
+  de: "Schritt hinzufügen",
+  zh: "添加步骤",
+  hi: "क़दम जोड़ें",
+  es: "Añadir paso",
+  ar: "إضافة خطوة",
+  ru: "Добавить шаг",
+};
+
+/**
+ * What an insert on a card's edge shows: a drawn ＋ and its few words, on a tab in the frame's colour that grows out of
+ * the card's edge, as if part of its frame (user request, 27 November 2026: the round ＋ floating over the edge looked
+ * loose). Across a line the tab stands upright and its words run up it; down a column it hangs below the card.
+ */
+function InsertTab({ label }: { label: string }) {
+  return (
+    <>
+      <span className="pl-insert-sign">
+        <PlusSign />
+      </span>
+      <span className="pl-insert-text">{label}</span>
+    </>
+  );
+}
 
 /**
  * While a plan is made, where nothing stands yet: the one place to add a card to an empty day, an empty part of the
@@ -534,7 +655,8 @@ function AddCard({ part, day, small = false, every = false }: { part?: Slot; day
       aria-label={t(ADD_CARD)}
       title={t(ADD_CARD)}
     >
-      ＋
+      <PlusSign />
+      <span className="pl-add-text">{t(ADD_STEP)}</span>
     </span>
   );
 }
@@ -605,7 +727,7 @@ function InsertCard({ cell, axis, first, every }: { cell: string; axis: "row" | 
           aria-label={t(names[side])}
           title={t(names[side])}
         >
-          ＋
+          <InsertTab label={t(ADD_STEP)} />
         </span>
       ))}
     </>
@@ -617,7 +739,7 @@ function AddReward() {
   const t = useT();
   return (
     <span className="pl-reward-add" data-edit="reward" role="button" tabIndex={0} title={t(ADD_REWARD)}>
-      ＋ <span aria-hidden>🎁</span> {t({ de: "Belohnung", en: "Reward", zh: "奖励", hi: "इनाम", es: "Premio", ar: "المكافأة", ru: "Награда" })}
+      <PlusSign /> <span aria-hidden>🎁</span> {t({ de: "Belohnung", en: "Reward", zh: "奖励", hi: "इनाम", es: "Premio", ar: "المكافأة", ru: "Награда" })}
     </span>
   );
 }
@@ -664,7 +786,7 @@ function DaySteps(props: StepsProps & { aspect: number }) {
     .map((part) => ({ part, steps: rest.filter((step) => partIn(step, n) === part) }))
     .filter((line) => line.steps.length > 0 || (edit && steps.length > 0));
   const named = n > 1;
-  const signs = named ? plan.signs : undefined;
+  const signs = named && (edit || !!signSetOf(plan.signs));
   const box = field ? dayBox(props, steps, done, open) : null;
   // The room for the rows: the sheet less its heading and the box, less the „Jetzt“ column, the reward and the signs; each part a row of it.
   const width = (lead ? 0.62 : 1) * (counts && plan.reward ? 0.82 : 1) * (signs ? 0.9 : 1);
@@ -714,7 +836,7 @@ function DaySteps(props: StepsProps & { aspect: number }) {
                     key={part ?? "day"}
                     className={`pl-row${signs ? " pl-row-named" : ""}${named ? ` pl-row-part rw-tint-${part === "noon" ? "day" : part}` : ""}`}
                   >
-                    {part && signs && <PartName part={part} set={signs} lines={look.print && !look.color} />}
+                    {part && signs && <PartName plan={plan} part={part} lines={look.print && !look.color} edit={edit} />}
                     <ol
                       className={`pl-steps${lines.length > 1 ? " pl-line" : ""}`}
                       style={
@@ -938,7 +1060,7 @@ function RingStep({
       aria-hidden={off}
       title={label}
     >
-      {by > 0 ? "＋" : "−"}
+      <PlusSign minus={by < 0} />
     </span>
   );
 }
@@ -1008,7 +1130,9 @@ function WeekCell({ plan, d, row, props, picture }: { plan: Plan; d: Date; row: 
             aria-label={`${dayName}: ${t(MORE_STARS)}`}
             title={`${dayName}: ${t(MORE_STARS)}`}
           >
-            <span className="rw-ring">＋</span>
+            <span className="rw-ring">
+              <PlusSign />
+            </span>
           </span>
         )}
       </span>
@@ -1040,7 +1164,12 @@ function RowTools({ plan, row, key0, withDelete, first }: { plan: Plan; row: Pla
     <div className="pl-wtools" data-row={row.id}>
       {withDelete && (
         <>
-          <SheetAction act="delete" ask={t(DELETE_ASK).replace("{name}", label)} data={{ "data-edit": "delete-card", "data-cell": key0, "data-every": "" }} />
+          <SheetAction
+            act="delete"
+            side="right"
+            ask={t(DELETE_ASK).replace("{name}", label)}
+            data={{ "data-edit": "delete-card", "data-cell": key0, "data-every": "" }}
+          />
           {weekRows(plan).length < MAX_STEPS && <InsertCard cell={key0} axis="column" first={first} every />}
         </>
       )}
@@ -1108,7 +1237,7 @@ function RowTools({ plan, row, key0, withDelete, first }: { plan: Plan; row: Pla
                 aria-label={t(slot.label)}
                 title={t(slot.label)}
               >
-                {plan.signs ? <DaySign set={plan.signs} part={slot.id} /> : SLOT_EMOJI[slot.id]}
+                {signSetOf(plan.signs) ? <PartSignPic chart={plan} part={slot.id} /> : SLOT_EMOJI[slot.id]}
               </span>
             );
           })}
@@ -1170,13 +1299,18 @@ function WeekStars(props: StepsProps) {
                 />
               )}
               {edit && rows.length < MAX_STEPS && <InsertCard cell={keyOf(row)} axis="column" first={i === 0} every />}
-              {tinted && plan.signs && (
-                <span className="pl-whead-part" aria-hidden>
-                  <DaySign set={plan.signs} part={partIn(row, n) ?? "noon"} lines={look.print && !look.color} />
+              {tinted && signSetOf(plan.signs) && (
+                <span
+                  className="pl-whead-part"
+                  aria-hidden
+                  data-edit={edit ? "part-sign" : undefined}
+                  data-part={edit ? (partIn(row, n) ?? "noon") : undefined}
+                >
+                  <PartSignPic chart={plan} part={partIn(row, n) ?? "noon"} lines={look.print && !look.color} />
                 </span>
               )}
-              <span className="pl-emoji" aria-hidden data-edit={edit ? "swap" : undefined} data-cell={edit ? keyOf(row) : undefined}>
-                <ItemPic item={row} lines={look.print && !look.color} />
+              <span className="pl-emoji" data-edit={edit ? "swap" : undefined} data-cell={edit ? keyOf(row) : undefined}>
+                <CardPicture item={row} lines={look.print && !look.color} swap={edit ? { cell: keyOf(row), label: label(row), every: true } : undefined} />
               </span>
             </div>
           )}
@@ -1312,7 +1446,7 @@ function NightCard({
         {edit && (
           <>
             <SheetAction
-              act="configure"
+              act="swap"
               ask={t({
                 de: "Bild der Nächte ändern",
                 en: "Change the picture of the nights",
@@ -1348,7 +1482,7 @@ function NightCard({
                 aria-label={t(ONE_MORE_NIGHT)}
                 title={t(ONE_MORE_NIGHT)}
               >
-                ＋
+                <InsertTab label={t(ONE_MORE_NIGHT)} />
               </span>
             )}
           </>
@@ -1434,7 +1568,8 @@ function Countdown({ plan, day, ticks, look, edit, fresh, aspect }: StepsProps &
             {adds && shown.length === 0 && (
               <span className="pl-night-cell">
                 <span className="pl-add pl-night-add" data-edit="add-night" role="button" tabIndex={0} aria-label={t(ONE_MORE_NIGHT)} title={t(ONE_MORE_NIGHT)}>
-                  ＋
+                  <PlusSign />
+                  <span className="pl-add-text">{t(ONE_MORE_NIGHT)}</span>
                 </span>
               </span>
             )}
@@ -1461,7 +1596,8 @@ function Countdown({ plan, day, ticks, look, edit, fresh, aspect }: StepsProps &
         </div>
       ) : edit ? (
         <span className="pl-big-day pl-add" {...BIG_DAY_EDIT} aria-label={t(BIG_DAY)} title={t(BIG_DAY)}>
-          ＋
+          <PlusSign />
+          <span className="pl-add-text">{t(BIG_DAY)}</span>
         </span>
       ) : (
         <NoSteps />

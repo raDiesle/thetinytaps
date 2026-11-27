@@ -731,6 +731,26 @@
   background: #fff;
 }
 
+/* An empty place's ＋ with its few words under it („Schritt hinzufügen“), both in its middle. */
+.pl-add {
+  align-content: center;
+  gap: 0.3em;
+}
+
+.pl-add > .rw-plus-sign {
+  width: 1.4em;
+  height: 1.4em;
+}
+
+.pl-add-text {
+  max-width: 100%;
+  font-family: var(--font-rounded);
+  font-size: 0.55em;
+  font-weight: 700;
+  line-height: 1.15;
+  text-align: center;
+}
+
 .pl-add.small {
   flex: none;
   aspect-ratio: auto;
@@ -751,6 +771,65 @@
   line-height: 1;
 }
 
+/* While the plan is made: the sign is a tap (its part's signs), ⇄ and 🗑️ under it, in the part's column. */
+.pl-editing .pl-part {
+  --rw-act: clamp(18px, 3.6cqmin, 26px);
+}
+
+.pl-editing .pl-part-sign {
+  cursor: pointer;
+}
+
+.pl-part > .rw-act {
+  position: relative;
+  z-index: 3;
+  top: auto;
+  right: auto;
+  left: auto;
+}
+
+.pl-part:has(> .rw-act-delete:hover) > .pl-part-sign {
+  outline: max(2px, 0.5cqmin) dashed #c62828;
+  outline-offset: 2px;
+  opacity: 0.6;
+}
+
+/* Hidden signs while the plan is made: a pale place for them, a tap brings them back. */
+.pl-part-none {
+  display: inline-flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 0.2em;
+  box-sizing: border-box;
+  width: clamp(2.4rem, 11cqmin, 5rem);
+  aspect-ratio: 1;
+  border: max(2px, 0.6cqmin) dashed color-mix(in srgb, var(--rw-ink) 55%, transparent);
+  border-radius: 1.6cqmin;
+  color: color-mix(in srgb, var(--rw-ink) 70%, transparent);
+  font-size: clamp(0.9rem, 3.4cqmin, 1.6rem);
+  cursor: pointer;
+}
+
+.pl-part-none > .rw-plus-sign {
+  width: 1.1em;
+  height: 1.1em;
+}
+
+.pl-part-none > .pl-add-text {
+  font-size: 0.5em;
+}
+
+.pl-part-none:hover,
+.pl-part-none:focus-visible {
+  background: var(--rw-main);
+  color: var(--rw-ink);
+}
+
+.pl-editing .pl-whead-part {
+  cursor: pointer;
+}
+
 /* A week's row under the mouse on its 🗑️: red, its rings and picture faded. Its parts by name, never `> *` after `:has()`. */
 .pl-wrow:has(.pl-whead > .rw-act-delete:hover) > :is(.pl-whead, .pl-wcell, .pl-wtools),
 .pl-wrow:has(.pl-wtools > .rw-act-delete:hover) > :is(.pl-whead, .pl-wcell, .pl-wtools) {
@@ -768,28 +847,65 @@
   display: none;
 }
 
-/* A card's ⚙️ and 🗑️ in its top corners, sized by the card; it comes forward while its question shows. */
+/*
+ * A card's actions while it is made (user request, 27 November 2026): its 🗑️ is a tab growing out of the card's frame
+ * above its top left corner, in the frame's colour, and ⇄ „Bild austauschen“ sits on the picture's top right corner,
+ * part of the picture (`CardPicture`, `.pl-pic`). Both sized by the card; each comes forward while its question shows.
+ */
 .pl-editing :is(.pl-card, .pl-whead) {
-  --rw-act: clamp(22px, 17cqmin, 38px);
+  --rw-act: clamp(20px, 15cqmin, 32px);
+  --pl-frame: max(2px, 3cqmin);
 }
 
 .pl-editing .pl-card.small {
-  --rw-act: clamp(16px, 24cqmin, 26px);
+  --rw-act: clamp(16px, 22cqmin, 24px);
+  --pl-frame: max(2px, 3cqmin);
 }
 
-.pl-card > .rw-act,
-.pl-whead > .rw-act {
-  top: 3cqmin;
+.pl-editing .pl-whead {
+  --pl-frame: max(2px, 0.6cqmin);
 }
 
-.pl-card > .rw-act-left,
-.pl-whead > .rw-act-left {
-  left: 3cqmin;
+/* The bin's tab: standing on the frame's top edge at its left, the frame's colour round it, no line between them. */
+:is(.pl-card, .pl-whead) > .rw-act-delete {
+  top: auto;
+  bottom: calc(100% + var(--pl-frame));
+  left: calc(10cqmin - var(--pl-frame));
+  height: calc(var(--rw-act) * 0.9);
+  padding-inline: calc(var(--rw-act) * 0.22) calc(var(--rw-act) * 0.34);
+  border: 0;
+  border-radius: calc(var(--rw-act) * 0.36) calc(var(--rw-act) * 0.36) 0 0;
+  background: var(--rw-main);
+  box-shadow: none;
+  color: var(--rw-ink);
 }
 
-.pl-card > .rw-act-right,
-.pl-whead > .rw-act-right {
-  right: 3cqmin;
+.pl-card.now > .rw-act-delete {
+  background: var(--rw-ink);
+  color: #fff;
+}
+
+:is(.pl-card, .pl-whead) > .rw-act-delete:is(:hover, :focus-visible) {
+  background: #c62828;
+  color: #fff;
+}
+
+/* The picture and its ⇄ on its top right corner, a little over its edge, so it reads as the picture's own. */
+.pl-pic {
+  position: relative;
+  display: inline-grid;
+  place-items: center;
+}
+
+.pl-pic-art {
+  display: grid;
+  place-items: center;
+}
+
+.pl-pic > .rw-act {
+  top: calc(var(--rw-act) * -0.3);
+  right: calc(var(--rw-act) * -0.6);
+  font-family: var(--font-rounded);
 }
 
 .pl-editing :is(.pl-card, .pl-whead, .pl-goal):has(.rw-act:hover, .rw-act:focus-visible, .pl-insert:hover, .pl-insert:focus-visible) {
@@ -888,6 +1004,23 @@
   opacity: 0.6;
   translate: -50% 0;
   cursor: pointer;
+}
+
+.pl-star-add {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.15em;
+  line-height: 1;
+}
+
+.pl-star-add > .rw-plus-sign {
+  width: 0.85em;
+  height: 0.85em;
+}
+
+.pl-star-step > .rw-plus-sign {
+  width: 70%;
+  height: 70%;
 }
 
 .pl-star-add:hover,
@@ -1019,9 +1152,10 @@
   box-shadow: inset 0 0 0 max(2px, 0.6cqmin) color-mix(in srgb, var(--rw-main) 80%, transparent);
 }
 
+/* Bottom left, clear of the picture's ⇄ and the row's 🗑️ above it while the plan is made. */
 .pl-whead-part {
   position: absolute;
-  top: 2cqmin;
+  bottom: 2cqmin;
   left: 3cqmin;
   font-family: var(--font-emoji);
   font-size: 26cqmin;
@@ -1551,89 +1685,181 @@
 }
 
 /*
- * ＋ at a card's edge while a plan is made: a new card right there, before it or – at the last card – after it (user
- * feedback, November 2026: WYSIWYG instead of an empty ＋ card keeping a place). Pale until the mouse comes, then a
- * bar along the edge shows where the card will go. It lies over the gap between two cards, so nothing moves.
+ * ＋ „Schritt hinzufügen“ at a card's edge while a plan is made: a new card right there, before it or after it (user
+ * feedback, November 2026: WYSIWYG instead of an empty ＋ card keeping a place). A tab of the card's frame, in its
+ * colour, growing out of its edge (user request, 27 November 2026: merged with the frame, never a loose round button
+ * over the gap): beside a card in a line its words run down the tab, under a card in a column across it. Under the
+ * mouse a bar along the edge shows where the card will go.
  */
 .pl-insert {
+  --pl-frame: max(2px, 3cqmin);
   position: absolute;
   z-index: 3;
-  display: grid;
-  place-items: center;
+  display: flex;
+  align-items: center;
+  gap: 0.35em;
   box-sizing: border-box;
-  width: clamp(20px, 15cqmin, 34px);
-  height: clamp(20px, 15cqmin, 34px);
-  border: 2px solid var(--rw-ink);
-  border-radius: 50%;
-  background: #fff;
+  max-width: 90cqw;
+  max-height: 80cqh;
+  overflow: hidden;
+  padding: 0.5em 0.3em;
+  background: var(--rw-main);
   color: var(--rw-ink);
-  font-size: clamp(13px, 10cqmin, 22px);
-  font-weight: 800;
+  font-family: var(--font-rounded);
+  font-size: clamp(10px, 7cqmin, 14px);
+  font-weight: 700;
   line-height: 1;
-  opacity: 0.45;
-  translate: -50% -50%;
+  white-space: nowrap;
   cursor: pointer;
+}
+
+.pl-card.now > .pl-insert {
+  background: var(--rw-ink);
+  color: #fff;
 }
 
 .pl-insert-row {
   top: 50%;
+  flex-direction: column;
+  translate: 0 -50%;
+}
+
+.pl-insert-row > .pl-insert-text {
+  writing-mode: vertical-rl;
 }
 
 .pl-insert-row.before {
-  left: 0;
+  right: calc(100% + var(--pl-frame));
+  border-radius: 0.6em 0 0 0.6em;
+}
+
+.pl-insert-row.before > .pl-insert-text {
+  rotate: 180deg;
 }
 
 .pl-insert-row.after {
-  left: 100%;
+  left: calc(100% + var(--pl-frame));
+  border-radius: 0 0.6em 0.6em 0;
 }
 
+/* Under a card in a column in its middle; over the first one at its right end, leaving its left to the 🗑️ tab. */
 .pl-insert-column {
   left: 50%;
+  padding: 0.3em 0.5em;
+  font-size: clamp(9px, 6cqmin, 13px);
+  translate: -50% 0;
 }
 
 .pl-insert-column.before {
-  top: 0;
+  right: 4%;
+  left: auto;
+  max-width: 56%;
+  translate: none;
+}
+
+.pl-insert-column.before {
+  bottom: calc(100% + var(--pl-frame));
+  border-radius: 0.6em 0.6em 0 0;
 }
 
 .pl-insert-column.after {
-  top: 100%;
+  top: calc(100% + var(--pl-frame));
+  border-radius: 0 0 0.6em 0.6em;
+}
+
+/* A counting week's row heads while it is made: the rows part a tab's height, so the 🗑️ tab of a row (left) and the
+   ＋ tab under the row above (right) share that gap side by side, never covered by the next row. */
+.pl-editing .pl-wgrid {
+  row-gap: clamp(22px, 3.4cqw, 34px);
+}
+
+.pl-whead > .pl-insert-column {
+  right: 4%;
+  left: auto;
+  max-width: 56%;
+  translate: none;
+}
+
+/* A low card in a line keeps only the ＋ of its tab beside it, its words in the tooltip (a phone on its side). */
+@container (max-height: 150px) {
+  .pl-card > .pl-insert-row > .pl-insert-text {
+    display: none;
+  }
+}
+
+/* A narrow row head keeps only the ＋ of its tab, its words in the tooltip: cut to „Schri…“ they said nothing. */
+@container (max-width: 200px) {
+  .pl-whead > .pl-insert > .pl-insert-text {
+    display: none;
+  }
+}
+
+.pl-insert-sign {
+  display: grid;
+  flex: none;
+  place-items: center;
+  width: 1.3em;
+  height: 1.3em;
+  border-radius: 50%;
+  background: #fff;
+  color: var(--rw-ink);
+  font-size: 1.1em;
+}
+
+.pl-insert-sign > .rw-plus-sign {
+  width: 0.8em;
+  height: 0.8em;
+}
+
+.pl-insert-text {
+  overflow: hidden;
+  text-overflow: ellipsis;
 }
 
 .pl-insert:hover,
 .pl-insert:focus-visible {
-  background: var(--rw-main);
-  opacity: 1;
+  background: var(--rw-ink);
+  color: #fff;
 }
 
-/* The bar: where the new card goes, along the card's edge. */
-.pl-insert::before {
+/* The bar: where the new card goes, along the card's edge – a blue caret, as where text goes in, seen on any card's
+   border, which is drawn in the chart's own colours. The card draws it while its tab is under the mouse. */
+.pl-editing .pl-card:has(> .pl-insert:is(:hover, :focus-visible))::after {
   position: absolute;
-  z-index: -1;
-  top: 50%;
-  left: 50%;
+  z-index: 2;
   border-radius: 999px;
-  /* A blue caret, as where text goes in: seen on any card's border, which is drawn in the chart's own colours. */
   background: #1c7ed6;
   box-shadow: 0 0 0 2px #fff;
   content: "";
-  opacity: 0;
-  translate: -50% -50%;
   pointer-events: none;
 }
 
-.pl-insert-row::before {
+.pl-editing .pl-card:has(> .pl-insert-row.after:is(:hover, :focus-visible))::after {
+  top: 5%;
+  right: calc(-1 * var(--pl-frame) - 4px);
   width: 5px;
-  height: 90cqh;
+  height: 90%;
 }
 
-.pl-insert-column::before {
-  width: 90cqw;
+.pl-editing .pl-card:has(> .pl-insert-row.before:is(:hover, :focus-visible))::after {
+  top: 5%;
+  left: calc(-1 * var(--pl-frame) - 4px);
+  width: 5px;
+  height: 90%;
+}
+
+.pl-editing .pl-card:has(> .pl-insert-column.after:is(:hover, :focus-visible))::after {
+  bottom: calc(-1 * var(--pl-frame) - 4px);
+  left: 5%;
+  width: 90%;
   height: 5px;
 }
 
-.pl-insert:hover::before,
-.pl-insert:focus-visible::before {
-  opacity: 1;
+.pl-editing .pl-card:has(> .pl-insert-column.before:is(:hover, :focus-visible))::after {
+  top: calc(-1 * var(--pl-frame) - 4px);
+  left: 5%;
+  width: 90%;
+  height: 5px;
 }
 
 /* No reward until one is chosen, and no room kept for it: only this small tag in the heading while it is made – on a
@@ -1656,6 +1882,9 @@
 
 .pl-reward-add,
 .rw-reward-add {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.3em;
   padding: 0.2em 0.8em;
   border: max(2px, 0.4cqmin) dashed var(--rw-ink);
   border-radius: 999px;
@@ -1665,6 +1894,11 @@
   white-space: nowrap;
   opacity: 0.7;
   cursor: pointer;
+}
+
+:is(.pl-reward-add, .rw-reward-add) > .rw-plus-sign {
+  width: 1.1em;
+  height: 1.1em;
 }
 
 .pl-reward-add:hover,

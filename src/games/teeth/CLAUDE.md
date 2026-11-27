@@ -47,16 +47,17 @@ late in the video. A new thing shown beside the picture (a control, a chart, a b
 - The gum always runs into the lips: never a strip or wedge of the mouth's dark between gum and lips, from the front
   or the side (user feedback, November 2026). Round the teeth lies the inside of the cheek, and dark only between the
   rows of an open mouth; a new part of the mouth keeps it so (`jaw.test.ts` checks the gum's walls in every step).
-  Beside the last teeth of the open mouth the cheek is stretched from the upper row to the lower like a band, taut and
-  only a little round (`CHEEK_INSIDE`, a pink a little darker than the gum): the dark is one rounded outline round the
-  two rows' chewing surfaces, bulging out a little beside the last teeth (`CAVITY_BULGE`, `CAVITY_ROUND` in
-  `cavityPath`). An opening that went on round to the lips, with folds of cheek drawn over the gum's end, left a gap
+  Beside the last teeth of the open mouth the cheek is stretched from the upper row to the lower like a band, taut
+  (`CHEEK_INSIDE`, a pink a little darker than the gum): the dark is the straight outline round the two rows' chewing
+  surfaces with only its corners rounded (`CAVITY_ROUND` in `cavityPath`) – a bulge out beside the last teeth looked
+  slack and was taken out again (user feedback, November 2026; `stains.test.ts`). An opening that went on round to the lips, with folds of cheek drawn over the gum's end, left a gap
   between the rows that looked very strange and was taken out again (user feedback, November 2026): never draw the
   dark from the lips nor folds over the gum (`stains.test.ts`).
 - On the tongue side the gum's edge is one smooth arc along the whole row, rounded like a bow, never papillae rising
-  between the teeth (`innerGumAt`, `INNER_GUM_LINE` in `jaw.ts`): seen from above, where the gum meets the palate or
-  the tongue, the papillae stood up as odd spikes (user feedback, November 2026; `jaw.test.ts`). The papillae stay on
-  the cheek side, where they show the teeth growing out of the gum.
+  between the teeth (`innerGumAt`, `INNER_GUM_LINE` in `jaw.ts`): where the gum met the palate or the tongue, the
+  papillae stood up as odd spikes (user feedback, November 2026; `jaw.test.ts`). The papillae stay on the cheek side,
+  where they show the teeth growing out of the gum; the tongue side's gum shows only where it is brushed (see
+  `lipSideOnly` below).
 - The inside of an open mouth looks natural and soft, never a flat dark hole (user feedback, November 2026; the look
   „natürlich weich“ picked by the user from four drawn side by side): at the back the throat, darkest in its middle,
   with the soft palate arching over it and the uvula hanging from its middle; the tongue in soft pinks with no hard
@@ -69,6 +70,13 @@ late in the video. A new thing shown beside the picture (a control, a chart, a b
   drawn as big as the front teeth the row ran down the sides like a flat horseshoe (user feedback, November 2026). The
   front teeth keep their size and the effect grows with the tip, so nothing jumps as a jaw starts to tip
   (`jaw.test.ts`).
+  Yet it lies flat, never a deep U: its back teeth rise above the front teeth only a little (`TIPPED_FLATTEN`) and bend
+  in only a little across (`TIPPED_ACROSS`), so the row reaches out towards the lips' corners with no wide band of
+  cheek beside it (user feedback, November 2026; `jaw.test.ts`).
+- A row tipped to show its chewing surfaces shows its gum only on the cheek side and between its crowns: never a band of
+  gum between the lower teeth and the tongue, nor above the upper ones' tongue side, which looked like a second row
+  (`lipSideOnly` in `jaw.ts`, user feedback, November 2026). The inner steps, which brush the tongue side, keep that
+  gum (`jaw.test.ts`).
 - The brush's foam is faint and varied (user feedback, November 2026: even white balls with a thick blue ring were too
   loud): small clumps, clear bubbles with a light and tiny dots, of different sizes, with a pale edge, and slightly
   see-through (`FOAM`, `FoamFleck` in `brush.tsx`; `brush.test.ts`). Never a row of equal balls, never so much that it hides
