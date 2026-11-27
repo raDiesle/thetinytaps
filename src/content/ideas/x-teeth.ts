@@ -20,6 +20,7 @@ export const teethIdeas: IdeaArea = {
       text: "Vor dem eigenen Putzen putzt das Kind einem Dino, Krokodil oder Teddy die Zähne: Wischen schrubbt die Zuckermonster weg, der Dino lacht mit blitzblanken Zähnen. Dann ist das Kind selbst dran.",
       why: "Kinder, die sich nicht putzen lassen wollen, machen es oft erst bei anderen gern.",
       effort: "M",
+      rejected: true,
     },
     {
       id: "X-02",
@@ -53,6 +54,7 @@ export const teethIdeas: IdeaArea = {
       text: "Nach dem gesungenen Putzen und vor dem Ausspülen kommt ein kurzer, ruhiger Teil (etwa 30 Sekunden, eine leise Melodie im Takt des Lieds): im Spiegel greift eine große Hand mit der Zahnbürste von der Seite ins Bild und fährt noch einmal sanft über alle Zähne, Seite für Seite, der Mund bleibt weit offen. Die Stimme sagt am Anfang einmal: „Jetzt putzt Mama oder Papa nach.“ Läuft wie alles nach der Uhr, ist auf der Leiste ein eigener Abschnitt und lässt sich überspringen.",
       why: "Zahnärzte raten, bei Kleinkindern immer nachzuputzen, bis das Kind etwa im Schulalter selbst gründlich putzt (Empfehlung der Kinderzahnärzte; vor dem Umsetzen nachlesen, bis zu welchem Alter genau). Heute endet das Spiel, wenn das Kind fertig ist – genau dann, wenn die Eltern dran wären. Das Spiel macht das Nachputzen zu einem selbstverständlichen Teil des Ablaufs statt zu einem Streit danach.",
       effort: "M",
+      rejected: true,
     },
     {
       id: "X-18",
@@ -83,6 +85,7 @@ export const teethIdeas: IdeaArea = {
       text: "Jedes Zuckermonster trägt die Farbe und ein kleines Merkmal der Süßigkeit, aus deren Krümeln es gewachsen ist: braun mit Schokostückchen, rot-weiß geringelt vom Lolli, bunt gepunktet vom Gummibärchen. Im Spiegel sitzen dieselben Monster wieder auf den Zähnen.",
       why: "Verbindet die Geschichte vom Anfang sichtbar mit dem Putzen: „Da ist ja das Lolli-Monster!“ – Kinder erkennen wieder und erzählen mit.",
       effort: "S",
+      rejected: true,
     },
     {
       id: "X-21",
@@ -107,6 +110,7 @@ export const teethIdeas: IdeaArea = {
       text: "Eine Art zu spielen ohne Bildschirm: das Zahnputzlied läuft, der Bildschirm wird dunkel und zeigt nur noch einen schlichten Fortschritt (die sieben Schritte als kleine Zähne, die nacheinander weiß werden), damit das Tablet vor der Badezimmertür liegen kann. Das Kind putzt am echten Waschbecken vor dem echten Spiegel, das Lied sagt die Schritte. Am Ende klebt der Stern wie sonst.",
       why: "Passt zu dem, was wir Eltern sagen („erst die echte Welt“): das Spiel bringt das Putzen bei und kann sich dann selbst zurücknehmen. Viele Eltern wollen kein Tablet im Bad.",
       effort: "M",
+      rejected: true,
     },
     {
       id: "X-24",
@@ -115,6 +119,7 @@ export const teethIdeas: IdeaArea = {
       text: "Statt des gezeichneten Gesichts zeigt der Spiegel das Kind selbst über die Frontkamera, und die Zuckermonster sitzen über seinem eigenen Mund, wo gerade geputzt wird; eine wischt weg, sobald der Schritt vorbei ist. Nichts wird gespeichert oder gesendet. Die Kamera würde nur auf Wunsch der Eltern eingeschaltet und bräuchte einen Absatz in der Datenschutzerklärung.",
       why: "Kinder schauen sich am liebsten selbst an, und das echte Putzen und das Spiel wären eins. Aber: die Kamera ist für viele Eltern heikel, und der Mund wird nicht wirklich erkannt – eher eine Frage zum Entscheiden als eine sichere Sache.",
       effort: "L",
+      rejected: true,
     },
     {
       id: "X-25",
@@ -123,6 +128,7 @@ export const teethIdeas: IdeaArea = {
       text: "Putzen zwei Kinder gleichzeitig, tippt ein Großer am Ende auf die beiden Sticker vom Regal (Fuchsmädchen und Bärenjunge), und jedes Kind bekommt seinen Stern in einer eigenen Wochenreihe. Sonst bleibt alles gleich: ein Lied, ein Spiegel.",
       why: "Mit Geschwistern putzt man abends meist zusammen; heute bekommt nur einer den Stern, und darüber gibt es Streit.",
       effort: "M",
+      rejected: true,
     },
     {
       id: "X-26",
@@ -142,6 +148,7 @@ export const teethIdeas: IdeaArea = {
       text: "Das Zahnputzlied gibt es ein zweites Mal als ruhige Abendfassung: gleiche Verse, gleiche Länge und gleiche Schritte, aber langsamer gesungen, weicher, fast wie ein Schlaflied, und das Finale „Fertig! Blitzeblank“ leise statt jubelnd. Abends (nach der Uhr, wie schon das Mondbild) läuft sie von selbst, morgens das fröhliche. Gemacht wie das Zahnputzlied (/zahnputzlied); kostet Suno-Lieder in jeder Sprache.",
       why: "Abends ist Zähneputzen der letzte Schritt vor dem Bett. Ein munteres Lied mit Jubel am Ende dreht viele Kinder noch einmal auf, gerade wenn danach Ruhe kommen soll.",
       effort: "M",
+      rejected: true,
     },
     {
       id: "X-28",
@@ -150,6 +157,7 @@ export const teethIdeas: IdeaArea = {
       text: "Das Spiel merkt sich, seit wann geputzt wird. Nach etwa drei Monaten stehen die Borsten der Bürste im Becher am Waschbecken zerzaust ab, ganz ohne Worte. Hält ein Großer die Bürste im Becher am Ende ein paar Sekunden, ist sie wieder neu, und die drei Monate beginnen von vorn.",
       why: "Empfohlen wird, die Zahnbürste etwa alle drei Monate zu tauschen, und daran denkt kaum jemand. Das Bild erinnert die Eltern, ohne dass dem Kind etwas zu lesen hingestellt wird – und das Kind sieht, warum die Bürste neu muss.",
       effort: "S",
+      rejected: true,
     },
     {
       id: "X-29",
@@ -166,6 +174,7 @@ export const teethIdeas: IdeaArea = {
       text: "Sind im Wochenplan alle vierzehn Plätze voll (jeden Tag morgens und abends), überreicht das Ende neben dem gewöhnlichen Pokal einmal einen eigenen, etwa einen silbernen Becher mit einer Zahnbürste darin. Er steht im Pokalzimmer bei Zähne putzen und zählt wie die anderen, wie oft er gewonnen wurde („3×“).",
       why: "Der Pokal für ein einzelnes Putzen ist nach ein paar Tagen nichts Besonderes mehr. Ein Pokal für die volle Woche belohnt genau das, worum es geht: jeden Tag zweimal. Und er nutzt das Pokalsystem, das es schon gibt, statt etwas Neues zum Sammeln.",
       effort: "S",
+      rejected: true,
     },
     {
       id: "X-31",
@@ -185,6 +194,7 @@ export const teethIdeas: IdeaArea = {
       text: "Ein Großer tippt einmal hinter ⚙️ auf einem kleinen Gebiss an, welche Milchzähne schon da sind (vom ersten Schneidezahn bis zu allen zwanzig). Der Spiegel zeigt dann genau diese Zähne, die anderen Plätze sind Zahnfleisch, und Schritte ohne Zähne (etwa die Kauflächen hinten, solange keine Backenzähne da sind) werden kurz. Gegen den Grundsatz, keine Einstellungen hinzuzufügen – nur umsetzen, wenn Eltern von Kindern unter zwei es wollen.",
       why: "Ein Baby mit acht Zähnen sieht im Spiegel ein volles Gebiss, das es nicht hat. Mit den eigenen Zähnen wird das Spiel für die ganz Kleinen „mein Mund“ – und Eltern suchen nach einem „Zahnungs-Tagebuch“, das sich nebenbei ergäbe.",
       effort: "L",
+      rejected: true,
     },
     {
       id: "X-33",
@@ -209,6 +219,7 @@ export const teethIdeas: IdeaArea = {
       text: "Eine Recherche unter /management/recherchen/: die Empfehlungen der deutschen Fachgesellschaften (Kinderzahnheilkunde, Kinderärzte) und der Krankenkassen zum Putzen bei Kleinkindern – Zahnpastamenge nach Alter, Fluorid, Nachputzen bis zu welchem Alter, Ausspucken statt Ausspülen, wie lange und wie oft, Handzahnbürste oder elektrisch, erster Zahnarztbesuch – aus den Leitlinien selbst gelesen. Dann Schritt für Schritt neben das Spiel gelegt: was es richtig zeigt, was es falsch vormacht, und welche der offenen Ideen (X-17, X-18, X-22, X-34) damit wichtig werden.",
       why: "Kinder machen nach, was sie im Spiel sehen, und Eltern verlassen sich darauf. Mehrere offene Ideen hängen an Empfehlungen, die bisher nur aus dem Gedächtnis stehen („vor dem Umsetzen nachlesen“) – einmal sauber nachgelesen, ist klar, was zuerst kommt.",
       effort: "S",
+      rejected: true,
     },
   ],
 };
