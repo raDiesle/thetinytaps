@@ -90,6 +90,20 @@ export function TeethGame() {
                 onChange={() => {}}
               />
               <Toggle
+                icon={<PhaseIcon name="spucken" />}
+                label={t({
+                  en: "Spitting out the foam",
+                  de: "Schaum ausspucken",
+                  zh: "把泡沫吐出来",
+                  hi: "झाग थूकना",
+                  es: "Escupir la espuma",
+                  ar: "بصق الرغوة",
+                  ru: "Выплёвываем пену",
+                })}
+                checked={settings.spit}
+                onChange={(spit) => update({ spit })}
+              />
+              <Toggle
                 icon={<PhaseIcon name="becher" />}
                 label={t({
                   en: "Putting the brush away",

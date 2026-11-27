@@ -22,8 +22,8 @@ import { Mouth, type MonsterSpot, type MouthAction } from "./mouth";
 import { dirtyFaces } from "./stains";
 import { SUNG_LANGUAGES, songEndMs, sungSteps, useBrushingMusic, useSongLoad } from "./music";
 import type { Cue } from "./cues";
-import { DONE_SAY, type Prelude, PRELUDE_TEXTS, TIDY_SAY } from "./lines";
-import { Lion, LION_INTRO_MS, LION_RECORDINGS, ROAR_CUES, ROARING_MS } from "./lion";
+import { DONE_SAY, LION_CALLS, type Prelude, PRELUDE_TEXTS, SPIT_TITLE, TIDY_SAY } from "./lines";
+import { CALL_MS, Lion, LION_MS, LION_RECORDINGS, ROAR_CUES } from "./lion";
 import { Origin, ORIGIN_CUES, ORIGIN_MS, ORIGIN_RECORDINGS } from "./origin";
 import { Scenes, type SceneKind } from "./scenes";
 import { Prep, PREP_CUES, PREP_MS, PREP_RECORDINGS, TIDY_RECORDINGS } from "./prep";
@@ -68,15 +68,16 @@ const BEAT_MS = 60000 / 112;
  */
 const MONSTERS_MS = 9 * BEAT_MS;
 /**
- * After the brushing: two bars of cheering at the clean grin, two of spitting the foam out over the basin (X-18: only
- * spitting, no rinsing of the mouth), then the brush is rinsed and put away, then the buttons. Putting the brush away
- * left out behind ⚙️ leaves out the spitting and the rinsing with it: the cheer, then the buttons.
+ * After the brushing: two bars of cheering at the clean grin, then two of spitting the foam out over the basin (X-18:
+ * only spitting, no rinsing of the mouth), then the brush is rinsed and put away, then the buttons. Spitting is a phase
+ * of its own after the song, and it and putting the brush away are each left out behind ⚙️ on their own (user request,
+ * November 2026): with both left out the cheer leads straight to the buttons.
  */
 const CHEER_MS = 4290;
-/** When the brush is rinsed, in ms after the brushing. */
-const TIDY_FROM = CHEER_MS + SPIT_MS;
-/** How long the end runs before the buttons: the cheer, and the spitting and tidying where putting the brush away is shown. */
-const endingOf = (tidy: boolean) => (tidy ? TIDY_FROM + PREP_MS.tidy : CHEER_MS);
+/** When the brush is rinsed, in ms after the brushing: after the cheer, and the spitting where it is shown. */
+const tidyFrom = (spit: boolean) => CHEER_MS + (spit ? SPIT_MS : 0);
+/** How long the end runs before the buttons: the cheer, then the spitting and the tidying where each is shown. */
+const endingOf = (spit: boolean, tidy: boolean) => (tidy ? tidyFrom(spit) + PREP_MS.tidy : tidyFrom(spit));
 /** On the dev server ← and → jump the clock this far back or on, anywhere in the game (user request, November 2026). */
 const DEV_SKIP_MS = 5000;
 /** A video recording ends at least this long after the brush is put away, so the last grin stays a moment. */
@@ -110,9 +111,8 @@ export const PRELUDE: Record<Prelude, { ms: number; title: Texts; cue?: Texts; s
   grow: { ...PRELUDE_TEXTS.grow, ms: ORIGIN_MS.grow },
   brush: { ...PRELUDE_TEXTS.brush, ms: PREP_MS.brush, sounds: PREP_CUES.brush },
   paste: { ...PRELUDE_TEXTS.paste, ms: PREP_MS.paste, sounds: PREP_CUES.paste },
-  // The lion's scene runs through both parts: the lion's, then the roaring's with its marks and roars.
-  lion: { ...PRELUDE_TEXTS.lion, ms: LION_INTRO_MS },
-  roar: { ...PRELUDE_TEXTS.roar, ms: ROARING_MS, sounds: ROAR_CUES },
+  // The lion and roaring with it, one part (its calls before each roar are said by TeethPlay, `lionCalls`).
+  lion: { ...PRELUDE_TEXTS.lion, ms: LION_MS, sounds: ROAR_CUES },
   // The countdown's 3, 2, 1 are the last seconds of the prelude, so they follow the look in the mirror here.
   monsters: { ...PRELUDE_TEXTS.monsters, ms: MONSTERS_MS + COUNTDOWN * 1000 },
 };
@@ -226,7 +226,6 @@ const preludeOf = ({ origin, prep }: TeethSettings): Prelude[] => [
   ...(origin ? (["sweets", "grow"] as const) : []),
   ...(prep ? (["brush", "paste"] as const) : []),
   "lion",
-  "roar",
   "monsters",
 ];
 
@@ -252,16 +251,16 @@ function preludeAt(prelude: Prelude[], elapsed: number): Prelude {
   return prelude[prelude.length - 1];
 }
 
-/** The phases of the routine the bar shows apart: eating, getting the brush, the lion, roaring with it, brushing, putting the brush away. */
-type BarPhase = "eat" | "fetch" | "lion" | "roar" | "tidy";
+/** The phases of the routine the bar shows apart: eating, getting the brush, roaring with the lion, brushing, spitting, putting the brush away. */
+type BarPhase = "eat" | "fetch" | "lion" | "spit" | "tidy";
 
 /** The symbol of each phase on the bar; the brushing has its frame with the riding brush and the clean tooth instead. */
-const PHASE_SYMBOL: Record<BarPhase, TeethSymbol> = { eat: "bonbon", fetch: "zahnpasta", lion: "loewe", roar: "bruellen", tidy: "becher" };
+const PHASE_SYMBOL: Record<BarPhase, TeethSymbol> = { eat: "bonbon", fetch: "zahnpasta", lion: "bruellen", spit: "spucken", tidy: "becher" };
 
 /**
- * The prelude's parts as the bar's tiles before the brushing: the story is eating, the sink is getting the brush, the
- * lion has the lion's symbol, and roaring with it is a phase of its own with the roaring lion's (user requests, November
- * 2026), the look in the mirror with the mouth open and 3, 2, 1 at its end.
+ * The prelude's parts as the bar's tiles before the brushing: the story is eating, the sink is getting the brush, and
+ * the lion with roaring is one phase with the roaring lion's symbol (user requests, November 2026: the lion's and the
+ * roaring's two phases became one), the look in the mirror with the mouth open and 3, 2, 1 at its end.
  */
 export function preludeTiles(prelude: Prelude[]): { phase: BarPhase; parts: Prelude[] }[] {
   const tiles: { phase: BarPhase; parts: Prelude[] }[] = [];
@@ -269,7 +268,7 @@ export function preludeTiles(prelude: Prelude[]): { phase: BarPhase; parts: Prel
   const fetch = prelude.filter((p) => p === "brush" || p === "paste");
   if (eat.length) tiles.push({ phase: "eat", parts: eat });
   if (fetch.length) tiles.push({ phase: "fetch", parts: fetch });
-  tiles.push({ phase: "lion", parts: ["lion"] }, { phase: "roar", parts: ["roar", "monsters"] });
+  tiles.push({ phase: "lion", parts: ["lion", "monsters"] });
   return tiles;
 }
 
@@ -359,9 +358,13 @@ export function TeethPlay({ settings, video, options }: { settings: TeethSetting
   // on at the end never brings the tidying back after the buttons.
   const [tidy, setTidy] = useState(settings.tidy);
   if (!done && tidy !== settings.tidy) setTidy(settings.tidy);
-  const endingMs = endingOf(tidy);
+  // Spitting likewise.
+  const [spit, setSpit] = useState(settings.spit);
+  if (!done && spit !== settings.spit) setSpit(settings.spit);
+  const endingMs = endingOf(spit, tidy);
+  const tidyAt = tidyFrom(spit);
   const after = brushed - totalMs;
-  const ending: Ending | null = !done ? null : after >= endingMs ? "rest" : after < CHEER_MS ? "cheer" : after < TIDY_FROM ? "spit" : "tidy";
+  const ending: Ending | null = !done ? null : after >= endingMs ? "rest" : after < CHEER_MS ? "cheer" : after < tidyAt ? "spit" : "tidy";
   /** -1 during the prelude, STEPS.length when done. */
   const phase = brushed < 0 ? -1 : done ? STEPS.length : stepStarts.filter((at, k) => k < STEPS.length && brushed >= at).length - 1;
   const before = brushed < 0 ? preludeAt(prelude, elapsed) : null;
@@ -419,17 +422,23 @@ export function TeethPlay({ settings, video, options }: { settings: TeethSetting
     ]);
   }, [settings.origin, settings.prep]);
 
-  // The sounds of the story, the sink, spitting and tidying up, each when the clock passes its moment; none of those a jump skips over.
+  /** The voice's call before each round of roaring with the lion, said when the clock passes it (queued after a line still said). */
+  const lionCalls = useMemo((): Cue[] => CALL_MS.map((at, k) => ({ at, play: () => say(spokenIn(LION_CALLS[k], language), true) })), [say, language]);
+
+  // The sounds of the story, the sink, the lion, spitting and tidying up, each when the clock passes its moment; none of those a jump skips over.
   const lastElapsed = useRef(elapsed);
   useEffect(() => {
     const from = lastElapsed.current;
     lastElapsed.current = elapsed;
     const sounds = before
-      ? { start: preludeStart(prelude, before), cues: before === "sweets" ? ORIGIN_CUES : (PRELUDE[before].sounds ?? []) }
+      ? {
+          start: preludeStart(prelude, before),
+          cues: before === "sweets" ? ORIGIN_CUES : before === "lion" ? [...ROAR_CUES, ...lionCalls] : (PRELUDE[before].sounds ?? []),
+        }
       : ending === "spit"
         ? { start: introMs + totalMs + CHEER_MS, cues: SPIT_CUES }
         : ending === "tidy"
-          ? { start: introMs + totalMs + TIDY_FROM, cues: PREP_CUES.tidy }
+          ? { start: introMs + totalMs + tidyAt, cues: PREP_CUES.tidy }
           : null;
     if (!sounds || elapsed <= from || elapsed - from > CUE_GAP_MS) return;
     for (const cue of sounds.cues) if (sounds.start + cue.at > from && sounds.start + cue.at <= elapsed) cue.play();
@@ -451,8 +460,7 @@ export function TeethPlay({ settings, video, options }: { settings: TeethSetting
   // What to say and play when a new part begins.
   useEffect(() => {
     if (before) {
-      // The roaring goes on in the lion's scene: no chime, the voice asks to roar along.
-      if (part > 0 && before !== "roar") playChime();
+      if (part > 0) playChime();
       if (part === 0) say(daytimeText(daytime, "hello", language));
       const line = preludeCue(before);
       if (line) say(line, part === 0);
@@ -564,13 +572,12 @@ export function TeethPlay({ settings, video, options }: { settings: TeethSetting
   // on. Each of their animations belongs to the part shown (`at-<part>`), so all of them are set to where the clock is in it.
   useLayoutEffect(() => {
     // Spitting and the sink at the end (tidying up) are such parts too, reached from the bar's last part.
-    // The lion's scene runs through both its parts, so its animations count from the lion's start.
     const into = before
-      ? elapsed - preludeStart(prelude, before === "roar" ? "lion" : before)
+      ? elapsed - preludeStart(prelude, before)
       : ending === "spit"
         ? brushed - totalMs - CHEER_MS
         : ending === "tidy"
-          ? brushed - totalMs - TIDY_FROM
+          ? brushed - totalMs - tidyAt
           : null;
     if (!jumps || into === null) return;
     const picture = stage.current?.querySelector(":scope > .teeth-scene:last-child :is(.origin, .prep, .lion-scene, .spit)");
@@ -593,9 +600,11 @@ export function TeethPlay({ settings, video, options }: { settings: TeethSetting
   const tiles = preludeTiles(prelude);
   const tileParts: [number, number][] = tiles.map(({ parts }) => [preludeStart(prelude, parts[0]), parts.reduce((sum, p) => sum + PRELUDE[p].ms, 0)]);
   const stepParts = STEPS.map((_, k): [number, number] => [introMs + stepStarts[k], stepLength(k)]);
-  const tidyPart: [number, number] = [introMs + totalMs, endingMs];
-  /** Every `.teeth-segment` of the bar in its order, as tapping and dragging find them; putting the brush away only where it is shown. */
-  const segments: [number, number][] = [...tileParts, ...stepParts, ...(tidy ? [tidyPart] : [])];
+  // The end's phases after the song: the cheer goes with the first one shown, spitting or putting the brush away.
+  const spitPart: [number, number] = [introMs + totalMs, tidyAt];
+  const tidyPart: [number, number] = spit ? [introMs + totalMs + tidyAt, PREP_MS.tidy] : [introMs + totalMs, endingMs];
+  /** Every `.teeth-segment` of the bar in its order, as tapping and dragging find them; spitting and putting the brush away only where shown. */
+  const segments: [number, number][] = [...tileParts, ...stepParts, ...(spit ? [spitPart] : []), ...(tidy ? [tidyPart] : [])];
   /** How far through a part the clock is, 0 to 1. */
   const share = ([start, length]: [number, number]) => Math.max(0, Math.min(1, (elapsed - start) / length));
 
@@ -691,7 +700,7 @@ export function TeethPlay({ settings, video, options }: { settings: TeethSetting
         ? "sink"
         : ending === "spit"
           ? "spit"
-          : before === "lion" || before === "roar"
+          : before === "lion"
             ? "lion"
             : "mirror";
   const target = roaring ? ROAR_VIEW : (step?.view ?? GRIN_VIEW);
@@ -833,9 +842,11 @@ export function TeethPlay({ settings, video, options }: { settings: TeethSetting
                 </div>
                 <BarSymbol name="zahn" />
               </div>
-              {/* After the brushing: the cheer at the clean teeth, spitting the foam out, then the brush rinsed and put back in
-                  its cup – unless left out behind ⚙️, when the cheer ends the brushing's frame at its clean tooth. */}
-              {tidy && <PhaseTile phase="tidy" now={ending !== null} done={share(tidyPart)} title={t(TIDY_SAY)} />}
+              {/* After the brushing: the cheer at the clean teeth and spitting the foam out, a phase of its own, then the brush
+                  rinsed and put back in its cup – each unless left out behind ⚙️; with both left out the cheer ends the
+                  brushing's frame at its clean tooth. */}
+              {spit && <PhaseTile phase="spit" now={ending === "cheer" || ending === "spit"} done={share(spitPart)} title={t(SPIT_TITLE)} />}
+              {tidy && <PhaseTile phase="tidy" now={ending === "tidy" || (!spit && ending === "cheer")} done={share(tidyPart)} title={t(TIDY_SAY)} />}
             </div>
             {/* For the grown-up, only where the screen is wide enough (teeth.css): before the brushing the time until it
                 starts, then the brushing time left – two clocks in one place. */}

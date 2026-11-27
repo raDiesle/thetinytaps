@@ -61,7 +61,16 @@ test("the stain of a tooth being brushed fades as an HTML layer of its own", () 
   const stain = mouth.slice(mouth.indexOf("const ToothStain"));
   expect(stain).not.toContain("<filter");
   // The still picture is built anew only when a step's teeth are done, never with every tick while they are brushed.
-  expect(mouth).toMatch(/\}, \[view, all, model, painted, lipPoints, lipsPath, stillDirty, stillFoam, side, happy, folds\]\);/);
+  expect(mouth).toMatch(/\}, \[view, all, model, painted, lipPoints, lipsPath, stillDirty, stillFoam, side, happy\]\);/);
+});
+
+// Beside the last teeth of the open mouth the cheek is stretched from the upper row to the lower, taut and a little
+// round: an opening that went on round to the lips, with folds of cheek over the gum's end, left an odd gap between the
+// rows (user feedback, November 2026). So the opening is drawn round the rows alone, never from the lips.
+test("the open mouth's dark lies between the rows, never round to the lips", () => {
+  expect(mouth).toMatch(/function cavityPath\(model: MouthModel, all: ReturnType<typeof projectors>\): string/);
+  expect(mouth).not.toContain("cheekFold");
+  expect(mouth).not.toMatch(/const CHEEK_INSIDE = GUM_FILLS/);
 });
 
 test("in the story the sugar stains the teeth while the monsters grow, as a layer of its own", () => {

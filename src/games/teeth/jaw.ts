@@ -92,8 +92,6 @@ const GUM = 18;
  * always runs into the lips with no dark gap between them, seen from the front or the side (user feedback, November 2026).
  */
 const GUM_CHEEK = 110;
-/** How far (degrees along the arch) the gum goes on behind the last molar, rounding off up to the chewing plane. */
-const GUM_BEHIND = 10;
 const SAMPLES = 4;
 /**
  * The gum line, as a share of the tooth's height from its base: the gum
@@ -187,13 +185,8 @@ function sweep(side: Side, from: number, to: number, samples = SAMPLES) {
 function gumLine(n: number, t: number) {
   const spec = TEETH[n];
   const s = (t - spec.from) / (spec.to - spec.from);
-  // Behind the last molar the gum rounds off up to the chewing plane, so the two jaws' gums meet there in a curve
-  // that runs into the lips' corner: cut off straight behind the tooth, the cheek between looked like a stretched
-  // strip (user feedback, November 2026).
-  if (s > 1 && n === TEETH.length - 1) {
-    const k = Math.min(1, (t - spec.to) / GUM_BEHIND);
-    return GUM_LINE.middle + (1 - GUM_OVERLAP - GUM_LINE.middle) * Math.sqrt(1 - (1 - k) ** 2);
-  }
+  // Behind the last molar the gum goes down again.
+  if (s > 1 && n === TEETH.length - 1) return GUM_LINE.middle;
   if (s <= 0 || s >= 1) return GUM_LINE.papilla[n];
   return GUM_LINE.papilla[n] - (GUM_LINE.papilla[n] - GUM_LINE.middle) * Math.sin(Math.PI * s) ** 0.7;
 }
@@ -244,21 +237,16 @@ function buildGum(jaw: Jaw, side: Side, n: number, open: number): GumPiece {
   const { top, base, dir } = levels(jaw, n, open);
   const next = TEETH[n + 1];
   // Reach halfway into the gap to the next tooth so the gum has no holes.
-  const to = next ? (spec.to + next.from) / 2 + 0.5 : spec.to + GUM_BEHIND;
+  const to = next ? (spec.to + next.from) / 2 + 0.5 : spec.to + 4;
   const from = n === 0 ? 0 : (TEETH[n - 1].to + spec.from) / 2 - 0.5;
-  // More points than a tooth has, so the gum line arches smoothly up between the teeth (and round behind the last).
-  const angles = sweep(side, from, to, (next ? 4 : 6) * SAMPLES);
+  // More points than a tooth has, so the gum line arches smoothly up between the teeth.
+  const angles = sweep(side, from, to, 4 * SAMPLES);
   const bottom = base - dir * GUM;
   const rim = (t: number) => base + (top - base) * (gumLine(n, Math.abs(t)) + GUM_OVERLAP);
-  // Behind the last molar the gum narrows and its walls shorten to its rim along a quarter circle, so its end is
-  // round from every side, never cut off straight (`gumLine` rounds its rim up there).
-  const round = (t: number) => (next ? 1 : Math.sqrt(1 - Math.min(1, Math.max(0, (Math.abs(t) - spec.to) / GUM_BEHIND)) ** 2));
-  const inner = (t: number) => -3 + (spec.depth + 7) * round(t);
-  const toward = (t: number, y: number) => rim(t) + (y - rim(t)) * round(t);
   const outerRim = angles.map((t) => archPoint(jaw, t, -3, rim(t)));
-  const outerFoot = angles.map((t) => archPoint(jaw, t, -3, toward(t, base - dir * GUM_CHEEK)));
-  const innerRim = angles.map((t) => archPoint(jaw, t, inner(t), rim(t)));
-  const innerFoot = angles.map((t) => archPoint(jaw, t, inner(t), toward(t, bottom)));
+  const outerFoot = angles.map((t) => archPoint(jaw, t, -3, base - dir * GUM_CHEEK));
+  const innerRim = angles.map((t) => archPoint(jaw, t, spec.depth + 4, rim(t)));
+  const innerFoot = angles.map((t) => archPoint(jaw, t, spec.depth + 4, bottom));
   const center = mean([...outerRim, ...outerFoot, ...innerRim, ...innerFoot]);
   const face = (kind: FaceKind, points: Vec3[]): Face => ({ kind, points, normal: normalOf(points, center), center: mean(points) });
   return {
@@ -659,54 +647,8 @@ export function projectors(view: View): { face: Projector } & Record<Jaw, Projec
   return { face, upper: forJaw("upper"), lower: forJaw("lower") };
 }
 
-/**
- * From how far open the mouth shows its dark between the rows, and with it the cheek's folds beside the last teeth
- * (`cheekFolds`): with the teeth together only cheek shows round them.
- */
+/** From how far open the mouth shows its dark between the rows; with the teeth together only cheek shows round them. */
 export const DARK_FROM = 0.3;
-
-/** A fold of the cheek beside the last teeth of one jaw, on one side: its outline in picture units. */
-export interface CheekFold {
-  jaw: Jaw;
-  side: Side;
-  ring: { x: number; y: number }[];
-}
-
-/** How far the fold reaches past the gum's end along the lips, up and down, in model units. */
-const FOLD_REACH = 10;
-
-/**
- * Where the open mouth's cheek, stretched between the lips' corners, lies over the gum's end behind each jaw's last
- * molar (user feedback, November 2026): the gum runs on behind the molar into the mouth and disappears under the
- * cheek beside the lips, never standing in front of it as a tongue of lighter pink out in the dark of the mouth. Each
- * fold is the outline round that end of the gum (the part behind the molar, `GUM_BEHIND`), the molar's outer back
- * corner and the stretch of the lips beside them; the mirror fills it with the cheek's pink over the gum, leaving the
- * teeth out, and the dark of the mouth stays between the two rows' folds.
- */
-export function cheekFolds(model: MouthModel, all: ReturnType<typeof projectors>, lips: { x: number; y: number }[], open: number): CheekFold[] {
-  if (open <= DARK_FROM) return [];
-  const last = TEETH.length - 1;
-  const back = TEETH[last].to;
-  return JAWS.flatMap((jaw) =>
-    SIDES.flatMap((side) => {
-      const s = side === "left" ? -1 : 1;
-      const project = all[jaw];
-      const molar = model.teeth.find((t) => t.id.jaw === jaw && t.id.side === side && t.id.n === last)!;
-      const gum = model.gums.find((g) => g.key === molar.key)!;
-      // How far round the arch a point lies, in degrees from the front (the arch's ellipse taken as a circle).
-      const angle = ([x, , z]: Vec3) => (Math.atan2(Math.abs(x) / MOUTH_WIDE, z) * 180) / Math.PI;
-      const behind = [...gum.rims.outer, ...gum.rims.inner].filter((p) => angle(p) > back - 0.5);
-      const corner = molar.faces.find((f) => f.kind === "top")!.points.reduce((a, b) => (s * b[0] > s * a[0] ? b : a));
-      const points = [...behind, corner].map(project.point);
-      const reach = FOLD_REACH * project.zoom;
-      const top = Math.min(...points.map((p) => p.y)) - reach;
-      const bottom = Math.max(...points.map((p) => p.y)) + reach;
-      const middle = points.reduce((a, p) => a + p.x, 0) / points.length;
-      const beside = lips.filter((p) => s * p.x > s * middle && p.y > top && p.y < bottom);
-      return beside.length > 0 ? [{ jaw, side, ring: convexHullOf([...points, ...beside]) }] : [];
-    }),
-  );
-}
 
 /** The smallest convex outline round `points` (Andrew's monotone chain). */
 export function convexHullOf<P extends { x: number; y: number }>(points: P[]): P[] {

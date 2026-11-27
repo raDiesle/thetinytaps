@@ -51,4 +51,15 @@ export interface VoiceJob {
 }
 
 /** Approved and not made yet, in the order `bun run paid` records them. */
-export const VOICE_QUEUE: VoiceJob[] = [];
+export const VOICE_QUEUE: VoiceJob[] = [
+  {
+    id: "zaehne-loewe",
+    why: "Zähne putzen: der Löwe wird mit Tapsis Stimme erklärt (dreimal brüllen, vor jedem Brüller ein Ruf), dazu die Sätze zum Essen und zu den Zuckermonstern",
+    date: "2026-11-27",
+    only: ["zaehne"],
+    lang: ["de", "en", "zh", "hi", "es", "ar", "ru"],
+    account: "first",
+    after:
+      "In src/content/ideas/languageStatus.ts bei /zaehne/ die Teile „🍎 Essen am Anfang“ und „🦁 Brüllen mit dem Löwen …“ auf done setzen und den Hinweis auf die Bestellung aus ihren Notizen nehmen. Im Spiel nachhören, dass der erste Ruf nach dem Satz zum Brüllen kommt, ohne ihn abzuschneiden (lion.tsx, CALL_MS).",
+  },
+];

@@ -1,7 +1,7 @@
 /**
  * Which phases of the routine are shown, kept for every brushing (user request, November 2026: chosen behind ⚙️ on the
- * strip of controls): the story, getting the brush and putting it away can each be left out, the brushing to the song
- * never.
+ * strip of controls): the story, getting the brush, spitting and putting the brush away can each be left out, the
+ * brushing to the song never.
  */
 export interface TeethSettings {
   /** At the end, a week with a star for every morning and evening brushed. */
@@ -10,7 +10,12 @@ export interface TeethSettings {
   origin: boolean;
   /** First fetch the brush and put toothpaste on it, shown and said. */
   prep: boolean;
-  /** At the end, after the cheer: rinse the brush and put it back in its cup. */
+  /**
+   * After the song and the cheer, a phase of its own: spitting the foam out over the basin (user request, November 2026:
+   * skippable, like putting the brush away, and independent of it).
+   */
+  spit: boolean;
+  /** At the end, after the cheer and the spitting: rinse the brush and put it back in its cup. */
   tidy: boolean;
 }
 
@@ -20,6 +25,7 @@ export const DEFAULT_TEETH_SETTINGS: TeethSettings = {
   week: true,
   origin: true,
   prep: true,
+  spit: true,
   tidy: true,
 };
 

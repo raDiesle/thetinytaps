@@ -37,9 +37,14 @@ test("the child leans and the dab drops as far as the picture says, moved only b
   for (const layer of ["spit-child", "spit-smile", "spit-pucker", "spit-blob"]) expect(spit).toMatch(new RegExp(`<Piece[^>]*className="${layer}"`));
 });
 
-test("it comes between the cheer and rinsing the brush, with no words on the picture", () => {
-  expect(play).toMatch(/const TIDY_FROM = CHEER_MS \+ SPIT_MS;/);
-  expect(play).toMatch(/after < CHEER_MS \? "cheer" : after < TIDY_FROM \? "spit"/);
+// Spitting is a phase of its own after the song, before the brush is put away, and like putting it away it can be
+// switched off behind ⚙️ (user request, November 2026).
+test("it comes between the cheer and rinsing the brush, can be left out, with no words on the picture", async () => {
+  expect(play).toMatch(/const tidyFrom = \(spit: boolean\) => CHEER_MS \+ \(spit \? SPIT_MS : 0\);/);
+  expect(play).toMatch(/after < CHEER_MS \? "cheer" : after < tidyAt \? "spit"/);
+  expect(play).toContain('{spit && <PhaseTile phase="spit"');
+  const settings = await Bun.file("src/games/teeth/settings.ts").text();
+  expect(settings).toMatch(/spit: true/);
   expect(spit).not.toMatch(/<text\b/);
 });
 

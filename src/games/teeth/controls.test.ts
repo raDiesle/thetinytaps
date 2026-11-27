@@ -20,18 +20,19 @@ test("the progress bar shows the time before the brushing as its first part", ()
 });
 
 // A sweet at the start and a tooth at the end said nothing of what each part of the bar is (user feedback, November
-// 2026): the bar shows the routine's phases apart – eating sweets, getting the brush, the lion and roaring with it (two
-// phases of their own, user requests, November 2026), the brushing's steps in a frame of their own, and putting the brush away,
-// which keeps the bar until the brush is back in its cup.
-test("the progress bar marks eating, getting the brush, roaring, brushing and putting the brush away apart", () => {
+// 2026): the bar shows the routine's phases apart – eating sweets, getting the brush, roaring with the lion (one phase,
+// user request, November 2026), the brushing's steps in a frame of their own, spitting and putting the brush away, which
+// keep the bar until the brush is back in its cup – each of the last two only where it is switched on.
+test("the progress bar marks eating, getting the brush, roaring, brushing, spitting and putting the brush away apart", () => {
   expect(play).toContain(
-    'const PHASE_SYMBOL: Record<BarPhase, TeethSymbol> = { eat: "bonbon", fetch: "zahnpasta", lion: "loewe", roar: "bruellen", tidy: "becher" };',
+    'const PHASE_SYMBOL: Record<BarPhase, TeethSymbol> = { eat: "bonbon", fetch: "zahnpasta", lion: "bruellen", spit: "spucken", tidy: "becher" };',
   );
   expect(play).toMatch(/<div className="teeth-brushing">\s*<div className="teeth-lane teeth-track">\s*\{STEPS\.map/);
   expect(play).toContain('{tidy && <PhaseTile phase="tidy"');
   expect(play).toContain('ending === "rest" ? (');
-  // The putting away is a section of the bar too: a tap on it starts the cheer and the tidying.
-  expect(play).toContain("const segments: [number, number][] = [...tileParts, ...stepParts, ...(tidy ? [tidyPart] : [])];");
+  // Spitting and putting away are sections of the bar too: a tap on one starts it.
+  expect(play).toContain('{spit && <PhaseTile phase="spit"');
+  expect(play).toMatch(/const segments: \[number, number\]\[\] = \[[^\n]*\.\.\.\(spit \? \[spitPart\] : \[\]\)[^\n]*\.\.\.\(tidy \? \[tidyPart\] : \[\]\)\];/);
   expect(play).toContain("introMs + totalMs + endingMs - 1");
   expect(css).toMatch(/\.teeth-brushing \{[^}]*background: #dff3e7;/);
 });
