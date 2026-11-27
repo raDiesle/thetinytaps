@@ -134,20 +134,35 @@
 
 /* The wooden loudspeaker: the music of all games. */
 .room-speaker svg {
-  height: min(calc(var(--ch) * 0.62), calc(var(--cw) * 0.82 / 0.72));
+  height: min(calc(var(--ch) * 0.62), calc(var(--cw) * 0.86 / 0.8));
   width: auto;
 }
 
 .room-speaker-box {
   fill: #b98552;
   stroke: var(--ink);
-  stroke-width: 2.5;
+  stroke-width: 2.2;
 }
 
 .room-speaker-side {
   fill: #8a5a33;
   stroke: var(--ink);
-  stroke-width: 2;
+  stroke-width: 1.8;
+  stroke-linejoin: round;
+}
+
+.room-speaker-top {
+  fill: #cf9e68;
+  stroke: var(--ink);
+  stroke-width: 1.8;
+  stroke-linejoin: round;
+}
+
+.room-speaker-grain {
+  fill: none;
+  stroke: #5a3414;
+  stroke-opacity: 0.35;
+  stroke-width: 0.8;
 }
 
 .room-speaker-foot {
@@ -156,24 +171,33 @@
 
 .room-speaker-edge {
   fill: none;
-  stroke: #ffffff59;
-  stroke-width: 2;
+  stroke: #ffffff66;
+  stroke-width: 1.6;
+  stroke-linecap: round;
+}
+
+.room-speaker-baffle {
+  fill: #2f262a;
+  stroke: #1d1619;
+  stroke-width: 1.2;
 }
 
 .room-speaker-ring {
-  fill: #3e3236;
-  stroke: var(--ink);
-  stroke-width: 2;
+  stroke: #1d1619;
+  stroke-width: 0.9;
 }
 
-.room-speaker-cone {
-  fill: #5d4c51;
+.room-speaker-surround {
+  fill: #1f181b;
 }
 
 .room-speaker-cap {
-  fill: #7a676c;
-  stroke: #2b2230;
-  stroke-width: 1.2;
+  stroke: #1d1619;
+  stroke-width: 0.6;
+}
+
+.room-speaker-screw {
+  fill: #3a3236;
 }
 
 .room-speaker-light {
@@ -254,40 +278,62 @@
 }
 
 .room-globe-sea {
-  fill: #6fb6dc;
+  fill: #4fa6d6;
 }
 
 .room-globe-land {
-  fill: #8cc46a;
+  fill: #86c063;
   stroke: #4f7f3a;
-  stroke-width: 1.2;
+  stroke-width: 1;
 }
 
 .room-globe-lines {
   fill: none;
-  stroke: #ffffffa6;
-  stroke-width: 1.3;
+  stroke: #ffffff80;
+  stroke-width: 0.9;
 }
 
-.room-globe-shine {
+.room-globe-rim {
   fill: none;
-  stroke: #ffffffcc;
-  stroke-width: 3;
+  stroke: #bfe6ff;
+  stroke-opacity: 0.55;
+  stroke-width: 2;
+  stroke-linecap: round;
 }
 
 .room-globe-outline {
   fill: none;
   stroke: var(--ink);
-  stroke-width: 2.5;
+  stroke-width: 2.2;
 }
 
-.room-globe-ring {
+.room-globe-ring,
+.room-globe-pin {
+  stroke: #5e4214;
+  stroke-width: 1;
+}
+
+.room-globe-pin {
+  fill: #e0b85c;
+}
+
+.room-globe-arm {
   fill: none;
-  stroke: #c79a3c;
-  stroke-width: 4;
+  stroke: #b8892f;
+  stroke-width: 3.6;
+  stroke-linecap: round;
 }
 
-.room-globe-pin,
+.room-globe-foot,
+.room-globe-foot-top {
+  stroke: #3d2a1c;
+  stroke-width: 1.4;
+}
+
+.room-globe-foot-top {
+  fill: #c99460;
+}
+
 .room-globe-plate {
   fill: #e0b85c;
   stroke: #7a5a1f;
@@ -825,7 +871,10 @@
   white-space: nowrap;
 }
 
-/* Taps go through the shelf's planes (a board's front lies in front of its books) to the books and things. */
+/*
+ * Taps go through the shelf's planes (a board's front lies in front of its books) to the books and things: a new thing to
+ * take joins the list below, or no tap reaches it (the ring calendar did not, November 2026; `shelfLayout.test.ts`).
+ */
 .shelf-box {
   position: absolute;
   inset: 0;
@@ -833,7 +882,7 @@
   pointer-events: none;
 }
 
-.shelf-box :is(.shelf-book, .shelf-toy, .shelf-daily, .room-thing, .shelf-spines > .shelf-spine, .shelf-lying) {
+.shelf-box :is(.shelf-book, .shelf-toy, .shelf-daily, .shelf-calendar, .room-thing, .shelf-spines > .shelf-spine, .shelf-lying) {
   pointer-events: auto;
 }
 
@@ -975,23 +1024,87 @@
   transform: rotateY(-90deg) translateZ(1px);
 }
 
+/*
+ * The stickers on the back panel of their compartment under the hourglass (wide shelf, user request, 26 November 2026):
+ * one above the other, each whole with its ♀ or ♂, moved like what is stuck on a back panel (`--sx`, `--sy`). They
+ * stand a little left of the middle, since the right wall hides the back panel's right edge and the signs stick out at
+ * the right.
+ */
+.shelf-back-stuck {
+  position: absolute;
+  inset: 4% 0;
+  container-type: size;
+  transform: translate(var(--sx), var(--sy)) translateZ(calc(var(--d) * -0.97 + 2px));
+}
+
+.shelf-back-stuck .room-stickers {
+  flex-direction: column;
+  gap: 10cqh;
+  translate: -8cqw 0;
+}
+
+.shelf-back-stuck .room-sticker {
+  --s: min(38cqh, 44cqw);
+}
+
+/*
+ * The ♀ or ♂ sits at the head's top right, over it, so it stays clear of the right wall (user feedback, 26 November
+ * 2026: at the head's right side it was cut off there).
+ */
+.shelf-back-stuck .room-sticker-sign {
+  top: calc(var(--s) * -0.12);
+  right: calc(var(--s) * -0.1);
+  translate: none;
+}
+
+/*
+ * „Wer spielt?“ on the right wall of the stickers' compartment, big, across the wall from its front to its back in one
+ * or two lines – the wall is deep and tall, while the back panel has room only for the heads (user request, 26 November
+ * 2026). Seen at a slant the letters come out narrow like a condensed face, yet as tall as they are: running down the
+ * wall they were flattened to a few pixels.
+ */
+.shelf-ask-wall {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+}
+
+/* Its room from the wall's edges is the words' own margin: on the wall, a container, a padding would measure the room. */
+.shelf-ask-wall .shelf-figure-ask {
+  position: static;
+  margin: 0 7cqw;
+  font-size: min(19cqw, 21cqh);
+  line-height: 1.1;
+  white-space: normal;
+  text-wrap: balance;
+}
+
 .shelf-cell.language .room-globe svg {
   height: min(calc(var(--ch) * 0.8), calc(var(--cw) * 0.86 / 0.75));
 }
 
 /*
- * On a wide shelf the trophy room's sign stands at the right of the speaker's compartment (`trophySignAt`), so the
- * speaker moves to its left, beside it, and is as wide as the room the sign leaves (user request, 25 November 2026).
- * The sign comes before the shelf's box in the page and is only there once a trophy is won.
+ * On a wide shelf the speaker stands big against the shelf's right wall, its right side flush with it (user feedback, 26
+ * November 2026), and the trophy room's sign is nailed into the
+ * compartment's top left corner above it (`trophySignAt`, `data-from="top"`; user request, 26 November 2026: beside
+ * each other on the board both were small).
  */
-.room-scene[data-plan="wide"] .shelf-trophy-sign ~ .shelf-box .shelf-cell.music .shelf-thing {
-  justify-content: flex-start;
-  /* The depth draws it left, towards the room's middle: so it starts a little further in. */
-  padding-left: calc(var(--cw) * 0.07);
+/* Its right side right against the wall: the front's right edge is the svg's, and nothing lies between it and the wall. */
+.room-scene[data-plan="wide"] .shelf-cell.music .shelf-thing {
+  justify-content: flex-end;
 }
 
-.room-scene[data-plan="wide"] .shelf-trophy-sign ~ .shelf-box .shelf-cell.music .room-speaker svg {
-  height: min(calc(var(--ch) * 0.5), calc(var(--cw) * 0.4 / 0.72));
+.room-scene[data-plan="wide"] .shelf-cell.music .room-speaker svg {
+  height: min(calc(var(--ch) * 0.66), calc(var(--cw) * 0.9 / 0.8));
+}
+
+/*
+ * Nailed onto the frame's front (user feedback, 26 November 2026): its top nails on the board above, its left ones on
+ * the post – `left` and `top` are those planks' middles, and the sign moves up and left by its nails' distance from its
+ * corner (`--nail-at`), so each nail's head lies on the wood.
+ */
+.shelf-trophy-sign[data-from="top"] {
+  translate: calc(var(--nail-at) * -1) calc(var(--nail-at) * -1);
 }
 
 /* ----- The front of the frame: the planks between compartments, the posts, the top board, the plinth ----- */
@@ -1182,8 +1295,10 @@
  */
 .shelf-trophy-sign {
   --trophy-sign: clamp(70px, calc(var(--bh) * 0.56), 124px);
-  --nail: max(8px, calc(var(--trophy-sign) * 0.1));
+  --nail: max(5px, calc(var(--trophy-sign) * 0.1));
   --edge: max(3px, calc(var(--trophy-sign) * 0.05));
+  /* How far a nail's middle lies from the sign's edges (`::before`'s inset and half a nail). */
+  --nail-at: calc(var(--trophy-sign) * 0.03 + var(--nail) / 2);
   position: absolute;
   z-index: 3;
   display: grid;

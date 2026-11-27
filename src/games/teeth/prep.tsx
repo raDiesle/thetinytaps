@@ -6,7 +6,7 @@ import type { Cue } from "./cues";
 import { useFigure } from "@/lib/common";
 import type { Daytime } from "@/lib/days";
 import { PyjamaPattern, topFill } from "./clothes";
-import { fitBox, FrameStroke, INK, screenFrame, SKIN, useRoom, type Box } from "./mouth";
+import { fitBox, FRAME_CLIP, FrameStroke, INK, screenFrame, SKIN, useRoom, type Box } from "./mouth";
 import { Piece, pictureSpace } from "./piece";
 
 // Before brushing, at the sink: the toothbrush wiggles in its cup until a
@@ -234,6 +234,21 @@ function Foam() {
   );
 }
 
+/** Where the spat-out foam lies in the bowl, a little beside the drain, where the water lands. */
+const SPAT_AREA: Box = { x: 200, y: SINK + 70, width: 54, height: 18 };
+
+/** The flat splat of foam the child spat into the basin (X-18), as it landed at the end of `Spit`. */
+function Spat() {
+  return (
+    <g fill="#fff" stroke="#9fd8ef" strokeWidth={2}>
+      <path
+        d={`M204 ${SINK + 82} C204 ${SINK + 76} 212 ${SINK + 73} 220 ${SINK + 75} C226 ${SINK + 71} 238 ${SINK + 72} 242 ${SINK + 77} C250 ${SINK + 77} 252 ${SINK + 83} 246 ${SINK + 85} L208 ${SINK + 86} C205 ${SINK + 86} 204 ${SINK + 84} 204 ${SINK + 82} Z`}
+      />
+      <circle cx={225} cy={SINK + 79} r={2.5} fill="#cfeefb" stroke="none" />
+    </g>
+  );
+}
+
 /** Where the water runs from the tap down into the basin, with room for its drops. */
 const WATER_AREA: Box = { x: 190, y: SINK - 50, width: 62, height: 126 };
 /** The drops hopping where the water lands. */
@@ -455,11 +470,8 @@ export function Prep({ part, daytime, free }: { part: PrepPart; daytime: Daytime
           });
   return (
     <div ref={scene} className={`prep at-${part}`}>
-      <svg className="prep-picture" viewBox={viewBox} role="img" aria-label={label}>
+      <svg className="prep-picture" viewBox={viewBox} role="img" aria-label={label} style={FRAME_CLIP}>
         <defs>
-          <clipPath id="prep-frame">
-            <rect {...frame} />
-          </clipPath>
           <pattern id="prep-tiles" width={55} height={55} patternUnits="userSpaceOnUse">
             <rect width={55} height={55} fill="#e6f7ff" />
             <path d="M0 0.5 H55 M0.5 0 V55" stroke="#b8e2f5" strokeWidth={3} />
@@ -485,7 +497,7 @@ export function Prep({ part, daytime, free }: { part: PrepPart; daytime: Daytime
           </linearGradient>
         </defs>
 
-        <g clipPath="url(#prep-frame)">
+        <g>
           <rect {...box} fill="url(#prep-tiles)" />
           <WindowSky daytime={daytime} />
           {/* The counter's shade on the wall just above it. */}
@@ -516,6 +528,12 @@ export function Prep({ part, daytime, free }: { part: PrepPart; daytime: Daytime
           <WindowFront daytime={daytime} />
         </Piece>
 
+        {/* The foam the child just spat out (spit.tsx) lies by the drain until the water washes it away. */}
+        {part === "tidy" && (
+          <Piece area={SPAT_AREA} className="prep-spat">
+            <Spat />
+          </Piece>
+        )}
         {part === "tidy" && <Water />}
 
         <Piece

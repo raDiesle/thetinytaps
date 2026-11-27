@@ -38,7 +38,7 @@ const WEEK_FROM: Localized<(date: string) => string> = {
   ru: (d) => `Неделя с ${d}`,
 };
 
-/** Width / height of a small picture in the strip, as in the gallery. */
+/** Width / height of a small picture in the strip. */
 const THUMB_ASPECT = 1.45;
 
 /**

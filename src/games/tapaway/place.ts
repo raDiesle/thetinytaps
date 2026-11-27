@@ -1,4 +1,4 @@
-// Where the next letter, number or shape of „Magic Keys“ lands: quick presses one after the other show several things
+// Where the next letter, number or shape of „Tap Magic“ lands: quick presses one after the other show several things
 // at once (user request, 24 November 2026), and each stands beside the others as long as there is room – only a full
 // page lets a new one overlap, where it covers the least.
 

@@ -21,7 +21,7 @@ import {
 
 const css = readFileSync(new URL("./tapaway.css", import.meta.url), "utf8");
 
-describe("Magic Keys shows several things at once, yet never a storm", () => {
+describe("Tap Magic shows several things at once, yet never a storm", () => {
   // Quick presses one after the other show several things at once (user request, 24 November 2026): the one game
   // where that is wanted. A held-down hand still can't flood the page.
   test("several letters and shapes at once, yet within limits", () => {
@@ -76,7 +76,7 @@ describe("Magic Keys shows several things at once, yet never a storm", () => {
 
 // User feedback, 25 November 2026: the letters, shapes and surprises looked chunky („klobig“) – they stay small, so
 // several stand light on the page; and more fireworks, so over half the surprises are one and every press bursts.
-describe("Magic Keys stays light and full of fireworks", () => {
+describe("Tap Magic stays light and full of fireworks", () => {
   test("letters, shapes and surprises stay small shares of the page", () => {
     expect(GLYPH_SHARE).toBeLessThanOrEqual(0.24);
     expect(SHAPE_SHARE).toBeLessThanOrEqual(0.16);

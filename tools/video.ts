@@ -11,7 +11,8 @@ import { evaluate, launchChrome, open, siteUrl } from "./chrome";
 //   bun run video intro --url http://localhost:3000   uses a running dev server instead
 //   bun run video outro --sprache en        the outro in that language (default: the browser's); its code always
 //                     leads to the home page, so one outro per language serves every video
-//   bun run video outro --variante regal     the outro's other way: the shelf instead of the games' pictures
+//   bun run video outro --variante bilder    the outro's other ways: the pictures one after another (bilder) or the
+//                                            shelf (regal) instead of the pin board
 //   --fps 30          frames per second (default 60)
 //   --shots 0.9,2.8   only pictures of these seconds, as PNG, to look at (no video)
 //   --out <folder>    where the files go (default video-out/, not in git)

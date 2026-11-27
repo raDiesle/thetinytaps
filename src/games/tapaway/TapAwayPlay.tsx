@@ -16,7 +16,7 @@ import { freeSpot, type Placed } from "./place";
 import { SHAPES, type ShapeKind, ShapeView } from "./shapes";
 import "./tapaway.css";
 
-// „Magic Keys“: a toy for banging on the keyboard, the mouse or the screen – no card, nothing to learn or find, only
+// „Tap Magic“: a toy for banging on the keyboard, the mouse or the screen – no card, nothing to learn or find, only
 // cause and effect (user request, 24 November 2026, in the spirit of the keyboard smash toys parents search for). A
 // letter key brings that letter big and bright somewhere on the page with its note and, where recorded, its name; a
 // digit brings its number with as many little shapes round it; every other key and every tap or click opens one of

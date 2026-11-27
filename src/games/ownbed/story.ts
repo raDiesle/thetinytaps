@@ -3,7 +3,7 @@ import { recordedVoice } from "@/lib/voice";
 import pictureFiles from "./bilder/*.webp?glob";
 import voiceFiles from "./stimme/**/*.mp3?glob";
 
-// What the book „Bed“ (`BedStoryGame.tsx` in src/games/bedstory) needs to read this story: its pictures, its
+// What the book „Sleep Tight“ (`BedStoryGame.tsx` in src/games/bedstory) needs to read this story: its pictures, its
 // translations and Tapsi's voice. Kept here, since a `?glob` finds its files only relative to the importing file.
 
 /** Tapsi's voice reading the pages, from `stimme/en/` (English first) and `stimme/<language>/`; a page not recorded yet stays silent. */

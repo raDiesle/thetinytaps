@@ -464,11 +464,17 @@ const Tub = memo(function Tub() {
   );
 });
 
+/**
+ * How often a second the foam's bobbing moves on: it bobs by at most 1.5 px a step, too little to see it jump, while in
+ * every frame the phone rastered the tub's band for it all the time it showed (perf, A-46).
+ */
+const FOAM_STEPS = 8;
+
 /** The water in the tub and the foam on it, both rising until they reach the rim. */
 const Water = still(function Water({ bath, t, inside }: { bath: Bath; t: number; inside: string }) {
   const y = bath.waterY(t);
   const foam = bath.foam(t);
-  const calm = Math.min(t, bath.duration);
+  const calm = Math.floor(Math.min(t, bath.duration) * FOAM_STEPS) / FOAM_STEPS;
   if (bath.pour(t) <= 0 && t < bath.tWater) return null;
   const width = TUB.x1 - TUB.x0;
   return (

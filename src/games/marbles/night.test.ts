@@ -215,6 +215,34 @@ describe("Gute-Nacht-Maschine", () => {
     }
   });
 
+  test("wheel, hamster and cable car stand exactly still outside the rope's run, and the room is dark all through it (A-43)", () => {
+    // Outside `ropeMoving` they are drawn in the room's svg, which a change of a fraction of a pixel would paint again;
+    // inside it they are sprites under a veil of their own, which a changing darkness would paint again in every frame.
+    const still = (t: number) => ({ turn: night.wheelTurn(t), car: night.carAt(t), step: night.hamsterAt(t).step });
+    const before = still(night.tRun);
+    const after = still(night.tArrive);
+    for (let t = night.tInWheel; t <= night.tHamsterSleep; t += 1 / 60) {
+      if (night.ropeMoving(t)) expect(night.dark(t)).toBe(night.dark(night.tArrive));
+      else expect(still(t)).toEqual(t <= night.tRun ? before : after);
+    }
+    expect(night.ropeMoving(night.tRun + 0.01)).toBe(true);
+    expect(night.ropeMoving(night.tArrive - 0.01)).toBe(true);
+  });
+
+  test("from tCornerStill on, only the pendulum and the chair still move in the reading corner, which holds that moment off the screen (A-43)", () => {
+    const corner = (t: number) => ({
+      door: night.doorOpen(t),
+      bird: night.birdX(t),
+      beak: night.beakOpen(t),
+      sleep: night.birdSleep(t),
+      hand: night.minuteHand(t),
+      chain: night.chainSwing(t),
+    });
+    const held = corner(night.tCornerStill);
+    expect(held.door).toBe(0);
+    for (let t = night.tCornerStill; t <= night.duration + 5; t += 1 / 30) expect(corner(t)).toEqual(held);
+  });
+
   test("the shutter stays shut until the car bumps it, and the moon rises only once it is open", () => {
     expect(night.shutterTurn(night.tArrive)).toBe(0);
     expect(night.shutterTurn(night.tOpen)).toBeCloseTo(SHUTTER.open);

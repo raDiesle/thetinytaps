@@ -11,7 +11,7 @@ export interface PlannerSettings {
 
 /**
  * The plan older versions showed before anything was saved (their morning routine, fixed id): kept only where it has
- * ticks. Its template is gone from the gallery (Morgen and Abend are one page now), so it is kept here as it was.
+ * ticks. Its template is gone (Morgen and Abend are one page now), so it is kept here as it was.
  */
 const OLD_FIRST: Plan = {
   ...planFromTemplate({

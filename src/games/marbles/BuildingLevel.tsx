@@ -88,8 +88,9 @@ const BRICK = "#e0533d";
 export function BuildingLevel(props: LevelProps) {
   const machine = useMemo(buildBuilding, []);
   const ids = useId();
-  // Until it has rolled out of the drum's mouth, the marble is drawn behind the mixer, so it stays hidden inside.
-  const inMixer = (t: number) => machine.marbleAt(t).pt.x < SPIRIT.from.x;
+  // Where each cloud of smoke is puffed out, once: a part compares its props one level deep, so a list of puffs it is
+  // given must be the same list in every frame.
+  const smoke = useMemo(() => puffLists(machine), [machine]);
 
   // The backdrop never changes: a layer of its own, painted once.
   const backdrop = useMemo(
@@ -115,58 +116,137 @@ export function BuildingLevel(props: LevelProps) {
       over={(t, at) => <BeltMoving at={at} travel={machine.beltTravel(t)} phase={machine.cleatPhase} />}
       {...props}
     >
-      {(t) => (
-        <>
-          {inMixer(t) && <Marble machine={machine} t={t} />}
-          <Mixer angle={machine.drumAngle(t)} spin={machine.drumSpin(t)} />
-          <SpiritLevel age={t - machine.tVial} />
-          <BeltMotor running={t >= 0} />
-          <Belt />
-          <Deck1 />
-          <Board />
-          <Deck2 />
-          <Cable machine={machine} t={t} />
-          <Tower angle={machine.towerAngle(t)} />
-          <Pile machine={machine} t={t} />
-          <Puddle />
-          <PileDriver machine={machine} t={t} />
-          <Pipe machine={machine} t={t} />
-          <Splash pts={machine.splashAt(t)} />
-          <Stack />
-          <Ladder machine={machine} t={t} />
-          <Winch turned={machine.crankAt(t)} />
-          <Sack machine={machine} t={t} />
-          <Crane drop={machine.roofDrop(t)} />
-          <House />
-          <Roof drop={machine.roofDrop(t)} />
-          <TopOutTree drop={machine.roofDrop(t)} age={t - machine.tTree} />
-          <TrafficLight green={t >= machine.tGreen} />
-          <Truck gone={machine.truckGone(t)} />
-          <Spool machine={machine} t={t} />
-          {/* The excavator stands behind the roller, so its arm reaches over it */}
-          <Excavator machine={machine} t={t} />
-          <Road machine={machine} t={t} />
-          <Roller machine={machine} t={t} />
-          <Pour machine={machine} t={t} />
-          <PowerCable machine={machine} t={t} />
-          <Generator machine={machine} t={t} />
-          <Jackhammer machine={machine} t={t} />
-          <Cone angle={machine.coneAngle(t)} />
+      {(t) => {
+        // Every part is `still` and gets only the numbers it draws, worked out here from the clock, so React skips each
+        // part whose numbers stay the same in a frame. Drawn with the clock itself, the whole site went through React in
+        // every frame (A-45: 58–60 % busy on the old phone, a fifth of it script).
+        const marble = machine.marbleAt(t);
+        // Until it has rolled out of the drum's mouth, the marble is drawn behind the mixer, so it stays hidden inside.
+        const inMixer = marble.pt.x < SPIRIT.from.x;
+        const ball = <Marble x={marble.pt.x} y={marble.pt.y} spin={marble.spin} />;
+        const spool = machine.spoolAt(t);
+        const drop = machine.roofDrop(t);
+        const exc = machine.excavatorAt(t);
+        const roller = machine.rollerAt(t);
+        const heapH = machine.heapH(t);
+        const jack = machine.jackAt(t);
+        const driver = machine.driverAt(t);
+        const pipe = machine.pipeAt(t);
+        const ladder = machine.ladderAt(t);
+        const sack = machine.sackAt(t);
+        const wrecking = machine.ballAt(t);
+        const ropeEnd = machine.ropeEnd(t);
+        const running = machine.genRunning(t);
+        const pour = machine.pourAt(t);
+        const pourFrom = pour < 0 ? { x: 0, y: 0 } : onScoop(exc.w, exc.cup, { x: SCOOP.mouth / 2, y: 0 });
+        const plof = machine.plofAge(t);
+        const tree = treeAt(t - machine.tTree);
+        const sparkle = t - machine.tTree;
+        const splash = t - machine.tSplash;
+        const spark = machine.sparkAt(t);
+        return (
+          <>
+            {inMixer && ball}
+            <Mixer angle={machine.drumAngle(t)} spin={machine.drumSpin(t)} />
+            <SpiritLevel bubble={-16 + wobble(t - machine.tVial, 14, 16, 2.5)} />
+            <BeltMotor running={t >= 0} />
+            <Belt />
+            <Deck1 />
+            <Board />
+            <Deck2 />
+            <Cable x={spool.pt.x} y={spool.pt.y} />
+            <Tower angle={machine.towerAngle(t)} />
+            <Pile h={machine.pileH(t)} spray={plof >= 0 && plof < 0.7 ? plof : -1} from={machine.spoolAt(machine.tPlof).pt} />
+            <Puddle />
+            <PileDriver ram={driver.ram} sunk={driver.sunk} />
+            <Puffs puffs={smoke.dust} t={puffClock(smoke.dust, t)} />
+            <Pipe x={pipe.pt.x} y={pipe.pt.y} turned={pipe.turned} />
+            <Splash machine={machine} at={splash >= 0 && splash <= 0.9 ? t : -1} />
+            <Stack />
+            <Ladder foot={ladder.foot} top={ladder.top} />
+            <Winch turned={machine.crankAt(t)} />
+            <Sack x={sack.pt.x} y={sack.pt.y} angle={sack.angle} />
+            <Crane drop={drop} />
+            <House />
+            <Roof drop={drop} />
+            <TopOutTree drop={drop} shown={tree.shown} sway={tree.sway} grow={tree.grow} flap={tree.flap} phase={tree.phase} />
+            <TrafficLight green={t >= machine.tGreen} />
+            <Truck gone={machine.truckGone(t)} />
+            <Spool x={spool.pt.x} y={spool.pt.y} turned={spool.turned} left={machine.cableLeft(t)} />
+            {/* The excavator stands behind the roller, so its arm reaches over it */}
+            <Excavator face={exc.face} shake={exc.shake} e={exc.e} w={exc.w} cup={exc.cup} full={exc.full} />
+            <Puffs puffs={smoke.exhaust} t={puffClock(smoke.exhaust, t)} dx={-73 * exc.face} />
+            <Road end={machine.roadTo(t)} cut={roller.x} h={heapH} />
+            <Roller x={roller.x} lift={roller.lift} turned={roller.turned} squash={roller.squash} />
+            <Puffs puffs={smoke.chimney} t={puffClock(smoke.chimney, t)} />
+            <Pour k={pour} x={pour < 0 ? 0 : EXC.x + exc.face * pourFrom.x} y={pour < 0 ? 0 : EXC.y + pourFrom.y} to={pour < 0 ? 0 : FLOOR - heapH} />
+            <PowerCable spark={spark ?? -1} />
+            <Puffs puffs={smoke.generator} t={puffClock(smoke.generator, t)} />
+            <Generator running={running} shake={running ? 1.5 * Math.sin(t * 70) : 0} button={machine.buttonAt(t)} />
+            <Jackhammer tip={jack.tip} lean={jack.lean} buzz={jack.buzz} />
+            <Cone angle={machine.coneAngle(t)} />
 
-          {!inMixer(t) && <Marble machine={machine} t={t} />}
-          <Chute />
-          <WreckingBall machine={machine} t={t} />
-          <Sparkles x={(HOUSE.x0 + HOUSE.x1) / 2} y={HOUSE.top - ROOF.h} age={t - machine.tTree} n={12} spread={260} />
-        </>
-      )}
+            {!inMixer && ball}
+            <Chute />
+            <WreckingBall bx={wrecking.x} by={wrecking.y} ex={ropeEnd.x} ey={ropeEnd.y} tight={t < machine.tRelease} />
+            <HouseSparkles x={(HOUSE.x0 + HOUSE.x1) / 2} y={HOUSE.top - ROOF.h} age={sparkle >= 0 && sparkle <= 3 ? sparkle : -1} n={12} spread={260} />
+          </>
+        );
+      }}
     </MachineStage>
   );
 }
 
-function Marble({ machine, t }: { machine: Building; t: number }) {
-  const { pt, spin } = machine.marbleAt(t);
-  return <Ball color={MARBLE_COLOR} x={pt.x} y={pt.y} spin={spin} />;
+const Marble = still(function Marble({ x, y, spin }: { x: number; y: number; spin: number }) {
+  return <Ball color={MARBLE_COLOR} x={x} y={y} spin={spin} />;
+});
+
+/** A cloud of smoke or dust: where it is puffed out and when. */
+interface Puff {
+  x: number;
+  y: number;
+  t0: number;
 }
+
+/** How long a puff rises and fades, in seconds. */
+const PUFF_S = 1.4;
+
+/** Every puff of the site, as lists made once (`smoke`), so `Puffs` gets the same list in every frame. */
+function puffLists(machine: Building) {
+  const exhaust = { x: EXC.x, y: EXC.y - 112 };
+  const genTop = FLOOR - GEN.wheelR - GEN.h - 26;
+  return {
+    /** From the excavator's exhaust; its x moves with the way the top faces (`dx`). */
+    exhaust: machine.exhaust.map((t0) => ({ ...exhaust, t0 })),
+    /** From the roller's chimney, where the roller was when it puffed. */
+    chimney: machine.chimney.map((t0) => {
+      const at = machine.rollerAt(Math.max(0, t0));
+      return { x: at.x - 164, y: FLOOR - at.lift - 140, t0 };
+    }),
+    generator: machine.genPuffs.map((t0) => ({ x: GEN.x + GEN.w / 2 - 22, y: genTop, t0 })),
+    dust: machine.dust.map((d) => ({ x: d.x, y: d.y, t0: d.t })),
+  } satisfies Record<string, Puff[]>;
+}
+
+/** The clock for a list of puffs: `t` while one of them shows, NaN (nothing to draw, and the same in every frame) otherwise. */
+const puffClock = (puffs: Puff[], t: number) => (puffs.some((p) => t >= p.t0 && t - p.t0 <= PUFF_S) ? t : Number.NaN);
+
+/** Where the topping-out tree stands in its spring and sway, `age` seconds after the roof is on; all still once it rests. */
+function treeAt(age: number) {
+  if (age < 0) return { shown: false, sway: 0, grow: 0, flap: 0, phase: 0 };
+  // The ribbons flutter for a few seconds and hang still: fluttering for ever kept the phone painting (perf).
+  const flap = Math.max(0, 1 - Math.max(0, age - 3) / 3);
+  return {
+    shown: true,
+    sway: wobble(age - 0.3, 8, 6, 1.4),
+    grow: Math.min(1.08, 1 - decay(age * 7) * Math.cos(age * 13)),
+    flap,
+    phase: flap > 0 ? age : 0,
+  };
+}
+
+/** The sparkles round the roof once it is on: `still`, so they are drawn again only while they fly. */
+const HouseSparkles = still(Sparkles);
 
 /* ---------- The site ---------- */
 
@@ -384,13 +464,12 @@ const Mixer = still(function Mixer({ angle, spin }: { angle: number; spin: numbe
   );
 });
 
-/** The big spirit level; its bubble wobbles `age` seconds after the marble rolled over the vial. */
-function SpiritLevel({ age }: { age: number }) {
+/** The big spirit level; its bubble wobbles `bubble` along the vial after the marble rolled over it. */
+const SpiritLevel = still(function SpiritLevel({ bubble }: { bubble: number }) {
   const { from, to } = SPIRIT;
   const len = Math.hypot(to.x - from.x, to.y - from.y) + 16;
   const slope = deg(Math.atan2(to.y - from.y, to.x - from.x));
   const mid = VIAL_X - from.x + 8;
-  const bubble = -16 + wobble(age, 14, 16, 2.5);
   return (
     <g transform={`translate(${from.x - 8} ${from.y + BALL_R}) rotate(${slope})`}>
       <rect x="0" y="0" width={len} height="30" rx="5" fill="#ffd23f" stroke={INK} strokeWidth="3" />
@@ -406,7 +485,7 @@ function SpiritLevel({ age }: { age: number }) {
       <rect x="22" y="4" width={mid - 72} height="5" rx="2.5" fill="#fff8" />
     </g>
   );
-}
+});
 
 /** The rubble chute: see-through orange cones hanging one in the next, drawn in front of the marble. */
 const Chute = memo(function Chute() {
@@ -604,19 +683,19 @@ const Board = memo(function Board() {
 });
 
 /** The traffic cone holding the rope's loop; it tips over `angle` radians to the right. */
-function Cone({ angle }: { angle: number }) {
+const Cone = still(function Cone({ angle }: { angle: number }) {
   const px = CONE.x + CONE.w / 2;
   return (
     <g transform={`rotate(${deg(angle)} ${px} ${DECK1.y}) translate(${CONE.x} ${DECK1.y})`}>
       <ConeShape />
     </g>
   );
-}
+});
 
-function WreckingBall({ machine, t }: { machine: Building; t: number }) {
-  const ball = machine.ballAt(t);
-  const end = machine.ropeEnd(t);
-  const tight = t < machine.tRelease;
+/** The wrecking ball at (`bx`, `by`) on its chain, and the rope from it to its loop at (`ex`, `ey`), tight until let go. */
+const WreckingBall = still(function WreckingBall({ bx, by, ex, ey, tight }: { bx: number; by: number; ex: number; ey: number; tight: boolean }) {
+  const ball = { x: bx, y: by };
+  const end = { x: ex, y: ey };
   const mid = { x: (ball.x + end.x) / 2, y: (ball.y + end.y) / 2 + (tight ? 0 : 22) };
   return (
     <g>
@@ -629,7 +708,7 @@ function WreckingBall({ machine, t }: { machine: Building; t: number }) {
       <circle cx={ball.x} cy={ball.y} r="6" fill="#7d7d96" stroke={INK} strokeWidth="2" />
     </g>
   );
-}
+});
 
 /* ---------- Deck with the tower and the cable drum ---------- */
 
@@ -655,7 +734,7 @@ const Deck2 = memo(function Deck2() {
 });
 
 /** The tower of bricks, falling over `angle` radians around its right foot. */
-function Tower({ angle }: { angle: number }) {
+const Tower = still(function Tower({ angle }: { angle: number }) {
   const { x, w, brick, n } = TOWER;
   return (
     <g transform={`rotate(${deg(angle)} ${x + w} ${DECK2.y})`}>
@@ -671,25 +750,24 @@ function Tower({ angle }: { angle: number }) {
       })}
     </g>
   );
-}
+});
 
 /** The cable from the plug to the drum: along the deck, then down over the edge once the drum has fallen off. */
-function Cable({ machine, t }: { machine: Building; t: number }) {
-  const { pt } = machine.spoolAt(t);
+const Cable = still(function Cable({ x, y: py }: { x: number; y: number }) {
+  const pt = { x, y: py };
   const y = DECK2.y - 4;
   const onDeck = pt.x <= DECK2.x1 && pt.y <= DECK2.y - SPOOL.r + 1;
   const start = `M${PLUG_X - 24} ${DECK2.y + 48} Q${PLUG_X + 6} ${DECK2.y + 40} ${PLUG_X + 4} ${DECK2.y + 8} Q${PLUG_X + 4} ${y} ${PLUG_X + 24} ${y}`;
   const d = onDeck ? `${start} L${pt.x} ${y}` : `${start} L${DECK2.x1} ${y} Q${DECK2.x1 + 14} ${y + 6} ${pt.x} ${pt.y + 10}`;
   return <path d={d} fill="none" stroke={ORANGE} strokeWidth="7" strokeLinecap="round" />;
-}
+});
 
 /** The wooden cable drum, rolling; the orange ring is the cable still wound on it. */
-function Spool({ machine, t }: { machine: Building; t: number }) {
-  const { pt, turned } = machine.spoolAt(t);
+const Spool = still(function Spool({ x, y, turned, left }: { x: number; y: number; turned: number; left: number }) {
   const { r, core } = SPOOL;
-  const wound = core + (r - 10 - core) * machine.cableLeft(t);
+  const wound = core + (r - 10 - core) * left;
   return (
-    <g transform={`translate(${pt.x} ${pt.y}) rotate(${deg(turned / r)})`}>
+    <g transform={`translate(${x} ${y}) rotate(${deg(turned / r)})`}>
       <circle r={r} fill={WOOD} stroke={INK} strokeWidth="4" />
       <circle r={wound} fill={ORANGE} stroke={INK} strokeWidth="2.5" />
       {wound > core + 4 && <circle r={(wound + core) / 2} fill="none" stroke="#d9692a" strokeWidth="3" />}
@@ -700,7 +778,7 @@ function Spool({ machine, t }: { machine: Building; t: number }) {
       <circle r="5" fill={INK} />
     </g>
   );
-}
+});
 
 /* ---------- Sand pile, excavator, road roller and jackhammer ---------- */
 
@@ -709,13 +787,10 @@ const SAND_DARK = "#d9a650";
 const ROAD = "#5b5b6e";
 
 /** The sand pile, a scoop lower once it is dug, with sand spraying up where the cable drum plopped in. */
-function Pile({ machine, t }: { machine: Building; t: number }) {
-  const h = machine.pileH(t);
+const Pile = still(function Pile({ h, spray: age, from: at }: { h: number; spray: number; from: Pt }) {
   const { x, w } = PILE;
   const top: string[] = [];
   for (let px = x - w; px <= x + w; px += 10) top.push(`${px} ${moundY(x, w, h, px)}`);
-  const age = machine.plofAge(t);
-  const at = machine.spoolAt(machine.tPlof).pt;
   return (
     <g>
       <path d={`M${top.join(" L")} Z`} fill={SAND} stroke={INK} strokeWidth="3" strokeLinejoin="round" />
@@ -743,14 +818,20 @@ function Pile({ machine, t }: { machine: Building; t: number }) {
         })}
     </g>
   );
-}
+});
 
-/** Little clouds of smoke, each rising and growing from where it was puffed out until it fades. */
-function Puffs({ puffs }: { puffs: { x: number; y: number; age: number }[] }) {
+/**
+ * Little clouds of smoke, each rising and growing from where it was puffed out until it fades; `t` is NaN while none
+ * shows (`puffClock`), and `dx` moves them all sideways.
+ */
+const Puffs = still(function Puffs({ puffs, t, dx = 0 }: { puffs: Puff[]; t: number; dx?: number }) {
+  if (Number.isNaN(t)) return null;
   return (
     <g>
-      {puffs.map(({ x, y, age }, i) =>
-        age < 0 || age > 1.4 ? null : (
+      {puffs.map(({ x: px, y, t0 }, i) => {
+        const age = t - t0;
+        const x = px + dx;
+        return age < 0 || age > PUFF_S ? null : (
           <circle
             key={i}
             cx={x + 14 * age + (i % 2 ? 4 : -4) * age}
@@ -759,13 +840,13 @@ function Puffs({ puffs }: { puffs: { x: number; y: number; age: number }[] }) {
             fill="#eef0f6"
             stroke={INK}
             strokeWidth="2"
-            opacity={0.9 * (1 - age / 1.4)}
+            opacity={0.9 * (1 - age / PUFF_S)}
           />
-        ),
-      )}
+        );
+      })}
     </g>
   );
-}
+});
 
 /** The excavator's tracks, which never turn: drawn once. */
 const Tracks = memo(function Tracks() {
@@ -809,13 +890,11 @@ function Scoop({ full }: { full: boolean }) {
   );
 }
 
-/** The excavator: its top, arm and scoop turn round on the tracks (seen from the side, it flips), and it puffs from its exhaust. */
-function Excavator({ machine, t }: { machine: Building; t: number }) {
-  const { face, shake, e, w, cup, full } = machine.excavatorAt(t);
+/** The excavator: its top, arm and scoop turn round on the tracks (seen from the side, it flips); its smoke is `Puffs` beside it. */
+const Excavator = still(function Excavator({ face, shake, e, w, cup, full }: { face: number; shake: number; e: Pt; w: Pt; cup: number; full: boolean }) {
   const { s } = ARM;
   // The cylinder lifting the boom, from the body to a third of the way up the boom.
   const lift = { x: s.x + (e.x - s.x) * 0.35, y: s.y + (e.y - s.y) * 0.35 };
-  const puffs = machine.exhaust.map((p) => ({ x: EXC.x - 73 * face, y: EXC.y - 112, age: t - p }));
   const thick = (a: { x: number; y: number }, b: { x: number; y: number }, width: number, color: string) => (
     <g>
       <line x1={a.x} y1={a.y} x2={b.x} y2={b.y} stroke={INK} strokeWidth={width + 7} strokeLinecap="round" />
@@ -849,19 +928,15 @@ function Excavator({ machine, t }: { machine: Building; t: number }) {
           <circle key={i} cx={p.x} cy={p.y} r="6" fill={INK} />
         ))}
       </g>
-      <Puffs puffs={puffs} />
     </g>
   );
-}
+});
 
 /** Sand and stones pouring out of the tipped scoop onto the heap. */
-function Pour({ machine, t }: { machine: Building; t: number }) {
-  const k = machine.pourAt(t);
+/** `k` (0 … 1, −1 for none) into the pour, from the scoop's mouth at (`x`, `y`) down to the heap's top `to`. */
+const Pour = still(function Pour({ k, x, y, to }: { k: number; x: number; y: number; to: number }) {
   if (k < 0) return null;
-  const { face, w, cup } = machine.excavatorAt(t);
-  const m = onScoop(w, cup, { x: SCOOP.mouth / 2, y: 0 });
-  const from = { x: EXC.x + face * m.x, y: EXC.y + m.y };
-  const to = FLOOR - machine.heapH(t);
+  const from = { x, y };
   return (
     <g>
       {Array.from({ length: 12 }, (_, i) => {
@@ -881,14 +956,14 @@ function Pour({ machine, t }: { machine: Building; t: number }) {
       })}
     </g>
   );
-}
+});
 
-/** The heap of tipped sand, and the flat new road the roller presses out of it. */
-function Road({ machine, t }: { machine: Building; t: number }) {
+/** The heap of tipped sand, `h` high, flattened left of the roller's drum at `cut`, and the flat new road up to `end`. */
+const Road = still(function Road({ end, cut, h }: { end: number; cut: number; h: number }) {
   const x0 = HEAP.x - HEAP.w;
-  const end = machine.roadTo(t);
   const top: string[] = [];
-  for (let x = x0; x <= HEAP.x + HEAP.w; x += 6) top.push(`${x} ${machine.heapY(t, x)}`);
+  // As the machine's `heapY`: flat where the drum has been, the heap's mound beyond it.
+  for (let x = x0; x <= HEAP.x + HEAP.w; x += 6) top.push(`${x} ${x < cut ? FLOOR : moundY(HEAP.x, HEAP.w, h, x)}`);
   return (
     <g>
       {end > x0 + 2 && (
@@ -899,19 +974,14 @@ function Road({ machine, t }: { machine: Building; t: number }) {
           ))}
         </g>
       )}
-      {machine.heapH(t) > 0.5 && <path d={`M${top.join(" L")} Z`} fill={SAND} stroke={INK} strokeWidth="3" strokeLinejoin="round" />}
+      {h > 0.5 && <path d={`M${top.join(" L")} Z`} fill={SAND} stroke={INK} strokeWidth="3" strokeLinejoin="round" />}
     </g>
   );
-}
+});
 
-/** The road roller: big drum in front, driver under a red roof, puffing from its chimney; patted, it squashes and springs back. */
-function Roller({ machine, t }: { machine: Building; t: number }) {
-  const { x, lift, turned, squash } = machine.rollerAt(t);
+/** The road roller: big drum in front, driver under a red roof (its chimney's smoke is `Puffs`); patted, it squashes and springs back. */
+const Roller = still(function Roller({ x, lift, turned, squash }: { x: number; lift: number; turned: number; squash: number }) {
   const r = ROLLER.drum;
-  const puffs = machine.chimney.map((p) => {
-    const at = machine.rollerAt(Math.max(0, p));
-    return { x: at.x - 164, y: FLOOR - at.lift - 140, age: t - p };
-  });
   const spin = deg(turned / r);
   return (
     <g>
@@ -961,14 +1031,12 @@ function Roller({ machine, t }: { machine: Building; t: number }) {
         <path d={`M-52 -92 L-4 ${-r - 10} L-4 ${-r + 10} L-52 -44 Z`} fill={YELLOW} stroke={INK} strokeWidth="3" strokeLinejoin="round" />
         <circle cx="0" cy={-r} r="10" fill={YELLOW} stroke={INK} strokeWidth="3" />
       </g>
-      <Puffs puffs={puffs} />
     </g>
   );
-}
+});
 
 /** The jackhammer: chisel, red body and handlebar; while it runs it shakes, with little lines round its chisel. */
-function Jackhammer({ machine, t }: { machine: Building; t: number }) {
-  const { tip, lean, buzz } = machine.jackAt(t);
+const Jackhammer = still(function Jackhammer({ tip, lean, buzz }: { tip: Pt; lean: number; buzz: number }) {
   const { w, h } = JACK;
   return (
     <g transform={`translate(${tip.x} ${tip.y}) rotate(${deg(lean)})`}>
@@ -992,24 +1060,20 @@ function Jackhammer({ machine, t }: { machine: Building; t: number }) {
       </g>
     </g>
   );
-}
+});
 
 /* ---------- Generator, pile driver, pipe, ladder and sack ---------- */
 
 const CONCRETE = "#b8b8c4";
 const CONCRETE_DARK = "#8e8e9e";
 
-/** The generator on its wheels: shaking a little while it runs, puffing smoke from its exhaust, its start button on top. */
-function Generator({ machine, t }: { machine: Building; t: number }) {
+/** The generator on its wheels: shaking a little while it runs (its smoke is `Puffs`), its start button on top, pressed `pressed` down. */
+const Generator = still(function Generator({ running, shake, button: pressed }: { running: boolean; shake: number; button: number }) {
   const { x, w, h, wheelR, button, buttonR } = GEN;
-  const running = machine.genRunning(t);
-  const shake = running ? 1.5 * Math.sin(t * 70) : 0;
   const bottom = FLOOR - wheelR;
   const top = bottom - h;
-  const exhaust = { x: x + w / 2 - 22, y: top - 26 };
   return (
     <g>
-      <Puffs puffs={machine.genPuffs.map((p) => ({ x: exhaust.x, y: exhaust.y, age: t - p }))} />
       <g transform={`translate(0 ${shake})`}>
         <rect x={x + w / 2 - 30} y={top - 26} width="16" height="30" rx="3" fill="#4a4a5e" stroke={INK} strokeWidth="2.5" />
         <rect x={x - w / 2} y={top} width={w} height={h} rx="12" fill={YELLOW} stroke={INK} strokeWidth="4" />
@@ -1028,16 +1092,7 @@ function Generator({ machine, t }: { machine: Building; t: number }) {
         ))}
         <circle cx={x + w / 2 - 30} cy={top + 12} r="6" fill={running ? "#3ec300" : "#9aa0a6"} stroke={INK} strokeWidth="2" />
         <rect x={x + button - buttonR - 4} y={top - 6} width={2 * buttonR + 8} height="8" rx="3" fill="#4a4a5e" stroke={INK} strokeWidth="2" />
-        <rect
-          x={x + button - buttonR}
-          y={top - 12 + machine.buttonAt(t)}
-          width={2 * buttonR}
-          height={12 - machine.buttonAt(t)}
-          rx="4"
-          fill="#3ec300"
-          stroke={INK}
-          strokeWidth="2.5"
-        />
+        <rect x={x + button - buttonR} y={top - 12 + pressed} width={2 * buttonR} height={12 - pressed} rx="4" fill="#3ec300" stroke={INK} strokeWidth="2.5" />
       </g>
       {[x - w / 2 + 26, x + w / 2 - 26].map((wx) => (
         <g key={wx}>
@@ -1047,7 +1102,7 @@ function Generator({ machine, t }: { machine: Building; t: number }) {
       ))}
     </g>
   );
-}
+});
 
 const CABLE_FROM = { x: GEN.x + GEN.w / 2, y: FLOOR - GEN.wheelR - 30 };
 const CABLE_TO = { x: DRIVER.x - 70, y: FLOOR - 40 };
@@ -1064,10 +1119,9 @@ function onCable(k: number): Pt {
     : quadAt(mid, { x: CABLE_TO.x - 40, y: FLOOR - 4 }, CABLE_TO, k * 2 - 1);
 }
 
-/** The power cable from the generator to the pile driver, with the spark running along it when the generator starts. */
-function PowerCable({ machine, t }: { machine: Building; t: number }) {
-  const k = machine.sparkAt(t);
-  const spark = k === null ? null : onCable(k);
+/** The power cable from the generator to the pile driver, with the spark `k` (0 … 1, −1 for none) along it when the generator starts. */
+const PowerCable = still(function PowerCable({ spark: k }: { spark: number }) {
+  const spark = k < 0 ? null : onCable(k);
   return (
     <g>
       <path d={cableD} fill="none" stroke={INK} strokeWidth="9" strokeLinecap="round" />
@@ -1080,12 +1134,11 @@ function PowerCable({ machine, t }: { machine: Building; t: number }) {
       )}
     </g>
   );
-}
+});
 
-/** The pile driver: a tracked base with a tall lattice mast, its heavy ram sliding on it, and the post below it sinking into the ground. */
-function PileDriver({ machine, t }: { machine: Building; t: number }) {
+/** The pile driver: a tracked base with a tall lattice mast, its heavy ram (bottom at `ram`) sliding on it, and the post below it sunk `sunk` thumps into the ground. */
+const PileDriver = still(function PileDriver({ ram: ramBottom, sunk }: { ram: number; sunk: number }) {
   const { x, top, ram, ramH, post, post0, sink } = DRIVER;
-  const { ram: ramBottom, sunk } = machine.driverAt(t);
   const postTop = post0 + sunk * sink;
   return (
     <g>
@@ -1105,14 +1158,12 @@ function PileDriver({ machine, t }: { machine: Building; t: number }) {
       <line x1={x + 20} y1={ramBottom - ramH / 2} x2={x + 41} y2={ramBottom - ramH / 2} stroke={INK} strokeWidth="8" />
       <rect x={x - ram / 2} y={ramBottom - ramH} width={ram} height={ramH} rx="8" fill="#4a4a5e" stroke={INK} strokeWidth="4" />
       <rect x={x - ram / 2 + 10} y={ramBottom - ramH + 12} width={ram - 20} height="14" rx="4" fill={YELLOW} stroke={INK} strokeWidth="2" />
-      <Puffs puffs={machine.dust.map((d) => ({ x: d.x, y: d.y, age: t - d.t }))} />
     </g>
   );
-}
+});
 
 /** The concrete pipe, first lying on its two wooden chocks, then rolling. */
-function Pipe({ machine, t }: { machine: Building; t: number }) {
-  const { pt, turned } = machine.pipeAt(t);
+const Pipe = still(function Pipe({ x, y, turned }: { x: number; y: number; turned: number }) {
   const r = PIPE.r;
   return (
     <g>
@@ -1126,7 +1177,7 @@ function Pipe({ machine, t }: { machine: Building; t: number }) {
           strokeLinejoin="round"
         />
       ))}
-      <g transform={`translate(${pt.x} ${pt.y}) rotate(${deg(turned)})`}>
+      <g transform={`translate(${x} ${y}) rotate(${deg(turned)})`}>
         <circle r={r} fill={CONCRETE} stroke={INK} strokeWidth="4" />
         <circle r={r * 0.62} fill={CONCRETE_DARK} stroke={INK} strokeWidth="3" />
         <circle r={r * 0.5} fill="#5b5b6e" />
@@ -1136,15 +1187,17 @@ function Pipe({ machine, t }: { machine: Building; t: number }) {
       </g>
     </g>
   );
-}
+});
 
 /** A puddle in the sand. */
 const Puddle = memo(function Puddle() {
   return <ellipse cx={PUDDLE.x} cy={FLOOR + 6} rx={PUDDLE.w / 2} ry="14" fill="#6fb8e8" stroke={INK} strokeWidth="3" />;
 });
 
-/** Drops of the puddle splashed up by the pipe. */
-function Splash({ pts }: { pts: Pt[] }) {
+/** Drops of the puddle splashed up by the pipe; `at` is the clock while they fly, −1 otherwise (the same in every frame). */
+const Splash = still(function Splash({ machine, at }: { machine: Building; at: number }) {
+  if (at < 0) return null;
+  const pts = machine.splashAt(at);
   return (
     <g>
       {pts.map((p, i) => (
@@ -1152,7 +1205,7 @@ function Splash({ pts }: { pts: Pt[] }) {
       ))}
     </g>
   );
-}
+});
 
 /** Brick pallets stacked up beside the winch. */
 const Stack = memo(function Stack() {
@@ -1178,8 +1231,7 @@ const Stack = memo(function Stack() {
 });
 
 /** The aluminium ladder leaning against the stack; pushed at its foot, it stands up steeper. */
-function Ladder({ machine, t }: { machine: Building; t: number }) {
-  const { foot, top } = machine.ladderAt(t);
+const Ladder = still(function Ladder({ foot, top }: { foot: Pt; top: Pt }) {
   const len = Math.hypot(top.x - foot.x, top.y - foot.y);
   const u = { x: (top.x - foot.x) / len, y: (top.y - foot.y) / len };
   const n = { x: -u.y, y: u.x };
@@ -1202,14 +1254,13 @@ function Ladder({ machine, t }: { machine: Building; t: number }) {
       ))}
     </g>
   );
-}
+});
 
 /** The cement sack: on the stack, tipping off, riding the crank's knob down and lying beside the winch. */
-function Sack({ machine, t }: { machine: Building; t: number }) {
-  const { pt, angle } = machine.sackAt(t);
+const Sack = still(function Sack({ x, y, angle }: { x: number; y: number; angle: number }) {
   const { w, h } = SACK;
   return (
-    <g transform={`translate(${pt.x} ${pt.y}) rotate(${deg(angle)})`}>
+    <g transform={`translate(${x} ${y}) rotate(${deg(angle)})`}>
       <path
         d={`M${-w / 2 + 6} 0 Q${-w / 2} ${-h / 2} ${-w / 2 + 8} ${-h} L${w / 2 - 8} ${-h} Q${w / 2} ${-h / 2} ${w / 2 - 6} 0 Z`}
         fill="#e8e3d3"
@@ -1221,12 +1272,12 @@ function Sack({ machine, t }: { machine: Building; t: number }) {
       <path d={`M${-w / 2 + 10} ${-h + 4} q6 4 0 8 M${w / 2 - 10} ${-h + 4} q-6 4 0 8`} fill="none" stroke={INK} strokeWidth="2" />
     </g>
   );
-}
+});
 
 /* ---------- Winch, crane and house ---------- */
 
 /** The winch at the crane's foot; `turned` is how far its crank has gone round. */
-function Winch({ turned }: { turned: number }) {
+const Winch = still(function Winch({ turned }: { turned: number }) {
   const { x, y, drum } = WINCH;
   const knob = crankKnob(turned);
   return (
@@ -1251,7 +1302,7 @@ function Winch({ turned }: { turned: number }) {
       <circle cx={x} cy={y} r="6" fill={INK} />
     </g>
   );
-}
+});
 
 const roofBase = (drop: number) => HOUSE.top - ROOF.drop + drop;
 
@@ -1283,7 +1334,7 @@ function Mast({ x, w, top, bottom }: { x: number; w: number; top: number; bottom
 }
 
 /** The tower crane; `drop` is how far the hook has come down. */
-function Crane({ drop }: { drop: number }) {
+const Crane = still(function Crane({ drop }: { drop: number }) {
   const { x, jibTop, jibY, end, back, apexY } = CRANE;
   const hookY = roofBase(drop) - ROOF.h - 14;
   const turn = deg(drop / TOP_PULLEY.r);
@@ -1333,7 +1384,7 @@ function Crane({ drop }: { drop: number }) {
       />
     </g>
   );
-}
+});
 
 const House = memo(function House() {
   const { x0, x1, top } = HOUSE;
@@ -1375,7 +1426,7 @@ const House = memo(function House() {
 });
 
 /** The roof, `drop` down from where it starts, hanging from the crane's hook by the eye on its top. */
-function Roof({ drop }: { drop: number }) {
+const Roof = still(function Roof({ drop }: { drop: number }) {
   const cx = (HOUSE.x0 + HOUSE.x1) / 2;
   const base = roofBase(drop);
   const half = ROOF.w / 2;
@@ -1406,15 +1457,27 @@ function Roof({ drop }: { drop: number }) {
       ))}
     </g>
   );
-}
+});
 
-/** The topping-out tree with ribbons, springing up on the roof `age` seconds after the roof is on. */
-function TopOutTree({ drop, age }: { drop: number; age: number }) {
-  if (age < 0) return null;
+/** The topping-out tree with ribbons, springing up on the roof once it is on (`treeAt`): `flap` how much its ribbons still flutter, at `phase`. */
+const TopOutTree = still(function TopOutTree({
+  drop,
+  shown,
+  sway,
+  grow,
+  flap: flutter,
+  phase,
+}: {
+  drop: number;
+  shown: boolean;
+  sway: number;
+  grow: number;
+  flap: number;
+  phase: number;
+}) {
+  if (!shown) return null;
   const cx = (HOUSE.x0 + HOUSE.x1) / 2 + 170;
   const foot = roofBase(drop) - ROOF.h + (170 * ROOF.h) / (ROOF.w / 2) - 4;
-  const grow = Math.min(1.08, 1 - decay(age * 7) * Math.cos(age * 13));
-  const sway = wobble(age - 0.3, 8, 6, 1.4);
   return (
     <g transform={`translate(${cx} ${foot}) rotate(${sway}) scale(${grow})`}>
       <line x1="0" y1="0" x2="0" y2="-70" stroke={DARK_WOOD} strokeWidth="7" strokeLinecap="round" />
@@ -1430,8 +1493,7 @@ function TopOutTree({ drop, age }: { drop: number; age: number }) {
       ))}
       {Array.from({ length: 5 }, (_, i) => {
         const x = -26 + i * 13;
-        // The ribbons flutter for a few seconds and hang still: fluttering for ever kept the phone painting (perf).
-        const flap = 6 * Math.sin(age * 9 + i) * Math.max(0, 1 - Math.max(0, age - 3) / 3);
+        const flap = 6 * Math.sin(phase * 9 + i) * flutter;
         return (
           <path
             key={i}
@@ -1445,9 +1507,9 @@ function TopOutTree({ drop, age }: { drop: number; age: number }) {
       })}
     </g>
   );
-}
+});
 
-function TrafficLight({ green }: { green: boolean }) {
+const TrafficLight = still(function TrafficLight({ green }: { green: boolean }) {
   const x = LIGHT_X;
   return (
     <g>
@@ -1459,10 +1521,10 @@ function TrafficLight({ green }: { green: boolean }) {
       <circle cx={x} cy="564" r="19" fill={green ? "#3ec300" : "#2c5a2c"} stroke={green ? "#d8ffc8" : INK} strokeWidth="3" />
     </g>
   );
-}
+});
 
 /** The dump truck waiting at the light; it drives off `gone` to the right. */
-function Truck({ gone }: { gone: number }) {
+const Truck = still(function Truck({ gone }: { gone: number }) {
   const x = TRUCK_X + gone;
   const r = 32;
   const wheel = (wx: number) => (
@@ -1511,4 +1573,4 @@ function Truck({ gone }: { gone: number }) {
       {wheel(x + 280)}
     </g>
   );
-}
+});

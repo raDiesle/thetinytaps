@@ -49,7 +49,7 @@ export const SURPRISE_KINDS = ["firework", "gift", "egg", "balloon", "flower", "
 /** One kind of surprise. */
 export type SurpriseKind = (typeof SURPRISE_KINDS)[number];
 
-/** The kinds that are fireworks: „Zaubertasten“ brings them more often (`TAP_AWAY_SURPRISES.bag`). */
+/** The kinds that are fireworks: „Tippzauber“ brings them more often (`TAP_AWAY_SURPRISES.bag`). */
 export const FIREWORK_KINDS = ["firework", "skyrocket", "starburst", "wheel", "fountain", "sparkler", "swirl"] as const satisfies readonly SurpriseKind[];
 
 /** How surprises are kept from piling up while a child hammers keys (`surprises.test.ts` keeps them few). */
@@ -326,7 +326,7 @@ export function shuffledBag(kinds: readonly SurpriseKind[], last?: SurpriseKind)
 /**
  * Surprises for Frei tippen: `spawn(x, y, size)` opens the next one at (x, y) in the layer's pixels, with its sound,
  * unless one came less than `limits.gapMs` ago or `limits.maxAtOnce` are on screen (then it returns false and the
- * game only ripples). Draw them with `<SurpriseLayer surprises={…} />`. Only „Magic Keys“, where the show is the
+ * game only ripples). Draw them with `<SurpriseLayer surprises={…} />`. Only „Tap Magic“, where the show is the
  * whole game, passes looser limits of its own (`src/games/tapaway/CLAUDE.md`).
  */
 export function useSurprises(limits: SurpriseLimits = SURPRISE) {
