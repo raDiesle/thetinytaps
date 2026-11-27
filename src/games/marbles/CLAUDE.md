@@ -280,6 +280,19 @@ Then a second part past the tree (`PART2`, `acornAt`, `beeAt`, `kiteAt`; a pure 
     ground, under the thing's sprite (`BeamLight`). Laid over the machine,
     such a thing passes in front of a crane's jib or a box it once passed behind: look at it at 844×390 and keep it only
     where that looks right.
+  - **The one thing that travels through a level for many seconds** (the Zirkus's marble from the hat to the basket,
+    the Aufräumen's wind-up truck and sock ball, the garden's snail creeping at the terrace's foot while the chimes swing
+    at the top, the fan's boat in Alles fällt um) is a `Sprite` in `over` while it travels (`marbleFree`, `truckDriving`,
+    `sockBallFlying`, `snailCreeping`, `FanLink.boatMoving`) and drawn in the machine's svg before and after, where it
+    sits inside or behind something. In the svg it kept the phone rastering its band and the bands of whatever moved at
+    other heights in every frame (A-46: Zirkus 67 / 74 % busy → 58 / 56 %, the garden's start 37 → 28 screens a second,
+    the Aufräumen's start painted 158 → 51 times in 10 s). Where it passes behind a part (the hat, the basket), the
+    window ends there, so the svg draws it behind that part again – look at the handover at 844×390. A level with a
+    stage of its own (Alles fällt um) places such a sprite by `cameraPoint`, its link units turned into world units
+    (`MARGIN + x * SCALE`) and the drawing scaled by `SCALE` inside the sprite.
+    A rocking that dies away by `decay` (the Aufräumen's rocking horse) rests at `WOBBLE_REST` like a `wobble`, or it
+    rocks by hundredths of a degree for seconds and the phone rasters its tall band for it (`rockAt`). Foam or water
+    bobbing gently for as long as it shows moves on a few steps a second (the bath's `FOAM_STEPS`), as the flames do.
   - Decorative flicker (the Zirkus hoop's flames) changes a few times a second (`FLICKER.steps`, a stepped `t`), not
     in every frame, and only round its moment (`seen` and a window round `tHoop`): 16 flame paths flickering in every
     frame were most of the Zirkus's 44 screens a second (now 31). The Raketenstart's blinking lamps pass only on or off

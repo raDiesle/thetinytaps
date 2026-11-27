@@ -508,6 +508,8 @@ export interface FanLink extends LinkBase {
   kind: "fan";
   spritY: number;
   pose: (age: number) => FanPose;
+  /** True while the boat's sail fills or empties or the boat rolls: then it is drawn as a sprite of its own. */
+  boatMoving: (age: number) => boolean;
 }
 
 /**
@@ -557,6 +559,7 @@ function fanLink(next: Size): FanLink {
     pusher: (age) => ({ x: boatX(age) + BOAT.len / 2 + SPRIT, y: spritY }),
     spritY,
     pose,
+    boatMoving: (age) => age > 0.3 && age < stopAt + 1.5,
   };
 }
 

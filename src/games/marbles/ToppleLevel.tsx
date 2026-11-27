@@ -21,7 +21,8 @@ import { cameraOn } from "./machineKit";
 import { Sparkles } from "./scenery";
 import { pickRuns } from "./things";
 import { createSim, DONE_AFTER_DRUM_S, DRUM, FLOOR, focusX, GROUPS, layOut, linkAge, linksSeconds, MARGIN, pushFirst, roomX, SCALE, stepSim } from "./topple";
-import { LinkArt } from "./toppleLinks";
+import { BOAT_MID, boatPad, FanBoat, LinkArt } from "./toppleLinks";
+import { Sprite } from "./parts";
 
 const INK = "#2a1e5c";
 /** How fast the camera catches up with the falling, per second. */
@@ -128,6 +129,7 @@ export function ToppleLevel({ sound, say, onDone }: LevelProps) {
   const world = { x: 0, y: 0, w: worldW, h: VIEW_H };
   const view = { x: camera.current, y: 0, w: VIEW_W, h: VIEW_H };
   const cameraStyle = cameraLayer(box.current, world, view);
+  const at = cameraPoint(box.current, world, view);
   // Round the first thing, the one the tap pushes over; the hand comes from the left, where the push comes from.
   const firstSpot = {
     x: MARGIN + (lefts[0] + first.w / 2) * SCALE,
@@ -164,8 +166,24 @@ export function ToppleLevel({ sound, say, onDone }: LevelProps) {
           </g>
         </g>
       </svg>
+      {links.map(({ link, left }, k) => {
+        // The fan's boat while it moves is a sprite of its own over the room (`FanBoat`, A-46).
+        if (link.kind !== "fan") return null;
+        const age = linkAge(sim, k);
+        if (!link.boatMoving(age)) return null;
+        const { boat, wind } = link.pose(age);
+        const mid = { x: boat + BOAT_MID.dx, y: BOAT_MID.y };
+        const pad = boatPad(link);
+        return (
+          <Sprite key={k} at={at} x={MARGIN + (left + mid.x) * SCALE} y={FLOOR + mid.y * SCALE} pad={pad * SCALE}>
+            <g transform={`scale(${SCALE}) translate(${-mid.x} ${-mid.y})`}>
+              <FanBoat link={link} boat={boat} wind={wind} />
+            </g>
+          </Sprite>
+        );
+      })}
       {/* Only once everything has dropped in, so the hint doesn't stand in the air before the first thing. */}
-      {phase.current === "ready" && <TapHint key="push" {...worldHint(cameraPoint(box.current, world, view), firstSpot)} side="left" />}
+      {phase.current === "ready" && <TapHint key="push" {...worldHint(at, firstSpot)} side="left" />}
     </div>
   );
 }

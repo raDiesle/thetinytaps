@@ -424,6 +424,9 @@ export const allGamesIdeas: IdeaArea = {
       text: "Messung vom 24. November 2026: sechs Level malen etwas mehr neu als 30 Bildschirme pro Sekunde – Garten Anfang 37 (`ketten-garden`), Alles fällt um Mitte 37–40 und dabei 61 % beschäftigt (`ketten-topple`), Aufräumen Anfang 35 (`ketten-tidy`), Wasserbahn Anfang 32 (`ketten-water`), Badezimmer Anfang 31 (`ketten-bath`), Zirkus Mitte 30–31 (`ketten-circus`). Die Ursache war in den anderen Leveln meist ein großes Ding, das sich im großen svg bewegt, seltener die fließenden Striche (`strokeDashoffset`). Lösung: je Level mit `bun run perf ketten-<id> --trace` die oft gemalten Ebenen finden und sie als kleine eigene Ebene (`Sprite`, `FlowingDashes` in `over`) aus dem großen svg nehmen; Level, die nach erneutem Messen im Rahmen liegen, nur notieren. Rahmen von `bun run perf`: höchstens 60 % beschäftigt, höchstens 30 Bildschirme pro Sekunde neu gemalt, langsamstes Zwanzigstel ≤ 34 ms. Vorher `main` am selben Tag gleich messen (die Zahlen schwanken), danach die Regeln in `src/games/marbles/CLAUDE.md` nachführen.",
       why: "Kleinkinder spielen oft auf alten Handys der Eltern; dort sehen sie das Spiel ruckeln.",
       effort: "M",
+      done: true,
+      partial:
+        "Umgesetzt am 27. November 2026 (alter Android, `main` am selben Tag gemessen): was lange quer durch ein Level reist, ist dort eine kleine eigene Ebene (`Sprite`), solange es sich bewegt – die Murmel im Zirkus vom Hut bis zum Korb, die Schnecke im Garten, der Aufzieh-Lastwagen und der Sockenball beim Aufräumen, das Segelboot vor dem Ventilator in Alles fällt um; das Schaukelpferd steht still, sobald es kaum noch schaukelt, und der Schaum in der Badewanne wippt in acht Schritten pro Sekunde. Garten Anfang 37 → 28 Bildschirme pro Sekunde, Zirkus 67 / 74 % → 58 / 56 % beschäftigt, Aufräumen Anfang 35 → 31 (gemalt 158 → 51-mal in 10 s) und Mitte 64 → 42 %, Alles fällt um Mitte 38–43 → 34 (zufällige Runden) bei 55 → 42 %, Badezimmer bleibt bei 31 und Wasserbahn bei 32. Was noch knapp über dem Rahmen liegt, ist A-62.",
     },
     {
       id: "A-47",
@@ -546,6 +549,14 @@ export const allGamesIdeas: IdeaArea = {
       title: "Leistung auf dem iPad prüfen",
       text: "Recherche vom 27. November 2026: Safari legt Teile *in* einem svg nie auf die Grafikkarte – seine neue SVG-Technik (LBSE) ist noch nicht eingeschaltet –, jede Animation dort malt das ganze svg neu. `bun run perf` misst nur Chrome. Zum Prüfen durch dich: die Spiele, in denen sich noch etwas in einem großen svg bewegt (z. B. Socken-Paare, der Zeitplan, siehe A-54), auf einem iPad spielen und sagen, wo es ruckelt; später ließe sich das Werkzeug um WebKit erweitern.",
       why: "Viele Familien spielen auf einem iPad, und dort hilft das, was Chrome rettet, nicht.",
+      effort: "S",
+    },
+    {
+      id: "A-62",
+      emoji: "🐢",
+      title: "Leistung: Kettenreaktion – letzte knappe Überschreitungen",
+      text: "Messung vom 27. November 2026 nach A-46: vier Abschnitte malen noch knapp mehr als 30 Bildschirme pro Sekunde neu, bei nur 26–47 % beschäftigt – Wasserbahn Anfang 32 (`ketten-water`), Badezimmer Anfang 31 (`ketten-bath`), Aufräumen Anfang 31 (`ketten-tidy`), Alles fällt um Mitte 34 (`ketten-topple`, je nach zufälligen Runden). Übrig ist jeweils die Hauptbewegung selbst: die Ente fährt *in* der Rinne der Wasserbahn unter deren Vorderwand (als Ebene bräuchte sie ein Stück Wand mit sich, wie das Hamsterrad in Gute Nacht `BarsHole`), die Wanne füllt sich, Klötze und Socken hüpfen, der Ventilator dreht und bläst. Lösung: zuerst auf einem echten alten Handy prüfen, ob man dort etwas ruckeln sieht (A-48); nur dann die Ente der Wasserbahn als Ebene mit dem Stück Rinnenwand bauen und neu messen.",
+      why: "Kleinkinder spielen oft auf alten Handys der Eltern; dort sehen sie das Spiel ruckeln.",
       effort: "S",
     },
   ],
