@@ -528,8 +528,10 @@ function BookBundle({ volumes, take }: { volumes: ShelfBook[]; take: (book: Shel
  * ring-bound desk calendar standing on the board as a tent – its pages leaning back on a cardboard stand behind them,
  * the two meeting in the rings on top like an upside-down V (user request, 26 November 2026: it should stand and look
  * 3D). Its page shows a day's plan: „Morning“ and „Afternoon“ written over two of the Tagesplan's pictures each, side by
- * side and as big as the page allows, on a sunny and a sky-blue band – no reward, no names, no plain white page (same
- * request: the small pictures with stars and the reward looked boring). One tap takes it out and opens the Zeitplan in
+ * side and as big as the page allows, on a sunny and a sky-blue band, each picture with its star on its top edge (user
+ * request, 27 November 2026) – no reward, no names, no plain white page (same request: small pictures on white paper
+ * with the reward looked boring). Last on its board, it grows up to the right wall and faces left into the room
+ * (user request, 27 November 2026). One tap takes it out and opens the Zeitplan in
  * its editor, whose quick access reaches the other two parts. Its page is the cover that swings open as it flies
  * (`.shelf-book-cover`, bookTravel.ts; the tent's other parts stay behind). Still, like everything on the shelf, and
  * glowing as the shelf's eye-catcher.
@@ -558,18 +560,21 @@ function ShelfCalendar({ book, onClick }: { book: ShelfBook; onClick: (e: MouseE
         <span className="shelf-calendar-pages" aria-hidden />
         <span className="shelf-book-cover shelf-calendar-sheet">
           <CalendarRings />
-          {CALENDAR_PARTS.map((part) => (
-            <span key={part.id} className="shelf-calendar-part" data-part={part.id} aria-hidden>
-              <span className="shelf-calendar-label">{t(part.name)}</span>
-              <span className="shelf-calendar-cards">
-                {part.cards.map((card) => (
-                  <span key={card} className="shelf-calendar-card">
-                    <img src={pictures[`kalender-${card}.webp`]} alt="" decoding="async" draggable={false} />
-                  </span>
-                ))}
+          <span className="shelf-calendar-day">
+            {CALENDAR_PARTS.map((part) => (
+              <span key={part.id} className="shelf-calendar-part" data-part={part.id} aria-hidden>
+                <span className="shelf-calendar-label">{t(part.name)}</span>
+                <span className="shelf-calendar-cards">
+                  {part.cards.map((card) => (
+                    <span key={card} className="shelf-calendar-card">
+                      <img src={pictures[`kalender-${card}.webp`]} alt="" decoding="async" draggable={false} />
+                      <CalendarStar />
+                    </span>
+                  ))}
+                </span>
               </span>
-            </span>
-          ))}
+            ))}
+          </span>
         </span>
       </span>
     </Link>
@@ -592,6 +597,26 @@ const CALENDAR_PARTS: { id: string; name: EnglishFirst; cards: string[] }[] = [
     cards: ["spielplatz", "malen"],
   },
 ];
+
+/**
+ * The star a picture's step earned, as the Tagesplan gives one: a golden star in a round field sitting on the picture's
+ * top edge, half above it and half on it (user request, 27 November 2026).
+ */
+function CalendarStar() {
+  return (
+    <svg className="shelf-calendar-star" viewBox="0 0 40 40" aria-hidden>
+      <circle cx={20} cy={20} r={18} fill="#fff4cf" stroke="#d99a1c" strokeWidth={3} />
+      <path
+        d="M20 7.5 L23.7 15.6 L32.4 16.4 L25.8 22.2 L27.8 30.8 L20 26.3 L12.2 30.8 L14.2 22.2 L7.6 16.4 L16.3 15.6 Z"
+        fill="#ffc531"
+        stroke="#c07d0c"
+        strokeWidth={1.6}
+        strokeLinejoin="round"
+      />
+      <path d="M17.2 14.4 L19.4 10.6" stroke="#fff6cf" strokeWidth={1.6} strokeLinecap="round" />
+    </svg>
+  );
+}
 
 /** The calendar's metal rings through the punched holes along its top edge. */
 function CalendarRings() {
@@ -743,17 +768,23 @@ function Compartment({
         <div
           className="shelf-row"
           data-leads={leads || undefined}
-          style={cell.lead || cell.pull ? ({ "--lead": `${cell.lead ?? 0}px`, "--pull": `${cell.pull ?? 0}px` } as CSSProperties) : undefined}
+          style={
+            cell.lead || cell.pull || ends.fills
+              ? ({ "--lead": `${cell.lead ?? 0}px`, "--pull": `${cell.pull ?? 0}px`, "--grow": `${ends.grow}px` } as CSSProperties)
+              : undefined
+          }
         >
           <span className="shelf-end">
             {ends.stack > 0 && stackLeft && <Stack seed={seed} />}
             <Spines count={stackLeft ? ends.left - ends.stack : ends.left} seed={seed} />
           </span>
           {children}
-          <span className="shelf-end">
-            <Spines count={stackLeft ? ends.right : ends.right - ends.stack} seed={seed + 3} />
-            {ends.stack > 0 && !stackLeft && <Stack seed={seed + 1} />}
-          </span>
+          {!ends.fills && (
+            <span className="shelf-end">
+              <Spines count={stackLeft ? ends.right : ends.right - ends.stack} seed={seed + 3} />
+              {ends.stack > 0 && !stackLeft && <Stack seed={seed + 1} />}
+            </span>
+          )}
         </div>
       )}
       {label && cell.books && <GroupSign name={t(label)} board style={groupWidth(cell, bh, spans)} />}
@@ -813,20 +844,26 @@ function BooksLight({ cell, bh, spans, leads }: { cell: ShelfCell; bh: number; s
 /**
  * How many books stand spine out at each end of a compartment of picture books, and whether a stack lies there too:
  * what the room beside the books leaves, the books standing together in the middle with `BOOK_GAP` round each – or,
- * where the carved words and the sign begin the board at its far left (`leads`), all of it at the right end. The
- * right end keeps room free beside the wall with the stickers, so they are seen.
+ * where the carved words and the sign begin the board at its far left (`leads`), all of it at the right end – or, where
+ * the ring calendar ends that board, none: it grows by that room (`grow`, `--grow`) up to the right wall.
  */
 function endsFor(cell: ShelfCell, bh: number, spans: number[], leads: boolean) {
   const n = cell.books?.length ?? 0;
   const span = (cell.books ?? []).reduce((sum, b) => sum + spans[b], 0);
   const free = cell.w - (cell.lead ?? 0) - span * bh * BOOK_ASPECT - (n + 1) * BOOK_GAP * bh - 4;
+  // The everyday helpers alone on their board end with the ring calendar: it takes all the room up to the right wall –
+  // the gap before the right end too, which is left out (`fills`) –, so none is given to books only filling the shelf
+  // (user request, 27 November 2026).
+  if (leads && n === 1 && PLACES[cell.books?.[0] ?? 0].at(-1)?.calendar) {
+    return { left: 0, right: 0, stack: 0, grow: Math.max(0, free + BOOK_GAP * bh), fills: true };
+  }
   const end = leads ? 0 : free / 2;
   // The widest spine's room, so that they never reach past the wall.
   const spine = bh * 0.17 + 1;
   const count = (room: number) => Math.max(0, Math.min(24, Math.floor(room / spine)));
   // A stack takes the room of this many spines, where there is room for it.
   const stack = free - end >= bh * 0.6 ? Math.ceil((bh * 0.62) / spine) : 0;
-  return { left: count(end), right: count(free - end), stack };
+  return { left: count(end), right: count(free - end), stack, grow: 0, fills: false };
 }
 
 /** A few books standing with their spines out, only to fill the shelf: their colours and heights from `seed`. */

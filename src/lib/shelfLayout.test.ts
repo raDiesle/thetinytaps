@@ -369,3 +369,20 @@ test("the carved words are set plainly and lie wholly in the light", () => {
   expect(light).toMatch(/inset: -/);
   expect(light).toMatch(/background: #[0-9a-f]{6}[c-f]\w;/);
 });
+
+// The ring calendar ends the everyday helpers' board (user request, 27 November 2026): it grows up to the right wall
+// instead of leaving that room to books only filling the shelf (`endsFor`'s `fills`, `--grow`), turns its face to the
+// left, into the room, and shows a star in a round field on each picture's top edge, half above and half on it.
+test("the ring calendar fills its board up to the right wall, faces left and shows a star on each picture", () => {
+  const css = readFileSync(new URL("../styles/bookshelf-books.css", import.meta.url), "utf8");
+  const tsx = readFileSync(new URL("../components/Bookshelf.tsx", import.meta.url), "utf8");
+  const rule = (selector: string) => css.match(new RegExp(`\\n${selector.replace(/[.>]/g, "\\$&")} \\{([^}]*)\\}`))?.[1] ?? "";
+  const [, turn] = rule(".shelf-calendar").match(/--turn: (-?[\d.]+)deg/) ?? [];
+  expect(Number(turn)).toBeLessThan(0);
+  expect(rule(".shelf-calendar")).toContain("flex: var(--spines) 1 var(--grow, 0px)");
+  for (const box of [".shelf-daily-row", ".shelf-daily-books"]) expect(rule(box)).toContain("var(--grow, 0px)");
+  expect(tsx).toMatch(/\{!ends\.fills && \(\s*<span className="shelf-end">/);
+  expect(tsx).toMatch(/<img src=\{pictures\[`kalender-\$\{card\}\.webp`\]\}[^>]*\/>\s*<CalendarStar \/>/);
+  expect(rule(".shelf-calendar-star")).toContain("transform: translate(-50%, -50%)");
+  expect(rule(".shelf-calendar-star")).toContain("top: 0");
+});

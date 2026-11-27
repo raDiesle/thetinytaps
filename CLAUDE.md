@@ -656,14 +656,19 @@ A game may give it before its end where reaching the goal once is enough (Ketten
   three small ribbons (user feedback, November 2026). The Belohnungstafel's three parts („Zeitplan“, „Belohnungstafel“,
   „Wie lange warten?“) no longer stand as such books but as **one ring-bound calendar** right of Aufs Töpfchen
   (`Game.calendar`, `ShelfCalendar`, user request, 26 November 2026), as wide as the three books were
-  (`CALENDAR_SPINES`). It stands on the board as a desk calendar does, a tent: its pages lean back from the board's
-  front onto a cardboard stand a little bigger than them, the two meeting in the rings like an upside-down V, turned a
-  little so the stand shows beside the pages (`--tilt`, `--turn`, `--ridge`; user request, 26 November 2026: it should
-  look 3D and stand) – within the compartment's depth (`--d`) and with its foot on the board, so look at it at 844×390,
-  1024×768, 1280×720 and 1920×1080 after changing them. Its page is never plain white: a red band under the rings, then
-  „Morning“ and „Afternoon“ written on a sunny and a sky-blue band, each over two of the Tagesplan's pictures side by
-  side, as big as the page allows (`CALENDAR_PARTS`, `bilder/kalender-*.webp`, cut from `src/games/rewards/bilder/`) –
-  no reward, no stars, no names (same request: small pictures on white paper looked boring) – one tap takes it out
+  (`CALENDAR_SPINES`) and, last on the board, wider still: it grows up to the compartment's right wall, never leaving
+  that room to books only filling the shelf (`endsFor`'s `fills`, `--grow`; user request, 27 November 2026). It stands
+  on the board as a desk calendar does, a tent: its pages lean back from the board's front onto a cardboard stand a
+  little bigger than them, the two meeting in the rings like an upside-down V, turned a little with its right side
+  forwards, so from the board's right end it faces left into the room – never out towards the wall (`--tilt`, `--turn`,
+  `--ridge`; user requests, 26 and 27 November 2026: it should look 3D and stand) – within the compartment's depth
+  (`--d`) and with its foot on the board, so look at it at 844×390, 1024×768, 1280×720 and 1920×1080 after changing
+  them. Its page is never plain white: a red band under the rings, then „Morning“ and „Afternoon“ written on a sunny
+  and a sky-blue band – one over the other, or side by side where the page grew wide (`.shelf-calendar-day`) – each over
+  two of the Tagesplan's pictures side by side, as big as the page allows (`CALENDAR_PARTS`, `bilder/kalender-*.webp`,
+  cut from `src/games/rewards/bilder/`), and on each picture's top edge its star, a golden star in a round field half
+  above the picture and half on it (`CalendarStar`, user request, 27 November 2026) – no reward, no names (same
+  request: small pictures on white paper looked boring) – one tap takes it out
   and opens the Zeitplan straight in its editor (`calendarHref`, router state `OPEN_EDITOR`), where a quick row reaches
   the other two (`src/games/rewards/CLAUDE.md`); every part's way back puts the calendar back. The single books stand thick enough to hit with a finger on a
   phone (`DAILY_SPINE`, widened again in November 2026 when they were still hard to hit), and lean a little differently, as books do.

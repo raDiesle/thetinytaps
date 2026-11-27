@@ -300,7 +300,7 @@
   flex: none;
   align-items: flex-end;
   /* With the room kept for the sign hanging over the carved words (`ShelfCell.lead`), which the words' place takes. */
-  width: calc(var(--bh) * 0.82 * var(--span, 1) + var(--lead, 0px));
+  width: calc(var(--bh) * 0.82 * var(--span, 1) + var(--lead, 0px) + var(--grow, 0px));
   height: var(--bh);
   transform: translateZ(calc(var(--d) * 0.17));
 }
@@ -326,7 +326,8 @@
   flex: none;
   gap: calc(var(--bh) * 0.03);
   align-items: flex-end;
-  width: calc(var(--bh) * 0.82 * var(--books-span));
+  /* With the room the ring calendar at its right end grows by up to the wall (`--grow`, `endsFor`). */
+  width: calc(var(--bh) * 0.82 * var(--books-span) + var(--grow, 0px));
   height: 100%;
 }
 
@@ -496,17 +497,20 @@
 .shelf-calendar {
   --tilt: 10deg;
   /*
-   * Turned a little, its left side forwards, so the stand shows at its left as the V's other leg – further, the tent
-   * reached through the compartment's back wall (`--d`) or its foot over the board's edge.
+   * Turned a little, its right side forwards, so it faces left into the room from the board's right end, as a desk
+   * calendar at the right of a desk faces whoever sits there (user request, 27 November 2026: turned the other way it
+   * looked out of the shelf); the stand shows at its right as the V's other leg – further, the tent reached through
+   * the compartment's back wall (`--d`) or its foot over the board's edge.
    */
-  --turn: 16deg;
+  --turn: -16deg;
   /* How far the tent reaches back on the board: twice its pages' height times sin(--tilt). */
   --tent: calc(var(--sh) * 0.97 * 0.35);
   /* Where the rings' line stands: half the tent back, and more for the turn, so the pages' foot keeps on the board. */
   --ridge: calc(var(--tent) * -0.5 - var(--sh) * 0.12);
   position: relative;
   display: block;
-  flex: var(--spines) 1 0;
+  /* As wide as three books, and the room up to the wall on top of that (`--grow`), the books left of it keeping theirs. */
+  flex: var(--spines) 1 var(--grow, 0px);
   min-width: 0;
   height: calc(var(--sh) * 0.97);
   color: var(--ink);
@@ -641,6 +645,29 @@
   overflow: visible;
 }
 
+/*
+ * The day's two parts, one over the other – or, where the calendar grew wide up to the wall (`--grow`), side by side,
+ * so their pictures stay big instead of flat bands across a wide page.
+ */
+.shelf-calendar-day {
+  display: flex;
+  flex: 1 1 0;
+  flex-direction: column;
+  gap: 0 3cqw;
+  min-height: 0;
+}
+
+@container (aspect-ratio > 1.15) {
+  .shelf-calendar-day {
+    flex-direction: row;
+  }
+
+  .shelf-calendar-part {
+    flex: 1 1 0;
+    min-width: 0;
+  }
+}
+
 /* A part of the day: its name on a band of its colour, its two pictures side by side under it, as big as they fit. */
 .shelf-calendar-part {
   --band: linear-gradient(#ffe48a, #ffd257);
@@ -684,6 +711,7 @@
 }
 
 .shelf-calendar-card {
+  position: relative;
   flex: 1 1 0;
   min-width: 0;
   padding: 1.5cqw;
@@ -697,6 +725,28 @@
   width: 100%;
   height: 100%;
   object-fit: contain;
+}
+
+/*
+ * Each picture's star, its round field sitting on the picture's top edge, half above it and half on it (user request,
+ * 27 November 2026); the band's gap under the name is half the star high, so the star never covers the name.
+ */
+.shelf-calendar-star {
+  position: absolute;
+  top: 0;
+  left: 50%;
+  width: var(--star);
+  height: var(--star);
+  transform: translate(-50%, -50%);
+  filter: drop-shadow(0 0.4cqh 0 #0000002e);
+}
+
+.shelf-calendar-part {
+  --star: 15cqh;
+}
+
+.shelf-calendar-part > .shelf-calendar-cards {
+  margin-top: calc(var(--star) / 2 - 1.5cqh);
 }
 
 /* Taken out (bookTravel.ts), only the page flies: the stand and the pages beneath stay behind. */
