@@ -1056,7 +1056,11 @@ src/lib/                 speech, sfx (synthesized + recorded sounds), storage, d
   copy gets ids of its own (`ownIds`, its `url(#…)` and `href` following them): with the page's ids each stood twice in
   the document, and Zähne putzen's face, clipped by one of them, vanished but for its eyes and mouth (user feedback,
   November 2026, reported twice; `bookTravel.test.ts`). A picture as big as the screen is cut to its frame by CSS
-  (`clip-path: inset(…)`), not by an svg `<clipPath>` found by its id. The grown-ups' options on the shelf's page are
+  (`clip-path: inset(…)`), not by an svg `<clipPath>` found by its id. Every face of the flying book that must
+  hide while turned away is hidden by an opacity step at the moment it stands edge on (`face`, `halfwayAt`), never by
+  `backface-visibility` or depth alone: WebKit (Safari) honours neither inside the turning cover, and the left page's
+  print lay over the cover, mirrored and dark, all the way out of the shelf (November 2026). Check a change to the flight
+  in WebKit too (Playwright's WebKit, its animations paused at fixed times), not only in Chrome. The grown-ups' options on the shelf's page are
   things one finds on a bookshelf, standing in its own narrow compartments beside the books, never buttons and never
   loose around the room (`RoomOptions.tsx`, user feedback, October 2026), on a wide screen all in one column at the
   shelf's right, one compartment over the other (`SIDE_COLUMN`, user decision, November 2026): on top, in the tallest,
