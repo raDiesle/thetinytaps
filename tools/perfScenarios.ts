@@ -41,6 +41,24 @@ export interface Budget {
 
 export const BUDGET: Budget = { p95: 34, stuttersPerS: 0.5, busy: 0.6, rasterScreensPerS: 30 };
 
+/**
+ * Zähne putzen: back to the start of the end's cheer, wherever the jumps before left the brushing: ← once if the end is
+ * on (its address says „ende“; → there only skips to the buttons), then → until the cheer's dazzled monster is there,
+ * one step at a time and waiting for each step's address – on the slow phone a press before the last had landed went
+ * past the cheer.
+ */
+const TO_THE_END = `(async () => {
+  const pause = (ms) => new Promise((r) => setTimeout(r, ms));
+  const press = async (key) => {
+    const was = location.search;
+    dispatchEvent(new KeyboardEvent("keydown", { key }));
+    for (let t = 0; t < 30 && location.search === was; t++) await pause(100);
+    await pause(300);
+  };
+  if (location.search.includes("ende")) await press("ArrowLeft");
+  for (let i = 0; i < 12 && !document.querySelector(".dazzle-body"); i++) await press("ArrowRight");
+})()`;
+
 /** Lebendige Bilder: the items of the picture, and a finger landing on one (an `eval` step defines `tapItem` with it). */
 const TAP_ITEMS = `((window.tapItem = (el) => { const r = el.getBoundingClientRect(); el.dispatchEvent(new PointerEvent("pointerdown", { bubbles: true, clientX: r.x + r.width / 2, clientY: r.y + r.height / 2, pointerType: "touch", isPrimary: true })); }), [...document.querySelectorAll("[data-item]")])`;
 
@@ -186,7 +204,9 @@ export const SCENARIOS: Scenario[] = [
       { label: "Putzen: Los!", ms: 6000 },
       { label: "Putzen: Monster antippen", ms: 6000, tap: { selector: ".monster-body", every: 700 } },
       { label: "Putzen: springen", ms: 12000, type: { keys: ["ArrowRight"], every: 2000 } },
-      { label: "Ende und Aufräumen", ms: 14000 },
+      // The jumps above run on into the end and skip it to the buttons, so until November 2026 this stretch measured
+      // only the still grin (X-18): it goes back to the cheer's start first and watches cheer, spitting and tidying whole.
+      { label: "Ende, Ausspucken und Aufräumen", before: [{ eval: TO_THE_END }, { waitFor: ".dazzle-body" }], ms: 17500 },
     ],
   },
   {

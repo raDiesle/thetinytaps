@@ -61,6 +61,9 @@ export const teethIdeas: IdeaArea = {
       text: "Am Ende, vor dem Ausspülen der Bürste, zeigt der Spiegel das Gesicht über dem Waschbecken: die Lippen gespitzt, ein Klecks Schaum fällt ins Becken, ein leises „Ptü“. Kein Becher Wasser zum Mundspülen. Ein Bild mit zwei Takten, ohne Worte im Bild. Der Schaum auf den Lippen (X-31) bleibt dann bis hierher und geht mit dem Ausspucken weg (heute blendet er beim Jubel aus, `foamStage` in foam.ts).",
       why: "Empfohlen wird, den Schaum nur auszuspucken und nicht mit Wasser nachzuspülen, damit das Fluorid an den Zähnen bleibt. Kinder machen nach, was sie sehen – und Ausspucken üben viele Zweijährige erst.",
       effort: "S",
+      done: true,
+      partial:
+        "Umgesetzt (27. November 2026): Nach dem Jubel fährt die Kamera vom Spiegel hinunter zum Kind über dem Waschbecken (zwei Takte): es beugt sich vor, spitzt die Lippen, der Schaum an den Lippen verschwindet, ein Klecks fällt ins Becken und liegt dort flach, mit einem leisen synthetischen „Ptü“. Dann hinunter zum Ausspülen der Bürste, der Klecks liegt noch im Becken und wird weggespült. Kein Becher, keine Worte. Das Ende ist dadurch 17 s lang; beim Hindi-Lied (Finale 14 s) laufen die letzten Sekunden des Aufräumens ohne Lied.",
     },
     {
       id: "X-19",
@@ -167,7 +170,7 @@ export const teethIdeas: IdeaArea = {
       effort: "S",
       done: true,
       partial:
-        "Umgesetzt (26. November 2026): Die Bläschen an den Borsten gab es schon; nach 20 s Putzen kommt Schaum in beide Mundwinkel, nach 40 s auf die Mitte der Unterlippe, nach 65 s mehr davon zu den Winkeln hin – jeder Klecks blendet in zwei Schlägen sanft ein. Da es das Ausspucken (X-18) noch nicht gibt, blendet der Schaum beim Jubel am Ende aus, während der Kopf zurückfährt; kommt X-18, bleibt er bis zum Ausspucken.",
+        "Umgesetzt (26. November 2026): Die Bläschen an den Borsten gab es schon; nach 20 s Putzen kommt Schaum in beide Mundwinkel, nach 40 s auf die Mitte der Unterlippe, nach 65 s mehr davon zu den Winkeln hin – jeder Klecks blendet in zwei Schlägen sanft ein. Seit X-18 bleibt er durch den Jubel und wird dann ausgespuckt.",
     },
     {
       id: "X-32",

@@ -150,6 +150,17 @@ export function playPuff() {
   hiss({ from: 1300, to: 800, duration: 0.6, volume: 0.2, q: 0.6 });
 }
 
+/**
+ * „Ptü“ – a child spitting toothpaste foam into the basin, softly: the lips' little pop, a short puff of air, and
+ * a faint wet splat as the foam lands a moment later.
+ */
+export function playSpit() {
+  note({ from: 220, to: 110, duration: 0.06, type: "sine", volume: 0.16 });
+  hiss({ from: 3200, to: 2200, duration: 0.05, volume: 0.12, delay: 0.04, q: 1.5 });
+  hiss({ from: 2400, to: 1500, duration: 0.16, volume: 0.07, delay: 0.08, q: 2.5 });
+  hiss({ from: 700, to: 400, duration: 0.09, volume: 0.08, delay: 0.32, q: 1.2 });
+}
+
 /** "Knirsch, knirsch" – footsteps or a shovel in fresh snow: short, dry, muffled crunches. */
 export function playCrunch() {
   for (let i = 0; i < 4; i++) {

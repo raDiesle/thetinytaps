@@ -242,7 +242,7 @@ interface MouthProps {
   happy: boolean;
   /** Right after the brushing: a last sugar monster peeks in, dazzled by the shining teeth, and puts on sunglasses. */
   dazzled: boolean;
-  /** How much toothpaste foam lies on the lips (`foamStage` in foam.ts): 0 none. Once all is clean (`happy`) it fades away. */
+  /** How much toothpaste foam lies on the lips (`foamStage` in foam.ts): 0 none. It stays through the cheer, until the child spits it out (`spit.tsx`). */
   foam: number;
   /** Shown while the child should open or close their mouth. */
   action: MouthAction | null;
@@ -856,16 +856,11 @@ export function Mouth({ view, zone, monsters, dirty, brush, happy, dazzled, foam
 
       <div className="mouth-sprites">
         {/* Foam on the lips, under the monsters and the arrows: each clump a small layer of its own that fades in once
-            and, once all is clean, away – never something inside the mirror's svg. */}
+            and stays until the child spits it out (`spit.tsx`) – never something inside the mirror's svg. */}
         {foamClumps.map((f) => {
           const at = onScreen(f.point, FOAM_SIZE * f.size);
           return (
-            <Sprite
-              key={f.at}
-              spot={{ x: round(at.x), y: round(at.y), scale: round(at.scale, 1000) }}
-              reach={FOAM_REACH}
-              className={`lip-foam${happy ? " gone" : ""}`}
-            >
+            <Sprite key={f.at} spot={{ x: round(at.x), y: round(at.y), scale: round(at.scale, 1000) }} reach={FOAM_REACH} className="lip-foam">
               <div>
                 <svg viewBox={spriteBox(FOAM_REACH)} aria-hidden>
                   <FoamClump shape={f.shape} flip={f.flip} />

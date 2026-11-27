@@ -2,12 +2,14 @@ import { existsSync } from "node:fs";
 import { expect, test } from "bun:test";
 import { PREP_CUES, PREP_MS, PREP_RECORDINGS, TIDY_RECORDINGS } from "./prep";
 import { ORIGIN_CUES, ORIGIN_MS, ORIGIN_RECORDINGS } from "./origin";
+import { SPIT_CUES, SPIT_MS } from "./spit";
 
 // The sounds of the prelude and of tidying up at the end fire when the brushing clock passes them, so they must lie inside their part.
 const PARTS = [
   { name: "sweets", cues: ORIGIN_CUES, ms: ORIGIN_MS.sweets },
   { name: "brush", cues: PREP_CUES.brush, ms: PREP_MS.brush },
   { name: "paste", cues: PREP_CUES.paste, ms: PREP_MS.paste },
+  { name: "spit", cues: SPIT_CUES, ms: SPIT_MS },
   { name: "tidy", cues: PREP_CUES.tidy, ms: PREP_MS.tidy },
 ];
 

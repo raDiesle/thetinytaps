@@ -25,6 +25,7 @@ import { DONE_SAY, type Prelude, PRELUDE_TEXTS, TIDY_SAY } from "./lines";
 import { Origin, ORIGIN_CUES, ORIGIN_MS, ORIGIN_RECORDINGS } from "./origin";
 import { Scenes, type SceneKind } from "./scenes";
 import { Prep, PREP_CUES, PREP_MS, PREP_RECORDINGS, TIDY_RECORDINGS } from "./prep";
+import { Spit, SPIT_CUES, SPIT_MS } from "./spit";
 import type { TeethSettings } from "./settings";
 import { GRIN_VIEW, STEPS, stepText } from "./steps";
 import { sungLanguageFor } from "./sung";
@@ -55,9 +56,14 @@ const ACTION_MS = 3500;
 const COUNTDOWN = 3;
 /** How long „Los!“ shows when the brushing begins. */
 const GO_MS = 1300;
-/** After the brushing: two bars of cheering at the clean grin, then the brush is rinsed and put away, then the buttons. */
+/**
+ * After the brushing: two bars of cheering at the clean grin, two of spitting the foam out over the basin (X-18: only
+ * spitting, no rinsing of the mouth), then the brush is rinsed and put away, then the buttons.
+ */
 const CHEER_MS = 4290;
-const ENDING_MS = CHEER_MS + PREP_MS.tidy;
+/** When the brush is rinsed, in ms after the brushing. */
+const TIDY_FROM = CHEER_MS + SPIT_MS;
+const ENDING_MS = TIDY_FROM + PREP_MS.tidy;
 /** A video recording ends at least this long after the brush is put away, so the last grin stays a moment. */
 const VIDEO_TAIL_MS = 3000;
 /** After the sung finale has rung out, the recording keeps the still grin this much longer, so the video doesn't end on the last note. */
@@ -77,8 +83,8 @@ export function preloadBrushing(language: string) {
   loadRecordings([...ORIGIN_RECORDINGS, ...PREP_RECORDINGS, ...TIDY_RECORDINGS, "cheer", "laugh"]);
 }
 
-/** The parts of the end: cheering at the clean teeth, tidying the brush away, and resting with the week chart and the buttons. */
-type Ending = "cheer" | "tidy" | "rest";
+/** The parts of the end: cheering at the clean teeth, spitting the foam out, tidying the brush away, and resting with the week chart and the buttons. */
+type Ending = "cheer" | "spit" | "tidy" | "rest";
 
 /** How the monsters grow depends on the time of day (over the day or the night), see DAYTIME. `sounds` play at their moment of the part; titles and lines are in lines.ts. */
 export const PRELUDE: Record<Prelude, { ms: number; title: Localized; cue?: Localized; sounds?: Cue[] }> = {
@@ -320,7 +326,8 @@ export function TeethPlay({ settings, video }: { settings: TeethSettings; video?
   const waiting = !paused && clock.until !== undefined && elapsed >= clock.until;
   const brushed = elapsed - introMs;
   const done = brushed >= totalMs;
-  const ending: Ending | null = !done ? null : brushed - totalMs < CHEER_MS ? "cheer" : brushed - totalMs < ENDING_MS ? "tidy" : "rest";
+  const after = brushed - totalMs;
+  const ending: Ending | null = !done ? null : after < CHEER_MS ? "cheer" : after < TIDY_FROM ? "spit" : after < ENDING_MS ? "tidy" : "rest";
   /** -1 during the prelude, STEPS.length when done. */
   const phase = brushed < 0 ? -1 : done ? STEPS.length : stepStarts.filter((at, k) => k < STEPS.length && brushed >= at).length - 1;
   const before = brushed < 0 ? preludeAt(prelude, elapsed) : null;
@@ -371,16 +378,18 @@ export function TeethPlay({ settings, video }: { settings: TeethSettings; video?
     loadRecordings([...(settings.origin ? ORIGIN_RECORDINGS : []), ...(settings.prep ? PREP_RECORDINGS : []), ...TIDY_RECORDINGS, "cheer", "laugh"]);
   }, [settings.origin, settings.prep]);
 
-  // The sounds of the story, the sink and tidying up, each when the clock passes its moment; none of those a jump skips over.
+  // The sounds of the story, the sink, spitting and tidying up, each when the clock passes its moment; none of those a jump skips over.
   const lastElapsed = useRef(elapsed);
   useEffect(() => {
     const from = lastElapsed.current;
     lastElapsed.current = elapsed;
     const sounds = before
       ? { start: preludeStart(prelude, before), cues: PRELUDE[before].sounds ?? [] }
-      : ending === "tidy"
-        ? { start: introMs + totalMs + CHEER_MS, cues: PREP_CUES.tidy }
-        : null;
+      : ending === "spit"
+        ? { start: introMs + totalMs + CHEER_MS, cues: SPIT_CUES }
+        : ending === "tidy"
+          ? { start: introMs + totalMs + TIDY_FROM, cues: PREP_CUES.tidy }
+          : null;
     if (!sounds || elapsed <= from || elapsed - from > CUE_GAP_MS) return;
     for (const cue of sounds.cues) if (sounds.start + cue.at > from && sounds.start + cue.at <= elapsed) cue.play();
   }, [elapsed]);
@@ -434,7 +443,7 @@ export function TeethPlay({ settings, video }: { settings: TeethSettings; video?
     // Only when the end moves on.
   }, [ending]);
 
-  // A video ends once the brush is put away and the sung finale has rung out (it lasts longer than the tidying).
+  // A video ends once the brush is put away and the sung finale has rung out (most finales last longer than the tidying; Hindi's ends before it).
   useEffect(() => {
     if (!video || ending !== "rest") return;
     const songLeft = (songEndMs(sungIn, song.buffer) ?? 0) + VIDEO_AFTER_SONG_MS - (totalMs + ENDING_MS);
@@ -505,10 +514,16 @@ export function TeethPlay({ settings, video }: { settings: TeethSettings; video?
   // jump into the middle of a part they would play it from its start while the clock, the song and the bar are further
   // on. Each of their animations belongs to the part shown (`at-<part>`), so all of them are set to where the clock is in it.
   useLayoutEffect(() => {
-    // The sink at the end (tidying up) is such a part too, reached from the bar's last part.
-    const into = before ? elapsed - preludeStart(prelude, before) : ending === "tidy" ? brushed - totalMs - CHEER_MS : null;
+    // Spitting and the sink at the end (tidying up) are such parts too, reached from the bar's last part.
+    const into = before
+      ? elapsed - preludeStart(prelude, before)
+      : ending === "spit"
+        ? brushed - totalMs - CHEER_MS
+        : ending === "tidy"
+          ? brushed - totalMs - TIDY_FROM
+          : null;
     if (!jumps || into === null) return;
-    const picture = stage.current?.querySelector(":scope > .teeth-scene:last-child :is(.origin, .prep)");
+    const picture = stage.current?.querySelector(":scope > .teeth-scene:last-child :is(.origin, .prep, .spit)");
     for (const animation of picture?.getAnimations({ subtree: true }) ?? []) animation.currentTime = into;
   }, [jumps]);
 
@@ -595,9 +610,15 @@ export function TeethPlay({ settings, video }: { settings: TeethSettings; video?
   const mouthBefore = phase <= 0 ? "closed" : STEPS[phase - 1].mouth;
   const mouthMoves = step !== null && step.mouth !== mouthBefore;
   const action: MouthAction | null = step && mouthMoves && brushed - stepStarts[phase] < ACTION_MS ? (step.mouth === "open" ? "open" : "close") : null;
-  /** The picture on: the camera looks from the child's face down to the sink, up into the mirror, and down again to tidy up. */
+  /** The picture on: the camera looks from the child's face down to the sink, up into the mirror, down to the basin the child spits into, and down again to tidy up. */
   const scene: SceneKind =
-    before === "sweets" || before === "grow" ? "story" : before === "brush" || before === "paste" || ending === "tidy" ? "sink" : "mirror";
+    before === "sweets" || before === "grow"
+      ? "story"
+      : before === "brush" || before === "paste" || ending === "tidy"
+        ? "sink"
+        : ending === "spit"
+          ? "spit"
+          : "mirror";
   const target = step?.view ?? GRIN_VIEW;
   const { view, gliding, k: glided } = useGlidingView(target, mouthMoves ? MOUTH_MS : TURN_MS);
 
@@ -644,6 +665,8 @@ export function TeethPlay({ settings, video }: { settings: TeethSettings; video?
             <Origin key={round} part={before === "sweets" ? "sweets" : "grow"} daytime={daytime} tickled={tickled} onTickle={tickle} free={room} />
           ) : scene === "sink" ? (
             <Prep key={round} part={before === "brush" || before === "paste" ? before : "tidy"} daytime={daytime} free={room} />
+          ) : scene === "spit" ? (
+            <Spit key={round} daytime={daytime} free={room} />
           ) : (
             <Mouth
               key={round}
@@ -734,7 +757,7 @@ export function TeethPlay({ settings, video }: { settings: TeethSettings; video?
                 </div>
                 <BarSymbol name="zahn" />
               </div>
-              {/* After the brushing: the cheer at the clean teeth, then the brush rinsed and put back in its cup. */}
+              {/* After the brushing: the cheer at the clean teeth, spitting the foam out, then the brush rinsed and put back in its cup. */}
               <PhaseTile phase="tidy" now={ending !== null} done={share(tidyPart)} title={t(TIDY_SAY)} />
             </div>
             {/* For the grown-up, only where the screen is wide enough (teeth.css): before the brushing the time until it

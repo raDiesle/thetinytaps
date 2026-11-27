@@ -1,6 +1,6 @@
 // Toothpaste foam round the mouth in the mirror (idea X-31): as at home it grows while the child brushes – first a few
 // bubbles on the bristles (`FOAM` in brush.tsx), then a rim of foam in the corners of the mouth, then on the lower lip –
-// and stays until the brushing is done. A child who sees it on the face in the game knows the foam in its own mouth.
+// and stays until the child spits it out after the cheer (X-18, `spit.tsx`). A child who sees it on the face in the game knows the foam in its own mouth.
 //
 // Only the data lives here, so a test reads it without the drawings; mouth.tsx draws each clump as a small HTML layer
 // of its own that fades in once (`.lip-foam`), never something inside the mirror's svg.
@@ -48,11 +48,11 @@ export const FOAM_FROM_MS = [20_000, 40_000, 65_000];
 
 /**
  * How much foam is on the lips `brushedMs` into the brushing (below 0: before it): 0 none, up to the number of stages.
- * At the end it stays through the cheer, where it fades away (`away`); when the mirror comes back after tidying up
- * (`rest`), the face is clean.
+ * At the end it stays through the cheer, until the child spits it out (`spit`, a picture of its own that draws the foam
+ * itself); when the mirror comes back after tidying up (`rest`), the face is clean.
  */
-export function foamStage(brushedMs: number, totalMs: number, ending: "cheer" | "tidy" | "rest" | null): number {
-  if (brushedMs < 0 || ending === "tidy" || ending === "rest") return 0;
+export function foamStage(brushedMs: number, totalMs: number, ending: "cheer" | "spit" | "tidy" | "rest" | null): number {
+  if (brushedMs < 0 || (ending !== null && ending !== "cheer")) return 0;
   const at = Math.min(brushedMs, totalMs);
   return FOAM_FROM_MS.filter((from) => at >= from).length;
 }

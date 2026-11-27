@@ -74,7 +74,8 @@ function framingFor(room: Parameters<typeof fitBox>[0]) {
 }
 /** Where the camera ends up while the monsters grow: the lips round the mouth with them, as big as the free room allows. */
 const MOUTH_FOCUS: Box = { x: 114, y: 234, width: 212, height: 118 };
-const HEAD = { x: W / 2, y: 215, r: 165 };
+/** The story's head: its middle and radius in picture units; the spitting at the end draws the same head (`spit.tsx`). */
+export const HEAD = { x: W / 2, y: 215, r: 165 };
 /** Where the teeth stand in the mouth: from left to right, and from the top edge down to the bottom's lowest point. */
 export const MOUTH = { left: 124, right: 316, top: 258, depth: 80 };
 const MID = (MOUTH.left + MOUTH.right) / 2;
@@ -279,13 +280,13 @@ const FIRST_ID = 1000;
 /** The closed mouth while chewing: where its lips meet, in the middle (a little below the open mouth's top). */
 const CLOSED = { y: MOUTH.top + 12, half: 50 };
 /** Its piece, and the point it moves round (where the lips meet). */
-const CLOSED_AREA: Box = { x: MID - CLOSED.half - 10, y: CLOSED.y - 22, width: 2 * CLOSED.half + 20, height: 60 };
+export const CLOSED_AREA: Box = { x: MID - CLOSED.half - 10, y: CLOSED.y - 22, width: 2 * CLOSED.half + 20, height: 60 };
 
 /**
  * The closed lips of a chewing mouth, full and a little pursed round the sweet: a thinner upper lip, a fuller lower one,
  * the line where they meet turning up at the corners as the smile does.
  */
-function ClosedMouth() {
+export function ClosedMouth() {
   const { y, half } = CLOSED;
   const [l, r] = [MID - half, MID + half];
   const upper = `M${l} ${y} Q${MID - half / 2} ${y - 16} ${MID} ${y - 10} Q${MID + half / 2} ${y - 16} ${r} ${y} Q${MID} ${y + 8} ${l} ${y} Z`;
@@ -580,7 +581,7 @@ function Pupil({ x, y, look }: { x: number; y: number; look?: CSSProperties }) {
 }
 
 /** The brows, each turning round its middle (the middle of its piece) as it goes up in delight or worry. */
-const BROWS = [
+export const BROWS = [
   { side: "left", d: "M140 150 Q160 140 180 148", area: { x: 134, y: 136, width: 52, height: 20 } },
   { side: "right", d: "M260 148 Q280 140 300 150", area: { x: 254, y: 136, width: 52, height: 20 } },
 ];

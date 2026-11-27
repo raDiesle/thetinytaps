@@ -1,17 +1,18 @@
 import { useEffect, useLayoutEffect, useRef, useState, type ReactNode } from "react";
 
 // The pictures before and after the brushing follow each other like one camera looking round the bathroom: from the
-// child's face down to the sink, from the sink up into the mirror, and down to the sink again to put the brush away.
+// child's face down to the sink, from the sink up into the mirror, down to the basin the child spits into, and down to
+// the sink again to put the brush away.
 // The old picture stays (still playing) while it slides out and the new one slides in, so there is never a cut.
 
-/** Which picture is on: the story's face, the sink, or the mirror. */
-export type SceneKind = "story" | "sink" | "mirror";
+/** Which picture is on: the story's face, the sink, the mirror, or the mirror's view of the child spitting over the basin. */
+export type SceneKind = "story" | "sink" | "mirror" | "spit";
 
 /** How long the camera takes from one picture to the next: two beats of the song (112 BPM). */
 export const SCENE_MS = 1072;
 
-/** Where the camera goes: down to the sink, up from it, or (story to mirror, a new round) a soft fade. */
-const wayTo = (from: SceneKind, to: SceneKind) => (to === "sink" ? "down" : from === "sink" ? "up" : "fade");
+/** Where the camera goes: down to the sink or to the basin the child spits into, up from the sink, or (story to mirror, a new round) a soft fade. */
+const wayTo = (from: SceneKind, to: SceneKind) => (to === "sink" || to === "spit" ? "down" : from === "sink" ? "up" : "fade");
 
 /** A picture still sliding out. */
 interface Leaving {

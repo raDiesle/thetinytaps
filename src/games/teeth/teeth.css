@@ -1911,9 +1911,164 @@
   animation-iteration-count: 3;
 }
 
+/* The splat the child spat out lies in the basin until the water washes it away (`.prep-spat`). */
+.prep-spat {
+  animation: teeth-prep-spat-off 8.57s ease-in forwards;
+}
+
+@keyframes teeth-prep-spat-off {
+  0%,
+  12.5% {
+    opacity: 1;
+  }
+  31.25%,
+  100% {
+    opacity: 0;
+  }
+}
+
+/* ---------- Spitting out, not rinsing (X-18, spit.tsx): two bars, 8 beats of 12.5 % (SPIT_MS) ---------- */
+
+.spit {
+  position: absolute;
+  inset: 0;
+  overflow: hidden;
+}
+
+.spit-picture,
+.spit-frame {
+  position: absolute;
+  inset: 0;
+  display: block;
+  width: 100%;
+  height: 100%;
+}
+
+.spit-frame {
+  pointer-events: none;
+}
+
+/* Two beats down over the basin (LEAN in spit.tsx), up again over the last two. */
+.spit-child {
+  animation: teeth-spit-lean 4.29s ease-in-out forwards;
+}
+
+@keyframes teeth-spit-lean {
+  0%,
+  12.5% {
+    transform: translateY(0);
+  }
+  25%,
+  75% {
+    transform: translateY(10px);
+  }
+  100% {
+    transform: translateY(0);
+  }
+}
+
+/* The smile gives way to the pursed lips on beat 2 and comes back on beat 5. */
+.spit-smile {
+  animation: teeth-spit-smile 4.29s ease-in-out forwards;
+}
+
+@keyframes teeth-spit-smile {
+  0%,
+  25%,
+  75%,
+  100% {
+    opacity: 1;
+  }
+  31.25%,
+  62.5% {
+    opacity: 0;
+  }
+}
+
+/* The foam on the lips gathers into the mouth as they purse. */
+.spit-lip-foam {
+  animation: teeth-spit-lip-foam 4.29s ease-in forwards;
+}
+
+@keyframes teeth-spit-lip-foam {
+  0%,
+  25% {
+    transform: scale(1);
+    opacity: 1;
+  }
+  31.25%,
+  100% {
+    transform: scale(0.5);
+    opacity: 0;
+  }
+}
+
+/* Pursed from beat 2, pushed forward once at the „ptü“ (beat 4), back into the smile on beat 5. */
+.spit-pucker {
+  opacity: 0;
+  animation: teeth-spit-pucker 4.29s ease-in-out forwards;
+}
+
+@keyframes teeth-spit-pucker {
+  0%,
+  25% {
+    transform: scale(0.7);
+    opacity: 0;
+  }
+  31.25%,
+  46.875% {
+    transform: scale(1);
+    opacity: 1;
+  }
+  50% {
+    transform: scale(1.12);
+    opacity: 1;
+  }
+  53.125%,
+  62.5% {
+    transform: scale(1);
+    opacity: 1;
+  }
+  75%,
+  100% {
+    transform: scale(0.8);
+    opacity: 0;
+  }
+}
+
+/* The dab peeks out of the lips on beat 3, drops on beat 4 with the „ptü“ (SPIT_CUES) down to the bowl (LANDS_AT, 154
+   picture units below) and lies there as a splat. */
+.spit-blob {
+  transform: scale(0);
+  animation: teeth-spit-blob 4.29s ease-out forwards;
+}
+
+@keyframes teeth-spit-blob {
+  0%,
+  37.5% {
+    transform: translateY(0) scale(0);
+  }
+  43.75% {
+    transform: translateY(2px) scale(1);
+  }
+  50% {
+    transform: translateY(4px) scale(1.05, 0.95);
+    animation-timing-function: ease-in;
+  }
+  58% {
+    transform: translateY(154px) scale(0.9, 1.15);
+    animation-timing-function: ease-out;
+  }
+  62.5%,
+  100% {
+    transform: translateY(154px) scale(1.7, 0.4);
+  }
+}
+
 /* Important for the same reason as the story's: `.prep.at-paste .prep-tube-squeeze` outranks it. */
 .teeth-play.paused .teeth-count,
 .teeth-play.paused .prep *,
+.teeth-play.paused .spit *,
 .teeth-play.paused .lip-arrow {
   animation-play-state: paused !important;
 }
@@ -2215,7 +2370,8 @@
 }
 
 /* Toothpaste foam on the lips (X-31, mouth.tsx `FoamClump`): each clump a small layer of its own that fades in calmly
-   over two beats as the brushing goes on, and away over two beats once all is clean – no bubbles that rise or burst. */
+   over two beats as the brushing goes on, and stays through the cheer until the child spits it out (spit.tsx) – no
+   bubbles that rise or burst. */
 .lip-foam {
   pointer-events: none;
 }
@@ -2225,25 +2381,12 @@
   animation: teeth-foam-in 1.07s ease-out both;
 }
 
-.lip-foam.gone > div {
-  animation: teeth-foam-away 1.07s ease-in forwards;
-}
-
 @keyframes teeth-foam-in {
   from {
     opacity: 0;
   }
   to {
     opacity: 1;
-  }
-}
-
-@keyframes teeth-foam-away {
-  from {
-    opacity: 1;
-  }
-  to {
-    opacity: 0;
   }
 }
 
@@ -2432,10 +2575,6 @@
 
   .lip-foam > div {
     animation: none;
-  }
-
-  .lip-foam.gone {
-    display: none;
   }
 
   /* Still, a brushed monster goes: it only fades. */
