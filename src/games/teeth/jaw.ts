@@ -154,6 +154,11 @@ export interface GumPiece {
   faces: Face[];
   /** The gum's edge on the cheek side and on the tongue side, drawn darker so the line where the tooth comes out shows. */
   rims: Record<"outer" | "inner", Vec3[]>;
+  /**
+   * The gum's top only from its cheek-side rim to the tooth's tongue side, filling the gaps between the crowns and
+   * reaching neither past the tooth towards the tongue nor behind the last molar (`lipSideOnly`).
+   */
+  bite: Face;
 }
 
 /** Y of the chewing plane and of the gum line for a jaw. */
@@ -249,10 +254,18 @@ function buildGum(jaw: Jaw, side: Side, n: number, open: number): GumPiece {
   const innerFoot = angles.map((t) => archPoint(jaw, t, spec.depth + 4, bottom));
   const center = mean([...outerRim, ...outerFoot, ...innerRim, ...innerFoot]);
   const face = (kind: FaceKind, points: Vec3[]): Face => ({ kind, points, normal: normalOf(points, center), center: mean(points) });
+  // The bite's tongue-side edge runs along the tooth's own tongue side at the rim's height, so the crown covers it.
+  const biteAngles = angles.filter((t) => Math.abs(t) <= spec.to);
+  const toothInside = (t: number) => spec.depth - spec.depth * (1 - spec.edge) * Math.min(1, gumLine(n, Math.abs(t)) + GUM_OVERLAP);
+  const bite = face("top", [
+    ...biteAngles.map((t) => archPoint(jaw, t, -3, rim(t))),
+    ...[...biteAngles].reverse().map((t) => archPoint(jaw, t, toothInside(t), rim(t))),
+  ]);
   return {
     jaw,
     key: toothKey({ jaw, side, n }),
     center,
+    bite,
     rims: { outer: outerRim, inner: innerRim },
     faces: [
       face("outer", [...outerRim, ...[...outerFoot].reverse()]),
@@ -260,6 +273,16 @@ function buildGum(jaw: Jaw, side: Side, n: number, open: number): GumPiece {
       face("inner", [...innerRim, ...[...innerFoot].reverse()]),
     ],
   };
+}
+
+/**
+ * A piece of gum with nothing of it on the tongue side of its tooth: its cheek-side wall and its `bite`. A row tipped
+ * to show its chewing surfaces shows no gum past the teeth towards the tongue – above the lower teeth, below the upper
+ * ones – and none behind the last molar (user feedback, November 2026): a band of lighter gum there lay between the
+ * teeth and the tongue like a second row.
+ */
+export function lipSideOnly(gum: GumPiece): GumPiece {
+  return { ...gum, faces: [gum.faces.find((f) => f.kind === "outer")!, gum.bite], rims: { outer: gum.rims.outer, inner: [] } };
 }
 
 export interface MouthModel {
@@ -615,6 +638,15 @@ const TIPPED_GROWTH = 0.15;
  * below, down for the lower one seen from above – as if they went away into the mouth (user feedback, November 2026).
  */
 export const TIPPED_PERSPECTIVE = 1 / 260;
+/**
+ * How much flatter a tipped row is drawn than the tip alone would show it, as a share of how far its teeth lie above
+ * (or below) the front teeth on the screen: tipped as far as it must be to show the chewing surfaces, the lower row
+ * rose in a deep U up the sides, and wide bands of cheek lay between its back teeth and the lips' corners (user
+ * feedback, November 2026). Flatter, the back teeth stay lower, out towards the corners.
+ */
+export const TIPPED_FLATTEN = 0.3;
+/** How much of the perspective's bending in a tipped row keeps across: its back teeth still shrink, but stay out towards the corners. */
+const TIPPED_ACROSS = 0.6;
 
 /** One projector for the face and lips, and one for each jaw, tipped about the middle of its chewing surface. */
 export function projectors(view: View): { face: Projector } & Record<Jaw, Projector> {
@@ -635,12 +667,19 @@ export function projectors(view: View): { face: Projector } & Record<Jaw, Projec
     const front = tipped.point([0, anchor[1], ARCH[jaw].b]).depth;
     const far = TIPPED_PERSPECTIVE * k;
     const mid = { x: PICTURE.width / 2, y: PICTURE.height / 2 };
+    // The front teeth's height on the screen, which the row is flattened towards (`TIPPED_FLATTEN`).
+    const frontY = tipped.point([0, anchor[1], ARCH[jaw].b]).y;
+    const flat = 1 - TIPPED_FLATTEN * k;
     return {
       ...tipped,
       point: (p: Vec3) => {
         const q = tipped.point(p);
-        const f = 1 / (1 + far * Math.max(0, front - q.depth));
-        return { x: mid.x + (q.x - mid.x) * f + dx, y: mid.y + (q.y - mid.y) * f + dy, depth: q.depth };
+        const behind = Math.max(0, front - q.depth);
+        const f = 1 / (1 + far * behind);
+        // Across, the back teeth bend in less, so the row reaches out towards the lips' corners.
+        const fx = 1 / (1 + far * TIPPED_ACROSS * behind);
+        const y = frontY + (q.y - frontY) * flat;
+        return { x: mid.x + (q.x - mid.x) * fx + dx, y: mid.y + (y - mid.y) * f + dy, depth: q.depth };
       },
     };
   };
