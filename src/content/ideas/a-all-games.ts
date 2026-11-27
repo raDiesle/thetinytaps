@@ -531,6 +531,9 @@ export const allGamesIdeas: IdeaArea = {
       text: "Recherche vom 27. November 2026: Der React Compiler (stabil seit Oktober 2025) setzt `memo`/`useMemo` selbst; Meta maß bis zu 2,5-mal schnellere Interaktionen. Für Bun gibt es keinen offiziellen Weg, aber `oxc-transform-react` (seit August 2026, mit `reactCompiler`) ließe sich im Bun-Plugin `tools/appPlugin.ts` für `.tsx` aufrufen. Lösung: in einem Zweig einbauen, `bun run perf` über alle Spiele vor und nach vergleichen und nur behalten, wenn es messbar hilft (Paketregeln in `bunfig.toml` beachten). Hilft nicht beim Uhrtakt der Kettenreaktion (A-56), wo sich wirklich jedes Bild etwas ändert.",
       why: "Könnte in vielen Spielen unnötiges Neuzeichnen sparen, ohne jedes von Hand zu ändern.",
       effort: "M",
+      rejected: true,
+      partial:
+        "Verworfen am 27. November 2026 nach der Recherche: Für Bun gibt es keinen offiziellen Weg, der Compiler käme als neues Paket in jeden Build, sein Nutzen ist nur in Metas eigenen Zahlen belegt, und wo Neuzeichnen bei uns teuer war, ist es schon von Hand mit `memo`/`useMemo` gelöst – das teuerste übrige Neuzeichnen, der Uhrtakt der Kettenreaktion, ändert sich wirklich jedes Bild und bleibt A-56.",
     },
     {
       id: "A-60",
@@ -539,6 +542,9 @@ export const allGamesIdeas: IdeaArea = {
       text: 'Recherche vom 27. November 2026: Der letzte Hänger beim Buch-Herausnehmen (67–100 ms, das Bild, in dem die neue Seite das Zimmer ersetzt) und beim Bildwechsel in Gefühle kommt vom Aufbau einer großen Seite auf einmal. React 19.2 kann einen Teil versteckt und mit niedriger Vorfahrt schon vorher zeichnen (`<Activity mode="hidden">`), und großer Aufbau lässt sich mit `scheduler.yield()` in Häppchen teilen (Chrome; in Safari mit `setTimeout` als Ersatz, `requestIdleCallback` fehlt dort). Lösung: an einer Stelle ausprobieren (nächste Szene in Gefühle oder das nächste Level nach „Weiter“) und mit `bun run perf` messen.',
       why: "Der Seitenwechsel ist der Moment, in dem ein Kind am genauesten hinschaut.",
       effort: "M",
+      rejected: true,
+      partial:
+        "Verworfen am 27. November 2026 nach der Recherche: Der übrige Hänger beim Buch-Herausnehmen liegt mit 67–100 ms in 7 von 8 Durchgängen im Rahmen, und der in Gefühle kommt vom Entpacken großer Bilder, nicht vom Aufbau in React – `<Activity>` und `scheduler.yield()` hülfen dort nicht, kosteten aber eine zweite, versteckte Seite im Speicher alter Handys.",
     },
     {
       id: "A-61",
