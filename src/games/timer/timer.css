@@ -3059,9 +3059,9 @@
 }
 
 /* Lift to the Top (H-127, lift.tsx): the tower many screens tall (`.tm-lift-world`) slides down as one layer on its
-   keyframes written for the run (`.tm-hop`) behind the cabin standing still; the top door's two halves and the flag
-   ride in it on keyframes of their own. The display's arrow scrolls up a dot at a time while the lift goes, the pulley
-   on the cabin's roof turns with it, and at the end the flag waves gently. Small layers by `transform` alone. */
+   keyframes written for the run (`.tm-hop`) behind the cabin standing still; the top door's two halves ride in it on
+   keyframes of their own. The display's arrow scrolls up a dot at a time while the lift goes and the pulley on the
+   cabin's roof turns with it. Small layers by `transform` alone. */
 .tm-lift-arrow-box {
   overflow: hidden;
 }
@@ -3096,29 +3096,6 @@
 @keyframes tm-lift-pulley {
   to {
     transform: rotate(90deg);
-  }
-}
-
-.tm-lift-wave {
-  position: absolute;
-  inset: 0;
-  transform-origin: 0 50%;
-}
-
-.tm-lift-wave > svg {
-  display: block;
-  width: 100%;
-  height: 100%;
-  overflow: visible;
-}
-
-.tm-done .tm-lift-wave {
-  animation: tm-lift-wave 2.4s ease-in-out infinite;
-}
-
-@keyframes tm-lift-wave {
-  50% {
-    transform: skewY(-5deg) scaleX(0.94);
   }
 }
 

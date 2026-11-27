@@ -32,22 +32,26 @@ import {
   DISPLAY,
   DOOR as LIFT_DOOR,
   displayAt,
-  FLAG,
-  FLAG_DROP,
-  FLOORS,
   floorAt,
   floorTurnsAt,
   LEVEL,
   levelOf,
   liftAt,
   liftPlan,
-  PLATE as LIFT_PLATE,
-  POLE,
+  MAX_FLOORS,
+  PIECE,
+  pieceSpan,
+  piecesNear,
+  piecesOf,
+  MIN_STOREY_MS,
+  plateOf,
   ROOF,
   SHAFT,
   STOREY,
-  TRAVEL,
+  storeyMs,
+  travelOf,
   worldFrames,
+  worldHOf,
 } from "./lift";
 import { BITE_R, BUTTERFLY, biteSpot, bodyFront, frontAfter, LEAF, LEAF_FLOOR, leafLeft, leafShape, leafSpan, planBites, REACH } from "./caterpillar";
 import { DISC, DOTS, dotAt } from "./disc";
@@ -775,68 +779,104 @@ describe("Timer", () => {
       expect(css, part).toMatch(new RegExp(`\\.tm-done \\.tm-${part}[,\\s{]`));
   });
 
-  test("Lift to the Top: every floor at every length, a gentle start and stop, arriving a little before the end, the flag going up as it is up (H-127)", () => {
-    // User request, 26 November 2026: one tower, one big lift riding all the way up, its red numbers counting slowly,
-    // then a flag hoisted. Every length rides all twenty floors (the whole story, only faster or slower).
-    for (const total of [10_000, 30_000, 60_000, 5 * 60_000, 10 * 60_000, 3 * 3_600_000]) {
-      const { arrive, doorOpen, flagFrom } = liftPlan(total);
+  test("Lift to the Top: up to a hundred floors, never more than one a second, a gentle start and stop, arriving a little before the end (H-127)", () => {
+    // User request, 26 November 2026: one tower, one big lift riding all the way up, its red numbers counting slowly.
+    // User request, 27 November 2026: „es soll bis 100 gehen, aber nicht mehr als ein Stockwerk pro Sekunde“ – a long
+    // time rides a hundred floors, a short one as many as leave a second for each (the one count that follows the time).
+    expect(MAX_FLOORS).toBe(100);
+    expect(liftPlan(5 * 60_000).floors).toBe(MAX_FLOORS);
+    expect(liftPlan(3 * 3_600_000).floors).toBe(MAX_FLOORS);
+    for (const total of [5_000, 10_000, 30_000, 60_000, 90_000, 2 * 60_000, 5 * 60_000, 10 * 60_000, 3 * 3_600_000]) {
+      const ride = liftPlan(total);
+      const { floors, arrive, doorOpen } = ride;
+      expect(floors, `${total}`).toBeGreaterThanOrEqual(1);
+      expect(floors, `${total}`).toBeLessThanOrEqual(MAX_FLOORS);
+      // As many floors as fit at one a second: one more would turn the display faster.
+      expect(storeyMs(ride), `${total}`).toBeGreaterThanOrEqual(MIN_STOREY_MS);
+      if (floors < MAX_FLOORS) expect(arrive / (floors + 2), `${total}`).toBeLessThan(MIN_STOREY_MS);
       expect(arrive, `${total}`).toBeLessThan(total);
       expect(total - arrive, `${total}`).toBeLessThanOrEqual(Math.min(5000, total * 0.12) + 1e-6);
-      expect(flagFrom).toBeGreaterThan(arrive);
       expect(doorOpen).toBeGreaterThan(arrive);
       expect(doorOpen).toBeLessThan(total);
-      expect(liftAt(0, arrive)).toBe(0);
-      expect(liftAt(arrive, arrive)).toBe(TRAVEL);
+      expect(liftAt(0, ride)).toBe(0);
+      expect(liftAt(arrive, ride)).toBe(travelOf(floors));
       // Rising all the way, never back, with no jump in between.
       let last = 0;
-      for (let i = 1; i <= 2000; i++) {
-        const now = liftAt((arrive * i) / 2000, arrive);
+      for (let i = 1; i <= 4000; i++) {
+        const now = liftAt((arrive * i) / 4000, ride);
         expect(now, `${total} ${i}`).toBeGreaterThanOrEqual(last);
         expect(now - last, `${total} ${i}`).toBeLessThan(STOREY / 2);
         last = now;
       }
-      // The display counts every floor from 0 to the top, one at a time, each turning before the lift arrives.
-      expect(floorAt(0, arrive)).toBe(0);
-      expect(floorAt(arrive, arrive)).toBe(FLOORS);
-      for (let k = 1; k <= FLOORS; k++) {
-        const at = floorTurnsAt(k, arrive);
+      // The display counts every floor from 0 to the top, one at a time and at least a second apart, each turning
+      // before the lift arrives.
+      expect(floorAt(0, ride)).toBe(0);
+      expect(floorAt(arrive, ride)).toBe(floors);
+      for (let k = 1; k <= floors; k++) {
+        const at = floorTurnsAt(k, ride);
         expect(at, `${total} ${k}`).toBeLessThan(arrive);
-        if (k > 1) expect(at, `${total} ${k}`).toBeGreaterThan(floorTurnsAt(k - 1, arrive));
-        expect(floorAt(at - 1, arrive), `${total} ${k}`).toBe(k - 1);
-        expect(floorAt(at + 1, arrive), `${total} ${k}`).toBe(k);
+        expect(at - (k > 1 ? floorTurnsAt(k - 1, ride) : 0), `${total} ${k}`).toBeGreaterThanOrEqual(MIN_STOREY_MS - 1e-6);
+        expect(floorAt(at - 1, ride), `${total} ${k}`).toBe(k - 1);
+        expect(floorAt(at + 1, ride), `${total} ${k}`).toBe(k);
       }
-      expect(displayAt(arrive - 1, arrive)).toBe(`${FLOORS}^`);
-      expect(displayAt(arrive, arrive)).toBe(`${FLOORS}`);
+      expect(displayAt(arrive - 1, ride)).toBe(`${floors}^`);
+      expect(displayAt(arrive, ride)).toBe(`${floors}`);
       // The tower's keyframes go the same way as the lift.
-      const frames = worldFrames(arrive);
-      expect(frames[0].transform).toBe(`translateY(${((-TRAVEL / (TRAVEL + 900)) * 100).toFixed(4)}%)`);
+      const frames = worldFrames(ride);
+      expect(frames[0].transform).toBe(`translateY(${((-travelOf(floors) / worldHOf(floors)) * 100).toFixed(4)}%)`);
       expect(frames.at(-1)?.transform).toBe("translateY(0.0000%)");
     }
   });
 
-  test("Lift to the Top: the cabin, its display, the top floor and the flag stand where every screen shows them (H-127)", () => {
-    // The cabin stands still in the middle; the floor it stands at reaches its level at the end.
-    expect(levelOf(FLOORS)).toBe(LEVEL);
+  test("Lift to the Top: the cabin, its display and the top floor stand where every screen shows them, and the roof has no flag (H-127)", async () => {
+    // The cabin stands still in the middle; the floor it stands at reaches its level at the end, however tall the tower.
+    for (const floors of [7, 50, MAX_FLOORS]) expect(levelOf(floors, floors)).toBe(LEVEL);
     expect(CAR.y + CAR.h).toBe(LEVEL);
     expect(CAR.x).toBeGreaterThanOrEqual(SHAFT.x);
     expect(CAR.x + CAR.w).toBeLessThanOrEqual(SHAFT.x + SHAFT.w);
-    // The display lies on the cabin's panel, above its glass.
+    // The display lies on the cabin's panel, above its glass, with room for three digits.
     expect(DISPLAY.x).toBeGreaterThan(CAR.x);
     expect(DISPLAY.x + DISPLAY.w).toBeLessThan(CAR.x + CAR.w);
     expect(DISPLAY.y).toBeGreaterThan(CAR.y);
     expect(DISPLAY.y + DISPLAY.h).toBeLessThan(CAR.y + 116);
-    // The landing door is seen through the cabin's glass, its number beside it.
-    expect(LIFT_DOOR.x).toBeGreaterThan(CAR.x);
-    expect(LIFT_DOOR.x + LIFT_DOOR.w).toBeLessThan(LIFT_PLATE.x);
-    expect(LIFT_PLATE.x + LIFT_PLATE.w).toBeLessThan(CAR.x + CAR.w);
-    // The flag, hoisted, stays within a tablet's 4:3 cut and below the top of a phone on its side; it starts down by
-    // the roof, on its pole.
-    expect(FLAG.x).toBeGreaterThanOrEqual(235);
-    expect(FLAG.x + FLAG.w).toBeLessThanOrEqual(RIGHT_EDGE);
-    expect(FLAG.y).toBeGreaterThanOrEqual(80);
-    expect(POLE.top).toBeLessThan(FLAG.y);
-    expect(FLAG.y + FLAG.h + FLAG_DROP).toBeLessThan(POLE.foot);
+    // The landing door is seen through the cabin's glass, its number beside it – „100“ on a wider plate.
+    for (const k of [1, 99, MAX_FLOORS]) {
+      const plate = plateOf(k);
+      expect(LIFT_DOOR.x).toBeGreaterThan(CAR.x);
+      expect(LIFT_DOOR.x + LIFT_DOOR.w + 12, `${k}`).toBeLessThan(plate.x);
+      expect(plate.x + plate.w, `${k}`).toBeLessThan(CAR.x + CAR.w);
+    }
     expect(ROOF).toBeLessThan(LEVEL);
+    // User request, 27 November 2026: the flag on the roof was taken out – with its pole.
+    const code = await Bun.file(new URL("./lift.tsx", import.meta.url)).text();
+    expect(code).not.toMatch(/\bFLAG\b|\bPOLE\b|function Flag/);
+  });
+
+  test("Lift to the Top: the tower is drawn in pieces that cover it without a gap, and those near the cabin cover the screen (H-127)", () => {
+    for (const floors of [1, 7, 26, MAX_FLOORS]) {
+      const n = piecesOf(floors);
+      // The pieces meet edge to edge from the world's top to its foot, each with at most `PIECE` storeys.
+      let below = worldHOf(floors);
+      for (let j = 0; j < n; j++) {
+        const { lo, hi, top, bottom } = pieceSpan(j, floors);
+        expect(bottom, `${floors} ${j}`).toBe(below);
+        expect(hi - lo + 1).toBeLessThanOrEqual(PIECE);
+        below = top;
+      }
+      expect(below).toBe(0);
+      expect(pieceSpan(n - 1, floors).hi).toBe(floors);
+      // At every moment of the ride the pieces drawn cover what the screen shows, a storey more above and below, since
+      // they change only every half second (27 November 2026: drawn whole, the 100 storeys stuttered on an old phone).
+      const travel = travelOf(floors);
+      for (let risen = 0; risen <= travel; risen += 37) {
+        const { first, last } = piecesNear(risen, floors);
+        expect(last - first + 1, `${floors} ${risen}`).toBeLessThanOrEqual(4);
+        const seenTop = Math.max(0, travel - risen - STOREY);
+        const seenBottom = Math.min(worldHOf(floors), travel - risen + STAGE_H + STOREY);
+        expect(pieceSpan(last, floors).top, `${floors} ${risen}`).toBeLessThanOrEqual(seenTop);
+        expect(pieceSpan(first, floors).bottom, `${floors} ${risen}`).toBeGreaterThanOrEqual(seenBottom);
+      }
+    }
   });
 
   test("Lift to the Top: what moves is a layer on CSS animations that stand still at the end, with no clip path (H-127)", async () => {

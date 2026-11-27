@@ -170,24 +170,32 @@ taken out (user request, November 2026). The pictures:
 - „Lift to the Top“ 🛗 („Mit dem Aufzug nach oben“, `lift.tsx`, id `jump`, H-127; user request, 26 November 2026:
   „nur ein Hochhaus mit einem Aufzug … man sieht groß den Aufzug und die Zahlen, die wie bei einem Aufzug langsam rot
   hochzählen“ – it replaced „Up to the Moon“, a fox's jump-and-run from a lake to the moon, with its fox, cake and
-  recordings): one tall tower (`TOWER`, `FLOORS` storeys of `STOREY`, a roof with the lift's machine room and a
-  flagpole) with a glass lift shaft up its front (`SHAFT`). The cabin (`CAR`) stands still and big in the picture's
+  recordings): one tall tower (`TOWER`, as many storeys of `STOREY` as the ride has floors, a roof with the lift's
+  machine room – its flagpole and flag taken out, user request, 27 November 2026) with a glass lift shaft up its front
+  (`SHAFT`). The cabin (`CAR`) stands still and big in the picture's
   middle the whole run, a sunny yellow frame with big glass panes, a handrail and a plant inside, a pulley turning on
-  its roof (`Pulley`); the tower slides down behind it as one HTML layer (`tm-lift-world`, `WORLD_H`, keyframes written
-  for the run by `worldFrames`, never a changing viewBox), so the landing doors with the floor's number on a plate
-  beside them (`DOOR`, `PLATE`) pass behind the glass, and the clouds pass beside the tower. On the cabin's black panel
-  (`DISPLAY`) red dot-matrix digits (5 × 7 dots, `GLYPHS`, the unlit dots faint) count the floors from 0 to 20, each
-  turning as the lift is halfway to it (`floorAt`, `floorTurnsAt`), and an arrow beside them scrolls up a dot at a time
+  its roof (`Pulley`); the tower slides down behind it as one HTML layer (`tm-lift-world`, keyframes written
+  for the run by `worldFrames`, never a changing viewBox; the world is top-anchored, `levelOf(k, floors)`, `worldHOf`).
+  Inside it the tower is drawn in pieces of `PIECE` storeys, each its own small svg, and only the pieces near the cabin
+  are there (`Tower`, `piecesNear`, `pieceSpan`, checked every half second on the run's clock): drawn whole, 100
+  storeys were one svg about fifty screens tall in the sliding layer and stuttered six times in eight seconds on the
+  old phone (`bun run perf timer-aufzug`, 27 November 2026) – never draw a world many screens tall as one svg; the
+  long parts (wall, shaft, rails) have side lines only, so no line cuts the tower at a piece's seam. So the landing doors with the floor's number on a plate
+  beside them (`DOOR`, `plateOf`, wider for 100) pass behind the glass, and the clouds pass beside the tower. On the cabin's black panel
+  (`DISPLAY`) red dot-matrix digits (5 × 7 dots, `GLYPHS`, the unlit dots faint, three cells) count the floors from 0
+  up to 100, each turning as the lift is halfway to it (`floorAt`, `floorTurnsAt`) and **never more than one a second**
+  (user request, 27 November 2026: „es soll bis 100 gehen, aber … nicht mehr als ein Stockwerk pro Sekunde“):
+  `liftPlan` rides `MAX_FLOORS` where the time allows (from about two minutes) and else as many as leave
+  `MIN_STOREY_MS` for each (10 seconds: 7 floors) – the one picture whose count follows the time, by the user's wish, and an arrow beside them scrolls up a dot at a time
   while it goes (`.tm-lift-arrow`, `steps(7)`). React draws only that small display, when the floor changes, on the
   run's clock (`LiftDisplay`, `displayAt`). The lift starts gently and stops gently (`liftAt`: half a storey speeding up
-  and slowing down, an even pace between) and arrives a little before the end (`liftPlan`: the flag's share at most
-  `FLAG_MS`, at most `FLAG_SHARE` of a short run); then the top floor's door slides open on a lit room (`TopDoor`) and
-  the flag (`FLAG`, red with a yellow star) goes up its pole on the roof as the time is up, waving gently at the end
-  (`.tm-lift-wave`). Every run rides all twenty floors, a short time only faster. Each floor passed plinks softly
+  and slowing down, an even pace between) and arrives a little before the end (`liftPlan`: at most `TOP_MS`, at most
+  `TOP_SHARE` of a short run); then the top floor's door slides open on a lit room (`TopDoor`) as the time is up. No
+  flag (a flag hoisted on the roof stood there from 26 to 27 November 2026 and was taken out, user request). Each floor passed plinks softly
   (spaced), the arrival dings (always), the end twinkles; a tap clicks like a lift's button and lights the shaft still
   above the cabin (`.tm-lift-left`). Its card is the middle as it is. Its name and lines (`liftNames.ts`) were written
   English first and translated into every app language at once; they wait for their recordings (Up to the Moon's no
-  longer fit). Flag, cabin and display stay within x 235–1340 and y ≥ 80 (`timer.test.ts`).
+  longer fit). Cabin, display and plates stay within x 235–1340 and y ≥ 80 (`timer.test.ts`).
   **A game-look timer may be big** (user feedback with Up to the Moon, 23 November 2026): a world many screens tall or wide that the
   picture follows is welcome where it shows how far the way has come (here the heights), moved as one layer, and a
   long way is told by changing what the figure does on it (swim, hop, ride, float, fly) rather than by more of the
@@ -350,7 +358,8 @@ and the shared `Layer`, `Draw`, `LeftGlow`), `timer.css`, `content.ts`
   grown). Many pieces mean many moments: their sounds are spaced (`PIECE_SOUND_GAP_MS`), never a din.
 - **Every length plays the whole story, only faster or slower** (user request, 24 November 2026): a picture's run is
   the same at 10 seconds as at 3 hours – every block, toy, apple, move and step of it, in the same order – and the
-  length only changes how fast it goes. Never leave a part out for a short time (a house already half built, a climb
+  length only changes how fast it goes – except where the user asks for a speed limit, as for the Lift's floors (at
+  most one a second, so a short time rides fewer; user request, 27 November 2026, `MIN_STOREY_MS`). Never leave a part out for a short time (a house already half built, a climb
   starting further up, fewer toys, a slip that only comes on a long share) nor add parts for a long one; what a step
   takes in fixed milliseconds is capped by its share (`Math.min(X_MS, share * …)`), so it shrinks with it. The counts
   are constants (`MAX_APPLES`, `MAX_TOYS`, `MAX_BLOCKS`, `MAX_DIG`, `FLOORS`), never worked out from the

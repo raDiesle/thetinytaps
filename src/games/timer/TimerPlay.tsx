@@ -37,7 +37,7 @@ import { useWakeLock } from "@/lib/wakeLock";
 import { AppleScene } from "./apples";
 import { BlocksScene, blocksPlan, MAX_BLOCKS } from "./blocks";
 import { MAX_DIG, TunnelScene, tunnelPlan } from "./tunnel";
-import { FLOORS, floorTurnsAt, LiftScene, liftPlan } from "./lift";
+import { floorTurnsAt, LiftScene, liftPlan } from "./lift";
 import { JarScene, jarPlan, MAX_MARBLES } from "./jar";
 import { FINAL_NOTES, FinalLight, finalMs, TimeBar, TimeBarChoice, TimeUp } from "./bar";
 import { CaterpillarScene } from "./caterpillar";
@@ -370,8 +370,8 @@ function TimerRun({
         .map((b) => b.gone);
     // Lift to the Top (H-127): each floor the display turns to, then the lift arriving at the top (always the last).
     if (picture === "jump") {
-      const { arrive } = liftPlan(total);
-      return [...Array.from({ length: FLOORS }, (_, i) => floorTurnsAt(i + 1, arrive)), arrive];
+      const ride = liftPlan(total);
+      return [...Array.from({ length: ride.floors }, (_, i) => floorTurnsAt(i + 1, ride)), ride.arrive];
     }
     // Marble Jar (H-149): each marble landing in its place in the jar, the last one being the end's.
     if (picture === "jar")

@@ -8,30 +8,41 @@ import { Draw, INK, Layer, LeftGlow, STAGE_H, STAGE_W } from "./scenes";
 // its front. The lift stands big in the picture's middle the whole run, and the tower slides down behind it, storey
 // after storey – one HTML layer moved by a transform (`tm-lift-world`), never a changing viewBox – so the landing doors
 // and the floor numbers beside them pass behind the glass. Over the cabin's glass a black panel shows the floor in red
-// dot-matrix digits with an arrow scrolling up, counting 0 to 20 as it passes each floor, the way a real lift does.
-// The lift starts gently and stops gently (`liftAt`), arrives at the top floor a few seconds before the end, the
-// landing door behind it opens, and the flag on the roof goes up its pole as the time is up.
+// dot-matrix digits with an arrow scrolling up, counting from 0 as it passes each floor, the way a real lift does: up
+// to a hundred floors, never more than one a second (user request, 27 November 2026), so a short time rides fewer.
+// The lift starts gently and stops gently (`liftAt`), arrives at the top floor a few seconds before the end, and the
+// landing door behind it opens on a lit room as the time is up (the flag on the roof was taken out, same request).
 
-/** How many floors the lift rises: every run all of them, a short time only faster (the whole story at every length). */
-export const FLOORS = 20;
+/** The most floors the lift rises (user request, 27 November 2026: „es soll bis 100 gehen“). */
+export const MAX_FLOORS = 100;
+
+/**
+ * The shortest time from one floor to the next (user request, 27 November 2026: „nicht mehr als ein Stockwerk pro
+ * Sekunde“): the display never turns faster than once a second, so a time too short for a hundred floors rides as many
+ * as fit – the one picture whose count follows the time, by the user's wish.
+ */
+export const MIN_STOREY_MS = 1000;
 
 /** One storey's height, floor to floor, in stage units. */
 export const STOREY = 440;
 
-/** How far the tower slides down while the lift goes up. */
-export const TRAVEL = FLOORS * STOREY;
-
-/** The world: the stage's height plus the way, so at the start its foot is the stage's foot and at the end its top the stage's top. */
-export const WORLD_H = STAGE_H + TRAVEL;
-
 /** Where the cabin's floor stands on the stage, the whole run (with the floor it stands at). */
 export const LEVEL = 780;
 
-/** The level of floor `k` in the world (0 the ground floor, `FLOORS` the top one, which stands at `LEVEL` at the end). */
-export const levelOf = (k: number) => LEVEL + (FLOORS - k) * STOREY;
+/** How far the tower slides down while the lift rides up `floors` floors. */
+export const travelOf = (floors: number) => floors * STOREY;
 
-/** The roof's level, a storey above the top floor. */
-export const ROOF = levelOf(FLOORS + 1);
+/** The world: the stage's height plus the way, so at the start its foot is the stage's foot and at the end its top the stage's top. */
+export const worldHOf = (floors: number) => STAGE_H + travelOf(floors);
+
+/**
+ * The level of floor `k` in the world of a tower of `floors` floors (0 the ground floor, `floors` the top one, which
+ * stands at `LEVEL` at the end, so the top of the world is the same however tall the tower is).
+ */
+export const levelOf = (k: number, floors: number) => LEVEL + (floors - k) * STOREY;
+
+/** The roof's level, a storey above the top floor (the same for every tower). */
+export const ROOF = LEVEL - STOREY;
 
 /** The tower's sides and the shaft on its front, in stage units. */
 export const TOWER = { x: 300, w: 1000 } as const;
@@ -41,99 +52,105 @@ export const SHAFT = { x: 570, w: 460 } as const;
 export const CAR = { x: 590, y: LEVEL - 430, w: 420, h: 430 } as const;
 const HEADER = 116;
 
-/** The floor display on the cabin's panel, in stage units. */
-export const DISPLAY = { x: 650, y: CAR.y + 12, w: 300, h: 92 } as const;
+/** The floor display on the cabin's panel, in stage units: room for the arrow and three digits (up to 100). */
+export const DISPLAY = { x: 620, y: CAR.y + 12, w: 360, h: 92 } as const;
 
-/** A landing door at each floor, behind the cabin's glass, and the plate with its number beside it. */
+/** A landing door at each floor, behind the cabin's glass, and the plate with its number beside it (wider for 100). */
 export const DOOR = { x: 735, w: 130, h: 270 } as const;
-export const PLATE = { x: 930, w: 62, h: 62, above: 250 } as const;
+export const PLATE = { mid: 961, w: 62, wide: 90, h: 62, above: 250 } as const;
 
-/** The flagpole on the roof and the flag at the top of it, in stage units at the end of the run. */
-export const POLE = { x: 420, top: 112, foot: ROOF - 40 } as const;
-export const FLAG = { x: 424, y: 122, w: 112, h: 66 } as const;
-/** How far below the top the flag waits until it is hoisted. */
-export const FLAG_DROP = POLE.foot - 4 - (FLAG.y + FLAG.h);
+/** The plate of floor `k`: its left edge and width, wider where the number has three digits. */
+export function plateOf(k: number) {
+  const w = k >= 100 ? PLATE.wide : PLATE.w;
+  return { x: PLATE.mid - w / 2, w };
+}
 
-/** The hoisting of the flag, at most this long, and at most this share of a short run. */
-const FLAG_MS = 5000;
-const FLAG_SHARE = 0.12;
+/** The lift's arrival at the top: at most this long before the end, and at most this share of a short run. */
+const TOP_MS = 5000;
+const TOP_SHARE = 0.12;
 
-/** The run's plan: when the lift arrives at the top, when the door has opened and when the flag starts up. */
-export function liftPlan(total: number) {
-  const flag = Math.min(FLAG_MS, total * FLAG_SHARE);
-  const arrive = total - flag;
-  return { arrive, doorOpen: arrive + flag * 0.3, flagFrom: arrive + flag * 0.2 };
+/** A run's ride: how many floors it rises and when it arrives at the top (`liftAt`, `floorAt`, `worldFrames` take it). */
+export type Ride = { floors: number; arrive: number };
+
+/**
+ * The run's plan: when the lift arrives at the top, when the door has opened, and how many floors it rides – all a
+ * hundred where the time allows, else as many as leave at least `MIN_STOREY_MS` for each (starting and stopping take
+ * one storey's time each, at half the way).
+ */
+export function liftPlan(total: number): Ride & { doorOpen: number } {
+  const top = Math.min(TOP_MS, total * TOP_SHARE);
+  const arrive = total - top;
+  const floors = Math.max(1, Math.min(MAX_FLOORS, Math.floor(arrive / MIN_STOREY_MS) - 1));
+  return { floors, arrive, doorOpen: arrive + top * 0.3 };
 }
 
 /** How long the lift takes for one storey at its even pace; starting and stopping take one each, at half the way. */
-const storeyMs = (arrive: number) => arrive / (FLOORS + 1);
+export const storeyMs = ({ floors, arrive }: Ride) => arrive / (floors + 1);
 
 /**
- * How far the lift has risen `t` ms into the run, in stage units (0 to `TRAVEL`): speeding up gently over the first
- * half storey, an even pace, and slowing down gently over the last half storey (quadratic, so the pace runs on smoothly).
+ * How far the lift has risen `t` ms into the run, in stage units (0 to the ride's travel): speeding up gently over the
+ * first half storey, an even pace, and slowing down gently over the last half storey (quadratic, so the pace runs on smoothly).
  */
-export function liftAt(t: number, arrive: number) {
-  const u = storeyMs(arrive);
+export function liftAt(t: number, ride: Ride) {
+  const u = storeyMs(ride);
   const half = STOREY / 2;
+  const travel = travelOf(ride.floors);
   if (t <= 0) return 0;
-  if (t >= arrive) return TRAVEL;
+  if (t >= ride.arrive) return travel;
   if (t < u) return half * (t / u) ** 2;
-  if (t > arrive - u) return TRAVEL - half * ((arrive - t) / u) ** 2;
+  if (t > ride.arrive - u) return travel - half * ((ride.arrive - t) / u) ** 2;
   return half + ((t - u) / u) * STOREY;
 }
 
 /** The floor the display shows `t` ms into the run: the next one from halfway between two floors, as a lift does. */
-export const floorAt = (t: number, arrive: number) => Math.min(FLOORS, Math.round(liftAt(t, arrive) / STOREY));
+export const floorAt = (t: number, ride: Ride) => Math.min(ride.floors, Math.round(liftAt(t, ride) / STOREY));
 
-/** When the display turns to floor `k` (1 to `FLOORS`): the moment the lift is halfway up to it. */
-export function floorTurnsAt(k: number, arrive: number) {
-  const u = storeyMs(arrive);
+/** When the display turns to floor `k` (1 to the ride's floors): the moment the lift is halfway up to it. */
+export function floorTurnsAt(k: number, ride: Ride) {
+  const u = storeyMs(ride);
+  const travel = travelOf(ride.floors);
   const at = (k - 0.5) * STOREY;
   if (at <= STOREY / 2) return u * Math.sqrt(at / (STOREY / 2));
-  if (at >= TRAVEL - STOREY / 2) return arrive - u * Math.sqrt((TRAVEL - at) / (STOREY / 2));
+  if (at >= travel - STOREY / 2) return ride.arrive - u * Math.sqrt((travel - at) / (STOREY / 2));
   return u + ((at - STOREY / 2) / STOREY) * u;
 }
 
 /** The tower's way down, as keyframes in % of the world's height: gently off, an even pace, gently to a stop. */
-export function worldFrames(arrive: number): Frame[] {
-  const u = storeyMs(arrive);
-  const y = (risen: number) => `translateY(${(((risen - TRAVEL) / WORLD_H) * 100).toFixed(4)}%)`;
+export function worldFrames(ride: Ride): Frame[] {
+  const u = storeyMs(ride);
+  const travel = travelOf(ride.floors);
+  const y = (risen: number) => `translateY(${(((risen - travel) / worldHOf(ride.floors)) * 100).toFixed(4)}%)`;
   return [
     { at: 0, transform: y(0), ease: "cubic-bezier(0.33, 0, 0.67, 0.33)" },
     { at: u, transform: y(STOREY / 2), ease: "linear" },
-    { at: arrive - u, transform: y(TRAVEL - STOREY / 2), ease: "cubic-bezier(0.33, 0.67, 0.67, 1)" },
-    { at: arrive, transform: y(TRAVEL) },
+    { at: ride.arrive - u, transform: y(travel - STOREY / 2), ease: "cubic-bezier(0.33, 0.67, 0.67, 1)" },
+    { at: ride.arrive, transform: y(travel) },
   ];
 }
 
-/** The keyframes of this run: the tower's way, the top door's two halves opening and the flag going up. */
+/** The keyframes of this run: the tower's way and the top door's two halves opening. */
 function LiftKeyframes({ name, total }: { name: string; total: number }) {
-  const { arrive, doorOpen, flagFrom } = liftPlan(total);
+  const plan = liftPlan(total);
   const door = (side: number): Frame[] => [
     { at: 0, transform: "translateX(0%)" },
-    { at: arrive, transform: "translateX(0%)" },
-    { at: doorOpen, transform: `translateX(${side * 85}%)` },
-  ];
-  const flag: Frame[] = [
-    { at: 0, transform: `translateY(${((FLAG_DROP / FLAG.h) * 100).toFixed(3)}%)` },
-    { at: flagFrom, transform: `translateY(${((FLAG_DROP / FLAG.h) * 100).toFixed(3)}%)` },
-    { at: total, transform: "translateY(0%)" },
+    { at: plan.arrive, transform: "translateX(0%)" },
+    { at: plan.doorOpen, transform: `translateX(${side * 85}%)` },
   ];
   const rules = [
-    keyframes(`${name}-world`, total, holdToEnd(worldFrames(arrive), total)),
+    keyframes(`${name}-world`, total, holdToEnd(worldFrames(plan), total)),
     keyframes(`${name}-door-l`, total, holdToEnd(door(-1), total)),
     keyframes(`${name}-door-r`, total, holdToEnd(door(1), total)),
-    keyframes(`${name}-flag`, total, holdToEnd(flag, total)),
   ];
   return <style>{rules.join("\n")}</style>;
 }
 
-/** A piece of the world as an HTML layer of its own, placed in stage units within the world's height. */
+/** A piece of the world as an HTML layer of its own, placed in stage units within the world's height (`worldH`). */
 function InWorld({
   x,
   y,
   w,
   h,
+  worldH,
   className,
   style,
   children,
@@ -142,6 +159,7 @@ function InWorld({
   y: number;
   w: number;
   h: number;
+  worldH: number;
   className?: string;
   style?: CSSProperties;
   children?: ReactNode;
@@ -149,7 +167,7 @@ function InWorld({
   return (
     <div
       className={`tm-layer${className ? ` ${className}` : ""}`}
-      style={{ left: `${(x / STAGE_W) * 100}%`, top: `${(y / WORLD_H) * 100}%`, width: `${(w / STAGE_W) * 100}%`, height: `${(h / WORLD_H) * 100}%`, ...style }}
+      style={{ left: `${(x / STAGE_W) * 100}%`, top: `${(y / worldH) * 100}%`, width: `${(w / STAGE_W) * 100}%`, height: `${(h / worldH) * 100}%`, ...style }}
       aria-hidden
     >
       {children}
@@ -199,11 +217,14 @@ function Cloud({ x, y, s }: { x: number; y: number; s: number }) {
   );
 }
 
-/** Clouds beside the tower at every height, some past the stage's sides for wide screens, so the rise is seen there too. */
-const CLOUDS = Array.from({ length: 18 }, (_, i) => {
-  const left = i % 2 === 0;
-  return { x: left ? 150 - ((i * 37) % 130) : 1450 + ((i * 53) % 120), y: 260 + i * 470 + ((i * 97) % 160), s: 0.8 + ((i * 29) % 40) / 100 };
-});
+/** Clouds beside the tower at every height down to a few storeys above the ground, some past the stage's sides for wide screens, so the rise is seen there too. */
+function cloudsOf(floors: number) {
+  const lowest = levelOf(0, floors) - 1300;
+  return Array.from({ length: Math.max(1, Math.floor((lowest - 260) / 470) + 1) }, (_, i) => {
+    const left = i % 2 === 0;
+    return { x: left ? 150 - ((i * 37) % 130) : 1450 + ((i * 53) % 120), y: 260 + i * 470 + ((i * 97) % 160), s: 0.8 + ((i * 29) % 40) / 100 };
+  });
+}
 
 /** One window of a floor, with curtains, a lamp or a plant here and there. */
 function Window({ x, y, w, h, look }: { x: number; y: number; w: number; h: number; look: number }) {
@@ -232,12 +253,13 @@ function Window({ x, y, w, h, look }: { x: number; y: number; w: number; h: numb
 }
 
 /** The number on the plate beside a landing door. */
-function FloorPlate({ k }: { k: number }) {
-  const y = levelOf(k) - PLATE.above;
+function FloorPlate({ k, floors }: { k: number; floors: number }) {
+  const y = levelOf(k, floors) - PLATE.above;
+  const { x, w } = plateOf(k);
   return (
     <g>
-      <rect x={PLATE.x} y={y} width={PLATE.w} height={PLATE.h} rx="10" fill="#fff" stroke={INK} strokeWidth="5" />
-      <text x={PLATE.x + PLATE.w / 2} y={y + PLATE.h / 2 + 15} textAnchor="middle" fontSize="40" fontWeight="800" fontFamily="system-ui, sans-serif" fill={INK}>
+      <rect x={x} y={y} width={w} height={PLATE.h} rx="10" fill="#fff" stroke={INK} strokeWidth="5" />
+      <text x={PLATE.mid} y={y + PLATE.h / 2 + 15} textAnchor="middle" fontSize="40" fontWeight="800" fontFamily="system-ui, sans-serif" fill={INK}>
         {k}
       </text>
     </g>
@@ -245,8 +267,9 @@ function FloorPlate({ k }: { k: number }) {
 }
 
 /** A landing door: its frame and the two steel halves, shut. */
-function LandingDoor({ k, open }: { k: number; open?: boolean }) {
-  const y = levelOf(k) - DOOR.h;
+function LandingDoor({ k, floors }: { k: number; floors: number }) {
+  const y = levelOf(k, floors) - DOOR.h;
+  const open = k === floors;
   return (
     <g>
       <rect x={DOOR.x - 12} y={y - 12} width={DOOR.w + 24} height={DOOR.h + 12} rx="6" fill={STEEL_DARK} stroke={INK} strokeWidth="5" />
@@ -273,8 +296,8 @@ function LandingDoor({ k, open }: { k: number; open?: boolean }) {
 }
 
 /** One floor of the tower: its band, its windows either side of the shaft, the shaft's wall with its door and number. */
-function Storey({ k }: { k: number }) {
-  const level = levelOf(k);
+function Storey({ k, floors }: { k: number; floors: number }) {
+  const level = levelOf(k, floors);
   const top = level - STOREY;
   const looks = [0, 1, 2, 3].map((i) => (k * 7 + i * 3) % 12);
   return (
@@ -304,15 +327,15 @@ function Storey({ k }: { k: number }) {
       )}
       {/* The band of the floor above. */}
       <rect x={TOWER.x - 10} y={top} width={TOWER.w + 20} height="36" fill={BAND} stroke={INK} strokeWidth="5" />
-      <LandingDoor k={k} open={k === FLOORS} />
-      <FloorPlate k={k} />
+      <LandingDoor k={k} floors={floors} />
+      <FloorPlate k={k} floors={floors} />
     </g>
   );
 }
 
 /** The tower's foot: the pavement, the meadow with its trees and bushes, reaching past the stage's sides. */
-function Ground() {
-  const ground = levelOf(0);
+function Ground({ floors }: { floors: number }) {
+  const ground = levelOf(0, floors);
   return (
     <g>
       {[110, 1490].map((x) => (
@@ -335,7 +358,7 @@ function Ground() {
   );
 }
 
-/** The roof over the top floor: the ledge, the lift's machine room over the shaft, and the flagpole. */
+/** The roof over the top floor: the ledge and the lift's machine room over the shaft (its flagpole taken out, user request, 27 November 2026). */
 function Roof() {
   return (
     <g>
@@ -343,43 +366,119 @@ function Roof() {
       <rect x={620} y={190} width={360} height={ROOF - 40 - 190} rx="8" fill={WALL} stroke={INK} strokeWidth="6" />
       <rect x={606} y={178} width={388} height="22" rx="6" fill={BAND} stroke={INK} strokeWidth="5" />
       <circle cx={800} cy={245} r="22" fill={GLASS} stroke={INK} strokeWidth="5" />
-      <rect x={POLE.x - 5} y={POLE.top} width="10" height={POLE.foot - POLE.top} fill="#dee2e6" stroke={INK} strokeWidth="4" />
-      <circle cx={POLE.x} cy={POLE.top - 4} r="10" fill="#fcc419" stroke={INK} strokeWidth="4" />
-      <rect x={POLE.x - 18} y={POLE.foot - 12} width="36" height="14" rx="4" fill={STEEL_DARK} stroke={INK} strokeWidth="4" />
     </g>
   );
 }
 
-/** The tower, many screens tall, with its ground and roof and the clouds round it; drawn once. */
-const Tower = memo(function Tower() {
-  const ground = levelOf(0);
+/** How many storeys one piece of the tower draws (`TowerPiece`). */
+export const PIECE = 4;
+
+/** How many pieces a tower of `floors` floors has. */
+export const piecesOf = (floors: number) => Math.floor(floors / PIECE) + 1;
+
+/**
+ * The world's rows a piece of the tower covers, from its top floor's band down to its bottom floor's level: the lowest
+ * piece reaches down past the meadow to the world's foot, the highest up over the roof to the world's top.
+ */
+export function pieceSpan(j: number, floors: number) {
+  const lo = j * PIECE;
+  const hi = Math.min(floors, lo + PIECE - 1);
+  const top = hi === floors ? 0 : levelOf(hi, floors) - STOREY;
+  const bottom = j === 0 ? worldHOf(floors) : levelOf(lo, floors);
+  return { lo, hi, top, bottom };
+}
+
+/**
+ * The pieces near the cabin `risen` units into the ride: from two floors below the one at the cabin to five above it,
+ * so a piece is drawn a screen before it slides in and dropped once it slid out below.
+ */
+export function piecesNear(risen: number, floors: number) {
+  const k = risen / STOREY;
+  const first = Math.max(0, Math.floor((k - 2) / PIECE));
+  const last = Math.min(piecesOf(floors) - 1, Math.floor((k + 5) / PIECE));
+  return { first, last };
+}
+
+/**
+ * A piece of the tower: `PIECE` storeys with the wall, the shaft, its rails and ropes behind them and the clouds beside
+ * them, as a layer of its own; the lowest piece has the ground, the highest the roof. Drawn once (`memo`).
+ */
+const TowerPiece = memo(function TowerPiece({ j, floors }: { j: number; floors: number }) {
+  const { lo, hi, top, bottom } = pieceSpan(j, floors);
+  const worldH = worldHOf(floors);
+  const ground = levelOf(0, floors);
+  // The long parts run from this piece's top to its bottom, a unit over each seam so no hairline shows between pieces;
+  // within the roof and the ground they end there.
+  const from = Math.max(ROOF, top - 1);
+  const to = Math.min(ground, bottom + 1);
+  const clouds = cloudsOf(floors).filter((c) => c.y >= top && c.y < bottom);
   return (
-    <InWorld x={0} y={0} w={STAGE_W} h={WORLD_H}>
-      <Draw w={STAGE_W} h={WORLD_H}>
-        {CLOUDS.map((c, i) => (
+    <InWorld x={0} y={top} w={STAGE_W} h={bottom - top} worldH={worldH}>
+      <svg viewBox={`0 ${top} ${STAGE_W} ${bottom - top}`} preserveAspectRatio="none">
+        {clouds.map((c, i) => (
           <Cloud key={i} {...c} />
         ))}
-        <rect x={TOWER.x} y={ROOF} width={TOWER.w} height={ground - ROOF} fill={WALL} stroke={INK} strokeWidth="6" />
-        {/* The shaft: the wall behind the lift, its two rails and the ropes, from the machine room down to the ground. */}
-        <rect x={SHAFT.x} y={ROOF} width={SHAFT.w} height={ground - ROOF} fill={SHAFT_WALL} stroke={INK} strokeWidth="5" />
-        {Array.from({ length: FLOORS + 1 }, (_, k) => (
-          <Storey key={k} k={k} />
+        {/* The wall and the shaft, with their side lines only: a line across at each seam would cut the tower into pieces. */}
+        <rect x={TOWER.x} y={from} width={TOWER.w} height={to - from} fill={WALL} />
+        <rect x={SHAFT.x} y={from} width={SHAFT.w} height={to - from} fill={SHAFT_WALL} />
+        <path d={`M${TOWER.x} ${from} V${to} M${TOWER.x + TOWER.w} ${from} V${to}`} stroke={INK} strokeWidth="6" />
+        <path d={`M${SHAFT.x} ${from} V${to} M${SHAFT.x + SHAFT.w} ${from} V${to}`} stroke={INK} strokeWidth="5" />
+        {Array.from({ length: hi - lo + 1 }, (_, i) => (
+          <Storey key={lo + i} k={lo + i} floors={floors} />
         ))}
+        {/* The shaft's two rails and the ropes, from the machine room down to the ground. */}
         {[SHAFT.x + 6, SHAFT.x + SHAFT.w - 18].map((x) => (
-          <rect key={x} x={x} y={ROOF} width="12" height={ground - ROOF} fill={STEEL_DARK} stroke={INK} strokeWidth="3" />
+          <g key={x}>
+            <rect x={x} y={from} width="12" height={to - from} fill={STEEL_DARK} />
+            <path d={`M${x} ${from} V${to} M${x + 12} ${from} V${to}`} stroke={INK} strokeWidth="3" />
+          </g>
         ))}
         {[792, 808].map((x) => (
-          <path key={x} d={`M${x} ${ROOF} V${ground}`} stroke="#495057" strokeWidth="4" />
+          <path key={x} d={`M${x} ${from} V${to}`} stroke="#495057" strokeWidth="4" />
         ))}
-        <Roof />
-        <Ground />
-      </Draw>
+        {hi === floors && <Roof />}
+        {j === 0 && <Ground floors={floors} />}
+      </svg>
     </InWorld>
   );
 });
 
+/**
+ * The tower of `floors` floors, many screens tall, with its ground and roof and the clouds round it, drawn in pieces of
+ * a few storeys, and only the pieces near the cabin: drawn whole, a hundred storeys were one svg about fifty screens
+ * tall in the sliding layer, and an old phone stuttered six times in eight seconds (`bun run perf timer-aufzug`,
+ * 27 November 2026). On the run's clock, so React adds a piece only every few floors; `still` (a menu's card) draws
+ * the moment it shows.
+ */
+function Tower({ floors, ride, startedAt, still }: { floors: number; ride: Ride; startedAt: number; still?: boolean }) {
+  const clock = useRunClock();
+  // The pieces near the cabin, as one number so React draws again only when they change.
+  const near = () => {
+    const t = Math.min(ride.arrive, Math.max(0, clock.now() - startedAt));
+    const { first, last } = piecesNear(liftAt(t, ride), floors);
+    return first * 1000 + last;
+  };
+  const [shown, setShown] = useState(near);
+  useEffect(() => {
+    if (still || clock.paused) return;
+    const tick = () => setShown(near());
+    tick();
+    const timer = setInterval(tick, 500);
+    return () => clearInterval(timer);
+  }, [still, clock, startedAt, ride, floors]);
+  const first = Math.floor(shown / 1000);
+  const last = shown % 1000;
+  return (
+    <>
+      {Array.from({ length: last - first + 1 }, (_, i) => (
+        <TowerPiece key={first + i} j={first + i} floors={floors} />
+      ))}
+    </>
+  );
+}
+
 /** The two halves of the top floor's landing door, which slide open once the lift has arrived. */
-function TopDoor({ name }: { name: string }) {
+function TopDoor({ name, worldH }: { name: string; worldH: number }) {
   const y = LEVEL - DOOR.h;
   return (
     <>
@@ -390,6 +489,7 @@ function TopDoor({ name }: { name: string }) {
           y={y}
           w={DOOR.w / 2}
           h={DOOR.h}
+          worldH={worldH}
           className="tm-hop tm-lift-door"
           style={{ "--tm-anim": `${name}-door-${side < 0 ? "l" : "r"}`, "--tm-end": `translateX(${side * 85}%)` } as CSSProperties}
         >
@@ -400,31 +500,6 @@ function TopDoor({ name }: { name: string }) {
         </InWorld>
       ))}
     </>
-  );
-}
-
-/** The flag on the roof: waiting low on its pole, hoisted to the top as the time is up, then waving gently. */
-function Flag({ name }: { name: string }) {
-  return (
-    <InWorld {...FLAG} className="tm-hop tm-lift-flag" style={{ "--tm-anim": `${name}-flag`, "--tm-end": "translateY(0%)" } as CSSProperties}>
-      <div className="tm-lift-wave">
-        <svg viewBox={`0 0 ${FLAG.w} ${FLAG.h}`}>
-          <path
-            d={`M0 0 Q${FLAG.w * 0.5} -8 ${FLAG.w} 6 Q${FLAG.w - 14} ${FLAG.h / 2} ${FLAG.w} ${FLAG.h - 6} Q${FLAG.w * 0.5} ${FLAG.h + 6} 0 ${FLAG.h} Z`}
-            fill="#fa5252"
-            stroke={INK}
-            strokeWidth="5"
-          />
-          <path
-            d="M56 18 L62 31 L76 32 L65 41 L69 55 L56 47 L43 55 L47 41 L36 32 L50 31 Z"
-            fill="#ffd43b"
-            stroke={INK}
-            strokeWidth="3"
-            strokeLinejoin="round"
-          />
-        </svg>
-      </div>
-    </InWorld>
   );
 }
 
@@ -471,11 +546,12 @@ function Glyph({ char, x, y }: { char: string; x: number; y: number }) {
 const GLYPH_W = 5 * DOT;
 const GLYPH_H = 7 * DOT;
 const GLYPH_TOP = (DISPLAY.h - GLYPH_H) / 2;
-const ARROW_X = 26;
-const DIGIT_XS = [ARROW_X + GLYPH_W + 40, ARROW_X + GLYPH_W + 40 + GLYPH_W + 16];
+const DIGIT_GAP = 12;
+const ARROW_X = (DISPLAY.w - (4 * GLYPH_W + 24 + 2 * DIGIT_GAP)) / 2;
+const DIGIT_XS = [0, 1, 2].map((i) => ARROW_X + GLYPH_W + 24 + i * (GLYPH_W + DIGIT_GAP));
 
 /** What the display shows `t` ms into the run: the floor, and whether the arrow still runs (until the lift arrives). */
-export const displayAt = (t: number, arrive: number) => `${floorAt(t, arrive)}${t < arrive ? "^" : ""}`;
+export const displayAt = (t: number, ride: Ride) => `${floorAt(t, ride)}${t < ride.arrive ? "^" : ""}`;
 
 /**
  * The display: the floor's number in red dots, and while the lift goes up the arrow beside it, its dots scrolling up a
@@ -483,18 +559,18 @@ export const displayAt = (t: number, arrive: number) => `${floorAt(t, arrive)}${
  * draws this small layer only when the lift passes a floor or arrives, and asks the clock a few times a second until
  * then. `still` (a menu's card) shows that moment and no more.
  */
-function LiftDisplay({ startedAt, arrive, still }: { startedAt: number; arrive: number; still?: boolean }) {
+function LiftDisplay({ startedAt, ride, still }: { startedAt: number; ride: Ride; still?: boolean }) {
   const clock = useRunClock();
-  const [shown, setShown] = useState(() => displayAt(clock.now() - startedAt, arrive));
+  const [shown, setShown] = useState(() => displayAt(clock.now() - startedAt, ride));
   const moving = shown.endsWith("^");
   useEffect(() => {
     if (still || clock.paused || !moving) return;
-    const tick = () => setShown(displayAt(clock.now() - startedAt, arrive));
+    const tick = () => setShown(displayAt(clock.now() - startedAt, ride));
     tick();
     const timer = setInterval(tick, 200);
     return () => clearInterval(timer);
-  }, [still, clock, startedAt, arrive, moving]);
-  const text = String(Number.parseInt(shown, 10)).padStart(2, " ");
+  }, [still, clock, startedAt, ride, moving]);
+  const text = String(Number.parseInt(shown, 10)).padStart(DIGIT_XS.length, " ");
   return (
     <Layer {...DISPLAY} className="tm-lift-digits">
       <svg viewBox={`0 0 ${DISPLAY.w} ${DISPLAY.h}`}>
@@ -595,12 +671,13 @@ function Pulley({ arrive }: { arrive: number }) {
 
 /**
  * Lift to the Top: the sky, the tower sliding down behind the big cabin standing still in the middle, its display
- * counting the floors, and on the roof the flag going up at the end.
+ * counting the floors, and the top floor's door opening at the end.
  */
 export function LiftScene({ total, startedAt, glow, still }: { total: number; startedAt: number; glow: number; still?: boolean }) {
   // A name of its own for each length, so a card's keyframes never take over a run's.
   const name = `tm-lift-${Math.round(total)}`;
-  const { arrive } = useMemo(() => liftPlan(total), [total]);
+  const ride = useMemo(() => liftPlan(total), [total]);
+  const worldH = worldHOf(ride.floors);
   return (
     <>
       <LiftKeyframes name={name} total={total} />
@@ -612,24 +689,23 @@ export function LiftScene({ total, startedAt, glow, still }: { total: number; st
             left: 0,
             top: 0,
             width: "100%",
-            height: `${(WORLD_H / STAGE_H) * 100}%`,
+            height: `${(worldH / STAGE_H) * 100}%`,
             "--tm-anim": `${name}-world`,
             "--tm-end": "translateY(0%)",
           } as CSSProperties
         }
         aria-hidden
       >
-        <Tower />
-        <TopDoor name={name} />
-        <Flag name={name} />
+        <Tower floors={ride.floors} ride={ride} startedAt={startedAt} still={still} />
+        <TopDoor name={name} worldH={worldH} />
       </div>
       {/* What is left of the way, lit at a tap (H-51): the shaft above the cabin, up to where the roof will be. */}
       <Layer x={CAR.x} y={0} w={CAR.w} h={CAR.y - 30} className="tm-lift-left">
         <LeftGlow n={glow} />
       </Layer>
-      <Pulley arrive={arrive} />
+      <Pulley arrive={ride.arrive} />
       <Cabin />
-      <LiftDisplay startedAt={startedAt} arrive={arrive} still={still} />
+      <LiftDisplay startedAt={startedAt} ride={ride} still={still} />
     </>
   );
 }
