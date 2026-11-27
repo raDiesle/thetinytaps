@@ -188,3 +188,19 @@ test("the riding brush points across the upright bar", () => {
   const rule = css.match(/\.teeth-runner > img \{[^}]*rotate: (-?\d+)deg/)?.[1];
   expect(Math.abs(Number(rule))).toBeLessThanOrEqual(20);
 });
+
+// The story's face, the sink and the mirror are cut to the frame by CSS (`FRAME_CLIP`), never by a `<clipPath>` found
+// by its id: while the book opened, the screen's copy held the same id, and the whole face vanished but for the eyes
+// and the mouth, which are layers of their own (user feedback, November 2026).
+test("the pictures as big as the screen are cut to the frame without an id", async () => {
+  const mouth = await Bun.file("src/games/teeth/mouth.tsx").text();
+  for (const [name, source, picture] of [
+    ["origin.tsx", origin, 'className="origin-picture" viewBox={viewBox} role="img"'],
+    ["prep.tsx", prep, 'className="prep-picture"'],
+    ["mouth.tsx", mouth, 'className="mouth"'],
+  ] as const) {
+    const tag = source.slice(source.indexOf(picture), source.indexOf(">", source.indexOf(picture)));
+    expect(tag, name).toContain("style={FRAME_CLIP}");
+    expect(source, name).not.toMatch(/clipPath id="(origin-frame|prep-frame|mirror)"/);
+  }
+});
