@@ -192,21 +192,35 @@ export const BOXES: Box[] = [
   { u: [118, 142], w: [-6, 6], b: [-17.5, -10.5], fills: BLUE },
 ];
 
-/** Foam round the bristle tips, in (u, w, b); more of it shows the longer the child brushes. */
-const FOAM: Vec3[] = [
-  [-15, 8, -3],
-  [-3, -9, -2],
-  [9, 9, -4],
-  [16, -7, -2],
-  [2, 2, 1],
-  [-20, -6, -1],
-  [-9, 11, 0],
-  [13, 1, 0],
-  [-12, -1, 1],
-  [20, 10, -3],
-  [4, -12, -1],
-  [-24, 3, -4],
+/**
+ * A fleck of foam round the bristle tips: `at` in (u, w, b), `r` its radius in model units. A `clump` is two round
+ * bits run together, a `bubble` a clear ring, a `dot` a tiny speck – unlike in size and look, and faint, so the foam
+ * reads as foam and never hides the brush or the teeth (user feedback, November 2026: even white balls with a thick
+ * blue ring were too loud).
+ */
+export interface Fleck {
+  at: Vec3;
+  r: number;
+  kind: "clump" | "bubble" | "dot";
+}
+
+/** The foam's flecks, the first few there at once, the rest coming the longer the child brushes. */
+export const FOAM: Fleck[] = [
+  { at: [-15, 8, -3], r: 3, kind: "clump" },
+  { at: [-3, -9, -2], r: 2, kind: "bubble" },
+  { at: [9, 9, -4], r: 2.4, kind: "clump" },
+  { at: [16, -7, -2], r: 1, kind: "dot" },
+  { at: [2, 2, 1], r: 1.6, kind: "bubble" },
+  { at: [-20, -6, -1], r: 2, kind: "clump" },
+  { at: [-9, 11, 0], r: 0.9, kind: "dot" },
+  { at: [13, 1, 0], r: 2.6, kind: "clump" },
+  { at: [-12, -1, 1], r: 1.3, kind: "bubble" },
+  { at: [20, 10, -3], r: 1.1, kind: "dot" },
+  { at: [4, -12, -1], r: 1.7, kind: "clump" },
+  { at: [-24, 3, -4], r: 1.5, kind: "bubble" },
 ];
+/** The foam's faint edge, so it still shows on white teeth. */
+export const FOAM_EDGE = "#d6e9f5";
 /** Seconds of brushing until all the foam is there. */
 const FOAM_FULL_S = 30;
 
@@ -299,6 +313,35 @@ export interface BrushFrame {
  * anew in every frame it made the brushing stutter on phones. The mouth is projected without perspective, so moving
  * the flat picture is exactly moving the brush in 3D.
  */
+/** One fleck of the brush's foam (`Fleck`), at (x, y) on the screen with radius `r` and an edge `edge` wide. */
+function FoamFleck({ x, y, r, edge, kind }: { x: number; y: number; r: number; edge: number; kind: Fleck["kind"] }) {
+  const n = (v: number) => v.toFixed(1);
+  if (kind === "bubble") {
+    return (
+      <g>
+        <circle cx={n(x)} cy={n(y)} r={n(r)} fill="#fff" fillOpacity={0.3} stroke={FOAM_EDGE} strokeWidth={n(edge * 0.8)} />
+        <circle cx={n(x - r * 0.35)} cy={n(y - r * 0.35)} r={n(r * 0.28)} fill="#fff" />
+      </g>
+    );
+  }
+  if (kind === "dot") return <circle cx={n(x)} cy={n(y)} r={n(r)} fill="#fff" stroke={FOAM_EDGE} strokeWidth={n(edge * 0.6)} />;
+  // A clump: its edge round both bits first, then both filled over it, so no line runs between them.
+  const bits = [
+    { cx: n(x), cy: n(y), r: n(r) },
+    { cx: n(x + r * 0.85), cy: n(y - r * 0.45), r: n(r * 0.62) },
+  ];
+  return (
+    <g fill="#fff">
+      {bits.map((b, i) => (
+        <circle key={`e${i}`} {...b} stroke={FOAM_EDGE} strokeWidth={n(edge * 1.6)} />
+      ))}
+      {bits.map((b, i) => (
+        <circle key={i} {...b} />
+      ))}
+    </g>
+  );
+}
+
 export function Brush({
   anchor,
   at,
@@ -363,11 +406,11 @@ export function Brush({
   const brushed = (now - since.current) / 1000;
   const foamCount = Math.min(FOAM.length, 4 + Math.floor(((FOAM.length - 4) * brushed) / FOAM_FULL_S));
   const foam = (
-    <g className="brush-foam" fill="#fff" stroke="#bde0fe" strokeWidth={2}>
-      {FOAM.slice(0, foamCount).map(([su, sw, sb], i) => {
-        const p = point(brushPoint(pose, w, su, sw, sb));
+    <g className="brush-foam" opacity={0.85}>
+      {FOAM.slice(0, foamCount).map((fleck, i) => {
+        const p = point(brushPoint(pose, w, ...fleck.at));
         // Rounded like the paths, so a brush that holds still leaves the page as it is (each change is painted).
-        return <circle key={i} cx={p.x.toFixed(1)} cy={p.y.toFixed(1)} r={((3.5 + (i % 3)) * project.zoom).toFixed(1)} />;
+        return <FoamFleck key={i} x={p.x} y={p.y} r={fleck.r * project.zoom} edge={project.zoom} kind={fleck.kind} />;
       })}
     </g>
   );

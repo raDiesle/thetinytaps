@@ -1,5 +1,5 @@
 import { describe, expect, test } from "bun:test";
-import { BOXES, drawOrder, SIZE, type Facing } from "./brush";
+import { BOXES, drawOrder, FOAM, FOAM_EDGE, SIZE, type Facing } from "./brush";
 
 // The bristle tufts stand on the bristle side of the head (b above -11), the head, neck and handle behind them.
 const isTuft = (i: number) => BOXES[i].b[0] >= -11;
@@ -60,5 +60,21 @@ describe("brush size", () => {
   // A bigger brush hid the teeth being brushed and their monsters (user feedback, November 2026, asked twice).
   test("the brush stays small, about a milk molar's head", () => {
     expect(SIZE).toBeLessThanOrEqual(0.75);
+  });
+});
+
+// Even white balls with a thick blue ring were too loud on the brush (user feedback, November 2026): the foam is faint
+// flecks unlike each other – clumps, clear bubbles and tiny dots of different sizes – with a pale edge.
+describe("the brush's foam", () => {
+  test("its flecks come in every kind and many sizes", () => {
+    expect(new Set(FOAM.map((f) => f.kind))).toEqual(new Set(["clump", "bubble", "dot"]));
+    expect(new Set(FOAM.map((f) => f.r)).size).toBeGreaterThanOrEqual(FOAM.length - 2);
+    expect(Math.max(...FOAM.map((f) => f.r))).toBeGreaterThanOrEqual(2.5 * Math.min(...FOAM.map((f) => f.r)));
+  });
+
+  test("it is small and its edge pale", () => {
+    for (const f of FOAM) expect(f.r).toBeLessThanOrEqual(3);
+    const [r, g, b] = [1, 3, 5].map((i) => Number.parseInt(FOAM_EDGE.slice(i, i + 2), 16));
+    expect(Math.min(r, g, b)).toBeGreaterThanOrEqual(0xc8);
   });
 });

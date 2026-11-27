@@ -79,8 +79,10 @@ describe("the teeth being brushed", () => {
 // Gaps of dark mouth showed between the gum and the lips, most of all seen from the side (user feedback, November 2026):
 // the gum's cheek-side wall reaches past the lips, which cut it off, so the gum always runs into them. Round a jaw
 // tipped into the open mouth, and beside the arch seen from the side, the inside of the cheek shows (CHEEK_INSIDE in
-// mouth.tsx), never the dark of the mouth.
+// mouth.tsx, the gum's own pink), never the dark of the mouth.
 describe("the gum runs into the lips", () => {
+  /** A wall at least this tall (model units) is one standing at full height, not the rounded end behind the last molar. */
+  const FULL_WALL = 100;
   const views: [string, View, (typeof STEPS)[number] | null][] = [
     ["grin", GRIN_VIEW, null],
     ...STEPS.map((s) => [s.id, s.view, s] as [string, View, (typeof STEPS)[number]]),
@@ -95,9 +97,15 @@ describe("the gum runs into the lips", () => {
       const wall = gum.faces.find((f) => f.kind === "outer")!;
       // A jaw tipped to show its top or tongue side lies in the open mouth like a model, with cheek round it.
       if (Math.abs(view.tilt[gum.jaw]) >= 0.01 || all[gum.jaw].facing(wall.normal) <= MIN_FACING) return [];
-      // The wall's points: its rim along the tooth, then its foot back the other way.
-      const feet = wall.points.slice(wall.points.length / 2).map(all[gum.jaw].point);
-      return feet.filter((p) => insideBy(p, lips, 0)).map(() => gum.key);
+      // The wall's points: its rim along the tooth, then its foot back the other way. Behind the last molar the wall
+      // rounds off up to its rim; the cheek round it there is the gum's own pink, so only its full height must reach out.
+      const half = wall.points.length / 2;
+      const rims = wall.points.slice(0, half).reverse();
+      const feet = wall.points.slice(half).filter((p, i) => Math.abs(p[1] - rims[i][1]) > FULL_WALL);
+      return feet
+        .map(all[gum.jaw].point)
+        .filter((p) => insideBy(p, lips, 0))
+        .map(() => gum.key);
     });
     expect(inside).toEqual([]);
   });

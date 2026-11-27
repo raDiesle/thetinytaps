@@ -59,12 +59,18 @@ export const STAIN = { plaque: "#dcc27c", plaqueOpacity: 0.75, spot: "#b9b09c", 
 const GUM_FILLS: Record<FaceKind, string> = { outer: "#ff8fab", top: "#ffa6bc", inner: "#f27c9c", side: "#ff8fab" };
 /** The gum's edge round each tooth. */
 const GUM_RIM = "#e2577c";
-/** The inside of the cheeks and lips round the teeth: the gum runs into it, so nothing dark shows between gum and lips. */
-const CHEEK_INSIDE = "#f27e9c";
+/**
+ * The inside of the cheeks and lips round the teeth: the gum's own pink, so the gum runs on into it right up to the
+ * lips, round as they are. A darker pink there showed the gum's walls ending in a straight edge beside the last teeth,
+ * like a strip stretched from the upper lip to the lower (user feedback, November 2026).
+ */
+const CHEEK_INSIDE = GUM_FILLS.outer;
 /** The dark of the mouth behind the teeth, seen only between the rows of an open mouth. */
 const MOUTH_DARK = "#5c1430";
 /** From how far open the dark behind the teeth shows; with the teeth together only cheek shows round them. */
 const DARK_FROM = 0.3;
+/** How far inside the lips' middle line the dark opening keeps beside the last teeth: half the lip and a thin band of cheek. */
+const CAVITY_LIP_GAP = 17 + 9;
 /** Monsters still waiting for a later step only show where their side of the tooth clearly faces out of the mouth. */
 const WAITING_FACING = 0.25;
 /** Small enough that a monster sits on its tooth rather than covering it and its neighbours. */
@@ -644,7 +650,7 @@ export function Mouth({ view, zone, monsters, dirty, brush, happy, dazzled, acti
         <KidFace project={all.face} head={all.face.point(HEAD_MIDDLE)} happy={happy} open={view.open} lips={lipPoints} />
         <g clipPath="url(#mouth-inside)">
           <path d={lipsPath} fill={CHEEK_INSIDE} />
-          {view.open > DARK_FROM && <path d={cavityPath(model, all)} fill={MOUTH_DARK} />}
+          {view.open > DARK_FROM && <path d={cavityPath(model, all, lipPoints)} fill={MOUTH_DARK} />}
           {tongueUp && <path d={smoothPath(model.tongue.map(all.lower.point))} fill="#ff6f91" stroke="#d94f74" strokeWidth={3} />}
           {palateDown && <path d={smoothPath(model.palate.map(all.upper.point))} fill="#c94a6e" />}
           {jawParts}
@@ -667,8 +673,10 @@ export function Mouth({ view, zone, monsters, dirty, brush, happy, dazzled, acti
   const shownStains = stains.filter((g) => seenDirty.current.has(g.key));
   // A brushed face sparkles only once the brush has reached the next tooth (user feedback, November 2026: a glint
   // flashing while the brush still lay on the tooth was hardly seen, and only the step's last tooth seemed to sparkle),
-  // and then every brushed face of the view goes on sparkling softly while the head holds still.
+  // and then the brushed faces of the view go on sparkling softly while the head holds still – only the one or two the
+  // brush left last, one small glint each (user feedback, November 2026: a glint on every brushed face was too much).
   const sparkling = stains.filter((g) => !dirty.includes(g.key) && brush !== null && brushLeft(brush, g.tooth.id));
+  const sparkles = brush ? [...sparkling].sort((a, b) => lastStop(brush, b.tooth.id) - lastStop(brush, a.tooth.id)).slice(0, SPARKLES_AT_ONCE) : [];
 
   const placed = (m: MonsterSpot) => {
     const face = toothFace(m.tooth, m.surface);
@@ -842,27 +850,20 @@ export function Mouth({ view, zone, monsters, dirty, brush, happy, dazzled, acti
         {action && <LipArrows action={action} lips={lipPoints} zoom={project.zoom} onScreen={onScreen} />}
         {/* A last sugar monster peeks in, dazzled by the clean teeth, and puts on sunglasses: no sugar left for it. */}
         {dazzled && <DazzledMonster screen={screen} />}
-        {/* The teeth of this view already brushed sparkle softly, small glints coming and going, once the brush has
-            moved on from them (`sparkling`). */}
-        {sparkling.map((g) =>
-          g.sparkles.map((spark, j) => {
-            const at = onScreen(spark, GLINT_SIZE * SPARKLE_SIZE);
-            return (
-              <Sprite
-                key={`${g.key}-${j}`}
-                spot={{ x: round(at.x), y: round(at.y), scale: round(at.scale, 1000) }}
-                reach={GLINT_REACH}
-                className="tooth-glint brushed"
-              >
-                <div style={{ "--turn": j + (g.seed % 3) * 0.5 } as CSSProperties}>
-                  <svg viewBox={spriteBox(GLINT_REACH)} aria-hidden>
-                    <Glint />
-                  </svg>
-                </div>
-              </Sprite>
-            );
-          }),
-        )}
+        {/* The teeth of this view the brush left last sparkle softly, one small glint each coming and going in turn
+            (`sparkles`). */}
+        {sparkles.map((g, j) => {
+          const at = onScreen(g.sparkle, GLINT_SIZE * SPARKLE_SIZE);
+          return (
+            <Sprite key={g.key} spot={{ x: round(at.x), y: round(at.y), scale: round(at.scale, 1000) }} reach={GLINT_REACH} className="tooth-glint brushed">
+              <div style={{ "--turn": 2 * j } as CSSProperties}>
+                <svg viewBox={spriteBox(GLINT_REACH)} aria-hidden>
+                  <Glint />
+                </svg>
+              </div>
+            </Sprite>
+          );
+        })}
         {/* All clean: glints of light flash on the teeth in turn, each a small layer of its own. */}
         {!gliding &&
           glints.map((g) => {
@@ -922,9 +923,36 @@ export function Mouth({ view, zone, monsters, dirty, brush, happy, dazzled, acti
  * The opening into the mouth between the two rows of teeth: the outline round every chewing surface of both jaws,
  * each seen through its own (perhaps tipped) projector. Dark behind the tongue and palate; outside it the cheeks show.
  */
-function cavityPath(model: MouthModel, all: ReturnType<typeof projectors>): string {
-  const points = model.teeth.flatMap((t) => surfaceFace(t.faces, "top").points.map(all[t.id.jaw].point));
-  return `M${convexHull(points).map(fmt).join(" L")}Z`;
+function cavityPath(model: MouthModel, all: ReturnType<typeof projectors>, lips: { x: number; y: number }[]): string {
+  const rows = (["upper", "lower"] as const).map((jaw) =>
+    model.teeth.filter((t) => t.id.jaw === jaw).flatMap((t) => surfaceFace(t.faces, "top").points.map(all[jaw].point)),
+  );
+  // Beside the last teeth the opening goes on round to the lips, keeping only a narrow band of cheek along them: cut
+  // off straight from one row's end to the other's, the cheek between looked like a stretched strip of gum (user
+  // feedback, November 2026). Only between the two rows' ends, so no dark shows beside a row's gum.
+  const ring = insetRing(lips, CAVITY_LIP_GAP);
+  const sides = ([-1, 1] as const).flatMap((s) => {
+    const end = (row: { x: number; y: number }[]) => row.reduce((a, b) => (s * b.x > s * a.x ? b : a));
+    const [up, down] = rows.map(end);
+    const past = s < 0 ? Math.min(up.x, down.x) : Math.max(up.x, down.x);
+    return ring.filter((p) => s * p.x > s * past && p.y > up.y && p.y < down.y);
+  });
+  return roundedPath(convexHull([...rows.flat(), ...sides]), 10);
+}
+
+/** The closed outline `points` moved `by` inwards along its normals (an outline in screen order either way round). */
+function insetRing(points: { x: number; y: number }[], by: number) {
+  const n = points.length;
+  const middle = { x: points.reduce((a, p) => a + p.x, 0) / n, y: points.reduce((a, p) => a + p.y, 0) / n };
+  return points.map((p, i) => {
+    const a = points[(i - 1 + n) % n];
+    const b = points[(i + 1) % n];
+    const length = Math.hypot(b.x - a.x, b.y - a.y) || 1;
+    let nx = -(b.y - a.y) / length;
+    let ny = (b.x - a.x) / length;
+    if (nx * (middle.x - p.x) + ny * (middle.y - p.y) < 0) [nx, ny] = [-nx, -ny];
+    return { x: p.x + nx * by, y: p.y + ny * by };
+  });
 }
 
 /** The smallest convex outline round `points` (Andrew's monotone chain). */
@@ -1210,22 +1238,26 @@ function Glint() {
 }
 
 /**
- * The sparkles on a tooth brushed are small, under a third of the end's glints, two to a face: small glints rather
- * than one big one (user feedback, November 2026).
+ * The sparkle on a tooth brushed is small, under a quarter of the end's glints, one to a face: small glints rather
+ * than one big one, and then fewer and fainter still (user feedback, November 2026).
  */
-const SPARKLE_SIZE = 0.3;
+const SPARKLE_SIZE = 0.22;
+/** How many brushed faces sparkle at once: the ones the brush left last, never every brushed face of the view. */
+const SPARKLES_AT_ONCE = 2;
 
 /**
  * Whether the brush has moved on from `tooth` to the next one: it has reached the stop after the tooth's last. A tooth
  * with no stop is never left.
  */
 function brushLeft(brush: { stops: { tooth: ToothId }[]; at: number }, tooth: ToothId): boolean {
-  const key = toothKey(tooth);
-  let last = -1;
-  brush.stops.forEach((s, i) => {
-    if (toothKey(s.tooth) === key) last = i;
-  });
+  const last = lastStop(brush, tooth);
   return last >= 0 && last < brush.stops.length - 1 && brush.at >= last + 1;
+}
+
+/** The index of the brush's last stop on `tooth`, -1 when it has none: the higher, the later the brush left it. */
+function lastStop(brush: { stops: { tooth: ToothId }[] }, tooth: ToothId): number {
+  const key = toothKey(tooth);
+  return brush.stops.findLastIndex((s) => toothKey(s.tooth) === key);
 }
 
 /** What a stain layer of one face needs, in picture units: where it lies and what the still picture draws over it. */
@@ -1237,8 +1269,8 @@ interface StainGeometry {
   seed: number;
   /** The layer's place, a little bigger than the face for its outline. */
   box: Box;
-  /** Where the face sparkles once it is clean: two small points apart on it. */
-  sparkles: { x: number; y: number }[];
+  /** Where the face sparkles once it is clean: one small point high on it, where the light catches it. */
+  sparkle: { x: number; y: number };
   /**
    * The outlines of what the still picture draws over the face – its crown's later faces, its gum's walls, the teeth
    * drawn after it that reach into its box – as plain shapes (`cut`, filled with their outline) and gum rims (`rims`,
@@ -1306,7 +1338,7 @@ function stainGeometry(
       project,
       seed: seedOf(id),
       box,
-      sparkles: [project.point(onFace(face, 0.3, 0.3)), project.point(onFace(face, 0.7, 0.65))],
+      sparkle: project.point(onFace(face, 0.35, 0.3)),
       cut: [...own, ...walls.cut, ...after.flatMap((a) => a.cut)],
       rims: [...walls.rims, ...after.flatMap((a) => a.rims)],
     },

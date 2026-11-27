@@ -70,17 +70,20 @@ test("in the story the sugar stains the teeth while the monsters grow, as a laye
 });
 
 // A brushed tooth's one big glint flashed while the brush still lay on it, so only the step's last tooth seemed to
-// sparkle (user feedback, November 2026): every brushed face of the view sparkles with small, faint glints, only once
-// the brush has reached the next tooth, after a beat's pause, and goes on sparkling softly.
+// sparkle (user feedback, November 2026): brushed faces sparkle with small, faint glints, only once the brush has
+// reached the next tooth, after a beat's pause, and go on sparkling softly. Then a glint on every brushed face was too
+// much (user feedback, November 2026): one or two glints, one to a face, on the faces the brush left last.
 test("brushed teeth sparkle small and softly, only once the brush has moved on", () => {
   expect(mouth).toMatch(/const sparkling = stains\.filter\(\(g\) => !dirty\.includes\(g\.key\) && brush !== null && brushLeft\(brush, g\.tooth\.id\)\);/);
   expect(mouth).toMatch(/function brushLeft[\s\S]*?brush\.at >= last \+ 1/);
-  expect(Number(mouth.match(/const SPARKLE_SIZE = ([\d.]+);/)?.[1])).toBeLessThanOrEqual(0.35);
-  expect(mouth).toMatch(/sparkles: \[project\.point\(onFace\([^)]*\)\), project\.point\(onFace\([^)]*\)\)\]/);
+  expect(Number(mouth.match(/const SPARKLE_SIZE = ([\d.]+);/)?.[1])).toBeLessThanOrEqual(0.25);
+  expect(Number(mouth.match(/const SPARKLES_AT_ONCE = (\d+);/)?.[1])).toBeLessThanOrEqual(2);
+  expect(mouth).toMatch(/\.slice\(0, SPARKLES_AT_ONCE\)/);
+  expect(mouth).toMatch(/sparkle: project\.point\(onFace\([^)]*\)\),/);
   const sparkle = css.match(/\.tooth-glint\.brushed > div \{\s*animation: ([^;]+);/)?.[1] ?? "";
   expect(sparkle).toMatch(/^teeth-sparkle [\d.]+s ease-in-out calc\(0\.536s \+ var\(--turn\) \* [\d.]+s\) infinite$/);
   const peak = Math.max(...[...(css.match(/@keyframes teeth-sparkle \{[\s\S]*?\n\}/)?.[0] ?? "").matchAll(/opacity: ([\d.]+)/g)].map((m) => Number(m[1])));
-  expect(peak).toBeLessThanOrEqual(0.75);
+  expect(peak).toBeLessThanOrEqual(0.55);
 });
 
 // Brushed teeth are a beautiful white (user feedback, November 2026), never cream.
