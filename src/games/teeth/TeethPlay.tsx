@@ -1,8 +1,9 @@
 import { sectionStart } from "./seekBar";
-import { type CSSProperties, useCallback, useEffect, useLayoutEffect, useMemo, useRef, useState, type PointerEvent } from "react";
+import { type CSSProperties, type ReactNode, useCallback, useEffect, useLayoutEffect, useMemo, useRef, useState, type PointerEvent } from "react";
 import { flushSync } from "react-dom";
 import { ControlIcon } from "@/components/ControlIcon";
 import { GameEnd } from "@/components/GameEnd";
+import { PlayOptions } from "@/components/PlayOptions";
 import { GO_ON, PAUSE, SPACE_OR_TAP_TO_GO_ON, TAP_TO_GO_ON } from "@/lib/sharedTexts";
 import { useNoBackgroundMusic } from "@/lib/backgroundMusic";
 import { useCommonSettings } from "@/lib/common";
@@ -54,9 +55,10 @@ const ACTION_MS = 3500;
 const COUNTDOWN = 3;
 /** How long „Los!“ shows when the brushing begins. */
 const GO_MS = 1300;
-/** After the brushing: two bars of cheering at the clean grin, then the brush is rinsed and put away, then the buttons. */
+/** After the brushing: two bars of cheering at the clean grin, then the brush is rinsed and put away (unless left out), then the buttons. */
 const CHEER_MS = 4290;
-const ENDING_MS = CHEER_MS + PREP_MS.tidy;
+/** How long the end runs before the buttons: the cheer, and the tidying where it is shown. */
+const endingOf = (tidy: boolean) => CHEER_MS + (tidy ? PREP_MS.tidy : 0);
 /** A video recording ends at least this long after the brush is put away, so the last grin stays a moment. */
 const VIDEO_TAIL_MS = 3000;
 /** After the sung finale has rung out, the recording keeps the still grin this much longer, so the video doesn't end on the last note. */
@@ -267,7 +269,7 @@ function PhaseTile({ phase, now, done, title }: { phase: BarPhase; now: boolean;
  * one by one. Arrow keys skip ahead or back, Space or the pause button pauses,
  * and tapping the progress bar jumps there.
  */
-export function TeethPlay({ settings, video }: { settings: TeethSettings; video?: VideoRun }) {
+export function TeethPlay({ settings, video, options }: { settings: TeethSettings; video?: VideoRun; options?: ReactNode }) {
   // Everything shown and said follows the app language; a line without a translation is said in German with the German voice (spoken.ts).
   const language = useAppLanguage();
   const t = useT();
@@ -305,7 +307,8 @@ export function TeethPlay({ settings, video }: { settings: TeethSettings; video?
     return cue ? spokenIn(cue, language) : daytimeText(daytime, "grow", language);
   };
   const perStep = useMemo(() => STEPS.map((_, s) => monsters.filter((m) => m.step === s).length), [monsters]);
-  // Taken at the start of each brushing: „Vorher zeigen“ changed meanwhile (⚙️ while playing) applies to the next one, so the clock never jumps.
+  // Taken at the start of each brushing, so the clock never jumps: a phase switched on or off behind ⚙️ while the
+  // prelude runs starts the brushing again with it (below), and later applies to the next one.
   const prelude = useMemo(() => preludeOf(settings), [round]);
   const introMs = introOf(prelude);
   // The song is sung in the app language; the brushing lasts as long as the song and each step as long as its verse.
@@ -319,7 +322,12 @@ export function TeethPlay({ settings, video }: { settings: TeethSettings; video?
   const waiting = !paused && clock.until !== undefined && elapsed >= clock.until;
   const brushed = elapsed - introMs;
   const done = brushed >= totalMs;
-  const ending: Ending | null = !done ? null : brushed - totalMs < CHEER_MS ? "cheer" : brushed - totalMs < ENDING_MS ? "tidy" : "rest";
+  // Putting the brush away follows ⚙️ until the brushing is done, then stays as it is for this brushing, so switching it
+  // on at the end never brings the tidying back after the buttons.
+  const [tidy, setTidy] = useState(settings.tidy);
+  if (!done && tidy !== settings.tidy) setTidy(settings.tidy);
+  const endingMs = endingOf(tidy);
+  const ending: Ending | null = !done ? null : brushed - totalMs < CHEER_MS ? "cheer" : brushed - totalMs < endingMs ? "tidy" : "rest";
   /** -1 during the prelude, STEPS.length when done. */
   const phase = brushed < 0 ? -1 : done ? STEPS.length : stepStarts.filter((at, k) => k < STEPS.length && brushed >= at).length - 1;
   const before = brushed < 0 ? preludeAt(prelude, elapsed) : null;
@@ -436,7 +444,7 @@ export function TeethPlay({ settings, video }: { settings: TeethSettings; video?
   // A video ends once the brush is put away and the sung finale has rung out (it lasts longer than the tidying).
   useEffect(() => {
     if (!video || ending !== "rest") return;
-    const songLeft = (songEndMs(sungIn, song.buffer) ?? 0) + VIDEO_AFTER_SONG_MS - (totalMs + ENDING_MS);
+    const songLeft = (songEndMs(sungIn, song.buffer) ?? 0) + VIDEO_AFTER_SONG_MS - (totalMs + endingMs);
     later(video.onFinished, Math.max(VIDEO_TAIL_MS, songLeft));
     // Only when the end moves on.
   }, [ending]);
@@ -472,6 +480,12 @@ export function TeethPlay({ settings, video }: { settings: TeethSettings; video?
     setNow(t);
     setRound((r) => r + 1);
   }, [song.ready, settings.origin, settings.prep]);
+
+  // A phase before the brushing switched on or off behind ⚙️ while that prelude still runs: the brushing starts again
+  // with it, as the grown-up expects to see the change. Once the song runs nothing changes until the next brushing.
+  useEffect(() => {
+    if (before && preludeOf(settings).join() !== prelude.join()) again();
+  }, [settings.origin, settings.prep]);
 
   const togglePause = useCallback(() => {
     const t = performance.now();
@@ -527,9 +541,9 @@ export function TeethPlay({ settings, video }: { settings: TeethSettings; video?
   const tiles = preludeTiles(prelude);
   const tileParts: [number, number][] = tiles.map(({ parts }) => [preludeStart(prelude, parts[0]), parts.reduce((sum, p) => sum + PRELUDE[p].ms, 0)]);
   const stepParts = STEPS.map((_, k): [number, number] => [introMs + stepStarts[k], stepLength(k)]);
-  const tidyPart: [number, number] = [introMs + totalMs, ENDING_MS];
-  /** Every `.teeth-segment` of the bar in its order, as tapping and dragging find them. */
-  const segments: [number, number][] = [...tileParts, ...stepParts, tidyPart];
+  const tidyPart: [number, number] = [introMs + totalMs, endingMs];
+  /** Every `.teeth-segment` of the bar in its order, as tapping and dragging find them; putting the brush away only where it is shown. */
+  const segments: [number, number][] = [...tileParts, ...stepParts, ...(tidy ? [tidyPart] : [])];
   /** How far through a part the clock is, 0 to 1. */
   const share = ([start, length]: [number, number]) => Math.max(0, Math.min(1, (elapsed - start) / length));
 
@@ -567,7 +581,7 @@ export function TeethPlay({ settings, video }: { settings: TeethSettings; video?
     const rect = parts[i].getBoundingClientRect();
     const k = Math.max(0, Math.min(1, upright ? (e.clientY - rect.top) / rect.height : (e.clientX - rect.left) / rect.width));
     const [start, length] = segments[i];
-    const target = sectionStart(Math.min(start + k * length, introMs + totalMs + ENDING_MS - 1), sectionStarts);
+    const target = sectionStart(Math.min(start + k * length, introMs + totalMs + endingMs - 1), sectionStarts);
     if (!first && target === lastSection.current) return;
     lastSection.current = target;
     seek(target);
@@ -581,14 +595,14 @@ export function TeethPlay({ settings, video }: { settings: TeethSettings; video?
         else togglePause();
       } else if (e.key === "ArrowRight" || e.key === "ArrowDown") {
         if (!done) jumpTo(part + 1);
-        else if (ending !== "rest") seek(introMs + totalMs + ENDING_MS);
+        else if (ending !== "rest") seek(introMs + totalMs + endingMs);
       } else if (e.key === "ArrowLeft" || e.key === "ArrowUp") {
         jumpTo(Math.max(0, part - 1));
       }
     };
     window.addEventListener("keydown", onKeyDown);
     return () => window.removeEventListener("keydown", onKeyDown);
-  }, [done, ending, part, again, togglePause, jumpTo, seek, introMs, totalMs]);
+  }, [done, ending, part, again, togglePause, jumpTo, seek, introMs, totalMs, endingMs]);
 
   // When the mouth has to open or close, the picture does it slowly and arrows on the lips show the way.
   const mouthBefore = phase <= 0 ? "closed" : STEPS[phase - 1].mouth;
@@ -691,8 +705,8 @@ export function TeethPlay({ settings, video }: { settings: TeethSettings; video?
               role="slider"
               aria-label={t({ de: "Fortschritt", en: "Progress", zh: "进度", hi: "प्रगति", es: "Progreso", ar: "التقدّم", ru: "Сколько уже почищено" })}
               aria-valuemin={0}
-              aria-valuemax={Math.round((introMs + totalMs + ENDING_MS) / 1000)}
-              aria-valuenow={Math.round(Math.max(0, Math.min(elapsed, introMs + totalMs + ENDING_MS)) / 1000)}
+              aria-valuemax={Math.round((introMs + totalMs + endingMs) / 1000)}
+              aria-valuenow={Math.round(Math.max(0, Math.min(elapsed, introMs + totalMs + endingMs)) / 1000)}
               onPointerDown={(e) => {
                 e.currentTarget.setPointerCapture(e.pointerId);
                 seekFromPointer(e, true);
@@ -732,8 +746,9 @@ export function TeethPlay({ settings, video }: { settings: TeethSettings; video?
                 </div>
                 <BarSymbol name="zahn" />
               </div>
-              {/* After the brushing: the cheer at the clean teeth, then the brush rinsed and put back in its cup. */}
-              <PhaseTile phase="tidy" now={ending !== null} done={share(tidyPart)} title={t(TIDY_SAY)} />
+              {/* After the brushing: the cheer at the clean teeth, then the brush rinsed and put back in its cup – unless left
+                  out behind ⚙️, when the cheer ends the brushing's frame at its clean tooth. */}
+              {tidy && <PhaseTile phase="tidy" now={ending !== null} done={share(tidyPart)} title={t(TIDY_SAY)} />}
             </div>
             {/* For the grown-up, only where the screen is wide enough (teeth.css): before the brushing the time until it
                 starts, then the brushing time left – two clocks in one place. */}
@@ -768,6 +783,8 @@ export function TeethPlay({ settings, video }: { settings: TeethSettings; video?
                 {formatTime(totalMs - Math.max(0, Math.min(brushed, totalMs)))}
               </span>
             )}
+            {/* Which phases are shown, kept for every brushing: held, like ⚙️ in other games, so a child's tap opens nothing. */}
+            {options && <PlayOptions inline={{ button: "teeth-button teeth-options", icon: "teeth-button-icon teeth-gear" }}>{options}</PlayOptions>}
           </div>
         </>
       )}

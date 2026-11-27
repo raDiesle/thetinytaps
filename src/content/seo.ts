@@ -249,7 +249,7 @@ export const SEO_TEXTS: PageSeo[] = [
     title: "Zähneputzen für Kinder – Zahnputzlied mit Timer",
     description:
       "Zähneputzen mit Lied: Schritt für Schritt putzen, die Zuckermonster verschwinden, morgens und abends ein Stern. Zahnputz-Timer für Kleinkinder.",
-    text: "Ein Zahnputz-Begleiter, so lang wie sein Lied, etwa zwei Minuten: Erst zeigt eine kleine Geschichte, wo die Zuckermonster herkommen, dann führen sieben Schritte nach KAI (Kauflächen, außen, innen) durchs Putzen, und die Monster verschwinden. Morgens geht die Sonne auf, abends der Mond, und eine Wochentafel sammelt die Sterne. Das Zahnputzlied singt in der Sprache der App – auf Deutsch, Englisch, Spanisch, Russisch, Chinesisch, Hindi oder Arabisch.",
+    text: "Ein Zahnputz-Begleiter, so lang wie sein Lied, etwa zwei Minuten: Erst zeigt eine kleine Geschichte, wo die Zuckermonster herkommen, dann führen sieben Schritte nach KAI (Kauflächen, außen, innen) durchs Putzen, und die Monster verschwinden. Morgens geht die Sonne auf, abends der Mond, und eine Wochentafel sammelt die Sterne. Über ⚙️ an der Leiste wählen Große, ob die Geschichte, das Holen der Zahnbürste und das Wegräumen jedes Mal dabei sind – das Putzen mit dem Lied bleibt immer. Das Zahnputzlied singt in der Sprache der App – auf Deutsch, Englisch, Spanisch, Russisch, Chinesisch, Hindi oder Arabisch.",
   },
   {
     path: "/toepfchen/",

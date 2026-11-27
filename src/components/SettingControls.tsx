@@ -1,10 +1,27 @@
 import type { ReactNode } from "react";
 
-export function Toggle({ label, checked, onChange }: { label: string; checked: boolean; onChange: (checked: boolean) => void }) {
+/**
+ * A switch with its label. `icon` stands between switch and words (a game's own picture for what it switches); `locked`
+ * shows a thing that is always on and can't be switched off, so grown-ups see it is there (Zähne putzen's brushing).
+ */
+export function Toggle({
+  label,
+  checked,
+  onChange,
+  icon,
+  locked,
+}: {
+  label: string;
+  checked: boolean;
+  onChange: (checked: boolean) => void;
+  icon?: ReactNode;
+  locked?: boolean;
+}) {
   return (
-    <label className="toggle">
-      <input type="checkbox" checked={checked} onChange={(e) => onChange(e.target.checked)} />
+    <label className={locked ? "toggle locked" : "toggle"}>
+      <input type="checkbox" checked={checked} disabled={locked} onChange={(e) => onChange(e.target.checked)} />
       <span className="toggle-track" aria-hidden />
+      {icon}
       {label}
     </label>
   );

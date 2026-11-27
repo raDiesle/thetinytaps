@@ -197,6 +197,12 @@
   transform: translateX(24px);
 }
 
+/* Always on: seen, but nothing to switch. */
+.toggle.locked {
+  cursor: default;
+  opacity: 0.6;
+}
+
 .toggle input:focus-visible + .toggle-track {
   outline: 3px solid var(--ocean);
   outline-offset: 3px;

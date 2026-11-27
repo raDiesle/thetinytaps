@@ -158,7 +158,7 @@ export const SEO_ES: SeoTranslation = {
       title: "Cepillarse los dientes: canción y temporizador",
       description:
         "Lavarse los dientes con canción: paso a paso desaparecen los monstruos del azúcar, y una estrella por la mañana y por la noche. Temporizador para peques.",
-      text: "Un compañero de cepillado que dura lo que su canción, unos dos minutos: primero un cuento corto muestra de dónde vienen los monstruos del azúcar, luego siete pasos (superficies de masticar, por fuera, por dentro) guían el cepillado y los monstruos desaparecen. Por la mañana sale el sol, por la noche la luna, y una tabla semanal reúne las estrellas. La canción del cepillado se canta en el idioma de la app: español, inglés, alemán, ruso, chino, hindi o árabe.",
+      text: "Un compañero de cepillado que dura lo que su canción, unos dos minutos: primero un cuento corto muestra de dónde vienen los monstruos del azúcar, luego siete pasos (superficies de masticar, por fuera, por dentro) guían el cepillado y los monstruos desaparecen. Por la mañana sale el sol, por la noche la luna, y una tabla semanal reúne las estrellas. Con ⚙️ en la barra, los adultos eligen si el cuento, tomar el cepillo y guardarlo aparecen cada vez; el cepillado con la canción se queda siempre. La canción del cepillado se canta en el idioma de la app: español, inglés, alemán, ruso, chino, hindi o árabe.",
     },
     "/toepfchen/": {
       title: "Control de esfínteres jugando: el juego del orinal",
