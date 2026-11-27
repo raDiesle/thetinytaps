@@ -27,9 +27,18 @@ the management page's contents by `TOOL_GROUPS`), never a link from the shelf or
   **The outro is the same in every video** (user decision, November 2026): its code leads to the home page, never to
   the video's game, so one outro per language is rendered once and put after each video; the link to the game stands
   in the video's description (`VIDEO_PAGES`, `youtubeTexts.ts`). Nothing in it may depend on the video it follows.
-  It comes in two variants (choice „Variante“ on the page, `--variante regal` for the tool): „Bilder aus den Spielen“,
-  the default (user request, November 2026: show the games' pictures big, not the books), and the shelf one above.
-  „Bilder aus den Spielen“ (`gallery.ts`, `GalleryScene`, `scheduleGallerySound`, about 17 s) opens on the two
+  It comes in three variants (choice „Variante“ on the page, `--variante bilder` or `--variante regal` for the tool):
+  „Pinnwand“, the default, „Bilder aus den Spielen“ and the shelf one above.
+  „Pinnwand“ (`pinboard.ts`, `PinboardScene`, `schedulePinboardSound`, about 9 s; user request, 27 November 2026: the
+  pictures one after another went by too fast and gave no overview) is one single picture: a cork board filling the
+  screen, the games' photos (`PINBOARD` in `content.ts`, places in `PIN_SLOTS`) pinned onto it one after another in
+  white frames, each with a word for what it shows on its frame (the game's name, or a short `word` where that is a
+  whole question), each held by a pushpin with a tap; then a paper pinned into the middle with only „www.funforboth.com“
+  and „Alltagshelfer & Lernspiele“ (`BOARD_LINE`) – no card, no signs, no code after it. Which photos hang there is the
+  user's choice (they pick from `/management/bilder/`); a photo swapped keeps its place, and the board stays one
+  picture to take in at a glance, never a run of pictures again.
+  „Bilder aus den Spielen“ (`gallery.ts`, `GalleryScene`, `scheduleGallerySound`, about 17 s; user request, November
+  2026: show the games' pictures big, not the books) opens on the two
   categories side by side, „Alltagshelfer“ and „Lernspiele“, each with a picture of its games and its name under it;
   then six helpers and six games (`GALLERY` in `content.ts`) come one after another out of the depth into the middle,
   big, the game's name on a slip under it and its category over it, each with a rising note, the one before flying on

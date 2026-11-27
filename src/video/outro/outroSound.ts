@@ -1,6 +1,7 @@
 import { COVERS } from "../intro/IntroScene";
 import { A5, bell, C4, C5, C6, D5, E5, G5, knock, rush } from "../sound";
 import { GALLERY_BEATS, HELPER_COUNT, PICTURE_COUNT, STEP } from "./gallery";
+import { PHOTO_COUNT, PINBOARD_BEATS, photoBeat } from "./pinboard";
 import { type CardBeats, OUTRO_BEATS } from "./timeline";
 
 /** Two notes below C5 the gallery's games rise from. */
@@ -90,3 +91,27 @@ export function scheduleGallerySound(ac: BaseAudioContext, out: AudioNode, at: n
 
 /** The last moment any of the gallery outro's sounds still rings, in seconds from its start. */
 export const GALLERY_SOUND_END = cardSoundEnd(GALLERY_BEATS);
+
+/**
+ * Lays the sound of the outro „Pinnwand“ onto `ac`: for each photo a soft swish of paper as it comes and the small
+ * tap of its pin going into the cork, then the card's sound – Fun – for – Both as the address is pinned and a warm
+ * chord with its line.
+ */
+export function schedulePinboardSound(ac: BaseAudioContext, out: AudioNode, at: number) {
+  const s = (seconds: number) => at + seconds;
+  for (let k = 0; k < PHOTO_COUNT; k++) pinSound(ac, out, s(0), photoBeat(k), 0.6 + (0.4 * ((k * 7) % 5)) / 4);
+  pinSound(ac, out, s(0), PINBOARD_BEATS.note, 1);
+  cardSound(ac, out, at, PINBOARD_CARD);
+}
+
+/** A thing pressed onto the cork during `beat`: paper swishing down, then its pin's tap; `pitch` varies the tap a little. */
+function pinSound(ac: BaseAudioContext, out: AudioNode, at: number, [from, to]: readonly [number, number], pitch: number) {
+  rush(ac, out, at + from, (to - from) * 0.7, 2400, 900, 0.03, 0.8);
+  knock(ac, out, at + to - 0.02, 520 * pitch + 300, 180, 0.2, 0.06);
+}
+
+/** When the pin board's card sound plays: its bells as the address is pinned, its chord with the line. */
+const PINBOARD_CARD: CardBeats = { card: [PINBOARD_BEATS.note[0] - 0.2, PINBOARD_BEATS.note[1]], signs: PINBOARD_BEATS.line, code: PINBOARD_BEATS.line };
+
+/** The last moment any of the pin board outro's sounds still rings, in seconds from its start. */
+export const PINBOARD_SOUND_END = cardSoundEnd(PINBOARD_CARD);
