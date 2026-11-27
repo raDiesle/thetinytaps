@@ -131,6 +131,9 @@ export const teethIdeas: IdeaArea = {
       text: "Vor dem ersten Vers, wenn der Spiegel das Gesicht zum ersten Mal zeigt, reißt das Kind im Spiegel den Mund weit auf und brüllt einmal leise wie ein kleiner Löwe („Rooaah“), zwei Takte lang, dann beginnt das Lied mit offenem Mund. Kein Löwe im Bild, nur das Gesicht und der Laut; das Kind vor dem Bildschirm macht es nach.",
       why: "„Brüll mal wie ein Löwe“ ist einer der häufigsten Elterntipps, wenn ein Kleinkind den Mund nicht aufmachen will: aus dem Muss wird ein Spiel, und der Mund ist offen, bevor die Bürste kommt.",
       effort: "S",
+      done: true,
+      partial:
+        "Gebaut: ein eigener Vorspielteil „Mund auf wie ein Löwe“ zwischen den Monstern im Spiegel und 3, 2, 1 – der Mund gleitet von vorn weit auf (Pfeile auf den Lippen), nach einem Schlag ein leises Brüllen, offen durch den Countdown bis in den ersten Schritt. Das Brüllen ist bis zur Aufnahme synthetisiert; die echte Aufnahme wartet in der Geräusche-Liste für Claude Cloud.",
     },
     {
       id: "X-27",

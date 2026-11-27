@@ -14,7 +14,7 @@ import {
   viewedLips,
 } from "./jaw";
 import { CHEEK, CHEEKS, MOUTH_CORNERS } from "./origin";
-import { GRIN_VIEW, STEPS } from "./steps";
+import { GRIN_VIEW, ROAR_VIEW, STEPS } from "./steps";
 
 // The pink cheeks once lay right on the corners of the open mouth, in the mirror and in the story, and looked odd
 // (user feedback, November 2026). They keep a gap of skin to the lips.
@@ -26,6 +26,7 @@ const edge = (x: number, y: number, rx: number, ry: number) =>
 describe("the mirror's cheeks", () => {
   const stops: { name: string; view: View; zone: (typeof STEPS)[number] | null }[] = [
     { name: "grin", view: GRIN_VIEW, zone: null },
+    { name: "roar", view: ROAR_VIEW, zone: null },
     ...STEPS.map((s) => ({ name: s.id, view: s.view, zone: s })),
   ];
 

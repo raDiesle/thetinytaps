@@ -4,11 +4,17 @@ import type { EnglishFirst, Localized, Texts } from "@/lib/language";
 // What Zähne putzen says before and after the brushing, in every language it has: plain data, so the list of
 // recordings (src/content/recordedLines.ts) reads it without loading the game's drawings.
 
-/** Before the clock starts: where the monsters come from, get the brush, toothpaste on, and see them in the mirror. */
-export type Prelude = "sweets" | "grow" | "brush" | "paste" | "monsters";
+/**
+ * Before the clock starts: where the monsters come from, get the brush, toothpaste on, see them in the mirror, and open
+ * wide like a little lion (X-26), so the mouth is open before the song begins.
+ */
+export type Prelude = "sweets" | "grow" | "brush" | "paste" | "monsters" | "roar";
 
-/** What each part before the clock is called (on the progress bar) and what the voice says in it; its timing and sounds are added in TeethPlay.tsx. */
-export const PRELUDE_TEXTS: Record<Prelude, { title: Localized; cue?: Localized }> = {
+/**
+ * What each part before the clock is called (on the progress bar) and what the voice says in it; its timing and sounds
+ * are added in TeethPlay.tsx. A part with no `cue` says nothing – but for `grow`, which says the daytime's line.
+ */
+export const PRELUDE_TEXTS: Record<Prelude, { title: Texts; cue?: Localized }> = {
   sweets: {
     title: {
       de: "🍭 Süßes essen",
@@ -98,6 +104,19 @@ export const PRELUDE_TEXTS: Record<Prelude, { title: Localized; cue?: Localized 
       es: "¡Ay, ahí están! ¡Ven, vamos a cepillarlos todos!",
       ar: "يا إلهي، ها هي! هيّا ننظّفها كلها!",
       ru: "Ой-ой, вот они! Давай прогоним их щёткой!",
+    },
+  },
+  // The child in the mirror opens wide and roars softly, and the child in front of it does the same (X-26, written
+  // English first): no voice tells it, the picture and the roar do.
+  roar: {
+    title: {
+      en: "🦁 Open wide like a lion",
+      de: "🦁 Mund auf wie ein Löwe",
+      zh: "🦁 像狮子一样张大嘴",
+      hi: "🦁 शेर की तरह मुँह खोलो",
+      es: "🦁 Boca abierta como un león",
+      ar: "🦁 نفتح الفم مثل الأسد",
+      ru: "🦁 Рот пошире, как у львёнка",
     },
   },
 };

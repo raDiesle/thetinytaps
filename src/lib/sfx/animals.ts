@@ -1,6 +1,6 @@
 // Animal sounds.
 
-import { hiss, note } from "./core";
+import { hiss, note, voice } from "./core";
 
 /** A little bird's chirp. */
 export function playTweet() {
@@ -90,6 +90,28 @@ export function playRoar() {
   note({ from: 90, to: 150, duration: 0.35, type: "sawtooth", volume: 0.28, lowpass: 500 });
   note({ from: 150, to: 80, duration: 0.8, type: "sawtooth", volume: 0.28, lowpass: 500, delay: 0.3 });
   note({ from: 60, to: 45, duration: 0.9, type: "square", volume: 0.08, lowpass: 300, delay: 0.2 });
+}
+
+/**
+ * "Rrrooaah!" – a small child roaring like a little lion, softly and for fun: a short growl, then a child's voice
+ * opening from „o“ to „a“, rising and sinking (Zähne putzen's mouth opening wide, X-26).
+ */
+export function playLittleRoar() {
+  note({ from: 150, to: 190, duration: 0.3, type: "sawtooth", volume: 0.12, lowpass: 700 });
+  voice({
+    pitch: [280, 330, 360, 340, 260],
+    vowels: [
+      [480, 850],
+      [560, 950],
+      [900, 1450],
+      [1000, 1550],
+      [900, 1400],
+    ],
+    duration: 1.2,
+    volume: 0.55,
+    delay: 0.12,
+  });
+  note({ from: 140, to: 110, duration: 1.1, type: "sawtooth", volume: 0.06, lowpass: 450, delay: 0.12 });
 }
 
 /** "Törööö!" – an elephant: a brassy note that climbs and holds. */

@@ -130,7 +130,9 @@ test("a brushed monster dissolves without a sound of its own", async () => {
     // The countdown before the brushing.
     "playCountNote",
     "playDrumRoll",
-    // The end's cheer.
+    // The mouth opening wide like a little lion's before the song (X-26), till its recording comes.
+    "playLittleRoar",
+    // The end's cheer, and the little lion's roar once it is recorded.
     "playRecorded",
     // A monster the child taps giggles.
     "playSqueak",
