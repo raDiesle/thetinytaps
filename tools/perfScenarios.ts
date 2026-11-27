@@ -163,6 +163,14 @@ function chainLevel(id: (typeof KETTEN_LEVELS)[number]): Scenario {
 
 export const SCENARIOS: Scenario[] = [
   {
+    // The shared tap hint waiting for a child who doesn't find what to tap: its hand presses again and again, maybe for
+    // minutes. Its shadow lay over the pressing layer, and the GPU blurred it anew in every frame (A-55). Measured on the
+    // wooden marble run's shelf before its first tap, in the hint's first stage (the hand presses, nothing darkens yet).
+    name: "tipp-hinweis",
+    path: "/kettenreaktion/track/",
+    parts: [{ label: "Hand drückt", before: [{ waitFor: ".tap-hint.stage-1" }], ms: 5000 }],
+  },
+  {
     // One stretch after the other, with no waits between them: collecting a trace already leaves seconds unmeasured
     // between two stretches, and a stretch started after a wait of its own missed the story's monsters growing, which
     // painted the whole screen 60 times a second until November 2026 (the sky's colour and the monsters swaying inside

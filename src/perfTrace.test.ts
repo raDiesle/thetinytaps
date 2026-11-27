@@ -1,5 +1,5 @@
 import { describe, expect, test } from "bun:test";
-import { rasteredPixels, type TraceEvent } from "../tools/perfTrace";
+import { chromeFrames, rasteredPixels, type TraceEvent } from "../tools/perfTrace";
 
 // `bun run perf` counts the pixels rastered anew from Chrome's trace (tools/perfTrace.ts). A raster task names its tile
 // only by a memory address, which Chrome reuses for tiles of other layers and sizes: counted by address alone, the same
@@ -50,5 +50,27 @@ describe("rasteredPixels", () => {
   test("a raster after the last snapshot takes that last snapshot, and an unknown tile counts nothing", () => {
     const events = [snapshot(0, [{ id: "0xc", layer: 5, w: 100, h: 100 }]), raster(50, "0xc", 5), raster(60, "0xd", 5), raster(70, "0xc", 6)];
     expect(rasteredPixels(events)).toBe(100 * 100);
+  });
+});
+
+// Chrome's own count of frames (A-57): each frame's PipelineReporter opens with its state; only drops the eye would see count.
+describe("chromeFrames", () => {
+  const frame = (state: string, smooth = true, ph = "b"): TraceEvent => ({
+    name: "PipelineReporter",
+    ph,
+    tid: 1,
+    args: ph === "b" ? { frame_reporter: { state, affects_smoothness: smooth } } : {},
+  });
+  test("counts frames shown, shown in part and dropped where it shows", () => {
+    const events = [
+      frame("STATE_PRESENTED_ALL"),
+      frame("STATE_PRESENTED_ALL", true, "e"),
+      frame("STATE_PRESENTED_ALL"),
+      frame("STATE_PRESENTED_PARTIAL"),
+      frame("STATE_DROPPED"),
+      frame("STATE_DROPPED", false),
+      frame("STATE_NO_UPDATE_DESIRED"),
+    ];
+    expect(chromeFrames(events)).toEqual({ presented: 2, partial: 1, dropped: 1 });
   });
 });

@@ -319,7 +319,7 @@ In a fresh worktree run `bun install` first.
   keyframe on a group inside an svg, but still lays the whole svg out in every frame, and Safari (iPads) repaints it all
   (study `svg-animation-leistung`, November 2026) – so the rule stands; where something still moves inside an svg, its
   keyframes use `transform`, never the separate `translate`, `rotate` or `scale` properties, which Chrome never
-  composites there (about 30 keyframes still use them, A-54 checks which run inside an svg). A layer is only as big as what it shows: a phone
+  composites there (`css.test.ts` names the keyframes checked to run on HTML elements, where they are fine). A layer is only as big as what it shows: a phone
   rasters a changed layer in bands as wide as the screen. Never an attribute selector inside `:has()` (`:has([aria-label=…])`)
   nor `*` after it (`.row:has(…) > *`): while such a rule is loaded Chrome restyles the whole page at every change of the
   DOM, and the shelf preloads every game's CSS, so two games' rules made the book's take-out stutter (November 2026;

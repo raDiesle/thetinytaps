@@ -156,6 +156,61 @@ test("no attribute selector inside :has() and no * after it", () => {
   expect(wrong).toEqual([]);
 });
 
+// Chrome composites a `transform` keyframe on an element inside an svg, but never one of the separate `translate`,
+// `rotate` or `scale` properties there (Blink's `kSVGTargetHasIndependentTransformProperty`): those repaint and raster
+// the svg in every frame, and Safari repaints it either way (study `svg-animation-leistung`, A-54, November 2026). On an
+// HTML element or an outer `<svg>` they are fine, so a keyframe may use them only once it is checked to run on such an
+// element and named here; one moving a group or shape inside an svg uses `transform` instead.
+const KEYFRAMES_ON_HTML = new Set([
+  "as-sway-a",
+  "as-sway-b",
+  "book-corner-lift",
+  "breathe",
+  "letter-hop",
+  "moon-rise",
+  "pl-night-count",
+  "pl-tick-in",
+  "pl-twinkle",
+  "play-options-glow",
+  "play-options-intro",
+  "rw-land",
+  "rw-twinkle",
+  "sleep-breathe",
+  "sock-basket-drop",
+  "sock-cheer",
+  "sock-line-pull",
+  "sock-peg-in",
+  "sock-shake",
+  "sock-swing",
+  "sock-trail",
+  "sock-wiggle-a",
+  "sock-wiggle-b",
+  "spin",
+  "tg-carry",
+  "tg-pop-arrive",
+  "twinkle",
+  "zzz-float",
+]);
+
+test("keyframes inside an svg move by transform, never by the separate translate, rotate or scale", () => {
+  const wrong: string[] = [];
+  for (const file of cssFiles) {
+    const css = readFileSync(file, "utf8").replace(/\/\*[\s\S]*?\*\//g, "");
+    for (const match of css.matchAll(/@keyframes\s+([\w-]+)\s*\{/g)) {
+      let depth = 1;
+      let end = (match.index ?? 0) + match[0].length;
+      while (depth > 0 && end < css.length) {
+        if (css[end] === "{") depth++;
+        else if (css[end] === "}") depth--;
+        end++;
+      }
+      const body = css.slice((match.index ?? 0) + match[0].length, end);
+      if (/(^|[\s;{])(translate|rotate|scale)\s*:/.test(body) && !KEYFRAMES_ON_HTML.has(match[1])) wrong.push(`${file}: @keyframes ${match[1]}`);
+    }
+  }
+  expect(wrong).toEqual([]);
+});
+
 // A `background` transition repaints and rasters its whole box in every frame of the fade: on Frei tippen's
 // screen-sized page, changing colour with each letter, it rastered 54 screens a second on an old phone (November
 // 2026). A changing page colour fades in as a layer of its own by opacity (`PageColor`); only these small things,

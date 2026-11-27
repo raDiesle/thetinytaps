@@ -494,6 +494,9 @@ export const allGamesIdeas: IdeaArea = {
       text: "Recherche vom 27. November 2026 (Studie „SVG-Animationen schneller machen“): Chrome legt eine `transform`-Animation eines Teils *in* einem svg auf die Grafikkarte, aber nie eine mit den einzelnen Eigenschaften `translate`, `rotate` oder `scale` – die malt das ganze svg in jedem Bild neu. Etwa 30 Keyframes nutzen sie: as-sway-a/b (Tiere), pl-night-count, pl-tick-in, pl-twinkle (Zeitplan), rw-land, rw-twinkle (Belohnungstafel), elf in Socken-Paare (sock-…), tg-carry, tg-pop-arrive (Was gehört zusammen?), dazu twinkle, moon-rise, sleep-breathe, zzz-float (Spielzeit), breathe, spin, letter-hop, book-corner-lift, play-options-glow/-intro, screen-hint-turn. Lösung: für jede nachsehen, ob sie auf einem Element *in* einem svg läuft (dann auf `transform: …` umstellen, wo kein anderes `transform` des Elements im Weg ist, oder das Teil zur eigenen HTML-Ebene machen); auf HTML-Elementen dürfen sie bleiben. Danach Socken-Paare und den Zeitplan mit `bun run perf` messen, vorher `main` am selben Tag.",
       why: "Ein Wort im CSS entscheidet, ob ein altes Handy ein kleines Teil oder das ganze Bild neu malt.",
       effort: "S",
+      done: true,
+      partial:
+        "Umgesetzt am 27. November 2026: Die Trommel und der Drehknopf der Sockenmaschine und das sich drehende Handy des Quer-Hinweises drehen sich jetzt per `transform`; die Sonnenstrahlen drehten sich im Buch ohnehin nie (eine tote Regel, entfernt). `css.test.ts` lässt neue Keyframes mit `translate`, `rotate` oder `scale` nur noch zu, wenn sie auf HTML-Elementen laufen (Liste `KEYFRAMES_ON_HTML`), und die Regel steht in `CLAUDE.md`.",
     },
     {
       id: "A-55",
@@ -502,12 +505,15 @@ export const allGamesIdeas: IdeaArea = {
       text: "Recherche vom 27. November 2026: liegt ein CSS-`filter` (`drop-shadow`, `blur`) auf einer eigenen Ebene, rechnet die Grafikkarte ihn in jedem Bild neu, solange sich die Ebene bewegt – auch wenn er gleich bleibt. Das CSS hat 47 solcher Filter. Lösung: mit `bun run perf <spiel> --trace` die Ebenen finden, die sich mit Filter bewegen, und dort den Schatten in die Zeichnung legen (eine dunkle Form unter der Figur) oder als eigene, stille Ebene darunter; nur was den Rahmen sprengt, ändern.",
       why: "Ein schöner Schatten soll kein Ruckeln kosten.",
       effort: "S",
+      done: true,
+      partial:
+        "Umgesetzt am 27. November 2026: Der Schatten und der helle Rand der zeigenden Hand im `TapHint` liegen jetzt auf ihrer Zeichnung in der drückenden Ebene statt auf einer Box um sie, so werden sie einmal gemalt und die Ebene bewegt sich nur. Neues Messstück `tipp-hinweis` in `bun run perf`: 12 % → 10 % beschäftigt, im Rauschen – die Arbeit der Grafikkarte für den Filter sieht das Werkzeug nicht; auf dem Handy des Nutzers zu prüfen, ob der wartende Hinweis ruhiger läuft.",
     },
     {
       id: "A-56",
       emoji: "🐢",
       title: "Leistung: Kettenreaktion – der Uhrtakt ohne React",
-      text: "Recherche vom 27. November 2026: Die Maschinen der Kettenreaktion lassen in jedem Bild React die Maschine durchgehen (A-38, A-44, A-45, A-50). Üblich und von den Machern von Motion empfohlen: eine `requestAnimationFrame`-Schleife hält die Bewegung in einfachen Objekten und schreibt `style.transform` der bewegten Ebenen direkt über Refs (oder spielt Bewegungen, die vorher feststehen, mit `element.animate()` ab); React zeichnet nur, wenn etwas erscheint oder verschwindet. Lösung: an einem Level (Raketenstart) bauen, mit `bun run perf ketten-space --profile` vorher und nachher messen, dann auf `MachineStage` übertragen.",
+      text: "Recherche vom 27. November 2026: Die Maschinen der Kettenreaktion lassen in jedem Bild React die Maschine durchgehen (A-38, A-44, A-45, A-50). Üblich und von den Machern von Motion empfohlen: eine `requestAnimationFrame`-Schleife hält die Bewegung in einfachen Objekten und schreibt `style.transform` der bewegten Ebenen direkt über Refs (oder spielt Bewegungen, die vorher feststehen, mit `element.animate()` ab); React zeichnet nur, wenn etwas erscheint oder verschwindet. Lösung: an einem Level (Raketenstart) bauen, mit `bun run perf ketten-space --profile` vorher und nachher messen, dann auf `MachineStage` übertragen. Gemessen am 27. November 2026 vor dem Umbau (Raketenstart, Mitte, 10 s im nachgebildeten alten Handy, `--trace`): JavaScript samt React 1,5 s (15 %), dagegen Ebenen-Aufbau (`Layerize`) 0,84 s, Malen 0,80 s, Übergabe an den Compositor (`Commit`) 0,45 s und Stil 0,44 s; insgesamt 53–61 % beschäftigt. Der Umbau spart also höchstens einen Teil der 15 % (die Wege über die Zeichnung blieben, und jede bewegte Ebene kostet weiter Aufbau und Übergabe), bei einem Umbau aller 21 Level – erst lohnend, wenn die übrigen Kosten (A-50) gesenkt sind oder ein Level vor allem an React hängt.",
       why: "Weniger Arbeit pro Bild für den Prozessor, gerade in den Leveln, die jetzt noch über 60 % beschäftigt sind.",
       effort: "L",
     },
@@ -518,6 +524,9 @@ export const allGamesIdeas: IdeaArea = {
       text: "Recherche vom 27. November 2026: Chrome schreibt für jedes Bild ein `PipelineReporter`-Ereignis in die Aufzeichnung, ob es gezeigt, verworfen oder nur teilweise gezeigt wurde und warum (Chromium-Doku „debug-janks“). `bun run perf` (`tools/perf.ts`) könnte das neben seiner eigenen Zählung ausgeben, als Gegenprobe für „das Werkzeug sagt gut, das Handy ruckelt“ (vgl. A-47).",
       why: "Das Werkzeug war schon einmal blind; eine zweite, unabhängige Zählung fällt so etwas früher auf.",
       effort: "S",
+      done: true,
+      partial:
+        "Umgesetzt am 27. November 2026: `chromeFrames` in `tools/perfTrace.ts` zählt die `PipelineReporter`-Ereignisse jeder Strecke (ganz gezeigt, teilweise gezeigt, sichtbar verworfen), und `bun run perf` druckt „Chrome's count: …“ unter einer Strecke, sobald Chrome dort Bilder verworfen oder nur teilweise gezeigt hat (`perfTrace.test.ts`).",
     },
     {
       id: "A-58",
@@ -526,6 +535,8 @@ export const allGamesIdeas: IdeaArea = {
       text: "Recherche vom 27. November 2026: Chrome meldet Bilder über 50 ms mit der „Long Animation Frames“-Schnittstelle (`PerformanceObserver`, Typ `long-animation-frame`), samt ob Skript oder Malen schuld war; Safari kann das nicht, dort zählt man Lücken zwischen `requestAnimationFrame`-Aufrufen. Vorschlag: pro Besuch einer Spielseite nur im Speicher zählen und beim Verlassen ein einziges grobes Umami-Ereignis senden (Spiel, „ruckelt nicht / etwas / stark“), nur für etwa jeden zehnten Besuch, damit das Monatskontingent reicht. Braucht deine Entscheidung und eine Zeile in der Datenschutzerklärung.",
       why: "Bisher kennen wir nur ein nachgebildetes altes Handy; so sähen wir, welches Spiel bei echten Familien ruckelt.",
       effort: "M",
+      rejected: true,
+      partial: "Verworfen vom Nutzer am 27. November 2026: kein Messen auf den Geräten der Familien.",
     },
     {
       id: "A-59",
@@ -534,6 +545,9 @@ export const allGamesIdeas: IdeaArea = {
       text: "Recherche vom 27. November 2026: Der React Compiler (stabil seit Oktober 2025) setzt `memo`/`useMemo` selbst; Meta maß bis zu 2,5-mal schnellere Interaktionen. Für Bun gibt es keinen offiziellen Weg, aber `oxc-transform-react` (seit August 2026, mit `reactCompiler`) ließe sich im Bun-Plugin `tools/appPlugin.ts` für `.tsx` aufrufen. Lösung: in einem Zweig einbauen, `bun run perf` über alle Spiele vor und nach vergleichen und nur behalten, wenn es messbar hilft (Paketregeln in `bunfig.toml` beachten). Hilft nicht beim Uhrtakt der Kettenreaktion (A-56), wo sich wirklich jedes Bild etwas ändert.",
       why: "Könnte in vielen Spielen unnötiges Neuzeichnen sparen, ohne jedes von Hand zu ändern.",
       effort: "M",
+      rejected: true,
+      partial:
+        "Verworfen am 27. November 2026 nach der Recherche: Für Bun gibt es keinen offiziellen Weg, der Compiler käme als neues Paket in jeden Build, sein Nutzen ist nur in Metas eigenen Zahlen belegt, und wo Neuzeichnen bei uns teuer war, ist es schon von Hand mit `memo`/`useMemo` gelöst – das teuerste übrige Neuzeichnen, der Uhrtakt der Kettenreaktion, ändert sich wirklich jedes Bild und bleibt A-56.",
     },
     {
       id: "A-60",
@@ -542,6 +556,9 @@ export const allGamesIdeas: IdeaArea = {
       text: 'Recherche vom 27. November 2026: Der letzte Hänger beim Buch-Herausnehmen (67–100 ms, das Bild, in dem die neue Seite das Zimmer ersetzt) und beim Bildwechsel in Gefühle kommt vom Aufbau einer großen Seite auf einmal. React 19.2 kann einen Teil versteckt und mit niedriger Vorfahrt schon vorher zeichnen (`<Activity mode="hidden">`), und großer Aufbau lässt sich mit `scheduler.yield()` in Häppchen teilen (Chrome; in Safari mit `setTimeout` als Ersatz, `requestIdleCallback` fehlt dort). Lösung: an einer Stelle ausprobieren (nächste Szene in Gefühle oder das nächste Level nach „Weiter“) und mit `bun run perf` messen.',
       why: "Der Seitenwechsel ist der Moment, in dem ein Kind am genauesten hinschaut.",
       effort: "M",
+      rejected: true,
+      partial:
+        "Verworfen am 27. November 2026 nach der Recherche: Der übrige Hänger beim Buch-Herausnehmen liegt mit 67–100 ms in 7 von 8 Durchgängen im Rahmen, und der in Gefühle kommt vom Entpacken großer Bilder, nicht vom Aufbau in React – `<Activity>` und `scheduler.yield()` hülfen dort nicht, kosteten aber eine zweite, versteckte Seite im Speicher alter Handys.",
     },
     {
       id: "A-61",
@@ -550,6 +567,8 @@ export const allGamesIdeas: IdeaArea = {
       text: "Recherche vom 27. November 2026: Safari legt Teile *in* einem svg nie auf die Grafikkarte – seine neue SVG-Technik (LBSE) ist noch nicht eingeschaltet –, jede Animation dort malt das ganze svg neu. `bun run perf` misst nur Chrome. Zum Prüfen durch dich: die Spiele, in denen sich noch etwas in einem großen svg bewegt (z. B. Socken-Paare, der Zeitplan, siehe A-54), auf einem iPad spielen und sagen, wo es ruckelt; später ließe sich das Werkzeug um WebKit erweitern.",
       why: "Viele Familien spielen auf einem iPad, und dort hilft das, was Chrome rettet, nicht.",
       effort: "S",
+      rejected: true,
+      partial: "Verworfen vom Nutzer am 27. November 2026.",
     },
     {
       id: "A-62",

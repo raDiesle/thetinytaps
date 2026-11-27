@@ -45,6 +45,14 @@ export const svgAnimationLeistung: Research = {
       title: "Qualität nach `navigator.deviceMemory` oder Prozessorkernen wählen",
       why: "Gibt es nur in Chrome, Safari begrenzt die Kernzahl gegen Fingerabdrücke; wenn überhaupt, dann nach gemessenen Bildlücken in den ersten Sekunden.",
     },
+    {
+      title: "React Compiler (A-59)",
+      why: "Kein offizieller Weg für Bun, ein neues Paket in jedem Build und kein Beleg für Gewinn in Spielen, deren teures Neuzeichnen schon von Hand gelöst ist.",
+    },
+    {
+      title: "Nächste Seite mit `<Activity>` und `scheduler.yield()` vorbereiten (A-60)",
+      why: "Der übrige Hänger beim Buch-Herausnehmen liegt im Rahmen, der in Gefühle kommt vom Entpacken der Bilder; eine versteckte zweite Seite kostete nur Speicher.",
+    },
   ],
   ideas: ["A-54", "A-55", "A-56", "A-57", "A-58", "A-59", "A-60", "A-61"],
   sources: [
