@@ -315,7 +315,11 @@ In a fresh worktree run `bun install` first.
   as a moving mask, each repainted most of the screen 60 times a second. Give such a thing a layer of its own (its own
   svg or element) and animate that layer's `transform` or `opacity`: a small figure that sways or glows is a small
   HTML layer round its own little svg, and the HTML moves, not a group inside (even small svgs animating inside kept an
-  old phone's main thread busy; Zähne putzen's monsters, `Sprite`). A layer is only as big as what it shows: a phone
+  old phone's main thread busy; Zähne putzen's monsters, `Sprite`). Chrome does composite a `transform` or `opacity`
+  keyframe on a group inside an svg, but still lays the whole svg out in every frame, and Safari (iPads) repaints it all
+  (study `svg-animation-leistung`, November 2026) – so the rule stands; where something still moves inside an svg, its
+  keyframes use `transform`, never the separate `translate`, `rotate` or `scale` properties, which Chrome never
+  composites there (about 30 keyframes still use them, A-52 checks which run inside an svg). A layer is only as big as what it shows: a phone
   rasters a changed layer in bands as wide as the screen. Never an attribute selector inside `:has()` (`:has([aria-label=…])`)
   nor `*` after it (`.row:has(…) > *`): while such a rule is loaded Chrome restyles the whole page at every change of the
   DOM, and the shelf preloads every game's CSS, so two games' rules made the book's take-out stutter (November 2026;
