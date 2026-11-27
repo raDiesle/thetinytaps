@@ -138,6 +138,41 @@ function upright(leaning: HTMLElement, spine: HTMLElement) {
 
 type Built = ReturnType<typeof buildBook>;
 
+/** How the cover turns open between the book reaching the middle and lying open: `cubic-bezier(.5,0,.35,1)`. */
+const TURN = [0.5, 0, 0.35, 1] as const;
+
+/**
+ * The share of a `cubic-bezier(x1, y1, x2, y2)` easing's time at which it has gone half the way: when the turning
+ * cover stands edge on, halfway from 0 to -180°.
+ */
+export function halfwayAt([x1, y1, x2, y2]: readonly [number, number, number, number]) {
+  const bezier = (a: number, b: number, t: number) => 3 * (1 - t) ** 2 * t * a + 3 * (1 - t) * t ** 2 * b + t ** 3;
+  let low = 0;
+  let high = 1;
+  for (let i = 0; i < 40; i++) {
+    const t = (low + high) / 2;
+    if (bezier(y1, y2, t) < 0.5) low = t;
+    else high = t;
+  }
+  return bezier(x1, x2, (low + high) / 2);
+}
+
+/**
+ * Shown up to `at`, then hidden (or the other way round): the cover's two faces swap as it stands edge on. WebKit
+ * neither hides the face turned away (`backface-visibility`) nor sorts the faces by depth inside the turning cover, so
+ * there the left page – later in the cover – lay over the cover's front all the way out of the shelf, mirrored and dark
+ * (November 2026); an opacity step works alike everywhere and runs on the compositor, nothing drawn anew mid-flight.
+ */
+function face(shown: boolean, at: number): Keyframe[] {
+  const [before, after] = shown ? [1, 0] : [0, 1];
+  return [
+    { offset: 0, opacity: before },
+    { offset: at, opacity: before },
+    { offset: at, opacity: after },
+    { offset: 1, opacity: after },
+  ];
+}
+
 /**
  * The book's moves, from its place on the shelf to its left page filling the screen, and the scale of that page then
  * (to print the screen on it at the right size).
@@ -163,7 +198,9 @@ function moves({ w, h, x, y, turned, lean, px, py }: Built) {
     { offset: AT_OPEN, transform: at(vw / 2 - x, vh / 2 - (middle * h) / 2 - y, middle), easing: "cubic-bezier(.55,0,.4,1)" },
     { offset: 1, transform: at(vw - margin.right - x, pageTop - y, page) },
   ];
-  const turn = "cubic-bezier(.5,0,.35,1)";
+  const turn = `cubic-bezier(${TURN.join(",")})`;
+  // Where the cover stands edge on: its front goes, the left page inside it comes.
+  const edgeOn = AT_MIDDLE + (AT_OPEN - AT_MIDDLE) * halfwayAt(TURN);
   const lid = [
     { offset: 0, transform: "rotateY(0deg)" },
     { offset: AT_MIDDLE, transform: "rotateY(0deg)", easing: turn },
@@ -186,7 +223,7 @@ function moves({ w, h, x, y, turned, lean, px, py }: Built) {
   ];
   // Where the screen's copy lies on the left page so that it is exactly the screen once the page fills it.
   const print = `translate(${-margin.left / page}px, ${-pageTop / page}px) scale(${1 / page})`;
-  return { book, lid, left, right, print, fills: page * h >= vh };
+  return { book, lid, left, right, print, fills: page * h >= vh, front: face(true, edgeOn), inside: face(false, edgeOn) };
 }
 
 /**
@@ -203,9 +240,12 @@ function travel(built: Built, m: ReturnType<typeof moves>, direction: "normal" |
     { offset: AT_OPEN, filter: "brightness(0.45)" },
     { offset: 1, filter: "brightness(0.45)" },
   ];
+  const cover = built.lid.querySelector(".shelf-book-cover");
   const parts: [Element | null, Keyframe[]][] = [
-    [built.lid.querySelector(".shelf-book-cover"), dim],
+    [cover, dim],
+    [cover, m.front],
     [built.left, m.left],
+    [built.left, m.inside],
     [built.right, m.right],
     [built.lid, m.lid],
     [built.book, m.book],
