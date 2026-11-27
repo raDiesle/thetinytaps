@@ -9,6 +9,11 @@ export function playDrops() {
   );
 }
 
+/** Two soft gulps of a warm drink (the cocoa in Zähne putzen's morning story): a low tone sliding down, twice. */
+export function playGulp() {
+  [0, 0.22].forEach((delay) => note({ from: 300, to: 170, duration: 0.13, type: "sine", volume: 0.2, lowpass: 900, delay }));
+}
+
 /** "Mampf, mampf" – three soft crunchy bites. */
 export function playMunch() {
   [0, 0.28, 0.56].forEach((delay) => {

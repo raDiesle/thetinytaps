@@ -6,7 +6,8 @@ import { SPIT_CUES, SPIT_MS } from "./spit";
 
 // The sounds of the prelude and of tidying up at the end fire when the brushing clock passes them, so they must lie inside their part.
 const PARTS = [
-  { name: "sweets", cues: ORIGIN_CUES, ms: ORIGIN_MS.sweets },
+  { name: "sweets", cues: ORIGIN_CUES.evening, ms: ORIGIN_MS.sweets },
+  { name: "breakfast", cues: ORIGIN_CUES.morning, ms: ORIGIN_MS.sweets },
   { name: "brush", cues: PREP_CUES.brush, ms: PREP_MS.brush },
   { name: "paste", cues: PREP_CUES.paste, ms: PREP_MS.paste },
   { name: "spit", cues: SPIT_CUES, ms: SPIT_MS },
@@ -31,4 +32,12 @@ test("the toothpaste gets no twinkle, seen or heard", async () => {
   const prep = await Bun.file("src/games/teeth/prep.tsx").text();
   expect(prep).toMatch(/\bpaste: \[\],/);
   expect(PREP_CUES.paste.some((c) => c.play.toString().includes("Twinkle"))).toBe(false);
+});
+
+// In the morning the story eats breakfast, not sweets (X-19): nothing is unwrapped and no hard candy crunches.
+test("the morning's breakfast sounds like breakfast", () => {
+  const played = ORIGIN_CUES.morning.map((c) => c.play.toString()).join(" ");
+  expect(played).not.toContain("wrapper");
+  expect(played).not.toContain("lolly");
+  expect(ORIGIN_CUES.evening.map((c) => c.play.toString()).join(" ")).toContain("wrapper");
 });

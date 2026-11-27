@@ -21,8 +21,8 @@ import { Mouth, type MonsterSpot, type MouthAction } from "./mouth";
 import { dirtyFaces } from "./stains";
 import { SUNG_LANGUAGES, songEndMs, sungSteps, useBrushingMusic, useSongLoad } from "./music";
 import type { Cue } from "./cues";
-import { DONE_SAY, type Prelude, PRELUDE_TEXTS, TIDY_SAY } from "./lines";
-import { Origin, ORIGIN_CUES, ORIGIN_MS, ORIGIN_RECORDINGS } from "./origin";
+import { DONE_SAY, type Prelude, PRELUDE_TEXTS, preludeTexts, TIDY_SAY } from "./lines";
+import { HoneyBread, Origin, ORIGIN_CUES, ORIGIN_MS, ORIGIN_RECORDINGS } from "./origin";
 import { Scenes, type SceneKind } from "./scenes";
 import { Prep, PREP_CUES, PREP_MS, PREP_RECORDINGS, TIDY_RECORDINGS } from "./prep";
 import { Spit, SPIT_CUES, SPIT_MS } from "./spit";
@@ -85,9 +85,13 @@ export function preloadBrushing(language: string) {
 /** The parts of the end: cheering at the clean teeth, spitting the foam out, tidying the brush away, and resting with the week chart and the buttons. */
 type Ending = "cheer" | "spit" | "tidy" | "rest";
 
-/** How the monsters grow depends on the time of day (over the day or the night), see DAYTIME. `sounds` play at their moment of the part; titles and lines are in lines.ts. */
+/**
+ * How the monsters grow depends on the time of day (over the day or the night), see DAYTIME, and so does what the
+ * story eats (`preludeTexts`, `ORIGIN_CUES`: breakfast in the morning). `sounds` play at their moment of the part;
+ * titles and lines are in lines.ts.
+ */
 export const PRELUDE: Record<Prelude, { ms: number; title: Localized; cue?: Localized; sounds?: Cue[] }> = {
-  sweets: { ...PRELUDE_TEXTS.sweets, ms: ORIGIN_MS.sweets, sounds: ORIGIN_CUES },
+  sweets: { ...PRELUDE_TEXTS.sweets, ms: ORIGIN_MS.sweets },
   grow: { ...PRELUDE_TEXTS.grow, ms: ORIGIN_MS.grow },
   brush: { ...PRELUDE_TEXTS.brush, ms: PREP_MS.brush, sounds: PREP_CUES.brush },
   paste: { ...PRELUDE_TEXTS.paste, ms: PREP_MS.paste, sounds: PREP_CUES.paste },
@@ -229,6 +233,8 @@ type BarPhase = "eat" | "fetch" | "ready" | "tidy";
 
 /** The symbol of each phase on the bar; the brushing has its frame with the riding brush and the clean tooth instead. */
 const PHASE_SYMBOL: Record<BarPhase, TeethSymbol | null> = { eat: "bonbon", fetch: "zahnpasta", ready: null, tidy: "becher" };
+/** In the morning the story eats breakfast (X-19), so its phase shows the honey bread instead of the sweet. */
+const symbolOf = (phase: BarPhase, daytime: Daytime): TeethSymbol | null => (phase === "eat" && daytime === "morning" ? "fruehstueck" : PHASE_SYMBOL[phase]);
 
 /**
  * The prelude's parts as the bar's tiles before the brushing: the story is eating, the sink is getting the brush. The
@@ -249,14 +255,22 @@ function preludeTiles(prelude: Prelude[]): { phase: BarPhase; parts: Prelude[] }
 function BarSymbol({ name }: { name: TeethSymbol | null }) {
   const src = name && teethSymbol(name);
   if (src) return <img className="teeth-symbol" src={src} alt="" draggable={false} aria-hidden />;
+  // Until its painted picture comes (queued in src/games/potty/symbolPictures.ts), the morning's breakfast shows the
+  // story's own honey bread, drawn in the same ink line.
+  if (name === "fruehstueck")
+    return (
+      <svg className="teeth-symbol" viewBox="-40 -42 80 84" aria-hidden>
+        <HoneyBread />
+      </svg>
+    );
   return <span className="teeth-symbol" aria-hidden />;
 }
 
 /** One phase outside the brushing on the bar: its symbol beside a groove that fills as the time goes by. */
-function PhaseTile({ phase, now, done, title }: { phase: BarPhase; now: boolean; done: number; title: string }) {
+function PhaseTile({ phase, daytime, now, done, title }: { phase: BarPhase; daytime: Daytime; now: boolean; done: number; title: string }) {
   return (
     <span className={`teeth-tile ${phase}`}>
-      <BarSymbol name={PHASE_SYMBOL[phase]} />
+      <BarSymbol name={symbolOf(phase, daytime)} />
       <span className="teeth-lane">
         <span className={`teeth-segment ${phase}${now ? " now" : ""}`} title={title}>
           <span style={{ "--done": done } as CSSProperties} />
@@ -307,7 +321,7 @@ export function TeethPlay({ settings, video }: { settings: TeethSettings; video?
   const monsters = useMemo(placeMonsters, [round]);
   const daytime = useMemo(() => video?.daytime ?? daytimeOf(), [round]);
   const preludeCue = (p: Prelude) => {
-    const cue = PRELUDE[p].cue;
+    const cue = preludeTexts(p, daytime).cue;
     return cue ? spokenIn(cue, language) : daytimeText(daytime, "grow", language);
   };
   const perStep = useMemo(() => STEPS.map((_, s) => monsters.filter((m) => m.step === s).length), [monsters]);
@@ -383,7 +397,7 @@ export function TeethPlay({ settings, video }: { settings: TeethSettings; video?
     const from = lastElapsed.current;
     lastElapsed.current = elapsed;
     const sounds = before
-      ? { start: preludeStart(prelude, before), cues: PRELUDE[before].sounds ?? [] }
+      ? { start: preludeStart(prelude, before), cues: before === "sweets" ? ORIGIN_CUES[daytime] : (PRELUDE[before].sounds ?? []) }
       : ending === "spit"
         ? { start: introMs + totalMs + CHEER_MS, cues: SPIT_CUES }
         : ending === "tidy"
@@ -729,9 +743,10 @@ export function TeethPlay({ settings, video }: { settings: TeethSettings; video?
                 <PhaseTile
                   key={kind}
                   phase={kind}
+                  daytime={daytime}
                   now={before !== null && parts.includes(before)}
                   done={share(tileParts[i])}
-                  title={parts.map((p) => t(PRELUDE[p].title)).join(" · ")}
+                  title={parts.map((p) => t(preludeTexts(p, daytime).title)).join(" · ")}
                 />
               ))}
               {/* The brushing itself: its steps in a frame of their own, the brush riding along them to the clean tooth. */}
@@ -756,7 +771,7 @@ export function TeethPlay({ settings, video }: { settings: TeethSettings; video?
                 <BarSymbol name="zahn" />
               </div>
               {/* After the brushing: the cheer at the clean teeth, spitting the foam out, then the brush rinsed and put back in its cup. */}
-              <PhaseTile phase="tidy" now={ending !== null} done={share(tidyPart)} title={t(TIDY_SAY)} />
+              <PhaseTile phase="tidy" daytime={daytime} now={ending !== null} done={share(tidyPart)} title={t(TIDY_SAY)} />
             </div>
             {/* For the grown-up, only where the screen is wide enough (teeth.css): before the brushing the time until it
                 starts, then the brushing time left – two clocks in one place. */}

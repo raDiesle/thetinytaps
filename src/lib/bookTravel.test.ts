@@ -1,6 +1,6 @@
 import { expect, test } from "bun:test";
 import { CATEGORIES, categoryHref, listedGames, shelfVolumes } from "@/content/games";
-import { putBookBack, renameIdRefs, shelfBookOf } from "./bookTravel";
+import { halfwayAt, putBookBack, renameIdRefs, shelfBookOf } from "./bookTravel";
 
 // The way back puts the book into its own gap (a shelf book's `data-book` is its category's id): every page in a book
 // finds it – the category's page and each of its games. A game standing apart has a book of its own; one still being
@@ -88,6 +88,16 @@ test("a way back that fails still goes back and leaves the next book free to tra
       else delete (globalThis as Record<string, unknown>)[name];
     });
   }
+});
+
+// The cover's two faces swap by an opacity step as it stands edge on (WebKit shows neither `backface-visibility` nor the
+// faces' depth inside the turning cover): that moment is when its easing has gone half the way.
+test("the cover's faces swap where its turn has gone half the way", () => {
+  expect(halfwayAt([0, 0, 1, 1])).toBeCloseTo(0.5, 5);
+  expect(halfwayAt([0.5, 0, 0.5, 1])).toBeCloseTo(0.5, 5);
+  // The cover's turn eases out longer than it eases in: half open a little before half its time.
+  expect(halfwayAt([0.5, 0, 0.35, 1])).toBeGreaterThan(0.4);
+  expect(halfwayAt([0.5, 0, 0.35, 1])).toBeLessThan(0.5);
 });
 
 // While a book flies, the screen is copied onto its page: with the page's own ids the document held each id twice, and
