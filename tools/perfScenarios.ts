@@ -201,8 +201,8 @@ export const SCENARIOS: Scenario[] = [
       { label: "Hinunter zum Waschbecken", ms: 6000 },
       { label: "Waschbecken", ms: 8000 },
       { label: "Hinauf in den Spiegel", ms: 5000 },
-      // X-26: the child roars like a lion, gets its mane, a lion walks in and both roar; then the mirror, mouth open, 3, 2, 1.
-      { label: "Brüllen wie ein Löwe", ms: 8600 },
+      // X-26: the lion, then the child beside it in its costume, three times 3, 2, 1 and both roar; then the mirror, mouth open, 3, 2, 1.
+      { label: "Brüllen wie ein Löwe", ms: 21500 },
       { label: "Mund offen, Countdown", ms: 5100 },
       { label: "Putzen: Los!", ms: 6000 },
       { label: "Putzen: Monster antippen", ms: 6000, tap: { selector: ".monster-body", every: 700 } },

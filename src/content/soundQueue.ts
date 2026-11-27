@@ -33,15 +33,75 @@ export interface QueuedSound {
 /** Approved and not made yet, oldest first. */
 export const SOUND_QUEUE: QueuedSound[] = [
   {
-    id: "littleroar",
-    file: "src/lib/sounds/littleroar.mp3",
-    use: "Zähne putzen (X-26): im Schritt „Brüllen wie ein Löwe“ reißt das Kind den Mund weit auf und brüllt wie ein kleiner Löwe, erst allein, dann zusammen mit einem Löwen, der neben ihm brüllt – ein Kind, kein echter Löwe (der Löwe ist roar.mp3). Bis die Aufnahme kommt, spielt ein synthetisches „Rooaah“ (playLittleRoar).",
+    id: "lion-roar-1",
+    file: "src/lib/sounds/lion-roar-1.mp3",
+    use: "Zähne putzen (X-26), Phase „Brüllen wie ein Löwe“: der Löwe brüllt in Runde 1 von 3 nach 3, 2, 1 zusammen mit dem Kind – leise und kurz, der erste von dreien. Bis die Aufnahme kommt, spielt roar.mp3 von Freesound.",
     prompt:
-      "A small child playfully roaring like a little lion, one soft and cute 'rooaah' that opens from a short growl into a long 'aah', happy and gentle, not scary, close up, clean recording, no background noise",
-    seconds: 2,
+      "A friendly lion roaring, a short, gentle roar that swells from a low growl into an open 'rooaar' and fades out, warm and playful for small children, not scary, close up, clean recording, no background noise",
+    seconds: 1.5,
     influence: 0.7,
     after:
-      "Cut to the roar alone (about 1.2–1.8 s: it plays on beat 3 of the lion's step alone and on beat 11 together with the lion's roar.mp3, LION_CUES in src/games/teeth/lion.tsx, and must have rung out before the next roar), bring it to about −20 LUFS – a soft roar, a little under the lion's – and add its row under „Made with ElevenLabs“ in src/lib/sounds/README.md. lion.tsx already plays and preloads it by its name (LITTLE_ROAR); listen to it at /zaehne/ (jump on the bar to „Brüllen wie ein Löwe“), check that child and lion are both heard together, and say in src/games/teeth/CLAUDE.md that the child's roar is a recording now.",
+      "Cut to the roar alone (about 1.0–1.3 s: each round's roar is longer than the one before, and the mouths stay open for it, ROUNDS in src/games/teeth/lion.tsx), bring it to about −18 LUFS like the other recordings – lion.tsx makes the rounds louder itself (ROUNDS' gain) – and add its row under „Made with ElevenLabs“ in src/lib/sounds/README.md. lion.tsx already plays and preloads it by its name; listen at /zaehne/ (tap the lion's symbol on the bar).",
+    date: "2026-11-27",
+  },
+  {
+    id: "child-roar-1",
+    file: "src/lib/sounds/child-roar-1.mp3",
+    use: "Zähne putzen (X-26), Phase „Brüllen wie ein Löwe“: das Kind im Löwenkostüm brüllt in Runde 1 von 3 zusammen mit dem Löwen – leise und kurz, der erste von dreien; ein Kind, kein echter Löwe. Bis die Aufnahme kommt, spielt ein synthetisches „Rooaah“ (playLittleRoar).",
+    prompt:
+      "A small child playfully roaring like a little lion, a short, gentle 'rooaah' that opens from a short growl into a long 'aah', happy and gentle, not scary, close up, clean recording, no background noise",
+    seconds: 1.5,
+    influence: 0.7,
+    after:
+      "Cut to the roar alone (about 1.0–1.3 s, as long as the lion's roar of the same round, which it sounds together with), bring it to about −20 LUFS – a little under the lion's – and add its row under „Made with ElevenLabs“ in src/lib/sounds/README.md. lion.tsx already plays and preloads it by its name; once all six roars are made, say in src/games/teeth/CLAUDE.md that the roars are recordings now and take the stand-ins (playRecorded(\"roar\", …), playLittleRoar's strength) out of roarTogether in lion.tsx.",
+    date: "2026-11-27",
+  },
+  {
+    id: "lion-roar-2",
+    file: "src/lib/sounds/lion-roar-2.mp3",
+    use: "Zähne putzen (X-26), Phase „Brüllen wie ein Löwe“: der Löwe brüllt in Runde 2 von 3 nach 3, 2, 1 zusammen mit dem Kind – lauter und etwas länger als in Runde 1. Bis die Aufnahme kommt, spielt roar.mp3 von Freesound.",
+    prompt:
+      "A friendly lion roaring, a bigger, longer roar that swells from a low growl into an open 'rooaar' and fades out, warm and playful for small children, not scary, close up, clean recording, no background noise",
+    seconds: 2.0,
+    influence: 0.7,
+    after:
+      "Cut to the roar alone (about 1.4–1.8 s: each round's roar is longer than the one before, and the mouths stay open for it, ROUNDS in src/games/teeth/lion.tsx), bring it to about −18 LUFS like the other recordings – lion.tsx makes the rounds louder itself (ROUNDS' gain) – and add its row under „Made with ElevenLabs“ in src/lib/sounds/README.md. lion.tsx already plays and preloads it by its name; listen at /zaehne/ (tap the lion's symbol on the bar).",
+    date: "2026-11-27",
+  },
+  {
+    id: "child-roar-2",
+    file: "src/lib/sounds/child-roar-2.mp3",
+    use: "Zähne putzen (X-26), Phase „Brüllen wie ein Löwe“: das Kind im Löwenkostüm brüllt in Runde 2 von 3 zusammen mit dem Löwen – lauter und etwas länger als in Runde 1; ein Kind, kein echter Löwe. Bis die Aufnahme kommt, spielt ein synthetisches „Rooaah“ (playLittleRoar).",
+    prompt:
+      "A small child playfully roaring like a little lion, a bigger, longer 'rooaah' that opens from a short growl into a long 'aah', happy and gentle, not scary, close up, clean recording, no background noise",
+    seconds: 2.0,
+    influence: 0.7,
+    after:
+      "Cut to the roar alone (about 1.4–1.8 s, as long as the lion's roar of the same round, which it sounds together with), bring it to about −20 LUFS – a little under the lion's – and add its row under „Made with ElevenLabs“ in src/lib/sounds/README.md. lion.tsx already plays and preloads it by its name; once all six roars are made, say in src/games/teeth/CLAUDE.md that the roars are recordings now and take the stand-ins (playRecorded(\"roar\", …), playLittleRoar's strength) out of roarTogether in lion.tsx.",
+    date: "2026-11-27",
+  },
+  {
+    id: "lion-roar-3",
+    file: "src/lib/sounds/lion-roar-3.mp3",
+    use: "Zähne putzen (X-26), Phase „Brüllen wie ein Löwe“: der Löwe brüllt in Runde 3 von 3 nach 3, 2, 1 zusammen mit dem Kind – der lauteste und längste der drei. Bis die Aufnahme kommt, spielt roar.mp3 von Freesound.",
+    prompt:
+      "A friendly lion roaring, the biggest and longest, proud and full roar that swells from a low growl into an open 'rooaar' and fades out, warm and playful for small children, not scary, close up, clean recording, no background noise",
+    seconds: 2.6,
+    influence: 0.7,
+    after:
+      "Cut to the roar alone (about 1.9–2.4 s: each round's roar is longer than the one before, and the mouths stay open for it, ROUNDS in src/games/teeth/lion.tsx), bring it to about −18 LUFS like the other recordings – lion.tsx makes the rounds louder itself (ROUNDS' gain) – and add its row under „Made with ElevenLabs“ in src/lib/sounds/README.md. lion.tsx already plays and preloads it by its name; listen at /zaehne/ (tap the lion's symbol on the bar).",
+    date: "2026-11-27",
+  },
+  {
+    id: "child-roar-3",
+    file: "src/lib/sounds/child-roar-3.mp3",
+    use: "Zähne putzen (X-26), Phase „Brüllen wie ein Löwe“: das Kind im Löwenkostüm brüllt in Runde 3 von 3 zusammen mit dem Löwen – der lauteste und längste der drei; ein Kind, kein echter Löwe. Bis die Aufnahme kommt, spielt ein synthetisches „Rooaah“ (playLittleRoar).",
+    prompt:
+      "A small child playfully roaring like a little lion, the biggest and longest, proud and full 'rooaah' that opens from a short growl into a long 'aah', happy and gentle, not scary, close up, clean recording, no background noise",
+    seconds: 2.6,
+    influence: 0.7,
+    after:
+      "Cut to the roar alone (about 1.9–2.4 s, as long as the lion's roar of the same round, which it sounds together with), bring it to about −20 LUFS – a little under the lion's – and add its row under „Made with ElevenLabs“ in src/lib/sounds/README.md. lion.tsx already plays and preloads it by its name; once all six roars are made, say in src/games/teeth/CLAUDE.md that the roars are recordings now and take the stand-ins (playRecorded(\"roar\", …), playLittleRoar's strength) out of roarTogether in lion.tsx.",
     date: "2026-11-27",
   },
 ];
