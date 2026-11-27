@@ -51,7 +51,7 @@ import {
   playWhoosh,
 } from "@/lib/sfx";
 import { playNeigh } from "@/lib/realSounds";
-import { VIEW_W, wobble, decay } from "./level";
+import { VIEW_W, WOBBLE_REST, wobble, decay } from "./level";
 import {
   along,
   cameraOn,
@@ -314,7 +314,9 @@ function drive(dist: number, v: number, ramp: number) {
 
 /** The rocking horse's tilt in degrees at `t` seconds since its first push (positive: nose down, to the right). */
 function rockAt(t: number) {
-  if (t <= 0) return 0;
+  // Below WOBBLE_REST of its start (after about 10 s) it stands still: until 16 s it rocked by hundredths of a degree,
+  // and the phone rastered the horse's tall band again in every frame while the books fell far off (perf, A-46).
+  if (t <= 0 || decay(0.55 * t) < WOBBLE_REST) return 0;
   // Back first, then forward: the kick comes at the first forward swing, and the rocking dies away.
   return -ROCK * decay(0.55 * t) * Math.sin((2 * Math.PI * t) / ROCK_PERIOD);
 }
@@ -867,6 +869,8 @@ export function buildTidy() {
     ((truckFront(t) - front0) / TRUCK.wheelR) * toDeg + 900 * clamp01((t - tStand) / (tLastPress - tStand)) * (tLastPress - tStand);
   /** The wind-up key turns while the truck drives and bounces. */
   const keyTurn = (t: number) => (t < tGo ? 0 : 140 * (Math.min(t, tLastPress + 0.3) - tGo));
+  /** From here on the truck stands still for good: its key stops turning after the last press. */
+  const tTruckStill = tLastPress + 0.3;
 
   /** Where the camera looks: the horse, the ball, the chest while the lid shuts, the truck, the shelf, the socks, the sock ball, the rug, the jack-in-the-box and the pyjamas, the slinky, the plane, the robot vacuum, and the bed. */
   // The camera's left edge is 0.42 of the screen left of what it looks at, so the finale shows the vacuum, the cushion and the whole bed.
@@ -915,6 +919,7 @@ export function buildTidy() {
     tBallIn,
     tShut,
     tGo,
+    tTruckStill,
     tStop,
     tRollOn,
     tPump,

@@ -2,7 +2,9 @@
    nothing loops faster than one. Every keyframe animates only transform, opacity or filter of an HTML layer, never
    something inside an svg (root CLAUDE.md, phones must keep up). States that last over several steps (sleeves up,
    water on, wet, foam, how each hand is seen) are classes on the stage with transitions; what moves within a step runs
-   on its `at-<step>`. A hand's place in a step is its `.hw-pose`, turned round its wrist; its motion there is `.hw-rub`. */
+   on its `at-<step>`. A hand's place in a step is its `.hw-pose`, turned round its wrist; its motion there is `.hw-rub`,
+   and its fingers bend by `.hw-fingers`. What lasts as long as its step is timed by `--step` (the step's length, set on
+   the stage), so a step can be made longer without touching its motions. */
 
 .hw-play {
   position: absolute;
@@ -44,29 +46,11 @@
   height: 100%;
 }
 
-/* A pause holds every motion where it is. Its rules are `!important`, since a step's rule with the `animation`
-   shorthand is more specific. */
-.hw-play.paused .hw-stage * {
+/* A pause holds every motion where it is, the bar's filling step too. Its rules are `!important`, since a step's rule
+   with the `animation` shorthand is more specific. */
+.hw-play.paused .hw-stage *,
+.hw-play.paused .hw-controls * {
   animation-play-state: paused !important;
-}
-
-.hw-paused {
-  position: absolute;
-  inset: 0;
-  z-index: 8;
-  display: grid;
-  place-items: center;
-  background: rgb(255 255 255 / 35%);
-}
-
-.hw-paused svg {
-  width: 18%;
-  height: 18%;
-  padding: 3%;
-  border-radius: 50%;
-  background: #fffaf0;
-  box-shadow: 0 0.4em 1.2em rgb(60 40 20 / 25%);
-  overflow: visible;
 }
 
 /* ---- The hands ---- */
@@ -92,11 +76,22 @@
 .hw-rub,
 .hw-mirror,
 .hw-view,
+.hw-fingers,
 .hw-wet,
 .hw-foam,
 .hw-dirt {
   position: absolute;
   inset: 0;
+}
+
+/* The four fingers bend over the knuckles, which lie at y 285 of the hand's 700 units: seen from above, fingers curling
+   down towards the other hand grow shorter and a little darker (user feedback, 26 November 2026: stiff fingers). */
+.hw-fingers {
+  transform-origin: 50% 40.7%;
+  transition:
+    transform var(--beat) ease-in-out,
+    filter var(--beat) ease-in-out;
+  will-change: transform;
 }
 
 /* Turned round the wrist, which lies at (170, 480) of the hand's 340 × 700 units. */
@@ -223,7 +218,7 @@
 
 /* The motion within a step, starting and ending where the hand is held. */
 .at-soap .hw-left .hw-rub {
-  animation: hw-press var(--beat) ease-in-out calc(var(--beat) * 1.6) 2;
+  animation: hw-press calc(var(--beat) * 1.5) ease-in-out calc(var(--beat) * 2) 2;
 }
 
 .at-palms .hw-left .hw-rub,
@@ -247,11 +242,11 @@
 }
 
 .at-water .hw-left .hw-rub {
-  animation: hw-feel calc(var(--beat) * 10) ease-in-out forwards;
+  animation: hw-feel var(--step) ease-in-out forwards;
 }
 
 .at-water .hw-right .hw-rub {
-  animation: hw-turn calc(var(--beat) * 10) ease-in-out forwards;
+  animation: hw-turn var(--step) ease-in-out forwards;
 }
 
 .at-off .hw-left .hw-rub {
@@ -263,11 +258,71 @@
 }
 
 .at-towel .hw-hand .hw-rub {
-  animation: hw-dry calc(var(--beat) * 10) ease-in-out forwards;
+  animation: hw-dry var(--step) ease-in-out forwards;
 }
 
 .at-towel .hw-right .hw-rub {
   animation-direction: reverse;
+}
+
+/* The fingers while washing: the hand on top curls its fingers down round the hand below with each stroke, the one
+   below flexes a little against it, so neither looks stiff. Pressing the pump the fingers bend onto its head, and the
+   palm holding the soap cups. */
+.at-palms .hw-left .hw-fingers,
+.at-backs .hw-right .hw-fingers,
+.at-backs2 .hw-left .hw-fingers,
+.at-between .hw-left .hw-fingers,
+.at-rinse .hw-left .hw-fingers {
+  animation: hw-curl calc(var(--beat) * 2) ease-in-out infinite;
+}
+
+.at-palms .hw-right .hw-fingers,
+.at-backs .hw-left .hw-fingers,
+.at-backs2 .hw-right .hw-fingers,
+.at-between .hw-right .hw-fingers,
+.at-rinse .hw-right .hw-fingers {
+  animation: hw-flex calc(var(--beat) * 2) ease-in-out calc(var(--beat) * -1) infinite;
+}
+
+.at-soap .hw-left .hw-fingers {
+  animation: hw-press-fingers calc(var(--beat) * 1.5) ease-in-out calc(var(--beat) * 2) 2;
+}
+
+.at-soap .hw-right .hw-fingers {
+  transform: scaleY(0.88);
+}
+
+@keyframes hw-curl {
+  0%,
+  100% {
+    transform: scaleY(0.9);
+    filter: brightness(0.97);
+  }
+  50% {
+    transform: scaleY(0.7) translateY(2%);
+    filter: brightness(0.9);
+  }
+}
+
+@keyframes hw-flex {
+  0%,
+  100% {
+    transform: none;
+  }
+  50% {
+    transform: scaleY(0.92);
+  }
+}
+
+@keyframes hw-press-fingers {
+  0%,
+  100% {
+    transform: none;
+  }
+  50% {
+    transform: scaleY(0.78);
+    filter: brightness(0.93);
+  }
 }
 
 @keyframes hw-press {
@@ -408,7 +463,7 @@
 }
 
 .rolling .hw-sleeve {
-  transition: transform calc(var(--beat) * 2.5) ease-in-out calc(var(--beat) * 0.5);
+  transition: transform calc(var(--step) * 0.55) ease-in-out calc(var(--step) * 0.1);
 }
 
 .hw-roll {
@@ -427,14 +482,27 @@
 
 .rolling .hw-roll {
   transition:
-    opacity calc(var(--beat) * 1.5) ease calc(var(--beat) * 1),
-    transform calc(var(--beat) * 1.5) ease calc(var(--beat) * 1);
+    opacity calc(var(--step) * 0.3) ease calc(var(--step) * 0.2),
+    transform calc(var(--step) * 0.3) ease calc(var(--step) * 0.2);
 }
 
-/* The dirt of playing goes bit by bit with the rubbing (`--dirt`), the last of it with the rinse. */
+/* The dirt of playing goes bit by bit with the rubbing, the hand's (`--dirt-hand`) before the fingertips'
+   (`--dirt-fingers`), and the last of it with the rinse: the fingers' first, where the water runs, then the hand's. */
 .hw-dirt {
-  opacity: var(--dirt, 1);
-  transition: opacity calc(var(--beat) * 8) ease;
+  opacity: var(--dirt-hand, 1);
+  transition: opacity calc(var(--beat) * 10) ease;
+}
+
+.hw-dirt.hw-dirt-fingers {
+  opacity: var(--dirt-fingers, 1);
+}
+
+.at-rinse .hw-dirt-fingers {
+  transition: opacity calc(var(--step) * 0.3) ease calc(var(--step) * 0.05);
+}
+
+.at-rinse .hw-dirt {
+  transition: opacity calc(var(--step) * 0.45) ease calc(var(--step) * 0.3);
 }
 
 .hw-wet {
@@ -467,24 +535,64 @@
   opacity: 1;
   transform: none;
   transition:
-    opacity 0.3s calc(var(--beat) * 2.6),
-    transform 0.3s calc(var(--beat) * 2.6);
+    opacity 0.3s calc(var(--beat) * 3.6),
+    transform 0.3s calc(var(--beat) * 3.6);
 }
 
-/* The foam grows with the rubbing, stays until the rinse and goes under the water. */
+/* The foam comes bit by bit with the rubbing (user feedback, 26 November 2026): a few patches spreading out from the
+   middle of the hand, then the whole hand creamy in the second half of palm on palm, then the fingers with the backs.
+   It stays until the rinse, which washes it off the other way round – the fingers' first, then the hand's, the last
+   patches at the end – each layer shrinking back to where it came from. */
 .hw-foam {
   opacity: 0;
-  transform: scale(0.6);
+  transform: scale(0.3);
+  transform-origin: 50% 53%;
   transition:
-    opacity calc(var(--beat) * 7) ease,
-    transform calc(var(--beat) * 7) ease;
+    opacity calc(var(--beat) * 4) ease,
+    transform calc(var(--beat) * 4) ease;
   will-change: transform, opacity;
 }
 
-.foamy .hw-foam {
+.hw-foam.f-fingers {
+  transform: scale(0.5);
+  transform-origin: 50% 40.7%;
+}
+
+.lather-patches .f-patches,
+.lather-full .f-full,
+.lather-fingers .f-fingers {
   opacity: 1;
   transform: none;
-  transition-duration: calc(var(--beat) * 8);
+  transition-duration: calc(var(--beat) * 5);
+}
+
+.at-palms .f-patches {
+  transition-delay: calc(var(--beat) * 1);
+}
+
+.at-palms .f-full {
+  transition-duration: calc(var(--step) * 0.45);
+  transition-delay: calc(var(--step) * 0.45);
+}
+
+.at-backs .f-fingers {
+  transition-duration: calc(var(--step) * 0.6);
+  transition-delay: calc(var(--beat) * 1);
+}
+
+.at-rinse .f-fingers {
+  transition-duration: calc(var(--step) * 0.25);
+  transition-delay: calc(var(--step) * 0.05);
+}
+
+.at-rinse .f-full {
+  transition-duration: calc(var(--step) * 0.3);
+  transition-delay: calc(var(--step) * 0.3);
+}
+
+.at-rinse .f-patches {
+  transition-duration: calc(var(--step) * 0.25);
+  transition-delay: calc(var(--step) * 0.6);
 }
 
 /* ---- The tap, the water and the pump ---- */
@@ -501,7 +609,7 @@
 }
 
 .at-water .hw-lever {
-  animation: hw-lever-temp calc(var(--beat) * 10) ease-in-out forwards;
+  animation: hw-lever-temp var(--step) ease-in-out forwards;
 }
 
 .at-off .hw-lever {
@@ -589,7 +697,7 @@
 }
 
 .at-water .hw-stream-cold {
-  animation: hw-cold calc(var(--beat) * 10) ease-in-out forwards;
+  animation: hw-cold var(--step) ease-in-out forwards;
 }
 
 @keyframes hw-cold {
@@ -623,7 +731,7 @@
 }
 
 .at-soap .hw-pump-head {
-  animation: hw-pump var(--beat) ease-in-out calc(var(--beat) * 1.6) 2;
+  animation: hw-pump calc(var(--beat) * 1.5) ease-in-out calc(var(--beat) * 2) 2;
 }
 
 @keyframes hw-pump {
@@ -642,7 +750,7 @@
 }
 
 .at-towel .hw-towel-wrap {
-  animation: hw-wrap calc(var(--beat) * 10) ease-in-out forwards;
+  animation: hw-wrap var(--step) ease-in-out forwards;
 }
 
 @keyframes hw-wrap {
@@ -699,7 +807,7 @@
 
 /* Up the stool halfway through its step. */
 .at-stool .p-hocker {
-  transition-delay: calc(var(--beat) * 4);
+  transition-delay: calc(var(--step) / 2);
 }
 
 .hw-pic-img {
@@ -715,24 +823,24 @@
 /* Mama calls from the doorway: the eye turns to her. */
 .at-call .p-ruf .hw-pic-img {
   transform-origin: 66% 40%;
-  animation: hw-look calc(var(--beat) * 8) ease-out forwards;
+  animation: hw-look var(--step) ease-out forwards;
 }
 
 /* Walking into the bathroom, towards the basin. */
 .at-stool .p-bad .hw-pic-img {
   transform-origin: 50% 55%;
-  animation: hw-walk calc(var(--beat) * 4.5) ease-in forwards;
+  animation: hw-walk calc(var(--step) * 0.56) ease-in forwards;
 }
 
 /* Climbing the stool: the picture rises a step. */
 .at-stool .p-hocker .hw-pic-img {
-  animation: hw-climb calc(var(--beat) * 4) ease-in-out calc(var(--beat) * 4) both;
+  animation: hw-climb calc(var(--step) / 2) ease-in-out calc(var(--step) / 2) both;
 }
 
 /* Running to the table, step by step, until the child arrives. */
 .at-run .p-essen .hw-pic-img {
   transform-origin: 50% 60%;
-  animation: hw-run calc(var(--beat) * 6) linear forwards;
+  animation: hw-run calc(var(--step) * 0.75) linear forwards;
 }
 
 @keyframes hw-look {
@@ -819,62 +927,274 @@
   opacity: 0.7;
 }
 
-/* ---- The bar: one groove per step, the rubbing's four together in green ---- */
+/* ---- The controls: Zähne putzen's, on one strip of paper (user request, 26 November 2026) ---- */
 
-.hw-bar {
+/* Pause (or go on), start again, the bar of steps and the time left lie together on one strip of paper, like the book's
+   notes, over the picture's foot; on a screen wider than tall it stands as a slim strip along the left edge under the
+   ✕, the bar running from top to bottom. They lie above the pause screen, so a grown-up can jump around while paused. */
+.hw-controls {
   position: absolute;
   left: 50%;
   bottom: max(8px, env(safe-area-inset-bottom));
-  z-index: 9;
+  z-index: 11;
   display: flex;
   align-items: center;
-  gap: 5px;
-  width: min(76%, 640px);
-  padding: 5px 10px;
+  gap: clamp(8px, 1.6vmin, 14px);
+  width: min(92%, 800px);
+  padding: 5px clamp(8px, 1.6vmin, 14px) 5px 6px;
   transform: translateX(-50%);
-  border-radius: 10px;
-  background: #fffaf0;
-  box-shadow: 0 2px 8px rgb(60 40 20 / 20%);
+  border: 1px solid #3d304559;
+  border-radius: 999px;
+  background: var(--paper-grain), color-mix(in srgb, var(--paper, #fbf4e3) 70%, #fff);
+  box-shadow:
+    0 2px 0 #5a3c1f22,
+    0 8px 18px -6px #2a1e5c59;
 }
 
-.hw-pause {
+/* Round paper discs with drawn signs in the game's ink, no emoji. */
+.hw-button {
   flex: none;
   display: grid;
   place-items: center;
-  width: 38px;
-  height: 38px;
-  padding: 7px;
-  border: none;
+  width: clamp(44px, 8vmin, 58px);
+  height: clamp(44px, 8vmin, 58px);
+  padding: 0;
+  border: 2.5px solid var(--ink);
   border-radius: 50%;
-  background: #fff3c8;
+  background: radial-gradient(circle at 38% 30%, #fff 45%, #f1e8d4);
+  box-shadow:
+    inset 0 -3px 0 #3d30451f,
+    0 2px 3px #2a1e5c33;
   cursor: pointer;
 }
 
-.hw-pause svg {
-  width: 100%;
-  height: 100%;
+.hw-button:active {
+  translate: 0 1px;
+  box-shadow:
+    inset 0 -1px 0 #3d30451f,
+    0 1px 2px #2a1e5c33;
 }
 
+.hw-button-icon {
+  display: block;
+  width: 64%;
+  height: 64%;
+}
+
+/* The time left of the whole washing, right of the bar; on a narrow screen the bar keeps the room. */
+.hw-time {
+  flex: none;
+  min-width: 3.2em;
+  padding: 0.1em 0.55em;
+  border: 2.5px solid var(--ink);
+  border-radius: 999px;
+  background: #fff;
+  box-shadow: inset 0 -2px 0 #3d30451a;
+  text-align: center;
+  color: var(--ink);
+  font-size: clamp(1.05rem, 3.6vmin, 1.6rem);
+  font-weight: 700;
+  font-variant-numeric: tabular-nums;
+}
+
+@media (max-width: 600px) {
+  .hw-time {
+    display: none;
+  }
+}
+
+/* One groove per step, as long as the step lasts; a tap or drag on it jumps there. */
+.hw-progress {
+  flex: 1;
+  display: flex;
+  align-items: center;
+  gap: clamp(3px, 0.7vmin, 6px);
+  min-width: 0;
+  /* Room above and below the thin bar, so a finger hits it easily. */
+  padding: 12px 0;
+  cursor: pointer;
+  touch-action: none;
+}
+
+/* Each step a groove pressed into the paper, filled with its colour as the step goes by: the rooms lilac, the basin
+   blue, the rubbing green. */
 .hw-seg {
   flex: var(--beats) 1 0;
   min-width: 6px;
-  height: 18px;
-  padding: 0;
-  border: none;
-  border-radius: 9px;
-  background: #e6dccb;
-  cursor: pointer;
+  height: clamp(14px, 3vmin, 24px);
+  border: 2px solid var(--ink);
+  border-radius: 999px;
+  background: #fffaf0;
+  box-shadow: inset 0 2px 3px #3d304529;
+  overflow: hidden;
+  --fill: #8fc9f2;
 }
 
-.hw-seg.rub {
-  background: #d6ecd3;
+.hw-seg-room {
+  --fill: #b9a4f5;
 }
 
-.hw-seg.past {
-  background: #9ccf8f;
+.hw-seg-rub {
+  --fill: #6fcf9d;
+}
+
+.hw-seg > span {
+  display: block;
+  width: 100%;
+  height: 100%;
+  /* A soft shine along the top, so the colour looks filled in rather than flat. */
+  background: linear-gradient(#ffffff73 0 30%, #fff0 55%), var(--fill);
+  /* Grows by scaling, never by its width, which would lay the bar out again in every frame. */
+  transform: scaleX(0);
+  transform-origin: left;
+}
+
+.hw-seg.past > span {
+  transform: none;
+}
+
+/* The step running now fills up as long as it lasts, stopping with a pause; it stands a little taller with a golden
+   ring, still – never pulsing. */
+.hw-seg.now > span {
+  animation: hw-fill var(--step) linear forwards;
 }
 
 .hw-seg.now {
-  background: #ffd54a;
-  box-shadow: 0 0 0 2px #d9a400;
+  height: clamp(20px, 4.2vmin, 32px);
+  border-width: 2.5px;
+  box-shadow:
+    inset 0 2px 3px #3d304529,
+    0 0 0 3px #ffc61a,
+    0 2px 6px 2px #2a1e5c40;
+}
+
+@keyframes hw-fill {
+  from {
+    transform: scaleX(0);
+  }
+  to {
+    transform: none;
+  }
+}
+
+@keyframes hw-fill-down {
+  from {
+    transform: scaleY(0);
+  }
+  to {
+    transform: none;
+  }
+}
+
+/* On a screen wider than tall the controls stand as a slim, quiet strip along the left edge, from just under the ✕ to
+   the bottom, inside the book's paper margin: the two buttons side by side on top, the bar under them running from top
+   to bottom, the time at its foot. */
+@media (orientation: landscape) {
+  .hw-controls {
+    --hw-gap: clamp(4px, 1vmin, 10px);
+    --hw-edge: calc(var(--frame, 0px) + var(--hw-gap));
+    left: var(--hw-edge);
+    top: calc(var(--play-corner, 0px) + var(--hw-gap));
+    bottom: max(var(--hw-edge), env(safe-area-inset-bottom));
+    display: grid;
+    grid-template-columns: auto auto;
+    grid-template-rows: auto minmax(0, 1fr) auto;
+    justify-items: center;
+    gap: clamp(5px, 1.2vmin, 10px) clamp(4px, 0.8vmin, 8px);
+    width: auto;
+    padding: 6px;
+    transform: none;
+    border-color: #3d304533;
+    border-radius: 24px;
+    background: var(--paper-grain), color-mix(in srgb, var(--paper, #fbf4e3) 55%, #fff0);
+    box-shadow: 0 4px 12px -6px #2a1e5c40;
+  }
+
+  .hw-progress,
+  .hw-time {
+    grid-column: 1 / -1;
+  }
+
+  .hw-button {
+    width: clamp(38px, 7vmin, 52px);
+    height: clamp(38px, 7vmin, 52px);
+    border-width: 2px;
+  }
+
+  .hw-progress {
+    flex-direction: column;
+    align-self: stretch;
+    min-height: 0;
+    padding: 4px 0;
+  }
+
+  .hw-seg {
+    width: clamp(13px, 2.6vmin, 20px);
+    height: auto;
+    min-height: 6px;
+    border-width: 1.5px;
+  }
+
+  .hw-seg.now {
+    width: clamp(16px, 3.2vmin, 26px);
+    height: auto;
+    border-width: 2px;
+  }
+
+  .hw-seg > span {
+    transform: scaleY(0);
+    transform-origin: top;
+  }
+
+  .hw-seg.now > span {
+    animation-name: hw-fill-down;
+  }
+
+  .hw-time {
+    display: block;
+    min-width: 0;
+    padding: 0.1em 0.3em;
+    border-width: 2px;
+    font-size: clamp(0.8rem, 2.8vmin, 1.2rem);
+  }
+}
+
+/* Pause: the picture stands still under a big sheet that goes on, as in Zähne putzen. */
+.hw-paused {
+  position: absolute;
+  inset: 0;
+  z-index: 10;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 1vmin;
+  border: 0;
+  background: #ffffffb0;
+  color: var(--ink);
+  font: inherit;
+  font-size: clamp(2.4rem, 10vmin, 5rem);
+  font-weight: 700;
+  cursor: pointer;
+  animation: pop-in 0.3s ease-out;
+}
+
+.hw-paused-icon {
+  display: grid;
+  place-items: center;
+  width: 1.6em;
+  height: 1.6em;
+  border: 4px solid var(--ink);
+  border-radius: 50%;
+  background: #fff;
+}
+
+.hw-paused-icon .hw-button-icon {
+  width: 60%;
+  height: 60%;
+}
+
+.hw-paused small {
+  font-size: 0.35em;
+  font-weight: 500;
 }

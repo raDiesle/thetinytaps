@@ -2,7 +2,7 @@ import { memo, useId, useMemo } from "react";
 import { VIEW_H, type LevelProps } from "./level";
 import { clamp01, deg, lerp, svgLine } from "./machineKit";
 import { MachineStage } from "./MachineStage";
-import { BAR_COLORS, STAR_POINTS, still } from "./parts";
+import { BAR_COLORS, STAR_POINTS, Sprite, still, type ScreenAt } from "./parts";
 import { INK, Picture, Sparkles, WallClock, Window } from "./scenery";
 import type { Pt } from "./path";
 import {
@@ -85,7 +85,19 @@ export function TidyLevel(props: LevelProps) {
   const backdrop = useMemo(() => [{ content: <Room paper={`${ids}-paper`} /> }], [ids]);
 
   return (
-    <MachineStage back={backdrop} machine={tidy} level="tidy" start={{ x: HORSE.x + 10, y: FLOOR - 170, r: 150, side: "left" }} {...props}>
+    <MachineStage
+      back={backdrop}
+      machine={tidy}
+      level="tidy"
+      start={{ x: HORSE.x + 10, y: FLOOR - 170, r: 150, side: "left" }}
+      over={(t, at) => (
+        <>
+          <TruckDriving tidy={tidy} t={t} at={at} />
+          <SockBallFlying tidy={tidy} t={t} at={at} />
+        </>
+      )}
+      {...props}
+    >
       {(t) => (
         <>
           {t < 0 && <StartGlow id={`${ids}-glow`} />}
@@ -142,8 +154,8 @@ export function TidyLevel(props: LevelProps) {
           {BOOKS.map((_, j) => (
             <Book key={j} j={j} tidy={tidy} t={t} />
           ))}
-          <Truck tidy={tidy} t={t} />
-          {t >= tidy.tBallOff && <SockBall tidy={tidy} t={t} />}
+          {!truckDriving(tidy, t) && <Truck tidy={tidy} t={t} />}
+          {t >= tidy.tBallOff && !sockBallFlying(tidy, t) && <SockBall tidy={tidy} t={t} />}
           <AirJet tidy={tidy} t={t} />
           <Bunny tidy={tidy} t={t} />
           <Blanket k={tidy.blanket(t)} />
@@ -343,7 +355,42 @@ function Book({ j, tidy, t }: { j: number; tidy: Tidy; t: number }) {
 }
 
 /** The wind-up toy truck, facing right; its front wheels ride up onto the bellows. */
+/**
+ * Whether the wind-up truck is moving: from its start until its key stops after the last press on the bellows. Then it
+ * is a small layer of its own over the room (`TruckDriving`): drawn in the room's svg, it kept the phone rastering its
+ * band while the blocks and the socks moved at other heights (perf, A-46). Only the sock ball and the air jet are drawn
+ * after it in the room, and neither is near it while it moves.
+ */
+const truckDriving = (tidy: Tidy, t: number) => t >= tidy.tGo && t < tidy.tTruckStill;
+
+/** Where the truck's sprite has its middle: half its length behind its nose, high enough for its cab on the bellows. */
+const TRUCK_MID = { back: TRUCK.len / 2, up: 90 };
+
+/** The truck while it drives and bounces: a small svg of its own over the machine, moved by a CSS transform. */
+function TruckDriving({ tidy, t, at }: { tidy: Tidy; t: number; at: ScreenAt }) {
+  if (!truckDriving(tidy, t)) return null;
+  const { front, ...pose } = truckPose(tidy, t);
+  return (
+    <Sprite at={at} x={front - TRUCK_MID.back} y={FLOOR - TRUCK_MID.up} pad={160}>
+      <g transform={`translate(${-TRUCK_MID.back} ${TRUCK_MID.up})`}>
+        <TruckShape {...pose} />
+      </g>
+    </Sprite>
+  );
+}
+
+/** The truck in the room, where it stands before and after it drives. */
 function Truck({ tidy, t }: { tidy: Tidy; t: number }) {
+  const { front, ...pose } = truckPose(tidy, t);
+  return (
+    <g transform={`translate(${front - TRUCK.len} ${FLOOR})`}>
+      <TruckShape {...pose} />
+    </g>
+  );
+}
+
+/** The truck's nose, its tilt on the bellows (degrees), how far its wheels have turned and its key's turn (as a cosine). */
+function truckPose(tidy: Tidy, t: number) {
   const front = tidy.truckFront(t);
   const { len, wheelR } = TRUCK;
   const rear = 45;
@@ -353,8 +400,15 @@ function Truck({ tidy, t }: { tidy: Tidy; t: number }) {
   const tilt = (Math.atan2(lift, len - FRONT_WHEEL - rear) * 180) / Math.PI;
   const turn = tidy.wheelTurn(t);
   const key = Math.cos((tidy.keyTurn(t) * Math.PI) / 180);
+  return { front, tilt, turn, key };
+}
+
+/** The truck drawn with its back end on the floor at 0,0, nose to the right. */
+const TruckShape = still(function TruckShape({ tilt, turn, key }: { tilt: number; turn: number; key: number }) {
+  const { len, wheelR } = TRUCK;
+  const rear = 45;
   return (
-    <g transform={`translate(${front - len} ${FLOOR}) rotate(${-tilt} ${rear} ${-wheelR})`}>
+    <g transform={`rotate(${-tilt} ${rear} ${-wheelR})`}>
       {/* Wind-up key on the back */}
       <g transform={`translate(70 -96) scale(${key} 1)`}>
         <line x1="0" y1="0" x2="0" y2="-20" stroke={INK} strokeWidth="6" />
@@ -375,7 +429,7 @@ function Truck({ tidy, t }: { tidy: Tidy; t: number }) {
       ))}
     </g>
   );
-}
+});
 
 /** The bookshelf on its legs, with a toy sailing boat below and a plant on top. */
 const Shelf = memo(function Shelf() {
@@ -511,12 +565,40 @@ function Sock({ k, tidy, t }: { k: number; tidy: Tidy; t: number }) {
   );
 }
 
+/**
+ * Whether the sock ball is on its way, from leaving the bellows until it has rolled back from the rug: then it is a small
+ * layer of its own over the room (`SockBallFlying`). It crosses half the room at the floor while the crayons, the pot and
+ * the puzzle pieces hop far above it, and drawn in the room's svg the phone rastered nearly the whole screen in every
+ * frame (perf, A-46). On its way it is drawn in front of everything in the room anyway.
+ */
+const sockBallFlying = (tidy: Tidy, t: number) => t >= tidy.tBallOff && t < tidy.tRug + 0.7;
+
+/** The sock ball while it flies and rolls: a small svg of its own over the machine, moved by a CSS transform. */
+function SockBallFlying({ tidy, t, at }: { tidy: Tidy; t: number; at: ScreenAt }) {
+  if (!sockBallFlying(tidy, t)) return null;
+  const { pt, spin } = tidy.sockBallAt(t);
+  return (
+    <Sprite at={at} x={pt.x} y={pt.y} pad={SOCK_BALL_R + 4}>
+      <SockBallShape spin={spin} />
+    </Sprite>
+  );
+}
+
 /** The rolled-up sock ball, turning as it flies, bounces and rolls. */
 function SockBall({ tidy, t }: { tidy: Tidy; t: number }) {
   const { pt, spin } = tidy.sockBallAt(t);
+  return (
+    <g transform={`translate(${pt.x} ${pt.y})`}>
+      <SockBallShape spin={spin} />
+    </g>
+  );
+}
+
+/** The sock ball's drawing round its middle, turned by `spin` degrees. */
+function SockBallShape({ spin }: { spin: number }) {
   const r = SOCK_BALL_R;
   return (
-    <g transform={`translate(${pt.x} ${pt.y}) rotate(${spin})`}>
+    <g transform={`rotate(${spin})`}>
       <circle r={r} fill="#ff8c42" stroke={INK} strokeWidth="3.5" />
       <path d={`M${-r + 4} -6 Q0 -18 ${r - 4} -6`} fill="none" stroke="#ffd23f" strokeWidth="6" strokeLinecap="round" />
       <path d={`M${-r + 5} 8 Q0 -2 ${r - 5} 8`} fill="none" stroke="#ffd23f" strokeWidth="6" strokeLinecap="round" />

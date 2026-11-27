@@ -1,13 +1,20 @@
-import type { Localized } from "@/lib/language";
+import type { Daytime } from "@/lib/days";
+import type { EnglishFirst, Localized, Texts } from "@/lib/language";
 
 // What Zähne putzen says before and after the brushing, in every language it has: plain data, so the list of
 // recordings (src/content/recordedLines.ts) reads it without loading the game's drawings.
 
-/** Before the clock starts: where the monsters come from, get the brush, toothpaste on, and see them in the mirror. */
-export type Prelude = "sweets" | "grow" | "brush" | "paste" | "monsters";
+/**
+ * Before the clock starts: where the monsters come from, get the brush, toothpaste on, see them in the mirror, and open
+ * wide like a little lion (X-26), so the mouth is open before the song begins.
+ */
+export type Prelude = "sweets" | "grow" | "brush" | "paste" | "monsters" | "roar";
 
-/** What each part before the clock is called (on the progress bar) and what the voice says in it; its timing and sounds are added in TeethPlay.tsx. */
-export const PRELUDE_TEXTS: Record<Prelude, { title: Localized; cue?: Localized }> = {
+/**
+ * What each part before the clock is called (on the progress bar) and what the voice says in it; its timing and sounds
+ * are added in TeethPlay.tsx. A part with no `cue` says nothing – but for `grow`, which says the daytime's line.
+ */
+export const PRELUDE_TEXTS: Record<Prelude, { title: Texts; cue?: Localized }> = {
   sweets: {
     title: {
       de: "🍭 Süßes essen",
@@ -99,7 +106,49 @@ export const PRELUDE_TEXTS: Record<Prelude, { title: Localized; cue?: Localized 
       ru: "Ой-ой, вот они! Давай прогоним их щёткой!",
     },
   },
+  // The child in the mirror opens wide and roars softly, and the child in front of it does the same (X-26, written
+  // English first): no voice tells it, the picture and the roar do.
+  roar: {
+    title: {
+      en: "🦁 Open wide like a lion",
+      de: "🦁 Mund auf wie ein Löwe",
+      zh: "🦁 像狮子一样张大嘴",
+      hi: "🦁 शेर की तरह मुँह खोलो",
+      es: "🦁 Boca abierta como un león",
+      ar: "🦁 نفتح الفم مثل الأسد",
+      ru: "🦁 Рот пошире, как у львёнка",
+    },
+  },
 };
+
+/**
+ * The story's first part before the morning brushing, where the child eats breakfast instead of sweets (X-19, written
+ * English first): its name on the bar and what the voice says.
+ */
+export const BREAKFAST_TEXTS: { title: EnglishFirst; cue: EnglishFirst } = {
+  title: {
+    en: "🥣 Eating breakfast",
+    de: "🥣 Frühstück essen",
+    zh: "🥣 吃早饭",
+    hi: "🥣 नाश्ता करना",
+    es: "🥣 Desayunar",
+    ar: "🥣 نتناول الفطور",
+    ru: "🥣 Завтракаем",
+  },
+  cue: {
+    en: "Mmm, breakfast! A little sugar stays on the teeth too.",
+    de: "Mmh, Frühstück! Auch davon bleibt ein bisschen Zucker an den Zähnen.",
+    zh: "嗯，早饭真好吃！也有一点点糖留在了牙齿上。",
+    hi: "म्म, नाश्ता! इससे भी थोड़ी-सी चीनी दाँतों पर रह जाती है।",
+    es: "¡Mmm, el desayuno! También se queda un poco de azúcar en los dientes.",
+    ar: "مممم، الفطور! يبقى منه أيضًا قليل من السكر على الأسنان.",
+    ru: "Ммм, завтрак! И от него немного сахара остаётся на зубках.",
+  },
+};
+
+/** What a part before the clock is called and says at this time of day: in the morning the story eats breakfast. */
+export const preludeTexts = (part: Prelude, daytime: Daytime): { title: Texts; cue?: Texts } =>
+  part === "sweets" && daytime === "morning" ? BREAKFAST_TEXTS : PRELUDE_TEXTS[part];
 
 /** Said at the end, before the daytime's goodbye (unless the sung finale sings it). */
 export const DONE_SAY: Localized = {

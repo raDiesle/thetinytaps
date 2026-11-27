@@ -40,7 +40,7 @@ house built from 1 to 100 in one go. Its name, line and the plus's name are in a
 
 ## Rules
 
-- Classes are prefixed `zt-` (Zaubertasten has `tw-`; `css.test.ts` fails on a prefixed class two games style).
+- Classes are prefixed `zt-` (Tippzauber has `tw-`; `css.test.ts` fails on a prefixed class two games style).
 - **The number is the same on every block** (user feedback, 25 November 2026): one font, size, weight and outline
   (`BlockNumber`), always in the block's middle. A block differs only round it – its frame, outline, colour, pattern
   and the dressing – never by a smaller, moved or differently drawn number, and nothing lies over it. So no motif that

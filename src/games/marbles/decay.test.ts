@@ -57,6 +57,14 @@ test("the building site's belt and drum stand once the marble is past them", () 
   expect(site.beltTravel(2)).toBeGreaterThan(site.beltTravel(1));
 });
 
+// Drawn with the clock itself, every part of the building site went through React in every frame (A-45: a fifth of the
+// old phone's time was script). Each part gets the numbers it draws, worked out where the level draws its machine.
+test("the building site's parts never take the machine together with its clock", () => {
+  const source = readFileSync(join(HERE, "BuildingLevel.tsx"), "utf8");
+  expect(source.match(/\{ machine: Building; t: number \}/g) ?? []).toEqual([]);
+  expect(source.match(/^function [A-Z]\w*\(\{ machine, t \}/gm) ?? []).toEqual([]);
+});
+
 test("a wobble is exactly 0 once it is too small to see, long before SETTLE_S", () => {
   // The barn's kick: 1.2° damped by 3.5 a second is under 0.006° after 1.6 s.
   expect(wobble(1.6, 1.2, 26, 3.5)).toBe(0);

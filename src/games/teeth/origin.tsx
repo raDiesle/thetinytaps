@@ -1,14 +1,14 @@
-import { useRef, type CSSProperties, type RefObject } from "react";
+import { useRef, type CSSProperties, type ReactElement, type RefObject } from "react";
 import { STAR_PATH } from "@/components/TapFeedback";
 import { useFigure } from "@/lib/common";
 import { useT } from "@/lib/language";
-import { playCrunch, playGiggle, playMunch, playRecorded, playRustle, playYum } from "@/lib/sfx";
+import { playCrunch, playGiggle, playGulp, playMunch, playRecorded, playRustle, playYum } from "@/lib/sfx";
 import type { Cue } from "./cues";
 import type { Daytime } from "@/lib/days";
 import { clothesOf, PyjamaPattern, topFill } from "./clothes";
 import { PICTURE, TOOTH_ARCS } from "./jaw";
 import { BROW, Ear, EyeBall, EyeLid, eyeOpening, FACE, HAIR, Hair, type HeadMap, INK, Iris, LASHES, LIP, Nose, SKIN_SHADE, SkinGradient } from "./face";
-import { fitBox, FrameStroke, Monster, screenFrame, STAIN, STAIN_FILLS, useRoom, type Box } from "./mouth";
+import { fitBox, FRAME_CLIP, FrameStroke, Monster, screenFrame, STAIN, STAIN_FILLS, useRoom, type Box } from "./mouth";
 import { Piece, pictureSpace } from "./piece";
 
 // Before anything else, a short story of where the sugar monsters come from:
@@ -20,6 +20,10 @@ import { Piece, pictureSpace } from "./piece";
 // looks worried. The child is happy about each sweet: its eyes follow it and
 // its brows go up, and while it chews its eyes close happily and its cheeks
 // glow. Each sweet flies into the mouth in an arc and crumbles as it is bitten.
+// Before the morning brushing it is breakfast instead (X-19): a honey bread, a
+// spoon of muesli with milk and a mug of cocoa leave their crumbs and monsters
+// too, so the child sees that everyday food leaves sugar on the teeth, not only
+// sweets. The daytime comes from the clock, as everywhere in the game.
 // All of it is CSS animation (teeth.css), calm enough to go with the music;
 // ARRIVE_MS here sets when each sweet reaches the mouth, and ORIGIN_CUES the
 // sounds that go with it (cheering, unwrapping, biting, chewing, „Mmmh“).
@@ -74,7 +78,8 @@ function framingFor(room: Parameters<typeof fitBox>[0]) {
 }
 /** Where the camera ends up while the monsters grow: the lips round the mouth with them, as big as the free room allows. */
 const MOUTH_FOCUS: Box = { x: 114, y: 234, width: 212, height: 118 };
-const HEAD = { x: W / 2, y: 215, r: 165 };
+/** The story's head: its middle and radius in picture units; the spitting at the end draws the same head (`spit.tsx`). */
+export const HEAD = { x: W / 2, y: 215, r: 165 };
 /** Where the teeth stand in the mouth: from left to right, and from the top edge down to the bottom's lowest point. */
 export const MOUTH = { left: 124, right: 316, top: 258, depth: 80 };
 const MID = (MOUTH.left + MOUTH.right) / 2;
@@ -279,13 +284,13 @@ const FIRST_ID = 1000;
 /** The closed mouth while chewing: where its lips meet, in the middle (a little below the open mouth's top). */
 const CLOSED = { y: MOUTH.top + 12, half: 50 };
 /** Its piece, and the point it moves round (where the lips meet). */
-const CLOSED_AREA: Box = { x: MID - CLOSED.half - 10, y: CLOSED.y - 22, width: 2 * CLOSED.half + 20, height: 60 };
+export const CLOSED_AREA: Box = { x: MID - CLOSED.half - 10, y: CLOSED.y - 22, width: 2 * CLOSED.half + 20, height: 60 };
 
 /**
  * The closed lips of a chewing mouth, full and a little pursed round the sweet: a thinner upper lip, a fuller lower one,
  * the line where they meet turning up at the corners as the smile does.
  */
-function ClosedMouth() {
+export function ClosedMouth() {
   const { y, half } = CLOSED;
   const [l, r] = [MID - half, MID + half];
   const upper = `M${l} ${y} Q${MID - half / 2} ${y - 16} ${MID} ${y - 10} Q${MID + half / 2} ${y - 16} ${r} ${y} Q${MID} ${y + 8} ${l} ${y} Z`;
@@ -360,15 +365,21 @@ const DELIGHT = perSweet(
   APPEAR_MS,
 );
 
-/** A crumb of each sweet on two teeth, in its colour; in the grow part each becomes a monster of that colour. */
+/** A crumb of each sweet on two teeth; in the grow part each becomes a monster of its colour (`CRUMB_COLORS`). */
 const CRUMBS = [
-  { tooth: 2, upper: true, sweet: 0, color: "#ff7bd0" },
-  { tooth: 5, upper: false, sweet: 0, color: "#ff7bd0" },
-  { tooth: 7, upper: true, sweet: 1, color: "#ff9f43" },
-  { tooth: 2, upper: false, sweet: 1, color: "#ff9f43" },
-  { tooth: 5, upper: true, sweet: 2, color: "#b388ff" },
-  { tooth: 7, upper: false, sweet: 2, color: "#8bd346" },
+  { tooth: 2, upper: true, sweet: 0 },
+  { tooth: 5, upper: false, sweet: 0 },
+  { tooth: 7, upper: true, sweet: 1 },
+  { tooth: 2, upper: false, sweet: 1 },
+  { tooth: 5, upper: true, sweet: 2 },
+  { tooth: 7, upper: false, sweet: 2 },
 ];
+
+/** Each crumb's colour, that of the sweet or breakfast it comes from: honey, oats and cocoa in the morning. */
+const CRUMB_COLORS: Record<Daytime, string[]> = {
+  evening: ["#ff7bd0", "#ff7bd0", "#ff9f43", "#ff9f43", "#b388ff", "#8bd346"],
+  morning: ["#f5b82e", "#f5b82e", "#e0b06a", "#c98a4b", "#9a6540", "#b98257"],
+};
 
 /** A tooth's place in the picture, where a crumb lies and its monster grows. */
 function crumbAt(c: (typeof CRUMBS)[number]) {
@@ -443,7 +454,63 @@ function Cupcake() {
   );
 }
 
-const SWEETS = [Lollipop, Bonbon, Cupcake];
+/** A slice of bread with golden honey on it, running down over the crust in two drips. Flat fills only: the strip's
+ * stand-in for its own picture draws it too (`TeethPlay`), so it has no ids to clash. */
+export function HoneyBread() {
+  return (
+    <g stroke={INK} strokeWidth={3} strokeLinejoin="round" strokeLinecap="round">
+      <path
+        d="M-26 34 L-26 -6 C-37 -9 -36 -31 -18 -30 C-10 -39 10 -39 18 -30 C36 -31 37 -9 26 -6 L26 34 Q26 39 21 39 L-21 39 Q-26 39 -26 34 Z"
+        fill="#c98a4b"
+      />
+      <path d="M-20 32 L-20 -10 C-29 -12 -28 -25 -15 -24 C-8 -32 8 -32 15 -24 C28 -25 29 -12 20 -10 L20 32 Z" fill="#f6dfae" stroke="none" />
+      <path d="M-11 8 l3 1 M6 18 l3 -1 M-6 26 l2 2 M10 2 l2 2" stroke="#dcb77a" strokeWidth={2.5} />
+      <path
+        d="M-20 -14 C-14 -24 12 -25 20 -15 C23 -10 20 -5 15 -6 L15 6 Q12 12 9 6 L9 -4 C1 -2 -8 -3 -13 -6 L-13 1 Q-16 7 -19 1 L-19 -7 C-22 -9 -22 -12 -20 -14 Z"
+        fill="#f5b82e"
+      />
+      <path d="M-10 -15 Q-2 -19 8 -16" fill="none" stroke="#fff6c2" strokeWidth={3} opacity={0.9} />
+    </g>
+  );
+}
+
+/** A spoon heaped with muesli – oat flakes, raisins and a piece of strawberry – in a little lake of milk. */
+function MuesliSpoon() {
+  return (
+    <g stroke={INK} strokeWidth={3} strokeLinejoin="round" strokeLinecap="round">
+      <path d="M-3 8 L3 54 Q6 60 11 56 L7 8 Z" fill="#cfd6e0" />
+      <ellipse cx={0} cy={-2} rx={28} ry={17} fill="#dfe5ee" />
+      <ellipse cx={0} cy={-5} rx={23} ry={11} fill="#fffaf0" strokeWidth={2} />
+      <path d="M-19 -6 C-19 -18 -9 -25 -1 -21 C6 -29 19 -22 18 -7 C10 -3 -10 -3 -19 -6 Z" fill="#e6c98f" />
+      <path d="M-12 -12 l6 -2 M2 -18 l5 3 M7 -10 l6 -1 M-5 -7 l5 1" stroke="#c49a56" strokeWidth={2} />
+      <ellipse cx={-8} cy={-17} rx={3.5} ry={2.5} fill="#6b3b2a" strokeWidth={1.5} />
+      <ellipse cx={11} cy={-14} rx={3} ry={2.2} fill="#6b3b2a" strokeWidth={1.5} />
+      <path d="M-1 -12 Q2 -20 7 -14 Q4 -9 -1 -12 Z" fill="#ff4d6d" strokeWidth={2} />
+      <ellipse cx={-14} cy={4} rx={5} ry={2} fill="#fff" stroke="none" opacity={0.8} />
+    </g>
+  );
+}
+
+/** A mug of cocoa with a cap of milk foam, a white dot pattern on its blue and a wisp of warmth over it. */
+function CocoaMug() {
+  return (
+    <g stroke={INK} strokeWidth={3} strokeLinejoin="round" strokeLinecap="round">
+      <path d="M-6 -24 q-5 -6 0 -11 q4 -5 0 -10 M6 -24 q-5 -6 0 -11" fill="none" stroke="#fff" strokeWidth={3} opacity={0.85} />
+      <path d="M20 -4 C36 -6 37 24 20 24" fill="none" strokeWidth={10} />
+      <path d="M20 -4 C36 -6 37 24 20 24" fill="none" stroke="#4cc9f0" strokeWidth={4.5} />
+      <path d="M-23 -16 L-21 32 Q-21 38 -15 38 L13 38 Q19 38 19 32 L21 -16 Z" fill="#4cc9f0" />
+      <path d="M-12 2 h0.1 M6 -4 h0.1 M-4 18 h0.1 M10 22 h0.1 M-14 28 h0.1" stroke="#fff" strokeWidth={5} />
+      <ellipse cx={-1} cy={-16} rx={22} ry={6.5} fill="#8a5a3c" />
+      <path d="M-15 -17 C-12 -23 -4 -22 -2 -19 C2 -24 12 -22 13 -17 C8 -13 -10 -13 -15 -17 Z" fill="#f3e3cc" strokeWidth={2} />
+    </g>
+  );
+}
+
+/** What the child eats: three sweets before the evening brushing, breakfast before the morning one (X-19). */
+const TREATS: Record<Daytime, (() => ReactElement)[]> = {
+  evening: [Lollipop, Bonbon, Cupcake],
+  morning: [HoneyBread, MuesliSpoon, CocoaMug],
+};
 
 /**
  * The eyes follow each sweet: up to its corner while it floats, down to the mouth as it glides in, and back to rest
@@ -460,45 +527,69 @@ const BITE = { x: MID, y: 284 };
 /** When the bits fly, after the sweet's arrival: as the teeth close on it. */
 const BITE_MS = 90;
 
-/** The colours a sweet crumbles into, and whether its bits are shards of candy or soft crumbs of cake. */
-const CRUMBLE = [
-  { colors: ["#ff7bd0", "#fff", "#ff7bd0"], shards: true },
-  { colors: ["#ff9f43", "#ffd23f", "#ff9f43"], shards: true },
-  { colors: ["#b388ff", "#e8b878", "#4cc9f0"], shards: false },
-];
+/** The colours a sweet crumbles into, and whether its bits are shards of candy or soft crumbs (of cake, bread,
+ * muesli, or drops of cocoa). */
+const CRUMBLE: Record<Daytime, { colors: string[]; shards: boolean }[]> = {
+  evening: [
+    { colors: ["#ff7bd0", "#fff", "#ff7bd0"], shards: true },
+    { colors: ["#ff9f43", "#ffd23f", "#ff9f43"], shards: true },
+    { colors: ["#b388ff", "#e8b878", "#4cc9f0"], shards: false },
+  ],
+  morning: [
+    { colors: ["#f6dfae", "#c98a4b", "#f5b82e"], shards: false },
+    { colors: ["#e6c98f", "#fffaf0", "#6b3b2a"], shards: false },
+    { colors: ["#8a5a3c", "#f3e3cc", "#8a5a3c"], shards: false },
+  ],
+};
 
 /**
  * The bits that break off a sweet as it is bitten: a few, flung out from the bite and falling past the chin, turning
  * and fading – calm, no burst of stars (`teeth-origin-bit`). Spread evenly to both sides, each a little different.
  */
-const BITS = CRUMBLE.flatMap(({ colors, shards }, sweet) =>
-  [0, 1, 2, 3, 4, 5].map((k) => {
-    const side = k % 2 ? 1 : -1;
-    const out = 1 + Math.floor(k / 2);
-    return {
-      sweet,
-      color: colors[k % colors.length],
-      shards,
-      size: 4 + ((k * 7 + sweet * 3) % 4),
-      dx: side * (14 + out * 16 + sweet * 3),
-      up: 26 + ((k * 13 + sweet * 5) % 24),
-      fall: 150 + out * 12,
-      spin: side * (120 + out * 60),
-      at: ARRIVE_MS[sweet] + BITE_MS + (k % 3) * 40,
-    };
-  }),
-);
+const bitsOf = (crumble: (typeof CRUMBLE)[Daytime]) =>
+  crumble.flatMap(({ colors, shards }, sweet) =>
+    [0, 1, 2, 3, 4, 5].map((k) => {
+      const side = k % 2 ? 1 : -1;
+      const out = 1 + Math.floor(k / 2);
+      return {
+        sweet,
+        color: colors[k % colors.length],
+        shards,
+        size: 4 + ((k * 7 + sweet * 3) % 4),
+        dx: side * (14 + out * 16 + sweet * 3),
+        up: 26 + ((k * 13 + sweet * 5) % 24),
+        fall: 150 + out * 12,
+        spin: side * (120 + out * 60),
+        at: ARRIVE_MS[sweet] + BITE_MS + (k % 3) * 40,
+      };
+    }),
+  );
+const BITS: Record<Daytime, ReturnType<typeof bitsOf>> = { evening: bitsOf(CRUMBLE.evening), morning: bitsOf(CRUMBLE.morning) };
 
-/** What the child hears: a cheer when the sweets come, unwrapping the bonbon, a bite and chewing for each, „Mmmh“ at the end. */
-export const ORIGIN_CUES: Cue[] = [
-  { at: APPEAR_MS[0] + 500, play: () => playRecorded("yay", playGiggle) },
-  { at: APPEAR_MS[1] + 700, play: () => playRecorded("wrapper", playRustle) },
-  ...ARRIVE_MS.flatMap((at, i) => [
-    { at: at + 300, play: i === 2 ? () => playRecorded("munch", playMunch) : () => playRecorded("lolly", playCrunch) },
-    { at: at + 600, play: () => playRecorded("chew", playMunch) },
-  ]),
-  { at: ARRIVE_MS[2] + CHEW_MS + 150, play: () => playRecorded("yum", playYum) },
-].sort((a, b) => a.at - b.at);
+/**
+ * What the child hears. In the evening: a cheer when the sweets come, unwrapping the bonbon, a bite and chewing for
+ * each, „Mmmh“ at the end. In the morning: the cheer, a bite into the bread and its chewing, the muesli's crunch, the
+ * cocoa's two gulps, and „Mmmh“.
+ */
+export const ORIGIN_CUES: Record<Daytime, Cue[]> = {
+  evening: [
+    { at: APPEAR_MS[0] + 500, play: () => playRecorded("yay", playGiggle) },
+    { at: APPEAR_MS[1] + 700, play: () => playRecorded("wrapper", playRustle) },
+    ...ARRIVE_MS.flatMap((at, i) => [
+      { at: at + 300, play: i === 2 ? () => playRecorded("munch", playMunch) : () => playRecorded("lolly", playCrunch) },
+      { at: at + 600, play: () => playRecorded("chew", playMunch) },
+    ]),
+    { at: ARRIVE_MS[2] + CHEW_MS + 150, play: () => playRecorded("yum", playYum) },
+  ].sort((a, b) => a.at - b.at),
+  morning: [
+    { at: APPEAR_MS[0] + 500, play: () => playRecorded("yay", playGiggle) },
+    { at: ARRIVE_MS[0] + 300, play: () => playRecorded("munch", playMunch) },
+    { at: ARRIVE_MS[0] + 600, play: () => playRecorded("chew", playMunch) },
+    { at: ARRIVE_MS[1] + 300, play: () => playRecorded("chew", playCrunch) },
+    { at: ARRIVE_MS[2] + 300, play: playGulp },
+    { at: ARRIVE_MS[2] + CHEW_MS + 150, play: () => playRecorded("yum", playYum) },
+  ].sort((a, b) => a.at - b.at),
+};
 
 /** The recordings the story plays, to load before it starts. */
 export const ORIGIN_RECORDINGS = ["yay", "wrapper", "lolly", "munch", "chew", "yum"];
@@ -580,7 +671,7 @@ function Pupil({ x, y, look }: { x: number; y: number; look?: CSSProperties }) {
 }
 
 /** The brows, each turning round its middle (the middle of its piece) as it goes up in delight or worry. */
-const BROWS = [
+export const BROWS = [
   { side: "left", d: "M140 150 Q160 140 180 148", area: { x: 134, y: 136, width: 52, height: 20 } },
   { side: "right", d: "M260 148 Q280 140 300 150", area: { x: 254, y: 136, width: 52, height: 20 } },
 ];
@@ -626,25 +717,35 @@ export function Origin({
   const space = pictureSpace(box, unit);
   const viewBox = `${box.x.toFixed(1)} ${box.y.toFixed(1)} ${box.width.toFixed(1)} ${box.height.toFixed(1)}`;
   const label =
-    part === "sweets"
+    part === "sweets" && daytime === "morning"
       ? t({
-          de: "Ein Kind isst Süßigkeiten",
-          en: "A child eats sweets",
-          zh: "一个孩子在吃甜食",
-          hi: "एक बच्चा मिठाई खा रहा है",
-          es: "Un niño come dulces",
-          ar: "طفل يأكل الحلوى",
-          ru: "Ребёнок ест сладости",
+          en: "A child eats breakfast",
+          de: "Ein Kind frühstückt",
+          zh: "一个孩子在吃早饭",
+          hi: "एक बच्चा नाश्ता कर रहा है",
+          es: "Un niño desayuna",
+          ar: "طفل يتناول الفطور",
+          ru: "Ребёнок завтракает",
         })
-      : t({
-          de: "Aus dem Zucker auf den Zähnen wachsen kleine Monster",
-          en: "Little monsters grow out of the sugar on the teeth",
-          zh: "牙齿上的糖长成了小怪兽",
-          hi: "दाँतों पर लगी चीनी से छोटे मॉन्स्टर बनते हैं",
-          es: "Del azúcar en los dientes crecen monstruitos",
-          ar: "من السكر على الأسنان تنمو وحوش صغيرة",
-          ru: "Из сахара на зубках вырастают маленькие монстры",
-        });
+      : part === "sweets"
+        ? t({
+            de: "Ein Kind isst Süßigkeiten",
+            en: "A child eats sweets",
+            zh: "一个孩子在吃甜食",
+            hi: "एक बच्चा मिठाई खा रहा है",
+            es: "Un niño come dulces",
+            ar: "طفل يأكل الحلوى",
+            ru: "Ребёнок ест сладости",
+          })
+        : t({
+            de: "Aus dem Zucker auf den Zähnen wachsen kleine Monster",
+            en: "Little monsters grow out of the sugar on the teeth",
+            zh: "牙齿上的糖长成了小怪兽",
+            hi: "दाँतों पर लगी चीनी से छोटे मॉन्स्टर बनते हैं",
+            es: "Del azúcar en los dientes crecen monstruitos",
+            ar: "من السكر على الأسنان تنمو وحوش صغيرة",
+            ru: "Из сахара на зубках вырастают маленькие монстры",
+          });
   // The picture is still pictures with small moving ones between them, each moving piece an HTML layer of its own
   // (Piece): the sky behind (it changes colour as the day goes by), the sun or the moon crossing it, the child, and on
   // the child its brows, pupils, cheeks, chewing mouth, the sweets and the bits they crumble into. Something animated inside an svg has the
@@ -667,16 +768,13 @@ export function Origin({
           <SkyBody daytime={daytime} arc={framing.arc} />
         </div>
 
-        <svg className="origin-picture" viewBox={viewBox} role="img" aria-label={label}>
+        <svg className="origin-picture" viewBox={viewBox} role="img" aria-label={label} style={FRAME_CLIP}>
           <defs>
-            <clipPath id="origin-frame">
-              <rect {...frame} />
-            </clipPath>
             <PyjamaPattern id="origin-pyjama" figure={figure} />
             <SkinGradient id="origin-skin" head={HEAD} />
           </defs>
 
-          <g clipPath="url(#origin-frame)">
+          <g>
             {/* Shoulders in the boy's or the girl's T-shirt, or pyjamas in the evening (`clothes.tsx`), down to the screen's bottom. */}
             <path
               d={`M20 ${Math.max(480, bottom + 20)} V440 C20 395 110 365 ${W / 2} 365 C330 365 420 395 420 440 V${Math.max(480, bottom + 20)} Z`}
@@ -793,6 +891,7 @@ export function Origin({
                 {/* Sugar crumbs: they show once the mouth opens after its sweet, and in the grow part each becomes a monster. */}
                 {CRUMBS.map((c, i) => {
                   const { x, y } = crumbAt(c);
+                  const color = CRUMB_COLORS[daytime][i];
                   return (
                     <Piece
                       key={i}
@@ -801,8 +900,8 @@ export function Origin({
                       className="origin-crumb"
                       style={{ "--crumb": `${ARRIVE_MS[c.sweet] + CHEW_MS - 200}ms`, "--grow": `${600 + i * 700}ms` } as CSSProperties}
                     >
-                      <circle cx={x - 5} cy={y + 2} r={3.8} fill={c.color} stroke={INK} strokeWidth={1.3} />
-                      <circle cx={x + 5} cy={y - 2} r={3} fill={c.color} stroke={INK} strokeWidth={1.3} />
+                      <circle cx={x - 5} cy={y + 2} r={3.8} fill={color} stroke={INK} strokeWidth={1.3} />
+                      <circle cx={x + 5} cy={y - 2} r={3} fill={color} stroke={INK} strokeWidth={1.3} />
                       <circle cx={x + 2.5} cy={y + 6} r={2.5} fill="#fff" stroke={INK} strokeWidth={1.3} />
                     </Piece>
                   );
@@ -821,9 +920,8 @@ export function Origin({
                       >
                         <g transform={`translate(${x.toFixed(1)} ${y.toFixed(1)}) scale(0.63)`}>
                           <Monster
-                            color={c.color}
+                            color={CRUMB_COLORS[daytime][i]}
                             variant={i % 3}
-                            active={false}
                             still
                             gone={false}
                             scared={false}
@@ -890,7 +988,7 @@ export function Origin({
               Its pieces lie round the picture's corner (0, 0), where the sweet is drawn and from where the keyframes
               move it: the outer one across (`-x`), the inner one up and down, so the two make the arc. */}
           {sweets &&
-            SWEETS.map((Sweet, i) => (
+            TREATS[daytime].map((Sweet, i) => (
               <Piece
                 key={i}
                 area={SWEET_AREA}
@@ -914,7 +1012,7 @@ export function Origin({
             ))}
           {/* As the teeth close on a sweet, a few bits break off it and fall past the chin. */}
           {sweets &&
-            BITS.map((bit, i) => (
+            BITS[daytime].map((bit, i) => (
               <Piece
                 key={i}
                 area={{ x: BITE.x - 8, y: BITE.y - 8, width: 16, height: 16 }}

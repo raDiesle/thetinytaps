@@ -134,3 +134,9 @@ export const stepText = (step: Step, key: keyof StepTexts, language: TargetLangu
 
 /** While the monsters arrive and when everything is clean: a big grin. */
 export const GRIN_VIEW = CLOSED_FRONT;
+
+/**
+ * Before the song (X-26): wide open from the front like a little lion roaring, the head tipped back a little, both
+ * jaws flat – the first step then only tips the lower jaw forward, the mouth already open.
+ */
+export const ROAR_VIEW: View = { open: 1, pitch: -4, yaw: 0, look: [0, 0, 100], zoom: 1.2, tilt: FLAT };

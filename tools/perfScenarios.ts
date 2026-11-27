@@ -41,6 +41,24 @@ export interface Budget {
 
 export const BUDGET: Budget = { p95: 34, stuttersPerS: 0.5, busy: 0.6, rasterScreensPerS: 30 };
 
+/**
+ * Zähne putzen: back to the start of the end's cheer, wherever the jumps before left the brushing: ← once if the end is
+ * on (its address says „ende“; → there only skips to the buttons), then → until the address says „ende“ again, one
+ * step at a time and waiting for each step's address – on the slow phone a press before the last had landed went past
+ * the cheer.
+ */
+const TO_THE_END = `(async () => {
+  const pause = (ms) => new Promise((r) => setTimeout(r, ms));
+  const press = async (key) => {
+    const was = location.search;
+    dispatchEvent(new KeyboardEvent("keydown", { key }));
+    for (let t = 0; t < 30 && location.search === was; t++) await pause(100);
+    await pause(300);
+  };
+  if (location.search.includes("ende")) await press("ArrowLeft");
+  for (let i = 0; i < 12 && !location.search.includes("ende"); i++) await press("ArrowRight");
+})()`;
+
 /** Lebendige Bilder: the items of the picture, and a finger landing on one (an `eval` step defines `tapItem` with it). */
 const TAP_ITEMS = `((window.tapItem = (el) => { const r = el.getBoundingClientRect(); el.dispatchEvent(new PointerEvent("pointerdown", { bubbles: true, clientX: r.x + r.width / 2, clientY: r.y + r.height / 2, pointerType: "touch", isPrimary: true })); }), [...document.querySelectorAll("[data-item]")])`;
 
@@ -89,14 +107,14 @@ export interface Scenario {
 }
 
 /**
- * A fixed chance from here on (`Math.random` replaced by a seeded one): Zaubertasten's surprises are drawn by chance, and
+ * A fixed chance from here on (`Math.random` replaced by a seeded one): Tippzauber's surprises are drawn by chance, and
  * which kinds came swung its smashing stretch between 58 and 70 % busy on the same code (November 2026).
  */
 const FIXED_CHANCE: Step = {
   eval: "(() => { let a = 12345; Math.random = () => { a |= 0; a = (a + 0x6d2b79f5) | 0; let t = Math.imul(a ^ (a >>> 15), 1 | a); t = (t + Math.imul(t ^ (t >>> 7), 61 | t)) ^ t; return ((t ^ (t >>> 14)) >>> 0) / 4294967296; }; })()",
 };
 
-/** Zaubertasten: a finger landing somewhere on the screen every 130 ms, for the next 10 s. */
+/** Tippzauber: a finger landing somewhere on the screen every 130 ms, for the next 10 s. */
 const SMASH = `(() => { const end = performance.now() + 10000; const id = setInterval(() => { const el = document.querySelector(".tw-play"); if (!el || performance.now() > end) return clearInterval(id); const r = el.getBoundingClientRect(); el.dispatchEvent(new PointerEvent("pointerdown", { bubbles: true, clientX: r.x + Math.random() * r.width, clientY: r.y + 60 + Math.random() * (r.height - 60), pointerType: "touch", isPrimary: true })); }, 130); })()`;
 
 /** The first card or start button of a game's start screen. */
@@ -163,6 +181,14 @@ function chainLevel(id: (typeof KETTEN_LEVELS)[number]): Scenario {
 
 export const SCENARIOS: Scenario[] = [
   {
+    // The shared tap hint waiting for a child who doesn't find what to tap: its hand presses again and again, maybe for
+    // minutes. Its shadow lay over the pressing layer, and the GPU blurred it anew in every frame (A-55). Measured on the
+    // wooden marble run's shelf before its first tap, in the hint's first stage (the hand presses, nothing darkens yet).
+    name: "tipp-hinweis",
+    path: "/kettenreaktion/track/",
+    parts: [{ label: "Hand drückt", before: [{ waitFor: ".tap-hint.stage-1" }], ms: 5000 }],
+  },
+  {
     // One stretch after the other, with no waits between them: collecting a trace already leaves seconds unmeasured
     // between two stretches, and a stretch started after a wait of its own missed the story's monsters growing, which
     // painted the whole screen 60 times a second until November 2026 (the sky's colour and the monsters swaying inside
@@ -174,11 +200,15 @@ export const SCENARIOS: Scenario[] = [
       { label: "Geschichte: Monster wachsen", ms: 5500 },
       { label: "Hinunter zum Waschbecken", ms: 6000 },
       { label: "Waschbecken", ms: 8000 },
-      { label: "Hinauf in den Spiegel, Countdown", ms: 5000 },
+      { label: "Hinauf in den Spiegel", ms: 5000 },
+      // X-26: the mouth glides wide open like a little lion's and roars, then 3, 2, 1 with it open.
+      { label: "Mund auf wie ein Löwe, Countdown", ms: 7600 },
       { label: "Putzen: Los!", ms: 6000 },
       { label: "Putzen: Monster antippen", ms: 6000, tap: { selector: ".monster-body", every: 700 } },
       { label: "Putzen: springen", ms: 12000, type: { keys: ["ArrowRight"], every: 2000 } },
-      { label: "Ende und Aufräumen", ms: 14000 },
+      // The jumps above run on into the end and skip it to the buttons, so until November 2026 this stretch measured
+      // only the still grin (X-18): it goes back to the cheer's start first and watches cheer, spitting and tidying whole.
+      { label: "Ende, Ausspucken und Aufräumen", before: [{ eval: TO_THE_END }], ms: 17500 },
     ],
   },
   {
@@ -236,7 +266,7 @@ export const SCENARIOS: Scenario[] = [
     ],
   },
   {
-    // Zaubertasten: a hand banging on the keys or the screen brings several letters, digits with their shapes and
+    // Tippzauber: a hand banging on the keys or the screen brings several letters, digits with their shapes and
     // surprises at once (up to `MAX_POPS` and five surprises), each a small layer of its own – far quicker presses than
     // in the other keyboard games, since that is how the toy is played.
     name: "zaubertasten",
@@ -336,7 +366,7 @@ export const SCENARIOS: Scenario[] = [
   // The timer's pictures in their order on its start screen, each running for a while with a tap now and then (the
   // twinkling, the flame, what is left lighting up), the moon setting and the sun rising, the pizza's slices
   // lifted off, the ladybug crawling round the red disc, the alarm clock's digits ticking, the toy crane carrying toys
-  // into the box, the crystal's beam carrying the blocks out of their jumble into the block house, the pickaxe digging the treasure tunnel block by block, the hopper climbing up to the moon catching its stars, the picture following it like a camera, in „Abwechseln“ the toy hopping onto the first cushion and the hourglass running,
+  // into the box, the crystal's beam carrying the blocks out of their jumble into the block house, the pickaxe digging the treasure tunnel block by block, the lift riding up its tower with the floors counting on its display, the tower sliding down behind it, in „Abwechseln“ the toy hopping onto the first cushion and the hourglass running,
   // on the Kugelbahn the marble rolling down its ramps, on the Rennstrecke the kart driving round the figure eight, and the marbles bouncing down the pegboard into the jar. Each card is tapped by its name (its
   // tooltip), so the cards' order and groups may change.
   ...(
@@ -346,7 +376,7 @@ export const SCENARIOS: Scenario[] = [
       ["apfelbaum", "Apfelbaum"],
       ["wecker", "Wecker"],
       ["blume", "Blume"],
-      ["mond", "Hoch bis zum Mond"],
+      ["aufzug", "Mit dem Aufzug nach oben"],
       ["pizza", "Pizza"],
       ["kerze", "Kerze"],
       // Tidy Up was written English first; the German app names their cards in German since they were translated.
