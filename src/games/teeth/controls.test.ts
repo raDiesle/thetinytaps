@@ -1,4 +1,5 @@
 import { expect, test } from "bun:test";
+import { readFileSync } from "node:fs";
 
 // Zähne putzen shows no words on its picture and draws its controls (user feedback, November 2026, see CLAUDE.md):
 // no headings or hints came back, and the pause button has no emoji.
@@ -24,11 +25,11 @@ test("the progress bar shows the time before the brushing as its first part", ()
 test("the progress bar marks eating, getting the brush, brushing and putting the brush away apart", () => {
   expect(play).toContain('const PHASE_SYMBOL: Record<BarPhase, TeethSymbol | null> = { eat: "bonbon", fetch: "zahnpasta", ready: null, tidy: "becher" };');
   expect(play).toMatch(/<div className="teeth-brushing">\s*<div className="teeth-lane teeth-track">\s*\{STEPS\.map/);
-  expect(play).toContain('<PhaseTile phase="tidy"');
+  expect(play).toContain('{tidy && <PhaseTile phase="tidy"');
   expect(play).toContain('ending === "rest" ? (');
   // The putting away is a section of the bar too: a tap on it starts the cheer and the tidying.
-  expect(play).toContain("const segments: [number, number][] = [...tileParts, ...stepParts, tidyPart];");
-  expect(play).toContain("introMs + totalMs + ENDING_MS - 1");
+  expect(play).toContain("const segments: [number, number][] = [...tileParts, ...stepParts, ...(tidy ? [tidyPart] : [])];");
+  expect(play).toContain("introMs + totalMs + endingMs - 1");
   expect(css).toMatch(/\.teeth-brushing \{[^}]*background: #dff3e7;/);
 });
 
@@ -90,4 +91,18 @@ test("the end's week, trophy and „Menü“ lie on a sheet sized by its own wid
 test("the week chart shows only at the end, never before the brushing", () => {
   expect(play.match(/<Week\b/g)?.length).toBe(1);
   expect(play).toMatch(/<div className="teeth-end">\s*\{settings\.week && <Week/);
+});
+
+// Which phases are shown is chosen behind ⚙️ on the strip itself, beside the progress bar (user request, November 2026),
+// kept for every brushing: the story, getting the brush and putting it away can each be left out, the brushing to the
+// song never – its row is locked on, and nothing in TeethPlay reads a setting to skip a step.
+test("the phases are chosen behind ⚙️ on the strip, the brushing always stays", () => {
+  const game = readFileSync("src/games/teeth/TeethGame.tsx", "utf8");
+  expect(play).toMatch(/<PlayOptions inline=\{\{ button: "teeth-button teeth-options"/);
+  expect(game).not.toContain("PlayOptions");
+  for (const key of ["origin", "prep", "tidy"]) expect(game).toContain(`checked={settings.${key}}`);
+  expect(game).toMatch(/<Toggle\s+icon=\{<PhaseIcon name="zahn" \/>\}[\s\S]*?checked\s+locked/);
+  expect(play).not.toMatch(/settings\.\w+[^;]*STEPS|STEPS[^;]*settings\./);
+  // Held, so a child's tap on the strip opens nothing.
+  expect(readFileSync("src/components/PlayOptions.tsx", "utf8")).toMatch(/if \(inline\)[\s\S]*className=\{`hold-exit /);
 });

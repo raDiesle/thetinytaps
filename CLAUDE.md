@@ -721,7 +721,8 @@ A game may give it before its end where reaching the goal once is enough (Ketten
 - No menu level more than needed: a book with one game opens that game directly (`categoryHref`, checked
   in `content.test.ts`); and variants of one way to play (which words, how long, whole word or first letter) are
   choices in the always visible row above the cards (`level`), not cards or a menu of their own – or, in a game that
-  plays at once, options while playing behind ⚙️ held in the top right corner (`PlayOptions`, Buchstaben & Zahlen; always held, whatever ✕ needs),
+  plays at once, options while playing behind ⚙️ held in the top right corner (`PlayOptions`, Buchstaben & Zahlen; always held, whatever ✕ needs; only where
+  the options choose what a game's own strip of controls shows, the held ⚙️ sits on that strip, `PlayOptions inline`, as Zähne putzen's phases),
   never a tap a child could make by chance. But ways to play that are each a game of their own – something else to do,
   not the same game easier or with other words – are games of their own in the book's table of contents, never one
   game's choice behind ⚙️ (Frei tippen, Zählen and Wörter tippen were one game's „Spielart“ and „Nur Zahlen“, and were

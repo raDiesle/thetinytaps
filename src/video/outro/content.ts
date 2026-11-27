@@ -165,7 +165,8 @@ export interface PinnedPhoto {
  * The photos pinned to the cork board, in the order they are pinned (user request, 27 November 2026: the pictures one
  * after another went by too fast to take in, so all of them hang together on one board). The first five fill the top
  * row, the next two stand left and right of the address, the last five fill the bottom row (`PIN_SLOTS`). The same
- * pictures as `GALLERY`'s, so none has words in it; the word on its frame is the video's own, in its language.
+ * pictures as `GALLERY`'s, so none has words in it; the word on its frame is the video's own, in its language. The
+ * user chose these twelve (27 November 2026): swap one only when they ask.
  */
 export const PINBOARD: readonly PinnedPhoto[] = [
   GALLERY.helpers[0]!,
