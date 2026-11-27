@@ -373,16 +373,26 @@ test("the carved words are set plainly and lie wholly in the light", () => {
 // The ring calendar ends the everyday helpers' board (user request, 27 November 2026): it grows up to the right wall
 // instead of leaving that room to books only filling the shelf (`endsFor`'s `fills`, `--grow`), turns its face to the
 // left, into the room, and shows a star in a round field on each picture's top edge, half above and half on it.
-test("the ring calendar fills its board up to the right wall, faces left and shows a star on each picture", () => {
+test("the ring calendar stands at the right wall turned left, its stand touching the wall, its name on top and a small star at each picture's foot", () => {
   const css = readFileSync(new URL("../styles/bookshelf-books.css", import.meta.url), "utf8");
   const tsx = readFileSync(new URL("../components/Bookshelf.tsx", import.meta.url), "utf8");
   const rule = (selector: string) => css.match(new RegExp(`\\n${selector.replace(/[.>]/g, "\\$&")} \\{([^}]*)\\}`))?.[1] ?? "";
   const [, turn] = rule(".shelf-calendar").match(/--turn: (-?[\d.]+)deg/) ?? [];
-  expect(Number(turn)).toBeLessThan(0);
+  expect(Number(turn)).toBeLessThanOrEqual(-30);
   expect(rule(".shelf-calendar")).toContain("flex: var(--spines) 1 var(--grow, 0px)");
+  // Not as wide as the board: capped by its height, then pushed to the right wall, with the room before the wall
+  // measured in the page so the stand touches the wall and the front page stays clear of the post.
+  expect(rule(".shelf-calendar")).toContain("max-width:");
+  expect(rule(".shelf-calendar")).toContain("margin-left: auto");
+  expect(rule(".shelf-calendar")).toContain("var(--wall-room");
+  expect(tsx).toContain('calendar.style.setProperty("--wall-room"');
+  expect(tsx).toMatch(/className="shelf-calendar-title">\{t\(CALENDAR_TITLE\)\}<\/span>\s*<CalendarGear \/>/);
+  expect(rule(".shelf-calendar-label")).toContain("bottom:");
+  expect(rule(".shelf-calendar-label")).toContain("left:");
   for (const box of [".shelf-daily-row", ".shelf-daily-books"]) expect(rule(box)).toContain("var(--grow, 0px)");
   expect(tsx).toMatch(/\{!ends\.fills && \(\s*<span className="shelf-end">/);
   expect(tsx).toMatch(/<img src=\{pictures\[`kalender-\$\{card\}\.webp`\]\}[^>]*\/>\s*<CalendarStar \/>/);
   expect(rule(".shelf-calendar-star")).toContain("transform: translate(-50%, -50%)");
-  expect(rule(".shelf-calendar-star")).toContain("top: 0");
+  expect(rule(".shelf-calendar-star")).toContain("top: 100%");
+  expect(rule(".shelf-calendar-star")).toContain("left: 50%");
 });
