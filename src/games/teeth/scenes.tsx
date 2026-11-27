@@ -5,13 +5,16 @@ import { useEffect, useLayoutEffect, useRef, useState, type ReactNode } from "re
 // the sink again to put the brush away.
 // The old picture stays (still playing) while it slides out and the new one slides in, so there is never a cut.
 
-/** Which picture is on: the story's face, the sink, the mirror, or the mirror's view of the child spitting over the basin. */
-export type SceneKind = "story" | "sink" | "mirror" | "spit";
+/**
+ * Which picture is on: the story's face, the sink, the mirror, the child roaring like a lion beside a lion, or the
+ * mirror's view of the child spitting over the basin.
+ */
+export type SceneKind = "story" | "sink" | "mirror" | "lion" | "spit";
 
 /** How long the camera takes from one picture to the next: two beats of the song (112 BPM). */
 export const SCENE_MS = 1072;
 
-/** Where the camera goes: down to the sink or to the basin the child spits into, up from the sink, or (story to mirror, a new round) a soft fade. */
+/** Where the camera goes: down to the sink or to the basin the child spits into, up from the sink, or (story to mirror, into the lion's step and back, a new round) a soft fade. */
 const wayTo = (from: SceneKind, to: SceneKind) => (to === "sink" || to === "spit" ? "down" : from === "sink" ? "up" : "fade");
 
 /** A picture still sliding out. */

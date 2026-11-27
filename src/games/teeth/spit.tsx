@@ -3,18 +3,18 @@ import { useFigure } from "@/lib/common";
 import type { Daytime } from "@/lib/days";
 import { useT } from "@/lib/language";
 import { playSpit } from "@/lib/sfx";
-import { clothesOf, PyjamaPattern, topFill } from "./clothes";
 import type { Cue } from "./cues";
-import { BROW, Ear, EyeBall, EyeLid, eyeOpening, FACE, HAIR, Hair, type HeadMap, INK, Iris, LASHES, LIP, Nose, SkinGradient } from "./face";
+import { INK, LIP } from "./face";
 import { fitBox, FrameStroke, screenFrame, useRoom, type Box } from "./mouth";
-import { BROWS, CHEEK, CHEEKS, CLOSED_AREA, ClosedMouth, HEAD } from "./origin";
+import { CLOSED_AREA, ClosedMouth, HEAD } from "./origin";
 import { Piece, pictureSpace } from "./piece";
+import { StoryHead, StoryShoulders } from "./storyChild";
 
 // Idea X-18: after the cheer and before the brush is rinsed, the child spits the foam out – and only spits: no cup of
 // water to rinse the mouth, so the fluoride stays on the teeth. The mirror shows the child leaning over the basin, its
 // lips pursed, a dab of foam dropping into the basin with a soft „ptü“. Two bars, no words on the picture.
 //
-// The child is the story's child, drawn with the same parts in the same place (`origin.tsx`, `face.tsx`); the basin
+// The child is the story's child, drawn with the same parts in the same place (`StoryHead` of storyChild.tsx); the basin
 // lies in front of it at the bottom. As everywhere in this game the picture is still and every moving thing an HTML
 // layer of its own (`Piece`): the child leaning (one layer with its lips on it), and the dab of foam falling into the
 // basin. The foam shows only as that dab, never on the lips (the mirror keeps it between lips and teeth, `foam.ts`). Its keyframes are `teeth-spit-…` in teeth.css, as long as SPIT_MS.
@@ -47,13 +47,8 @@ const BLOB: Box = { x: LIPS.x - 15, y: LIPS.y + LEAN - 10, width: 30, height: 30
 /** How far the dab drops from the lips into the bowl, in picture units (`teeth-spit-blob`'s last keyframes). */
 export const FALL = LANDS_AT - (BLOB.y + BLOB.height);
 
-/** A point of the head (head units round its middle, `face.tsx`) in this picture: the story's head, standing straight. */
-const onHead: HeadMap = (x, y) => ({ x: HEAD.x + x, y: HEAD.y + y });
-/** The eyes' middles. */
-const EYES = ([-1, 1] as const).map((s) => ({ s, x: HEAD.x + s * FACE.eyes.x, y: HEAD.y + FACE.eyes.y }));
 /** Where the irises look: down into the basin. */
 const LOOK_DOWN = 9;
-const OPENING = eyeOpening(FACE.eyes.rx, FACE.eyes.ry);
 
 /** Pursed lips, pushed forward round a small opening: the shape a child makes to spit. */
 function Pucker() {
@@ -86,7 +81,6 @@ export function Spit({ daytime, free }: { daytime: Daytime; free: RefObject<HTML
   const viewBox = `${box.x.toFixed(1)} ${box.y.toFixed(1)} ${box.width.toFixed(1)} ${box.height.toFixed(1)}`;
   const space = pictureSpace(box, unit);
   const figure = useFigure();
-  const girl = figure === "girl";
   const label = t({
     en: "The child leans over the sink and spits out the foam",
     de: "Das Kind beugt sich über das Waschbecken und spuckt den Schaum aus",
@@ -127,80 +121,9 @@ export function Spit({ daytime, free }: { daytime: Daytime; free: RefObject<HTML
             </>
           }
         >
-          <defs>
-            <PyjamaPattern id="spit-pyjama" figure={figure} />
-            <SkinGradient id="spit-skin" head={HEAD} />
-            <radialGradient id="spit-cheek">
-              <stop offset="0" stopColor="#ff7f99" stopOpacity={0.7} />
-              <stop offset="0.6" stopColor="#ff8fab" stopOpacity={0.45} />
-              <stop offset="1" stopColor="#ff8fab" stopOpacity={0} />
-            </radialGradient>
-            {EYES.map(({ s, x, y }) => (
-              <clipPath key={s} id={`spit-eye-${s}`}>
-                <ellipse cx={x} cy={y} rx={OPENING.rx} ry={OPENING.ry} />
-              </clipPath>
-            ))}
-          </defs>
-          {/* Shoulders in the boy's or the girl's T-shirt, or pyjamas in the evening, going down behind the counter. */}
-          <path
-            d={`M20 ${COUNTER + 40} V440 C20 395 110 365 ${HEAD.x} 365 C330 365 420 395 420 440 V${COUNTER + 40} Z`}
-            fill={topFill(figure, daytime, "spit-pyjama")}
-            stroke={INK}
-            strokeWidth={5}
-          />
-          {girl &&
-            ([-1, 1] as const).map((s) => {
-              const tail = onHead(s * FACE.pigtails.x, FACE.pigtails.y);
-              return (
-                <ellipse
-                  key={s}
-                  cx={tail.x}
-                  cy={tail.y}
-                  rx={FACE.pigtails.rx}
-                  ry={FACE.pigtails.ry}
-                  transform={`rotate(${s * -35} ${tail.x} ${tail.y})`}
-                  fill={HAIR}
-                  stroke={INK}
-                  strokeWidth={5}
-                />
-              );
-            })}
-          {([-1, 1] as const).map((s) => {
-            const ear = onHead(s * FACE.ears.x, FACE.ears.y);
-            return <Ear key={s} x={ear.x} y={ear.y} r={FACE.ears.r} side={s} />;
-          })}
-          <circle cx={HEAD.x} cy={HEAD.y} r={HEAD.r} fill="url(#spit-skin)" stroke={INK} strokeWidth={5} />
-          <Hair at={onHead} />
-          {girl &&
-            ([-1, 1] as const).map((s) => {
-              const band = onHead(s * FACE.bands.x, FACE.bands.y);
-              return <circle key={s} cx={band.x} cy={band.y} r={FACE.bands.r} fill={clothesOf(figure).band} stroke={INK} strokeWidth={4} />;
-            })}
-          {/* The eyes look down into the basin; the irises stay inside the eyes' whites. */}
-          {EYES.map(({ s, x, y }) => (
-            <g key={s}>
-              {girl && (
-                <path
-                  d={LASHES.map(([x1, y1, x2, y2]) => `M${x + s * x1} ${y + y1} L${x + s * x2} ${y + y2}`).join(" ")}
-                  stroke={INK}
-                  strokeWidth={4}
-                  strokeLinecap="round"
-                />
-              )}
-              <EyeBall x={x} y={y} rx={FACE.eyes.rx} ry={FACE.eyes.ry} />
-              <g clipPath={`url(#spit-eye-${s})`}>
-                <Iris x={x} y={y + LOOK_DOWN} r={FACE.eyes.iris} />
-              </g>
-              <EyeLid x={x} y={y} rx={FACE.eyes.rx} ry={FACE.eyes.ry} />
-            </g>
-          ))}
-          {BROWS.map((brow) => (
-            <path key={brow.side} d={brow.d} fill="none" stroke={BROW} strokeWidth={6} strokeLinecap="round" />
-          ))}
-          <Nose x={HEAD.x} y={HEAD.y + FACE.nose.y} r={FACE.nose.r} />
-          {CHEEKS.map((cx) => (
-            <ellipse key={cx} cx={cx} cy={CHEEK.y} rx={CHEEK.rx} ry={CHEEK.ry} fill="url(#spit-cheek)" />
-          ))}
+          {/* Shoulders going down behind the counter, and the head with its eyes looking down into the basin. */}
+          <StoryShoulders id="spit" figure={figure} daytime={daytime} bottom={COUNTER + 40} />
+          <StoryHead id="spit" figure={figure} look={LOOK_DOWN} />
         </Piece>
       </div>
 

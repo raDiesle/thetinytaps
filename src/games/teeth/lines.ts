@@ -5,10 +5,11 @@ import type { EnglishFirst, Localized, Texts } from "@/lib/language";
 // recordings (src/content/recordedLines.ts) reads it without loading the game's drawings.
 
 /**
- * Before the clock starts: where the monsters come from, get the brush, toothpaste on, see them in the mirror, and open
- * wide like a little lion (X-26), so the mouth is open before the song begins.
+ * Before the clock starts: where the monsters come from, get the brush, toothpaste on, see them in the mirror, roar like
+ * a lion beside a lion (X-26, a step of its own), and back in the mirror with the mouth still wide open, so it is open
+ * before the song begins.
  */
-export type Prelude = "sweets" | "grow" | "brush" | "paste" | "monsters" | "roar";
+export type Prelude = "sweets" | "grow" | "brush" | "paste" | "monsters" | "lion" | "roar";
 
 /**
  * What each part before the clock is called (on the progress bar) and what the voice says in it; its timing and sounds
@@ -106,8 +107,20 @@ export const PRELUDE_TEXTS: Record<Prelude, { title: Texts; cue?: Localized }> =
       ru: "Ой-ой, вот они! Давай прогоним их щёткой!",
     },
   },
-  // The child in the mirror opens wide and roars softly, and the child in front of it does the same (X-26, written
-  // English first): no voice tells it, the picture and the roar do.
+  // The child roars like a lion, gets a lion costume's mane, and a lion beside it roars along (X-26, written English
+  // first): no voice tells it, the picture and the roars do.
+  lion: {
+    title: {
+      en: "🦁 Roar like a lion",
+      de: "🦁 Brüllen wie ein Löwe",
+      zh: "🦁 像狮子一样吼",
+      hi: "🦁 शेर की तरह दहाड़ें",
+      es: "🦁 Rugir como un león",
+      ar: "🦁 نزأر مثل الأسد",
+      ru: "🦁 Рычим, как лев",
+    },
+  },
+  // Back in the mirror the mouth is still wide open for 3, 2, 1, and the child in front of it keeps it open too.
   roar: {
     title: {
       en: "🦁 Open wide like a lion",

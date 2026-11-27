@@ -25,7 +25,12 @@ function onlyOnPieces(classes: Set<string>, code: string) {
   expect(classes.size).toBeGreaterThan(5);
   for (const name of classes) {
     // Every element that carries the class: the tag it is written on.
-    const tags = [...code.matchAll(new RegExp(`<(\\w+)\\b[^<>]*?className=[^>]*?\\b${name}\\b`, "g"))].map((m) => m[1]);
+    // A class built from a template (`prep-brush-${side}`) counts by the part before its last dash.
+    const built = name.slice(0, name.lastIndexOf("-") + 1);
+    const tags = [
+      ...code.matchAll(new RegExp(`<(\\w+)\\b[^<>]*?className=[^>]*?\\b${name}\\b`, "g")),
+      ...code.matchAll(new RegExp(`<(\\w+)\\b[^<>]*?className=\\{\`${built}\\$\\{\\w+\\}\`\\}`, "g")),
+    ].map((m) => m[1]);
     expect({ name, found: tags.length > 0 }).toEqual({ name, found: true });
     for (const tag of tags) expect({ name, tag }).toEqual({ name, tag: "Piece" });
   }
@@ -130,9 +135,7 @@ test("a brushed monster dissolves without a sound of its own", async () => {
     // The countdown before the brushing.
     "playCountNote",
     "playDrumRoll",
-    // The mouth opening wide like a little lion's before the song (X-26), till its recording comes.
-    "playLittleRoar",
-    // The end's cheer, and the little lion's roar once it is recorded.
+    // The end's cheer (the lion's step plays its roars itself, lion.tsx).
     "playRecorded",
     // A monster the child taps giggles.
     "playSqueak",

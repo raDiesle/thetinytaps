@@ -139,7 +139,7 @@ export const teethIdeas: IdeaArea = {
       effort: "S",
       done: true,
       partial:
-        "Gebaut: ein eigener Vorspielteil „Mund auf wie ein Löwe“ zwischen den Monstern im Spiegel und 3, 2, 1 – der Mund gleitet von vorn weit auf (Pfeile auf den Lippen), nach einem Schlag ein leises Brüllen, offen durch den Countdown bis in den ersten Schritt. Das Brüllen ist bis zur Aufnahme synthetisiert; die echte Aufnahme wartet in der Geräusche-Liste für Claude Cloud.",
+        "Gebaut: zuerst als Mund, der im Spiegel aufgeht und leise brüllt; dann (Wunsch des Nutzers, November 2026) ein eigener Schritt „Brüllen wie ein Löwe“ vor dem Spiegel: das Gesicht des Kindes groß, der Mund weit auf, es brüllt; dann bekommt es eine Löwenmähne als Kostüm, ein Löwe (vorerst SVG, später vielleicht ein Gemini-Bild) kommt daneben und beide brüllen gleichzeitig. Danach zeigt der Spiegel den Mund schon offen durch 3, 2, 1 bis in den ersten Schritt. Das Brüllen des Kindes ist bis zur Aufnahme synthetisiert; die echte Aufnahme wartet in der Geräusche-Liste für Claude Cloud.",
     },
     {
       id: "X-27",

@@ -35,13 +35,13 @@ export const SOUND_QUEUE: QueuedSound[] = [
   {
     id: "littleroar",
     file: "src/lib/sounds/littleroar.mp3",
-    use: "Zähne putzen (X-26): vor dem ersten Vers reißt das Kind im Spiegel den Mund weit auf und brüllt einmal leise wie ein kleiner Löwe – ein Kind, kein echter Löwe. Bis die Aufnahme kommt, spielt ein synthetisches „Rooaah“ (playLittleRoar).",
+    use: "Zähne putzen (X-26): im Schritt „Brüllen wie ein Löwe“ reißt das Kind den Mund weit auf und brüllt wie ein kleiner Löwe, erst allein, dann zusammen mit einem Löwen, der neben ihm brüllt – ein Kind, kein echter Löwe (der Löwe ist roar.mp3). Bis die Aufnahme kommt, spielt ein synthetisches „Rooaah“ (playLittleRoar).",
     prompt:
       "A small child playfully roaring like a little lion, one soft and cute 'rooaah' that opens from a short growl into a long 'aah', happy and gentle, not scary, close up, clean recording, no background noise",
     seconds: 2,
     influence: 0.7,
     after:
-      "Cut to the roar alone (about 1.2–1.8 s, it starts on the third beat of the lion's two bars, ROAR_AT in src/games/teeth/TeethPlay.tsx, and must have rung out before 3, 2, 1 begins at 4.3 s), bring it to about −20 LUFS – a soft roar, a little under the other sounds – and add its row under „Made with ElevenLabs“ in src/lib/sounds/README.md. TeethPlay already plays and preloads it by its name (LITTLE_ROAR); listen to it at /zaehne/ (jump to the first look in the mirror) and say in src/games/teeth/CLAUDE.md that the roar is a recording now.",
+      "Cut to the roar alone (about 1.2–1.8 s: it plays on beat 3 of the lion's step alone and on beat 11 together with the lion's roar.mp3, LION_CUES in src/games/teeth/lion.tsx, and must have rung out before the next roar), bring it to about −20 LUFS – a soft roar, a little under the lion's – and add its row under „Made with ElevenLabs“ in src/lib/sounds/README.md. lion.tsx already plays and preloads it by its name (LITTLE_ROAR); listen to it at /zaehne/ (jump on the bar to „Brüllen wie ein Löwe“), check that child and lion are both heard together, and say in src/games/teeth/CLAUDE.md that the child's roar is a recording now.",
     date: "2026-11-27",
   },
 ];

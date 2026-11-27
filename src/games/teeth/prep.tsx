@@ -11,7 +11,7 @@ import { Piece, pictureSpace } from "./piece";
 
 // Before brushing, at the sink: the toothbrush wiggles in its cup until a
 // hand takes it out, then the tube comes over and squeezes a little striped dab of
-// toothpaste onto the bristles and lies down again. All of it is CSS
+// toothpaste onto the bristles and stands on its cap again. All of it is CSS
 // animation (teeth.css); the sounds (PREP_CUES) go by the brushing clock.
 // After brushing the same sink again: the brush is rinsed under the tap and
 // goes back into its cup. Through the window the sun comes up in the morning;
@@ -25,7 +25,7 @@ export type PrepPart = "brush" | "paste" | "tidy";
 
 const SINK = 300;
 /** The part of the sink that always shows: window, cup, tube and the bowl; the rest of the screen shows more wall and sink. */
-const FOCUS: Box = { x: 30, y: 24, width: 390, height: 356 };
+const FOCUS: Box = { x: 20, y: 24, width: 400, height: 356 };
 const WINDOW = { x: 176, y: 34, width: 112, height: 112 };
 
 /** How long each part lasts, as long as its animation in teeth.css. */
@@ -176,11 +176,15 @@ function OpenHand({ daytime }: { daytime: Daytime }) {
   );
 }
 
-/** Lying with the nozzle at the origin pointing down and the body going up to the crimped end. */
+/**
+ * Standing on its wide flip-top cap at the origin, the body going up to the crimped end: it rests on the counter on
+ * that cap, so nothing of it hangs in the air (lying on its side the cap end floated, user feedback, November 2026).
+ */
 function Tube() {
   return (
     <g stroke={INK} strokeWidth={4} strokeLinejoin="round">
-      <rect x={-7} y={-12} width={14} height={14} rx={3} fill="#fff" />
+      <rect x={-16} y={-14} width={32} height={16} rx={4} fill="#ff8fab" />
+      <path d="M-14 -7 H14" stroke="#d94f74" strokeWidth={2} />
       <path d="M-16 -12 L16 -12 L20 -26 L-20 -26 Z" fill="#fff" />
       <path d="M-20 -26 C-26 -60 -31 -108 -33 -136 L33 -136 C31 -108 26 -60 20 -26 Z" fill="#fff" />
       <path d="M8 -30 C12 -60 16 -100 18 -130 L28 -130 C26 -100 22 -60 17 -30 Z" fill="#e3f3ff" stroke="none" />
@@ -392,8 +396,14 @@ const BRUSH_AREA: Box = { x: -46, y: -46, width: 236, height: 72 };
 const FIST_AREA: Box = { x: -64, y: -52, width: 128, height: 704 };
 /** Where the hand holds the handle, in the toothbrush's coordinates: the wrist turns round it. */
 const WRIST = { x: 118, y: 12 };
-/** The tube's layer, in its own coordinates (the nozzle at the origin). */
+/** The tube's layer, in its own coordinates (the cap's bottom at the origin). */
 const TUBE_AREA: Box = { x: -40, y: -156, width: 80, height: 160 };
+/**
+ * Where the tube stands on the counter, left of the basin and clear of the brush held up for its toothpaste: the
+ * bottom of its cap (2 units under its origin) on the counter's top (`SINK`). `.prep-tube` and `tube-over` in teeth.css
+ * start and end there (`sink.test.ts`).
+ */
+export const TUBE_REST = { x: 60, y: SINK - 2 };
 const ORIGIN = { x: 0, y: 0 };
 /** Points as empty boxes, for pieces placed inside a piece that has no size. */
 const WRIST_BOX: Box = { ...WRIST, width: 0, height: 0 };
@@ -401,8 +411,8 @@ const ORIGIN_BOX: Box = { ...ORIGIN, width: 0, height: 0 };
 
 /**
  * The brush's moves (out of its cup, over to the tube, under the tap and back) and its bob while it waits, for what
- * goes with it. The brush lies behind the glass and the hand in front of it, so each has its own, moved alike by the
- * same keyframes from the same moment.
+ * goes with it. The hand lies in front of the glass, and the brush behind it only while it stands in the cup, so each
+ * has its own, moved alike by the same keyframes from the same moment.
  */
 function BrushMoves({ children }: { children: ReactNode }) {
   return (
@@ -411,6 +421,39 @@ function BrushMoves({ children }: { children: ReactNode }) {
       pivot={ORIGIN}
       className="prep-brush"
       over={<Piece area={BRUSH_AREA} within={BRUSH_AREA} className="prep-brush-bob" over={children} />}
+    />
+  );
+}
+
+/**
+ * The brush with its toothpaste or its foam, drawn twice: behind the cup's glass (`back`), shown only while it stands in
+ * the cup, and in front of it (with the hand), shown from the moment it is lifted out above the rim until it goes back
+ * in (`.prep-brush-back`, `.prep-brush-front` in teeth.css) – the glass never lies over a brush held outside it (user
+ * feedback, November 2026: the handle went behind the glass while the toothpaste went on).
+ */
+function BrushDrawing({ part, side }: { part: PrepPart; side: "back" | "front" }) {
+  return (
+    <Piece
+      area={BRUSH_AREA}
+      within={BRUSH_AREA}
+      className={`prep-brush-${side}`}
+      over={
+        <>
+          <Piece area={BRUSH_AREA} within={BRUSH_AREA} className="prep-still">
+            <Toothbrush />
+          </Piece>
+          {part === "paste" && (
+            <Piece area={{ x: -21, y: -31, width: 29, height: 20 }} within={BRUSH_AREA} className="prep-paste">
+              <Paste />
+            </Piece>
+          )}
+          {part === "tidy" && (
+            <Piece area={{ x: -46, y: -46, width: 80, height: 36 }} within={BRUSH_AREA} className="prep-foam">
+              <Foam />
+            </Piece>
+          )}
+        </>
+      }
     />
   );
 }
@@ -507,8 +550,8 @@ export function Prep({ part, daytime, free }: { part: PrepPart; daytime: Daytime
           <path d={`M${box.x} ${SINK + 9} H${box.x + box.width}`} stroke="#e3f1fa" strokeWidth={6} />
           <Basin />
           <Tap />
-          {/* Shadows of the tube and the cup on the counter. */}
-          <ellipse cx={114} cy={SINK + 3} rx={78} ry={6} fill={INK} opacity={0.1} />
+          {/* Shadows of the tube standing on its cap and of the cup on the counter. */}
+          <ellipse cx={TUBE_REST.x} cy={SINK + 2} rx={24} ry={5} fill={INK} opacity={0.1} />
           <ellipse cx={356} cy={SINK + 1} rx={38} ry={6} fill={INK} opacity={0.12} />
           {/* The cup's inside, behind the brush, and the far edge of its rim. */}
           <path d={CUP} fill="#cfe9ff" />
@@ -547,21 +590,9 @@ export function Prep({ part, daytime, free }: { part: PrepPart; daytime: Daytime
           }
         />
 
-        {/* The brush (with its toothpaste or foam) behind the glass, so it stands in it. */}
+        {/* The brush (with its toothpaste or foam) behind the glass while it stands in it. */}
         <BrushMoves>
-          <Piece area={BRUSH_AREA} within={BRUSH_AREA} className="prep-still">
-            <Toothbrush />
-          </Piece>
-          {part === "paste" && (
-            <Piece area={{ x: -21, y: -31, width: 29, height: 20 }} within={BRUSH_AREA} className="prep-paste">
-              <Paste />
-            </Piece>
-          )}
-          {part === "tidy" && (
-            <Piece area={{ x: -46, y: -46, width: 80, height: 36 }} within={BRUSH_AREA} className="prep-foam">
-              <Foam />
-            </Piece>
-          )}
+          <BrushDrawing part={part} side="back" />
         </BrushMoves>
 
         <Piece area={{ x: 312, y: 206, width: 88, height: 98 }} className="prep-still">
@@ -572,8 +603,9 @@ export function Prep({ part, daytime, free }: { part: PrepPart; daytime: Daytime
 
         {/* The hand holding it, in front of the glass (the child's arm comes from in front of the sink): the same moves
             as the brush, so it holds the handle wherever the brush goes. Turned against the brush, so the arm always
-            comes up from below, also while the brush stands in its cup. */}
+            comes up from below, also while the brush stands in its cup. Under the hand, the brush once it is out of the cup. */}
         <BrushMoves>
+          <BrushDrawing part={part} side="front" />
           <Piece
             area={WRIST_BOX}
             within={BRUSH_AREA}

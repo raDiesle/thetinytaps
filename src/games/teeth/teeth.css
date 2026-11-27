@@ -1513,7 +1513,79 @@
 }
 
 .prep.at-paste .prep-brush {
-  transform: translate(120px, 195px) scale(1.2);
+  transform: translate(150px, 190px) scale(1.2);
+}
+
+/* The brush is drawn twice (BrushDrawing in prep.tsx): behind the cup's glass only while it stands in the cup, in front
+   of it from the moment it is lifted out above the rim (grab-brush's 62 %, (340px, 20px)) until it is back over the cup
+   (tidy-brush's 62.5 %) – the glass never lies over a brush held outside it (user feedback, November 2026). */
+.prep-brush-front,
+.prep.at-paste .prep-brush-back {
+  opacity: 0;
+}
+
+.prep.at-paste .prep-brush-front {
+  opacity: 1;
+}
+
+.prep.at-brush .prep-brush-back {
+  animation: teeth-prep-brush-out-back 4.5s linear forwards;
+}
+
+.prep.at-brush .prep-brush-front {
+  animation: teeth-prep-brush-out-front 4.5s linear forwards;
+}
+
+@keyframes teeth-prep-brush-out-back {
+  0%,
+  62% {
+    opacity: 1;
+  }
+  62.1%,
+  100% {
+    opacity: 0;
+  }
+}
+
+@keyframes teeth-prep-brush-out-front {
+  0%,
+  62% {
+    opacity: 0;
+  }
+  62.1%,
+  100% {
+    opacity: 1;
+  }
+}
+
+.prep.at-tidy .prep-brush-back {
+  animation: teeth-prep-brush-in-back 8.57s linear forwards;
+}
+
+.prep.at-tidy .prep-brush-front {
+  animation: teeth-prep-brush-in-front 8.57s linear forwards;
+}
+
+@keyframes teeth-prep-brush-in-back {
+  0%,
+  62.5% {
+    opacity: 0;
+  }
+  62.6%,
+  100% {
+    opacity: 1;
+  }
+}
+
+@keyframes teeth-prep-brush-in-front {
+  0%,
+  62.5% {
+    opacity: 1;
+  }
+  62.6%,
+  100% {
+    opacity: 0;
+  }
 }
 
 @keyframes grab-brush {
@@ -1538,7 +1610,7 @@
   }
   85%,
   100% {
-    transform: translate(120px, 195px) rotate(0deg) scale(1.2);
+    transform: translate(150px, 190px) rotate(0deg) scale(1.2);
   }
 }
 
@@ -1676,36 +1748,39 @@
   animation: bob 2s ease-in-out 5.5s infinite;
 }
 
+/* The tube stands on its cap on the counter (TUBE_REST in prep.tsx), never lying with its cap end in the air (user
+   feedback, November 2026). */
 .prep-tube {
-  transform: translate(190px, 266px) rotate(-90deg);
+  transform: translate(60px, 298px) rotate(0deg);
 }
 
 .prep.at-paste .prep-tube {
   animation: tube-over 5.5s ease-in-out forwards;
 }
 
-/* Over to the middle of the bristles, a short squeeze for a pea-sized dab, lift off, lie down again. */
+/* Up from the counter over to the middle of the bristles, a short squeeze for a pea-sized dab, lift off, and back
+   down onto its cap. */
 @keyframes tube-over {
   0%,
   6% {
-    transform: translate(190px, 266px) rotate(-90deg);
+    transform: translate(60px, 298px) rotate(0deg);
   }
   26% {
-    transform: translate(106px, 146px) rotate(35deg);
+    transform: translate(136px, 141px) rotate(35deg);
   }
   30% {
-    transform: translate(108px, 150px) rotate(35deg);
+    transform: translate(138px, 145px) rotate(35deg);
     animation-timing-function: linear;
   }
   46% {
-    transform: translate(112px, 150px) rotate(35deg);
+    transform: translate(142px, 145px) rotate(35deg);
   }
   58% {
-    transform: translate(124px, 118px) rotate(28deg);
+    transform: translate(154px, 113px) rotate(28deg);
   }
   82%,
   100% {
-    transform: translate(190px, 266px) rotate(-90deg);
+    transform: translate(60px, 298px) rotate(0deg);
   }
 }
 
@@ -1769,7 +1844,7 @@
 
 @keyframes tidy-brush {
   0% {
-    transform: translate(120px, 195px) rotate(0deg) scale(1.2);
+    transform: translate(150px, 190px) rotate(0deg) scale(1.2);
   }
   12.5% {
     transform: translate(225px, 296px) rotate(-12deg) scale(1.1);
@@ -2011,10 +2086,208 @@
   }
 }
 
+/* ---------- Roaring like a lion (X-26, lion.tsx): four bars, 16 beats of 6.25 % (LION_MS) ---------- */
+
+.lion {
+  position: absolute;
+  inset: 0;
+  overflow: hidden;
+}
+
+.lion-camera,
+.lion-picture,
+.lion-frame {
+  position: absolute;
+  inset: 0;
+  display: block;
+  width: 100%;
+  height: 100%;
+}
+
+.lion-frame {
+  pointer-events: none;
+}
+
+.teeth-piece.lion-still {
+  will-change: auto;
+}
+
+/* The camera starts close on the child (lion.tsx sets where) and draws back to the child and the lion on beats 7–10,
+   while the lion walks in. It moves the picture as a whole, an HTML layer, so the phone doesn't paint it again. */
+.lion-camera {
+  transform-origin: 0 0;
+  transform: translate(var(--zoom-x), var(--zoom-y)) scale(var(--zoom));
+  animation: teeth-lion-camera 8.571s ease-in-out forwards;
+}
+
+@keyframes teeth-lion-camera {
+  0%,
+  43.75% {
+    transform: translate(var(--zoom-x), var(--zoom-y)) scale(var(--zoom));
+  }
+  62.5%,
+  100% {
+    transform: translate(0, 0) scale(1);
+  }
+}
+
+/* The smile gives way to the mouth wide open on beat 2. */
+.lion-kid-smile {
+  animation: teeth-lion-kid-smile 8.571s ease-in-out forwards;
+}
+
+@keyframes teeth-lion-kid-smile {
+  0%,
+  12.5% {
+    opacity: 1;
+  }
+  16.5%,
+  100% {
+    opacity: 0;
+  }
+}
+
+/* Wide open from beat 2 to 3, a roar on beat 3 (LION_CUES) and one with the lion on beat 11, open to the end. */
+.lion-kid-roar {
+  opacity: 0;
+  animation: teeth-lion-kid-roar 8.571s ease-in-out forwards;
+}
+
+@keyframes teeth-lion-kid-roar {
+  0%,
+  12.5% {
+    transform: scale(0.4, 0.2);
+    opacity: 0;
+  }
+  14% {
+    opacity: 1;
+  }
+  18.75% {
+    transform: scale(1);
+    opacity: 1;
+  }
+  22% {
+    transform: scale(1.06, 1.1);
+  }
+  31.25%,
+  68.75% {
+    transform: scale(1);
+  }
+  72% {
+    transform: scale(1.06, 1.1);
+  }
+  81.25%,
+  100% {
+    transform: scale(1);
+    opacity: 1;
+  }
+}
+
+/* The costume's mane grows in round the face on beats 4.5–6. */
+.lion-mane {
+  opacity: 0;
+  animation: teeth-lion-mane 8.571s ease-in-out forwards;
+}
+
+@keyframes teeth-lion-mane {
+  0%,
+  28.125% {
+    transform: scale(0.6);
+    opacity: 0;
+  }
+  34.375% {
+    transform: scale(1.04);
+    opacity: 1;
+  }
+  37.5%,
+  100% {
+    transform: scale(1);
+    opacity: 1;
+  }
+}
+
+/* The lion walks in from the side in four steps on beats 7–10 (far off the picture before),
+   and leans into its roar on beat 11. */
+.lion-lion {
+  animation: teeth-lion-walk 8.571s ease-in-out forwards;
+}
+
+@keyframes teeth-lion-walk {
+  0%,
+  43.75% {
+    transform: translate(560px, 0) scale(1);
+  }
+  48.4375% {
+    transform: translate(420px, -10px) scale(1);
+  }
+  53.125% {
+    transform: translate(280px, 0) scale(1);
+  }
+  57.8125% {
+    transform: translate(140px, -10px) scale(1);
+  }
+  62.5%,
+  68.75% {
+    transform: translate(0, 0) scale(1);
+  }
+  72% {
+    transform: translate(0, 0) scale(1.04);
+  }
+  81.25%,
+  100% {
+    transform: translate(0, 0) scale(1);
+  }
+}
+
+/* Its mouth opens on beat 10 and roars with the child on beat 11. */
+.lion-lion-shut {
+  animation: teeth-lion-shut 8.571s ease-in-out forwards;
+}
+
+@keyframes teeth-lion-shut {
+  0%,
+  62.5% {
+    opacity: 1;
+  }
+  66%,
+  100% {
+    opacity: 0;
+  }
+}
+
+.lion-lion-jaw {
+  opacity: 0;
+  animation: teeth-lion-jaw 8.571s ease-in-out forwards;
+}
+
+@keyframes teeth-lion-jaw {
+  0%,
+  62.5% {
+    transform: scale(0.4, 0.2);
+    opacity: 0;
+  }
+  64% {
+    opacity: 1;
+  }
+  68.75% {
+    transform: scale(1);
+    opacity: 1;
+  }
+  72% {
+    transform: scale(1.06, 1.1);
+  }
+  81.25%,
+  100% {
+    transform: scale(1);
+    opacity: 1;
+  }
+}
+
 /* Important for the same reason as the story's: `.prep.at-paste .prep-tube-squeeze` outranks it. */
 .teeth-play.paused .teeth-count,
 .teeth-play.paused .prep *,
 .teeth-play.paused .spit *,
+.teeth-play.paused .lion *,
 .teeth-play.paused .lip-arrow {
   animation-play-state: paused !important;
 }
