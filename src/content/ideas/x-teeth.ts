@@ -76,7 +76,7 @@ export const teethIdeas: IdeaArea = {
       effort: "M",
       done: true,
       partial:
-        "Umgesetzt am 27. November 2026: morgens (bis 14 Uhr) fliegen ein Honigbrot, ein Löffel Müsli mit Milch und ein Becher Kakao in den Mund, zerkrümeln beim Abbeißen, und ihre Krümel in Honig-, Hafer- und Kakaofarben werden zu Zuckermonstern; dazu Abbeißen, Knuspern und zwei Schlucke Kakao. Die Leiste heißt morgens „🥣 Frühstück essen“ und zeigt das gezeichnete Honigbrot, bis sein gemaltes Symbol aus der Bilder-Warteschlange kommt. Der Satz „Mmh, Frühstück! …“ ist in allen sieben Sprachen da, wartet aber noch auf seine Aufnahme.",
+        "Umgesetzt am 27. November 2026: morgens (bis 14 Uhr) fliegen ein Honigbrot, ein Löffel Müsli mit Milch und ein Becher Kakao in den Mund, zerkrümeln beim Abbeißen, und ihre Krümel in Honig-, Hafer- und Kakaofarben werden zu Zuckermonstern; dazu Abbeißen, Knuspern und zwei Schlucke Kakao. Die Leiste heißt morgens „🥣 Frühstück essen“ und zeigt das gezeichnete Honigbrot, bis sein gemaltes Symbol aus der Bilder-Warteschlange kommt. Der Satz „Mmh, Frühstück! …“ ist in allen sieben Sprachen da, wartet aber noch auf seine Aufnahme. Später am selben Tag wurden Müsli-Löffel und Kakao-Becher durch eine Banane und einen Apfel ersetzt: der Becher sah aus, als würde das Kind eine Tasse essen, der Löffel wie ein Stück Metall (Rückmeldung).",
     },
     {
       id: "X-20",

@@ -2,7 +2,7 @@ import { useRef, type CSSProperties, type ReactElement, type RefObject } from "r
 import { STAR_PATH } from "@/components/TapFeedback";
 import { useFigure } from "@/lib/common";
 import { useT } from "@/lib/language";
-import { playCrunch, playGiggle, playGulp, playMunch, playRecorded, playRustle, playYum } from "@/lib/sfx";
+import { playCrunch, playGiggle, playMunch, playRecorded, playRustle, playYum } from "@/lib/sfx";
 import type { Cue } from "./cues";
 import type { Daytime } from "@/lib/days";
 import { clothesOf, PyjamaPattern, topFill } from "./clothes";
@@ -21,7 +21,7 @@ import { Piece, pictureSpace } from "./piece";
 // its brows go up, and while it chews its eyes close happily and its cheeks
 // glow. Each sweet flies into the mouth in an arc and crumbles as it is bitten.
 // Before the morning brushing it is breakfast instead (X-19): a honey bread, a
-// spoon of muesli with milk and a mug of cocoa leave their crumbs and monsters
+// banana and an apple leave their crumbs and monsters
 // too, so the child sees that everyday food leaves sugar on the teeth, not only
 // sweets. The daytime comes from the clock, as everywhere in the game.
 // All of it is CSS animation (teeth.css), calm enough to go with the music;
@@ -375,10 +375,10 @@ const CRUMBS = [
   { tooth: 7, upper: false, sweet: 2 },
 ];
 
-/** Each crumb's colour, that of the sweet or breakfast it comes from: honey, oats and cocoa in the morning. */
+/** Each crumb's colour, that of the sweet or breakfast it comes from: honey, banana and apple in the morning. */
 const CRUMB_COLORS: Record<Daytime, string[]> = {
   evening: ["#ff7bd0", "#ff7bd0", "#ff9f43", "#ff9f43", "#b388ff", "#8bd346"],
-  morning: ["#f5b82e", "#f5b82e", "#e0b06a", "#c98a4b", "#9a6540", "#b98257"],
+  morning: ["#f5b82e", "#f5b82e", "#f0cf4a", "#e3bd52", "#ef5a5f", "#8bd346"],
 };
 
 /** A tooth's place in the picture, where a crumb lies and its monster grows. */
@@ -474,34 +474,42 @@ export function HoneyBread() {
   );
 }
 
-/** A spoon heaped with muesli – oat flakes, raisins and a piece of strawberry – in a little lake of milk. */
-function MuesliSpoon() {
+/**
+ * A banana with its peel pulled half down: the pale fruit standing up out of it, the yellow peel hanging in two flaps
+ * with brown tips, and its little brown stalk at the bottom – the way a child holds one to bite. Flat fills, like the
+ * honey bread.
+ */
+function Banana() {
   return (
     <g stroke={INK} strokeWidth={3} strokeLinejoin="round" strokeLinecap="round">
-      <path d="M-3 8 L3 54 Q6 60 11 56 L7 8 Z" fill="#cfd6e0" />
-      <ellipse cx={0} cy={-2} rx={28} ry={17} fill="#dfe5ee" />
-      <ellipse cx={0} cy={-5} rx={23} ry={11} fill="#fffaf0" strokeWidth={2} />
-      <path d="M-19 -6 C-19 -18 -9 -25 -1 -21 C6 -29 19 -22 18 -7 C10 -3 -10 -3 -19 -6 Z" fill="#e6c98f" />
-      <path d="M-12 -12 l6 -2 M2 -18 l5 3 M7 -10 l6 -1 M-5 -7 l5 1" stroke="#c49a56" strokeWidth={2} />
-      <ellipse cx={-8} cy={-17} rx={3.5} ry={2.5} fill="#6b3b2a" strokeWidth={1.5} />
-      <ellipse cx={11} cy={-14} rx={3} ry={2.2} fill="#6b3b2a" strokeWidth={1.5} />
-      <path d="M-1 -12 Q2 -20 7 -14 Q4 -9 -1 -12 Z" fill="#ff4d6d" strokeWidth={2} />
-      <ellipse cx={-14} cy={4} rx={5} ry={2} fill="#fff" stroke="none" opacity={0.8} />
+      {/* The fruit, a little bent, standing out of the peel. */}
+      <path d="M-9 10 C-11 -8 -8 -24 -1 -33 C1 -35 4 -34 5 -31 C9 -20 10 -6 9 10 Z" fill="#fff6d6" />
+      <path d="M2 -26 C5 -16 6 -6 5 4" fill="none" stroke="#ead38e" strokeWidth={2.5} />
+      {/* The back flap of the peel, behind the peel's body. */}
+      <path d="M-2 6 C2 -2 8 -10 13 -12 C15 -6 12 4 7 12 Z" fill="#e9b10f" />
+      {/* The peel's body down to the stalk. */}
+      <path d="M-12 8 C-13 24 -9 40 -4 48 L4 48 C9 40 13 24 12 8 C6 12 -6 12 -12 8 Z" fill="#ffd23f" />
+      <path d="M-4 48 L-3 56 L3 56 L4 48 Z" fill="#8a5a2b" />
+      <path d="M6 16 C7 26 5 36 2 44" fill="none" stroke="#fff3b0" strokeWidth={3} opacity={0.9} />
+      {/* The two side flaps hanging out and down, with brown tips. */}
+      <path d="M-12 8 C-20 6 -28 12 -32 24 C-31 27 -28 27 -27 25 C-23 18 -17 15 -9 15 Z" fill="#ffd23f" />
+      <path d="M-32 24 C-31 27 -28 27 -27 25 L-29 22 Z" fill="#8a5a2b" strokeWidth={2} />
+      <path d="M12 8 C20 6 28 12 32 24 C31 27 28 27 27 25 C23 18 17 15 9 15 Z" fill="#ffd23f" />
+      <path d="M32 24 C31 27 28 27 27 25 L29 22 Z" fill="#8a5a2b" strokeWidth={2} />
     </g>
   );
 }
 
-/** A mug of cocoa with a cap of milk foam, a white dot pattern on its blue and a wisp of warmth over it. */
-function CocoaMug() {
+/** A round red apple with the dip at its top, a brown stalk, a green leaf and a soft light on its cheek. */
+function Apple() {
   return (
     <g stroke={INK} strokeWidth={3} strokeLinejoin="round" strokeLinecap="round">
-      <path d="M-6 -24 q-5 -6 0 -11 q4 -5 0 -10 M6 -24 q-5 -6 0 -11" fill="none" stroke="#fff" strokeWidth={3} opacity={0.85} />
-      <path d="M20 -4 C36 -6 37 24 20 24" fill="none" strokeWidth={10} />
-      <path d="M20 -4 C36 -6 37 24 20 24" fill="none" stroke="#4cc9f0" strokeWidth={4.5} />
-      <path d="M-23 -16 L-21 32 Q-21 38 -15 38 L13 38 Q19 38 19 32 L21 -16 Z" fill="#4cc9f0" />
-      <path d="M-12 2 h0.1 M6 -4 h0.1 M-4 18 h0.1 M10 22 h0.1 M-14 28 h0.1" stroke="#fff" strokeWidth={5} />
-      <ellipse cx={-1} cy={-16} rx={22} ry={6.5} fill="#8a5a3c" />
-      <path d="M-15 -17 C-12 -23 -4 -22 -2 -19 C2 -24 12 -22 13 -17 C8 -13 -10 -13 -15 -17 Z" fill="#f3e3cc" strokeWidth={2} />
+      <path d="M0 -20 C-4 -27 -6 -31 -5 -35" fill="none" stroke="#7a4a24" strokeWidth={4} />
+      <path d="M-1 -26 C6 -36 18 -36 22 -30 C14 -22 4 -22 -1 -26 Z" fill="#6cc04a" />
+      <path d="M2 -27 Q11 -30 18 -30" fill="none" stroke="#4e9a35" strokeWidth={2} />
+      <path d="M0 -19 C8 -26 26 -24 28 -6 C30 10 20 28 8 30 C4 31 2 29 0 29 C-2 29 -4 31 -8 30 C-20 28 -30 10 -28 -6 C-26 -24 -8 -26 0 -19 Z" fill="#ef4b4f" />
+      <path d="M12 -12 C20 -6 21 8 16 18" fill="none" stroke="#c8333b" strokeWidth={4} opacity={0.6} />
+      <ellipse cx={-14} cy={-8} rx={5} ry={8} transform="rotate(20 -14 -8)" fill="#fff" stroke="none" opacity={0.75} />
     </g>
   );
 }
@@ -509,7 +517,7 @@ function CocoaMug() {
 /** What the child eats: three sweets before the evening brushing, breakfast before the morning one (X-19). */
 const TREATS: Record<Daytime, (() => ReactElement)[]> = {
   evening: [Lollipop, Bonbon, Cupcake],
-  morning: [HoneyBread, MuesliSpoon, CocoaMug],
+  morning: [HoneyBread, Banana, Apple],
 };
 
 /**
@@ -527,8 +535,8 @@ const BITE = { x: MID, y: 284 };
 /** When the bits fly, after the sweet's arrival: as the teeth close on it. */
 const BITE_MS = 90;
 
-/** The colours a sweet crumbles into, and whether its bits are shards of candy or soft crumbs (of cake, bread,
- * muesli, or drops of cocoa). */
+/** The colours a sweet crumbles into, and whether its bits are hard shards (candy, apple) or soft crumbs (cake,
+ * bread, banana). */
 const CRUMBLE: Record<Daytime, { colors: string[]; shards: boolean }[]> = {
   evening: [
     { colors: ["#ff7bd0", "#fff", "#ff7bd0"], shards: true },
@@ -537,8 +545,8 @@ const CRUMBLE: Record<Daytime, { colors: string[]; shards: boolean }[]> = {
   ],
   morning: [
     { colors: ["#f6dfae", "#c98a4b", "#f5b82e"], shards: false },
-    { colors: ["#e6c98f", "#fffaf0", "#6b3b2a"], shards: false },
-    { colors: ["#8a5a3c", "#f3e3cc", "#8a5a3c"], shards: false },
+    { colors: ["#fff6d6", "#ffd23f", "#fff6d6"], shards: false },
+    { colors: ["#fff3d6", "#ef4b4f", "#fff3d6"], shards: true },
   ],
 };
 
@@ -568,8 +576,8 @@ const BITS: Record<Daytime, ReturnType<typeof bitsOf>> = { evening: bitsOf(CRUMB
 
 /**
  * What the child hears. In the evening: a cheer when the sweets come, unwrapping the bonbon, a bite and chewing for
- * each, „Mmmh“ at the end. In the morning: the cheer, a bite into the bread and its chewing, the muesli's crunch, the
- * cocoa's two gulps, and „Mmmh“.
+ * each, „Mmmh“ at the end. In the morning: the cheer, a soft bite and chewing for the bread and the banana, the
+ * apple's crunch and its chewing, and „Mmmh“.
  */
 export const ORIGIN_CUES: Record<Daytime, Cue[]> = {
   evening: [
@@ -585,8 +593,10 @@ export const ORIGIN_CUES: Record<Daytime, Cue[]> = {
     { at: APPEAR_MS[0] + 500, play: () => playRecorded("yay", playGiggle) },
     { at: ARRIVE_MS[0] + 300, play: () => playRecorded("munch", playMunch) },
     { at: ARRIVE_MS[0] + 600, play: () => playRecorded("chew", playMunch) },
-    { at: ARRIVE_MS[1] + 300, play: () => playRecorded("chew", playCrunch) },
-    { at: ARRIVE_MS[2] + 300, play: playGulp },
+    { at: ARRIVE_MS[1] + 300, play: () => playRecorded("munch", playMunch) },
+    { at: ARRIVE_MS[1] + 600, play: () => playRecorded("chew", playMunch) },
+    { at: ARRIVE_MS[2] + 300, play: () => playRecorded("chew", playCrunch) },
+    { at: ARRIVE_MS[2] + 600, play: () => playRecorded("chew", playMunch) },
     { at: ARRIVE_MS[2] + CHEW_MS + 150, play: () => playRecorded("yum", playYum) },
   ].sort((a, b) => a.at - b.at),
 };
