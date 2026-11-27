@@ -7,7 +7,7 @@ import type { Daytime } from "@/lib/days";
 import { clothesOf, PyjamaPattern, topFill } from "./clothes";
 import { PICTURE, TOOTH_ARCS } from "./jaw";
 import { BROW, Ear, EyeBall, EyeLid, eyeOpening, FACE, HAIR, Hair, type HeadMap, INK, Iris, LASHES, LIP, Nose, SKIN_SHADE, SkinGradient } from "./face";
-import { fitBox, FRAME_CLIP, FrameStroke, Monster, screenFrame, STAIN, STAIN_FILLS, useRoom, type Box } from "./mouth";
+import { fitBox, FRAME_CLIP, FrameStroke, Monster, screenFrame, STAIN, STAIN_FILLS, useRoom, type Box, type Room } from "./mouth";
 import { Piece, pictureSpace } from "./piece";
 
 // Before anything else, a short story of where the sugar monsters come from:
@@ -34,7 +34,7 @@ export const ORIGIN_MS: Record<OriginPart, number> = { sweets: 9600, grow: 6000 
 const { width: W } = PICTURE;
 /**
  * How the story is framed before the camera moves in on the mouth: what has to fit between heading and controls (the
- * screen shows more sky round it) and where the sweets appear. On a screen not much wider than tall the whole head fits with the sweets in the corners above it; on a
+ * screen shows more sky round it) and where the sweets appear. On a screen not much wider than tall the whole head fits with the sweets beside its top; on a
  * wide one (a phone on its side) the face from the brows to the chin, the sweets beside it at eye level, so the face and
  * its mouth show bigger (user feedback, November 2026: the mouth should show bigger).
  */
@@ -44,10 +44,11 @@ interface Framing {
 }
 const HEAD_FRAMING: Framing = {
   focus: { x: 40, y: 34, width: 360, height: 340 },
+  // Out beside the head's top, as far as the screen shows them whole (`sweetPlace` moves them in where it is narrower).
   sweets: [
-    { x: 372, y: 78 },
-    { x: 68, y: 78 },
-    { x: 372, y: 78 },
+    { x: 440, y: 110 },
+    { x: 0, y: 110 },
+    { x: 440, y: 110 },
   ],
 };
 const FACE_FRAMING: Framing = {
@@ -60,8 +61,33 @@ const FACE_FRAMING: Framing = {
 };
 /** Both framings, for the tests. */
 export const FRAMINGS = { head: HEAD_FRAMING, face: FACE_FRAMING };
+/**
+ * How far a sweet reaches round its point while it is seen there, in picture units: grown to 1.5, floating up, turned,
+ * and lifted before it flies (`teeth-origin-sweet`) – the widest of the apple, the banana and the lollipop.
+ */
+export const SWEET_REACH = { left: 56, right: 56, up: 82, down: 88 };
+/** Room kept between a sweet and the edge of the free room, in screen px: the mirror's frame lies there (`FRAME_PX`). */
+const SWEET_EDGE_PX = 24;
+/**
+ * Where a sweet appears: its framing's point, moved in just as far as needed for the whole sweet to show inside the free
+ * room (`seen`, picture units) – it once appeared half cut off by the screen's edge (user feedback, November 2026).
+ */
+export function sweetPlace(want: { x: number; y: number }, seen: Box, unit: number) {
+  const edge = SWEET_EDGE_PX * unit;
+  const fit = (at: number, from: number, to: number) => (from > to ? (from + to) / 2 : Math.min(Math.max(at, from), to));
+  return {
+    x: fit(want.x, seen.x + edge + SWEET_REACH.left, seen.x + seen.width - edge - SWEET_REACH.right),
+    y: fit(want.y, seen.y + edge + SWEET_REACH.up, seen.y + seen.height - edge - SWEET_REACH.down),
+  };
+}
+/** The free room between heading and controls in picture units, for a picture showing `box` at `unit`. */
+export function freeSeen(room: Room | null, box: Box, unit: number): Box {
+  if (!room) return box;
+  const { free } = room;
+  return { x: box.x + free.x * unit, y: box.y + free.y * unit, width: free.width * unit, height: free.height * unit };
+}
 /** The face's framing where it shows the picture clearly bigger than the head's, else the head's. */
-function framingFor(room: Parameters<typeof fitBox>[0]) {
+export function framingFor(room: Parameters<typeof fitBox>[0]) {
   const [face, head] = [fitBox(room, FACE_FRAMING.focus), fitBox(room, HEAD_FRAMING.focus)];
   return face.unit * 1.05 < head.unit ? { framing: FACE_FRAMING, ...face } : { framing: HEAD_FRAMING, ...head };
 }
@@ -575,6 +601,8 @@ export function Origin({
   const scene = useRef<HTMLDivElement>(null);
   const room = useRoom(scene, free);
   const { framing, box, unit } = framingFor(room);
+  const seen = freeSeen(room, box, unit);
+  const places = framing.sweets.map((want) => sweetPlace(want, seen, unit));
   const frame = screenFrame(box, unit);
   const bottom = box.y + box.height;
   const sweets = part === "sweets";
@@ -837,7 +865,7 @@ export function Origin({
             })}
           </Piece>
 
-          {/* Each sweet appears big in a top corner, floats a moment, then flies into the mouth in an arc: it lifts a
+          {/* Each sweet appears big beside the face (`sweetPlace` keeps it whole on the screen), floats a moment, then flies into the mouth in an arc: it lifts a
               little and swoops down, turning towards where it goes, and is squeezed as the teeth bite (`teeth-origin-sweet`).
               Its pieces lie round the picture's corner (0, 0), where the sweet is drawn and from where the keyframes
               move it: the outer one across (`-x`), the inner one up and down, so the two make the arc. */}
@@ -850,11 +878,11 @@ export function Origin({
                 style={
                   {
                     "--arrive": `${ARRIVE_MS[i]}ms`,
-                    "--sx": `${framing.sweets[i].x}px`,
-                    "--sy": `${framing.sweets[i].y}px`,
+                    "--sx": `${places[i].x.toFixed(1)}px`,
+                    "--sy": `${places[i].y.toFixed(1)}px`,
                     "--bx": `${BITE.x}px`,
                     "--by": `${BITE.y}px`,
-                    "--tilt": `${framing.sweets[i].x > W / 2 ? -18 : 18}deg`,
+                    "--tilt": `${places[i].x > W / 2 ? -18 : 18}deg`,
                   } as CSSProperties
                 }
                 over={
