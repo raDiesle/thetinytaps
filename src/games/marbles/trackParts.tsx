@@ -2,7 +2,7 @@
 // xylophones, switch, barrier, looping, drums, chimes, tunnel, and the wooden world (`WOODEN`) the other worlds replace,
 // with its own stretch down the lower wall (helix tower, step lifter, tipping troughs).
 import { memo, useContext, useId, type PointerEvent, type ReactNode } from "react";
-import { VIEW_W, wobble, decay } from "./level";
+import { VIEW_W, wobble, decay, wobbleSeconds } from "./level";
 import { Ball, BAR_COLORS, type BallLook, Rail, STAR_POINTS, still } from "./parts";
 import { HELIX, helixAt, LIFTER, lifterAt, sample, STRETCHES, TAU, TROUGHS, UNDER, WOOD_CUES } from "./trackStretches";
 import { type EndProps, INK, type StretchArtProps, type ThingProps, TrackLook, type TrackTheme } from "./trackTheme";
@@ -43,7 +43,11 @@ import {
   type Slot,
   type Turn,
 } from "./track";
-import { anyStirring, Piece as Layer } from "./trackPieces";
+import { anyStirring, Piece as Layer, stirring } from "./trackPieces";
+
+/** How a hit bell swings and a hit funnel shakes: how far, how fast and how quickly it dies away (`wobble`'s arguments). */
+const BELL_SWING = [24, 13, 2.2] as const;
+const FUNNEL_SHAKE = [0.07, 24, 6] as const;
 
 /** The flag springs up out of the full basket; then the level is done. */
 const FLAG_MS = 500;
@@ -428,9 +432,14 @@ export const Spot = still(function Spot({
   angle: number;
   layer: "back" | "front";
 }) {
-  // A funnel wobbles a little when a marble swirls in or a finger taps it.
-  const k = (age >= 0 && age < 1.5 ? 1 - 0.45 * decay(age * 7) * Math.cos(age * 22) : 1) * (piece === "funnel" ? 1 + wobble(hitAge, 0.07, 24, 6) : 1);
+  // A part just put in pops up from small (`pop`); a funnel wobbles a little when a marble swirls in or a finger taps it.
+  const pop = age >= 0 && age < 1.5 ? 1 - 0.45 * decay(age * 7) * Math.cos(age * 22) : 1;
+  const k = pop * (piece === "funnel" ? 1 + wobble(hitAge, ...FUNNEL_SHAKE) : 1);
   const m = slotMiddle(slot);
+  // A bell swinging or a funnel shaking after a hit is a layer of its own, turned or grown as a whole (`Layer`), so the
+  // run's big svgs are not painted again in every frame of it: each marble rolling through the first rows hit them
+  // within the first seconds of the run (A-41). While the part pops up it stays inline, grown with the spot.
+  const swinging = pop === 1 && stirring(hitAge, wobbleSeconds(piece === "funnel" ? FUNNEL_SHAKE[2] : BELL_SWING[2]));
   let body: ReactNode = null;
   switch (piece) {
     case "bell": {
@@ -442,7 +451,14 @@ export const Spot = still(function Spot({
           <g>
             <line x1={pivot.x} y1={pivot.y - 44} x2={pivot.x} y2={pivot.y} stroke={INK} strokeWidth="5" strokeLinecap="round" />
             <circle cx={pivot.x} cy={pivot.y - 44} r="7" fill="#8a5a2b" stroke={INK} strokeWidth="3" />
-            <Bell x={pivot.x} y={pivot.y} angle={wobble(hitAge, 24, 13, 2.2)} />
+            <Layer
+              layer="front"
+              rest={!swinging}
+              box={{ x: pivot.x - 40, y: pivot.y - 6, w: 80, h: 86 }}
+              turn={{ deg: wobble(hitAge, ...BELL_SWING), x: pivot.x, y: pivot.y }}
+            >
+              <Bell x={pivot.x} y={pivot.y} />
+            </Layer>
           </g>
         );
       break;
@@ -452,16 +468,25 @@ export const Spot = still(function Spot({
       break;
     case "funnel": {
       const f = funnelIn(slot);
-      body =
-        layer === "back" ? (
-          <g>
-            <ellipse cx={f.cx} cy={f.rimY} rx={f.rx} ry={f.ry} fill="#1b8fc4" opacity="0.45" />
-            <TrackRail a={{ x: f.cx - slot.dir * 20, y: slot.to.y }} b={slot.to} />
-          </g>
-        ) : (
-          <Funnel slot={slot} />
-        );
-      break;
+      const out = { x: f.cx - slot.dir * 20, y: slot.to.y };
+      // The whole funnel shakes round the spot's middle, the rail out of it with it, as one layer behind the rolling
+      // things and one in front.
+      const x0 = Math.min(f.cx - f.rx, out.x, slot.to.x) - 24;
+      const x1 = Math.max(f.cx + f.rx, out.x, slot.to.x) + 24;
+      const y0 = f.rimY - f.ry - 24;
+      const box = { x: x0, y: y0, w: x1 - x0, h: Math.max(f.spoutY + 12, slot.to.y) + 24 - y0 };
+      return (
+        <Layer layer={layer} rest={!swinging} box={box} turn={{ deg: 0, x: m.x, y: m.y, scale: k }}>
+          {layer === "back" ? (
+            <g>
+              <ellipse cx={f.cx} cy={f.rimY} rx={f.rx} ry={f.ry} fill="#1b8fc4" opacity="0.45" />
+              <TrackRail a={out} b={slot.to} />
+            </g>
+          ) : (
+            <Funnel slot={slot} />
+          )}
+        </Layer>
+      );
     }
     case "wheel":
       // A layer of its own, which grows round the slot's middle (the wheel's) by itself.
@@ -480,19 +505,24 @@ export const Wall = still(function Wall({ turn, index, age }: { turn: Turn; inde
   const y = turn.from.y + 3;
   const flash = age >= 0 && age < 1 ? decay(age * 6) : 0;
   const squash = age >= 0 && age < 1 ? 5 * decay(age * 9) * Math.cos(age * 30) : 0;
+  const cx = turn.x - side * 5;
   return (
     <g>
       <rect x={side > 0 ? turn.x : turn.x - 18} y={top} width="18" height={bottom - top} rx="6" fill={post} stroke={INK} strokeWidth="3" />
-      <ellipse
-        cx={turn.x - side * (5 - squash)}
-        cy={y}
-        rx={9 - squash}
-        ry="24"
-        fill={BAR_COLORS[(index * 3) % BAR_COLORS.length]}
-        stroke={INK}
-        strokeWidth="3"
-      />
-      <ellipse cx={turn.x - side * (5 - squash)} cy={y} rx={9 - squash} ry="24" fill="#fff" opacity={0.8 * flash} />
+      {/* The bumper is a layer of its own for the second it flashes and squashes after a hit: in the wall's svg it had
+        the phone paint the wall's bands again in every frame of it, at every turn a marble comes to (A-41) */}
+      <Layer layer="back" rest={!stirring(age, 1)} box={{ x: cx - 26, y: y - 30, w: 52, h: 60 }}>
+        <ellipse
+          cx={turn.x - side * (5 - squash)}
+          cy={y}
+          rx={9 - squash}
+          ry="24"
+          fill={BAR_COLORS[(index * 3) % BAR_COLORS.length]}
+          stroke={INK}
+          strokeWidth="3"
+        />
+        <ellipse cx={turn.x - side * (5 - squash)} cy={y} rx={9 - squash} ry="24" fill="#fff" opacity={0.8 * flash} />
+      </Layer>
     </g>
   );
 });
@@ -639,10 +669,10 @@ function Flag({ rise, sway }: { rise: number; sway: number }) {
   );
 }
 
-/** A bell hanging from `x`, `y`, swinging by `angle` degrees. */
-function Bell({ x, y, angle }: { x: number; y: number; angle: number }) {
+/** A bell hanging from `x`, `y` (its `Layer` swings it). */
+function Bell({ x, y }: { x: number; y: number }) {
   return (
-    <g transform={`translate(${x} ${y}) rotate(${angle})`}>
+    <g transform={`translate(${x} ${y})`}>
       <path
         d="M-4 0 L4 0 L5 12 C22 16 28 34 30 58 L34 64 L-34 64 L-30 58 C-28 34 -22 16 -5 12 Z"
         fill="#ffc93c"

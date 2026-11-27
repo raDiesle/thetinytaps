@@ -1,19 +1,21 @@
-// „Magic Keys“ (Zaubertasten): the poster standing on the bookshelf (user request, 24 November 2026). Its name and line
+// „Tap Magic“ (Tippzauber): the poster standing on the bookshelf (user request, 24 November 2026). Its name and line
 // stand here, in the game's folder, so its row in the language table answers for them. English first, then translated.
 // It was „Tap Away“ / „Drauflos tippen“ at first, an instruction rather than a name: the poster on the shelf asked
-// for a good one (user request, 24 November 2026).
+// for a good one (user request, 24 November 2026). Then „Magic Keys“ / „Zaubertasten“, which named only the keys while
+// most children play it by tapping a phone or tablet: the name says what both do, „tippen“ being to tap and to type
+// (user request, 26 November 2026).
 
 import type { EnglishFirst } from "@/lib/language";
 
 /** The game's name: on its poster on the shelf, its label and the browser tab. */
 export const TAP_AWAY_TITLE: EnglishFirst = {
-  en: "Magic Keys",
-  de: "Zaubertasten",
-  ru: "Волшебные клавиши",
-  zh: "神奇按键",
-  hi: "जादुई बटन",
-  es: "Teclas mágicas",
-  ar: "الأزرار السحرية",
+  en: "Tap Magic",
+  de: "Tippzauber",
+  ru: "Волшебные нажатия",
+  zh: "点点魔法",
+  hi: "जादुई टैप",
+  es: "Toques mágicos",
+  ar: "اللمسات السحرية",
 };
 
 /** Its line for grown-ups (the poster's tooltip on the shelf). */

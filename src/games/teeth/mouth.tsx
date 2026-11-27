@@ -38,6 +38,7 @@ import { BROW, Ear, EyeBall, EyeLid, eyeOpening, FACE, HAIR, Hair, HEAD_UNITS, t
 import { Brush, lerp3, squeezeOut, type BrushAnchor } from "./brush";
 import type { Motion } from "./steps";
 import { faceKey } from "./stains";
+import { LIP_FOAM, type FoamShape } from "./foam";
 
 // A child's face in a mirror, close up. The mouth is a small 3D model (see
 // jaw.ts), so the picture can turn and tilt to show exactly where to brush.
@@ -249,6 +250,8 @@ interface MouthProps {
   happy: boolean;
   /** Right after the brushing: a last sugar monster peeks in, dazzled by the shining teeth, and puts on sunglasses. */
   dazzled: boolean;
+  /** How much toothpaste foam lies on the lips (`foamStage` in foam.ts): 0 none. Once all is clean (`happy`) it fades away. */
+  foam: number;
   /** Shown while the child should open or close their mouth. */
   action: MouthAction | null;
   /**
@@ -510,7 +513,7 @@ const jawOrder = (view: View): Jaw[] => {
   return view.pitch >= 0 ? ["lower", "upper"] : ["upper", "lower"];
 };
 
-export function Mouth({ view, zone, monsters, dirty, brush, happy, dazzled, action, gliding, glide, free, onTickle }: MouthProps) {
+export function Mouth({ view, zone, monsters, dirty, brush, happy, dazzled, foam, action, gliding, glide, free, onTickle }: MouthProps) {
   const pictureLabel = useT()({
     de: "Ein Kindergesicht im Spiegel beim Zähneputzen",
     en: "A child's face in the mirror while brushing teeth",
@@ -678,6 +681,21 @@ export function Mouth({ view, zone, monsters, dirty, brush, happy, dazzled, acti
   // and then every brushed face of the view goes on sparkling softly while the head holds still.
   const sparkling = stains.filter((g) => !dirty.includes(g.key) && brush !== null && brushLeft(brush, g.tooth.id));
 
+  // The toothpaste foam on the lips (X-31): each clump on its point of the lips, as they are pulled open, set a little
+  // out from the mouth's middle so it lies on the lip and never over the teeth being brushed. Seen from the side what
+  // lies past the face's front is not seen, so neither is the foam in the far corner.
+  const foamClumps = useMemo(() => {
+    const shown = LIP_FOAM.filter((f) => f.stage <= foam);
+    if (shown.length === 0) return [];
+    const middle = { x: lipPoints.reduce((a, p) => a + p.x, 0) / lipPoints.length, y: lipPoints.reduce((a, p) => a + p.y, 0) / lipPoints.length };
+    return shown.flatMap((f) => {
+      const at = lipPoints[f.at];
+      if (side && insideBy(at, side.ring, 0)) return [];
+      const away = Math.hypot(at.x - middle.x, at.y - middle.y) || 1;
+      return [{ ...f, point: { x: at.x + ((at.x - middle.x) / away) * FOAM_OUT, y: at.y + ((at.y - middle.y) / away) * FOAM_OUT } }];
+    });
+  }, [foam, lipPoints, side]);
+
   const placed = (m: MonsterSpot) => {
     const face = toothFace(m.tooth, m.surface);
     const jaw = all[m.tooth.jaw];
@@ -840,6 +858,25 @@ export function Mouth({ view, zone, monsters, dirty, brush, happy, dazzled, acti
       )}
 
       <div className="mouth-sprites">
+        {/* Foam on the lips, under the monsters and the arrows: each clump a small layer of its own that fades in once
+            and, once all is clean, away – never something inside the mirror's svg. */}
+        {foamClumps.map((f) => {
+          const at = onScreen(f.point, FOAM_SIZE * f.size);
+          return (
+            <Sprite
+              key={f.at}
+              spot={{ x: round(at.x), y: round(at.y), scale: round(at.scale, 1000) }}
+              reach={FOAM_REACH}
+              className={`lip-foam${happy ? " gone" : ""}`}
+            >
+              <div>
+                <svg viewBox={spriteBox(FOAM_REACH)} aria-hidden>
+                  <FoamClump shape={f.shape} flip={f.flip} />
+                </svg>
+              </div>
+            </Sprite>
+          );
+        })}
         {/* The ones being brushed now on top. */}
         {monsters.filter((m) => !m.waiting).map(placed)}
         {action && <LipArrows action={action} lips={lipPoints} zoom={project.zoom} onScreen={onScreen} />}
@@ -1209,6 +1246,76 @@ function Glint() {
       </g>
       <circle r={6} fill="#fff" />
     </>
+  );
+}
+
+/** How far a clump of foam reaches from its middle, in its own units. */
+const FOAM_REACH = 24;
+/** A full clump's size in the picture: a little wider than the lip is thick (34 with its outline, at every zoom), so it shows on a phone. */
+const FOAM_SIZE = 1.25;
+/** How far a clump lies out from the lips' line, away from the mouth's middle: on the lip, clear of the teeth. */
+const FOAM_OUT = 3;
+
+/** The clumps' bubbles, [x, y, r] in their own units: round in a corner, flat along the lower lip. */
+const FOAM_BUBBLES: Record<FoamShape, { body: number[][]; loose: number[][] }> = {
+  corner: {
+    body: [
+      [-5, 0, 9],
+      [6, -3, 8],
+      [2, 7, 7.5],
+      [-12, 6, 5.5],
+      [12, 5, 5],
+    ],
+    loose: [
+      [15, -11, 3],
+      [-11, -11, 2.5],
+    ],
+  },
+  lip: {
+    body: [
+      [-11, 1, 6],
+      [-2, -1, 8],
+      [8, 1, 6.5],
+      [15, 3, 4.5],
+      [2, 6, 5.5],
+    ],
+    loose: [
+      [-16, -6, 2.5],
+      [10, -8, 3],
+    ],
+  },
+};
+
+/**
+ * A clump of white toothpaste foam: overlapping bubbles merged into one soft cloud – their light blue outline drawn
+ * under all their fills, so only the cloud's edge shows – with a soft shine and two loose bubbles beside it. Drawn
+ * still: its Sprite's HTML fades it in.
+ */
+function FoamClump({ shape, flip }: { shape: FoamShape; flip: boolean }) {
+  const { body, loose } = FOAM_BUBBLES[shape];
+  return (
+    <g transform={flip ? "scale(-1 1)" : undefined}>
+      <g fill="#bde0fe">
+        {body.map(([x, y, r]) => (
+          <circle key={`${x} ${y}`} cx={x} cy={y} r={r + 1.6} />
+        ))}
+      </g>
+      <g fill="#fff">
+        {body.map(([x, y, r]) => (
+          <circle key={`${x} ${y}`} cx={x} cy={y} r={r} />
+        ))}
+      </g>
+      <g fill="#eaf6ff">
+        {body.slice(0, 3).map(([x, y, r]) => (
+          <circle key={`${x} ${y}`} cx={x + r * 0.15} cy={y + r * 0.35} r={r * 0.55} />
+        ))}
+      </g>
+      <g fill="#fff" stroke="#bde0fe" strokeWidth={1.4}>
+        {loose.map(([x, y, r]) => (
+          <circle key={`${x} ${y}`} cx={x} cy={y} r={r} />
+        ))}
+      </g>
+    </g>
   );
 }
 

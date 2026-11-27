@@ -33,7 +33,6 @@ const MASCOT_DRAWINGS = [
   "src/games/scenes/weltall/parts.tsx",
   "src/games/scenes/strand/beach.tsx",
   "src/games/scenes/winterbaustelle/people.tsx",
-  "src/games/timer/jumpFox.tsx",
   "src/games/timer/race.tsx",
   "src/games/rewards/PosterPrint.tsx",
 ];

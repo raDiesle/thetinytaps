@@ -57,6 +57,7 @@ import {
 import { DAY_PARTS_CHOICES, DAY_SIGN_SETS, DaySign, type DayParts, type DaySignSet, PARTS_OF } from "./daySigns";
 import { RITUALS } from "./rituals";
 import { emptyHistory, type History, record, redo, undo } from "./history";
+import { REWARD_BOOK, SCHEDULE_BOOK, WAIT_BOOK } from "./names";
 import { Pick } from "./pageParts";
 import { ItemPic, LazyPictures, MarkPic, NightPic, Pic, picture } from "./pictures";
 import {
@@ -171,6 +172,32 @@ export function draftInSpan(span: Span, from: Draft, language: TargetLanguageId)
   return { type: "board", board: span.id === "collect" ? board : { ...withBoardDayParts(board, parts), signs } };
 }
 
+/** The three things the page makes, as the shelf names them: a Zeitplan, a Belohnungstafel and a Countdown („Wie lange warten?“). */
+export type ChartKind = "plan" | "board" | "countdown";
+
+/** Which of the three a draft is: a board, and a plan whose cards count stars, are a Belohnungstafel. */
+export const kindOf = (draft: Draft): ChartKind =>
+  draft.type === "board" ? "board" : draft.plan.view === "countdown" ? "countdown" : counting(draft.plan) ? "board" : "plan";
+
+/** The quick choice on top of the editor (user request, 26 November 2026): the three, by the names of their books. */
+export const CHART_KINDS: { id: ChartKind; label: Localized }[] = [
+  { id: "plan", label: SCHEDULE_BOOK },
+  { id: "board", label: REWARD_BOOK },
+  { id: "countdown", label: WAIT_BOOK },
+];
+
+/**
+ * A draft turned into another of the three, in the wizard: a day's plan without a Zähler, the same with one, or a
+ * Countdown – keeping name, photo, colours and reward like any other Zeitraum (`draftInSpan`).
+ */
+export function draftOfKind(kind: ChartKind, from: Draft, language: TargetLanguageId): Draft {
+  if (kindOf(from) === kind) return from;
+  const span = SPANS.find((s) => s.id === (kind === "countdown" ? "countdown" : "day")) ?? SPANS[0];
+  const made = draftInSpan(span, from, language);
+  if (kind === "countdown" || made.type !== "plan") return made;
+  return { type: "plan", plan: withCounter(made.plan, kind === "board" ? Math.max(1, counterOf(made.plan)) : 0) };
+}
+
 /** The Belohnungstafel's week as a plan: the board Vorlage „woche“'s tasks, the same every day. */
 function rewardWeek(plan: Plan): Plan {
   const tasks = TEMPLATES.find((tpl) => tpl.id === "woche")?.tasks ?? [];
@@ -270,9 +297,11 @@ function useDraftHistory(draft: Draft, onChange: (draft: Draft) => void) {
 
 /**
  * A chart as it will look, changed right on it – the same in the wizard and under „Gestalten“ (user decision,
- * November 2026: „exakt gleiche Seite für Assistent und Seite“). On top only what the sheet has no place to tap for:
- * the Zeitraum (in the wizard any span, a new chart from its Vorlage; on the page only views of the same kind, its
- * cards kept), what moves where nothing counts, the colours and the child's name – what a tap on the sheet changes
+ * November 2026: „exakt gleiche Seite für Assistent und Seite“). On top the quick choice of the three things the page
+ * makes (Zeitplan, Belohnungstafel, Wie lange warten?: in the wizard it turns the draft into that one, under
+ * „Gestalten“ `onKind` shows that kind's chart), then only what the sheet has no place to tap for: first the Zeitraum
+ * (in the wizard any span, a new chart from its first template; on the page only views of the same kind, its cards
+ * kept) with the colours, then the Tageszeiten and what moves where nothing counts – what a tap on the sheet changes
  * (stars, reward, cards, the day's parts) is never there twice (user feedback, November 2026). Below, the sheet itself
  * in edit mode: each card and the reward have ⚙️ and 🗑️ in their corners (`SheetAction`), a card − ＋ at its stars; a
  * tap on a card swaps it, sets its stars for a day, moves or removes it; ＋ adds one; a part's sign takes its line
@@ -290,6 +319,7 @@ export function ChartEditor({
   linked = NO_LINKED,
   more,
   onRemove,
+  onKind,
 }: {
   draft: Draft;
   onChange: (draft: Draft) => void;
@@ -304,6 +334,8 @@ export function ChartEditor({
   more?: ReactNode;
   /** Deletes the chart (after asking); missing in the wizard and for the only chart. */
   onRemove?: () => void;
+  /** Under „Gestalten“: show the chart of another of the three kinds (the wizard turns the draft itself). */
+  onKind?: (kind: ChartKind) => void;
 }) {
   const t = useT();
   const { id: language } = useAppLanguage();
@@ -420,6 +452,13 @@ export function ChartEditor({
     else onChange({ type: "board", board: withKind(draft.board, span.id as BoardKind) });
   };
 
+  const kind = kindOf(draft);
+  const pickKind = (next: ChartKind) => {
+    if (next === kind) return;
+    if (making) onChange(draftOfKind(next, draft, language));
+    else onKind?.(next);
+  };
+
   const plan = draft.type === "plan" ? draft.plan : undefined;
   const counts = plan ? counting(plan) : true;
   const ticks = draft.type === "plan" ? log?.[draft.plan.id] : log?.[draft.board.id];
@@ -447,6 +486,29 @@ export function ChartEditor({
     (plan?.view === "day" && !counts) || (draft.type === "board" && draft.board.kind === "month") || (plan?.view === "week" && counts) || !!parts;
   return (
     <div className="rw-chart-editor">
+      {/* The three things the page makes, on top of the editor (user request, 26 November 2026: one calendar on the shelf for all three). */}
+      {(making || onKind) && (
+        <div
+          className="rw-chart-kinds"
+          role="group"
+          aria-label={t({
+            en: "Kind of chart",
+            de: "Art der Tafel",
+            zh: "表的类型",
+            hi: "चार्ट का प्रकार",
+            es: "Tipo de tabla",
+            ar: "نوع اللوحة",
+            ru: "Вид таблицы",
+          })}
+        >
+          {CHART_KINDS.map((choice) => (
+            <button key={choice.id} type="button" className="rw-chart-kind" aria-pressed={choice.id === kind} onClick={() => pickKind(choice.id)}>
+              <KindPic id={choice.id} />
+              <span className="rw-chart-kind-name">{t(choice.label)}</span>
+            </button>
+          ))}
+        </div>
+      )}
       <div className="rw-edit-bar">
         <span
           className="rw-history"
@@ -537,6 +599,54 @@ export function ChartEditor({
         )}
       </div>
 
+      {/* The first step, right under the edit bar (user request, 26 November 2026): the Zeitraum on the left, the colours on the right. */}
+      <div className="rw-span-row">
+        {spans.length > 0 && (
+          <div className="rw-spans" role="group" aria-label={t(SPAN)}>
+            <span className="rw-band-label">{t(SPAN)}</span>
+            {spans.map((span) => (
+              <button
+                key={span.id}
+                type="button"
+                className="rw-span"
+                aria-pressed={span.id === spanOf(draft)}
+                title={span.hint ? t(span.hint) : undefined}
+                onClick={() => pickSpan(span)}
+              >
+                <SpanPic id={span.id} />
+                <span className="rw-span-name">{t(span.label)}</span>
+              </button>
+            ))}
+          </div>
+        )}
+        <span
+          className="rw-swatches"
+          role="group"
+          aria-label={t({ de: "Farben", en: "Colours", zh: "颜色", hi: "रंग", es: "Colores", ar: "الألوان", ru: "Цвета" })}
+        >
+          {THEMES.map((theme) => {
+            const on = (draft.type === "board" ? draft.board.theme : draft.plan.theme) === theme.id;
+            return (
+              <button
+                key={theme.id}
+                type="button"
+                className="rw-swatch"
+                aria-pressed={on}
+                aria-label={t(theme.label)}
+                title={t(theme.label)}
+                style={{ background: theme.paper, borderColor: theme.ink, boxShadow: `inset 0 0 0 5px ${theme.main}` }}
+                onClick={() =>
+                  onChange(
+                    draft.type === "board"
+                      ? { type: "board", board: { ...draft.board, theme: theme.id } }
+                      : { type: "plan", plan: { ...draft.plan, theme: theme.id } },
+                  )
+                }
+              />
+            );
+          })}
+        </span>
+      </div>
       {hasOptions && (
         <section
           className="rw-options-band"
@@ -752,54 +862,6 @@ export function ChartEditor({
           </div>
         </section>
       )}
-      {/* Right on the sheet (user feedback, November 2026): its Zeitraum on the left, its colours on the right. */}
-      <div className="rw-sheet-top">
-        {spans.length > 0 && (
-          <div className="rw-spans" role="group" aria-label={t(SPAN)}>
-            <span className="rw-band-label">{t(SPAN)}</span>
-            {spans.map((span) => (
-              <button
-                key={span.id}
-                type="button"
-                className="rw-span"
-                aria-pressed={span.id === spanOf(draft)}
-                title={span.hint ? t(span.hint) : undefined}
-                onClick={() => pickSpan(span)}
-              >
-                <SpanPic id={span.id} />
-                <span className="rw-span-name">{t(span.label)}</span>
-              </button>
-            ))}
-          </div>
-        )}
-        <span
-          className="rw-swatches"
-          role="group"
-          aria-label={t({ de: "Farben", en: "Colours", zh: "颜色", hi: "रंग", es: "Colores", ar: "الألوان", ru: "Цвета" })}
-        >
-          {THEMES.map((theme) => {
-            const on = (draft.type === "board" ? draft.board.theme : draft.plan.theme) === theme.id;
-            return (
-              <button
-                key={theme.id}
-                type="button"
-                className="rw-swatch"
-                aria-pressed={on}
-                aria-label={t(theme.label)}
-                title={t(theme.label)}
-                style={{ background: theme.paper, borderColor: theme.ink, boxShadow: `inset 0 0 0 5px ${theme.main}` }}
-                onClick={() =>
-                  onChange(
-                    draft.type === "board"
-                      ? { type: "board", board: { ...draft.board, theme: theme.id } }
-                      : { type: "plan", plan: { ...draft.plan, theme: theme.id } },
-                  )
-                }
-              />
-            );
-          })}
-        </span>
-      </div>
       {/* In a row, like the chart on the page (`rw-main`): only there the sheet gets the box's whole height. */}
       <div className="rw-main">
         <div className="rw-screen">
@@ -978,6 +1040,53 @@ function SpanPic({ id }: { id: SpanId }) {
           <circle cx={7} cy={16} r={4.6} />
           <circle cx={20} cy={16} r={4.6} />
           <path d="M33.5 8h11v4.5a5.5 5.5 0 0 1-11 0z M33.5 10h-2.2a2.4 2.4 0 0 0 2.6 4 M44.5 10h2.2a2.4 2.4 0 0 1-2.6 4 M39 18v4 M35.5 24.5h7v-2.5h-7z" />
+        </>
+      )}
+    </svg>
+  );
+}
+
+/** A five-pointed star's outline around (cx, cy), for the small drawings. */
+function starPath(cx: number, cy: number, r: number) {
+  const points = Array.from({ length: 10 }, (_, i) => {
+    const angle = (Math.PI / 5) * i - Math.PI / 2;
+    const d = i % 2 ? r * 0.45 : r;
+    return `${(cx + d * Math.cos(angle)).toFixed(2)} ${(cy + d * Math.sin(angle)).toFixed(2)}`;
+  });
+  return `M${points.join("L")}z`;
+}
+
+/**
+ * The small drawing of each of the three kinds, in the Zeitraum's ink: cards in a row with the paper arrow under the
+ * one to do (Zeitplan), cards with a star under each (Belohnungstafel), nights as moons up to a present (Wie lange warten?).
+ */
+function KindPic({ id }: { id: ChartKind }) {
+  const box = (x: number, y: number, w: number, h: number, key?: string | number) => <rect key={key} x={x} y={y} width={w} height={h} rx={1.5} />;
+  return (
+    <svg className="rw-chart-kind-pic" viewBox="0 0 48 32" aria-hidden>
+      {id === "plan" && (
+        <>
+          {[4, 18, 32].map((x) => box(x, 4, 12, 14, x))}
+          <path d="M24 30v-8m-3.2 3.2 3.2-3.2 3.2 3.2" fill="none" />
+        </>
+      )}
+      {id === "board" && (
+        <>
+          {[4, 18, 32].map((x) => box(x, 3, 12, 13, x))}
+          {[10, 24, 38].map((x) => (
+            <path key={x} d={starPath(x, 24.5, 5)} />
+          ))}
+        </>
+      )}
+      {id === "countdown" && (
+        <>
+          {[3, 13].map((x) => (
+            <path key={x} d={`M${x + 4} 11a5.5 5.5 0 1 0 0 10 6 6 0 0 1 0-10z`} />
+          ))}
+          <path d="M23 16h4m-2-2 2 2-2 2" fill="none" />
+          {box(31, 14, 14, 11)}
+          {box(30, 10.5, 16, 4)}
+          <path d="M38 10.5V25 M38 10.5c-1.5-4-6-4-4.5-1 M38 10.5c1.5-4 6-4 4.5-1" fill="none" />
         </>
       )}
     </svg>

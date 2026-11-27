@@ -44,26 +44,35 @@ export const SHELF_THINGS: ShelfThing[] = ["music", "playtime", "language", "fig
 
 /**
  * On a screen wider than tall the things on a board stand in one column at the shelf's right side, one compartment over
- * the other (user decision, November 2026): the hourglass on top in the tallest, the most needed; the globe in the
- * middle; the speaker at the bottom, standing at the left of its compartment beside the trophy room's sign at its right
- * (user request, 25 November 2026; `trophySignAt` in Bookshelf.tsx). The stickers are stuck on the right wall of the big
- * compartment on top, beside the everyday helpers, where they are seen better than in a narrow one (user feedback,
- * November 2026).
+ * the other (user decision, November 2026): the hourglass on top in the tallest, the most needed; under it the stickers
+ * of the child's figure with „Wer spielt?“ on that compartment's back panel (user request, 26 November 2026: on the wall
+ * of the helpers' compartment beside the books they were squeezed and took the books' room, and with the hourglass the
+ * fullscreen sign on the shelf's corner covered them); the globe; the speaker at the bottom, standing against the
+ * shelf's right wall, with the trophy room's sign at its left (user request, 26 November 2026; `trophySignAt` in
+ * Bookshelf.tsx).
  */
 const SIDE_COLUMN: { things: ShelfThing[]; share: number }[] = [
-  { things: ["playtime"], share: 0.36 },
-  { things: ["language"], share: 0.31 },
-  { things: ["music"], share: 0.33 },
+  { things: ["playtime"], share: 0.29 },
+  { things: ["figure"], share: 0.21 },
+  { things: ["language"], share: 0.24 },
+  { things: ["music"], share: 0.26 },
 ];
 
 /**
  * How wide that column is, as a share of the room and in px at least and at most: narrow, so the books get the room
  * (user request, 25 November 2026: at 12 % of the room the three compartments were too wide for what stands in them; on a
- * big monitor they keep their 150 px, where they were narrow already).
+ * big monitor they keep their 150 px, where they were narrow already). On a phone (`PHONE_ROOM`) narrower still (user
+ * request, 26 November 2026): what stands in it may be cut off a little at the left by the wall in front, which only
+ * shows the shelf's depth the better.
  */
 const SIDE_SHARE = 0.095;
 const SIDE_MIN = 60;
 const SIDE_MAX = 150;
+const PHONE_SIDE_SHARE = 0.07;
+const PHONE_SIDE_MIN = 50;
+
+/** The room's height below which the shelf is planned for a phone (the shorter side below 600 px, as `useFitGrid`). */
+const PHONE_ROOM = 600;
 
 /**
  * The sign with the app's name, on a screen wider than tall: it hangs on its chains in front of the shelf, down into its
@@ -77,12 +86,6 @@ export const SIGN_DIP = 0.3;
  * leans left towards them (`--lean` in bookshelf-books.css): its top would reach under the sign and over the words.
  */
 export const LEAN_CLEAR = 0.34;
-
-/**
- * The room the books spine out keep from the wall with the stickers of the child's figure, in book heights, so the
- * stickers are seen (user feedback, November 2026); a book to take keeps its `BOOK_GAP` from it.
- */
-export const STICKERS_ROOM = 0.45;
 
 /**
  * How far the sign at the top board's far left may reach over the shelf's left post, in posts: hanging on its chains in
@@ -120,7 +123,7 @@ export interface ShelfCell extends ShelfRect {
   bh?: number;
   /**
    * The grown-ups' things in it: one standing on its board, and the stickers (`figure`) on its right wall – in a
-   * compartment of their own, or in the one of the everyday helpers on a wide shelf.
+   * compartment of their own: on a wide shelf on its back panel.
    */
   things?: ShelfThing[];
   /**
@@ -342,7 +345,7 @@ function planWide(width: number, height: number, spans: number[], legs: number, 
   const frame = frameFor(width, height);
   const { post, wall, crown, board } = frame;
   const inner = height - crown - frame.plinth;
-  const side = clamp(width * SIDE_SHARE, SIDE_MIN, SIDE_MAX);
+  const side = height < PHONE_ROOM ? clamp(width * PHONE_SIDE_SHARE, PHONE_SIDE_MIN, SIDE_MAX) : clamp(width * SIDE_SHARE, SIDE_MIN, SIDE_MAX);
   const room = width - 2 * post - wall - side;
   const option = (rows: number) => {
     const tier = (inner - (rows - 1) * board) / rows;
@@ -385,8 +388,6 @@ function planWide(width: number, height: number, spans: number[], legs: number, 
   plan.boards.forEach((books, r) => {
     const y = crown + r * (plan.tier + board);
     const lead = plan.leadOf(r);
-    // The stickers on the top compartment's right wall.
-    const things: ShelfThing[] | undefined = r === 0 ? ["figure"] : undefined;
     const tall = r === 0 ? plan.tall : undefined;
     cells.push({
       x: mid,
@@ -395,7 +396,6 @@ function planWide(width: number, height: number, spans: number[], legs: number, 
       h: plan.tier,
       books,
       bh: plan.bhs[r],
-      ...(things && { things }),
       ...(lead > 0 && { lead }),
       ...(tall !== undefined && { tall }),
     });
@@ -480,7 +480,7 @@ function planUpright(width: number, height: number, spans: number[], legs: numbe
 
 /**
  * Where the rail of a group's sign runs under a compartment's books, `bh` high, standing together in its middle with
- * `BOOK_GAP` between them: from the first to the last that belongs to the group – a toy among them (`isToy`, Zaubertasten's
+ * `BOOK_GAP` between them: from the first to the last that belongs to the group – a toy among them (`isToy`, Tippzauber's
  * poster) is no learning game, so the rail of „Lernspiele“ leaves it out (user feedback, 25 November 2026).
  */
 export function railUnder(cell: ShelfCell, bh: number, spans: number[], isToy: (place: number) => boolean): { left: number; width: number } {

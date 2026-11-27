@@ -132,7 +132,7 @@ export function CircusLevel(props: LevelProps) {
             {t < circus.tFire && <Clown at={clown.pt} turn={clown.turn} arms={clown.arms} stride={clown.stride} />}
             <Cannon age={t - circus.tFire} />
             <Unicycle at={uni.pt} turned={uni.turned} lean={uni.lean} />
-            <Ball color={MARBLE_COLOR} x={marble.pt.x} y={marble.pt.y} spin={marble.spin} />
+            {!marbleFree(circus, t) && <Ball color={MARBLE_COLOR} x={marble.pt.x} y={marble.pt.y} spin={marble.spin} />}
             <Basket at={uni.pt} lean={uni.lean} />
             <Ribbon tassel={circus.tasselAt(t)} pulled={circus.pulledAt(t)} fired={t >= circus.tFire} />
             <Hoop t={0} flicker={0} tPass={circus.tHoop} part="front" />
@@ -1211,8 +1211,14 @@ function Spotlights({ on }: { on: number }) {
 function BallAndClown({ circus, t, at }: { circus: Circus; t: number; at: ScreenAt }) {
   const ball = circus.bigBallAt(t);
   const clown = circus.clownAt(t);
+  const marble = circus.marbleAt(t);
   return (
     <>
+      {marbleFree(circus, t) && (
+        <Sprite at={at} x={marble.pt.x} y={marble.pt.y} pad={BALL_R + 4}>
+          <Ball color={MARBLE_COLOR} x={0} y={0} spin={marble.spin} />
+        </Sprite>
+      )}
       <Sprite at={at} x={ball.pt.x} y={ball.pt.y} pad={BIG_BALL.r + 4}>
         <BigBall at={ORIGIN} spin={ball.spin} />
       </Sprite>
@@ -1223,6 +1229,18 @@ function BallAndClown({ circus, t, at }: { circus: Circus; t: number; at: Screen
       )}
     </>
   );
+}
+
+/**
+ * Whether the marble is out on its way, from below the top hat until the bear's basket catches it: then it is a sprite
+ * over the machine (`BallAndClown`). Rolling, hopping and swinging in the machine's svg through the level's first ten
+ * seconds, it had the phone paint that whole svg again in every frame (A-46: the circus's start 67 % busy). Nothing it
+ * passes on that way lies in front of it; inside the hat and in the basket it is drawn in the svg, behind their fronts.
+ */
+function marbleFree(circus: Circus, t: number) {
+  if (t < 0 || t >= circus.tCatch) return false;
+  const { pt } = circus.marbleAt(t);
+  return !(Math.abs(pt.x - HAT.x) < 70 && pt.y < HAT.y + 40 + BALL_R);
 }
 
 const ORIGIN: Pt = { x: 0, y: 0 };

@@ -169,7 +169,7 @@
 
 .sock-knob {
   transform-origin: 170px 28px;
-  transition: rotate 0.3s;
+  transition: transform 0.3s;
 }
 
 .sock-door {
@@ -186,7 +186,7 @@
 }
 
 .washing .sock-knob {
-  rotate: 90deg;
+  transform: rotate(90deg);
 }
 
 .sock-machine.open .sock-door {
@@ -321,7 +321,7 @@
 
 @keyframes sock-drum-spin {
   to {
-    rotate: 360deg;
+    transform: rotate(360deg);
   }
 }
 

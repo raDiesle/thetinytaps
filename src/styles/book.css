@@ -599,7 +599,6 @@
 /* ----- Buttons, labels and panels: paper too, nothing glossy or app-like ----- */
 
 /* A printed book's pictures don't move by themselves: the sun's rays and the clouds stand still. */
-:root .sky-sun-rays,
 :root .sky-cloud {
   animation: none;
 }

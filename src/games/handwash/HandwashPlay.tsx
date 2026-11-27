@@ -1,18 +1,20 @@
-import { type CSSProperties, useCallback, useEffect, useMemo, useRef, useState } from "react";
+import { type CSSProperties, type PointerEvent, useCallback, useEffect, useMemo, useRef, useState } from "react";
+import { ControlIcon } from "@/components/ControlIcon";
 import { GameEnd } from "@/components/GameEnd";
 import { FeedbackLayer, useTapFeedback } from "@/components/TapFeedback";
 import { useNoBackgroundMusic } from "@/lib/backgroundMusic";
 import { DEV } from "@/lib/buildInfo";
 import { type Daytime, daytimeOf } from "@/lib/days";
+import { useDevice } from "@/lib/device";
 import { useT } from "@/lib/language";
 import { usePageStill } from "@/lib/pageMotion";
-import { noPointerClick } from "@/lib/press";
 import { loadRecordings, playChime, playPlop, playRecorded, playSplash, playTuneNote } from "@/lib/sfx";
+import { GO_ON, PAUSE, SPACE_OR_TAP_TO_GO_ON, TAP_TO_GO_ON } from "@/lib/sharedTexts";
 import { stepInAddress, useStepAddress } from "@/lib/stepAddress";
 import { useTimers } from "@/lib/timers";
 import { useWakeLock } from "@/lib/wakeLock";
 import pictureFiles from "./bilder/*.webp?glob";
-import { Dirt, Foam, HAND_VIEWS, HandArt, type HandView, handSpot, Sleeve, SleeveRoll, SoapDab, Wet } from "./hands";
+import { Dirt, Foam, type FoamStage, HAND_VIEWS, HandArt, type HandView, handSpot, Sleeve, SleeveRoll, SoapDab, Wet } from "./hands";
 import { AREAS, LeverArt, place, PumpHeadArt, SinkPicture, SplashArt, Stream, TowelWrapArt } from "./sink";
 import { BEAT_MS, type PictureId, playedSteps, RUB_STEPS, STEPS, type Step, type StepId } from "./steps";
 
@@ -36,6 +38,9 @@ const PLAYED = playedSteps(STEPS, (id) => PICTURES.has(id), DEV);
 /** Every painted picture of the steps played, in order. */
 const PLAYED_PICTURES = PLAYED.flatMap((s) => s.pictures ?? []);
 
+/** How long a step lasts, in ms. */
+const stepMs = (step: Step) => step.beats * BEAT_MS;
+
 /**
  * How each hand is seen in a step (left, right), so one hand soaps the other: the right palm up for the soap, the left
  * hand's palm lying on it while they rub, one spread hand over the other's back, the fingers interlaced.
@@ -49,35 +54,68 @@ const VIEWS: Partial<Record<StepId, [HandView, HandView]>> = {
   rinse: ["back", "palm"],
 };
 
-/** How much of the dirt is left in a step (1 all of it, 0 none): it goes with the rubbing and the last of it with the rinse. */
-const DIRT: Partial<Record<StepId, number>> = { palms: 0.6, backs: 0.4, backs2: 0.25, between: 0.12, water: 0.12 };
+/** The views of a step played (left, right); the hands are seen from their backs where a step names none. */
+const viewsAt = (index: number): [HandView, HandView] => VIEWS[PLAYED[index]?.id] ?? ["back", "back"];
 
-/** One view of a hand with its dirt, foam and wet shine, shown while the step sees the hand so. */
+/**
+ * How much of the dirt is left in a step (1 all of it, 0 none), on the hand and on the fingers: it goes bit by bit with
+ * the rubbing (user feedback, 26 November 2026) – the hand's first, the fingertips' last – and the rest with the rinse.
+ */
+const DIRT: Partial<Record<StepId, [number, number]>> = {
+  palms: [0.55, 0.9],
+  backs: [0.35, 0.7],
+  backs2: [0.2, 0.45],
+  between: [0.1, 0.2],
+  water: [0.1, 0.2],
+};
+
+/** The foam's three layers, in the order they come with the rubbing (and go again, the other way round, with the rinse). */
+const FOAM_STAGES: readonly FoamStage[] = ["patches", "full", "fingers"];
+
+/** One view of a hand: the hand and its fingers, each with its dirt, foam and wet shine, shown while the step sees the hand so. */
 function View({ side, view }: { side: "left" | "right"; view: HandView }) {
   return (
     <div className={`hw-view v-${view}`}>
-      <HandArt side={side} view={view} />
+      <HandArt side={side} view={view} part="hand" />
       <div className="hw-dirt">
-        <Dirt view={view} />
+        <Dirt view={view} part="hand" />
       </div>
-      <div className="hw-foam">
-        <Foam view={view} />
-      </div>
+      {FOAM_STAGES.slice(0, 2).map((stage) => (
+        <div key={stage} className={`hw-foam f-${stage}`}>
+          <Foam view={view} stage={stage} />
+        </div>
+      ))}
       <div className="hw-wet">
-        <Wet view={view} />
+        <Wet view={view} part="hand" />
+      </div>
+      {/* The fingers lie over the hand's top edge and bend over its knuckles. */}
+      <div className="hw-fingers">
+        <HandArt side={side} view={view} part="fingers" />
+        <div className="hw-dirt hw-dirt-fingers">
+          <Dirt view={view} part="fingers" />
+        </div>
+        <div className="hw-foam f-fingers">
+          <Foam view={view} stage="fingers" />
+        </div>
+        <div className="hw-wet">
+          <Wet view={view} part="fingers" />
+        </div>
       </div>
     </div>
   );
 }
 
-/** One hand: its four views, the sleeve over its arm with the rolled-up cuff, the soap in the right palm. */
-function Hand({ side, daytime }: { side: "left" | "right"; daytime: Daytime }) {
+/**
+ * One hand: the views it shows now, just before and next (only those are drawn, so a phone keeps few layers), the sleeve
+ * over its arm with the rolled-up cuff, the soap in the right palm.
+ */
+function Hand({ side, daytime, views }: { side: "left" | "right"; daytime: Daytime; views: ReadonlySet<HandView> }) {
   return (
     <div className={`hw-hand hw-${side}`} style={place(AREAS[side])}>
       <div className="hw-pose">
         <div className="hw-rub">
           <div className="hw-mirror">
-            {HAND_VIEWS.map((view) => (
+            {HAND_VIEWS.filter((view) => views.has(view)).map((view) => (
               <View key={view} side={side} view={view} />
             ))}
             <div className="hw-sleeve">
@@ -87,7 +125,7 @@ function Hand({ side, daytime }: { side: "left" | "right"; daytime: Daytime }) {
               </div>
             </div>
             {side === "right" && (
-              <div className="hw-dab" style={handSpot(170, 350, 76)}>
+              <div className="hw-dab" style={handSpot(168, 372, 76)}>
                 <SoapDab />
               </div>
             )}
@@ -115,21 +153,28 @@ function Picture({ id, name }: { id: PictureId; name: string }) {
   );
 }
 
-/** The pause and play signs, drawn like Zähne putzen's (never emoji). */
-function PauseIcon({ paused }: { paused: boolean }) {
+/** Minutes and seconds, as the time left beside the bar shows them. */
+const formatTime = (ms: number) => {
+  const seconds = Math.max(0, Math.ceil(ms / 1000));
+  return `${Math.floor(seconds / 60)}:${String(seconds % 60).padStart(2, "0")}`;
+};
+
+/** The time left of the whole washing, for the grown-up beside the bar: it counts by itself, so the picture is never drawn again for it. */
+function TimeLeft({ left, label }: { left: () => number; label: string }) {
+  const [, tick] = useState(0);
+  useEffect(() => {
+    const timer = setInterval(() => tick((n) => n + 1), 250);
+    return () => clearInterval(timer);
+  }, []);
   return (
-    <svg viewBox="0 0 24 24" aria-hidden>
-      {paused ? (
-        <path d="M8 5 L19 12 L8 19 Z" fill="#2a1e5c" strokeLinejoin="round" stroke="#2a1e5c" strokeWidth={2} />
-      ) : (
-        <>
-          <rect x={6} y={5} width={4} height={14} rx={1.5} fill="#2a1e5c" />
-          <rect x={14} y={5} width={4} height={14} rx={1.5} fill="#2a1e5c" />
-        </>
-      )}
-    </svg>
+    <span className="hw-time" aria-label={label}>
+      {formatTime(left())}
+    </span>
   );
 }
+
+/** The bar's colour family of a step: the rooms (lilac), at the basin with no water (blue), the rubbing (green) and the water (blue). */
+const segmentKind = (id: StepId) => (PLAYED.find((s) => s.id === id)?.pictures ? "hw-seg-room" : RUB_STEPS.includes(id) ? "hw-seg-rub" : "hw-seg-sink");
 
 /** The classes of the picture in a step: what is held on from step to step, and how each hand is seen. */
 function stageStates(steps: readonly Step[], index: number, done: boolean) {
@@ -143,7 +188,8 @@ function stageStates(steps: readonly Step[], index: number, done: boolean) {
     const at = steps.findIndex((s) => s.id === end);
     return at < 0 || index < at;
   };
-  const [left, right] = VIEWS[id] ?? ["back", "back"];
+  const [left, right] = viewsAt(index);
+  const lathered = RUB_STEPS.includes(id) || id === "water";
   return [
     `at-${id}`,
     done ? "done" : "",
@@ -154,7 +200,9 @@ function stageStates(steps: readonly Step[], index: number, done: boolean) {
     id === "sleeves" ? "rolling" : "",
     id === "water" || id === "rinse" ? "water-on" : "",
     id === "soap" ? "dab" : "",
-    RUB_STEPS.includes(id) || id === "water" ? "foamy" : "",
+    // The foam comes bit by bit: patches with the first rubbing, the whole hand halfway through it, the fingers with the backs.
+    lathered ? "lather-patches lather-full" : "",
+    lathered && from("backs") ? "lather-fingers" : "",
     from("water") && before("towel") ? "wet" : "",
   ]
     .filter(Boolean)
@@ -166,13 +214,16 @@ function stageStates(steps: readonly Step[], index: number, done: boolean) {
  * the child's own eyes – Mama calls that dinner is nearly ready, into the bathroom and up the step stool (painted
  * pictures), then the child's own hands over the basin: sleeves up, soap into one hand, one hand soaps the other (palm
  * on palm, over each back, between the fingers) while the dirt goes, water on and feel how warm it is, rinse, water off,
- * into the towel – and off to eat (painted again). It plays by itself, to the beat of the song to come: a tap or a key
- * answers with soft rings, Space or the bar's button pauses, the arrow keys and the bar jump between steps.
+ * into the towel – and off to eat (painted again). It plays by itself, to the beat of the song to come. Its controls are
+ * Zähne putzen's (user request, 26 November 2026): a tap on the picture, Space or the pause button pauses, „Von vorn“
+ * starts again, the bar shows each step filling up and a tap or drag on it jumps there, the time left beside it; the
+ * arrow keys jump between steps.
  */
 export function HandwashPlay({ video }: { video?: VideoRun }) {
   const t = useT();
   const { later } = useTimers();
   const still = usePageStill();
+  const { touchOnly } = useDevice();
   const { effects, ripple } = useTapFeedback();
   const [round, setRound] = useState(0);
   const [index, setIndex] = useState(() => Math.max(0, video ? 0 : PLAYED.findIndex((s) => s.id === stepInAddress())));
@@ -180,7 +231,6 @@ export function HandwashPlay({ video }: { video?: VideoRun }) {
   const [done, setDone] = useState(false);
   // The picture stands at its start until the book lies open: only then the states come on and their motions run.
   const [started, setStarted] = useState(false);
-  // biome-ignore lint/correctness/useExhaustiveDependencies: a new round reads the clock again
   const daytime = useMemo(() => video?.daytime ?? daytimeOf(), [video?.daytime, round]);
   const running = started && !paused && !done;
   const step = PLAYED[index];
@@ -192,7 +242,6 @@ export function HandwashPlay({ video }: { video?: VideoRun }) {
   useEffect(() => loadRecordings(["splash"]), []);
 
   // Starts once nothing moves on the page (a video at once), a frame after the first picture, so the states' transitions run.
-  // biome-ignore lint/correctness/useExhaustiveDependencies: a new round starts again
   useEffect(() => {
     if (!still && !video) return;
     let frame = requestAnimationFrame(() => {
@@ -201,29 +250,44 @@ export function HandwashPlay({ video }: { video?: VideoRun }) {
     return () => cancelAnimationFrame(frame);
   }, [still, video, round]);
 
-  // The clock: each step lasts its beats, and a pause keeps what is left of the step it fell into.
+  // The clock: each step lasts its beats, and a pause keeps what is left of the step it fell into (`left`); while it
+  // runs, `since` knows when the step's rest began, so the time beside the bar can count down.
   const left = useRef<{ index: number; ms: number } | null>(null);
+  const since = useRef<{ index: number; at: number; ms: number } | null>(null);
   useEffect(() => {
     if (!running) return;
-    const ms = left.current?.index === index && left.current.ms > 0 ? left.current.ms : PLAYED[index].beats * BEAT_MS;
+    const ms = left.current?.index === index && left.current.ms > 0 ? left.current.ms : stepMs(PLAYED[index]);
     const from = performance.now();
+    since.current = { index, at: from, ms };
     const timer = later(() => {
       if (index + 1 < PLAYED.length) setIndex(index + 1);
       else setDone(true);
     }, ms);
     return () => {
       clearTimeout(timer);
+      since.current = null;
       left.current = { index, ms: ms - (performance.now() - from) };
     };
   }, [running, index, later]);
 
+  /** What is left of the whole washing, in ms: the rest of this step and every step after it. */
+  const timeLeft = () => {
+    const run = since.current;
+    const rest =
+      run?.index === index
+        ? run.ms - (performance.now() - run.at)
+        : left.current?.index === index && left.current.ms > 0
+          ? left.current.ms
+          : stepMs(PLAYED[index]);
+    return rest + PLAYED.slice(index + 1).reduce((sum, s) => sum + stepMs(s), 0);
+  };
+
   // The sounds of a step, as it begins: the pump giving its soap, the water coming on, the chime at the table.
-  // biome-ignore lint/correctness/useExhaustiveDependencies: only a new step plays them, never a pause going on
   useEffect(() => {
     if (!started) return;
     if (step.id === "water") later(() => playRecorded("splash", playSplash), BEAT_MS);
     if (step.id === "rinse") playRecorded("splash", playSplash);
-    if (step.id === "soap") later(playPlop, BEAT_MS * 2.6);
+    if (step.id === "soap") later(playPlop, BEAT_MS * 3.6);
     if (step.id === "run") later(playChime, BEAT_MS * 2);
   }, [started, index, round]);
 
@@ -248,35 +312,57 @@ export function HandwashPlay({ video }: { video?: VideoRun }) {
 
   const togglePause = useCallback(() => setPaused((p) => !p), []);
 
-  // A tap or a key never pauses: a child tapping the picture alone would stop the washing and not know how to go on.
-  // It answers with soft rings; pausing is the button's and Space's.
-  useEffect(() => {
-    if (video) return;
-    const onKey = (e: KeyboardEvent) => {
-      if (e.key === "Escape" || e.repeat) return;
-      if (done) return;
-      if (e.key === " ") togglePause();
-      else if (e.key === "ArrowRight") jump(index + 1);
-      else if (e.key === "ArrowLeft") jump(index - 1);
-      else ripple();
-    };
-    window.addEventListener("keydown", onKey);
-    return () => window.removeEventListener("keydown", onKey);
-  }, [video, done, index, jump, togglePause, ripple]);
-
-  const again = () => {
+  const again = useCallback(() => {
     left.current = null;
     setRound((r) => r + 1);
     setIndex(0);
     setDone(false);
     setPaused(false);
     setStarted(false);
+  }, []);
+
+  // Space (or Enter) pauses and goes on, or starts again at the end; the arrows jump a step; any other key answers with rings.
+  useEffect(() => {
+    if (video) return;
+    const onKey = (e: KeyboardEvent) => {
+      if (e.key === "Escape" || e.repeat) return;
+      if (e.key === " " || e.key === "Enter") {
+        if (done) again();
+        else togglePause();
+      } else if (e.key === "ArrowRight" || e.key === "ArrowDown") jump(index + 1);
+      else if (e.key === "ArrowLeft" || e.key === "ArrowUp") jump(Math.max(0, index - 1));
+      else if (!done) ripple();
+    };
+    window.addEventListener("keydown", onKey);
+    return () => window.removeEventListener("keydown", onKey);
+  }, [video, done, index, jump, togglePause, again, ripple]);
+
+  /**
+   * A tap or drag on the bar jumps to the step under the finger, from its start – along the bar held upright beside a
+   * wide picture too (`handwash.css`). Dragging jumps only when it reaches another step, so one never starts again and
+   * again under a moving finger.
+   */
+  const seekFromPointer = (e: PointerEvent<HTMLDivElement>, first: boolean) => {
+    const segments = [...e.currentTarget.querySelectorAll(".hw-seg")];
+    const upright = getComputedStyle(e.currentTarget).flexDirection === "column";
+    const along = upright ? e.clientY : e.clientX;
+    const to = segments.findIndex((s, k) => {
+      const r = s.getBoundingClientRect();
+      return k === segments.length - 1 || along < (upright ? r.bottom : r.right);
+    });
+    if (to < 0 || (!first && to === index)) return;
+    jump(to);
   };
 
-  // Before the book lies open the hands stand still, seen from the back – and a painted picture already stands.
-  const states = started ? stageStates(PLAYED, index, done) : `l-back r-back${step.pictures ? ` at-${step.id} pictured` : ""}`;
+  // Only the views of the step before, this one and the next are drawn: the one going, the one shown, the one coming.
+  const mounted = (side: 0 | 1) => new Set([index - 1, index, index + 1].filter((i) => i >= 0 && i < PLAYED.length).map((i) => viewsAt(i)[side]));
+
+  // Before the book lies open the hands stand still in the step's own views (only those are drawn) – and a painted
+  // picture already stands.
+  const [leftView, rightView] = viewsAt(index);
+  const states = started ? stageStates(PLAYED, index, done) : `l-${leftView} r-${rightView}${step.pictures ? ` at-${step.id} pictured` : ""}`;
   const rinseAt = PLAYED.findIndex((s) => s.id === "rinse");
-  const dirt = done || index >= rinseAt ? 0 : (DIRT[step.id] ?? 1);
+  const [dirtHand, dirtFingers] = done || index >= rinseAt ? [0, 0] : (DIRT[step.id] ?? [1, 1]);
 
   const label = t({
     en: "Your own hands over the basin, washed step by step",
@@ -290,13 +376,14 @@ export function HandwashPlay({ video }: { video?: VideoRun }) {
 
   return (
     <div className={`hw-play ${daytime}${paused ? " paused" : ""}${video ? " video" : ""}`}>
+      {/* A tap on the picture pauses, as in Zähne putzen (user request, 26 November 2026); the pause screen over it goes
+          on again. Not at the end, which has nothing left to pause, and never in a video. */}
       <div
         key={round}
         className={`hw-stage ${states}`}
-        style={{ "--dirt": dirt } as CSSProperties}
-        onPointerDown={(e) => {
-          // In a video nothing on the picture answers a click.
-          if (!video && !done && !paused) ripple(e.clientX, e.clientY);
+        style={{ "--dirt-hand": dirtHand, "--dirt-fingers": dirtFingers, "--step": `${stepMs(step)}ms` } as CSSProperties}
+        onPointerDown={() => {
+          if (!video && !done && !paused && started) togglePause();
         }}
       >
         <SinkPicture daytime={daytime} label={label} />
@@ -312,57 +399,71 @@ export function HandwashPlay({ video }: { video?: VideoRun }) {
         <div className="hw-layer hw-pump-head" style={place(AREAS.pumpHead)}>
           <PumpHeadArt />
         </div>
-        <Hand side="left" daytime={daytime} />
-        <Hand side="right" daytime={daytime} />
+        <Hand side="left" daytime={daytime} views={mounted(0)} />
+        <Hand side="right" daytime={daytime} views={mounted(1)} />
         <div className="hw-layer hw-towel-wrap" style={place(AREAS.towelWrap)}>
           <TowelWrapArt />
         </div>
         {PLAYED_PICTURES.map((id) => (
           <Picture key={id} id={id} name={t(PLAYED.find((s) => s.pictures?.includes(id))?.name ?? STEPS[0].name)} />
         ))}
-        {paused && (
-          // While paused (only a grown-up pauses), a tap anywhere on the picture goes on: going on stops nothing.
-          <div
-            className="hw-paused"
-            data-tap
-            onPointerDown={(e) => {
-              e.stopPropagation();
-              togglePause();
-            }}
-          >
-            <PauseIcon paused />
-          </div>
-        )}
       </div>
+
+      {paused && (
+        <button type="button" className="hw-paused" onClick={togglePause}>
+          <span className="hw-paused-icon" aria-hidden>
+            <ControlIcon kind="pause" className="hw-button-icon" />
+          </span>
+          {t(PAUSE)}
+          <small>{t(touchOnly ? TAP_TO_GO_ON : SPACE_OR_TAP_TO_GO_ON)}</small>
+        </button>
+      )}
+
+      {/* Zähne putzen's controls on one strip of paper: pause, start again, the bar of steps and the time left. */}
       {!video && !done && (
-        <div className="hw-bar">
+        <div className="hw-controls">
+          <button type="button" className="hw-button" onClick={togglePause} aria-label={paused ? t(GO_ON) : t(PAUSE)}>
+            <ControlIcon kind={paused ? "play" : "pause"} className="hw-button-icon" />
+          </button>
           <button
             type="button"
-            className="hw-pause"
-            data-tap
-            aria-label={t(
-              paused
-                ? { en: "Go on", de: "Weiter", zh: "继续", hi: "आगे चलो", es: "Seguir", ar: "متابعة", ru: "Дальше" }
-                : { en: "Pause", de: "Pause", zh: "暂停", hi: "रुको", es: "Pausa", ar: "إيقاف مؤقت", ru: "Пауза" },
-            )}
-            onPointerDown={togglePause}
-            onClick={noPointerClick(togglePause)}
+            className="hw-button"
+            onClick={again}
+            aria-label={t({ de: "Von vorn", en: "Start again", zh: "重新开始", hi: "फिर से शुरू", es: "Otra vez", ar: "من جديد", ru: "Сначала" })}
           >
-            <PauseIcon paused={paused} />
+            <ControlIcon kind="again" className="hw-button-icon" />
           </button>
-          {PLAYED.map((s, i) => (
-            <button
-              key={s.id}
-              type="button"
-              className={`hw-seg${i < index ? " past" : i === index ? " now" : ""}${RUB_STEPS.includes(s.id) ? " rub" : ""}`}
-              style={{ "--beats": s.beats } as CSSProperties}
-              title={t(s.name)}
-              aria-label={t(s.name)}
-              data-tap
-              onPointerDown={() => jump(i)}
-              onClick={noPointerClick(() => jump(i))}
-            />
-          ))}
+          <div
+            className="hw-progress"
+            role="slider"
+            aria-label={t({ de: "Fortschritt", en: "Progress", zh: "进度", hi: "प्रगति", es: "Progreso", ar: "التقدّم", ru: "Сколько уже сделано" })}
+            aria-valuemin={1}
+            aria-valuemax={PLAYED.length}
+            aria-valuenow={index + 1}
+            aria-valuetext={t(step.name)}
+            onPointerDown={(e) => {
+              e.currentTarget.setPointerCapture(e.pointerId);
+              seekFromPointer(e, true);
+            }}
+            onPointerMove={(e) => {
+              if (e.currentTarget.hasPointerCapture(e.pointerId)) seekFromPointer(e, false);
+            }}
+          >
+            {PLAYED.map((s, i) => (
+              <span
+                key={s.id}
+                className={`hw-seg ${segmentKind(s.id)}${i < index ? " past" : i === index ? " now" : ""}`}
+                style={{ "--beats": s.beats, "--step": `${stepMs(s)}ms` } as CSSProperties}
+                title={t(s.name)}
+              >
+                <span />
+              </span>
+            ))}
+          </div>
+          <TimeLeft
+            left={timeLeft}
+            label={t({ de: "Restzeit", en: "Time left", zh: "剩余时间", hi: "बाकी समय", es: "Tiempo restante", ar: "الوقت المتبقي", ru: "Осталось времени" })}
+          />
         </div>
       )}
       <FeedbackLayer effects={effects} />

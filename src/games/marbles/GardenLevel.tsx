@@ -54,7 +54,7 @@ import { beside, deg, lerp, seg, svgLine } from "./machineKit";
 import { MachineStage } from "./MachineStage";
 import { DARK_WOOD, INK, MARBLE_COLOR, MID_WOOD, Sparkles, WOOD } from "./scenery";
 import { BALL_R, type Pt } from "./path";
-import { BAR_COLORS, Ball, still } from "./parts";
+import { BAR_COLORS, Ball, Sprite, still, type ScreenAt } from "./parts";
 
 const LAWN = "#7fd34e";
 const LEAF = "#4caf50";
@@ -99,7 +99,14 @@ export function GardenLevel(props: LevelProps) {
   );
 
   return (
-    <MachineStage back={backdrop} machine={garden} level="garden" start={{ x: BIRDHOUSE.x, y: BIRDHOUSE.doorY - 8, r: 84 }} {...props}>
+    <MachineStage
+      back={backdrop}
+      machine={garden}
+      level="garden"
+      start={{ x: BIRDHOUSE.x, y: BIRDHOUSE.doorY - 8, r: 84 }}
+      over={(t, at) => <SnailCreeping t={t} at={at} />}
+      {...props}
+    >
       {(t) => (
         <>
           <Chimes garden={garden} t={t} />
@@ -110,7 +117,7 @@ export function GardenLevel(props: LevelProps) {
           <Lawn />
           <MownStripe length={garden.stripeAt(t)} />
           <FeederPole garden={garden} t={t} />
-          <Snail t={t} />
+          {!snailCreeping(t) && <Snail x={snailX(t)} />}
           <Birdhouse garden={garden} t={t} />
           <GutterBack />
           <CanStick />
@@ -266,12 +273,29 @@ const Lawn = memo(function Lawn() {
 /** How long the snail creeps, in seconds: by then the camera has left it. */
 const SNAIL_S = 20;
 
-/** A little snail creeping along the raised lawn, very slowly. */
-function Snail({ t }: { t: number }) {
-  // It creeps for the level's first seconds only: creeping for ever, it changed the picture in every frame (perf).
-  const x = 520 + 4 * Math.min(Math.max(0, t), SNAIL_S);
+/** Where the snail is: it creeps for the level's first seconds only, since creeping for ever changed the picture in every frame (perf). */
+const snailX = (t: number) => 520 + 4 * Math.min(Math.max(0, t), SNAIL_S);
+/** While it creeps, the snail is a layer of its own (`SnailCreeping`), so the machine's svg isn't painted again for it. */
+const snailCreeping = (t: number) => t > 0 && t < SNAIL_S;
+
+/**
+ * The creeping snail as a sprite over the machine. Drawn in the machine's svg, it crept at the bottom of the screen while
+ * the chimes swung at the top, and the phone rastered the whole band between them in every frame (A-46: the garden's
+ * start rastered 37 screens a second).
+ */
+function SnailCreeping({ t, at }: { t: number; at: ScreenAt }) {
+  if (!snailCreeping(t)) return null;
   return (
-    <g transform={`translate(${x} ${TERRACE.y})`}>
+    <Sprite at={at} x={snailX(t)} y={TERRACE.y} pad={60}>
+      <Snail x={0} y={0} />
+    </Sprite>
+  );
+}
+
+/** A little snail creeping along the raised lawn, very slowly, its foot at `x` on the lawn (or at `x`, `y`). */
+const Snail = still(function Snail({ x, y = TERRACE.y }: { x: number; y?: number }) {
+  return (
+    <g transform={`translate(${x} ${y})`}>
       <path d="M-30 0 Q-34 -12 -20 -12 L22 -12 Q34 -12 34 0 Z" fill="#ffd9a8" stroke={INK} strokeWidth="3" strokeLinejoin="round" />
       <line x1="26" y1="-12" x2="32" y2="-30" stroke={INK} strokeWidth="3" strokeLinecap="round" />
       <line x1="20" y1="-12" x2="22" y2="-28" stroke={INK} strokeWidth="3" strokeLinecap="round" />
@@ -281,7 +305,7 @@ function Snail({ t }: { t: number }) {
       <path d="M-4 -26 m-12 0 a12 12 0 1 1 12 12 a7 7 0 1 1 -6 -8" fill="none" stroke={INK} strokeWidth="2.5" />
     </g>
   );
-}
+});
 
 /* ---------- Birdhouse, chimes and gutter ---------- */
 

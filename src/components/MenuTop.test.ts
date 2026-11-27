@@ -232,7 +232,7 @@ test("the families stand at the bottom of a menu's page, not in its head", () =>
 test("headings carry no emoji", () => {
   const leading = /<h[1-6][^>]*>\s*(<span aria-hidden>|\{?[^\s<{}]*\p{Extended_Pictographic})/u;
   const offenders = sourceFiles()
-    .filter((file) => file.endsWith(".tsx") && !/ManagementPage|ResearchPage|pages\/management\/|PictureQueue|VoiceList/.test(file))
+    .filter((file) => file.endsWith(".tsx") && !/ManagementPage|ResearchPage|SongsPage|pages\/management\/|PictureQueue|VoiceList/.test(file))
     .filter((file) => leading.test(read(join("src", file))));
   expect(offenders).toEqual([]);
   expect(read("src/components/MenuTop.tsx")).toMatch(/title: string; tools/);

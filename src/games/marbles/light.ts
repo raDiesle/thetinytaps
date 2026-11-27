@@ -430,11 +430,13 @@ export function buildLight() {
     const v = Math.min(u - GLOBE_SPIN, 2);
     return 0.8 + 1.6 * (GLOBE_SPIN - 1) + 1.6 * v - 0.4 * v * v;
   };
-  /** A wobble in degrees as it starts, dying away. */
+  /** A wobble in degrees as it starts, dying away (`+ 0` makes the -0 it ends on 0, which `still` takes as the same). */
   const globeWobble = (t: number) => {
     const u = t - tGlobe;
-    return u <= 0 ? 0 : 7 * Math.sin(u * 14) * decay(3 * u);
+    return u <= 0 ? 0 : 7 * Math.sin(u * 14) * decay(3 * u) + 0;
   };
+  /** Whether the globe's ball moves (wobbles, lights up or turns): from the click until it stands, a sprite of its own then (A-42). */
+  const globeMoving = (t: number) => t >= tGlobe && t <= tGlobe + 0.3 + GLOBE_SPIN + 2;
 
   /* The glowing globe calls the fireflies: they fly over the top of it and on into the lighthouse's lantern, the one furthest left first. */
   const tCall = (i: number) => tGlobe + 0.9 + FLY_GAP * (FIREFLIES - 1 - i);
@@ -506,6 +508,8 @@ export function buildLight() {
     return hits;
   });
   stickerHits.forEach((hits, k) => hits.forEach((h, n) => at(h, { sound: () => playChimeNote(k + 3 * n) })));
+  /** Whether sticker `k` is waking, from the beam's first pass over it until its glow has come up after the last (A-42). */
+  const stickerWaking = (k: number, t: number) => t >= stickerHits[k][0] && t <= stickerHits[k][stickerHits[k].length - 1] + 0.4;
   /** How brightly sticker `k` glows: half after the spot's first pass, fully after the second. */
   const stickerGlow = (k: number, t: number) =>
     Math.min(
@@ -692,6 +696,34 @@ export function buildLight() {
   };
   const cameraTarget = (t: number) => cameraOn(WORLD_W, focusX(t));
 
+  /** The moments `lampRest` found, by how many world units the screen shows beyond the view on each side. */
+  const rests = new Map<number, number>();
+  /**
+   * When the lava lamp, its carousel, the warm air and the shadows on the wall stand still for good: the first moment
+   * after the bird reached the globe at which the camera has left all of them behind, `wide` being how many world units
+   * a screen wider than 16 : 9 shows beyond the view on each side. From the globe on the camera only moves to the
+   * right, so they are never seen again and nothing jumps. Turning on to the end, they had the machine's whole svg
+   * painted again in every frame while the lighthouse swept the wall, a screen away (A-42: 52 screens a second).
+   */
+  const lampRest = (wide: number) => {
+    const key = Math.round(wide);
+    const known = rests.get(key);
+    if (known !== undefined) return known;
+    // How far right of the lamp's middle the carousel's hoop and cut-outs reach, and a shadow's shape either side of its
+    // middle (the cut-outs, `SHADOW.scale` times bigger); the camera glides after its target, so it is looked at a
+    // second late, and a few units more for the edges' soft pixels.
+    const reach = CAROUSEL.r + 60;
+    const shadowReach = 35 * SHADOW.scale;
+    const gone = (t: number) => {
+      const left = cameraTarget(t - 1) - key - 40;
+      return LAVA.x + reach < left && [rabbitShadow(t), birdShadow(t)].every((s) => s.show <= 0 || s.x + shadowReach < left);
+    };
+    let t = tGlobe;
+    while (t < tDone && !gone(t)) t += 1 / 30;
+    rests.set(key, t);
+    return t;
+  };
+
   return {
     events: sorted(),
     duration: tDone,
@@ -742,11 +774,13 @@ export function buildLight() {
     globeGlow,
     globeTurn,
     globeWobble,
+    globeMoving,
     lighthouseAngle,
     lanternGlow,
     beamSpot,
     stickerHits,
     stickerGlow,
+    stickerWaking,
     rainbow,
     rainbowReach,
     flowerLean,
@@ -756,6 +790,7 @@ export function buildLight() {
     lampTurn,
     dark,
     cameraTarget,
+    lampRest,
     width: WORLD_W,
   };
 }

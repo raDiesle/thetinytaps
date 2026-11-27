@@ -89,14 +89,14 @@ export interface Scenario {
 }
 
 /**
- * A fixed chance from here on (`Math.random` replaced by a seeded one): Zaubertasten's surprises are drawn by chance, and
+ * A fixed chance from here on (`Math.random` replaced by a seeded one): Tippzauber's surprises are drawn by chance, and
  * which kinds came swung its smashing stretch between 58 and 70 % busy on the same code (November 2026).
  */
 const FIXED_CHANCE: Step = {
   eval: "(() => { let a = 12345; Math.random = () => { a |= 0; a = (a + 0x6d2b79f5) | 0; let t = Math.imul(a ^ (a >>> 15), 1 | a); t = (t + Math.imul(t ^ (t >>> 7), 61 | t)) ^ t; return ((t ^ (t >>> 14)) >>> 0) / 4294967296; }; })()",
 };
 
-/** Zaubertasten: a finger landing somewhere on the screen every 130 ms, for the next 10 s. */
+/** Tippzauber: a finger landing somewhere on the screen every 130 ms, for the next 10 s. */
 const SMASH = `(() => { const end = performance.now() + 10000; const id = setInterval(() => { const el = document.querySelector(".tw-play"); if (!el || performance.now() > end) return clearInterval(id); const r = el.getBoundingClientRect(); el.dispatchEvent(new PointerEvent("pointerdown", { bubbles: true, clientX: r.x + Math.random() * r.width, clientY: r.y + 60 + Math.random() * (r.height - 60), pointerType: "touch", isPrimary: true })); }, 130); })()`;
 
 /** The first card or start button of a game's start screen. */
@@ -162,6 +162,14 @@ function chainLevel(id: (typeof KETTEN_LEVELS)[number]): Scenario {
 }
 
 export const SCENARIOS: Scenario[] = [
+  {
+    // The shared tap hint waiting for a child who doesn't find what to tap: its hand presses again and again, maybe for
+    // minutes. Its shadow lay over the pressing layer, and the GPU blurred it anew in every frame (A-55). Measured on the
+    // wooden marble run's shelf before its first tap, in the hint's first stage (the hand presses, nothing darkens yet).
+    name: "tipp-hinweis",
+    path: "/kettenreaktion/track/",
+    parts: [{ label: "Hand drückt", before: [{ waitFor: ".tap-hint.stage-1" }], ms: 5000 }],
+  },
   {
     // One stretch after the other, with no waits between them: collecting a trace already leaves seconds unmeasured
     // between two stretches, and a stretch started after a wait of its own missed the story's monsters growing, which
@@ -236,7 +244,7 @@ export const SCENARIOS: Scenario[] = [
     ],
   },
   {
-    // Zaubertasten: a hand banging on the keys or the screen brings several letters, digits with their shapes and
+    // Tippzauber: a hand banging on the keys or the screen brings several letters, digits with their shapes and
     // surprises at once (up to `MAX_POPS` and five surprises), each a small layer of its own – far quicker presses than
     // in the other keyboard games, since that is how the toy is played.
     name: "zaubertasten",
@@ -336,7 +344,7 @@ export const SCENARIOS: Scenario[] = [
   // The timer's pictures in their order on its start screen, each running for a while with a tap now and then (the
   // twinkling, the flame, what is left lighting up), the moon setting and the sun rising, the pizza's slices
   // lifted off, the ladybug crawling round the red disc, the alarm clock's digits ticking, the toy crane carrying toys
-  // into the box, the crystal's beam carrying the blocks out of their jumble into the block house, the pickaxe digging the treasure tunnel block by block, the hopper climbing up to the moon catching its stars, the picture following it like a camera, in „Abwechseln“ the toy hopping onto the first cushion and the hourglass running,
+  // into the box, the crystal's beam carrying the blocks out of their jumble into the block house, the pickaxe digging the treasure tunnel block by block, the lift riding up its tower with the floors counting on its display, the tower sliding down behind it, in „Abwechseln“ the toy hopping onto the first cushion and the hourglass running,
   // on the Kugelbahn the marble rolling down its ramps, on the Rennstrecke the kart driving round the figure eight, and the marbles bouncing down the pegboard into the jar. Each card is tapped by its name (its
   // tooltip), so the cards' order and groups may change.
   ...(
@@ -346,7 +354,7 @@ export const SCENARIOS: Scenario[] = [
       ["apfelbaum", "Apfelbaum"],
       ["wecker", "Wecker"],
       ["blume", "Blume"],
-      ["mond", "Hoch bis zum Mond"],
+      ["aufzug", "Mit dem Aufzug nach oben"],
       ["pizza", "Pizza"],
       ["kerze", "Kerze"],
       // Tidy Up was written English first; the German app names their cards in German since they were translated.

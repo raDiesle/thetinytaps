@@ -1,5 +1,5 @@
 import { expect, test } from "bun:test";
-import { CATEGORIES, categoryHref, listedGames } from "@/content/games";
+import { CATEGORIES, categoryHref, listedGames, shelfVolumes } from "@/content/games";
 import { putBookBack, renameIdRefs, shelfBookOf } from "./bookTravel";
 
 // The way back puts the book into its own gap (a shelf book's `data-book` is its category's id): every page in a book
@@ -12,8 +12,10 @@ test("every category's page and every game finds its book on the shelf", () => {
     if (!category.apart) expect(shelfBookOf(categoryHref(category))).toBe(category.id);
     for (const game of category.games.filter((g) => g.unfinished === true)) expect(shelfBookOf(game.href), game.href).toBeUndefined();
     for (const game of listedGames(category)) {
-      // A bundle of volumes: the game's own address is the volume of that address, wherever it stands in the bundle.
-      const own = game.volumes?.find((v) => v.href === game.href)?.href ?? game.volumes?.[0].href ?? game.href;
+      // A bundle of volumes: the game's own address is the volume of that address, wherever it stands in the bundle; a
+      // calendar (`Game.calendar`) is one thing, found by the game's own address.
+      const volumes = shelfVolumes(game);
+      const own = volumes?.find((v) => v.href === game.href)?.href ?? volumes?.[0].href ?? game.href;
       expect(shelfBookOf(game.href)).toBe(category.apart ? own.replaceAll("/", "") : category.id);
     }
   }
@@ -26,8 +28,9 @@ test("the games standing apart are books of their own, each found by its pages",
   for (const game of apart.filter((g) => !g.volumes)) for (const href of game.also ?? []) expect(shelfBookOf(href)).toBe(shelfBookOf(game.href));
 });
 
-// A game standing as several books (Belohnungstafel & Zeitplan) has a book for each of its addresses: going back from a part puts
-// that part's book back, not its neighbour.
+// A game standing as several books has a book for each of its addresses: going back from a part puts that part's book
+// back, not its neighbour. A game standing as one calendar (Belohnungstafel & Zeitplan, `Game.calendar`) goes back into
+// that calendar's gap from every part.
 test("each of a game's volumes is found by its own address", () => {
   const games = CATEGORIES.flatMap((c) => c.games).filter((g) => g.volumes);
   expect(games.length).toBeGreaterThan(0);
@@ -35,7 +38,7 @@ test("each of a game's volumes is found by its own address", () => {
     const volumes = game.volumes ?? [];
     expect(volumes.map((v) => v.href).sort()).toEqual([game.href, ...(game.also ?? [])].sort());
     // A volume still being built is no book on the shelf (`shelfVolumes`): its page belongs to its game's book.
-    for (const v of volumes) expect(shelfBookOf(v.href), v.href).toBe((v.unfinished ? game.href : v.href).replaceAll("/", ""));
+    for (const v of volumes) expect(shelfBookOf(v.href), v.href).toBe((game.calendar || v.unfinished ? game.href : v.href).replaceAll("/", ""));
   }
 });
 

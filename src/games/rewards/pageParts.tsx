@@ -53,7 +53,7 @@ export function PanelButton({ open, onClick, emoji, label }: { open: boolean; on
 
 /**
  * A choice in the wizard shown as what it makes: a picture of the result (or a big emoji) and its name – the picture
- * says the rest, so a grown-up sees what they decide on, as with the Vorlagen.
+ * says the rest, so a grown-up sees what they decide on.
  */
 export function Pick({
   selected,
