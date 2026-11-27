@@ -270,6 +270,12 @@ export const LANGUAGE_STATUS: LanguageStatusRow[] = [
         note: "Was vor dem Putzen und am Ende gesagt wird, von ElevenLabs gesprochen (Tapsis Stimme, 30. Oktober 2026); die Putzschritte auch, für den Fall, dass das Lied nicht lädt.",
       },
       {
+        label: "🥣 Frühstück am Morgen",
+        recorded: true,
+        languages: { de: "text", en: "text", zh: "text", hi: "text", es: "text", ar: "text", ru: "text" },
+        note: "Morgens isst das Kind in der Geschichte Frühstück statt Süßigkeiten (X-19, 27. November 2026): der Name auf der Leiste und der Satz „Mmm, breakfast! …“ (BREAKFAST_TEXTS in lines.ts), Englisch zuerst und gleich in allen sieben Sprachen. Noch nicht aufgenommen: bis dahin bleibt der Satz morgens stumm (bun run voice make --only zaehne, nur auf Wunsch).",
+      },
+      {
         label: "🎵 Zahnputzlied (gesungen)",
         recorded: true,
         languages: { de: "done", en: "done", zh: "done", hi: "done", es: "done", ar: "done", ru: "done", it: "done" },

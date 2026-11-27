@@ -1,4 +1,5 @@
-import type { Localized } from "@/lib/language";
+import type { Daytime } from "@/lib/days";
+import type { EnglishFirst, Localized, Texts } from "@/lib/language";
 
 // What Zähne putzen says before and after the brushing, in every language it has: plain data, so the list of
 // recordings (src/content/recordedLines.ts) reads it without loading the game's drawings.
@@ -100,6 +101,35 @@ export const PRELUDE_TEXTS: Record<Prelude, { title: Localized; cue?: Localized 
     },
   },
 };
+
+/**
+ * The story's first part before the morning brushing, where the child eats breakfast instead of sweets (X-19, written
+ * English first): its name on the bar and what the voice says.
+ */
+export const BREAKFAST_TEXTS: { title: EnglishFirst; cue: EnglishFirst } = {
+  title: {
+    en: "🥣 Eating breakfast",
+    de: "🥣 Frühstück essen",
+    zh: "🥣 吃早饭",
+    hi: "🥣 नाश्ता करना",
+    es: "🥣 Desayunar",
+    ar: "🥣 نتناول الفطور",
+    ru: "🥣 Завтракаем",
+  },
+  cue: {
+    en: "Mmm, breakfast! A little sugar stays on the teeth too.",
+    de: "Mmh, Frühstück! Auch davon bleibt ein bisschen Zucker an den Zähnen.",
+    zh: "嗯，早饭真好吃！也有一点点糖留在了牙齿上。",
+    hi: "म्म, नाश्ता! इससे भी थोड़ी-सी चीनी दाँतों पर रह जाती है।",
+    es: "¡Mmm, el desayuno! También se queda un poco de azúcar en los dientes.",
+    ar: "مممم، الفطور! يبقى منه أيضًا قليل من السكر على الأسنان.",
+    ru: "Ммм, завтрак! И от него немного сахара остаётся на зубках.",
+  },
+};
+
+/** What a part before the clock is called and says at this time of day: in the morning the story eats breakfast. */
+export const preludeTexts = (part: Prelude, daytime: Daytime): { title: Texts; cue?: Texts } =>
+  part === "sweets" && daytime === "morning" ? BREAKFAST_TEXTS : PRELUDE_TEXTS[part];
 
 /** Said at the end, before the daytime's goodbye (unless the sung finale sings it). */
 export const DONE_SAY: Localized = {

@@ -69,6 +69,9 @@ export const teethIdeas: IdeaArea = {
       text: "Die Geschichte am Anfang zeigt morgens, was zum Frühstück gegessen wurde: ein Honigbrot, ein Müsli mit Milch, ein Becher Kakao gleiten in den Mund, und auch daraus werden Krümel und dann Zuckermonster. Abends bleiben die drei Süßigkeiten. Die Tageszeit kommt wie bisher von der Uhr.",
       why: "So lernt das Kind, dass auch normales Essen Spuren an den Zähnen lässt und nicht nur Süßes – und das Morgenputzen nach dem Frühstück bekommt seinen eigenen Grund.",
       effort: "M",
+      done: true,
+      partial:
+        "Umgesetzt am 27. November 2026: morgens (bis 14 Uhr) fliegen ein Honigbrot, ein Löffel Müsli mit Milch und ein Becher Kakao in den Mund, zerkrümeln beim Abbeißen, und ihre Krümel in Honig-, Hafer- und Kakaofarben werden zu Zuckermonstern; dazu Abbeißen, Knuspern und zwei Schlucke Kakao. Die Leiste heißt morgens „🥣 Frühstück essen“ und zeigt das gezeichnete Honigbrot, bis sein gemaltes Symbol aus der Bilder-Warteschlange kommt. Der Satz „Mmh, Frühstück! …“ ist in allen sieben Sprachen da, wartet aber noch auf seine Aufnahme.",
     },
     {
       id: "X-20",
