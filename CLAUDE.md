@@ -1050,7 +1050,11 @@ src/lib/                 speech, sfx (synthesized + recorded sounds), storage, d
   A tap on a book takes it out (`takeOutBook`, `bookTravel.ts`): it comes off its board, into the middle, its cover swings open
   to the left, and its left page, the next menu printed on it, comes close until it is the screen – **no page turns on
   the way into a book**. Back to the shelf (`useTurnPage("/")` → `putBookBack`) is the same backwards: the book closes
-  and goes back into its own gap (`shelfBookOf`, `bookTravel.test.ts`). The grown-ups' options on the shelf's page are
+  and goes back into its own gap (`shelfBookOf`, `bookTravel.test.ts`). The screen is copied onto the book's page both ways (`seenCopy`), and the
+  copy gets ids of its own (`ownIds`, its `url(#…)` and `href` following them): with the page's ids each stood twice in
+  the document, and Zähne putzen's face, clipped by one of them, vanished but for its eyes and mouth (user feedback,
+  November 2026, reported twice; `bookTravel.test.ts`). A picture as big as the screen is cut to its frame by CSS
+  (`clip-path: inset(…)`), not by an svg `<clipPath>` found by its id. The grown-ups' options on the shelf's page are
   things one finds on a bookshelf, standing in its own narrow compartments beside the books, never buttons and never
   loose around the room (`RoomOptions.tsx`, user feedback, October 2026), on a wide screen all in one column at the
   shelf's right, one compartment over the other (`SIDE_COLUMN`, user decision, November 2026): on top, in the tallest,
