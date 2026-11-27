@@ -23,8 +23,8 @@ import { dirtyFaces } from "./stains";
 import { SUNG_LANGUAGES, songEndMs, sungSteps, useBrushingMusic, useSongLoad } from "./music";
 import type { Cue } from "./cues";
 import { DONE_SAY, type Prelude, PRELUDE_TEXTS, preludeTexts, TIDY_SAY } from "./lines";
-import { Lion, LION_INTRO_MS, LION_RECORDINGS, LionSymbol, ROAR_CUES, ROARING_MS, RoarSymbol } from "./lion";
-import { HoneyBread, Origin, ORIGIN_CUES, ORIGIN_MS, ORIGIN_RECORDINGS } from "./origin";
+import { Lion, LION_INTRO_MS, LION_RECORDINGS, ROAR_CUES, ROARING_MS } from "./lion";
+import { Origin, ORIGIN_CUES, ORIGIN_MS, ORIGIN_RECORDINGS } from "./origin";
 import { Scenes, type SceneKind } from "./scenes";
 import { Prep, PREP_CUES, PREP_MS, PREP_RECORDINGS, TIDY_RECORDINGS } from "./prep";
 import { Spit, SPIT_CUES, SPIT_MS } from "./spit";
@@ -280,21 +280,6 @@ export function preludeTiles(prelude: Prelude[]): { phase: BarPhase; parts: Prel
 function BarSymbol({ name }: { name: TeethSymbol | null }) {
   const src = name && teethSymbol(name);
   if (src) return <img className="teeth-symbol" src={src} alt="" draggable={false} aria-hidden />;
-  // Until its painted picture comes (queued in src/games/potty/symbolPictures.ts), the morning's breakfast shows the
-  // story's own honey bread, drawn in the same ink line.
-  if (name === "fruehstueck")
-    return (
-      <svg className="teeth-symbol" viewBox="-40 -42 80 84" aria-hidden>
-        <HoneyBread />
-      </svg>
-    );
-  // The lion's phases show the scene's lion's head in the same ink line, roaring for the roaring, until their painted pictures come.
-  if (name === "loewe" || name === "bruellen")
-    return (
-      <svg className="teeth-symbol" viewBox="-40 -42 80 84" aria-hidden>
-        {name === "loewe" ? <LionSymbol /> : <RoarSymbol />}
-      </svg>
-    );
   return <span className="teeth-symbol" aria-hidden />;
 }
 

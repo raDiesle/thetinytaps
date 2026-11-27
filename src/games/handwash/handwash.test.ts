@@ -1,5 +1,5 @@
 import { describe, expect, test } from "bun:test";
-import { readFileSync } from "node:fs";
+import { existsSync, readFileSync } from "node:fs";
 import { APP_LANGUAGES } from "@/lib/language";
 import { HANDWASH_PICTURE_QUEUE } from "./handwashPictures";
 import { BEAT_MS, playedSteps, RUB_STEPS, STEPS, stepAt, stepStarts } from "./steps";
@@ -29,10 +29,13 @@ describe("Hände waschen", () => {
     expect(rest).toEqual([...rest].sort((a, b) => a - b));
   });
 
-  test("every painted picture is waiting in the queue, and the built site leaves out the steps whose pictures aren't made", () => {
+  test("every painted picture is made or waiting in the queue, and the built site leaves out the steps whose pictures aren't made", () => {
     const pictures = STEPS.flatMap((s) => s.pictures ?? []);
     const queued = HANDWASH_PICTURE_QUEUE.flatMap((q) => q.panels?.map((p) => p.file) ?? [q.file]);
-    for (const id of pictures) expect(queued).toContain(`src/games/handwash/bilder/${id}.webp`);
+    for (const id of pictures) {
+      const file = `src/games/handwash/bilder/${id}.webp`;
+      expect({ file, there: existsSync(file) || queued.includes(file) }).toEqual({ file, there: true });
+    }
     expect(playedSteps(STEPS, () => false, true)).toEqual(STEPS);
     const built = playedSteps(STEPS, () => false, false);
     expect(built.some((s) => s.pictures)).toBe(false);

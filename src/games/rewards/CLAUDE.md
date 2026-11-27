@@ -288,7 +288,7 @@ the format's pixels – 20 × 30, 30 × 40 (default), 40 × 60, a panorama 30 ×
 a square 30 × 30 for a Countdown and a collecting board (`posterFormatsFor`). English names them in inches. It redraws
 once the stage has stood still `SETTLE_MS` (the child's photo arrives later from IndexedDB). Round it a frame of the
 season by default (`seasonalDecor`) or all year, the heading on a ribbon, the sheet lifted with a shadow; the painted
-grounds `poster-<theme>` wait in the picture queue, a gradient of the theme meanwhile. On 40 × 60 another chart may
+grounds `poster-<theme>` (made 27 November 2026), a gradient of the theme where one is missing. On 40 × 60 another chart may
 join it (T-39, `PosterCompanion`, built in `RewardsGame`): the poster stands upright, the plan above, the board below.
 The preview dashes the `POSTER_SAFE_MM` margin, warns where a picture prints under `SHARP_DPI` and names the largest
 sharp format (`blurriest`, `largestSharp`), and a drawn child's room shows the poster at true size beside a child of

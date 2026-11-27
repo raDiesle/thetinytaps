@@ -91,6 +91,7 @@ export const PICTURE_SOURCES: Record<string, PictureSource> = {
   ownbed: { title: "Bett: eigenes Bett", hrefs: ["/grosses-bett/eigenes-bett/"] },
   teeth: { title: "Zähne putzen", hrefs: ["/zaehne/"] },
   potty: { title: "Aufs Töpfchen", hrefs: ["/toepfchen/"] },
+  handwash: { title: "Hände waschen", hrefs: ["/haende-waschen/"] },
   rewards: { title: "Belohnungstafel, Zeitplan und Wie lange warten?", hrefs: ["/belohnungstafel/", "/tagesplan/", "/wie-lange-warten/"] },
   scenes: { title: "Lebendige Bilder", hrefs: ["/bilder/"] },
   marbles: { title: "Kettenreaktion", hrefs: ["/kettenreaktion/"] },
