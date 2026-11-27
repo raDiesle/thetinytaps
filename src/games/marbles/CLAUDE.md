@@ -255,7 +255,15 @@ Then a second part past the tree (`PART2`, `acornAt`, `beeAt`, `kiteAt`; a pure 
     whose numbers stay the same in a frame. A glow that dies away passes its `decay` (exactly 0 at rest), a blinking lamp
     a boolean (dark while `seen` says it is off the screen), a stretch of smoke a `t` held outside the seconds it shows.
     Drawn with `t` itself, the Raketenstart's whole machine went through React in every frame while only a few
-    attributes changed: 71–78 % busy on the old phone, 61–62 % once its parts were still and its flying things sprites (A-38). Props are compared one level deep, so a list of things
+    attributes changed: 71–78 % busy on the old phone, 61–62 % once its parts were still and its flying things sprites (A-38).
+    The Hatschi-Kette is drawn alike (A-44): each animal, the tree, its falling leaves and the feather are `still`,
+    the tree's wobble and the leaves' fall held once they rest (`wobbleSeconds`), the feather by its numbers, never by
+    the ref the level counts in; and each thing past the tree gets the second part's clock `u` only inside its spans
+    (`PART2_SPANS`, `held`), between them the moment its last span ended – a new thing there gets its spans, and
+    `sneezeStill.test.tsx` checks that every held moment draws exactly what the moment itself would (a span ending too
+    early would freeze a thing mid-move). Tap ages pass capped at 1 s, or every part tapped once was drawn again in
+    every frame. Drawn with `t` and `u` themselves, every animal and thing went through React in every frame: 56 % /
+    66 % busy (script 23 / 25 %), now 43 % / 46–53 % (script 9–11 %). Props are compared one level deep, so a list of things
     that move (radio waves) is a row of `still` parts, never an array of objects. What flies or bobs on its own across
     the sky (the Raketenstart's satellite, capsule and radio waves, its UFO with its beam and the moon rock it carries),
     and what drives or turns for seconds (its moon buggy, its planet mobile), is a `Sprite` in `over` (`SkyFall`,
