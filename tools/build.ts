@@ -268,7 +268,7 @@ if (beaconToken && !/^[0-9a-f]{32}$/i.test(beaconToken)) throw new Error("build:
 // How long each game is played is sent to Umami Cloud (src/lib/analytics.ts), which sets no cookies either. Its
 // website id is no secret (it stands in every page), so it lives here; the script counts only on the site's own
 // hosts (with and without www, `countedHosts`), so a build looked at locally sends nothing, and it leaves out the address's query (?level=…).
-const UMAMI_WEBSITE_ID = "f51dbbd5-9252-4b5b-addc-267b2bb89f67";
+const UMAMI_WEBSITE_ID = "5915235d-f8fa-4fe2-b12e-bc41fc38b348";
 const ANALYTICS = [
   ...(beaconToken
     ? [`<script defer src="https://static.cloudflareinsights.com/beacon.min.js" data-cf-beacon='{"token": "${beaconToken}", "spa": true}'></script>`]
