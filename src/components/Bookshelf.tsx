@@ -192,14 +192,17 @@ const SPINE_COLOURS = ["#5e4f44", "#475057", "#685e4b", "#515647", "#594c51", "#
 
 /**
  * The sign with the app's name hanging in front of a wide shelf: its letters' size for the room's height, and its
- * board's width and height in those (the name, the sign's padding and frame; the foxes on its o rise 0.4 above it). The
- * board measures 6.9 of them in the page: a wider guess took the books' room beside it (November 2026).
+ * board's width and height in those (the name's two lines, the sign's padding and frame). The board measures 6.6 by 2.36
+ * of them in the page: a wider guess takes the books' room beside it (November 2026).
  */
-const SIGN_SIZE = 0.09;
-const SIGN_EMS = 7.1;
-const SIGN_BOARD = 1.5;
-/** How far the foxes on its o rise above its board, in its letters' size. */
-const SIGN_FOXES = 0.4;
+const SIGN_SIZE = 0.078;
+const SIGN_EMS = 7.2;
+const SIGN_BOARD = 2.4;
+/**
+ * How far the foxes on its o rise above its board, in its letters' size: none since the name has two lines, where they
+ * sit on „Grow“ in the lower one, under the board's top edge.
+ */
+const SIGN_FOXES = 0;
 
 /**
  * The least height of the shelf's legs, for the room's: the bottom's middle where browsers note how to leave

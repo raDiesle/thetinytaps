@@ -58,16 +58,16 @@ test("everything happens, the card stands whole for a while to scan its code, an
 });
 
 test("the code always leads to the home page in the video's language, so one outro serves every video", () => {
-  expect(codeAddress("de")).toBe("https://www.funforboth.com/");
-  expect(codeAddress("en")).toBe("https://www.funforboth.com/en/");
+  expect(codeAddress("de")).toBe("https://www.littlestepstogrow.com/");
+  expect(codeAddress("en")).toBe("https://www.littlestepstogrow.com/en/");
   expect(read(join(import.meta.dir, "../../../tools/video.ts"))).not.toContain("ziel");
 });
 
 test("every page a video links to is a page of the site, German at the root and the others under their prefix", () => {
   const pages = new Set(["/", ...CATEGORIES.flatMap((category) => category.games.map((game) => game.href))]);
   for (const [path] of VIDEO_PAGES) expect(pages.has(path)).toBe(true);
-  expect(addressFor("/zaehne/", "de")).toBe("https://www.funforboth.com/zaehne/");
-  expect(addressFor("/zaehne/", "en")).toBe("https://www.funforboth.com/en/zaehne/");
-  expect(shortAddress(addressFor("/", "de"))).toBe("funforboth.com");
-  expect(shortAddress(addressFor("/toepfchen/", "es"))).toBe("funforboth.com/es/toepfchen");
+  expect(addressFor("/zaehne/", "de")).toBe("https://www.littlestepstogrow.com/zaehne/");
+  expect(addressFor("/zaehne/", "en")).toBe("https://www.littlestepstogrow.com/en/zaehne/");
+  expect(shortAddress(addressFor("/", "de"))).toBe("littlestepstogrow.com");
+  expect(shortAddress(addressFor("/toepfchen/", "es"))).toBe("littlestepstogrow.com/es/toepfchen");
 });

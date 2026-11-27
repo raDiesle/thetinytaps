@@ -10,7 +10,7 @@ import type { CardPose } from "./timeline";
 const CODE_SIZE = 360;
 
 /**
- * The card every outro ends on (ideas Y-04 and Y-05): the `Logo`, „funforboth.com“, what the site is in five small
+ * The card every outro ends on (ideas Y-04 and Y-05): the `Logo`, „littlestepstogrow.com“, what the site is in five small
  * signs, and a code leading to the home page in `language`, coming up from below as `pose` says.
  */
 export function EndCard({ pose, language }: { pose: CardPose; language: SeoLanguage }) {
@@ -20,7 +20,7 @@ export function EndCard({ pose, language }: { pose: CardPose; language: SeoLangu
     <div className="vo-card" style={{ opacity: Math.min(1, pose.card * 1.6), translate: `0 ${(1 - pose.card) * 640}px` }}>
       <div className="vo-card-main">
         <Logo />
-        <p className="vo-address">funforboth.com</p>
+        <p className="vo-address">littlestepstogrow.com</p>
         <ul className="vo-signs">
           {SIGNS.map((sign, k) => (
             <li key={sign.icon} style={{ opacity: pose.signs[k], translate: `0 ${(1 - pose.signs[k]!) * 18}px` } as CSSProperties}>

@@ -37,10 +37,10 @@
 
 .room-scene {
   /* The wall round the shelf, and above it the room for the sign with the app's name, hanging on its chains above the
-   * shelf, and for Papa Fox and his child sitting on it (Logo). */
+   * shelf: the name's two lines (Logo, Papa Fox and his child on „Grow“ in the lower one) and the board round them. */
   --side: max(10px, 1.5vw);
   --sign: clamp(1.5rem, min(9vh, 6.4vw), 5rem);
-  --top: calc(var(--sign) * 2.1 + 16px);
+  --top: calc(var(--sign) * 2.65 + 16px);
   --floor: clamp(14px, 5vh, 44px);
   position: relative;
   height: 100dvh;
@@ -534,7 +534,7 @@
   z-index: 1;
   left: 50%;
   translate: -50% 0;
-  padding: 0.12em 0.7em calc(var(--sign) * 0.2);
+  padding: 0.12em 1em calc(var(--sign) * 0.2);
   border: clamp(4px, 0.9vh, 8px) solid #9a6a40;
   border-radius: 10px 10px 4px 4px;
   background: linear-gradient(#ffffff80, #0000 30%, #0000 80%, #a0784a26), var(--paper-grain, none), #fbf3df;
@@ -868,7 +868,13 @@
   flex-wrap: nowrap;
   margin: 0;
   font-size: var(--sign);
+  line-height: 0.95;
   white-space: nowrap;
+}
+
+/* Exactly two lines on the sign, never a word of a line broken off onto a third (it was, above an upright shelf). */
+.room .shelf .shelf-sign .logo-line {
+  flex-wrap: nowrap;
 }
 
 /*

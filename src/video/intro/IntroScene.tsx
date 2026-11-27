@@ -3,7 +3,7 @@ import { Logo } from "@/components/Logo";
 import pictures from "../../components/bilder/*.webp?glob";
 import { type BookPose, bookPose, CANVAS, fadeIn, HERO, type ShelfPose, shelfPose, type TitlePose, titlePose } from "./timeline";
 
-/** The picture books standing cover out beside the Fun for Both book, two on each side, as on the home page's shelf, from left to right. */
+/** The picture books standing cover out beside the Little Steps to Grow book, two on each side, as on the home page's shelf, from left to right. */
 export const COVERS = ["cover-lebendige-welten", "cover-zuordnen", "cover-buchstaben-zahlen", "cover-gefuehle"];
 
 /** The everyday helpers standing spine out at both ends, each with its picture on a paper label, as on the shelf. */
@@ -23,7 +23,7 @@ const BOARD = HERO.y + HERO.height + 6;
 const COVER_SIZE = 262;
 const GAP = 22;
 
-/** Where each picture book of `COVERS` stands on the canvas, from left to right: two left of the Fun for Both book, two right. */
+/** Where each picture book of `COVERS` stands on the canvas, from left to right: two left of the Little Steps to Grow book, two right. */
 export const COVER_BOXES = COVERS.map((_, k) => {
   const side = k < 2 ? -1 : 1;
   const step = k < 2 ? 1 - k : k - 2;
@@ -49,7 +49,7 @@ function Spine({ id, color, height, x }: { id: string; color: string; height: nu
 export const Shelf = memo(function Shelf() {
   const left = SPINES.slice(0, 4);
   const right = SPINES.slice(4);
-  // From the Fun for Both book outwards: two covers on each side, then four spines.
+  // From the Little Steps to Grow book outwards: two covers on each side, then four spines.
   const firstLeft = COVER_BOXES[0]!.left - GAP;
   const firstRight = COVER_BOXES[3]!.left + COVER_SIZE + GAP;
   return (
@@ -74,7 +74,7 @@ export const Shelf = memo(function Shelf() {
   );
 });
 
-/** The Fun for Both book: its pages, and over them the cover with the families reading, which swings open. */
+/** The Little Steps to Grow book: its pages, and over them the cover with the families reading, which swings open. */
 export const Book = memo(function Book() {
   return (
     <>
@@ -85,7 +85,7 @@ export const Book = memo(function Book() {
       <div className="vi-cover">
         <div className="vi-cover-front">
           <img src={pictures["buch-cover.webp"]} alt="" />
-          <span className="vi-cover-label">Fun for Both</span>
+          <span className="vi-cover-label">Little Steps to Grow</span>
         </div>
         <div className="vi-cover-inside" />
       </div>
@@ -93,7 +93,7 @@ export const Book = memo(function Book() {
   );
 });
 
-/** The shelf under the camera and the Fun for Both book in its pose: what the intro and the outro both show. */
+/** The shelf under the camera and the Little Steps to Grow book in its pose: what the intro and the outro both show. */
 export function ShelfAndBook({ shelf, book, glows }: { shelf: ShelfPose; book: BookPose; glows?: readonly number[] }) {
   const bookStyle = {
     left: HERO.x,
@@ -137,14 +137,14 @@ export function PrintedTitle({ title, opacity = 1 }: { title: TitlePose; opacity
     >
       <Logo />
       <p className="vi-address" style={{ opacity: title.address, translate: `0 ${(1 - title.address) * 12}px` }}>
-        funforboth.com
+        littlestepstogrow.com
       </p>
     </div>
   );
 }
 
 /**
- * One frame of the intro at second `t`: a shelf of picture books, the Fun for Both book coming out and opening, and on
+ * One frame of the intro at second `t`: a shelf of picture books, the Little Steps to Grow book coming out and opening, and on
  * its first page the name printed with Papa Fox and his child sitting down on the o. Everything is a function of `t`.
  */
 export function IntroScene({ t }: { t: number }) {

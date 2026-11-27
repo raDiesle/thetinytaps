@@ -10,7 +10,7 @@ import { languagePrefix, type SeoLanguage } from "@/content/seo";
 import { APP_LANGUAGES, type EnglishFirst, type Texts } from "@/lib/language";
 
 /** The site the outro sends to: its main address (`siteUrl` in tools/build.ts). */
-export const SITE = "https://www.funforboth.com";
+export const SITE = "https://www.littlestepstogrow.com";
 
 /**
  * The pages a video's YouTube description links to: the home page or the game the video shows, each with its German
@@ -38,7 +38,7 @@ export const addressFor = (path: VideoPage, language: SeoLanguage) => `${SITE}${
  */
 export const codeAddress = (language: SeoLanguage) => addressFor("/", language);
 
-/** The address as people say and type it: no https, no www, no slash at the end („funforboth.com/en/zaehne“). */
+/** The address as people say and type it: no https, no www, no slash at the end („littlestepstogrow.com/en/zaehne“). */
 export const shortAddress = (url: string) => url.replace(/^https:\/\/(www\.)?/, "").replace(/\/$/, "");
 
 /**
@@ -193,7 +193,7 @@ export const PINBOARD: readonly PinnedPhoto[] = [
 export const photoWord = (photo: PinnedPhoto): Texts => photo.word ?? gameTitle(photo);
 
 /** The address in the middle of the board, as people read it off a television: with www, never https or a slash. */
-export const BOARD_ADDRESS = "www.funforboth.com";
+export const BOARD_ADDRESS = "www.littlestepstogrow.com";
 
 /** The short line under the address: what the site holds, in the categories' words. */
 export const BOARD_LINE: EnglishFirst = {

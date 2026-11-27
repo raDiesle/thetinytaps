@@ -42,6 +42,7 @@ import { APP_LANGUAGES, pick } from "../lib/language";
 import { SCENES } from "../games/scenes";
 import { WORLDS } from "../components/Worlds";
 import { TARGET_LANGUAGES } from "./targetLanguages";
+import { LOGO_LINES } from "../components/Logo";
 import { structuredData } from "../../tools/structuredData";
 import { isTest } from "../testSources";
 
@@ -302,7 +303,7 @@ describe("search engine texts (seo.ts)", () => {
     });
   });
 
-  // Many titles ran past what a search result shows once „ | Fun for Both“ stood after them (Spanish 31 of 54), and
+  // Many titles ran past what a search result shows once „ | Little Steps to Grow“ stood after them (Spanish 31 of 54), and
   // Google cut the end off: the name gives way, the words parents search for stay whole.
   test("a title keeps the site's name only where both fit in a search result; the home page always keeps it", () => {
     const text = { description: "", text: "" };
@@ -316,8 +317,8 @@ describe("search engine texts (seo.ts)", () => {
     expect(titleWidth("abc")).toBe(3);
     expect(titleWidth("कि")).toBe(2);
     expect(titleWidth("कु")).toBe(1);
-    expect(fullTitle({ title: "小".repeat(23), ...text }, "/zaehne/")).toBe("小".repeat(23));
-    expect(fullTitle({ title: "小".repeat(22), ...text }, "/zaehne/")).toBe(`${"小".repeat(22)} | ${SITE_NAME}`);
+    expect(fullTitle({ title: "小".repeat(19), ...text }, "/zaehne/")).toBe("小".repeat(19));
+    expect(fullTitle({ title: "小".repeat(18), ...text }, "/zaehne/")).toBe(`${"小".repeat(18)} | ${SITE_NAME}`);
     // The built page and the running app take the same title, from the one function.
     expect(readFileSync("tools/build.ts", "utf8")).toContain("fullTitle(one.text, one.page.path)");
     expect(readFileSync("src/lib/title.ts", "utf8")).toContain("fullTitle(seo, seo.path)");
@@ -424,7 +425,18 @@ describe("the app's name", () => {
     expect(readFileSync("src/components/Bookshelf.tsx", "utf8")).toContain("<Logo ");
   });
 
-  test("the title's o of „Both“ is the picture of Papa Fox reading to his child, and that picture is there", () => {
+  test("lives at one domain only, www.littlestepstogrow.com: no other domain's zone redirects there (user decision, 27 November 2026)", () => {
+    expect(readdirSync("tools").filter((file) => file.endsWith(".zone"))).toEqual(["littlestepstogrow.com.zone"]);
+    expect(readFileSync("tools/build.ts", "utf8")).toContain('"https://www.littlestepstogrow.com"');
+  });
+
+  test("the title stands in two lines, „Little Steps“ over „to Grow“, so its sign over the shelf stays narrow", () => {
+    expect(LOGO_LINES.map((line) => line.join(" "))).toEqual(["Little Steps", "to Grow"]);
+    expect(LOGO_LINES.flat().join(" ")).toBe(SITE_NAME);
+    expect(LOGO_LINES.at(-1)?.at(-1)).toContain("o");
+  });
+
+  test("the title's o of „Grow“ is the picture of Papa Fox reading to his child, and that picture is there", () => {
     const logo = readFileSync("src/components/Logo.tsx", "utf8");
     const file = logo.match(/pictures\["([^"]+)"\]/)?.[1];
     expect(file).toBe("logo-fuchs-o.webp");

@@ -1,6 +1,6 @@
 ---
 name: paid-queue
-description: Run the open paid queue of Fun for Both in a Claude cloud session – the approved ElevenLabs recordings (src/content/voiceQueue.ts) and sound effects (src/content/soundQueue.ts) and the Gemini pictures cheap now (src/content/pictureQueue.ts) – make them, check and cut them, finish each entry's `after`, take them out of the queues, verify, merge into main and push. Use in a Claude cloud session when the user says "/paid-queue", "run the queue", "Paid-Queue ausführen", "mach die offenen Aufnahmen und Bilder", or /management/ shows „Offen für Claude Cloud“. Never on the user's Mac (Zscaler blocks both services).
+description: Run the open paid queue of Little Steps to Grow in a Claude cloud session – the approved ElevenLabs recordings (src/content/voiceQueue.ts) and sound effects (src/content/soundQueue.ts) and the Gemini pictures cheap now (src/content/pictureQueue.ts) – make them, check and cut them, finish each entry's `after`, take them out of the queues, verify, merge into main and push. Use in a Claude cloud session when the user says "/paid-queue", "run the queue", "Paid-Queue ausführen", "mach die offenen Aufnahmen und Bilder", or /management/ shows „Offen für Claude Cloud“. Never on the user's Mac (Zscaler blocks both services).
 ---
 
 # Run the paid queue in Claude Cloud

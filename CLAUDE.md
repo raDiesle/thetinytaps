@@ -1,4 +1,4 @@
-# Fun for Both – notes for Claude
+# Little Steps to Grow – notes for Claude
 
 Keyboard and touch games for toddlers. A React 19 single-page app
 built and served by Bun, deployed to GitHub Pages, works offline (PWA). No backend.
@@ -175,7 +175,7 @@ In a fresh worktree run `bun install` first.
   the picture queue and never offered – only done when the user says those words (H-88, user decision, November 2026).
   An idea round only collects – the user decides later what to implement, so don't offer to implement
   after one (say „umsetzen“, not the ambiguous „bauen“).
-- The hidden page `/management/` (hold Papa Fox and his child on the o of „Both“ in the home title, `Logo`; `/ideen/` is its old address) is where
+- The hidden page `/management/` (hold Papa Fox and his child on the o of „Grow“ in the home title, `Logo`; `/ideen/` is its old address) is where
   everything goes that helps the user decide: ideas, the language table, and research. Its page `/management/bilder/`
   shows every picture of the app at once, by game and story, a picture with its frames and variants side by side
   (`src/content/pictureGallery.ts`, read from the file names' conventions): a new folder of pictures gets its line in
@@ -1018,7 +1018,7 @@ src/lib/                 speech, sfx (synthesized + recorded sounds), storage, d
   buttons on top, its switch `?buch=aus` and its stored choice) was removed, since keeping it only kept code no one
   sees – never bring back a second look or a switch between looks, and write new styles as the book's plain rules, with
   no `data-look` or other branch (`look.test.ts`). Like this: the home page is a room with a bookshelf (`Bookshelf`, D-20, user
-  decision, October 2026), the app's name „Fun for Both“ in its title, each category a picture book standing on it with its cover out;
+  decision, October 2026), the app's name „Little Steps to Grow“ in its title, each category a picture book standing on it with its cover out;
   a category's page looks like its book's table of contents (`BookContents`, user feedback, October 2026): one line per
   game – its framed picture, its name, dots leading to its page number (the first game on page 1,
   `gamePage`, user feedback, October 2026; on a phone only picture and name, the name centred and never broken inside a
@@ -1192,23 +1192,28 @@ src/lib/                 speech, sfx (synthesized + recorded sounds), storage, d
   page): no book on the shelf (`shelfVolumes`, a single book left stands alone), `noindex`, reached from „🚧 In Arbeit“.
 - A new game needs: folder, page, route in `App.tsx`, entry in `CATEGORIES`
   (`src/content/games.ts`, with its `blurb`), a row in `src/content/ideas/languageStatus.ts`, an entry in `src/content/seo.ts` and its translations in `seo.<lang>.ts` – use `/neues-spiel`.
-- The app is called „Fun for Both“ and lives at www.funforboth.com (its main address since November 2026, user decision;
-  toddlerfox.com and booksforboth.com, the app's name and address in October 2026, only redirect there; before that it was
-  „The Tiny Taps“, whose `tinytaps.` storage keys stay so nothing saved is lost). The address is `siteUrl` in
-  `tools/build.ts`, the DNS `tools/funforboth.com.zone`, the redirects `tools/redirect-*.zone` (README).
+- The app is called „Little Steps to Grow“ and lives at www.littlestepstogrow.com, its one and only domain (user decision,
+  27 November 2026: no other domain redirects there any more – toddlerfox.com, booksforboth.com and funforboth.com, its
+  names and addresses from October to November 2026, were let go, and their redirect zones deleted; never add a second
+  domain or redirect back without the user asking; before them it was „The Tiny Taps“, whose `tinytaps.` storage keys
+  stay so nothing saved is lost). The address is `siteUrl` in `tools/build.ts`, the DNS
+  `tools/littlestepstogrow.com.zone` (README).
   The custom domain in the repo's Pages settings (`gh api repos/raDiesle/thetinytaps/pages -q .cname`) must be the
-  host of `siteUrl` (`www.funforboth.com`, user decision, 8 November 2026: www is the usual form): in November 2026
-  Pages served funforboth.com while `siteUrl` said www, so every canonical link, hreflang and sitemap address went through
-  a redirect and Umami, told to count on www only, counted no visitor. A 404 „There isn't a GitHub Pages site here“ after a change of domain is GitHub's cache of „/“
+  host of `siteUrl` (`www.littlestepstogrow.com`, user decision, 8 November 2026: www is the usual form; GitHub sends
+  the bare host on to it by itself): in November 2026 Pages served the bare host while `siteUrl` said www, so every
+  canonical link, hreflang and sitemap address went through a redirect and Umami, told to count on www only, counted no
+  visitor. A 404 „There isn't a GitHub Pages site here“ after a change of domain is GitHub's cache of „/“
   from before the change. Check it with `curl -sI` (`age`, `x-cache: HIT`) and against GitHub directly
   (`--resolve <host>:443:185.199.108.153`) before you suspect the build or the DNS. A new deploy clears that cache only
-  for the custom domain's host, not for the other name (November 2026: funforboth.com came back after a deploy, www stayed 404).
+  for the custom domain's host, not for the other name (November 2026: the bare host came back after a deploy, www stayed 404).
   The name is `SITE_NAME` in `seo.ts` and the same in every language; title, cover, manifest and `index.html` say it
   (`content.test.ts` checks). Its name and addresses never say „toddler“ or „baby“ (user decision, October 2026: offering screen games expressly for small
   children is delicate) – the age may stand in page texts, where parents search for it, never in a name.
-  The title shows who „Both“ are (user feedback, October 2026): the o of „Both“ is a picture of Papa Fox
-  sitting on the letter with his child on his lap, reading it a story, and a big and a small paw track run under the name
-  up to them (`Logo`). The o itself is the title's real letter; the picture holds only the foxes (Gemini drew them on
+  The title shows who grows (user feedback, October 2026, kept with the new name): the o of „Grow“ is a picture of Papa
+  Fox sitting on the letter with his child on his lap, reading it a story, and a big and a small paw track run under the
+  name up to them (`Logo`). The name stands in two lines, „Little Steps“ over „to Grow“ with the small „to“ in the
+  accent's italics (`LOGO_LINES`; user decision, 27 November 2026: in one line the longer name's sign took the books'
+  room). The o itself is the title's real letter; the picture holds only the foxes (Gemini drew them on
   Georgia's bold o, which was then cut out) and lies over it so that Papa really sits on the letter – never floating above
   it (user feedback, October 2026, twice: look at the seat magnified, his thighs must lie on the letter's top stroke). The foxes are twice the letter's height, rising above the sign. The
   sign is big enough for them to be seen (`--sign`; `SIGN_SIZE` in `Bookshelf.tsx` in front of a wide shelf): at the
@@ -1228,14 +1233,14 @@ src/lib/                 speech, sfx (synthesized + recorded sounds), storage, d
   Pages would answer with 404.html and status 404, which Google skips), plus `sitemap.xml`; the app keeps title
   and head in step (`useTitle`, `SeoHead`). Under `/en/`, `/ru/` … the router runs below the prefix (`routerBase()`,
   `src/lib/pageAddress.ts`), so links stay in that language's pages and routes need no change; players still get their
-  browser's language. A level's address (`/abenteuer/schatzinsel/`) gets the game's built page too, with the game's canonical link and out of the sitemap, and `seoFor` gives it the game's entry – GitHub Pages answered a shared level link with 404 before: a new game with levels, or a new level, is listed in `LEVEL_IDS` (`src/content/levelPages.ts`, ids only, since the build must not load a game; `levelPages.test.ts` checks it against the games). A title leaves „ | Fun for Both“ out where both would be cut off in a search result (`fullTitle`, 60 letters wide; the home page keeps it), and every page but the home pages carries its way from the home page as a BreadcrumbList (`tools/structuredData.ts`). Each page's text tells in sentences of its own what is on that page (a scene: what is in its picture and what happens there), never only a template shared with its siblings – the scene pages had one template's 45 words each and stood among Google's pages „gecrawlt – zurzeit nicht indexiert“ (November 2026; `content.test.ts`). Texts say only what the page really does, and keep saying it: a change that adds, removes or
+  browser's language. A level's address (`/abenteuer/schatzinsel/`) gets the game's built page too, with the game's canonical link and out of the sitemap, and `seoFor` gives it the game's entry – GitHub Pages answered a shared level link with 404 before: a new game with levels, or a new level, is listed in `LEVEL_IDS` (`src/content/levelPages.ts`, ids only, since the build must not load a game; `levelPages.test.ts` checks it against the games). A title leaves „ | Little Steps to Grow“ out where both would be cut off in a search result (`fullTitle`, 60 letters wide; the home page keeps it), and every page but the home pages carries its way from the home page as a BreadcrumbList (`tools/structuredData.ts`). Each page's text tells in sentences of its own what is on that page (a scene: what is in its picture and what happens there), never only a template shared with its siblings – the scene pages had one template's 45 words each and stood among Google's pages „gecrawlt – zurzeit nicht indexiert“ (November 2026; `content.test.ts`). Texts say only what the page really does, and keep saying it: a change that adds, removes or
   renames something a page offers (a picture, a mode, a kind of round, a game moving to another book) updates that page's
   text in every language in the same commit, and its book's and the home page's where they name it, also for something new in every game (the trophies) or a new picture in a game (the Timer's Tennis), which both stayed missing from the texts for days (November 2026) – they had fallen
   behind a month of work (a slider long gone, a game moved elsewhere, the Alltagshelfer missing from the home page; user
   feedback, November 2026; `content.test.ts` checks that a book's text names each of its games). No text names an age the app is for („ab 2“,
   „2- bis 3-Jährige“, „Ages 2+“; „Kleinkinder“, „toddlers“ are fine): each family decides when its child starts with
   screens, which „Ein paar Worte von uns“ on the home page (`ParentsNote`) tells: the real world first, then a screen together,
-  later a learning game alone, plain watching least – Fun for Both meant as that first step together (user
+  later a learning game alone, plain watching least – Little Steps to Grow meant as that first step together (user
   decision, October 2026; `content.test.ts` checks). Google reads the page after the app ran, in an
   English browser: so search engines play in the language of the address (`isCrawler` in `src/lib/locale.ts`) –
   a crawler that runs pages and isn't on its list gets added there. The app replaces the built page's text when
@@ -1255,7 +1260,7 @@ src/lib/                 speech, sfx (synthesized + recorded sounds), storage, d
   `CF_BEACON_TOKEN`) and how the app is used by Umami Cloud (`src/lib/analytics.ts`: pages by itself, plus a few events –
   time on each page with the last step of a story or game shown there, a level's end with „Nochmal“ or „Weiter“, play time running out, options for all games, installs;
   its website id in `tools/build.ts`, counting only on the site's own hosts – with and without www, `countedHosts`, since
-  Umami drops every visit on a host not listed and counted no one while Pages served funforboth.com and `siteUrl` said
+  Umami drops every visit on a host not listed and counted no one while Pages served the bare host and `siteUrl` said
   www, November 2026), both
   without cookies or a consent banner: never add Google Analytics (not even in its consent mode, which still sends to
   Google and shows almost nothing without consent) or another tracker that sets cookies, needs consent or records

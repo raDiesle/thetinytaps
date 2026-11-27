@@ -8,7 +8,7 @@ import { languagePrefix, NO_INDEX_PATHS, MOVED_PATHS, SEO_LANGUAGES, SEO_PAGES, 
 // The structured data in a built page's head (tools/structuredData.ts): what the site is on the home pages, and on
 // every other page its way from the home page (BreadcrumbList), which Google shows in place of the bare address.
 
-const SITE = "https://www.funforboth.com";
+const SITE = "https://www.littlestepstogrow.com";
 const urlOf = (language: (typeof SEO_LANGUAGES)[number]) => (path: string) => `${SITE}${languagePrefix(language)}${path}`;
 const titleOf = (path: string) => `title of ${path}`;
 const facts = (path: string, language: (typeof SEO_LANGUAGES)[number] = "de") => ({

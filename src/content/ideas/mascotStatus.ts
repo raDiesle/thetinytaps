@@ -540,9 +540,9 @@ export const MASCOT_STATUS: MascotStatusRow[] = [
   },
   {
     href: "/",
-    note: "Cover und Familien neben dem Bücherregal sind Gemini-Bilder (components/bilder) mit Fuchs- und Bärenfamilie – so bleibt es; im Titel „Fun for Both“ ist das o von „Both“ ein Gemini-Bild: Papa Fuchs sitzt auf dem Buchstaben, sein Kind auf dem Schoß, und liest ihm vor; eine große und eine kleine Fußspur führen unter dem Namen zu ihnen.",
+    note: "Cover und Familien neben dem Bücherregal sind Gemini-Bilder (components/bilder) mit Fuchs- und Bärenfamilie – so bleibt es; im Titel „Little Steps to Grow“ ist das o von „Both“ ein Gemini-Bild: Papa Fuchs sitzt auf dem Buchstaben, sein Kind auf dem Schoß, und liest ihm vor; eine große und eine kleine Fußspur führen unter dem Namen zu ihnen.",
     tasks: [
-      { label: "Titel „Fun for Both“ auf Startseite, Cover, Manifest, Suchmaschinen", work: "drawing", effort: "S", idea: "D-16", state: "done" },
+      { label: "Titel „Little Steps to Grow“ auf Startseite, Cover, Manifest, Suchmaschinen", work: "drawing", effort: "S", idea: "D-16", state: "done" },
       { label: "Startseite als Wald mit Fuchsbau und Bärenhöhle, Fuchs oder Bär mit seinem Kind in jeder Welt", work: "drawing", effort: "M", idea: "D-17" },
       {
         label: "Fuchs- oder Bärenkind und sein Großer klatschen am Ende jedes Spiels (GameEnd)",

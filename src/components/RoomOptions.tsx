@@ -323,13 +323,13 @@ export function RoomNotes() {
     <MenuButton
       icon="ℹ️"
       label={t({
-        de: "Über Fun for Both",
-        ru: "О Fun for Both",
-        en: "About Fun for Both",
-        zh: "关于 Fun for Both",
-        hi: "Fun for Both के बारे में",
-        es: "Acerca de Fun for Both",
-        ar: "عن Fun for Both",
+        de: "Über Little Steps to Grow",
+        ru: "О Little Steps to Grow",
+        en: "About Little Steps to Grow",
+        zh: "关于 Little Steps to Grow",
+        hi: "Little Steps to Grow के बारे में",
+        es: "Acerca de Little Steps to Grow",
+        ar: "عن Little Steps to Grow",
       })}
       className="room-thing shelf-carving-more"
       keep
@@ -425,13 +425,13 @@ export function RoomFeedback() {
         </h2>
         <p>
           {t({
-            de: "Fun for Both wächst mit jeder Rückmeldung. Was gefällt Ihrem Kind, wo hakt es, und welches Spiel würden Sie sich noch wünschen? Erzählen Sie es uns gern – über ein Lob freuen wir uns, über Kritik und neue Ideen genauso.",
-            ru: "Fun for Both растёт с каждым отзывом. Что нравится вашему ребёнку, где что-то не получается и какую игру вам бы ещё хотелось? Расскажите нам – похвале мы рады, а критике и новым идеям ничуть не меньше.",
-            en: "Fun for Both grows with every message we get. What does your child love, where does something get stuck, and which game would you still like to see? Do tell us – we are glad of praise, and just as glad of criticism and new ideas.",
-            zh: "Fun for Both 因每一条反馈而成长。您的孩子喜欢什么，哪里不太顺，您还希望有什么游戏？欢迎告诉我们——我们喜欢听到夸奖，也同样欢迎批评和新点子。",
-            hi: "Fun for Both हर सुझाव के साथ बढ़ता है। आपके बच्चे को क्या अच्छा लगता है, कहाँ अटकता है, और आप कौन-सा खेल और चाहेंगे? हमें ज़रूर बताइए – तारीफ़ से हमें ख़ुशी होती है, और आलोचना व नए विचारों से भी उतनी ही।",
-            es: "Fun for Both crece con cada mensaje que recibimos. ¿Qué le gusta a su peque, dónde se atasca algo y qué juego le gustaría ver todavía? Cuéntenoslo: un elogio nos alegra, y las críticas y las ideas nuevas, igual.",
-            ar: "ينمو Fun for Both مع كل رسالة تصلنا. ما الذي يحبّه طفلكم، وأين يتعثّر شيء ما، وأيّ لعبة تتمنّون أن تروها بعد؟ أخبرونا – يسعدنا المديح، وتسعدنا الملاحظات والأفكار الجديدة بالقدر نفسه.",
+            de: "Little Steps to Grow wächst mit jeder Rückmeldung. Was gefällt Ihrem Kind, wo hakt es, und welches Spiel würden Sie sich noch wünschen? Erzählen Sie es uns gern – über ein Lob freuen wir uns, über Kritik und neue Ideen genauso.",
+            ru: "Little Steps to Grow растёт с каждым отзывом. Что нравится вашему ребёнку, где что-то не получается и какую игру вам бы ещё хотелось? Расскажите нам – похвале мы рады, а критике и новым идеям ничуть не меньше.",
+            en: "Little Steps to Grow grows with every message we get. What does your child love, where does something get stuck, and which game would you still like to see? Do tell us – we are glad of praise, and just as glad of criticism and new ideas.",
+            zh: "Little Steps to Grow 因每一条反馈而成长。您的孩子喜欢什么，哪里不太顺，您还希望有什么游戏？欢迎告诉我们——我们喜欢听到夸奖，也同样欢迎批评和新点子。",
+            hi: "Little Steps to Grow हर सुझाव के साथ बढ़ता है। आपके बच्चे को क्या अच्छा लगता है, कहाँ अटकता है, और आप कौन-सा खेल और चाहेंगे? हमें ज़रूर बताइए – तारीफ़ से हमें ख़ुशी होती है, और आलोचना व नए विचारों से भी उतनी ही।",
+            es: "Little Steps to Grow crece con cada mensaje que recibimos. ¿Qué le gusta a su peque, dónde se atasca algo y qué juego le gustaría ver todavía? Cuéntenoslo: un elogio nos alegra, y las críticas y las ideas nuevas, igual.",
+            ar: "ينمو Little Steps to Grow مع كل رسالة تصلنا. ما الذي يحبّه طفلكم، وأين يتعثّر شيء ما، وأيّ لعبة تتمنّون أن تروها بعد؟ أخبرونا – يسعدنا المديح، وتسعدنا الملاحظات والأفكار الجديدة بالقدر نفسه.",
           })}
         </p>
         <p>
@@ -450,13 +450,13 @@ export function RoomFeedback() {
             className="install-button"
             href={`mailto:${CONTACT_EMAIL}?subject=${encodeURIComponent(
               t({
-                de: "Feedback zu Fun for Both",
-                ru: "Отзыв о Fun for Both",
-                en: "Feedback on Fun for Both",
-                zh: "关于 Fun for Both 的反馈",
-                hi: "Fun for Both के बारे में सुझाव",
-                es: "Comentarios sobre Fun for Both",
-                ar: "ملاحظات حول Fun for Both",
+                de: "Feedback zu Little Steps to Grow",
+                ru: "Отзыв о Little Steps to Grow",
+                en: "Feedback on Little Steps to Grow",
+                zh: "关于 Little Steps to Grow 的反馈",
+                hi: "Little Steps to Grow के बारे में सुझाव",
+                es: "Comentarios sobre Little Steps to Grow",
+                ar: "ملاحظات حول Little Steps to Grow",
               }),
             )}`}
           >

@@ -10,8 +10,8 @@
 
 .logo {
   display: flex;
-  flex-wrap: wrap;
-  justify-content: center;
+  flex-direction: column;
+  align-items: center;
   gap: 0 0.35em;
   margin: 0;
   font-size: clamp(3rem, 9vw, 5.5rem);
@@ -23,8 +23,16 @@
   display: inline-flex;
 }
 
+/* The name's two lines (`LOGO_LINES`), each centred, the words of a line side by side. */
+.logo-line {
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: center;
+  gap: inherit;
+}
+
 /*
- * The o of „Both“: Papa Fox on the letter with his child on his lap (Logo). The o is the title's own letter; the picture
+ * The o of „Grow“: Papa Fox on the letter with his child on his lap (Logo). The o is the title's own letter; the picture
  * holds only the foxes (drawn on Georgia's o, 271 px of the picture to the letter's 0.563em, the o then cut out). It hangs
  * from a point on the baseline, placed where the cut-out o lay and 0.18em lower, so Papa sits on the letter instead of
  * floating over it. The foxes, twice the letter's height, rise 1.5em above the baseline, over the sign's top edge: onto

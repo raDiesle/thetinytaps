@@ -16,7 +16,7 @@ describe("the texts for YouTube (Y-18)", () => {
       const text = youtubeText(id, language);
       expect(text.language, `${id} ${language}`).toBe(language);
       const prefix = language === "de" ? "" : `/${language}`;
-      expect(text.description).toContain(`▶ https://www.funforboth.com${prefix}${YOUTUBE_VIDEOS[id].path}`);
+      expect(text.description).toContain(`▶ https://www.littlestepstogrow.com${prefix}${YOUTUBE_VIDEOS[id].path}`);
       expect(text.description.split("\n\n").length, `${id} ${language}`).toBe(4);
     }
   });

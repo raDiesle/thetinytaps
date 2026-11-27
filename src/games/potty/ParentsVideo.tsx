@@ -34,7 +34,7 @@ interface Hand {
 /** The game's page in `language`, English where that language has no pages for search engines. */
 const addressFor = (language: string) => {
   const page: SeoLanguage = SEO_LANGUAGES.find((l) => l === language) ?? "en";
-  return `funforboth.com${languagePrefix(page)}/toepfchen/`;
+  return `littlestepstogrow.com${languagePrefix(page)}/toepfchen/`;
 };
 
 /**
@@ -190,7 +190,7 @@ function ParentsPlay({ address, onFinished }: { address: string; onFinished: () 
       {hand && <ParentHand {...hand} />}
       {slate && (
         <div className="pv-slate">
-          <p className="pv-slate-name">Fun for Both</p>
+          <p className="pv-slate-name">Little Steps to Grow</p>
           <p className="pv-slate-address">{address}</p>
         </div>
       )}
