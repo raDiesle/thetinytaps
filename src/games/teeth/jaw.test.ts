@@ -5,6 +5,7 @@ import {
   CHEWING_DEPTHS,
   cornerStretch,
   glideStretch,
+  innerGumAt,
   insideBy,
   lerpView,
   midLine,
@@ -211,5 +212,26 @@ describe("a tipped row goes back into the mouth", () => {
       return Math.hypot(b.x - a.x, b.y - a.y);
     };
     expect(scale(TEETH_PER_SIDE - 1)).toBeLessThan(0.97 * scale(0));
+  });
+});
+
+// On the tongue side the gum's edge ran up into a papilla between every two teeth, which showed as odd spikes where the
+// gum meets the palate and the tongue (user feedback, November 2026): there it is one smooth arc along the whole row.
+describe("the gum on the tongue side", () => {
+  // From the middle of the front teeth to past the last molar (beyond it the edge stays as it is).
+  const along = Array.from({ length: 400 }, (_, i) => (i / 399) * 120);
+
+  test.each(["upper", "lower"] as const)("%s jaw: its edge runs as one arc, never up and down between the teeth", (jaw) => {
+    for (const open of [0, ROAR_VIEW.open]) {
+      const heights = along.map((t) => innerGumAt(jaw, t, open).rim);
+      const steps = heights.slice(1).map((h, i) => h - heights[i]);
+      const moving = steps.filter((d) => Math.abs(d) > 1e-9);
+      const turns = moving.slice(1).filter((d, i) => Math.sign(d) !== Math.sign(moving[i])).length;
+      // The edge follows the teeth's heights, so it may turn at a tooth's middle – never up into a papilla and down
+      // again between two teeth, which would turn it twice for every tooth.
+      expect(turns).toBeLessThanOrEqual(TEETH_PER_SIDE - 2);
+      // No jump anywhere: from one sample to the next it moves only a little.
+      expect(Math.max(...steps.map(Math.abs))).toBeLessThan(0.5);
+    }
   });
 });

@@ -40,6 +40,7 @@ import { BROW, Ear, EyeBall, EyeLid, eyeOpening, FACE, HAIR, Hair, HEAD_UNITS, t
 import { Brush, lerp3, squeezeOut, type BrushAnchor } from "./brush";
 import type { Motion } from "./steps";
 import { faceKey } from "./stains";
+import { MouthInside } from "./inside";
 import { FOAM_AMOUNTS, foamyTeeth, GUM_FOAM, GUM_FOAM_SPREAD } from "./foam";
 
 // A child's face in a mirror, close up. The mouth is a small 3D model (see
@@ -67,8 +68,6 @@ const GUM_RIM = "#e2577c";
  * mouth it is stretched from the upper row to the lower like a band (`cavityPath`).
  */
 const CHEEK_INSIDE = "#f27e9c";
-/** The dark of the mouth behind the teeth, seen only between the rows of an open mouth. */
-const MOUTH_DARK = "#5c1430";
 /**
  * How far the dark opening bulges out beside the last teeth, as a share of the way from the upper row's end to the
  * lower's: the cheek stretched between them stays taut, only a little round, never a straight cut (user feedback,
@@ -694,16 +693,25 @@ export function Mouth({ view, zone, monsters, dirty, brush, happy, spat = false,
       ];
     });
 
-    const tongueUp = all.lower.facing([0, 1, 0.2]) > 0.05;
+    // The tongue's top is seen only where the lower jaw is tipped to show it; else only its back rises behind the teeth.
+    const tongueUp = all.lower.facing([0, 1, 0]) > 0.3;
     const palateDown = all.upper.facing([0, -1, 0.2]) > 0.05;
     return (
       <>
         <KidFace project={all.face} head={all.face.point(HEAD_MIDDLE)} happy={happy} open={view.open} lips={lipPoints} />
         <g clipPath="url(#mouth-inside)">
           <path d={lipsPath} fill={CHEEK_INSIDE} />
-          {view.open > DARK_FROM && <path d={cavityPath(model, all)} fill={MOUTH_DARK} />}
-          {tongueUp && <path d={smoothPath(model.tongue.map(all.lower.point))} fill="#ff6f91" stroke="#d94f74" strokeWidth={3} />}
-          {palateDown && <path d={smoothPath(model.palate.map(all.upper.point))} fill="#c94a6e" />}
+          {view.open > DARK_FROM && (
+            <MouthInside
+              model={model}
+              upper={all.upper}
+              lower={all.lower}
+              cavity={cavityPath(model, all)}
+              hull={cavityHull(model, all)}
+              tongueUp={tongueUp}
+              palateDown={palateDown}
+            />
+          )}
           {jawParts}
         </g>
       </>
@@ -994,6 +1002,11 @@ export function Mouth({ view, zone, monsters, dirty, brush, happy, spat = false,
  * end, and the gap between the rows looked odd (user feedback, November 2026).
  */
 function cavityPath(model: MouthModel, all: ReturnType<typeof projectors>): string {
+  return roundedPath(cavityHull(model, all), CAVITY_ROUND);
+}
+
+/** The points round the opening (`cavityPath`) before its corners are rounded. */
+function cavityHull(model: MouthModel, all: ReturnType<typeof projectors>) {
   const rows = (["upper", "lower"] as const).map((jaw) =>
     model.teeth.filter((t) => t.id.jaw === jaw).flatMap((t) => surfaceFace(t.faces, "top").points.map(all[jaw].point)),
   );
@@ -1002,7 +1015,7 @@ function cavityPath(model: MouthModel, all: ReturnType<typeof projectors>): stri
     const gap = Math.hypot(down.x - up.x, down.y - up.y);
     return { x: (up.x + down.x) / 2 + s * CAVITY_BULGE * gap, y: (up.y + down.y) / 2 };
   });
-  return roundedPath(convexHullOf([...rows.flat(), ...sides]), CAVITY_ROUND);
+  return convexHullOf([...rows.flat(), ...sides]);
 }
 
 /**

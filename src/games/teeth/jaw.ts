@@ -105,6 +105,12 @@ const GUM_LINE = { papilla: [0.36, 0.34, 0.32, 0.24, 0.22], middle: 0.06 };
  * over the tooth, so its ink outline ends under the gum and the tooth grows out of it instead of standing in it.
  */
 const GUM_OVERLAP = 0.08;
+/**
+ * On the tongue side the gum has no papillae: its edge runs along the whole row as one smooth arc (`innerGumAt`), as
+ * high as this share of each tooth's height. Seen into the open mouth that edge is where the gum meets the palate or
+ * the tongue, and papillae there made a row of sharp spikes (user feedback, November 2026).
+ */
+const INNER_GUM_LINE = 0.14;
 
 const rad = (deg: number) => (deg * Math.PI) / 180;
 const add = (a: Vec3, b: Vec3): Vec3 => [a[0] + b[0], a[1] + b[1], a[2] + b[2]];
@@ -191,6 +197,26 @@ function gumLine(n: number, t: number) {
   return GUM_LINE.papilla[n] - (GUM_LINE.papilla[n] - GUM_LINE.middle) * Math.sin(Math.PI * s) ** 0.7;
 }
 
+/**
+ * The tongue-side gum at angle `t` (degrees, either sign): how far in from the cheek side it lies (`inset`), and the
+ * height of its edge (`rim`) and of its foot. Each tooth's own values hold at its middle and blend smoothly into its
+ * neighbour's between them, so the pieces of gum of all teeth meet in one smooth arc, never in steps or spikes.
+ */
+export function innerGumAt(jaw: Jaw, t: number, open: number) {
+  const at = (n: number) => {
+    const { top, base, dir } = levels(jaw, n, open);
+    return { inset: TEETH[n].depth + 4, rim: base + (top - base) * (INNER_GUM_LINE + GUM_OVERLAP), foot: base - dir * GUM };
+  };
+  const middles = TEETH.map((s) => (s.from + s.to) / 2);
+  const a = Math.abs(t);
+  const n = middles.findIndex((_, i) => i === middles.length - 1 || a < middles[i + 1]);
+  if (a <= middles[0] || n === middles.length - 1) return at(a <= middles[0] ? 0 : n);
+  const s = (a - middles[n]) / (middles[n + 1] - middles[n]);
+  const k = s * s * (3 - 2 * s);
+  const [p, q] = [at(n), at(n + 1)];
+  return { inset: p.inset + (q.inset - p.inset) * k, rim: p.rim + (q.rim - p.rim) * k, foot: p.foot + (q.foot - p.foot) * k };
+}
+
 const lerp3 = (a: Vec3, b: Vec3, k: number): Vec3 => [a[0] + (b[0] - a[0]) * k, a[1] + (b[1] - a[1]) * k, a[2] + (b[2] - a[2]) * k];
 
 function buildTooth(id: ToothId, open: number): Tooth {
@@ -206,7 +232,8 @@ function buildTooth(id: ToothId, open: number): Tooth {
   // Only the crown shows: the faces end where the gum begins.
   const line = angles.map((t) => gumLine(id.n, Math.abs(t)));
   const outerGum = outerBase.map((p, i) => lerp3(p, outerTop[i], line[i]));
-  const innerGum = innerBase.map((p, i) => lerp3(p, innerTop[i], line[i]));
+  // The tongue side's gum runs in a smooth arc with no papillae (`innerGumAt`), always above this.
+  const innerGum = innerBase.map((p, i) => lerp3(p, innerTop[i], GUM_LINE.middle));
 
   const face = (kind: FaceKind, points: Vec3[]): Face => ({ kind, points, normal: normalOf(points, center), center: mean(points) });
   const faces = [
@@ -241,12 +268,12 @@ function buildGum(jaw: Jaw, side: Side, n: number, open: number): GumPiece {
   const from = n === 0 ? 0 : (TEETH[n - 1].to + spec.from) / 2 - 0.5;
   // More points than a tooth has, so the gum line arches smoothly up between the teeth.
   const angles = sweep(side, from, to, 4 * SAMPLES);
-  const bottom = base - dir * GUM;
   const rim = (t: number) => base + (top - base) * (gumLine(n, Math.abs(t)) + GUM_OVERLAP);
   const outerRim = angles.map((t) => archPoint(jaw, t, -3, rim(t)));
   const outerFoot = angles.map((t) => archPoint(jaw, t, -3, base - dir * GUM_CHEEK));
-  const innerRim = angles.map((t) => archPoint(jaw, t, spec.depth + 4, rim(t)));
-  const innerFoot = angles.map((t) => archPoint(jaw, t, spec.depth + 4, bottom));
+  const inner = angles.map((t) => innerGumAt(jaw, t, open));
+  const innerRim = angles.map((t, i) => archPoint(jaw, t, inner[i].inset, inner[i].rim));
+  const innerFoot = angles.map((t, i) => archPoint(jaw, t, inner[i].inset, inner[i].foot));
   const center = mean([...outerRim, ...outerFoot, ...innerRim, ...innerFoot]);
   const face = (kind: FaceKind, points: Vec3[]): Face => ({ kind, points, normal: normalOf(points, center), center: mean(points) });
   return {
