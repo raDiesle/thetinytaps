@@ -446,6 +446,9 @@ export const allGamesIdeas: IdeaArea = {
       text: "Zum Prüfen durch dich: am 26. November 2026 wurden nach der Rückmeldung „ruckelt auf einem Gaming-Handy, z. B. Weltraumbahn, wenn der Ball um den Planeten kreist“ Planet, Wirbel, Xylophon-Stäbe und Schaufelrad zu eigenen Ebenen, und der Ball kreist nur noch einmal um den Planeten. Gemessen wurde das nur im nachgebildeten alten Handy (das Malen am Planeten sank von 320 auf etwa 130 ms pro Sekunde). Bitte auf dem Gaming-Handy die Weltraumbahn bis zum Ende und zwei, drei andere Bahnen spielen und sagen, wo es noch ruckelt – sein 120-Hz-Bildschirm verdoppelt die Arbeit der Grafik, so dass dort mehr auffällt als im Messwerkzeug.",
       why: "Kleinkinder spielen oft auf alten Handys der Eltern; dort sehen sie das Spiel ruckeln.",
       effort: "S",
+      done: true,
+      partial:
+        "Geprüft am 27. November 2026 auf dem Gaming-Handy: die Weltraumbahn und die anderen Murmelbahnen laufen flüssig, auch wo der Ball um den Planeten kreist.",
     },
     {
       id: "A-49",
