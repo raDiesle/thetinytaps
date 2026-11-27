@@ -10,7 +10,6 @@ import {
   boardFromTemplate,
   collectWays,
   fieldCount,
-  type LinkedDays,
   MAX_TASKS,
   MAX_WAYS,
   MONTH_LOOKS,
@@ -20,7 +19,6 @@ import {
   newId,
   parseCellKey,
   rewardFromCatalog,
-  type StarLog,
   taskFromCatalog,
   taskInParts,
   weekday,
@@ -68,7 +66,6 @@ import {
   counting,
   dayPartsOf,
   daysLater,
-  exampleTicks,
   MAX_NIGHTS,
   withBigDay,
   withNightsLeft,
@@ -95,6 +92,10 @@ import {
   withSteps,
 } from "./plan";
 import { BIG_DAY, PaperArrow, PLAN_SCREEN, PlanSheet, useStepLabel } from "./PlanSheet";
+import { planOrientation } from "./PlanPrint";
+import { DEFAULT_PLANNER_SETTINGS } from "./planSettings";
+import { A4, orientationOf } from "./PrintPanel";
+import { DEFAULT_REWARDS_SETTINGS } from "./settings";
 
 /** A chart while it is made or changed: a board or a plan. */
 export type Draft = { type: "board"; board: Board } | { type: "plan"; plan: Plan };
@@ -315,8 +316,6 @@ export function ChartEditor({
   onChange,
   making,
   day = new Date(),
-  log,
-  linked = NO_LINKED,
   more,
   onRemove,
   onKind,
@@ -327,9 +326,6 @@ export function ChartEditor({
   making: boolean;
   /** The day the sheet shows. */
   day?: Date;
-  /** The real stars, on a chart already made. */
-  log?: StarLog;
-  linked?: LinkedDays;
   /** „Weitere Einstellungen“, under the sheet. */
   more?: ReactNode;
   /** Deletes the chart (after asking); missing in the wizard and for the only chart. */
@@ -342,6 +338,8 @@ export function ChartEditor({
   const box = useRef<HTMLDivElement>(null);
   const [aspect, setAspect] = useState(1.6);
   const [editing, setEditing] = useState<Editing | null>(null);
+  // „Bearbeiten“ or „Druckansicht“ (user request, 27 November 2026): the sheet with its places to tap, or as it prints.
+  const [printView, setPrintView] = useState(false);
   const today = new Date();
   const { canUndo, canRedo, back, forward } = useDraftHistory(draft, onChange);
   const setPlan = (next: Plan) => onChange({ type: "plan", plan: next });
@@ -390,6 +388,7 @@ export function ChartEditor({
   }, []);
 
   const onClick = (event: React.MouseEvent) => {
+    if (printView) return;
     const el = (event.target as Element).closest<HTMLElement>("[data-edit], [data-step]");
     if (!el) return;
     const { edit, part, day: dayId, task, step, cell, by, every, row, side, way } = el.dataset;
@@ -461,7 +460,6 @@ export function ChartEditor({
 
   const plan = draft.type === "plan" ? draft.plan : undefined;
   const counts = plan ? counting(plan) : true;
-  const ticks = draft.type === "plan" ? log?.[draft.plan.id] : log?.[draft.board.id];
   // „Tageszeiten“ and their signs, chosen once for the whole chart (user feedback, November 2026): a day's plan, a
   // week of rings, and a board of fields – never a reason to collect, which has no days.
   const parts: { n: DayParts; signs?: DaySignSet; set: (n: DayParts) => void; setSigns: (signs?: DaySignSet) => void } | undefined =
@@ -480,6 +478,13 @@ export function ChartEditor({
             setSigns: (signs) => setBoard({ ...draft.board, signs }),
           }
         : undefined;
+
+  // The Druckansicht's page: A4 turned as the print panel turns it by default (`orientationOf`, `planOrientation`).
+  const portrait =
+    draft.type === "board"
+      ? orientationOf(draft.board, DEFAULT_REWARDS_SETTINGS.print) === "portrait"
+      : planOrientation(draft.plan, DEFAULT_PLANNER_SETTINGS.print, day) === "portrait";
+  const paperAspect = portrait ? A4.short / A4.long : A4.long / A4.short;
 
   // Only what the chart has: without any option the band is left out.
   const hasOptions =
@@ -502,7 +507,14 @@ export function ChartEditor({
           })}
         >
           {CHART_KINDS.map((choice) => (
-            <button key={choice.id} type="button" className="rw-chart-kind" aria-pressed={choice.id === kind} onClick={() => pickKind(choice.id)}>
+            <button
+              key={choice.id}
+              type="button"
+              className="rw-chart-kind"
+              aria-pressed={choice.id === kind}
+              title={t(choice.label)}
+              onClick={() => pickKind(choice.id)}
+            >
               <KindPic id={choice.id} />
               <span className="rw-chart-kind-name">{t(choice.label)}</span>
             </button>
@@ -510,6 +522,7 @@ export function ChartEditor({
         </div>
       )}
       <div className="rw-edit-bar">
+        <ViewSwitch print={printView} onChange={setPrintView} />
         <span
           className="rw-history"
           role="group"
@@ -536,7 +549,7 @@ export function ChartEditor({
             onClick={forward}
           />
         </span>
-        <p className="rw-wysiwyg">
+        <p className="rw-wysiwyg" hidden={printView}>
           <span className="rw-wysiwyg-pic" aria-hidden>
             ✏️
           </span>
@@ -567,6 +580,19 @@ export function ChartEditor({
           <button
             type="button"
             className="rw-remove-chart"
+            title={
+              draft.type === "board"
+                ? t({
+                    de: "Tafel löschen",
+                    en: "Delete chart",
+                    zh: "删除奖励表",
+                    hi: "चार्ट मिटाएँ",
+                    es: "Borrar tabla",
+                    ar: "حذف اللوحة",
+                    ru: "Удалить таблицу",
+                  })
+                : t({ de: "Plan löschen", en: "Delete plan", zh: "删除日程表", hi: "योजना मिटाएँ", es: "Borrar plan", ar: "حذف الخطة", ru: "Удалить план" })
+            }
             onClick={() =>
               window.confirm(
                 draft.type === "board"
@@ -869,35 +895,42 @@ export function ChartEditor({
           {/* biome-ignore lint/a11y/noStaticElementInteractions: the places inside are buttons (role, tabIndex), and Enter on one reaches this listener */}
           <div
             ref={box}
-            className="rw-screen-box rw-edit-box"
+            className={`rw-screen-box ${printView ? "rw-print-view" : "rw-edit-box"}`}
             onClick={onClick}
             onKeyDown={(e) => e.key === "Enter" && onClick(e as unknown as React.MouseEvent)}
           >
-            {draft.type === "plan" ? (
-              <PlanSheet
-                plan={draft.plan}
-                ticks={draft.plan.examples ? { ...exampleTicks(draft.plan, today), ...ticks } : ticks}
-                linked={linked}
-                today={today}
-                day={day}
-                look={PLAN_SCREEN}
-                aspect={aspect}
-                edit
-                onTitle={(title) => setPlan({ ...draft.plan, title })}
-              />
-            ) : (
-              <BoardSheet
-                board={draft.board}
-                stars={ticks}
-                linked={linked}
-                today={today}
-                day={day}
-                look={SCREEN_LOOK}
-                aspect={aspect}
-                edit
-                onTitle={(title) => setBoard({ ...draft.board, title })}
-              />
-            )}
+            {/*
+              No stars in the circles while the chart is made, examples and real ones alike (user request, 27 November
+              2026): a star is stuck on or coloured in, never part of what is printed – the sheet shows what the paper
+              will. The Druckansicht shows the sheet on an A4 page as it prints, with nothing to tap.
+            */}
+            <div className={printView ? `rw-print-paper${portrait ? " portrait" : ""}` : "rw-edit-sheet"}>
+              {draft.type === "plan" ? (
+                <PlanSheet
+                  plan={draft.plan}
+                  ticks={undefined}
+                  linked={NO_LINKED}
+                  today={today}
+                  day={day}
+                  look={printView ? PRINT_VIEW : PLAN_SCREEN}
+                  aspect={printView ? paperAspect : aspect}
+                  edit={!printView}
+                  onTitle={(title) => setPlan({ ...draft.plan, title })}
+                />
+              ) : (
+                <BoardSheet
+                  board={draft.board}
+                  stars={undefined}
+                  linked={NO_LINKED}
+                  today={today}
+                  day={day}
+                  look={printView ? { ...PRINT_VIEW, colorIn: false } : SCREEN_LOOK}
+                  aspect={printView ? paperAspect : aspect}
+                  edit={!printView}
+                  onTitle={(title) => setBoard({ ...draft.board, title })}
+                />
+              )}
+            </div>
           </div>
         </div>
       </div>
@@ -995,6 +1028,63 @@ export function ChartEditor({
  * ↶ or ↷ with its word. With nothing to undo it is hidden but keeps its place, so the other doesn't jump (a button that
  * can do nothing is never shown greyed).
  */
+/** The sheet as it prints, in colour, without the editor's ⚙️, 🗑️, ＋ and − (the Druckansicht). */
+const PRINT_VIEW = { print: true, color: true } as const;
+
+/**
+ * Bearbeiten or Druckansicht, first in the edit bar and always there (user request, 27 November 2026): the grown-up
+ * sees at any time what the paper will show, and goes back to changing it with one tap.
+ */
+function ViewSwitch({ print, onChange }: { print: boolean; onChange: (print: boolean) => void }) {
+  const t = useT();
+  const views = [
+    {
+      print: false,
+      sign: "✏️",
+      label: t({ en: "Edit", de: "Bearbeiten", zh: "编辑", hi: "बदलें", es: "Editar", ar: "تعديل", ru: "Редактировать" }),
+      tip: t({
+        en: "Change the chart right on the sheet",
+        de: "Die Tafel direkt auf dem Blatt ändern",
+        zh: "直接在表上修改",
+        hi: "चार्ट को सीधे पन्ने पर बदलें",
+        es: "Cambiar el cuadro directamente en la hoja",
+        ar: "غيّروا اللوحة مباشرة على الورقة",
+        ru: "Менять таблицу прямо на листе",
+      }),
+    },
+    {
+      print: true,
+      sign: "🖨️",
+      label: t({ en: "Print view", de: "Druckansicht", zh: "打印预览", hi: "प्रिंट झलक", es: "Vista de impresión", ar: "معاينة الطباعة", ru: "Вид для печати" }),
+      tip: t({
+        en: "See the page as it is printed",
+        de: "Die Seite so sehen, wie sie gedruckt wird",
+        zh: "查看打印出来的样子",
+        hi: "पन्ना वैसा देखें जैसा वह छपेगा",
+        es: "Ver la página tal como se imprime",
+        ar: "شاهدوا الصفحة كما تُطبع",
+        ru: "Посмотреть страницу такой, какой она будет напечатана",
+      }),
+    },
+  ];
+  return (
+    <span className="rw-view-switch" role="group">
+      {views.map((view) => (
+        <button
+          key={view.label}
+          type="button"
+          className="rw-view-switch-button"
+          aria-pressed={print === view.print}
+          title={view.tip}
+          onClick={() => onChange(view.print)}
+        >
+          <span aria-hidden>{view.sign}</span> {view.label}
+        </button>
+      ))}
+    </span>
+  );
+}
+
 function UndoButton({ sign, label, on, onClick }: { sign: string; label: string; on: boolean; onClick: () => void }) {
   return (
     <button type="button" className={`rw-history-button${on ? "" : " off"}`} tabIndex={on ? 0 : -1} aria-hidden={!on} title={label} onClick={onClick}>
@@ -1108,7 +1198,7 @@ function Segments<I extends string>({
   return (
     <span className="rw-opt-segments" role="group" aria-label={label}>
       {items.map((item) => (
-        <button key={item.id} type="button" aria-pressed={item.id === selected} onClick={() => onPick(item.id)}>
+        <button key={item.id} type="button" aria-pressed={item.id === selected} title={`${label}: ${item.label}`} onClick={() => onPick(item.id)}>
           {item.pic}
           {item.label}
         </button>
@@ -1212,6 +1302,7 @@ function Counter({
         type="button"
         disabled={value <= min}
         aria-label={t({ de: "Weniger", en: "Fewer", zh: "减少", hi: "कम", es: "Menos", ar: "أقل", ru: "Меньше" })}
+        title={t({ de: "Weniger", en: "Fewer", zh: "减少", hi: "कम", es: "Menos", ar: "أقل", ru: "Меньше" })}
         onClick={() => onChange(value - 1)}
       >
         −
@@ -1221,6 +1312,7 @@ function Counter({
         type="button"
         disabled={value >= max}
         aria-label={t({ de: "Mehr", en: "More", zh: "增加", hi: "ज़्यादा", es: "Más", ar: "أكثر", ru: "Больше" })}
+        title={t({ de: "Mehr", en: "More", zh: "增加", hi: "ज़्यादा", es: "Más", ar: "أكثر", ru: "Больше" })}
         onClick={() => onChange(value + 1)}
       >
         +
@@ -1230,22 +1322,41 @@ function Counter({
 }
 
 /** A window over the chart for one thing on it, closed by ✕, Esc or a tap beside it. */
-function EditDialog({ title, onClose, children }: { title: ReactNode; onClose: () => void; children: ReactNode }) {
+function EditDialog({
+  title,
+  wide = false,
+  onClose,
+  children,
+}: {
+  title: ReactNode;
+  /** A window of pictures to pick: the screen's whole width on a computer, so the pictures are big (user request, 27 November 2026). */
+  wide?: boolean;
+  onClose: () => void;
+  children: ReactNode;
+}) {
   const t = useT();
   const ref = useRef<HTMLDialogElement>(null);
   useEffect(() => {
     const dialog = ref.current;
     if (dialog && !dialog.open) dialog.showModal();
+    // With a mouse the search takes the keys at once; on a touch screen the keyboard would cover the pictures.
+    if (dialog && matchMedia("(pointer: fine)").matches) dialog.querySelector<HTMLInputElement>(".rw-pick-search")?.focus();
   }, []);
   return (
     // biome-ignore lint/a11y/useKeyWithClickEvents: a tap beside the window closes it; Esc does the same
-    <dialog ref={ref} className="rw-edit-dialog" onClose={onClose} onClick={(event) => event.target === event.currentTarget && ref.current?.close()}>
+    <dialog
+      ref={ref}
+      className={`rw-edit-dialog${wide ? " rw-edit-dialog-wide" : ""}`}
+      onClose={onClose}
+      onClick={(event) => event.target === event.currentTarget && ref.current?.close()}
+    >
       <div className="rw-edit-dialog-head">
         <h3>{title}</h3>
         <button
           type="button"
           className="rw-edit-close"
           aria-label={t({ de: "Schließen", ru: "Закрыть", en: "Close", zh: "关闭", hi: "बंद करें", es: "Cerrar", ar: "إغلاق" })}
+          title={t({ de: "Schließen", ru: "Закрыть", en: "Close", zh: "关闭", hi: "बंद करें", es: "Cerrar", ar: "إغلاق" })}
           onClick={() => ref.current?.close()}
         >
           ✕
@@ -1282,21 +1393,9 @@ const withTaskPhoto = (board: Board, id: string, photo: string | undefined): Boa
   tasks: board.tasks.map((task) => (task.id === id ? { ...task, photo } : task)),
 });
 
-/** „Eigenes Foto“: the heading of a card's or task's own photo in its window (T-13). */
-const OWN_PHOTO: Localized = {
-  de: "Eigenes Foto",
-  en: "Your own photo",
-  zh: "自己的照片",
-  hi: "अपनी फ़ोटो",
-  es: "Foto propia",
-  ar: "صورتكم الخاصة",
-  ru: "Своё фото",
-};
-
 /**
- * A card's or task's own photo (T-13): a photo of the child's own potty, toothbrush or Kita door, which a two-year-old
- * knows best, in place of its picture – chosen on this device and kept only here, like the child's photo. Once there,
- * a tap chooses another, and „Ohne Foto“ brings its picture back.
+ * A card's or task's own photo (T-13), as the first tiles of its window's one list of pictures: „Foto wählen“, or once
+ * there „Anderes Foto“ and „Ohne Foto“ – no heading and no note round them (user request, 27 November 2026).
  */
 function OwnPhotoPicks({
   item,
@@ -1310,39 +1409,82 @@ function OwnPhotoPicks({
   const t = useT();
   return (
     <>
-      <h4 className="rw-edit-sub">{t(OWN_PHOTO)}</h4>
-      <div className="rw-picks rw-picks-tiles rw-own-photo" role="group" aria-label={t(OWN_PHOTO)}>
+      <Pick
+        selected={!!item.photo}
+        onClick={onChoose}
+        emoji={item.photo ? <ItemPic item={item} /> : <CameraSign />}
+        label={
+          item.photo
+            ? t({ de: "Anderes Foto", en: "Another photo", zh: "换一张照片", hi: "दूसरी फ़ोटो", es: "Otra foto", ar: "صورة أخرى", ru: "Другое фото" })
+            : t({ de: "Foto wählen", en: "Choose a photo", zh: "选择照片", hi: "फ़ोटो चुनें", es: "Elegir una foto", ar: "اختاروا صورة", ru: "Выбрать фото" })
+        }
+      />
+      {item.photo && (
         <Pick
-          selected={!!item.photo}
-          onClick={onChoose}
-          emoji={item.photo ? <ItemPic item={item} /> : <CameraSign />}
-          label={
-            item.photo
-              ? t({ de: "Anderes Foto", en: "Another photo", zh: "换一张照片", hi: "दूसरी फ़ोटो", es: "Otra foto", ar: "صورة أخرى", ru: "Другое фото" })
-              : t({ de: "Foto wählen", en: "Choose a photo", zh: "选择照片", hi: "फ़ोटो चुनें", es: "Elegir una foto", ar: "اختاروا صورة", ru: "Выбрать фото" })
-          }
+          selected={false}
+          onClick={onRemove}
+          emoji={<ItemPic item={{ ...item, photo: undefined }} />}
+          label={t({ de: "Ohne Foto", en: "Without photo", zh: "不用照片", hi: "बिना फ़ोटो", es: "Sin foto", ar: "بدون صورة", ru: "Без фото" })}
         />
-        {item.photo && (
-          <Pick
-            selected={false}
-            onClick={onRemove}
-            emoji={<ItemPic item={{ ...item, photo: undefined }} />}
-            label={t({ de: "Ohne Foto", en: "Without photo", zh: "不用照片", hi: "बिना फ़ोटो", es: "Sin foto", ar: "بدون صورة", ru: "Без фото" })}
-          />
-        )}
+      )}
+    </>
+  );
+}
+
+/** One picture to pick in a window, named in the app language, which is what the search looks in. */
+interface PickItem {
+  id: string;
+  label: string;
+  picture: ReactNode;
+  selected: boolean;
+  disabled?: boolean;
+  onPick: () => void;
+}
+
+/** A name as the search compares it: lower case and without accents, so „zahn“ finds „Zähne putzen“, „nino“ „niño“. */
+const searchable = (text: string) => text.normalize("NFD").replace(/\p{M}/gu, "").toLocaleLowerCase();
+
+/**
+ * Every picture of a window in one list, in its order, with a search over their names on top (user request, 27 November
+ * 2026: no headings splitting it, the own photo's tiles first and part of the list). `lead` – the own photo, „Ohne
+ * Belohnung“ – stands first and only while nothing is searched.
+ */
+function PickGrid({ lead, items }: { lead?: ReactNode; items: PickItem[] }) {
+  const t = useT();
+  const [query, setQuery] = useState("");
+  const words = searchable(query.trim());
+  const shown = words ? items.filter((item) => searchable(item.label).includes(words)) : items;
+  const search = t({ en: "Search", de: "Suchen", zh: "搜索", hi: "खोजें", es: "Buscar", ar: "بحث", ru: "Поиск" });
+  return (
+    <>
+      <input
+        type="search"
+        className="rw-pick-search"
+        placeholder={`🔍 ${search}`}
+        aria-label={search}
+        title={search}
+        value={query}
+        onChange={(event) => setQuery(event.target.value)}
+      />
+      <div className="rw-picks rw-picks-tiles">
+        {!words && lead}
+        {shown.map((item) => (
+          <Pick key={item.id} selected={item.selected} disabled={item.disabled} onClick={item.onPick} emoji={item.picture} label={item.label} />
+        ))}
       </div>
-      <p className="rw-portrait-note rw-own-photo-note">
-        {t({
-          de: "Ein Foto vom eigenen Töpfchen, der eigenen Zahnbürste oder der Kita-Tür erkennt Ihr Kind am besten.",
-          en: "Your child knows a photo of their own potty, toothbrush or nursery door best.",
-          zh: "孩子最认得自己的便盆、牙刷或幼儿园大门的照片。",
-          hi: "अपने पॉटी, अपने टूथब्रश या क्रेश के दरवाज़े की फ़ोटो आपका बच्चा सबसे अच्छी तरह पहचानता है।",
-          es: "Lo que mejor reconoce su peque es una foto de su propio orinal, su cepillo de dientes o la puerta de la guardería.",
-          ar: "يتعرّف طفلكم أفضل ما يكون على صورة نونيّته أو فرشاة أسنانه أو باب حضانته.",
-          ru: "Лучше всего ребёнок узнаёт фото своего горшка, своей зубной щётки или двери детского сада.",
-        })}{" "}
-        {t(PHOTO_STAYS)}
-      </p>
+      {shown.length === 0 && (
+        <p className="setting-note">
+          {t({
+            en: "No picture with that name.",
+            de: "Kein Bild mit diesem Namen.",
+            zh: "没有这个名字的图片。",
+            hi: "इस नाम का कोई चित्र नहीं है।",
+            es: "No hay ninguna imagen con ese nombre.",
+            ar: "لا توجد صورة بهذا الاسم.",
+            ru: "Картинки с таким названием нет.",
+          })}
+        </p>
+      )}
     </>
   );
 }
@@ -1385,7 +1527,6 @@ function CardDialog({
   onOwnPhoto: () => void;
   onClose: () => void;
 }) {
-  const t = useT();
   const stepLabel = useStepLabel();
   const { day, taskId } = parseCellKey(cellKey);
   const steps = stepsOn(plan, day);
@@ -1403,20 +1544,20 @@ function CardDialog({
           {stepLabel(step)}
         </>
       }
+      wide
       onClose={onClose}
     >
-      <OwnPhotoPicks
-        item={step}
-        onChoose={onOwnPhoto}
-        onRemove={() => {
-          onChange(withCardPhoto(plan, cellKey, every, undefined));
-          onClose();
-        }}
-      />
-      <h4 className="rw-edit-sub">
-        {t({ de: "Tauschen gegen", en: "Swap for", zh: "换成", hi: "इससे बदलें", es: "Cambiar por", ar: "استبدال بـ", ru: "Заменить на" })}
-      </h4>
       <CardPicks
+        lead={
+          <OwnPhotoPicks
+            item={step}
+            onChoose={onOwnPhoto}
+            onRemove={() => {
+              onChange(withCardPhoto(plan, cellKey, every, undefined));
+              onClose();
+            }}
+          />
+        }
         selected={step.catalog}
         onPick={(id) => {
           // One new id for every day's card, so a week's row stays one row.
@@ -1463,6 +1604,7 @@ function AddDialog({
   return (
     <EditDialog
       title={t({ de: "Karte dazu", en: "Add a card", zh: "添加卡片", hi: "कार्ड जोड़ें", es: "Añadir tarjeta", ar: "إضافة بطاقة", ru: "Добавить карточку" })}
+      wide
       onClose={onClose}
     >
       {steps.length >= stepLimit(steps) ? (
@@ -1484,46 +1626,19 @@ function AddDialog({
   );
 }
 
-/** Every card to pick, as big pictures; first the rituals (H-58), whose cards bring their words for the grown-up. */
-function CardPicks({ selected, onPick }: { selected?: string; onPick: (id: string) => void }) {
+/** Every card to pick, as big pictures in one list: first the rituals (H-58), whose cards bring their words for the grown-up. */
+function CardPicks({ lead, selected, onPick }: { lead?: ReactNode; selected?: string; onPick: (id: string) => void }) {
   const t = useT();
-  const pick = (item: CatalogTask) => (
-    <Pick
-      key={item.id}
-      selected={item.id === selected}
-      onClick={() => onPick(item.id)}
-      emoji={<ItemPic item={{ emoji: item.emoji, catalog: item.id }} />}
-      label={t(item.label)}
-    />
+  const items = [...RITUALS, ...OFFERED].map(
+    (item: CatalogTask): PickItem => ({
+      id: item.id,
+      label: t(item.label),
+      picture: <ItemPic item={{ emoji: item.emoji, catalog: item.id }} />,
+      selected: item.id === selected,
+      onPick: () => onPick(item.id),
+    }),
   );
-  return (
-    <>
-      <h4 className="rw-edit-sub">
-        {t({
-          de: "Rituale – mit Worten für Sie auf der Karte",
-          en: "Rituals – with words for you on the card",
-          zh: "仪式——卡片上写着给您的话",
-          hi: "रस्में – कार्ड पर आपके लिए शब्द",
-          es: "Rituales: con palabras para usted en la tarjeta",
-          ar: "طقوس – مع كلمات لكم على البطاقة",
-          ru: "Ритуалы – со словами для вас на карточке",
-        })}
-      </h4>
-      <div className="rw-picks rw-picks-tiles">{RITUALS.map(pick)}</div>
-      <h4 className="rw-edit-sub">
-        {t({
-          de: "Bilder für den Tag",
-          en: "Pictures for the day",
-          zh: "一天的图片",
-          hi: "दिन के चित्र",
-          es: "Imágenes para el día",
-          ar: "صور لليوم",
-          ru: "Картинки для дня",
-        })}
-      </h4>
-      <div className="rw-picks rw-picks-tiles">{OFFERED.map(pick)}</div>
-    </>
-  );
+  return <PickGrid lead={lead} items={items} />;
 }
 
 /**
@@ -1536,7 +1651,7 @@ function BigDayDialog({ plan, onChange, onClose }: { plan: Plan; onChange: (plan
   const step = bigDayStep(plan);
   const on = (key: string) => onChange(withBigDay(plan, key, today));
   return (
-    <EditDialog title={t(BIG_DAY)} onClose={onClose}>
+    <EditDialog title={t(BIG_DAY)} wide onClose={onClose}>
       <div className="rw-edit-row">
         <label className="rw-opt-counter">
           <span aria-hidden>📅</span>
@@ -1645,7 +1760,7 @@ function RewardDialog({
       ? { value: planGoal(draft.plan, day), max: allStars(draft.plan, day), set: (n: number) => onChange({ type: "plan", plan: { ...draft.plan, goal: n } }) }
       : { value: draft.board.goal, max: fieldCount(draft.board, day), set: (n: number) => onChange({ type: "board", board: { ...draft.board, goal: n } }) };
   return (
-    <EditDialog title={reward ? rewardLabel(reward) : none} onClose={onClose}>
+    <EditDialog title={reward ? rewardLabel(reward) : none} wide onClose={onClose}>
       {/* A reward is reached after so many stars: set here only where the sheet has no ＋ − for it (a collecting way has). */}
       {reward && !collect && (draft.type !== "board" || draft.board.kind !== "day") && (
         <div className="rw-edit-row">
@@ -1668,18 +1783,16 @@ function RewardDialog({
           />
         </div>
       )}
-      <div className="rw-picks rw-picks-tiles">
-        <Pick selected={!reward} onClick={() => set(null)} emoji={<Pic src={picture("fest")} emoji="🎉" />} label={none} />
-        {REWARDS.map((item) => (
-          <Pick
-            key={item.id}
-            selected={item.id === reward?.catalog}
-            onClick={() => set(rewardFromCatalog(item.id))}
-            emoji={<ItemPic item={{ emoji: item.emoji, catalog: item.id }} kind="reward" />}
-            label={t(item.label)}
-          />
-        ))}
-      </div>
+      <PickGrid
+        lead={<Pick selected={!reward} onClick={() => set(null)} emoji={<Pic src={picture("fest")} emoji="🎉" />} label={none} />}
+        items={REWARDS.map((item) => ({
+          id: item.id,
+          label: t(item.label),
+          picture: <ItemPic item={{ emoji: item.emoji, catalog: item.id }} kind="reward" />,
+          selected: item.id === reward?.catalog,
+          onPick: () => set(rewardFromCatalog(item.id)),
+        }))}
+      />
     </EditDialog>
   );
 }
@@ -1812,42 +1925,38 @@ function TaskDialog({
           t({ de: "Aufgabe dazu", en: "Add a task", zh: "添加任务", hi: "काम जोड़ें", es: "Añadir tarea", ar: "إضافة مهمة", ru: "Добавить задание" })
         )
       }
+      wide
       onClose={onClose}
     >
-      {task && (
-        <OwnPhotoPicks
-          item={task}
-          onChoose={() => onOwnPhoto(task.id)}
-          onRemove={() => {
-            onChange(withTaskPhoto(board, task.id, undefined));
+      <PickGrid
+        lead={
+          task && (
+            <OwnPhotoPicks
+              item={task}
+              onChoose={() => onOwnPhoto(task.id)}
+              onRemove={() => {
+                onChange(withTaskPhoto(board, task.id, undefined));
+                onClose();
+              }}
+            />
+          )
+        }
+        items={TASKS.map((item) => ({
+          id: item.id,
+          label: t(item.label),
+          picture: <ItemPic item={{ emoji: item.emoji, catalog: item.id }} />,
+          selected: item.id === task?.catalog,
+          disabled: !task && board.tasks.length >= (board.kind === "collect" ? MAX_WAYS : MAX_TASKS),
+          onPick: () => {
+            const made = taskInParts(taskFromCatalog(item.id), boardDayParts(board));
+            // A collecting way keeps its rings and reward when its task is swapped; a new way starts without a reward.
+            const kept = task && board.kind === "collect" ? { ...made, goal: task.goal, reward: task.reward } : made;
+            const added = board.kind === "collect" ? { ...made, reward: null } : made;
+            setTasks(task ? board.tasks.map((own) => (own.id === task.id ? kept : own)) : [...board.tasks, added]);
             onClose();
-          }}
-        />
-      )}
-      {task && (
-        <h4 className="rw-edit-sub">
-          {t({ de: "Tauschen gegen", en: "Swap for", zh: "换成", hi: "इससे बदलें", es: "Cambiar por", ar: "استبدال بـ", ru: "Заменить на" })}
-        </h4>
-      )}
-      <div className="rw-picks rw-picks-tiles">
-        {TASKS.map((item) => (
-          <Pick
-            key={item.id}
-            selected={item.id === task?.catalog}
-            disabled={!task && board.tasks.length >= (board.kind === "collect" ? MAX_WAYS : MAX_TASKS)}
-            onClick={() => {
-              const made = taskInParts(taskFromCatalog(item.id), boardDayParts(board));
-              // A collecting way keeps its rings and reward when its task is swapped; a new way starts without a reward.
-              const kept = task && board.kind === "collect" ? { ...made, goal: task.goal, reward: task.reward } : made;
-              const added = board.kind === "collect" ? { ...made, reward: null } : made;
-              setTasks(task ? board.tasks.map((own) => (own.id === task.id ? kept : own)) : [...board.tasks, added]);
-              onClose();
-            }}
-            emoji={<ItemPic item={{ emoji: item.emoji, catalog: item.id }} />}
-            label={t(item.label)}
-          />
-        ))}
-      </div>
+          },
+        }))}
+      />
     </EditDialog>
   );
 }

@@ -680,3 +680,30 @@ describe("the black-and-white print to colour in is advertised", () => {
     expect(readFileSync(new URL("./PlanPrint.tsx", import.meta.url), "utf8")).toContain("<InkChoice");
   });
 });
+
+describe("the editor's windows and sheet (user request, 27 November 2026)", () => {
+  const editor = readFileSync(new URL("./ChartEditor.tsx", import.meta.url), "utf8");
+  const sheet = readFileSync(new URL("./PlanSheet.tsx", import.meta.url), "utf8");
+
+  test("a window of pictures is one list with a search, wide, with no headings or notes splitting it", () => {
+    for (const gone of ["Tauschen gegen", "Rituale – mit Worten", "Bilder für den Tag", "rw-own-photo-note", "OWN_PHOTO"]) expect(editor).not.toContain(gone);
+    // Every window listing pictures to pick goes through the one list, and is a wide one.
+    for (const dialog of ["CardDialog", "AddDialog", "RewardDialog", "TaskDialog", "BigDayDialog"]) {
+      const body = editor.slice(editor.indexOf(`function ${dialog}(`));
+      const own = body.slice(0, body.indexOf("\nfunction ", 1));
+      expect(own).toMatch(/<EditDialog[\s\S]*?\swide[\s>]/);
+      expect(own).toMatch(/<(PickGrid|CardPicks)\b/);
+    }
+    expect(editor).toContain('className="rw-pick-search"');
+  });
+
+  test("the first card carries ＋ on both sides, the others only after them", () => {
+    expect(sheet).toContain('first ? ["before", "after"] : ["after"]');
+  });
+
+  test("the editor never shows stars in the circles, and switches to the print view at any time", () => {
+    expect(editor).toContain("ticks={undefined}");
+    expect(editor).toContain("stars={undefined}");
+    expect(editor).toContain("<ViewSwitch");
+  });
+});

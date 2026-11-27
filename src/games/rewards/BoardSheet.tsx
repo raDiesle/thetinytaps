@@ -30,7 +30,7 @@ import {
 import { DaySign, type DaySignSet } from "./daySigns";
 import { type CatalogMark, DAY_NAMES, MARK_BY_ID, MARKS, REWARD_BY_ID, type Slot, TASK_BY_ID, TEMPLATES, THEME_BY_ID, THEMES } from "./catalog";
 import { ItemPic, MarkPic, Pic, picture, SheetStrip } from "./pictures";
-import { RewardActions, SheetAction } from "./SheetAction";
+import { ADD_REWARD, CHANGE_REWARD, RewardActions, SheetAction } from "./SheetAction";
 import { ChildPhoto, photoHead, photoInCorner } from "./ChildPhoto";
 import { SheetTitle, titleMarkOf } from "./SheetTitle";
 
@@ -193,7 +193,7 @@ export function BoardSheet({
         {board.kind === "month" && !fourWeeks(board) && <span className="rw-blank">{dateFormat({ month: "long", year: "numeric" }).format(day)}</span>}
         {/* No reward by default, and no room kept for one: only this small tag while the board is made (user feedback, November 2026). */}
         {editing && board.kind !== "collect" && !board.reward && (
-          <span className="rw-reward-add" data-edit="reward" role="button" tabIndex={0}>
+          <span className="rw-reward-add" data-edit="reward" role="button" tabIndex={0} title={t(ADD_REWARD)}>
             ＋ <span aria-hidden>🎁</span> {t({ de: "Belohnung", en: "Reward", zh: "奖励", hi: "इनाम", es: "Premio", ar: "المكافأة", ru: "Награда" })}
           </span>
         )}
@@ -209,7 +209,7 @@ export function BoardSheet({
         )}
       </div>
       {board.kind !== "collect" && board.reward && (
-        <footer className="rw-goal" data-edit={editing ? "reward" : undefined}>
+        <footer className="rw-goal" data-edit={editing ? "reward" : undefined} title={editing ? t(CHANGE_REWARD) : undefined}>
           {board.reward && (
             <span className="rw-reward">
               {editing && <RewardActions />}
@@ -282,6 +282,7 @@ function EditTasks({ board }: { board: Board }) {
           role="button"
           tabIndex={0}
           aria-label={t({ de: "Aufgabe dazu", en: "Add a task", zh: "添加任务", hi: "काम जोड़ें", es: "Añadir tarea", ar: "إضافة مهمة", ru: "Добавить задание" })}
+          title={t({ de: "Aufgabe dazu", en: "Add a task", zh: "添加任务", hi: "काम जोड़ें", es: "Añadir tarea", ar: "إضافة مهمة", ru: "Добавить задание" })}
         >
           ＋
         </span>
@@ -889,6 +890,7 @@ function CollectPath({
         className="rw-cell rw-path-end"
         data-edit={edit ? "reward" : undefined}
         data-way={edit ? way0 : undefined}
+        title={edit ? t(CHANGE_REWARD) : undefined}
         role={edit ? "button" : undefined}
         tabIndex={edit ? 0 : undefined}
         style={{ gridRow: end.row + 1, gridColumn: end.col + 1 }}

@@ -902,6 +902,71 @@
   line-height: 1;
 }
 
+/*
+ * Bearbeiten or Druckansicht (`ViewSwitch`), first in the edit bar: two joined paper buttons, big enough to be seen at
+ * once, the one shown yellow (user request, 27 November 2026).
+ */
+.rw-view-switch {
+  display: inline-flex;
+  flex: none;
+  border: 2px solid var(--ink);
+  border-radius: 12px;
+  overflow: hidden;
+  background: var(--paper, #fffdf6);
+}
+.rw-view-switch-button {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  min-height: 44px;
+  padding: 6px 16px;
+  border: 0;
+  background: transparent;
+  color: var(--ink);
+  font: inherit;
+  font-size: 1rem;
+  font-weight: 700;
+  cursor: pointer;
+}
+.rw-view-switch-button + .rw-view-switch-button {
+  border-left: 2px solid var(--ink);
+}
+.rw-view-switch-button[aria-pressed="true"] {
+  background: #ffd84d;
+}
+.rw-view-switch-button:hover:not([aria-pressed="true"]) {
+  background: color-mix(in srgb, #ffd84d 35%, transparent);
+}
+
+/* The sheet in the edit view, as big as its box. */
+.rw-edit-sheet {
+  display: flex;
+  flex: 1;
+  min-width: 0;
+}
+
+/* The Druckansicht: the sheet on an A4 page of white paper, as big as the box allows, turned as it prints. */
+.rw-print-view {
+  container-type: size;
+  align-items: center;
+  justify-content: center;
+}
+.rw-print-paper {
+  display: flex;
+  box-sizing: border-box;
+  width: min(100cqw, 100cqh * 297 / 210);
+  aspect-ratio: 297 / 210;
+  padding: 3cqmin;
+  background: #fff;
+  box-shadow:
+    0 1px 2px rgb(0 0 0 / 0.18),
+    0 6px 18px rgb(0 0 0 / 0.16);
+}
+.rw-print-paper.portrait {
+  width: min(100cqw, 100cqh * 210 / 297);
+  aspect-ratio: 210 / 297;
+}
+
 /* The sheet while it is changed: it carries a dashed edge, a sign that it can be tapped anywhere. */
 .rw-edit-box {
   outline: 3px dashed color-mix(in srgb, var(--ink) 45%, transparent);
@@ -1036,6 +1101,47 @@
 
 .rw-edit-dialog::backdrop {
   background: #0006;
+}
+
+/*
+ * A window of pictures to pick (`EditDialog wide`): on a computer the screen's whole width, and the pictures big enough
+ * to tell apart at a glance (user request, 27 November 2026: in the narrow window they were hard to see).
+ */
+.rw-edit-dialog-wide {
+  width: calc(100vw - 24px);
+  max-width: none;
+  /* As tall while a search narrows the pictures, so the window doesn't jump. */
+  min-height: min(640px, calc(100dvh - 24px));
+}
+@media (min-width: 900px) {
+  .rw-edit-dialog-wide {
+    width: calc(100vw - 48px);
+  }
+}
+.rw-edit-dialog-wide .rw-picks-tiles {
+  grid-template-columns: repeat(auto-fill, minmax(150px, 1fr));
+  gap: 10px;
+}
+.rw-edit-dialog-wide .rw-pick-emoji {
+  font-size: 4.6rem;
+  line-height: 1.05;
+}
+.rw-edit-dialog-wide .rw-pick-label {
+  font-size: 1rem;
+}
+
+/* The search over a window's pictures: by their names in the app language. */
+.rw-pick-search {
+  box-sizing: border-box;
+  width: min(100%, 420px);
+  min-height: 44px;
+  padding: 6px 14px;
+  border: 2px solid var(--ink);
+  border-radius: 999px;
+  background: #fff;
+  color: var(--ink);
+  font: inherit;
+  font-size: 1rem;
 }
 
 .rw-edit-dialog-head {
@@ -1186,6 +1292,14 @@
 
   .rw-pick-label {
     font-size: 0.82rem;
+  }
+
+  .rw-edit-dialog-wide .rw-picks-tiles {
+    grid-template-columns: repeat(auto-fill, minmax(104px, 1fr));
+  }
+
+  .rw-edit-dialog-wide .rw-pick-emoji {
+    font-size: 3rem;
   }
 }
 
@@ -1566,15 +1680,6 @@
   stroke-width: 1.7;
   stroke-linecap: round;
   stroke-linejoin: round;
-}
-
-.rw-own-photo .rw-pic {
-  width: 1.3em;
-  height: 1.3em;
-}
-
-.rw-own-photo-note {
-  margin: 0.4em 0 0;
 }
 
 .rw-portrait-row {

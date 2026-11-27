@@ -1,4 +1,4 @@
-import { useT } from "@/lib/language";
+import { type Localized, useT } from "@/lib/language";
 
 /** What a corner action does: take its thing away, or open the window to change it. */
 export type SheetAct = "delete" | "configure";
@@ -51,19 +51,27 @@ export function SheetAction({
  */
 export function RewardActions() {
   const t = useT();
-  return (
-    <SheetAction
-      act="configure"
-      ask={t({
-        de: "Belohnung ändern",
-        en: "Change reward",
-        zh: "修改奖励",
-        hi: "इनाम बदलें",
-        es: "Cambiar premio",
-        ar: "تغيير المكافأة",
-        ru: "Изменить награду",
-      })}
-      data={{ "data-edit": "reward" }}
-    />
-  );
+  return <SheetAction act="configure" ask={t(CHANGE_REWARD)} data={{ "data-edit": "reward" }} />;
 }
+
+/** The tooltip and read-out name of a tap that opens the rewards on a chart being made. */
+export const CHANGE_REWARD: Localized = {
+  de: "Belohnung ändern",
+  en: "Change reward",
+  zh: "修改奖励",
+  hi: "इनाम बदलें",
+  es: "Cambiar premio",
+  ar: "تغيير المكافأة",
+  ru: "Изменить награду",
+};
+
+/** The tooltip of the small „＋ 🎁 Belohnung“ tag while a chart without a reward is made. */
+export const ADD_REWARD: Localized = {
+  en: "Add a reward",
+  de: "Belohnung hinzufügen",
+  zh: "添加奖励",
+  hi: "इनाम जोड़ें",
+  es: "Añadir un premio",
+  ar: "إضافة مكافأة",
+  ru: "Добавить награду",
+};

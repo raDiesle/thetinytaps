@@ -10,7 +10,7 @@ import { DaySign, type DaySignSet, PARTS_OF, SLOT_EMOJI } from "./daySigns";
 import { ItemPic, MarkPic, NightPic, SheetStrip } from "./pictures";
 import { ChildPhoto, photoHead, photoInCorner } from "./ChildPhoto";
 import { SheetTitle, titleMarkOf } from "./SheetTitle";
-import { RewardActions, SheetAction } from "./SheetAction";
+import { ADD_REWARD, RewardActions, SheetAction } from "./SheetAction";
 import {
   bigDayCome,
   bigDayStep,
@@ -278,8 +278,8 @@ function StepCard({
   counts?: boolean;
   /** Being made or changed: ⚙️ and 🗑️ on it, and its own number of stars set right at them (`StarStep`). */
   edit?: boolean;
-  /** While it is made: the ＋ at its edges that put a new card before it (and, `last`, after it), across a line or down a column. */
-  insert?: { axis: "row" | "column"; last: boolean };
+  /** While it is made: the ＋ at its edges that put a new card after it (and, `first`, before it too), across a line or down a column. */
+  insert?: { axis: "row" | "column"; first: boolean };
   /** The ＋ at its edges put the new card into every day (a week alike every day). */
   every?: boolean;
 }) {
@@ -299,7 +299,7 @@ function StepCard({
     >
       {number !== undefined && <span className="pl-number">{number}</span>}
       {edit && <CardActions cell={key} label={label} />}
-      {edit && insert && <InsertCard cell={key} axis={insert.axis} last={insert.last} every={every} />}
+      {edit && insert && <InsertCard cell={key} axis={insert.axis} first={insert.first} every={every} />}
       <span className="pl-emoji" aria-hidden>
         <ItemPic item={step} lines={look.print && !look.color} />
       </span>
@@ -355,6 +355,8 @@ function StarFields({ stars, got, edit, ghost = !!edit }: { stars: number; got: 
   return (
     <span className={`pl-stars${edit ? " pl-stars-edit" : ""}`} aria-hidden={!edit}>
       {edit && <StarStep {...edit} by={-1} off={stars <= 0} />}
+      {/* The ghost's twin on the left, never seen, so the rings stand in the card's middle (user request, 27 November 2026). */}
+      {ghost && stars < MAX_STARS && <span className="pl-star pl-star-spacer" />}
       {Array.from({ length: stars }, (_, i) => (
         <span key={i} className={`pl-star rw-field${i < got ? " filled" : ""}${i === got - 1 ? " last" : ""}${i === stars - 1 ? " pl-star-end" : ""}`}>
           <span className="rw-ring">
@@ -538,13 +540,14 @@ function AddCard({ part, day, small = false, every = false }: { part?: Slot; day
 }
 
 /**
- * While a plan is made: a small round ＋ on a card's edge – before it, and on the last card after it too – that puts a
- * new card right there (user feedback, November 2026: WYSIWYG, left or right of any card). Under the mouse a bar shows
- * where the card goes. `axis` says whether the cards run across (a line) or down (a week's column).
+ * While a plan is made: a small round ＋ on a card's edge – after it, and on the first card before it too, so the first
+ * card carries two – that puts a new card right there (user feedback, November 2026: WYSIWYG, left or right of any card;
+ * user request, 27 November 2026: the two ＋ on the first card, not on the last). Under the mouse a bar shows where the
+ * card goes. `axis` says whether the cards run across (a line) or down (a week's column).
  */
-function InsertCard({ cell, axis, last, every }: { cell: string; axis: "row" | "column"; last: boolean; every: boolean }) {
+function InsertCard({ cell, axis, first, every }: { cell: string; axis: "row" | "column"; first: boolean; every: boolean }) {
   const t = useT();
-  const sides: ("before" | "after")[] = last ? ["before", "after"] : ["before"];
+  const sides: ("before" | "after")[] = first ? ["before", "after"] : ["after"];
   const names: Record<"before" | "after", Localized> = {
     before:
       axis === "row"
@@ -613,7 +616,7 @@ function InsertCard({ cell, axis, last, every }: { cell: string; axis: "row" | "
 function AddReward() {
   const t = useT();
   return (
-    <span className="pl-reward-add" data-edit="reward" role="button" tabIndex={0}>
+    <span className="pl-reward-add" data-edit="reward" role="button" tabIndex={0} title={t(ADD_REWARD)}>
       ＋ <span aria-hidden>🎁</span> {t({ de: "Belohnung", en: "Reward", zh: "奖励", hi: "इनाम", es: "Premio", ar: "المكافأة", ru: "Награда" })}
     </span>
   );
@@ -676,7 +679,7 @@ function DaySteps(props: StepsProps & { aspect: number }) {
       got={starsGot(ticks, linked, day, step)}
       counts={counts}
       edit={edit}
-      insert={edit && steps.length < stepLimit(steps) ? { axis: "row", last: step === line.at(-1) } : undefined}
+      insert={edit && steps.length < stepLimit(steps) ? { axis: "row", first: step === line[0] } : undefined}
     />
   );
   // Cards with star fields stand taller than wide, so the fields under the picture are big (`STAR_CARD`).
@@ -832,7 +835,7 @@ function FirstThen(props: StepsProps & { aspect: number }) {
                     got={starsGot(props.ticks, props.linked, day, pair[i])}
                     counts={props.counts}
                     edit={props.edit}
-                    insert={props.edit && steps.length < MAX_STEPS ? { axis: "row", last: pair[i] === steps.at(-1) } : undefined}
+                    insert={props.edit && steps.length < MAX_STEPS ? { axis: "row", first: pair[i] === steps[0] } : undefined}
                   />
                 ) : props.edit && (i === 0 || pair.length === 1) ? (
                   <AddCard />
@@ -1026,7 +1029,7 @@ function WeekCell({ plan, d, row, props, picture }: { plan: Plan; d: Date; row: 
  * by the chosen signs or sun and moon. In the look with pictures its 🗑️ and the ＋ to put a row before or after it are
  * here too.
  */
-function RowTools({ plan, row, key0, withDelete, last }: { plan: Plan; row: PlanStep; key0: string; withDelete: boolean; last: boolean }) {
+function RowTools({ plan, row, key0, withDelete, first }: { plan: Plan; row: PlanStep; key0: string; withDelete: boolean; first: boolean }) {
   const t = useT();
   const label = useStepLabel()(row);
   const most = Math.max(0, ...plan.days.map((day) => day.find((s) => s.id === row.id)).map((s) => (s ? starsOf(s) : 0)));
@@ -1038,7 +1041,7 @@ function RowTools({ plan, row, key0, withDelete, last }: { plan: Plan; row: Plan
       {withDelete && (
         <>
           <SheetAction act="delete" ask={t(DELETE_ASK).replace("{name}", label)} data={{ "data-edit": "delete-card", "data-cell": key0, "data-every": "" }} />
-          {weekRows(plan).length < MAX_STEPS && <InsertCard cell={key0} axis="column" last={last} every />}
+          {weekRows(plan).length < MAX_STEPS && <InsertCard cell={key0} axis="column" first={first} every />}
         </>
       )}
       <span className="pl-wtools-line">
@@ -1166,7 +1169,7 @@ function WeekStars(props: StepsProps) {
                   data={{ "data-edit": "delete-card", "data-cell": keyOf(row), "data-every": "" }}
                 />
               )}
-              {edit && rows.length < MAX_STEPS && <InsertCard cell={keyOf(row)} axis="column" last={i === rows.length - 1} every />}
+              {edit && rows.length < MAX_STEPS && <InsertCard cell={keyOf(row)} axis="column" first={i === 0} every />}
               {tinted && plan.signs && (
                 <span className="pl-whead-part" aria-hidden>
                   <DaySign set={plan.signs} part={partIn(row, n) ?? "noon"} lines={look.print && !look.color} />
@@ -1180,7 +1183,7 @@ function WeekStars(props: StepsProps) {
           {week.map((d) => (
             <WeekCell key={dayKey(d)} plan={plan} d={d} row={row} props={props} picture={pictures} />
           ))}
-          {edit && <RowTools plan={plan} row={row} key0={keyOf(row)} withDelete={pictures} last={i === rows.length - 1} />}
+          {edit && <RowTools plan={plan} row={row} key0={keyOf(row)} withDelete={pictures} first={i === 0} />}
         </div>
       ))}
     </div>
@@ -1230,7 +1233,7 @@ function DayColumns(props: StepsProps) {
                 got={starsGot(props.ticks, props.linked, d, step)}
                 counts={props.counts}
                 edit={edit}
-                insert={edit && steps.length < MAX_STEPS ? { axis: "column", last: i === steps.length - 1 } : undefined}
+                insert={edit && steps.length < MAX_STEPS ? { axis: "column", first: i === 0 } : undefined}
                 small
               />
             ))}

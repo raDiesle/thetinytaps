@@ -61,8 +61,9 @@ its stars are its − ＋, its place is where it was put, 🗑️ takes it at on
 the window to do what the sheet already does (user feedback, November 2026: „Früher / Später“, „Entfernen“, „Sterne“ and
 „Jeden Tag / Nur Freitag“ went); the reward's ⚙️ (or a tap on it) opens the rewards, with no 🗑️: „Ohne
 Belohnung“ is the first of them, a reward like any other, with Tapsi in confetti as its picture (below). A new card comes from a small ＋ on a card's edge
-(`InsertCard`, `withInserted`): before every card, and after the last one, left and right in a line, above and below in
-a week's column – under the mouse a blue bar shows where it goes, in that card's part. No empty ＋ card keeps a place:
+(`InsertCard`, `withInserted`): the first card carries two, before and after it, every other card one after it (user
+request, 27 November 2026: the two ＋ belong to the first card, never the last), left and right in a line, above and
+below in a week's column – under the mouse a blue bar shows where it goes, in that card's part. No empty ＋ card keeps a place:
 the cards always take the best layout, and are set out anew when one comes (user feedback, November 2026); only an
 empty day, line or column shows a ＋ place. A board of days shows its tasks as a strip of cards over the sheet (`EditTasks`): a
 tap swaps one, its 🗑️ takes it (never the last), ＋ adds one in the board's times of day; a collecting board has no
@@ -71,11 +72,17 @@ its automatic title as the placeholder – so there is no field for the child's 
 own to change it or take it away (`titleMark`, „Ohne Zeichen“; a pale ＋ keeps its place while the chart is made), and
 „Tafel löschen“ / „Plan löschen“ stands at the far end of the edit bar (`ChartEditor onRemove`). What needs typing besides (own words, own emoji, times of day,
 „Von vorn“) stays below under „Weitere Einstellungen“ (`Editor`, `PlanEditor`) – and a Countdown has none of it, so it
-has no „Weitere Einstellungen“ at all. Above the band ↶ Rückgängig and ↷ Wiederholen stand on the left, then „✏️ Direkt
+has no „Weitere Einstellungen“ at all. The edit bar starts with **„✏️ Bearbeiten“ / „🖨️ Druckansicht“**, two
+joined paper buttons, the one shown yellow (`ViewSwitch`, user request, 27 November 2026): always there, so a grown-up
+sees at any moment what the paper will show – the sheet in colour on an A4 page turned as the print panel turns it by
+default (`.rw-print-paper`, `orientationOf`, `planOrientation`), with nothing to tap on it – and goes back with one tap.
+Then ↶ Rückgängig and ↷ Wiederholen, then „✏️ Direkt
 auf der Tafel ändern“, which says that the sheet is changed as it is seen and printed so (↶ ↷:
 `history.ts`, also Ctrl/⌘+Z, Ctrl+Shift+Z, Ctrl+Y outside a box for words; letters typed in a row undo as one word);
 the sheet has a dashed edge while it is changed. The stars are set where they are seen: − and ＋ stand at the ends of
-the card's row of star fields, no number between them (the fields are the count); under the mouse ＋ shows the next
+the card's row of star fields, no number between them (the fields are the count), and the fields stand in the
+card's middle between them – the ghost below has an unseen twin before the first field (`.pl-star-spacer`, user
+request, 27 November 2026: a single field stood left of the middle); under the mouse ＋ shows the next
 field pale and − pales the last – that field keeps its room unseen all the time (`visibility`, never `display`), so
 nothing jumps under the mouse (user feedback, November 2026). A plain plan's card has a small „＋⭐“, which makes it
 count (without a reward). A part's sign, where one is chosen, stands big for its whole line (`PartName`). Cards are not
@@ -109,9 +116,10 @@ deleting a chart, 🗑️ on the photo or „Abbrechen“ in the wizard deletes 
 `rw-photo*` belongs to the photo prints (`PhotoPrint`).
 
 **An own photo for a task or card** (T-13: the child's own potty, toothbrush or Kita door, which a two-year-old knows
-best): the window a card of a plan or a task of a board opens (a tap or its ⚙️) starts with „Eigenes Foto“ –
-„Foto wählen“ (a drawn camera, `CameraSign`) opens the same file picker as the child's photo, and once there „Anderes
-Foto“ and „Ohne Foto“, which brings the picture back (`OwnPhotoPicks`, `withCardPhoto`, `withTaskPhoto`). The file
+best): the window a card of a plan or a task of a board opens (a tap or its ⚙️) starts its one list of pictures with
+„Foto wählen“ (a drawn camera, `CameraSign`), which opens the same file picker as the child's photo, and once there
+„Anderes Foto“ and „Ohne Foto“, which brings the picture back (`OwnPhotoPicks`, `withCardPhoto`, `withTaskPhoto`) – tiles
+like the others, no heading or note of their own (below). The file
 picker knows where a photo goes by `photoFor` in `ChartEditor` (null: the child's). The card keeps its name, stars and
 place; only its key is new on it (`PlanStep.photo`, `BoardTask.photo`, a key in the same store, read by the same
 `photoStore`). `ItemPic` draws it wherever the picture stood – screen, A4, cut-out cards, poster, Urkunde – as a square
@@ -344,6 +352,17 @@ sharp format (`blurriest`, `largestSharp`), and a drawn child's room shows the p
   November 2026); a chart with nothing left to type there shows no „Weitere Einstellungen“. And so for every window a
   tap opens: it offers only what is not on the sheet already (the reward's window lost its goal on a collecting board,
   whose circles have their own − ＋, and its 🗑️; user feedback, November 2026). A count that the sheet shows (star fields) is never written beside its − ＋ as well.
+- **A window of pictures to pick is one list** (`PickGrid`, user request, 27 November 2026): every picture in its
+  order – the own photo's tiles or „Ohne Belohnung“ first, then the rituals, then the day's pictures – with no headings
+  splitting it („Eigenes Foto“, „Rituale …“, „Bilder für den Tag“, „Tauschen gegen“ went) and no note in it (the note on
+  the own potty's photo went); a search over their names on top (case and accents ignored, focused at once only with a
+  mouse, never popping a phone's keyboard over the pictures), and the window as wide as the screen with big pictures
+  (`EditDialog wide`). A new window of pictures uses the same (`rewards.test.ts`).
+- Every action on the sheet and in the edit bar says what it does under the mouse (`title`): ⚙️, 🗑️, ＋, − ＋ at the
+  stars, the reward's tag, the kinds, the Zeitraum, the view switch, the window's ✕ (user request, 27 November 2026).
+- While a chart is made and in the Druckansicht its circles are empty, also on a chart with stars or examples
+  (`ticks`/`stars` `undefined` in `ChartEditor`): a star is stuck on or coloured in, never printed (user request, 27
+  November 2026); the stars are seen on the chart itself.
 - Delete and change are drawn icons in a thing's corners (`SheetAction`: a bin and a gear in a white disc, the bin red),
   never an emoji in a ring, which cut through the bin; under the mouse each says its question („„Anziehen“ löschen?“)
   and a 🗑️ marks in red what it would take. A new thing that can be removed or changed on the sheet gets the same pair
@@ -495,8 +514,8 @@ shares the board's page and parts (sheet look, themes, `A4`/`Preview`, the star 
 - `rituals.ts` – the rituals (H-58, research „rituale“): catalogue cards like the activities (`STEP_BY_ID` finds them,
   `ritualOf(step)` tells one), each with when it belongs, its words for the grown-up in parts (what they ask, say, or
   the child says after them) and how it goes best; `RitualCard.tsx` – those words as a card: `RitualDialog` on screen,
-  `RitualPages` on paper (two by two standing, four in a row lying). The editor offers them first, under their own
-  heading; the template „Mein Tag mit Ritualen“ puts all four on the day.
+  `RitualPages` on paper (two by two standing, four in a row lying). The editor offers them first in its one list of
+  pictures, with no heading of their own; the template „Mein Tag mit Ritualen“ puts all four on the day.
 - Ticks live in the board's star log (`REWARDS_STARS_KEY`) under the plan's id, keyed `YYYY-MM-DD|stepId` (`cellKey`).
 
 ## The tick flow

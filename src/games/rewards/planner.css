@@ -837,6 +837,14 @@
   opacity: 0.55;
 }
 
+/*
+ * The ghost's twin before the first ring, never seen: with it the rings stand in the middle of the card, between − and
+ * ＋ of the same size (user request, 27 November 2026: a single ring stood left of the middle).
+ */
+.pl-star.pl-star-spacer {
+  visibility: hidden;
+}
+
 .pl-stars:has(> .pl-star-step.more:hover) > .pl-star.pl-star-ghost,
 .pl-wrow:has(.pl-star-step.more:hover) .pl-star.pl-star-ghost {
   visibility: visible;

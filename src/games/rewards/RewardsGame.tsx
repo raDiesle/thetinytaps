@@ -295,8 +295,6 @@ export function RewardsGame({ type: routeType = "board" }: { type?: PageKind }) 
       onChange={changeDraft}
       making={false}
       day={type === "board" ? boardDay : planDay}
-      log={log}
-      linked={linked}
       more={editor || undefined}
       onRemove={remove || undefined}
       onKind={designKind}
