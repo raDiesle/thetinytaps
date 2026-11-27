@@ -32,4 +32,4 @@ const server = serveOnFreePort(askedPort(3000), {
     return new Response(Bun.file(join(OUT, "404.html")), { status: 404, headers: { "Content-Type": "text/html;charset=utf-8" } });
   },
 });
-console.log(`Fun for Both (out/): http://localhost:${server.port}${base}/`);
+console.log(`Little Steps to Grow (out/): http://localhost:${server.port}${base}/`);

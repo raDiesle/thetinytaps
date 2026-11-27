@@ -38,6 +38,7 @@ import { BROW, Ear, EyeBall, EyeLid, eyeOpening, FACE, HAIR, Hair, HEAD_UNITS, t
 import { Brush, lerp3, squeezeOut, type BrushAnchor } from "./brush";
 import type { Motion } from "./steps";
 import { faceKey } from "./stains";
+import { foamyTeeth, GUM_FOAM, GUM_FOAM_SPREAD } from "./foam";
 
 // A child's face in a mirror, close up. The mouth is a small 3D model (see
 // jaw.ts), so the picture can turn and tilt to show exactly where to brush.
@@ -150,6 +151,14 @@ export function fitBox(room: Room | null, focus: Box): { box: Box; unit: number 
 /** The mirror's frame along the screen's edge, in px; it keeps its thickness however far the picture zooms. */
 const FRAME_PX = { inset: 6, radius: 36, ink: 12, color: 6 };
 
+/**
+ * The inside of the frame (`screenFrame`) as a CSS clip of a picture as big as the stage: the face, the sink and the
+ * mirror are cut there by CSS, never by an svg `<clipPath>` found by its id. While a book opens, the screen is copied
+ * onto its page, and a whole picture hanging on one id vanished – only the eyes and the mouth, layers of their own,
+ * were left (user feedback, November 2026).
+ */
+export const FRAME_CLIP: CSSProperties = { clipPath: `inset(${FRAME_PX.inset}px round ${FRAME_PX.radius}px)` };
+
 /** A frame at the edge of `box`, see FRAME_PX. */
 export function screenFrame(box: Box, unit: number) {
   const inset = FRAME_PX.inset * unit;
@@ -223,7 +232,7 @@ export interface MonsterSpot {
   variant: number;
   /** Where in its blink it starts, so they don't all blink at once. */
   blinkMs: number;
-  /** On a tooth that comes later: only shown where it clearly shows. The others glow. */
+  /** On a tooth that comes later: only shown where it clearly shows. The others move in layers of their own. */
   waiting: boolean;
   /** The brush is coming for this one. */
   scared: boolean;
@@ -245,13 +254,16 @@ interface MouthProps {
   brush: { stops: { tooth: ToothId; spot: number }[]; at: number; surface: Surface; motion: Motion } | null;
   /** All clean: the teeth shine and the eyes smile. */
   happy: boolean;
-  /** Right after the brushing: a last sugar monster peeks in, dazzled by the shining teeth, and puts on sunglasses. */
-  dazzled: boolean;
+  /**
+   * The foam is spat out (X-18, `spit.tsx`): after the cheer. Until then it stays on the gum of every tooth through the
+   * cheer, as it does at home until the child spits.
+   */
+  spat?: boolean;
   /** Shown while the child should open or close their mouth. */
   action: MouthAction | null;
   /**
-   * The head turns or the mouth opens or closes: the picture is drawn anew in every frame, so the glow on the teeth
-   * to brush waits until it holds still (their monsters show the way meanwhile).
+   * The head turns or the mouth opens or closes: the picture is drawn anew in every frame, so the layers over it
+   * (the stains and the foam of the teeth being brushed) wait until it holds still and join the still picture meanwhile.
    */
   gliding: boolean;
   /** Where the glide is going, and how far it has come (0 to 1, eased like the view): the corners of the mouth follow it. */
@@ -508,7 +520,7 @@ const jawOrder = (view: View): Jaw[] => {
   return view.pitch >= 0 ? ["lower", "upper"] : ["upper", "lower"];
 };
 
-export function Mouth({ view, zone, monsters, dirty, brush, happy, dazzled, action, gliding, glide, free, onTickle }: MouthProps) {
+export function Mouth({ view, zone, monsters, dirty, brush, happy, spat = false, action, gliding, glide, free, onTickle }: MouthProps) {
   const pictureLabel = useT()({
     de: "Ein Kindergesicht im Spiegel beim Zähneputzen",
     en: "A child's face in the mirror while brushing teeth",
@@ -626,6 +638,26 @@ export function Mouth({ view, zone, monsters, dirty, brush, happy, dazzled, acti
   const zoneFaces = useMemo(() => new Set(zone?.teeth.map((id) => faceKey(id, zone.surface))), [zone?.teeth, zone?.surface]);
   const stillDirty = dirty.filter((k) => !(layered && zoneFaces.has(k))).join(" ");
 
+  // The toothpaste foam (X-31) lies on the gum between the lips and the teeth, on the teeth brushed already and those
+  // the brush has reached in this step (`foamyTeeth`) – never on the lips (user feedback, November 2026). Once all is
+  // clean it lies on every tooth through the cheer, until the child spits it out (`spat`, X-18). The teeth of the step
+  // running now get theirs in small layers that fade in once (`GumFoam`); the others are in the still picture, which
+  // changes only when a step begins and the head turns.
+  const reached = brush && zone ? reachedTeeth(zone.teeth, brush.stops.slice(0, Math.floor(brush.at) + 1), brush.surface, view.open) : [];
+  const foamy = happy && spat ? new Set<string>() : foamyTeeth(dirty, reached);
+  const zoneTeeth = new Set(zone?.teeth.map(toothKey));
+  const stillFoam = [...foamy]
+    .filter((k) => !(layered && zoneTeeth.has(k)))
+    .sort()
+    .join(" ");
+  const layerFoam = layered ? (zone?.teeth ?? []).map(toothKey).filter((k) => foamy.has(k)) : [];
+  // A tooth's foam fades in only where it first comes: where the still picture showed it already (the step's first
+  // tooth while the head turned to it), its layer takes over without a fade.
+  const foamFades = useRef(new Map<string, boolean>());
+  for (const k of foamFades.current.keys()) if (!foamy.has(k)) foamFades.current.delete(k);
+  for (const k of stillFoam.split(" ").filter(Boolean)) if (!foamFades.current.has(k)) foamFades.current.set(k, false);
+  for (const k of layerFoam) if (!foamFades.current.has(k)) foamFades.current.set(k, true);
+
   // The face and the teeth change only while the head turns or the mouth opens, or a step's teeth are done: built once
   // for each, not again with every tick of the clock (hundreds of paths, too slow for a phone five times a second).
   const still = useMemo(() => {
@@ -634,14 +666,28 @@ export function Mouth({ view, zone, monsters, dirty, brush, happy, dazzled, acti
       const [tooth, surface] = k.split(":");
       dirtyBy.set(tooth, (dirtyBy.get(tooth) ?? new Set()).add(surface as Surface));
     }
-    // Far teeth first; each one stands in its own piece of gum: the gum's top under it, its walls over its foot.
-    const jawParts = painted.map(({ tooth: t, gum, project }) => (
-      <g key={t.key}>
-        <GumFaces gum={gum} project={project} top />
-        <Crown tooth={t} project={project} dirty={dirtyBy.get(t.key)} />
-        <GumFaces gum={gum} project={project} top={false} />
-      </g>
-    ));
+    // Far teeth first; each one stands in its own piece of gum: the gum's top under it, its walls over its foot. Each
+    // jaw's foam lies on its gum walls once all its teeth stand, so a neighbour's gum never cuts a bubble off.
+    const foamOn = new Set(stillFoam.split(" "));
+    const jawParts = jawOrder(view).flatMap((jaw) => {
+      const ofJaw = painted.filter((p) => p.tooth.id.jaw === jaw);
+      return [
+        ...ofJaw.map(({ tooth: t, gum, project }) => (
+          <g key={t.key}>
+            <GumFaces gum={gum} project={project} top />
+            <Crown tooth={t} project={project} dirty={dirtyBy.get(t.key)} />
+            <GumFaces gum={gum} project={project} top={false} />
+          </g>
+        )),
+        <g key={`foam-${jaw}`}>
+          {ofJaw
+            .filter(({ tooth: t }) => foamOn.has(t.key))
+            .map(({ tooth: t, gum, project }) => (
+              <FoamBubbles key={t.key} bubbles={gumFoam(t.id, gum, project, lipPoints, side)} />
+            ))}
+        </g>,
+      ];
+    });
 
     const tongueUp = all.lower.facing([0, 1, 0.2]) > 0.05;
     const palateDown = all.upper.facing([0, -1, 0.2]) > 0.05;
@@ -657,7 +703,7 @@ export function Mouth({ view, zone, monsters, dirty, brush, happy, dazzled, acti
         </g>
       </>
     );
-  }, [view, all, model, painted, lipPoints, lipsPath, stillDirty, happy]);
+  }, [view, all, model, painted, lipPoints, lipsPath, stillDirty, stillFoam, side, happy]);
 
   // The stains on the teeth being brushed now, each a small layer of its own over the still picture that fades away
   // as its tooth's monsters are brushed off: a fade inside the picture's svg would have the phone paint the screen
@@ -705,7 +751,6 @@ export function Mouth({ view, zone, monsters, dirty, brush, happy, dazzled, acti
         sprite={!m.waiting}
         color={m.color}
         variant={m.variant}
-        active={!m.waiting}
         still={m.waiting}
         gone={m.gone}
         squeezeAngle={squeeze?.angle ?? 0}
@@ -738,8 +783,8 @@ export function Mouth({ view, zone, monsters, dirty, brush, happy, dazzled, acti
     );
   }, [side, lipPoints]);
 
-  // The lips over the glow's edge, in a layer of their own above it, so the glow stays inside them; with them the
-  // monsters waiting for a later step, which stand still. While the head turns or the mouth opens there is no glow and
+  // The lips in a layer of their own over the stains and the foam of the teeth being brushed, so both stay inside
+  // them; with them the monsters waiting for a later step, which stand still. While the head turns or the mouth opens
   // every layer with the picture's viewBox is drawn anew in every frame, so they join the still picture instead:
   // one screen painted per frame rather than two.
   const lipsAndWaiting = (
@@ -752,28 +797,22 @@ export function Mouth({ view, zone, monsters, dirty, brush, happy, dazzled, acti
   );
 
   // Pictures on top of each other, all with the same viewBox and size, so they line up exactly: the still one below
-  // (face, teeth), then each in a layer of its own the glow on the teeth to brush (the whole svg pulses, which a phone
-  // does without painting), the lips and the waiting monsters, what moves (the monsters being brushed, the arrows on
-  // the lips) each in a small layer of its own (Sprite), the mirror's glass and frame, and the brush. Something
-  // animated inside an svg has the browser paint that whole svg again in every frame: the glow once pulsed with the
-  // lips in one picture, and the swaying monsters lay in one the size of the screen, and each time the phone painted
-  // the screen anew 50 times a second.
+  // (face, teeth), then each in a small layer of its own the stains and the foam of the teeth being brushed, the lips
+  // and the waiting monsters, what moves (the monsters being brushed, the arrows on the lips) each in a small layer of
+  // its own (Sprite), the mirror's glass and frame, and the brush. Something animated inside an svg has the browser
+  // paint that whole svg again in every frame: a glow once pulsed with the lips in one picture, and the swaying monsters
+  // lay in one the size of the screen, and each time the phone painted the screen anew 50 times a second.
   return (
     <>
-      <svg ref={svg} className="mouth" viewBox={viewBox} role="img" aria-label={pictureLabel}>
+      <svg ref={svg} className="mouth" viewBox={viewBox} role="img" aria-label={pictureLabel} style={FRAME_CLIP}>
         <defs>
-          <clipPath id="mirror">
-            <rect {...frame} />
-          </clipPath>
           <clipPath id="mouth-inside">
             <path d={lipsPath} />
           </clipPath>
         </defs>
         <rect {...frame} fill="#dff6ff" />
-        <g clipPath="url(#mirror)">
-          {still}
-          {gliding && lipsAndWaiting}
-        </g>
+        {still}
+        {gliding && lipsAndWaiting}
       </svg>
 
       {shownStains.length > 0 && (
@@ -789,6 +828,31 @@ export function Mouth({ view, zone, monsters, dirty, brush, happy, dazzled, acti
                 width={round(g.box.width / unit)}
                 height={round(g.box.height / unit)}
                 clean={!dirty.includes(g.key)}
+              />
+            );
+          })}
+        </div>
+      )}
+
+      {/* The foam on the gum of the teeth being brushed, under the lips, each tooth's a layer of its own. */}
+      {layerFoam.length > 0 && (
+        <div className="mouth-foam">
+          {layerFoam.map((k) => {
+            const p = painted.find((q) => q.tooth.key === k)!;
+            const bubbles = gumFoam(p.tooth.id, p.gum, p.project, lipPoints, side);
+            if (bubbles.length === 0) return null;
+            const box = bubblesBox(bubbles);
+            const at = onScreen(box, 1);
+            return (
+              <GumFoam
+                key={k}
+                bubbles={bubbles}
+                box={box}
+                x={round(at.x)}
+                y={round(at.y)}
+                width={round(box.width / unit)}
+                height={round(box.height / unit)}
+                fades={foamFades.current.get(k) ?? true}
               />
             );
           })}
@@ -848,8 +912,6 @@ export function Mouth({ view, zone, monsters, dirty, brush, happy, dazzled, acti
         {/* The ones being brushed now on top. */}
         {monsters.filter((m) => !m.waiting).map(placed)}
         {action && <LipArrows action={action} lips={lipPoints} zoom={project.zoom} onScreen={onScreen} />}
-        {/* A last sugar monster peeks in, dazzled by the clean teeth, and puts on sunglasses: no sugar left for it. */}
-        {dazzled && <DazzledMonster screen={screen} />}
         {/* The teeth of this view the brush left last sparkle softly, one small glint each coming and going in turn
             (`sparkles`). */}
         {sparkles.map((g, j) => {
@@ -1002,22 +1064,12 @@ const PlacedMonster = memo(function PlacedMonster({
   onTickle: (id: number) => void;
 } & Omit<Parameters<typeof Monster>[0], "onTickle">) {
   // While the head turns only the place changes: the monster itself is kept, so React doesn't draw it again.
-  const { color, variant, active, still, gone, scared, tickled, blinkMs } = monster;
+  const { color, variant, still, gone, scared, tickled, blinkMs } = monster;
   const drawn = useMemo(
     () => (
-      <Monster
-        color={color}
-        variant={variant}
-        active={active && !sprite}
-        still={still}
-        gone={gone}
-        scared={scared}
-        tickled={tickled}
-        blinkMs={blinkMs}
-        onTickle={() => onTickle(id)}
-      />
+      <Monster color={color} variant={variant} still={still} gone={gone} scared={scared} tickled={tickled} blinkMs={blinkMs} onTickle={() => onTickle(id)} />
     ),
-    [id, color, variant, active, sprite, still, gone, scared, tickled, blinkMs, onTickle],
+    [id, color, variant, still, gone, scared, tickled, blinkMs, onTickle],
   );
   if (sprite)
     return (
@@ -1027,7 +1079,6 @@ const PlacedMonster = memo(function PlacedMonster({
         reach={MONSTER_REACH}
         className={`monster-sprite${gone ? " gone" : ""}${scared ? " scared" : ""}${tickled ? " tickled" : ""}`}
       >
-        {active && <div className="sprite-glow" />}
         <div
           className="sprite-body"
           style={
@@ -1144,7 +1195,7 @@ function MonsterDust({ color }: { color: string }) {
 /** Rounded, so a place that hasn't really moved leaves the page as it is. */
 const round = (n: number, by = 10) => Math.round(n * by) / by;
 
-/** How far a monster reaches from its middle, glow and sway included, in its own units. */
+/** How far a monster reaches from its middle, sway included, in its own units. */
 const MONSTER_REACH = 34;
 
 /** Where a sprite's middle lies on the screen, in px from the screen's middle, and how many px one of its units is. */
@@ -1158,7 +1209,7 @@ interface SpriteSpot {
  * A small moving picture over the mirror in an HTML layer of its own, `reach` of its units each way round its middle
  * (an svg in it takes `spriteBox(reach)`). Something animated inside an svg has the browser paint that whole svg again
  * in every frame, and even a small svg on every frame keeps a phone's main thread busy: so the monsters being brushed
- * and the arrows on the lips are each such a layer, and what moves in them (sway, glow, nudge) moves the HTML around
+ * and the arrows on the lips are each such a layer, and what moves in them (sway, nudge) moves the HTML around
  * their svg, which the browser does without painting (`.monster-sprite`, `.lip-arrow` in teeth.css).
  */
 function Sprite({
@@ -1235,6 +1286,118 @@ function Glint() {
       <circle r={6} fill="#fff" />
     </>
   );
+}
+
+/** A bubble of foam on the screen, in picture units. */
+interface Bubble {
+  x: number;
+  y: number;
+  r: number;
+}
+
+/**
+ * The bubbles of foam on a tooth's gum (`GUM_FOAM`), in picture units: along its gum line on the cheek side, a little
+ * down towards the lip. Only where that gum faces us, inside the lips (they cover the rest) and, in a profile, on the
+ * near side of the face's front.
+ */
+function gumFoam(id: ToothId, gum: MouthModel["gums"][number], project: Project, lips: Point2[], side: ProfileParts | null): Bubble[] {
+  if (project.facing(surfaceFace(gum.faces, "outer").normal) <= MIN_FACING) return [];
+  const rim = gum.rims.outer;
+  const towardLip = id.jaw === "lower" ? -1 : 1;
+  // Not every tooth's foam alike: every other one mirrored, one bubble left out and the others sized a little apart.
+  const seed = seedOf(id);
+  const mirrored = seed % 2 === 1;
+  return GUM_FOAM.flatMap(({ along, down, r: size }, n) => {
+    if (n === seed % GUM_FOAM.length) return [];
+    const r = size * (1 + GUM_FOAM_SPREAD * (((seed * 7 + n * 3) % 5) / 2 - 1));
+    const k = (mirrored ? 1 - along : along) * (rim.length - 1);
+    const i = Math.min(rim.length - 2, Math.floor(k));
+    const on = lerp3(rim[i], rim[i + 1], k - i);
+    const at = project.point([on[0], on[1] + towardLip * down, on[2]]);
+    if (!insideBy(at, lips, 0) || (side && insideBy(at, side.ring, 0))) return [];
+    return [{ x: Math.round(at.x * 10) / 10, y: Math.round(at.y * 10) / 10, r: Math.round(r * project.zoom * 10) / 10 }];
+  });
+}
+
+/** The box round some bubbles, with room for their outline. */
+function bubblesBox(bubbles: Bubble[]) {
+  const pad = 2;
+  const x = Math.min(...bubbles.map((b) => b.x - b.r)) - pad;
+  const y = Math.min(...bubbles.map((b) => b.y - b.r)) - pad;
+  const width = Math.max(...bubbles.map((b) => b.x + b.r)) + pad - x;
+  const height = Math.max(...bubbles.map((b) => b.y + b.r)) + pad - y;
+  return { x, y, width, height };
+}
+
+/** The foam's faint edge: just enough to show it on the pink gum and white teeth (`FOAM_EDGE` of the brush's foam). */
+const GUM_FOAM_EDGE = "#d6e9f5";
+
+/**
+ * White toothpaste foam, faint (user feedback, November 2026: subtler): overlapping bubbles merged into one soft cloud
+ * – their pale outline drawn under all their fills, so only the cloud's edge shows –, a little see-through, each bigger
+ * one with a soft shade low in it. Drawn still.
+ */
+function FoamBubbles({ bubbles }: { bubbles: Bubble[] }) {
+  return (
+    <g opacity={0.85}>
+      <g fill={GUM_FOAM_EDGE}>
+        {bubbles.map((b, i) => (
+          <circle key={i} cx={b.x} cy={b.y} r={b.r + 0.8} />
+        ))}
+      </g>
+      <g fill="#fff">
+        {bubbles.map((b, i) => (
+          <circle key={i} cx={b.x} cy={b.y} r={b.r} />
+        ))}
+      </g>
+      <g fill="#eef6fc">
+        {bubbles
+          .filter((b) => b.r > 3)
+          .map((b, i) => (
+            <circle key={i} cx={b.x + b.r * 0.15} cy={b.y + b.r * 0.4} r={b.r * 0.45} />
+          ))}
+      </g>
+    </g>
+  );
+}
+
+/**
+ * The foam on a tooth being brushed now, in a small layer of its own under the lips that fades in once as the brush
+ * reaches it (`fades`) – a fade inside the mirror's svg would have the phone paint the screen anew in every frame.
+ */
+const GumFoam = memo(function GumFoam({
+  bubbles,
+  box,
+  x,
+  y,
+  width,
+  height,
+  fades,
+}: {
+  bubbles: Bubble[];
+  box: Box;
+  x: number;
+  y: number;
+  width: number;
+  height: number;
+  fades: boolean;
+}) {
+  return (
+    <div className={`gum-foam${fades ? " fades" : ""}`} style={{ width, height, transform: `translate(${x}px, ${y}px)` }}>
+      <svg viewBox={`${box.x} ${box.y} ${box.width} ${box.height}`} aria-hidden>
+        <FoamBubbles bubbles={bubbles} />
+      </svg>
+    </div>
+  );
+});
+
+/**
+ * The teeth of a step the brush has reached (`toothKey`): those of its stops up to the one it is on. Outside with the
+ * teeth together it brushes both rows at once, so a stop reaches the tooth above or below it too.
+ */
+function reachedTeeth(teeth: ToothId[], stops: { tooth: ToothId }[], surface: Surface, open: number): string[] {
+  const both = surface === "outer" && open < 0.5;
+  return teeth.filter((id) => stops.some(({ tooth }) => tooth.side === id.side && tooth.n === id.n && (both || tooth.jaw === id.jaw))).map(toothKey);
 }
 
 /**
@@ -1620,69 +1783,10 @@ const MONSTER_SHINE = "M-10.5 -7.5 C-10 -11 -7 -13 -4 -13 C-6 -11.6 -8 -9.8 -8.6
 
 const MONSTER_BODY = "M-15 8 C-17 -6 -10 -15 0 -15 C10 -15 17 -6 15 8 C12 14 7 11 5 15 C2 11 -2 11 -5 15 C-7 11 -12 14 -15 8 Z";
 
-/** Where the mirror's frame covers its bottom edge, in px from the screen's edge (FRAME_PX: inset and half the ink). */
-const MIRROR_EDGE_PX = 12;
-
-/** How far the dazzled monster reaches round its middle, horns and paws included, in its own units. */
-const DAZZLED_REACH = 26;
-
-/**
- * The end's surprise: a last sugar monster rises at the bottom edge of the mirror, squeezes its eyes shut at the
- * shining teeth, then sunglasses drop onto its nose and it grins – there is no sugar left for it. A small layer of
- * its own (body and glasses each an HTML layer moved by CSS, `teeth-dazzle-…`), placed on the screen, so the end's
- * zoom doesn't move it.
- */
-function DazzledMonster({ screen }: { screen: { width: number; height: number } }) {
-  const size = round(Math.min(screen.height * 0.36, screen.width * 0.26));
-  const box = spriteBox(DAZZLED_REACH);
-  return (
-    <div
-      className="mouth-sprite dazzled-monster"
-      style={{
-        width: size,
-        height: size,
-        transform: `translate(${round(screen.width * 0.3 - size / 2)}px, ${round(screen.height / 2 - size - MIRROR_EDGE_PX)}px)`,
-      }}
-    >
-      <div className="dazzle-body">
-        <svg viewBox={box} aria-hidden>
-          <path d={MONSTER_TOPS[0]} fill="#8bd346" stroke={INK} strokeWidth={2.5} strokeLinejoin="round" />
-          {/* Paws up at the bright light. */}
-          <g fill="#8bd346" stroke={INK} strokeWidth={2}>
-            <ellipse cx={-17} cy={0} rx={4.5} ry={3.5} transform="rotate(-30 -17 0)" />
-            <ellipse cx={17} cy={0} rx={4.5} ry={3.5} transform="rotate(30 17 0)" />
-          </g>
-          <path d={MONSTER_BODY} fill="#8bd346" stroke={INK} strokeWidth={2.5} strokeLinejoin="round" />
-          {/* Eyes squeezed shut: > < */}
-          <path d="M-9 -7 L-4 -4 L-9 -1 M9 -7 L4 -4 L9 -1" fill="none" stroke={INK} strokeWidth={2} strokeLinecap="round" strokeLinejoin="round" />
-          <path d="M-6 4 Q0 10 6 4" fill="#7a1f3d" stroke={INK} strokeWidth={2} strokeLinejoin="round" />
-          <path d="M-3.5 5.6 L-2.2 9 L-0.8 6.6 Z" fill="#fff" />
-        </svg>
-        <div className="dazzle-glasses">
-          <svg viewBox={box} aria-hidden>
-            <path d="M-13 -5 L13 -5" stroke={INK} strokeWidth={2} />
-            <path d="M-13 -5 L-17 -8 M13 -5 L17 -8" stroke={INK} strokeWidth={1.8} strokeLinecap="round" />
-            <path
-              d="M-12.5 -6.5 H-1.5 Q-1.5 1.5 -7 1.5 Q-12.5 1.5 -12.5 -6.5 Z M1.5 -6.5 H12.5 Q12.5 1.5 7 1.5 Q1.5 1.5 1.5 -6.5 Z"
-              fill="#2b2140"
-              stroke={INK}
-              strokeWidth={1.6}
-              strokeLinejoin="round"
-            />
-            {/* The light on the lenses. */}
-            <path d="M-10 -4.5 L-7.5 -4.5 M3.5 -4.5 L6 -4.5" stroke="#fff" strokeWidth={1.3} strokeLinecap="round" opacity={0.85} />
-          </svg>
-        </div>
-      </div>
-    </div>
-  );
-}
-
 /** A sugar monster drawn round its middle, about 30 wide; the story at the start (origin.tsx) shows the same ones. */
 export function Monster({
   color,
   variant,
-  active,
   gone,
   scared,
   tickled,
@@ -1692,7 +1796,6 @@ export function Monster({
 }: {
   color: string;
   variant: number;
-  active: boolean;
   /** Stands still, not even blinking: in the mirror only the ones to brush now move, so a phone keeps up. */
   still?: boolean;
   gone: boolean;
@@ -1712,8 +1815,6 @@ export function Monster({
       className={`sugar-monster${gone ? " gone" : ""}${scared ? " scared" : ""}${tickled ? " tickled" : ""}${still ? " still" : ""}`}
       style={{ "--blink": `${-(blinkMs % 3700)}ms` } as CSSProperties}
     >
-      {/* The ones to brush now glow, only just round them, so the light stays on their tooth (`.sprite-glow`). */}
-      {active && <circle className="monster-glow" cy={-3} r={21} fill="url(#monster-glow)" />}
       <g className="monster-body" data-tap={gone ? "done" : ""} onPointerDown={stop}>
         {/* Sticky: the monster has melted a little onto its tooth – a puddle of its sugar under it, drips hanging from
             its foot and little paws stuck to the tooth on both sides (user feedback, November 2026). */}

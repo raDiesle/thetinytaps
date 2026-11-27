@@ -11,25 +11,34 @@ the management page's contents by `TOOL_GROUPS`), never a link from the shelf or
   description (`chapterList`: the first at 0:00, one shorter than 10 s joined to the one before, since YouTube shows
   chapters only when there are three of at least 10 s) and saves the lines as an .srt. A new video calls `chapter` where
   its parts begin, with names a parent would look for, never one per few seconds.
-- `intro/`: the videos' intro (Y-01), at `/management/video-intro/`: the shelf of picture books, the Fun for Both book
+- `intro/`: the videos' intro (Y-01), at `/management/video-intro/`: the shelf of picture books, the Little Steps to Grow book
   (the families' picture `buch-cover.webp` as its cover) coming out and opening, its first page filling the screen,
   and the app's own `Logo` printed on it letter by letter, the paw tracks walking to the o and Papa Fox with his child
-  sitting down on it, then „funforboth.com“. 7.5 s with a sound of its own (`introSound.ts`: a knock, the rush out of
+  sitting down on it, then „littlestepstogrow.com“. 7.5 s with a sound of its own (`introSound.ts`: a knock, the rush out of
   the shelf, the page-turn, Fun – for – Both as three rising bell notes, paws patting, a warm chord). No voice yet:
-  Tapsi saying „Fun for Both!“ would be a paid recording, made only when the user asks.
+  Tapsi saying „Little Steps to Grow!“ would be a paid recording, made only when the user asks.
 - `outro/`: the videos' outro (Y-04, Y-05), at `/management/video-outro/`: the intro backwards (it starts on the page
   the intro ends on, the name fades, the book closes and goes back into its gap – `introSecond` maps its time onto the
   intro's, so both stay one motion), the four picture books lighting up one after another with a menu picture of one of
-  their games, then a card with the `Logo`, „funforboth.com“, five signs (free, no ads, offline, languages, play-time
+  their games, then a card with the `Logo`, „littlestepstogrow.com“, five signs (free, no ads, offline, languages, play-time
   limit) and a QR code to the home page in the video's language (`codeAddress`; `uqr` draws it). 12 s.
   YouTube shows no end screen links on videos made for children, so all of it is in the picture.
   `bun run video outro --sprache en` makes it for one language.
   **The outro is the same in every video** (user decision, November 2026): its code leads to the home page, never to
   the video's game, so one outro per language is rendered once and put after each video; the link to the game stands
   in the video's description (`VIDEO_PAGES`, `youtubeTexts.ts`). Nothing in it may depend on the video it follows.
-  It comes in two variants (choice „Variante“ on the page, `--variante regal` for the tool): „Bilder aus den Spielen“,
-  the default (user request, November 2026: show the games' pictures big, not the books), and the shelf one above.
-  „Bilder aus den Spielen“ (`gallery.ts`, `GalleryScene`, `scheduleGallerySound`, about 17 s) opens on the two
+  It comes in three variants (choice „Variante“ on the page, `--variante bilder` or `--variante regal` for the tool):
+  „Pinnwand“, the default, „Bilder aus den Spielen“ and the shelf one above.
+  „Pinnwand“ (`pinboard.ts`, `PinboardScene`, `schedulePinboardSound`, about 9 s; user request, 27 November 2026: the
+  pictures one after another went by too fast and gave no overview) is one single picture: a cork board filling the
+  screen, the games' photos (`PINBOARD` in `content.ts`, places in `PIN_SLOTS`) pinned onto it one after another in
+  white frames, each with a word for what it shows on its frame (the game's name, or a short `word` where that is a
+  whole question), each held by a pushpin with a tap; then a paper pinned into the middle with only „www.littlestepstogrow.com“
+  and „Alltagshelfer & Lernspiele“ (`BOARD_LINE`) – no card, no signs, no code after it. Which photos hang there is the
+  user's choice (they pick from `/management/bilder/`; the twelve there now were chosen on 27 November 2026); a photo swapped keeps its place, and the board stays one
+  picture to take in at a glance, never a run of pictures again.
+  „Bilder aus den Spielen“ (`gallery.ts`, `GalleryScene`, `scheduleGallerySound`, about 17 s; user request, November
+  2026: show the games' pictures big, not the books) opens on the two
   categories side by side, „Alltagshelfer“ and „Lernspiele“, each with a picture of its games and its name under it;
   then six helpers and six games (`GALLERY` in `content.ts`) come one after another out of the depth into the middle,
   big, the game's name on a slip under it and its category over it, each with a rising note, the one before flying on

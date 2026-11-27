@@ -206,10 +206,6 @@ function Fan({ link, age }: { link: FanLink; age: number }) {
   const { blades, wind, boat, button } = link.pose(age);
   const top = -STOOL.h;
   const head = { x: FAN.x, y: top - 14 - FAN.neck - FAN.r * 0.6 };
-  const { len, mast } = BOAT;
-  const deckY = -44;
-  const bow = boat + len / 2;
-  const belly = 10 + 26 * wind;
   return (
     <g>
       {[14, STOOL.w - 34].map((x) => (
@@ -245,6 +241,29 @@ function Fan({ link, age }: { link: FanLink; age: number }) {
             />
           );
         })}
+      {!link.boatMoving(age) && <FanBoat link={link} boat={boat} wind={wind} />}
+    </g>
+  );
+}
+
+/** Where the middle of the fan's boat is, from its mast's foot: the sprite that carries it is centred there. */
+export const BOAT_MID = { dx: 14, y: -BOAT.mast / 2 };
+/** How far the boat reaches from its middle, in the link's units, with a margin – up to its bowsprit's tip too. */
+export const boatPad = (link: FanLink) => Math.max(110, BOAT_MID.y - link.spritY + 12);
+
+/**
+ * The fan's toy boat with its mast at `boat` (link units, the floor at y = 0), its sail filled by `wind` (0–1). Drawn
+ * in the link while it stands, and as a sprite of its own over the room while its sail fills or it rolls
+ * (`FanLink.boatMoving`): rolling across the floor in the room's svg, it rastered its band while the fan's blades turned
+ * high above it (perf, A-46).
+ */
+export function FanBoat({ link, boat, wind }: { link: FanLink; boat: number; wind: number }) {
+  const { len, mast } = BOAT;
+  const deckY = -44;
+  const bow = boat + len / 2;
+  const belly = 10 + 26 * wind;
+  return (
+    <g>
       <line x1={bow - 6} y1={deckY + 4} x2={bow + SPRIT} y2={link.spritY} {...LINE} strokeWidth={5} />
       <line x1={boat} y1={deckY} x2={boat} y2={-mast} {...LINE} strokeWidth={5} />
       <path

@@ -10,7 +10,6 @@ import { playBlow, playMunch } from "@/lib/realSounds";
 import {
   loadRecordings,
   playBeeps,
-  playBoing,
   playBuzz,
   playChime,
   playChimeNote,
@@ -22,13 +21,11 @@ import {
   playKnock,
   playLeaves,
   playMelody,
-  playCoin,
   playPlink,
   playPlop,
   playSizzle,
   playTusch,
   playTwinkle,
-  playWhoosh,
   playWhirr,
   playYawn,
   playYum,
@@ -40,7 +37,7 @@ import { useWakeLock } from "@/lib/wakeLock";
 import { AppleScene } from "./apples";
 import { BlocksScene, blocksPlan, MAX_BLOCKS } from "./blocks";
 import { MAX_DIG, TunnelScene, tunnelPlan } from "./tunnel";
-import { JumpScene, jumpPlan, MAX_MOVES } from "./jump";
+import { floorTurnsAt, LiftScene, liftPlan } from "./lift";
 import { JarScene, jarPlan, MAX_MARBLES } from "./jar";
 import { FINAL_NOTES, FinalLight, finalMs, TimeBar, TimeBarChoice, TimeUp } from "./bar";
 import { CaterpillarScene } from "./caterpillar";
@@ -371,10 +368,10 @@ function TimerRun({
       return tunnelPlan(total, MAX_DIG)
         .blocks.slice(0, -1)
         .map((b) => b.gone);
-    // Up to the Moon (H-127): each star caught on the way, then the leap off the moon (always the last).
+    // Lift to the Top (H-127): each floor the display turns to, then the lift arriving at the top (always the last).
     if (picture === "jump") {
-      const plan = jumpPlan(total, MAX_MOVES);
-      return [...plan.moves.map((m) => m.star), plan.dive.start];
+      const ride = liftPlan(total);
+      return [...Array.from({ length: ride.floors }, (_, i) => floorTurnsAt(i + 1, ride)), ride.arrive];
     }
     // Marble Jar (H-149): each marble landing in its place in the jar, the last one being the end's.
     if (picture === "jar")
@@ -422,8 +419,10 @@ function TimerRun({
       // A piece done: one sound, also when several passed while the page was away.
       if (nextMoment.current < moments.length && at >= startedAt + moments[nextMoment.current]) {
         while (nextMoment.current < moments.length && at >= startedAt + moments[nextMoment.current]) nextMoment.current++;
-        // Many apples or slices fall every few seconds: their sound is spaced, so it never becomes a din.
-        if (at - lastPieceSound.current >= PIECE_SOUND_GAP_MS) {
+        // Many apples or slices fall every few seconds: their sound is spaced, so it never becomes a din. The lift's ding
+        // as it arrives at the top always sounds.
+        const arrived = picture === "jump" && nextMoment.current === moments.length;
+        if (arrived || at - lastPieceSound.current >= PIECE_SOUND_GAP_MS) {
           lastPieceSound.current = at;
           if (picture === "apple") playPlop();
           else if (picture === "pizza") playMunch();
@@ -431,8 +430,8 @@ function TimerRun({
           else if (picture === "blocks") playKnock(520);
           else if (picture === "tunnel") playCrack();
           else if (picture === "candle") playSizzle();
-          // A star caught: a bright note climbing the scale star by star; the leap off the moon whooshes.
-          else if (picture === "jump") nextMoment.current === moments.length ? playWhoosh() : playCoin(nextMoment.current + 3);
+          // A floor passed: a soft plink, the same each floor; arriving at the top: the lift's ding.
+          else if (picture === "jump") arrived ? playDing() : playPlink(2);
           else if (picture === "disc" || picture === "jar") playPlink(nextMoment.current);
           else playDing();
         }
@@ -486,7 +485,7 @@ function TimerRun({
       else if (picture === "tidy") playClonk();
       else if (picture === "blocks") playChime();
       else if (picture === "tunnel") playTwinkle();
-      else if (picture === "jump") playPlop();
+      else if (picture === "jump") playTwinkle();
       else if (picture === "jar") playChime();
       say(lines.end, true);
       // The time is up, plain to see and hear (user feedback, November 2026): children cheer, the picture
@@ -527,8 +526,8 @@ function TimerRun({
       else if (picture === "blocks") playKnock(880);
       // The pickaxe gives a bright tink on the stone.
       else if (picture === "tunnel") playKnock(1200);
-      // The hopper's springy boing.
-      else if (picture === "jump") playBoing();
+      // A lift's button clicks.
+      else if (picture === "jump") playClick();
       // The marbles waiting in the tube clink.
       else if (picture === "jar") playPlink(Math.floor(Math.random() * 8));
       else playChimeNote(Math.floor(Math.random() * 8));
@@ -634,7 +633,7 @@ export function SceneParts({
       {picture === "tidy" && <TidyScene count={MAX_TOYS} total={total} glow={poke} />}
       {picture === "blocks" && <BlocksScene count={MAX_BLOCKS} total={total} glow={poke} />}
       {picture === "tunnel" && <TunnelScene count={MAX_DIG} total={total} glow={poke} />}
-      {picture === "jump" && <JumpScene count={MAX_MOVES} total={total} glow={poke} />}
+      {picture === "jump" && <LiftScene total={total} startedAt={startedAt} glow={poke} still={still} />}
       {picture === "jar" && <JarScene count={MAX_MARBLES} total={total} glow={poke} />}
       {picture === "clock" && <ClockScene glow={poke} endsAt={startedAt + total} total={total} running={phase === "running"} still={still} />}
       {picture === "flower" && <FlowerScene glow={poke} total={total} />}

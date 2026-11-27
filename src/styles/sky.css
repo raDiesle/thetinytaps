@@ -57,7 +57,6 @@
 .sky-sun-rays {
   fill: #ffb703;
   transform-origin: 100px 100px;
-  animation: spin 40s linear infinite;
 }
 
 .sky-cloud {

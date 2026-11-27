@@ -754,3 +754,58 @@ button.idea-id {
   border-radius: 16px;
   background: #fff;
 }
+
+/* Lieder für Suno (/management/lieder/): each song's words and Suno fields, one column per language on wide screens. */
+.ideas-song-points li {
+  margin-bottom: 6px;
+}
+
+.ideas-song-languages {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(min(100%, 340px), 1fr));
+  gap: 16px 24px;
+}
+
+.ideas-song-languages h3 {
+  margin: 8px 0;
+}
+
+.ideas-song-style h4 {
+  margin: 14px 0 6px;
+  font-size: 0.95rem;
+}
+
+.ideas-song-block {
+  margin-bottom: 10px;
+}
+
+.ideas-song-field {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 8px;
+  margin-bottom: 4px;
+}
+
+.ideas-song-block pre {
+  margin: 0;
+  padding: 10px 12px;
+  border-radius: 12px;
+  background: #f3f0ff;
+  font-size: 0.85rem;
+  line-height: 1.45;
+  white-space: pre-wrap;
+  overflow-wrap: anywhere;
+}
+
+.ideas-song-postponed {
+  padding: 8px 12px;
+  border-radius: 12px;
+  background: #fff8e6;
+}
+
+details.ideas-song-style summary {
+  margin: 14px 0 6px;
+  font-weight: 700;
+  cursor: pointer;
+}

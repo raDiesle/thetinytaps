@@ -51,6 +51,8 @@ export const rewardChartIdeas: IdeaArea = {
       text: "Zähne-Woche, Mein Morgen, Mein Abend, Töpfchen-Woche, Woche mit drei Aufgaben, Zähne-Monat, Monat mit zwei Aufgaben, 5 Sterne bis zum Spielplatz, 7 Nächte im eigenen Bett – als Galerie „Vorlagen“ neben der Tafel, jede ein kleines Bild der Tafel mit Beispiel-Sternen und einer Zeile dazu. Darüber groß der Schalter Tag | Woche | Monat (dieselben Sterne) und daneben Sammeln.",
       effort: "S",
       done: true,
+      partial:
+        "Die Galerie „Vorlagen“ und der Knopf „🧩 Vorlagen“ sind seit dem 26. November 2026 wieder weg (Wunsch des Nutzers): Die Tafel nimmt die ganze Breite, und neue Tafeln entstehen im Editor – erst der Zeitraum, dann die Tageszeiten, oben die Schnellwahl Zeitplan, Belohnungstafel und „Wie lange warten?“. Die Vorlagen bleiben als Startpunkte des Zeitraums.",
     },
     {
       id: "T-06",
@@ -168,7 +170,7 @@ export const rewardChartIdeas: IdeaArea = {
       id: "T-19",
       emoji: "🌐",
       title: "Eigene Seite für die Belohnungstafel",
-      text: "Die Tafel als eigene kleine Website (eigene Adresse, eigene Suchmaschinen-Texte, z. B. „belohnungstafel gestalten“) mit Link zu Fun for Both. Der Ordner src/games/rewards hängt dafür nur an wenigen gemeinsamen Teilen.",
+      text: "Die Tafel als eigene kleine Website (eigene Adresse, eigene Suchmaschinen-Texte, z. B. „belohnungstafel gestalten“) mit Link zu Little Steps to Grow. Der Ordner src/games/rewards hängt dafür nur an wenigen gemeinsamen Teilen.",
       why: "Wer „belohnungstafel zum ausdrucken“ sucht, findet so die Tafel und von dort die Spiele.",
       effort: "M",
     },
@@ -228,7 +230,7 @@ export const rewardChartIdeas: IdeaArea = {
       id: "T-27",
       emoji: "🔗",
       title: "Kurze Adressen, die direkt zur Tafel und zum Plan führen",
-      text: "Ein paar eigene Domains, die nur weiterleiten: kinderbelohnungstafel.de → /belohnungstafel/, kindertagesplan.de → /tagesplan/ (dort ist auch der Wochenplan), auf Englisch kidsrewardcharts.com → /en/belohnungstafel/ und kidsvisualschedule.com → /en/tagesplan/. Bei Cloudflare eine Weiterleitungsregel wie für funforboth.com, nur mit dem Pfad im Ziel; .de gibt es nicht bei Cloudflare zu kaufen (INWX o. ä., die Nameserver dann zu Cloudflare).",
+      text: "Ein paar eigene Domains, die nur weiterleiten: kinderbelohnungstafel.de → /belohnungstafel/, kindertagesplan.de → /tagesplan/ (dort ist auch der Wochenplan), auf Englisch kidsrewardcharts.com → /en/belohnungstafel/ und kidsvisualschedule.com → /en/tagesplan/. Bei Cloudflare eine Weiterleitungsregel wie für littlestepstogrow.com, nur mit dem Pfad im Ziel; .de gibt es nicht bei Cloudflare zu kaufen (INWX o. ä., die Nameserver dann zu Cloudflare).",
       why: "Eine Adresse, die man sagen, auf einen Zettel schreiben oder in einer Elterngruppe posten kann und die ohne Umweg zur Tafel führt. Bei Google bringt sie nichts (Recherche „Adressen für Belohnungstafel und Tagesplan“).",
       effort: "S",
     },

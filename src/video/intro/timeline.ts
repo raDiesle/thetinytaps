@@ -8,7 +8,7 @@ export { CANVAS };
 /** How long the intro lasts, in seconds; the sound rings out within it. */
 export const INTRO_SECONDS = 7.5;
 
-/** The Fun for Both book on the shelf, closed: its pages' box on the canvas (its cover lies over it). */
+/** The Little Steps to Grow book on the shelf, closed: its pages' box on the canvas (its cover lies over it). */
 export const HERO = { x: 750, y: 410, width: 420, height: 315 };
 
 /** When things happen, in seconds from the start. */

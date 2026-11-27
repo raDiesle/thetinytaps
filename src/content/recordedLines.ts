@@ -4,7 +4,7 @@
 // /management/; the other languages from each game's translations. A line a language has no translation of is said
 // in German, so only translated lines get a recording in that language.
 
-import { APP_LANGUAGES, type Localized } from "@/lib/language";
+import { APP_LANGUAGES, type Texts } from "@/lib/language";
 import type { TargetLanguageId } from "@/content/targetLanguages";
 import { ENGLISH_FILMS, voiceLines } from "@/content/voiceLines";
 import { AGAIN_ONLY, AGAIN_OR_NEXT } from "@/components/GameEnd";
@@ -12,7 +12,7 @@ import { GOOD_NIGHT } from "@/components/GoodNight";
 import { translationOf } from "@/games/elevator/phrases";
 import { DAYTIME, DAYTIME_TRANSLATIONS } from "@/games/teeth/daytime";
 import { type Step, STEP_TRANSLATIONS, STEPS } from "@/games/teeth/steps";
-import { DONE_SAY, PRELUDE_TEXTS, TIDY_SAY } from "@/games/teeth/lines";
+import { BREAKFAST_TEXTS, DONE_SAY, PRELUDE_TEXTS, TIDY_SAY } from "@/games/teeth/lines";
 
 /** How a line is said: the recording script puts an audio tag for it in front. */
 export type RecordedKind = "instruction" | "praise" | "calm";
@@ -42,7 +42,7 @@ const once = (lines: (RecordedLine | false | "" | undefined)[]) => {
 function teeth(language: TargetLanguageId): RecordedLine[] {
   const daytimes = (["morning", "evening"] as const).map((d) => (language === "de" ? DAYTIME[d] : DAYTIME_TRANSLATIONS[language]?.[d]));
   const daytime = (key: "hello" | "grow" | "after", kind: RecordedKind) => daytimes.map((d) => d?.[key] && { text: d[key], kind });
-  const said = (texts: Localized | undefined, kind: RecordedKind) => {
+  const said = (texts: Texts | undefined, kind: RecordedKind) => {
     const text = texts?.[language];
     return text !== undefined && { text, kind };
   };
@@ -51,6 +51,7 @@ function teeth(language: TargetLanguageId): RecordedLine[] {
     ...daytime("hello", "instruction"),
     ...daytime("grow", "instruction"),
     ...Object.values(PRELUDE_TEXTS).map((p) => said(p.cue, "instruction")),
+    said(BREAKFAST_TEXTS.cue, "instruction"),
     said(DONE_SAY, "praise"),
     said(TIDY_SAY, "instruction"),
     ...daytime("after", "calm"),

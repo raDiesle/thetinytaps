@@ -125,8 +125,8 @@ export function fontsAsFiles(css: string, names: ReadonlyMap<string, string>, pr
 /**
  * The hosts Umami counts on (`data-domains`): the site's own host and its twin with or without „www.“. Umami drops
  * every visit on a host not listed, and the site is served on whichever of the two the repository's Pages setting
- * names while the other only redirects there: in November 2026 `siteUrl` said www.funforboth.com while Pages served
- * funforboth.com, and Umami counted no visitor at all. Listing both counts them wherever the site is served.
+ * names while GitHub sends the other on to it: in November 2026 `siteUrl` said the www host while Pages served the
+ * bare one, and Umami counted no visitor at all. Listing both counts them wherever the site is served.
  */
 export function countedHosts(siteUrl: string): string {
   const host = new URL(siteUrl).hostname;

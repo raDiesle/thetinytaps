@@ -19,7 +19,7 @@ import {
   type View,
   viewedLips,
 } from "./jaw";
-import { GRIN_VIEW, STEPS } from "./steps";
+import { GRIN_VIEW, ROAR_VIEW, STEPS } from "./steps";
 
 // From the two broad molars the next three teeth were all equally thin from above, a jump that looked odd (user
 // feedback, November 2026): from the last molar to the front tooth the chewing surface narrows step by step.
@@ -85,6 +85,7 @@ describe("the gum runs into the lips", () => {
   const FULL_WALL = 100;
   const views: [string, View, (typeof STEPS)[number] | null][] = [
     ["grin", GRIN_VIEW, null],
+    ["roar", ROAR_VIEW, null],
     ...STEPS.map((s) => [s.id, s.view, s] as [string, View, (typeof STEPS)[number]]),
   ];
 
@@ -121,13 +122,14 @@ describe("the lips while the head turns or the mouth opens", () => {
   };
   const ease = (k: number) => (k < 0.5 ? 2 * k * k : 1 - (-2 * k + 2) ** 2 / 2);
   const width = (lips: { x: number }[]) => Math.max(...lips.map((p) => p.x)) - Math.min(...lips.map((p) => p.x));
-  // From the grin before brushing through every step back to the grin at the end, as the mirror glides.
-  const stops: { view: View; zone: Zone }[] = [
-    { view: GRIN_VIEW, zone: null },
-    ...STEPS.map((s) => ({ view: s.view, zone: s })),
-    { view: GRIN_VIEW, zone: null },
+  // From the grin before brushing through the lion's open mouth (X-26) and every step back to the grin at the end, as the mirror glides.
+  const stops: { name: string; view: View; zone: Zone }[] = [
+    { name: "grin", view: GRIN_VIEW, zone: null },
+    { name: "roar", view: ROAR_VIEW, zone: null },
+    ...STEPS.map((s) => ({ name: s.id, view: s.view, zone: s })),
+    { name: "grin", view: GRIN_VIEW, zone: null },
   ];
-  const glides = stops.slice(1).map((to, i) => [`${stops[i].zone?.id ?? "grin"} → ${to.zone?.id ?? "grin"}`, stops[i], to] as const);
+  const glides = stops.slice(1).map((to, i) => [`${stops[i].name} → ${to.name}`, stops[i], to] as const);
 
   test.each(glides)("%s: the mouth widens or narrows smoothly, never jumps open", (_, from, to) => {
     const start = stretchAt(from.view, from.zone);
@@ -180,7 +182,7 @@ describe("the mouth seen from the side", () => {
   });
 
   test("from the front nothing changes", () => {
-    for (const view of [GRIN_VIEW, ...STEPS.filter((s) => s.view.yaw === 0).map((s) => s.view)]) expect(profileOf(view)).toBe(0);
+    for (const view of [GRIN_VIEW, ROAR_VIEW, ...STEPS.filter((s) => s.view.yaw === 0).map((s) => s.view)]) expect(profileOf(view)).toBe(0);
   });
 
   test.each(sideways.map((s) => [s.id, s] as const))("%s: the lips end in front of the front teeth, past their gums", (_, step) => {

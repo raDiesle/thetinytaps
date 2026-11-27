@@ -59,7 +59,7 @@ export function introSecond(t: number) {
   return last[1];
 }
 
-/** The Fun for Both book's pose: the intro's, backwards. */
+/** The Little Steps to Grow book's pose: the intro's, backwards. */
 export const outroBookPose = (t: number): BookPose => bookPose(introSecond(t));
 
 /** The camera on the shelf: the intro's backwards, then going dim and soft again behind the card. */

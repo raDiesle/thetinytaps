@@ -1,4 +1,4 @@
-# Fun for Both – notes for Claude
+# Little Steps to Grow – notes for Claude
 
 Keyboard and touch games for toddlers. A React 19 single-page app
 built and served by Bun, deployed to GitHub Pages, works offline (PWA). No backend.
@@ -175,7 +175,7 @@ In a fresh worktree run `bun install` first.
   the picture queue and never offered – only done when the user says those words (H-88, user decision, November 2026).
   An idea round only collects – the user decides later what to implement, so don't offer to implement
   after one (say „umsetzen“, not the ambiguous „bauen“).
-- The hidden page `/management/` (hold Papa Fox and his child on the o of „Both“ in the home title, `Logo`; `/ideen/` is its old address) is where
+- The hidden page `/management/` (hold Papa Fox and his child on the o of „Grow“ in the home title, `Logo`; `/ideen/` is its old address) is where
   everything goes that helps the user decide: ideas, the language table, and research. Its page `/management/bilder/`
   shows every picture of the app at once, by game and story, a picture with its frames and variants side by side
   (`src/content/pictureGallery.ts`, read from the file names' conventions): a new folder of pictures gets its line in
@@ -289,7 +289,7 @@ In a fresh worktree run `bun install` first.
   padding, gap) they measure the next one up, often the whole window, so size only a container's children with them.
 - CSS is global and each game's CSS arrives only when the game is opened: prefix
   classes and `@keyframes` by game or scene (`el-`, `bs-`), a prefix no other game has (the Counting Tower and
-  Zaubertasten both used `tw-`; `css.test.ts` now fails on a prefixed class two games style); never style another
+  Tippzauber both used `tw-`; `css.test.ts` now fails on a prefixed class two games style); never style another
   game's classes. A game using another game's parts imports that CSS itself. Keyframes a game borrows
   (`pop-in`, `wiggle`, `bob`, …) live in `src/styles/animations.css`, which every page loads – never use
   keyframes from another game's CSS (`css.test.ts` checks it). Game sheets arrive in any order (the shelf preloads
@@ -315,7 +315,11 @@ In a fresh worktree run `bun install` first.
   as a moving mask, each repainted most of the screen 60 times a second. Give such a thing a layer of its own (its own
   svg or element) and animate that layer's `transform` or `opacity`: a small figure that sways or glows is a small
   HTML layer round its own little svg, and the HTML moves, not a group inside (even small svgs animating inside kept an
-  old phone's main thread busy; Zähne putzen's monsters, `Sprite`). A layer is only as big as what it shows: a phone
+  old phone's main thread busy; Zähne putzen's monsters, `Sprite`). Chrome does composite a `transform` or `opacity`
+  keyframe on a group inside an svg, but still lays the whole svg out in every frame, and Safari (iPads) repaints it all
+  (study `svg-animation-leistung`, November 2026) – so the rule stands; where something still moves inside an svg, its
+  keyframes use `transform`, never the separate `translate`, `rotate` or `scale` properties, which Chrome never
+  composites there (`css.test.ts` names the keyframes checked to run on HTML elements, where they are fine). A layer is only as big as what it shows: a phone
   rasters a changed layer in bands as wide as the screen. Never an attribute selector inside `:has()` (`:has([aria-label=…])`)
   nor `*` after it (`.row:has(…) > *`): while such a rule is loaded Chrome restyles the whole page at every change of the
   DOM, and the shelf preloads every game's CSS, so two games' rules made the book's take-out stutter (November 2026;
@@ -327,7 +331,11 @@ In a fresh worktree run `bun install` first.
   (`tools/perfScenarios.ts`: p95 frame ≤ 34 ms, ≤ 0.5 frames over 50 ms a second, main thread ≤ 60 % busy, and ≤ 30
   screens of pixels rastered anew a second – the GPU's work, which a gaming phone's 120 Hz screen doubles). Until
   November 2026 it rastered at 1× and counted the idle seconds of collecting its trace into every stretch, so it found
-  nothing while the user's phone stuttered: when a phone stutters and the tool says it's fine, doubt the tool first. A stretch that
+  nothing while the user's phone stuttered: when a phone stutters and the tool says it's fine, doubt the tool first.
+  Until 26 November 2026 it also sized each rastered tile by its memory address alone, which Chrome reuses for tiles of
+  other layers and sizes, so the screens rastered a second swung 21–39 on the same code and could read half the truth
+  (A-41): a tile is now found by address and layer in the snapshot after its raster (`tools/perfTrace.ts`,
+  `perfTrace.test.ts`), and raster numbers from before that date in `tools/perf-history/` don't compare with later ones. A stretch that
   starts with a tap also counts the frames before the motion, where the next page is drawn while the screen stays still,
   and whether it catches them depends on when its counter starts: before blaming a motion, compare where the stutters
   fall with when it starts (in „Buch aus dem Regal nehmen“ all of them fell in the 0.2 s before the book lifts, and
@@ -336,9 +344,12 @@ In a fresh worktree run `bun install` first.
   the stretch begins with the first moving frame, and the wait from the finger landing is a number of its own with its
   own limit („tap to lift“, about 0.3 s on the old phone) – never one stretch judging both by chance. A new game,
   or a new part that moves a lot, gets a scenario there; run it after changing what moves, and after changing a page a scenario taps through (the home page's cards became a bookshelf and its menu scenario failed until the weekly run; `bun run perf <name>`,
-  `--profile` names the functions that cost, `--shots` shows what was measured). A stretch's numbers swing with where it
-  falls in a game's own clock (Zähne putzen's „Putzen: Los!“ passed and failed on the same code, November 2026): before
-  blaming a change, measure `main` the same way on the same day, and `--trace` (paint per element in the trace) tells
+  `--profile` names the functions that cost – its profiler starts with the page, never with a stretch, where starting it
+  gave every stretch a stutter of its own in its first 0.4 s (A-47) –, `--shots` shows what was measured). A stretch's numbers swing with where it
+  falls in a game's own clock (Zähne putzen's „Putzen: Los!“ passed and failed on the same code, and a marble run's
+  start painted 21 and then 39 screens a second, November 2026): before blaming or crediting a change, measure `main`
+  the same way on the same day, both with `--repeat 3`, which plays each scenario three times and judges each stretch by
+  its median with the spread beside it – one run alone says nothing there –, and `--trace` (paint per element in the trace) tells
   which layer is painted how often. A stretch after one that taps everything starts wherever those taps left the game: start it
   from a reload (`{ eval: "location.reload()" }`, a wait, then the fullscreen question's `.screen-hint-button`), as
   „wie-gehts-dir“ does – its second stretch waited for a screen it never reached, and nobody saw it until it was run. The build ships React's production code
@@ -413,7 +424,7 @@ In a fresh worktree run `bun install` first.
   `celebrate` is left only to a grown-ups' chart filled (Belohnungstafel, Tagesplan). The one place where a key or tap
   is meant to set off a show is Frei tippen, where keys without a letter, number or job, and taps beside the card, open
   a surprise (a firework, a present, an egg hatching, user request, November 2026) – one at a time, never a storm, and
-  never copied into another game's answers (`src/games/letters/CLAUDE.md`) – and „Zaubertasten“ („Magic Keys“), its copy without
+  never copied into another game's answers (`src/games/letters/CLAUDE.md`) – and „Tippzauber“ („Tap Magic“), its copy without
   the card standing as a toy keyboard on the shelf, where every press is such a show (`src/games/tapaway/CLAUDE.md`). `tapFeedback.test.ts` keeps it
   calm, `calmAnswers.test.ts` keeps answers still and `celebrate` out of the games.
 - No wrong answers, no error sounds, nothing to read: pictures, sounds and voice. That means no words in the picture
@@ -468,10 +479,12 @@ In a fresh worktree run `bun install` first.
   bouncing. They stand in the trophy room, a page of its own at `/pokale/` (`TrophyMuseum`, user request, November
   2026), never in the bookshelf (between its books a trophy stood as if in the wall) nor in a popup: reached by a little
   wooden board in 3D (grain, bevelled edges, its thickness seen below and right of it) with a big golden cup on it,
-  sitting right in the bottom right corner of a compartment – on a wide shelf the loudspeaker's, at the bottom of the
-  right column, with the loudspeaker moved to its left beside it and both sized by that narrow compartment (user
-  request, 25 November 2026; `trophySignAt`), on an upright one the picture books' lowest – its
-  foot on the board, its right edge against the post, never hanging in the air above the board – held by three nails in
+  nailed into a corner of a compartment – on a wide shelf the loudspeaker's, at the bottom of the right column, in its
+  top left corner, its nails' heads on the wood of the post and the board above (placed at their middles and moved up
+  and left by `--nail-at`; user feedback, 26 November 2026: under the board and beside the post the nails held nothing),
+  with the loudspeaker standing big against the right wall below it (user request, 26 November 2026: beside each other
+  on the board both were small; `trophySignAt`, `from: "top"`), on an upright one in the bottom right corner of the picture books' lowest, its right edge against the
+  post – its foot on the board, never hanging in the air above the board – held by three nails in
   its corners (the top two and the bottom left; user request, November 2026: the paper sign hanging there looked flat
   and loose) (`TrophySign`, only once a trophy is won;
   user feedback, November 2026: a small sign with a cup in a doorway above the loudspeaker was hardly recognised – it is
@@ -557,7 +570,7 @@ A game may give it before its end where reaching the goal once is enough (Ketten
   The home page's options for all games are „🎵 Musik“, one tap on its own button, never a menu, „Junge / Mädchen“,
   play time (⏳), the language (🌐) and „Offline spielen“ (things standing in or hanging from the bookshelf, see the
   picture book below).
-- **A figure that stands for the child follows „Junge / Mädchen“** (stickers of a fox girl and a bear boy on a wall inside the shelf, each with a little ♀ / ♂ beside
+- **A figure that stands for the child follows „Junge / Mädchen“** (stickers of a fox girl and a bear boy in a compartment of the shelf (see the picture book below), each with a little ♀ / ♂ beside
   it so it is plain which is which, one tap on either chooses it – user decision, October 2026; `useFigure()` from `src/lib/common.ts`, boy by default): the child of Kleine Abenteuer (`useHero()`),
   the face in Zähne putzen's mirror and story. The girl differs only in hair (pigtails, lashes where only the eyes show)
   and clothes' colours, never in size or poses. Animals (Tapsi, the Gefühle animals), the people in the pictures and the
@@ -637,18 +650,42 @@ A game may give it before its end where reaching the goal once is enough (Ketten
   head as far (user feedback, November 2026) – taken out, a book straightens as it lifts; the category has no page, and its games' way back is the
   shelf. The name on a spine stands in one line, never broken – smaller where it is long (`--len`, by its script's letter width, `--per-letter`), checked in every
   language at 844×390 (user feedback, November 2026). A game with parts of its own address (`Game.volumes`) stands as
-  that many books tied together with a red ribbon and a bow, each opening its part and found by the way back:
-  „Wie lange warten?“ (the Zeitplan's Countdown), Zeitplan and Belohnungstafel, right of Aufs Töpfchen (user feedback, November 2026).
+  that many books tied together with a red ribbon and a bow, each opening its part and found by the way back (`BookBundle`).
   Tied, they are one block: pressed close and standing upright – never leaning, which looked unnatural for tied books –
   and one ribbon runs round all of them with its bow in their middle – never a band on each book, which looked like
-  three small ribbons (user feedback, November 2026). The single books stand thick enough to hit with a finger on a
+  three small ribbons (user feedback, November 2026). The Belohnungstafel's three parts („Zeitplan“, „Belohnungstafel“,
+  „Wie lange warten?“) no longer stand as such books but as **one ring-bound calendar** right of Aufs Töpfchen
+  (`Game.calendar`, `ShelfCalendar`, user request, 26 November 2026), as wide as the three books were
+  (`CALENDAR_SPINES`), last on the board and standing at its right wall: the board's room is given to it
+  (`endsFor`'s `fills`, `--grow`), never to books only filling the shelf, yet it is no wider than its height allows
+  (`--wide`, user request, 27 November 2026: grown to the wall it was too wide) and pushed to the right
+  (`margin-left: auto`). It stands on the board as a desk calendar does, a tent: its pages lean back from the board's
+  front onto a cardboard stand a little bigger than them, the two meeting in the rings like an upside-down V, turned
+  clearly with its right side forwards (`--turn` about -32°, brought forward by `--forward` so its left edge stays out
+  of the back wall), so from the board's right end it faces left into the room – never out towards the wall (`--tilt`,
+  `--turn`, `--ridge`; user requests, 26 and 27 November 2026: it should look 3D and stand). Its stand behind touches
+  the right wall while its front page stays clear of the post – never cut off by it: how far the turned stand swings out
+  depends on each screen's perspective, so `ShelfCalendar` measures the room before the wall in the page
+  (`--wall-room`, `WALL_TOUCH`), never a fixed margin – within the compartment's depth (`--d`) and with its foot on the
+  board, so look at it at 844×390, 1024×768, 1280×720 and 1920×1080 after changing them. Its page is never plain white:
+  a red band under the rings with the name „Zeitplan & Belohnungstafel“ set as the picture books' titles are – the same
+  letters, weight and size, on two balanced lines, never a small line of its own style (`.shelf-calendar-title`) – and
+  a gear beside it (`CALENDAR_TITLE`, `CalendarGear`), then a sunny and a sky-blue band filling the page with only a
+  thin margin of white – one over the other, or side by side where the page grew wide (`.shelf-calendar-day`) – each
+  with two of the Tagesplan's pictures side by side, as big as the page allows (`CALENDAR_PARTS`,
+  `bilder/kalender-*.webp`, cut from `src/games/rewards/bilder/`), at the middle of each picture's foot a small golden
+  star in a round field, half on the picture and half below it (`CalendarStar`), and „Morning“ and „Afternoon“ small on
+  a tag in the middle between the two stars, on their line – never big over the pictures, nor a row of their own under
+  the stars, which took the pictures' room (user requests, 27 November 2026) – no reward, no names of the pictures (same request: small pictures on white paper looked boring) – one tap takes it out
+  and opens the Zeitplan straight in its editor (`calendarHref`, router state `OPEN_EDITOR`), where a quick row reaches
+  the other two (`src/games/rewards/CLAUDE.md`); every part's way back puts the calendar back. The single books stand thick enough to hit with a finger on a
   phone (`DAILY_SPINE`, widened again in November 2026 when they were still hard to hit), and lean a little differently, as books do.
   Their row is as wide as its board allows, so they grow in height instead: taller than the picture books, as high as
   their compartment lets them be taken out (`DAILY_TALL`), and the picture on each spine takes nearly its whole width,
   since that picture is what a child knows the book by (user feedback, November 2026: books and pictures too small to
   recognise; `shelfLayout.test.ts`). The Alltagshelfer are what parents
-  need most, so they stand first, top left (first in `CATEGORIES`), and that bundle is the eye-catcher of the shelf:
-  glowing brightest, the Belohnungstafel in it bound in gold – still, nothing idles. Every book stands on its board like
+  need most, so they stand first, top left (first in `CATEGORIES`), and the ring calendar is the eye-catcher of the shelf:
+  glowing brightest – still, nothing idles. Every book stands on its board like
   its neighbours, never in a box or pulled out further than they: a slipcase round the two, pulled out and tipped, looked
   as if it floated (user feedback, November 2026). What can be taken is
   plainly unlike what only fills the shelf (user feedback, November 2026): books to take are bright, with paper labels
@@ -659,7 +696,7 @@ A game may give it before its end where reaching the goal once is enough (Ketten
   made of wood so it looks mounted; the small sign alone was hardly seen, nor that it named every book on the board, so
   it grew and got the rail, user feedback, November 2026), and the picture books standing together on one board just so
   by „Lernspiele“ on the board under them (`labelOf`), its rail only under the picture books – a toy standing among
-  them (Zaubertasten's poster) is no learning game and stays outside it (`groupWidth`, user feedback, 25 November 2026); such a sign hangs only a little below its board, never over a
+  them (Tippzauber's poster) is no learning game and stays outside it (`groupWidth`, user feedback, 25 November 2026); such a sign hangs only a little below its board, never over a
   book on the board below (measure it at 844×390, where it comes closest). Before the helpers words carved into the back panel tell grown-ups in short what
   the shelf is for – „Für Groß & Klein“ – then that it is the first step into the digital world taken together, with
   learning games and little helpers for the day – and nothing else: no „Alles kostenlos.“, no „Seite an Seite“, no „die die Kommunikation fördern“, no „von Eltern für Eltern“ (each tried and
@@ -684,7 +721,8 @@ A game may give it before its end where reaching the goal once is enough (Ketten
 - No menu level more than needed: a book with one game opens that game directly (`categoryHref`, checked
   in `content.test.ts`); and variants of one way to play (which words, how long, whole word or first letter) are
   choices in the always visible row above the cards (`level`), not cards or a menu of their own – or, in a game that
-  plays at once, options while playing behind ⚙️ held in the top right corner (`PlayOptions`, Buchstaben & Zahlen; always held, whatever ✕ needs),
+  plays at once, options while playing behind ⚙️ held in the top right corner (`PlayOptions`, Buchstaben & Zahlen; always held, whatever ✕ needs; only where
+  the options choose what a game's own strip of controls shows, the held ⚙️ sits on that strip, `PlayOptions inline`, as Zähne putzen's phases),
   never a tap a child could make by chance. But ways to play that are each a game of their own – something else to do,
   not the same game easier or with other words – are games of their own in the book's table of contents, never one
   game's choice behind ⚙️ (Frei tippen, Zählen and Wörter tippen were one game's „Spielart“ and „Nur Zahlen“, and were
@@ -980,7 +1018,7 @@ src/lib/                 speech, sfx (synthesized + recorded sounds), storage, d
   buttons on top, its switch `?buch=aus` and its stored choice) was removed, since keeping it only kept code no one
   sees – never bring back a second look or a switch between looks, and write new styles as the book's plain rules, with
   no `data-look` or other branch (`look.test.ts`). Like this: the home page is a room with a bookshelf (`Bookshelf`, D-20, user
-  decision, October 2026), the app's name „Fun for Both“ in its title, each category a picture book standing on it with its cover out;
+  decision, October 2026), the app's name „Little Steps to Grow“ in its title, each category a picture book standing on it with its cover out;
   a category's page looks like its book's table of contents (`BookContents`, user feedback, October 2026): one line per
   game – its framed picture, its name, dots leading to its page number (the first game on page 1,
   `gamePage`, user feedback, October 2026; on a phone only picture and name, the name centred and never broken inside a
@@ -1015,20 +1053,36 @@ src/lib/                 speech, sfx (synthesized + recorded sounds), storage, d
   A tap on a book takes it out (`takeOutBook`, `bookTravel.ts`): it comes off its board, into the middle, its cover swings open
   to the left, and its left page, the next menu printed on it, comes close until it is the screen – **no page turns on
   the way into a book**. Back to the shelf (`useTurnPage("/")` → `putBookBack`) is the same backwards: the book closes
-  and goes back into its own gap (`shelfBookOf`, `bookTravel.test.ts`). The grown-ups' options on the shelf's page are
+  and goes back into its own gap (`shelfBookOf`, `bookTravel.test.ts`). The screen is copied onto the book's page both ways (`seenCopy`), and the
+  copy gets ids of its own (`ownIds`, its `url(#…)` and `href` following them): with the page's ids each stood twice in
+  the document, and Zähne putzen's face, clipped by one of them, vanished but for its eyes and mouth (user feedback,
+  November 2026, reported twice; `bookTravel.test.ts`). A picture as big as the screen is cut to its frame by CSS
+  (`clip-path: inset(…)`), not by an svg `<clipPath>` found by its id. Every face of the flying book that must
+  hide while turned away is hidden by an opacity step at the moment it stands edge on (`face`, `halfwayAt`), never by
+  `backface-visibility` or depth alone: WebKit (Safari) honours neither inside the turning cover, and the left page's
+  print lay over the cover, mirrored and dark, all the way out of the shelf (November 2026). Check a change to the flight
+  in WebKit too (Playwright's WebKit, its animations paused at fixed times), not only in Chrome. The grown-ups' options on the shelf's page are
   things one finds on a bookshelf, standing in its own narrow compartments beside the books, never buttons and never
   loose around the room (`RoomOptions.tsx`, user feedback, October 2026), on a wide screen all in one column at the
   shelf's right, one compartment over the other (`SIDE_COLUMN`, user decision, November 2026): on top, in the tallest,
   the hourglass (play time, the most needed, yet small in its compartment – user request, 25 November 2026: it was too
-  big), below it a globe with the 🌐 lines and the language's name on its foot (the language – never a light switch), at
-  the bottom a wooden loudspeaker (music, one tap) with the trophy sign beside it (user request, 25 November 2026); the
-  column is narrow (`SIDE_SHARE`, at most 150 px: at 12 % of the room its compartments were too wide, user request,
-  25 November 2026); stickers of the fox girl and
-  the bear boy (the figure) are stuck on the right wall of the big compartment on top, beside the everyday helpers,
-  where they are seen better than in a narrow one (user feedback, November 2026; on an upright screen on the shelf's
-  right inner side), and no books spine out stand against that wall to hide them. „Wer spielt?“ stands small on that same wall
-  right above the first sticker's head, the fox's, in one line (`.shelf-figure-ask`, user feedback, November 2026:
-  carved big into the back panel beside the wall it was too far from the stickers it asks about). The texts that stood below
+  big), right under it the figure's compartment – the stickers of the fox girl and the bear boy one above the other on
+  its back panel, each whole with its ♀ or ♂ at the head's top right, over it (at its right side the wall cut it off;
+  `.shelf-back-stuck`), and „Wer spielt?“ big on its right wall, the face
+  seen most of in that narrow compartment, across the wall in one or two lines (`.shelf-ask-wall`; user request, 26
+  November 2026: on the right wall of the helpers' compartment they took the books' room, squeezed onto a narrow wall or
+  beside the hourglass under the fullscreen sign they were not seen, and the words over the heads side by side on the
+  back panel were cut off with them; never write it down a slanted wall, which flattens the letters to a few pixels; on
+  an upright screen words and stickers stay on the shelf's right inner side) –, then a globe drawn round and lit (a
+  shaded ball seen a little from above, curved parallels, a gleam, a brass half ring with its thickness on a turned
+  wooden foot; user request, 26 November 2026: the flat one looked poor) with the 🌐 lines and the language's name on
+  its foot (the language – never a light switch), at the bottom a wooden loudspeaker (music, one tap) standing big
+  against the shelf's right wall, its right side flush with it and drawn as seen from the room's middle – its front,
+  its left side and its top going back, never a right side the wall would hide (user feedback, 26 November 2026) –, the
+  trophy sign nailed into the compartment's top left corner above it (user request,
+  26 November 2026); the column is narrow (`SIDE_SHARE`, at most 150 px: at 12 % of the room its compartments were too
+  wide, user request, 25 November 2026), and narrower still on a phone (`PHONE_SIDE_SHARE`, below 600 px high: user
+  request, 26 November 2026 – the perspective may cut a little off its left side, which shows the room's depth better). The texts that stood below
   the shelf – what the app is (the page's words for search engines, `SeoWords`) and „Ein paar Worte von uns“
   (`ParentsNote`) – open together from „mehr …“ at the end of the carved words, where grown-ups already read (a little
   „i“ book in the shelf was replaced by it, user feedback, November 2026); their text stays in the page unseen while
@@ -1055,7 +1109,7 @@ src/lib/                 speech, sfx (synthesized + recorded sounds), storage, d
   (`LEAN_CLEAR`) –; where the top compartment is tall enough (a tablet), it hangs above the helpers' books instead, clear
   over their tops (`ShelfCell.tall`, `UNDER_SIGN`), and they get its room – only where that makes them clearly wider
   (`ABOVE_GAIN`), since under it they stand lower, and with a breath of room left beside the words (`WORDS_BREATH`;
-  user feedback, November 2026: beside the sign on a tablet the spines were too thin for their pictures) – and the books spine out keep clear of the wall with the stickers (`STICKERS_ROOM`), the foxes on its o stay on the screen (`shelfLayout.test.ts`), and the books spine out fill only the
+  user feedback, November 2026: beside the sign on a tablet the spines were too thin for their pictures) – and the foxes on its o stay on the screen (`shelfLayout.test.ts`), and the books spine out fill only the
   board's right end (`data-leads`). A brighter, still light lies close round the carved words only (`.shelf-carving-text`)
   so they stand out – evenly over every line of the words, never fading out before their last one, and soft at its rim
   (a blurred rounded box: an ellipse round the words ended hard), yet never over the whole compartment, where it reached
@@ -1138,23 +1192,28 @@ src/lib/                 speech, sfx (synthesized + recorded sounds), storage, d
   page): no book on the shelf (`shelfVolumes`, a single book left stands alone), `noindex`, reached from „🚧 In Arbeit“.
 - A new game needs: folder, page, route in `App.tsx`, entry in `CATEGORIES`
   (`src/content/games.ts`, with its `blurb`), a row in `src/content/ideas/languageStatus.ts`, an entry in `src/content/seo.ts` and its translations in `seo.<lang>.ts` – use `/neues-spiel`.
-- The app is called „Fun for Both“ and lives at www.funforboth.com (its main address since November 2026, user decision;
-  toddlerfox.com and booksforboth.com, the app's name and address in October 2026, only redirect there; before that it was
-  „The Tiny Taps“, whose `tinytaps.` storage keys stay so nothing saved is lost). The address is `siteUrl` in
-  `tools/build.ts`, the DNS `tools/funforboth.com.zone`, the redirects `tools/redirect-*.zone` (README).
+- The app is called „Little Steps to Grow“ and lives at www.littlestepstogrow.com, its one and only domain (user decision,
+  27 November 2026: no other domain redirects there any more – toddlerfox.com, booksforboth.com and funforboth.com, its
+  names and addresses from October to November 2026, were let go, and their redirect zones deleted; never add a second
+  domain or redirect back without the user asking; before them it was „The Tiny Taps“, whose `tinytaps.` storage keys
+  stay so nothing saved is lost). The address is `siteUrl` in `tools/build.ts`, the DNS
+  `tools/littlestepstogrow.com.zone` (README).
   The custom domain in the repo's Pages settings (`gh api repos/raDiesle/thetinytaps/pages -q .cname`) must be the
-  host of `siteUrl` (`www.funforboth.com`, user decision, 8 November 2026: www is the usual form): in November 2026
-  Pages served funforboth.com while `siteUrl` said www, so every canonical link, hreflang and sitemap address went through
-  a redirect and Umami, told to count on www only, counted no visitor. A 404 „There isn't a GitHub Pages site here“ after a change of domain is GitHub's cache of „/“
+  host of `siteUrl` (`www.littlestepstogrow.com`, user decision, 8 November 2026: www is the usual form; GitHub sends
+  the bare host on to it by itself): in November 2026 Pages served the bare host while `siteUrl` said www, so every
+  canonical link, hreflang and sitemap address went through a redirect and Umami, told to count on www only, counted no
+  visitor. A 404 „There isn't a GitHub Pages site here“ after a change of domain is GitHub's cache of „/“
   from before the change. Check it with `curl -sI` (`age`, `x-cache: HIT`) and against GitHub directly
   (`--resolve <host>:443:185.199.108.153`) before you suspect the build or the DNS. A new deploy clears that cache only
-  for the custom domain's host, not for the other name (November 2026: funforboth.com came back after a deploy, www stayed 404).
+  for the custom domain's host, not for the other name (November 2026: the bare host came back after a deploy, www stayed 404).
   The name is `SITE_NAME` in `seo.ts` and the same in every language; title, cover, manifest and `index.html` say it
   (`content.test.ts` checks). Its name and addresses never say „toddler“ or „baby“ (user decision, October 2026: offering screen games expressly for small
   children is delicate) – the age may stand in page texts, where parents search for it, never in a name.
-  The title shows who „Both“ are (user feedback, October 2026): the o of „Both“ is a picture of Papa Fox
-  sitting on the letter with his child on his lap, reading it a story, and a big and a small paw track run under the name
-  up to them (`Logo`). The o itself is the title's real letter; the picture holds only the foxes (Gemini drew them on
+  The title shows who grows (user feedback, October 2026, kept with the new name): the o of „Grow“ is a picture of Papa
+  Fox sitting on the letter with his child on his lap, reading it a story, and a big and a small paw track run under the
+  name up to them (`Logo`). The name stands in two lines, „Little Steps“ over „to Grow“ with the small „to“ in the
+  accent's italics (`LOGO_LINES`; user decision, 27 November 2026: in one line the longer name's sign took the books'
+  room). The o itself is the title's real letter; the picture holds only the foxes (Gemini drew them on
   Georgia's bold o, which was then cut out) and lies over it so that Papa really sits on the letter – never floating above
   it (user feedback, October 2026, twice: look at the seat magnified, his thighs must lie on the letter's top stroke). The foxes are twice the letter's height, rising above the sign. The
   sign is big enough for them to be seen (`--sign`; `SIGN_SIZE` in `Bookshelf.tsx` in front of a wide shelf): at the
@@ -1174,14 +1233,14 @@ src/lib/                 speech, sfx (synthesized + recorded sounds), storage, d
   Pages would answer with 404.html and status 404, which Google skips), plus `sitemap.xml`; the app keeps title
   and head in step (`useTitle`, `SeoHead`). Under `/en/`, `/ru/` … the router runs below the prefix (`routerBase()`,
   `src/lib/pageAddress.ts`), so links stay in that language's pages and routes need no change; players still get their
-  browser's language. A level's address (`/abenteuer/schatzinsel/`) gets the game's built page too, with the game's canonical link and out of the sitemap, and `seoFor` gives it the game's entry – GitHub Pages answered a shared level link with 404 before: a new game with levels, or a new level, is listed in `LEVEL_IDS` (`src/content/levelPages.ts`, ids only, since the build must not load a game; `levelPages.test.ts` checks it against the games). A title leaves „ | Fun for Both“ out where both would be cut off in a search result (`fullTitle`, 60 letters wide; the home page keeps it), and every page but the home pages carries its way from the home page as a BreadcrumbList (`tools/structuredData.ts`). Each page's text tells in sentences of its own what is on that page (a scene: what is in its picture and what happens there), never only a template shared with its siblings – the scene pages had one template's 45 words each and stood among Google's pages „gecrawlt – zurzeit nicht indexiert“ (November 2026; `content.test.ts`). Texts say only what the page really does, and keep saying it: a change that adds, removes or
+  browser's language. A level's address (`/abenteuer/schatzinsel/`) gets the game's built page too, with the game's canonical link and out of the sitemap, and `seoFor` gives it the game's entry – GitHub Pages answered a shared level link with 404 before: a new game with levels, or a new level, is listed in `LEVEL_IDS` (`src/content/levelPages.ts`, ids only, since the build must not load a game; `levelPages.test.ts` checks it against the games). A title leaves „ | Little Steps to Grow“ out where both would be cut off in a search result (`fullTitle`, 60 letters wide; the home page keeps it), and every page but the home pages carries its way from the home page as a BreadcrumbList (`tools/structuredData.ts`). Each page's text tells in sentences of its own what is on that page (a scene: what is in its picture and what happens there), never only a template shared with its siblings – the scene pages had one template's 45 words each and stood among Google's pages „gecrawlt – zurzeit nicht indexiert“ (November 2026; `content.test.ts`). Texts say only what the page really does, and keep saying it: a change that adds, removes or
   renames something a page offers (a picture, a mode, a kind of round, a game moving to another book) updates that page's
   text in every language in the same commit, and its book's and the home page's where they name it, also for something new in every game (the trophies) or a new picture in a game (the Timer's Tennis), which both stayed missing from the texts for days (November 2026) – they had fallen
   behind a month of work (a slider long gone, a game moved elsewhere, the Alltagshelfer missing from the home page; user
   feedback, November 2026; `content.test.ts` checks that a book's text names each of its games). No text names an age the app is for („ab 2“,
   „2- bis 3-Jährige“, „Ages 2+“; „Kleinkinder“, „toddlers“ are fine): each family decides when its child starts with
   screens, which „Ein paar Worte von uns“ on the home page (`ParentsNote`) tells: the real world first, then a screen together,
-  later a learning game alone, plain watching least – Fun for Both meant as that first step together (user
+  later a learning game alone, plain watching least – Little Steps to Grow meant as that first step together (user
   decision, October 2026; `content.test.ts` checks). Google reads the page after the app ran, in an
   English browser: so search engines play in the language of the address (`isCrawler` in `src/lib/locale.ts`) –
   a crawler that runs pages and isn't on its list gets added there. The app replaces the built page's text when
@@ -1201,7 +1260,7 @@ src/lib/                 speech, sfx (synthesized + recorded sounds), storage, d
   `CF_BEACON_TOKEN`) and how the app is used by Umami Cloud (`src/lib/analytics.ts`: pages by itself, plus a few events –
   time on each page with the last step of a story or game shown there, a level's end with „Nochmal“ or „Weiter“, play time running out, options for all games, installs;
   its website id in `tools/build.ts`, counting only on the site's own hosts – with and without www, `countedHosts`, since
-  Umami drops every visit on a host not listed and counted no one while Pages served funforboth.com and `siteUrl` said
+  Umami drops every visit on a host not listed and counted no one while Pages served the bare host and `siteUrl` said
   www, November 2026), both
   without cookies or a consent banner: never add Google Analytics (not even in its consent mode, which still sends to
   Google and shows almost nothing without consent) or another tracker that sets cookies, needs consent or records

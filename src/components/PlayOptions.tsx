@@ -1,4 +1,5 @@
-import { type CSSProperties, type ReactNode, useEffect, useState } from "react";
+import { type CSSProperties, type ReactNode, useEffect, useRef, useState } from "react";
+import { createPortal } from "react-dom";
 import { useT } from "@/lib/language";
 import { useHold } from "@/lib/hold";
 
@@ -35,11 +36,24 @@ const GEAR_PATH = (() => {
  * is open, keys don't reach the game (holding Esc still leaves it). Changes apply at once, the game keeps playing behind.
  * `intro` (a game with many ways to play) is a note under it as play starts, telling grown-ups what they can choose
  * there; it fades by itself and goes when the options are opened.
+ *
+ * `inline` puts the gear into a game's own strip of controls instead of the corner (Zähne putzen's ⚙️ beside its
+ * progress bar, whose phases it chooses; user request, November 2026): the button takes the strip's classes, is held
+ * just the same, and its panel still covers the whole game (`.play-area`), never only the strip.
  */
-export function PlayOptions({ children, intro }: { children: ReactNode; intro?: ReactNode }) {
+/** The drawn gear, on the corner's note or on a game's own button. */
+const Gear = ({ className }: { className: string }) => (
+  <svg className={className} viewBox="0 0 24 24" aria-hidden>
+    <path d={GEAR_PATH} />
+    <circle cx="12" cy="12" r="3.2" />
+  </svg>
+);
+
+export function PlayOptions({ children, intro, inline }: { children: ReactNode; intro?: ReactNode; inline?: { button: string; icon: string } }) {
   const t = useT();
   const [open, setOpen] = useState(false);
   const [introShown, setIntroShown] = useState(intro !== undefined);
+  const button = useRef<HTMLButtonElement>(null);
   const { holding, props } = useHold(() => setOpen(true), HOLD_MS);
   const label = t({ de: "Einstellungen", ru: "Настройки", en: "Settings", zh: "设置", hi: "सेटिंग्स", es: "Ajustes", ar: "الإعدادات" });
   const hold = t({ de: "halten", ru: "удерживать", en: "hold", zh: "按住", hi: "दबाए रखें", es: "mantener pulsado", ar: "ضغط مطوّل" });
@@ -61,14 +75,47 @@ export function PlayOptions({ children, intro }: { children: ReactNode; intro?: 
     if (open) setIntroShown(false);
   }, [open]);
 
+  const panel = open && (
+    <div
+      className="play-options-panel"
+      data-tap-root
+      onPointerDown={(e) => {
+        e.stopPropagation();
+        if (e.target === e.currentTarget) setOpen(false);
+      }}
+    >
+      <section className="settings">{children}</section>
+      <button type="button" className="play-options-close" onClick={() => setOpen(false)}>
+        ▶ {t({ de: "Weiter spielen", en: "Keep playing", zh: "继续玩", hi: "खेलते रहें", es: "Seguir jugando", ar: "متابعة اللعب", ru: "Играть дальше" })}
+      </button>
+    </div>
+  );
+
+  if (inline) {
+    // The strip is a positioned box of its own: the panel goes to the play area, so it covers the game as the corner's does.
+    const host = button.current?.closest(".play-area");
+    return (
+      <>
+        <button
+          ref={button}
+          type="button"
+          className={`hold-exit ${inline.button}${holding ? " holding" : ""}`}
+          aria-label={`${label} (${hold})`}
+          data-tap-keep
+          {...props}
+        >
+          <Gear className={inline.icon} />
+        </button>
+        {panel && host ? createPortal(panel, host) : panel}
+      </>
+    );
+  }
+
   return (
     <>
       <div className="play-options-corner" data-tap-keep>
         <button type="button" className={`hold-exit play-options-button${holding ? " holding" : ""}`} aria-label={`${label} (${hold})`} {...props}>
-          <svg className="play-options-icon" viewBox="0 0 24 24" aria-hidden>
-            <path d={GEAR_PATH} />
-            <circle cx="12" cy="12" r="3.2" />
-          </svg>
+          <Gear className="play-options-icon" />
         </button>
         {introShown && (
           <div
@@ -82,21 +129,7 @@ export function PlayOptions({ children, intro }: { children: ReactNode; intro?: 
           </div>
         )}
       </div>
-      {open && (
-        <div
-          className="play-options-panel"
-          data-tap-root
-          onPointerDown={(e) => {
-            e.stopPropagation();
-            if (e.target === e.currentTarget) setOpen(false);
-          }}
-        >
-          <section className="settings">{children}</section>
-          <button type="button" className="play-options-close" onClick={() => setOpen(false)}>
-            ▶ {t({ de: "Weiter spielen", en: "Keep playing", zh: "继续玩", hi: "खेलते रहें", es: "Seguir jugando", ar: "متابعة اللعب", ru: "Играть дальше" })}
-          </button>
-        </div>
-      )}
+      {panel}
     </>
   );
 }

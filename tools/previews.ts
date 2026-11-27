@@ -124,7 +124,7 @@ const VIDEO_SIZE = { width: 1200, height: 800 };
 /**
  * The posters of the shelf's toys (`ToyPoster` in Bookshelf.tsx, user request, 24 November 2026), by the file they
  * go to: a big square picture of the game in the middle of play, in a window of `POSTER_WINDOW` cut to the play area's
- * square at its foot. „Magic Keys“ shows a firework, a number with as many shapes round it and a letter at once – what
+ * square at its foot. „Tap Magic“ shows a firework, a number with as many shapes round it and a letter at once – what
  * the toy does, where a card's single moment would show only one of them.
  */
 const POSTERS: Record<string, { href: string; play: (cdp: Cdp) => Promise<void> }> = {

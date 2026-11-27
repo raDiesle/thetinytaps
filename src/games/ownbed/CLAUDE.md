@@ -2,7 +2,7 @@
 
 Route `/grosses-bett/eigenes-bett/` (level `eigenes-bett`) · idea H-148 · research „grosses-bett“ (Nachtrag 24 November 2026).
 
-The second story of the book „Bed“ (`src/games/bedstory`, its `CLAUDE.md` holds the book's rules), beside „Tapsi's Big
+The second story of the book „Sleep Tight“ (`src/games/bedstory`, its `CLAUDE.md` holds the book's rules), beside „Tapsi's Big
 Bed“: written on the user's request of 24 November 2026 („eine weitere Geschichte … soll davon gehen, dass das Kind im
 eigenen Bett und nicht mehr im Elternbett schlafen soll“). Chosen on the book's first page (`StoryChoice.tsx`, its line
 „From Mama and Papa's bed“, dev tags `E<chapter>-<page>`), read with the shared `ChapterBook`, a trophy of its own

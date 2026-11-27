@@ -17,16 +17,18 @@ export const BED_STORY_TITLE: EnglishFirst = {
 
 /**
  * The name of its book on the shelf, among the Alltagshelfer beside „Hair Washing“: what parents look for. „Big Bed“
- * until its second story, „Tapsi's Own Bed“ out of the parents' bed, made it a book about beds (user request, 24 November 2026).
+ * until its second story, „Tapsi's Own Bed“ out of the parents' bed, made it a book about beds (user request, 24 November 2026), then „Bed“
+ * until it became the book of sleeping – night, nap and quiet time to come (H-138, H-153, H-154) – under a warmer name
+ * (user request, 26 November 2026: „treffender und schöner“).
  */
 export const BED_STORY_BOOK: EnglishFirst = {
-  en: "Bed",
-  de: "Bett",
-  zh: "床",
-  hi: "बिस्तर",
-  es: "Cama",
-  ar: "السرير",
-  ru: "Кровать",
+  en: "Sleep Tight",
+  de: "Schlaf gut",
+  zh: "睡个好觉",
+  hi: "मीठी नींद",
+  es: "Dulces sueños",
+  ar: "نومًا هنيئًا",
+  ru: "Сладких снов",
 };
 
 /** What the story is about, on its line in the book's choice beside „Tapsi's Own Bed“. */

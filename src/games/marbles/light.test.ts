@@ -30,6 +30,8 @@ import {
   WORLD_W,
   wireY,
 } from "./light";
+import { VIEW_W } from "./level";
+import { CAMERA_FOLLOW } from "./MachineStage";
 
 describe("Licht-Kette", () => {
   const light = buildLight();
@@ -230,5 +232,51 @@ describe("Licht-Kette", () => {
       const { pt } = light.fireflyAt(i, light.duration);
       expect(Math.hypot(pt.x - LAMP.x, pt.y - DOME_Y)).toBeLessThan(LAMP.r + 40);
     }
+  });
+
+  test("the lava lamp and its shadows stand still only once the camera has left them for good, before the lighthouse sweeps", () => {
+    // What 16 : 9, a phone on its side (844 × 390) and a 21 : 9 phone show beyond the view on each side: the first two
+    // stop the lamp before the sweep, where the old phone was measured painting 52 screens a second (A-42).
+    const wides = [0, (844 / (390 / 900) - VIEW_W) / 2, (21 / 9 / (16 / 9) - 1) * (VIEW_W / 2)];
+    for (const wide of wides) {
+      const rest = light.lampRest(wide);
+      expect(rest).toBeGreaterThan(light.tGlobe);
+      if (wide < 200) expect(rest).toBeLessThan(light.tSweep);
+      // The stage's camera glides after its target: from the rest on, the screen's left edge stays right of the lamp.
+      let camera = light.cameraTarget(-1);
+      const dt = 1 / 60;
+      for (let t = -1; t < light.duration; t += dt) {
+        camera += (light.cameraTarget(t) - camera) * (1 - Math.exp(-dt * CAMERA_FOLLOW));
+        if (t < rest) continue;
+        const left = camera - wide;
+        expect(LAVA.x + CAROUSEL.r + 50).toBeLessThan(left);
+        for (const s of [light.rabbitShadow(rest), light.birdShadow(rest)]) if (s.show > 0) expect(s.x + 100).toBeLessThan(left);
+      }
+    }
+  });
+  test("the globe's ball and the stickers change only while they are layers of their own", () => {
+    // Drawn in the world's svg before and after, a change there would have the phone raster their band again (A-42).
+    const ball = (t: number) => [light.globeGlow(t), light.globeTurn(t), light.globeWobble(t)];
+    const glows = (t: number) => STICKERS.map((_, k) => light.stickerGlow(k, t));
+    const before = ball(light.tGlobe - 0.01);
+    let after: number[] | undefined;
+    const steady = glows(0);
+    const lit: (number | undefined)[] = STICKERS.map(() => undefined);
+    for (let t = 0; t <= light.duration + 6; t += 1 / 60) {
+      if (t < light.tGlobe) expect(ball(t)).toEqual(before);
+      else if (!light.globeMoving(t)) {
+        after ??= ball(t);
+        expect(ball(t)).toEqual(after);
+      }
+      glows(t).forEach((g, k) => {
+        if (light.stickerWaking(k, t)) return;
+        if (g === 0) expect(steady[k]).toBe(0);
+        else {
+          lit[k] ??= g;
+          expect(g).toBe(lit[k] as number);
+        }
+      });
+    }
+    expect(lit.every((g) => g === 1)).toBe(true);
   });
 });

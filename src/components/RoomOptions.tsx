@@ -25,44 +25,77 @@ export function RoomSpeaker() {
   const id = useId();
   return (
     <button type="button" className="room-thing room-speaker" aria-pressed={music.on} aria-label={music.label} title={music.title} onClick={music.toggle}>
-      <svg viewBox="0 0 72 100" aria-hidden>
+      {/*
+       * Seen from the middle of the room on a wide shelf: its front, its left side and its top going back towards the
+       * eye's point, and its right side against the shelf's right wall, the front's right edge right at the svg's edge.
+       */}
+      <svg viewBox="0 0 80 100" aria-hidden>
         <defs>
-          {/* The lamp's light on the box's front, and the cones' hollows. */}
+          {/* The lamp's light on the box's front. */}
           <linearGradient id={`${id}f`} x1="0" y1="0" x2="1" y2="1">
-            <stop offset="0" stopColor="#fff" stopOpacity="0.28" />
-            <stop offset="0.5" stopColor="#fff" stopOpacity="0" />
-            <stop offset="1" stopColor="#000" stopOpacity="0.2" />
+            <stop offset="0" stopColor="#fff" stopOpacity="0.3" />
+            <stop offset="0.45" stopColor="#fff" stopOpacity="0" />
+            <stop offset="1" stopColor="#000" stopOpacity="0.18" />
           </linearGradient>
-          <radialGradient id={`${id}h`} cx="0.42" cy="0.38" r="0.65">
+          {/* The side, darker towards the back. */}
+          <linearGradient id={`${id}d`} x1="1" y1="0" x2="0" y2="0">
             <stop offset="0" stopColor="#000" stopOpacity="0" />
-            <stop offset="0.7" stopColor="#000" stopOpacity="0.15" />
-            <stop offset="1" stopColor="#000" stopOpacity="0.45" />
+            <stop offset="1" stopColor="#000" stopOpacity="0.3" />
+          </linearGradient>
+          {/* Polished metal rings round the cones, lit from above left. */}
+          <linearGradient id={`${id}m`} x1="0" y1="0" x2="1" y2="1">
+            <stop offset="0" stopColor="#f1ece4" />
+            <stop offset="0.45" stopColor="#a69c93" />
+            <stop offset="1" stopColor="#4d453f" />
+          </linearGradient>
+          {/* The cone's hollow, deepest round its cap. */}
+          <radialGradient id={`${id}c`} cx="0.42" cy="0.38" r="0.7">
+            <stop offset="0" stopColor="#7a686e" />
+            <stop offset="0.55" stopColor="#4a3c41" />
+            <stop offset="1" stopColor="#231b1f" />
+          </radialGradient>
+          {/* Domes: the cap and the tweeter, round with a light on them. */}
+          <radialGradient id={`${id}h`} cx="0.36" cy="0.32" r="0.75">
+            <stop offset="0" stopColor="#e6dde0" />
+            <stop offset="0.4" stopColor="#8c7b81" />
+            <stop offset="1" stopColor="#3a2f33" />
           </radialGradient>
         </defs>
-        <ellipse className="room-shade" cx="33" cy="97" rx="30" ry="3" />
-        {/* Its side, seen from the middle of the shelf, and its little feet. */}
-        <path className="room-speaker-side" d="M56 30 L62 33 V90 L56 94 Z" />
-        <path className="room-speaker-foot" d="M10 93 h8 v4 h-8 Z M44 93 h8 v4 h-8 Z" />
-        <rect className="room-speaker-box" x="6" y="28" width="50" height="66" rx="5" />
-        <rect x="6" y="28" width="50" height="66" rx="5" fill={`url(#${id}f)`} />
-        <path className="room-speaker-edge" d="M10 31 H52" />
-        <circle className="room-speaker-ring" cx="31" cy="43" r="7" />
-        <circle className="room-speaker-cone" cx="31" cy="43" r="3" />
-        <circle className="room-speaker-ring" cx="31" cy="72" r="17" />
-        <circle className="room-speaker-cone" cx="31" cy="72" r="11.5" />
-        <circle cx="31" cy="72" r="11.5" fill={`url(#${id}h)`} />
-        <circle className="room-speaker-cap" cx="31" cy="72" r="4.5" />
-        <circle className={`room-speaker-light${music.on ? " on" : ""}`} cx="49" cy="88" r="2.4" />
+        <ellipse className="room-shade" cx="45" cy="97" rx="35" ry="2.8" />
+        <path className="room-speaker-foot" d="M28 92 h7 v5 h-7 Z M70 92 h7 v5 h-7 Z M13 85.5 h5 v3.5 h-5 Z" />
+        {/* Its left side and its top, going back. */}
+        <path className="room-speaker-side" d="M24 34 L11 27 V86 L24 93 Z" />
+        <path d="M24 34 L11 27 V86 L24 93 Z" fill={`url(#${id}d)`} />
+        <path className="room-speaker-grain" d="M14 38 Q17 52 15 66 M19 36 Q21 58 20 84" />
+        <path className="room-speaker-top" d="M24 34 L11 27 H65.8 L78.8 34 Z" />
+        <rect className="room-speaker-box" x="24" y="34" width="54.8" height="59" rx="2" />
+        <rect x="24" y="34" width="54.8" height="59" rx="2" fill={`url(#${id}f)`} />
+        <path className="room-speaker-edge" d="M26.5 36.4 H76.3" />
+        {/* The dark baffle with the tweeter above and the woofer below, their rings held by little screws. */}
+        <rect className="room-speaker-baffle" x="29" y="39" width="44.8" height="49" rx="2" />
+        <circle cx="51.4" cy="50" r="6.6" fill={`url(#${id}m)`} className="room-speaker-ring" />
+        <circle cx="51.4" cy="50" r="3.8" fill={`url(#${id}h)`} />
+        <circle cx="51.4" cy="71.5" r="14.6" fill={`url(#${id}m)`} className="room-speaker-ring" />
+        <circle className="room-speaker-surround" cx="51.4" cy="71.5" r="12.4" />
+        <circle cx="51.4" cy="71.5" r="10.8" fill={`url(#${id}c)`} />
+        <circle cx="51.4" cy="71.5" r="4.4" fill={`url(#${id}h)`} className="room-speaker-cap" />
+        <g className="room-speaker-screw">
+          <circle cx="41.6" cy="61.7" r="0.9" />
+          <circle cx="61.2" cy="61.7" r="0.9" />
+          <circle cx="41.6" cy="81.3" r="0.9" />
+          <circle cx="61.2" cy="81.3" r="0.9" />
+        </g>
+        <circle className={`room-speaker-light${music.on ? " on" : ""}`} cx="70" cy="84.6" r="1.9" />
         {music.on ? (
           // Notes coming out, printed still: they don't move by themselves.
           <g className="room-speaker-notes">
-            <ellipse cx="49" cy="20" rx="4.2" ry="3.2" transform="rotate(-20 49 20)" />
-            <path d="M52.8 19 V4 Q59 6 59 12" />
-            <ellipse cx="62" cy="15" rx="3.2" ry="2.5" transform="rotate(-20 62 15)" />
-            <path d="M65 14 V3" />
+            <ellipse cx="52" cy="20" rx="4.2" ry="3.2" transform="rotate(-20 52 20)" />
+            <path d="M55.8 19 V4 Q62 6 62 12" />
+            <ellipse cx="65" cy="15" rx="3.2" ry="2.5" transform="rotate(-20 65 15)" />
+            <path d="M68 14 V3" />
           </g>
         ) : (
-          <path className="room-speaker-off" d="M50 6 L62 18 M62 6 L50 18" />
+          <path className="room-speaker-off" d="M53 6 L65 18 M65 6 L53 18" />
         )}
       </svg>
     </button>
@@ -147,43 +180,71 @@ export function RoomGlobe() {
         <svg viewBox="0 0 84 112" aria-hidden>
           <defs>
             <clipPath id={`${id}c`}>
-              <circle cx="42" cy="44" r="31" />
+              <circle cx="42" cy="42" r="29" />
             </clipPath>
-            <radialGradient id={`${id}s`} cx="0.36" cy="0.3" r="0.75">
-              <stop offset="0" stopColor="#fff" stopOpacity="0.45" />
-              <stop offset="0.35" stopColor="#fff" stopOpacity="0" />
-              <stop offset="0.8" stopColor="#0b2a40" stopOpacity="0.22" />
-              <stop offset="1" stopColor="#0b2a40" stopOpacity="0.5" />
+            {/* The ball lit from the lamp above left: bright there, its far side and rim in deep shadow. */}
+            <radialGradient id={`${id}s`} cx="0.34" cy="0.28" r="0.8">
+              <stop offset="0" stopColor="#fff" stopOpacity="0.42" />
+              <stop offset="0.28" stopColor="#fff" stopOpacity="0" />
+              <stop offset="0.62" stopColor="#06233a" stopOpacity="0.12" />
+              <stop offset="0.86" stopColor="#06233a" stopOpacity="0.45" />
+              <stop offset="1" stopColor="#06233a" stopOpacity="0.7" />
             </radialGradient>
+            {/* The lamp's gleam on the varnish. */}
+            <radialGradient id={`${id}g`}>
+              <stop offset="0" stopColor="#fff" stopOpacity="0.9" />
+              <stop offset="1" stopColor="#fff" stopOpacity="0" />
+            </radialGradient>
+            {/* Brass and turned wood, round: light where they face the lamp, dark where they turn away. */}
+            <linearGradient id={`${id}b`} x1="0" y1="0" x2="1" y2="0">
+              <stop offset="0" stopColor="#8a6420" />
+              <stop offset="0.3" stopColor="#f6dc8c" />
+              <stop offset="0.6" stopColor="#c99a3e" />
+              <stop offset="1" stopColor="#7a5418" />
+            </linearGradient>
+            <linearGradient id={`${id}w`} x1="0" y1="0" x2="1" y2="0">
+              <stop offset="0" stopColor="#6e3f1f" />
+              <stop offset="0.28" stopColor="#c08a55" />
+              <stop offset="0.55" stopColor="#94592f" />
+              <stop offset="1" stopColor="#5a321a" />
+            </linearGradient>
           </defs>
-          <ellipse className="room-shade" cx="42" cy="109" rx="30" ry="3" />
-          <path className="room-wood" d="M38 82 L36 95 H48 L46 82 Z" />
-          <rect className="room-wood" x="16" y="94" width="52" height="14" rx="3" />
-          <rect className="room-globe-plate" x="23" y="97" width="38" height="8" rx="1.5" />
-          <text className="room-globe-name" x="42" y="103.2" textAnchor="middle">
+          <ellipse className="room-shade" cx="44" cy="108.6" rx="31" ry="3" />
+          {/* The turned wooden foot, a low round box seen from a little above, the language's name on its front. */}
+          <path className="room-globe-foot" d="M16 95 V103.5 A26 5 0 0 0 68 103.5 V95 Z" fill={`url(#${id}w)`} />
+          <ellipse className="room-globe-foot-top" cx="42" cy="95" rx="26" ry="5" />
+          <path className="room-globe-foot" d="M37 95.5 C37 92 39.5 90.5 40 86 H44 C44.5 90.5 47 92 47 95.5 A5 1.6 0 0 1 37 95.5 Z" fill={`url(#${id}w)`} />
+          <rect className="room-globe-plate" x="23" y="99.6" width="38" height="7.6" rx="1.5" />
+          <text className="room-globe-name" x="42" y="105.4" textAnchor="middle">
             {name}
           </text>
-          <g transform="rotate(-20 42 44)">
-            <circle className="room-globe-sea" cx="42" cy="44" r="31" />
+          {/* The brass arm from the foot up to the axis' lower end. */}
+          <path className="room-globe-arm" d="M42 88 C42 81 48 77.5 55.4 74.6" />
+          <circle cx="42" cy="42" r="29" className="room-globe-sea" />
+          <g transform="rotate(-23 42 42)">
+            {/* Seen a little from above, so the parallels curve down in front and the north pole tips towards the eye. */}
             <g clipPath={`url(#${id}c)`}>
               <path
                 className="room-globe-land"
-                d="M14 26 C20 18 34 18 36 27 C38 33 30 36 29 42 C27 49 21 52 16 46 C12 40 10 32 14 26 Z M47 15 C55 13 66 19 69 28 C72 37 61 38 59 44 C57 52 63 58 59 66 C55 71 50 63 50 55 C50 47 44 42 46 34 C47 28 43 20 47 15 Z M22 60 C27 56 36 58 36 65 C36 71 28 75 23 71 C19 68 19 63 22 60 Z"
+                d="M15 24 C18 18 25 15 30 17 C33 19 31 23 28 26 C26 29 27 33 24 36 C21 38 18 37 16 34 C14 31 13 27 15 24 Z M36 22 C38 17 46 15 52 16 C58 15 64 18 68 24 C70 28 66 31 62 30 C58 30 56 33 52 32 C50 34 47 33 46 30 C43 31 40 29 39 27 C37 26 35 25 36 22 Z M42 34 C46 32 52 33 55 36 C58 39 60 43 58 47 C56 51 55 56 52 61 C50 64 47 63 46 59 C45 55 44 51 42 47 C39 44 38 38 42 34 Z M18 44 C21 42 25 44 26 48 C27 53 24 58 22 63 C20 66 18 64 17 60 C15 55 15 48 18 44 Z M60 52 C63 50 67 51 68 54 C68 57 65 59 62 58 C60 57 59 54 60 52 Z"
               />
               <g className="room-globe-lines">
-                <ellipse cx="42" cy="44" rx="13" ry="31" />
-                <ellipse cx="42" cy="44" rx="25" ry="31" />
-                <path d="M11 44 H73 M14 28 Q42 34 70 28 M14 60 Q42 54 70 60" />
+                <ellipse cx="42" cy="42" rx="16.6" ry="27.6" />
+                <ellipse cx="42" cy="42" rx="27.3" ry="27.6" />
+                <path d="M42 14.4 V69.6 M13 42 A29 9 0 0 0 71 42 M19.8 24.3 A22.2 6.9 0 0 0 64.2 24.3 M19.8 59.7 A22.2 6.9 0 0 0 64.2 59.7" />
               </g>
             </g>
-            {/* Round: lit from the lamp above left, its far side in shadow. */}
-            <circle cx="42" cy="44" r="31" fill={`url(#${id}s)`} />
-            <path className="room-globe-shine" d="M22 26 Q28 16 40 14" />
-            <circle className="room-globe-outline" cx="42" cy="44" r="31" />
-            {/* The brass half ring holding it at its poles. */}
-            <path className="room-globe-ring" d="M42 7 A37 37 0 0 1 42 81" />
-            <circle className="room-globe-pin" cx="42" cy="9" r="2.4" />
-            <circle className="room-globe-pin" cx="42" cy="79" r="2.4" />
+          </g>
+          <circle cx="42" cy="42" r="29" fill={`url(#${id}s)`} />
+          {/* Light thrown back from the shelf on its lower right rim, and the lamp's gleam. */}
+          <path className="room-globe-rim" d="M57 66.5 A29 29 0 0 0 69.5 50" />
+          <ellipse cx="31" cy="27" rx="9" ry="5.5" transform="rotate(-38 31 27)" fill={`url(#${id}g)`} />
+          <circle className="room-globe-outline" cx="42" cy="42" r="29" />
+          <g transform="rotate(-23 42 42)">
+            {/* The brass half ring round it, holding it at its poles: a band with its thickness, lit like the arm. */}
+            <path className="room-globe-ring" d="M42 6.5 A35.5 35.5 0 0 1 42 77.5 L42 73.6 A31.6 31.6 0 0 0 42 10.4 Z" fill={`url(#${id}b)`} />
+            <rect className="room-globe-pin" x="40.6" y="9" width="2.8" height="5.4" rx="1" />
+            <rect className="room-globe-pin" x="40.6" y="69.6" width="2.8" height="5.4" rx="1" />
           </g>
         </svg>
       }
@@ -262,13 +323,13 @@ export function RoomNotes() {
     <MenuButton
       icon="ℹ️"
       label={t({
-        de: "Über Fun for Both",
-        ru: "О Fun for Both",
-        en: "About Fun for Both",
-        zh: "关于 Fun for Both",
-        hi: "Fun for Both के बारे में",
-        es: "Acerca de Fun for Both",
-        ar: "عن Fun for Both",
+        de: "Über Little Steps to Grow",
+        ru: "О Little Steps to Grow",
+        en: "About Little Steps to Grow",
+        zh: "关于 Little Steps to Grow",
+        hi: "Little Steps to Grow के बारे में",
+        es: "Acerca de Little Steps to Grow",
+        ar: "عن Little Steps to Grow",
       })}
       className="room-thing shelf-carving-more"
       keep
@@ -364,13 +425,13 @@ export function RoomFeedback() {
         </h2>
         <p>
           {t({
-            de: "Fun for Both wächst mit jeder Rückmeldung. Was gefällt Ihrem Kind, wo hakt es, und welches Spiel würden Sie sich noch wünschen? Erzählen Sie es uns gern – über ein Lob freuen wir uns, über Kritik und neue Ideen genauso.",
-            ru: "Fun for Both растёт с каждым отзывом. Что нравится вашему ребёнку, где что-то не получается и какую игру вам бы ещё хотелось? Расскажите нам – похвале мы рады, а критике и новым идеям ничуть не меньше.",
-            en: "Fun for Both grows with every message we get. What does your child love, where does something get stuck, and which game would you still like to see? Do tell us – we are glad of praise, and just as glad of criticism and new ideas.",
-            zh: "Fun for Both 因每一条反馈而成长。您的孩子喜欢什么，哪里不太顺，您还希望有什么游戏？欢迎告诉我们——我们喜欢听到夸奖，也同样欢迎批评和新点子。",
-            hi: "Fun for Both हर सुझाव के साथ बढ़ता है। आपके बच्चे को क्या अच्छा लगता है, कहाँ अटकता है, और आप कौन-सा खेल और चाहेंगे? हमें ज़रूर बताइए – तारीफ़ से हमें ख़ुशी होती है, और आलोचना व नए विचारों से भी उतनी ही।",
-            es: "Fun for Both crece con cada mensaje que recibimos. ¿Qué le gusta a su peque, dónde se atasca algo y qué juego le gustaría ver todavía? Cuéntenoslo: un elogio nos alegra, y las críticas y las ideas nuevas, igual.",
-            ar: "ينمو Fun for Both مع كل رسالة تصلنا. ما الذي يحبّه طفلكم، وأين يتعثّر شيء ما، وأيّ لعبة تتمنّون أن تروها بعد؟ أخبرونا – يسعدنا المديح، وتسعدنا الملاحظات والأفكار الجديدة بالقدر نفسه.",
+            de: "Little Steps to Grow wächst mit jeder Rückmeldung. Was gefällt Ihrem Kind, wo hakt es, und welches Spiel würden Sie sich noch wünschen? Erzählen Sie es uns gern – über ein Lob freuen wir uns, über Kritik und neue Ideen genauso.",
+            ru: "Little Steps to Grow растёт с каждым отзывом. Что нравится вашему ребёнку, где что-то не получается и какую игру вам бы ещё хотелось? Расскажите нам – похвале мы рады, а критике и новым идеям ничуть не меньше.",
+            en: "Little Steps to Grow grows with every message we get. What does your child love, where does something get stuck, and which game would you still like to see? Do tell us – we are glad of praise, and just as glad of criticism and new ideas.",
+            zh: "Little Steps to Grow 因每一条反馈而成长。您的孩子喜欢什么，哪里不太顺，您还希望有什么游戏？欢迎告诉我们——我们喜欢听到夸奖，也同样欢迎批评和新点子。",
+            hi: "Little Steps to Grow हर सुझाव के साथ बढ़ता है। आपके बच्चे को क्या अच्छा लगता है, कहाँ अटकता है, और आप कौन-सा खेल और चाहेंगे? हमें ज़रूर बताइए – तारीफ़ से हमें ख़ुशी होती है, और आलोचना व नए विचारों से भी उतनी ही।",
+            es: "Little Steps to Grow crece con cada mensaje que recibimos. ¿Qué le gusta a su peque, dónde se atasca algo y qué juego le gustaría ver todavía? Cuéntenoslo: un elogio nos alegra, y las críticas y las ideas nuevas, igual.",
+            ar: "ينمو Little Steps to Grow مع كل رسالة تصلنا. ما الذي يحبّه طفلكم، وأين يتعثّر شيء ما، وأيّ لعبة تتمنّون أن تروها بعد؟ أخبرونا – يسعدنا المديح، وتسعدنا الملاحظات والأفكار الجديدة بالقدر نفسه.",
           })}
         </p>
         <p>
@@ -389,13 +450,13 @@ export function RoomFeedback() {
             className="install-button"
             href={`mailto:${CONTACT_EMAIL}?subject=${encodeURIComponent(
               t({
-                de: "Feedback zu Fun for Both",
-                ru: "Отзыв о Fun for Both",
-                en: "Feedback on Fun for Both",
-                zh: "关于 Fun for Both 的反馈",
-                hi: "Fun for Both के बारे में सुझाव",
-                es: "Comentarios sobre Fun for Both",
-                ar: "ملاحظات حول Fun for Both",
+                de: "Feedback zu Little Steps to Grow",
+                ru: "Отзыв о Little Steps to Grow",
+                en: "Feedback on Little Steps to Grow",
+                zh: "关于 Little Steps to Grow 的反馈",
+                hi: "Little Steps to Grow के बारे में सुझाव",
+                es: "Comentarios sobre Little Steps to Grow",
+                ar: "ملاحظات حول Little Steps to Grow",
               }),
             )}`}
           >

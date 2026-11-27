@@ -2,6 +2,8 @@
 // one file per study. Newest first. Idea ids and game addresses are checked in content.test.ts.
 
 import type { Research } from "./types";
+import { svgAnimationLeistung } from "./svg-animation-leistung";
+import { youtubeTimerThemen } from "./youtube-timer-themen";
 import { tinyfingersMarke } from "./tinyfingers-marke";
 import { nachtsAbstillen } from "./nachts-abstillen";
 import { flascheAbgewoehnen } from "./flasche-abgewoehnen";
@@ -36,6 +38,8 @@ export { RESEARCH_AREAS } from "./types";
 export type { Research, ResearchArea, ResearchDomain, ResearchExclusion, ResearchGameMatch, ResearchTopic } from "./types";
 
 export const RESEARCH: Research[] = [
+  svgAnimationLeistung,
+  youtubeTimerThemen,
   tinyfingersMarke,
   nachtsAbstillen,
   flascheAbgewoehnen,

@@ -98,11 +98,11 @@ export const LANGUAGE_STATUS: LanguageStatusRow[] = [
         files: ["src/games/timer/tunnelNames.ts"],
       },
       {
-        label: "🚀 Up to the Moon",
-        languages: { de: "done", en: "done", zh: "done", hi: "done", es: "done", ar: "done", ru: "done" },
+        label: "🛗 Lift to the Top",
+        languages: { de: "text", en: "text", zh: "text", hi: "text", es: "text", ar: "text", ru: "text" },
         recorded: true,
-        note: "Das dritte Spiel-Video-Bild und das erste, das keine Klötzchenwelt ist: ein Jump'n'Run nach oben, in dem ein kleiner Hüpfer vom Grund eines Sees bis zum Mond schwimmt, hüpft, klettert und fliegt und am Ende in eine Torte springt (H-127, jump.tsx; am 23. November 2026 neu gebaut statt „Hop to the Flag“), Englisch zuerst geschrieben und gleich in alle Sprachen übersetzt: sein Name „Up to the Moon“ („Hoch bis zum Mond“) und seine zwei Sätze am Anfang und am Ende (jumpNames.ts). Beide Sätze am 23. November 2026 von ElevenLabs gesprochen mit den Klonen von Tapsis Stimme im zweiten Konto: Englisch, Chinesisch, Hindi, Spanisch und Arabisch mit „Tapsi Coach (Klon)“, Deutsch mit „Tapsi Coach (Klon de)“, Russisch mit „Tapsi Coach (Klon ru)“ – beide Sätze eines Bildes aus einer Stimme, wie bei den anderen Bildern. Die Texte für Suchmaschinen nennen es in allen sieben Sprachen.",
-        files: ["src/games/timer/jumpNames.ts"],
+        note: "Ein Hochhaus mit einem großen gläsernen Aufzug, der Stockwerk für Stockwerk nach oben fährt, während rote Punktziffern wie in einem echten Aufzug die Stockwerke hochzählen; oben geht die Tür auf (H-127, lift.tsx, Wunsch 26. November 2026, statt „Up to the Moon“ mit dem Fuchskind; seit 27. November 2026 bis zu 100 Stockwerke, höchstens eins pro Sekunde, und ohne Fahne – der Schlusssatz sagt jetzt „die Tür geht auf“ statt „die Fahne weht“). Englisch zuerst geschrieben und gleich in alle Sprachen übersetzt: sein Name „Lift to the Top“ („Mit dem Aufzug nach oben“) und seine zwei Sätze am Anfang und am Ende (liftNames.ts). Die Sätze warten auf ihre Aufnahmen (die von „Up to the Moon“ passen nicht mehr). Die Texte für Suchmaschinen nennen es in allen sieben Sprachen.",
+        files: ["src/games/timer/liftNames.ts"],
       },
       {
         label: "🫙 Marble Jar",
@@ -243,7 +243,7 @@ export const LANGUAGE_STATUS: LanguageStatusRow[] = [
   },
   {
     href: "/grosses-bett/",
-    note: "Das Buch „Bett“ (bis 24. November 2026 „Großes Bett“) mit zwei Geschichten in Kapiteln, gewählt auf seiner ersten Seite (StoryChoice), die Tapsis Stimme vorliest; unten rechts über ▶ schaltet ein Lautsprecher sie für Erwachsene aus, die selbst vorlesen. Der Name des Buchs (names.ts) ist in allen sieben Sprachen da.",
+    note: "Das Buch „Schlaf gut“ (bis 24. November 2026 „Großes Bett“, bis 26. November 2026 „Bett“) mit zwei Geschichten in Kapiteln, gewählt auf seiner ersten Seite (StoryChoice), die Tapsis Stimme vorliest; unten rechts über ▶ schaltet ein Lautsprecher sie für Erwachsene aus, die selbst vorlesen. Der Name des Buchs (names.ts) ist in allen sieben Sprachen da.",
     parts: [
       {
         label: "🛏️ Tapsi's Big Bed",
@@ -268,6 +268,12 @@ export const LANGUAGE_STATUS: LanguageStatusRow[] = [
         recorded: true,
         languages: { de: "done", en: "done", zh: "done", hi: "done", es: "done", ar: "done", ru: "done" },
         note: "Was vor dem Putzen und am Ende gesagt wird, von ElevenLabs gesprochen (Tapsis Stimme, 30. Oktober 2026); die Putzschritte auch, für den Fall, dass das Lied nicht lädt.",
+      },
+      {
+        label: "🥣 Frühstück am Morgen",
+        recorded: true,
+        languages: { de: "text", en: "text", zh: "text", hi: "text", es: "text", ar: "text", ru: "text" },
+        note: "Morgens isst das Kind in der Geschichte Frühstück statt Süßigkeiten (X-19, 27. November 2026): der Name auf der Leiste und der Satz „Mmm, breakfast! …“ (BREAKFAST_TEXTS in lines.ts), Englisch zuerst und gleich in allen sieben Sprachen. Noch nicht aufgenommen: bis dahin bleibt der Satz morgens stumm (bun run voice make --only zaehne, nur auf Wunsch).",
       },
       {
         label: "🎵 Zahnputzlied (gesungen)",
@@ -366,7 +372,7 @@ export const LANGUAGE_STATUS: LanguageStatusRow[] = [
     href: "/drauflos/",
     recorded: true,
     languages: { de: "done", en: "done", zh: "done", hi: "done", es: "done", ar: "done", ru: "done" },
-    note: "Neu (24. November 2026, L-24), englisch zuerst und gleich in alle sieben Sprachen übersetzt: Name, Zeile, die Aufforderung vor dem ersten Druck („Drück irgendeine Taste!“ / „Tipp irgendwohin!“) und die Texte für Suchmaschinen. Der neue Name „Zaubertasten“ („Magic Keys“) auf dem Plakat über der Tastatur am selben Tag in alle sieben Sprachen. Gesprochen werden nur die Buchstabennamen, aus den Aufnahmen von „Buchstaben & Zahlen“ in jeder Sprache; sonst nur Töne.",
+    note: "Neu (24. November 2026, L-24), englisch zuerst und gleich in alle sieben Sprachen übersetzt: Name, Zeile, die Aufforderung vor dem ersten Druck („Drück irgendeine Taste!“ / „Tipp irgendwohin!“) und die Texte für Suchmaschinen. Der neue Name „Zaubertasten“ („Magic Keys“) auf dem Plakat über der Tastatur am selben Tag in alle sieben Sprachen; am 26. November 2026 umbenannt in „Tippzauber“ („Tap Magic“), da die meisten am Handy tippen, wieder in allen sieben Sprachen samt Suchtiteln. Gesprochen werden nur die Buchstabennamen, aus den Aufnahmen von „Buchstaben & Zahlen“ in jeder Sprache; sonst nur Töne.",
   },
   {
     href: "/bilder/",
@@ -705,7 +711,7 @@ export const LANGUAGE_STATUS: LanguageStatusRow[] = [
       {
         label: "Startseite, Menüs und alles für Eltern",
         languages: { de: "done", en: "done", zh: "done", hi: "done", es: "done", ar: "done", ru: "done" },
-        note: "Startseite, Einstellungen und alles für Eltern (🌐 auf der Startseite), auch „Junge / Mädchen“, „Spiel verlassen“, die Schnitzerei „Für Groß & Klein“ mit „mehr …“, „Lernspiele“, „Alltagshelfer“ und „Ein paar Worte von uns“ (übersetzt am 3. November 2026); nur die Management-Seite, Impressum und Datenschutz bleiben Deutsch; die Seiten für Suchmaschinen gibt es in allen sieben Sprachen (/en/, /zh/, /hi/, /es/, /ar/, /ru/, A-22; die fünf weiteren seit 7. November 2026). „Gute Nacht! Die Spielzeit ist vorbei.“ (alle Spiele) von ElevenLabs gesprochen, in allen sieben Sprachen (30. Oktober 2026). „Nochmal oder weiter?“ und „Nochmal?“ am Ende eines Levels (alle Spiele, A-24) in allen sieben Sprachen geschrieben (7. November 2026) und außer Russisch von ElevenLabs gesprochen (7./8. November 2026). Der Name „Fun for Both“ bleibt in allen Sprachen gleich. „Wer spielt?“ über dem Fuchs-Sticker im Regal (Bookshelf.tsx) übersetzt am 5. November 2026; auf Hindi „किसकी बारी?“, da „wer spielt“ dort nach Junge oder Mädchen ginge. „Ohne Internet spielen“ hinter „mehr …“ (OfflineOptions.tsx: speichern ja/nein, Musik und Stimmen, Bücher) übersetzt am 8. November 2026. „Feedback“ unten links auf der Startseite (RoomOptions.tsx: „Schreiben Sie uns“, „E-Mail schreiben“) übersetzt am 8. November 2026.",
+        note: "Startseite, Einstellungen und alles für Eltern (🌐 auf der Startseite), auch „Junge / Mädchen“, „Spiel verlassen“, die Schnitzerei „Für Groß & Klein“ mit „mehr …“, „Lernspiele“, „Alltagshelfer“ und „Ein paar Worte von uns“ (übersetzt am 3. November 2026); nur die Management-Seite, Impressum und Datenschutz bleiben Deutsch; die Seiten für Suchmaschinen gibt es in allen sieben Sprachen (/en/, /zh/, /hi/, /es/, /ar/, /ru/, A-22; die fünf weiteren seit 7. November 2026). „Gute Nacht! Die Spielzeit ist vorbei.“ (alle Spiele) von ElevenLabs gesprochen, in allen sieben Sprachen (30. Oktober 2026). „Nochmal oder weiter?“ und „Nochmal?“ am Ende eines Levels (alle Spiele, A-24) in allen sieben Sprachen geschrieben (7. November 2026) und außer Russisch von ElevenLabs gesprochen (7./8. November 2026). Der Name „Little Steps to Grow“ bleibt in allen Sprachen gleich. „Wer spielt?“ über dem Fuchs-Sticker im Regal (Bookshelf.tsx) übersetzt am 5. November 2026; auf Hindi „किसकी बारी?“, da „wer spielt“ dort nach Junge oder Mädchen ginge. „Ohne Internet spielen“ hinter „mehr …“ (OfflineOptions.tsx: speichern ja/nein, Musik und Stimmen, Bücher) übersetzt am 8. November 2026. „Feedback“ unten links auf der Startseite (RoomOptions.tsx: „Schreiben Sie uns“, „E-Mail schreiben“) übersetzt am 8. November 2026.",
       },
       {
         label: "📱 Hinweis „Bitte quer halten“",

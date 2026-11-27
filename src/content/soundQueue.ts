@@ -31,4 +31,17 @@ export interface QueuedSound {
 }
 
 /** Approved and not made yet, oldest first. */
-export const SOUND_QUEUE: QueuedSound[] = [];
+export const SOUND_QUEUE: QueuedSound[] = [
+  {
+    id: "littleroar",
+    file: "src/lib/sounds/littleroar.mp3",
+    use: "Zähne putzen (X-26): im Schritt „Brüllen wie ein Löwe“ reißt das Kind den Mund weit auf und brüllt wie ein kleiner Löwe, erst allein, dann zusammen mit einem Löwen, der neben ihm brüllt – ein Kind, kein echter Löwe (der Löwe ist roar.mp3). Bis die Aufnahme kommt, spielt ein synthetisches „Rooaah“ (playLittleRoar).",
+    prompt:
+      "A small child playfully roaring like a little lion, one soft and cute 'rooaah' that opens from a short growl into a long 'aah', happy and gentle, not scary, close up, clean recording, no background noise",
+    seconds: 2,
+    influence: 0.7,
+    after:
+      "Cut to the roar alone (about 1.2–1.8 s: it plays on beat 3 of the lion's step alone and on beat 11 together with the lion's roar.mp3, LION_CUES in src/games/teeth/lion.tsx, and must have rung out before the next roar), bring it to about −20 LUFS – a soft roar, a little under the lion's – and add its row under „Made with ElevenLabs“ in src/lib/sounds/README.md. lion.tsx already plays and preloads it by its name (LITTLE_ROAR); listen to it at /zaehne/ (jump on the bar to „Brüllen wie ein Löwe“), check that child and lion are both heard together, and say in src/games/teeth/CLAUDE.md that the child's roar is a recording now.",
+    date: "2026-11-27",
+  },
+];

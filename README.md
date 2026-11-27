@@ -1,4 +1,4 @@
-# Fun for Both
+# Little Steps to Grow
 
 Simple keyboard and touch games for toddlers. Everything new is written English first (since 11 November 2026); older content is German first.
 
@@ -15,15 +15,12 @@ bun run preview    # serve the built site like GitHub Pages (tools/preview.ts)
 ```
 
 Pushing to `main` deploys to GitHub Pages via `.github/workflows/deploy.yml`
-(repo settings → Pages → Source: **GitHub Actions**, Custom domain: **www.funforboth.com** (not funforboth.com: GitHub then sends funforboth.com on to www by itself), Enforce HTTPS).
-The domain is registered at Cloudflare; its DNS records are `tools/funforboth.com.zone` (import it under
+(repo settings → Pages → Source: **GitHub Actions**, Custom domain: **www.littlestepstogrow.com** (not littlestepstogrow.com: GitHub then sends littlestepstogrow.com on to www by itself), Enforce HTTPS).
+The domain is registered at Cloudflare; its DNS records are `tools/littlestepstogrow.com.zone` (import it under
 DNS → Records → Import, without „Proxy imported DNS records“, so GitHub can issue the HTTPS certificate: with the records proxied (orange cloud) Pages shows „Enforce HTTPS – Unavailable … not properly configured to support HTTPS“, as in November 2026; switch them to „DNS only“, wait for the certificate, then tick Enforce HTTPS).
-toddlerfox.com (the address until October 2026) and booksforboth.com (until November 2026) only redirect: import
-`tools/redirect-<domain>.zone` *with* „Proxy imported DNS records“ (delete the old GitHub records first), then
-Rules → Redirect Rules → a rule for all incoming requests, dynamic target
-`concat("https://www.funforboth.com", http.request.uri.path)`, status 301, preserve query string.
+It is the site's only domain: the earlier ones (toddlerfox.com, booksforboth.com, funforboth.com) no longer redirect here.
 Visits are counted with Cloudflare Web Analytics (no cookies): Cloudflare → Analytics & Logs → Web Analytics →
-Add a site (www.funforboth.com), manual setup, and its site token as the repository variable `CF_BEACON_TOKEN` (repo settings →
+Add a site (www.littlestepstogrow.com), manual setup, and its site token as the repository variable `CF_BEACON_TOKEN` (repo settings →
 Secrets and variables → Actions → Variables); without it the build counts nothing.
 
 Use **Bun** (not npm or yarn) for everything: installing, scripts, tests, bundling, dev server; dependencies are locked in `bun.lock`.
@@ -52,7 +49,7 @@ where its parts are. Skills in `.claude/skills/`: `/neues-spiel`, `/neue-szene`,
 | `src/components/Sky.tsx`, `Logo.tsx` | Menu look: sky backdrop and the bouncy logo; colours and buttons in `src/styles/` (all loaded in order by `src/globals.css`) |
 | `src/content/de.ts` | German words, pictures, number words – edit here to change content |
 | `src/content/en.ts`, `tr.ts`, `pl.ts` | English, Turkish and Polish for the letters and words games, chosen under „Sprache“ on the home page (`src/content/languages.ts`, `src/components/LanguageSetting.tsx`). An optional second language shows and says every word in it too („Bär – bear“); words are matched by their emoji (`src/content/translate.ts`), and `moreWords` names pictures that only other languages have. The other games are German only |
-| `src/games/tapaway/` | „Zaubertasten“ („Magic Keys“): a wooden toy keyboard under its poster on the shelf, in no book – every key, tap or click brings a letter, a shape or a surprise at once. Details in its [`CLAUDE.md`](src/games/tapaway/CLAUDE.md) |
+| `src/games/tapaway/` | „Tippzauber“ („Tap Magic“): a wooden toy keyboard under its poster on the shelf, in no book – every key, tap or click brings a letter, a shape or a surprise at once. Details in its [`CLAUDE.md`](src/games/tapaway/CLAUDE.md) |
 | `src/games/letters/` | The book „Buchstaben & Zahlen“: three games, „Frei tippen“, „Zählen“ and „Wörter tippen“ (whole words or „Wo ist das B?“; picture, colour and doing words). Details in its [`CLAUDE.md`](src/games/letters/CLAUDE.md) |
 | `src/games/scenes/` | Game „Lebendige Bilder“: the Wimmelbild engine and all its pictures. Details in its [`CLAUDE.md`](src/games/scenes/CLAUDE.md) |
 | `src/games/animals/` | Game „Was gehört zum Tier?“: feed the animal, bring it home, what it gives us, what the small one becomes. Details in its [`CLAUDE.md`](src/games/animals/CLAUDE.md) |

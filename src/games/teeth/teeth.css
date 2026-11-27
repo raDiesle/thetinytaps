@@ -358,7 +358,8 @@
    already, and fades away in a beat once the brush has taken its monsters off – a beat, since the step's last tooth is
    done only a moment before the head turns on. Then the tooth sparkles once, a little glint coming up and going over
    four beats, as calm as the end's. Only the layers' opacity and transform change. */
-.mouth-stains {
+.mouth-stains,
+.mouth-foam {
   position: absolute;
   inset: 0;
   pointer-events: none;
@@ -416,49 +417,6 @@
   animation-play-state: paused;
 }
 
-/* The end's surprise (mouth.tsx, DazzledMonster), eight beats as long as the cheer: three beats while the head glides
-   to its grin, the monster rises at the mirror's bottom edge in two, squints, the sunglasses drop onto its nose in one,
-   and at the end it sinks back. Body and glasses are layers of their own moved by transform. */
-/* It rises from behind the mirror's bottom edge: its box ends there and hides what is below. */
-.dazzled-monster {
-  overflow: hidden;
-}
-
-.dazzle-body {
-  animation: teeth-dazzle-peek 4.29s ease-in-out both;
-}
-
-@keyframes teeth-dazzle-peek {
-  0%,
-  37% {
-    transform: translateY(100%);
-  }
-  50%,
-  88% {
-    transform: translateY(26%);
-  }
-  100% {
-    transform: translateY(100%);
-  }
-}
-
-.dazzle-glasses {
-  animation: teeth-dazzle-glasses 4.29s ease-in both;
-}
-
-@keyframes teeth-dazzle-glasses {
-  0%,
-  62% {
-    opacity: 0;
-    transform: translateY(-45%);
-  }
-  75%,
-  100% {
-    opacity: 1;
-    transform: translateY(0);
-  }
-}
-
 /* Pause button and progress bar sit above the pause screen, so a grown-up can jump around while paused. They lie
    together on one strip of paper, like the book's notes, so they read as one thing apart from the picture behind them
    (user feedback, November 2026: on their own the discs, the pills and the time looked scattered over the picture). */
@@ -506,6 +464,36 @@
   display: block;
   width: 64%;
   height: 64%;
+}
+
+/* ⚙️ at the end of the strip (`PlayOptions inline`): which phases are shown. A smaller disc than pause and „Von vorn“,
+   for grown-ups, held like ✕ – the ink fills round it while it is held, so a child's tap opens nothing. */
+.teeth-button.teeth-options {
+  width: clamp(34px, 6vmin, 46px);
+  height: clamp(34px, 6vmin, 46px);
+  border-width: 2px;
+  background: conic-gradient(var(--ink) var(--progress, 0%), transparent 0), radial-gradient(circle at 38% 30%, #fff 45%, #f1e8d4);
+  color: var(--ink);
+}
+
+.teeth-button.teeth-options.holding {
+  color: #fff;
+}
+
+.teeth-gear {
+  fill: none;
+  stroke: currentColor;
+  stroke-width: 2.2;
+  stroke-linecap: round;
+  stroke-linejoin: round;
+}
+
+/* In the options' panel each phase carries the bar's own picture beside its switch. */
+.teeth-option-symbol {
+  flex: none;
+  width: 36px;
+  height: 36px;
+  object-fit: contain;
 }
 
 /* The time right of the bar: before the brushing the time until it starts (in the intro's lilac), then the brushing time
@@ -705,7 +693,7 @@
     --teeth-edge: calc(var(--frame, 0px) + var(--teeth-gap));
     display: grid;
     grid-template-columns: auto auto;
-    grid-template-rows: auto minmax(0, 1fr) auto;
+    grid-template-rows: auto minmax(0, 1fr) auto auto;
     justify-items: center;
     align-self: stretch;
     gap: clamp(5px, 1.2vmin, 10px) clamp(4px, 0.8vmin, 8px);
@@ -721,7 +709,8 @@
   }
 
   .teeth-progress,
-  .teeth-time {
+  .teeth-time,
+  .teeth-options {
     grid-column: 1 / -1;
   }
 
@@ -832,8 +821,7 @@
   }
 }
 
-/* Pause: brush, monsters and glow stand still under a big button that goes on. */
-.teeth-play.paused .monster-glow,
+/* Pause: brush and monsters stand still under a big button that goes on. */
 .teeth-play.paused .monster-body {
   animation-play-state: paused;
 }
@@ -937,8 +925,7 @@
 
   .monster-body,
   .origin-monster > svg,
-  .teeth-shine,
-  .monster-glow {
+  .teeth-shine {
     animation: none;
   }
 
@@ -954,29 +941,6 @@
 }
 
 /* ---------- More life: blinking, brows, scared monsters, arrows on the lips ---------- */
-
-/* The monsters to brush now glow. */
-.monster-glow {
-  pointer-events: none;
-  transform-box: fill-box;
-  transform-origin: center;
-  animation: glow-breathe 1.07s ease-in-out infinite alternate;
-}
-
-.sugar-monster.gone .monster-glow {
-  animation: fade-out 0.3s ease-out forwards;
-}
-
-@keyframes glow-breathe {
-  from {
-    transform: scale(0.8);
-    opacity: 0.7;
-  }
-  to {
-    transform: scale(1.1);
-    opacity: 1;
-  }
-}
 
 .monster-eyes {
   transform-box: fill-box;
@@ -1550,7 +1514,79 @@
 }
 
 .prep.at-paste .prep-brush {
-  transform: translate(120px, 195px) scale(1.2);
+  transform: translate(150px, 190px) scale(1.2);
+}
+
+/* The brush is drawn twice (BrushDrawing in prep.tsx): behind the cup's glass only while it stands in the cup, in front
+   of it from the moment it is lifted out above the rim (grab-brush's 62 %, (340px, 20px)) until it is back over the cup
+   (tidy-brush's 62.5 %) – the glass never lies over a brush held outside it (user feedback, November 2026). */
+.prep-brush-front,
+.prep.at-paste .prep-brush-back {
+  opacity: 0;
+}
+
+.prep.at-paste .prep-brush-front {
+  opacity: 1;
+}
+
+.prep.at-brush .prep-brush-back {
+  animation: teeth-prep-brush-out-back 4.5s linear forwards;
+}
+
+.prep.at-brush .prep-brush-front {
+  animation: teeth-prep-brush-out-front 4.5s linear forwards;
+}
+
+@keyframes teeth-prep-brush-out-back {
+  0%,
+  62% {
+    opacity: 1;
+  }
+  62.1%,
+  100% {
+    opacity: 0;
+  }
+}
+
+@keyframes teeth-prep-brush-out-front {
+  0%,
+  62% {
+    opacity: 0;
+  }
+  62.1%,
+  100% {
+    opacity: 1;
+  }
+}
+
+.prep.at-tidy .prep-brush-back {
+  animation: teeth-prep-brush-in-back 8.57s linear forwards;
+}
+
+.prep.at-tidy .prep-brush-front {
+  animation: teeth-prep-brush-in-front 8.57s linear forwards;
+}
+
+@keyframes teeth-prep-brush-in-back {
+  0%,
+  62.5% {
+    opacity: 0;
+  }
+  62.6%,
+  100% {
+    opacity: 1;
+  }
+}
+
+@keyframes teeth-prep-brush-in-front {
+  0%,
+  62.5% {
+    opacity: 1;
+  }
+  62.6%,
+  100% {
+    opacity: 0;
+  }
 }
 
 @keyframes grab-brush {
@@ -1575,7 +1611,7 @@
   }
   85%,
   100% {
-    transform: translate(120px, 195px) rotate(0deg) scale(1.2);
+    transform: translate(150px, 190px) rotate(0deg) scale(1.2);
   }
 }
 
@@ -1713,36 +1749,39 @@
   animation: bob 2s ease-in-out 5.5s infinite;
 }
 
+/* The tube stands on its cap on the counter (TUBE_REST in prep.tsx), never lying with its cap end in the air (user
+   feedback, November 2026). */
 .prep-tube {
-  transform: translate(190px, 266px) rotate(-90deg);
+  transform: translate(60px, 298px) rotate(0deg);
 }
 
 .prep.at-paste .prep-tube {
   animation: tube-over 5.5s ease-in-out forwards;
 }
 
-/* Over to the middle of the bristles, a short squeeze for a pea-sized dab, lift off, lie down again. */
+/* Up from the counter over to the middle of the bristles, a short squeeze for a pea-sized dab, lift off, and back
+   down onto its cap. */
 @keyframes tube-over {
   0%,
   6% {
-    transform: translate(190px, 266px) rotate(-90deg);
+    transform: translate(60px, 298px) rotate(0deg);
   }
   26% {
-    transform: translate(106px, 146px) rotate(35deg);
+    transform: translate(136px, 141px) rotate(35deg);
   }
   30% {
-    transform: translate(108px, 150px) rotate(35deg);
+    transform: translate(138px, 145px) rotate(35deg);
     animation-timing-function: linear;
   }
   46% {
-    transform: translate(112px, 150px) rotate(35deg);
+    transform: translate(142px, 145px) rotate(35deg);
   }
   58% {
-    transform: translate(124px, 118px) rotate(28deg);
+    transform: translate(154px, 113px) rotate(28deg);
   }
   82%,
   100% {
-    transform: translate(190px, 266px) rotate(-90deg);
+    transform: translate(60px, 298px) rotate(0deg);
   }
 }
 
@@ -1806,7 +1845,7 @@
 
 @keyframes tidy-brush {
   0% {
-    transform: translate(120px, 195px) rotate(0deg) scale(1.2);
+    transform: translate(150px, 190px) rotate(0deg) scale(1.2);
   }
   12.5% {
     transform: translate(225px, 296px) rotate(-12deg) scale(1.1);
@@ -1912,9 +1951,344 @@
   animation-iteration-count: 3;
 }
 
+/* The splat the child spat out lies in the basin until the water washes it away (`.prep-spat`). */
+.prep-spat {
+  animation: teeth-prep-spat-off 8.57s ease-in forwards;
+}
+
+@keyframes teeth-prep-spat-off {
+  0%,
+  12.5% {
+    opacity: 1;
+  }
+  31.25%,
+  100% {
+    opacity: 0;
+  }
+}
+
+/* ---------- Spitting out, not rinsing (X-18, spit.tsx): two bars, 8 beats of 12.5 % (SPIT_MS) ---------- */
+
+.spit {
+  position: absolute;
+  inset: 0;
+  overflow: hidden;
+}
+
+.spit-picture,
+.spit-frame {
+  position: absolute;
+  inset: 0;
+  display: block;
+  width: 100%;
+  height: 100%;
+}
+
+.spit-frame {
+  pointer-events: none;
+}
+
+/* Two beats down over the basin (LEAN in spit.tsx), up again over the last two. */
+.spit-child {
+  animation: teeth-spit-lean 4.29s ease-in-out forwards;
+}
+
+@keyframes teeth-spit-lean {
+  0%,
+  12.5% {
+    transform: translateY(0);
+  }
+  25%,
+  75% {
+    transform: translateY(10px);
+  }
+  100% {
+    transform: translateY(0);
+  }
+}
+
+/* The smile gives way to the pursed lips on beat 2 and comes back on beat 5. */
+.spit-smile {
+  animation: teeth-spit-smile 4.29s ease-in-out forwards;
+}
+
+@keyframes teeth-spit-smile {
+  0%,
+  25%,
+  75%,
+  100% {
+    opacity: 1;
+  }
+  31.25%,
+  62.5% {
+    opacity: 0;
+  }
+}
+
+/* Pursed from beat 2, pushed forward once at the „ptü“ (beat 4), back into the smile on beat 5. */
+.spit-pucker {
+  opacity: 0;
+  animation: teeth-spit-pucker 4.29s ease-in-out forwards;
+}
+
+@keyframes teeth-spit-pucker {
+  0%,
+  25% {
+    transform: scale(0.7);
+    opacity: 0;
+  }
+  31.25%,
+  46.875% {
+    transform: scale(1);
+    opacity: 1;
+  }
+  50% {
+    transform: scale(1.12);
+    opacity: 1;
+  }
+  53.125%,
+  62.5% {
+    transform: scale(1);
+    opacity: 1;
+  }
+  75%,
+  100% {
+    transform: scale(0.8);
+    opacity: 0;
+  }
+}
+
+/* The dab peeks out of the lips on beat 3, drops on beat 4 with the „ptü“ (SPIT_CUES) down to the bowl (LANDS_AT, 154
+   picture units below) and lies there as a splat. */
+.spit-blob {
+  transform: scale(0);
+  animation: teeth-spit-blob 4.29s ease-out forwards;
+}
+
+@keyframes teeth-spit-blob {
+  0%,
+  37.5% {
+    transform: translateY(0) scale(0);
+  }
+  43.75% {
+    transform: translateY(2px) scale(1);
+  }
+  50% {
+    transform: translateY(4px) scale(1.05, 0.95);
+    animation-timing-function: ease-in;
+  }
+  58% {
+    transform: translateY(154px) scale(0.9, 1.15);
+    animation-timing-function: ease-out;
+  }
+  62.5%,
+  100% {
+    transform: translateY(154px) scale(1.7, 0.4);
+  }
+}
+
+/* ---------- Roaring like a lion (X-26, lion.tsx): four bars, 16 beats of 6.25 % (LION_MS) ---------- */
+
+.lion {
+  position: absolute;
+  inset: 0;
+  overflow: hidden;
+}
+
+.lion-camera,
+.lion-picture,
+.lion-frame {
+  position: absolute;
+  inset: 0;
+  display: block;
+  width: 100%;
+  height: 100%;
+}
+
+.lion-frame {
+  pointer-events: none;
+}
+
+.teeth-piece.lion-still {
+  will-change: auto;
+}
+
+/* The camera starts close on the child (lion.tsx sets where) and draws back to the child and the lion on beats 7–10,
+   while the lion walks in. It moves the picture as a whole, an HTML layer, so the phone doesn't paint it again. */
+.lion-camera {
+  transform-origin: 0 0;
+  transform: translate(var(--zoom-x), var(--zoom-y)) scale(var(--zoom));
+  animation: teeth-lion-camera 8.571s ease-in-out forwards;
+}
+
+@keyframes teeth-lion-camera {
+  0%,
+  43.75% {
+    transform: translate(var(--zoom-x), var(--zoom-y)) scale(var(--zoom));
+  }
+  62.5%,
+  100% {
+    transform: translate(0, 0) scale(1);
+  }
+}
+
+/* The smile gives way to the mouth wide open on beat 2. */
+.lion-kid-smile {
+  animation: teeth-lion-kid-smile 8.571s ease-in-out forwards;
+}
+
+@keyframes teeth-lion-kid-smile {
+  0%,
+  12.5% {
+    opacity: 1;
+  }
+  16.5%,
+  100% {
+    opacity: 0;
+  }
+}
+
+/* Wide open from beat 2 to 3, a roar on beat 3 (LION_CUES) and one with the lion on beat 11, open to the end. */
+.lion-kid-roar {
+  opacity: 0;
+  animation: teeth-lion-kid-roar 8.571s ease-in-out forwards;
+}
+
+@keyframes teeth-lion-kid-roar {
+  0%,
+  12.5% {
+    transform: scale(0.4, 0.2);
+    opacity: 0;
+  }
+  14% {
+    opacity: 1;
+  }
+  18.75% {
+    transform: scale(1);
+    opacity: 1;
+  }
+  22% {
+    transform: scale(1.06, 1.1);
+  }
+  31.25%,
+  68.75% {
+    transform: scale(1);
+  }
+  72% {
+    transform: scale(1.06, 1.1);
+  }
+  81.25%,
+  100% {
+    transform: scale(1);
+    opacity: 1;
+  }
+}
+
+/* The costume's mane grows in round the face on beats 4.5–6. */
+.lion-mane {
+  opacity: 0;
+  animation: teeth-lion-mane 8.571s ease-in-out forwards;
+}
+
+@keyframes teeth-lion-mane {
+  0%,
+  28.125% {
+    transform: scale(0.6);
+    opacity: 0;
+  }
+  34.375% {
+    transform: scale(1.04);
+    opacity: 1;
+  }
+  37.5%,
+  100% {
+    transform: scale(1);
+    opacity: 1;
+  }
+}
+
+/* The lion walks in from the side in four steps on beats 7–10 (far off the picture before),
+   and leans into its roar on beat 11. */
+.lion-lion {
+  animation: teeth-lion-walk 8.571s ease-in-out forwards;
+}
+
+@keyframes teeth-lion-walk {
+  0%,
+  43.75% {
+    transform: translate(560px, 0) scale(1);
+  }
+  48.4375% {
+    transform: translate(420px, -10px) scale(1);
+  }
+  53.125% {
+    transform: translate(280px, 0) scale(1);
+  }
+  57.8125% {
+    transform: translate(140px, -10px) scale(1);
+  }
+  62.5%,
+  68.75% {
+    transform: translate(0, 0) scale(1);
+  }
+  72% {
+    transform: translate(0, 0) scale(1.04);
+  }
+  81.25%,
+  100% {
+    transform: translate(0, 0) scale(1);
+  }
+}
+
+/* Its mouth opens on beat 10 and roars with the child on beat 11. */
+.lion-lion-shut {
+  animation: teeth-lion-shut 8.571s ease-in-out forwards;
+}
+
+@keyframes teeth-lion-shut {
+  0%,
+  62.5% {
+    opacity: 1;
+  }
+  66%,
+  100% {
+    opacity: 0;
+  }
+}
+
+.lion-lion-jaw {
+  opacity: 0;
+  animation: teeth-lion-jaw 8.571s ease-in-out forwards;
+}
+
+@keyframes teeth-lion-jaw {
+  0%,
+  62.5% {
+    transform: scale(0.4, 0.2);
+    opacity: 0;
+  }
+  64% {
+    opacity: 1;
+  }
+  68.75% {
+    transform: scale(1);
+    opacity: 1;
+  }
+  72% {
+    transform: scale(1.06, 1.1);
+  }
+  81.25%,
+  100% {
+    transform: scale(1);
+    opacity: 1;
+  }
+}
+
 /* Important for the same reason as the story's: `.prep.at-paste .prep-tube-squeeze` outranks it. */
 .teeth-play.paused .teeth-count,
 .teeth-play.paused .prep *,
+.teeth-play.paused .spit *,
+.teeth-play.paused .lion *,
 .teeth-play.paused .lip-arrow {
   animation-play-state: paused !important;
 }
@@ -2183,7 +2557,7 @@
 
 /* A monster being brushed or an arrow on the lips: a small layer of its own over the mirror (Sprite in mouth.tsx).
    What moves in it moves the HTML round its svg, never something inside the svg, so a phone moves it without painting:
-   swaying, trembling and the glow breathing are the svg ones (above) done on the sprite's own elements. */
+   swaying and trembling are the svg ones (above) done on the sprite's own elements. */
 .mouth-sprites {
   position: absolute;
   inset: 0;
@@ -2198,9 +2572,6 @@
 }
 
 .mouth-sprite > *,
-.dazzle-body > svg,
-.dazzle-glasses,
-.dazzle-glasses > svg,
 .sprite-body > svg,
 .lip-arrow-sprite > div > svg {
   position: absolute;
@@ -2213,6 +2584,36 @@
 
 .mouth-sprite .monster-body {
   pointer-events: auto;
+}
+
+/* Toothpaste foam on the gum between the lips and the teeth being brushed (X-31, mouth.tsx `GumFoam`): each tooth's
+   a small layer of its own under the lips that fades in calmly over two beats as the brush reaches it – no bubbles
+   that rise or burst. */
+.gum-foam {
+  position: absolute;
+  left: 50%;
+  top: 50%;
+}
+
+.gum-foam > svg {
+  display: block;
+  width: 100%;
+  height: 100%;
+  overflow: visible;
+}
+
+.gum-foam.fades {
+  will-change: opacity;
+  animation: teeth-foam-in 1.07s ease-out both;
+}
+
+@keyframes teeth-foam-in {
+  from {
+    opacity: 0;
+  }
+  to {
+    opacity: 1;
+  }
 }
 
 .monster-sprite .monster-body,
@@ -2367,33 +2768,19 @@
   }
 }
 
-/* The glow of svg's monster-glow (r 21 round 3 units above the middle), as a soft round light behind the monster:
-   only just round it, so it stays on the tooth – a wider one lay over the gum like a second frame (user feedback,
-   November 2026). */
-.sprite-glow {
-  top: 14.7%;
-  left: 19.1%;
-  width: 61.8%;
-  height: 61.8%;
-  border-radius: 50%;
-  background: radial-gradient(closest-side, #fffbd1 50%, #ffd23ff2 72%, #ffb70300);
-  animation: glow-breathe 1.07s ease-in-out infinite alternate;
-}
-
-.monster-sprite.gone .sprite-glow {
-  animation: fade-out 0.3s ease-out forwards;
-}
-
 .teeth-play.paused .sprite-body,
-.teeth-play.paused .sprite-glow,
+.teeth-play.paused .gum-foam,
 .teeth-play.paused .monster-dust > i,
 .teeth-play.paused .lip-arrow {
   animation-play-state: paused;
 }
 
 @media (prefers-reduced-motion: reduce) {
-  .sprite-body,
-  .sprite-glow {
+  .sprite-body {
+    animation: none;
+  }
+
+  .gum-foam {
     animation: none;
   }
 

@@ -85,8 +85,8 @@ test("a chunk's closure follows its static imports, never a page loaded later", 
 });
 
 test("Umami counts on the site's host with and without www, wherever Pages serves it", () => {
-  expect(countedHosts("https://www.funforboth.com/")).toBe("www.funforboth.com,funforboth.com");
-  expect(countedHosts("https://funforboth.com/")).toBe("funforboth.com,www.funforboth.com");
+  expect(countedHosts("https://www.littlestepstogrow.com/")).toBe("www.littlestepstogrow.com,littlestepstogrow.com");
+  expect(countedHosts("https://littlestepstogrow.com/")).toBe("littlestepstogrow.com,www.littlestepstogrow.com");
 });
 
 /** What the script of `textsPreload` asks the browser to fetch, for a visitor with these languages, saved choice and user agent. */

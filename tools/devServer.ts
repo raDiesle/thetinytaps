@@ -31,7 +31,7 @@ const server = serveOnFreePort(askedPort(3000), {
   routes: { ...publicRoutes, [`${DEV_FILES}*`]: fileOf(SRC, DEV_FILES), "/*": index },
   development: { hmr: true, console: true },
 });
-console.log(`Fun for Both: http://localhost:${server.port}/`);
+console.log(`Little Steps to Grow: http://localhost:${server.port}/`);
 
 // Started by tools/dev.ts: when that ends without stopping this one (killed hard), end too instead of
 // keeping the port.

@@ -31,7 +31,7 @@ jobs:
       - run: bun install --frozen-lockfile
       # GitHub sets CI=true: tests that take seconds (`heavyTest`, src/heavyTest.ts) are skipped here, they ran before the commit.
       - run: bun run verify
-      # The site is served from the root of https://www.funforboth.com (repo settings → Pages → Custom domain).
+      # The site is served from the root of https://www.littlestepstogrow.com (repo settings → Pages → Custom domain).
       - run: bun run build
         env:
           # Cloudflare Web Analytics' site token: Settings → Secrets and variables → Actions → Variables.

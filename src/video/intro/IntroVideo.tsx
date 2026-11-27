@@ -9,7 +9,7 @@ const scene = (t: number) => <IntroScene t={t} />;
 
 /**
  * The intro of the YouTube videos (Y-01, user request, November 2026), reached from /management/ only: a shelf of
- * picture books, the Fun for Both book coming out and opening, and on its first page the name with Papa Fox and his
+ * picture books, the Little Steps to Grow book coming out and opening, and on its first page the name with Papa Fox and his
  * child sitting down on the o, with a sound of its own. It plays and records in the shared `VideoRecorder` like the
  * games' videos; `bun run video intro` makes the sharp file frame by frame through `?render`.
  */
@@ -21,9 +21,9 @@ export function IntroVideo() {
       title="Intro für die Videos"
       about={
         <>
-          Das Bücherregal, das Fun-for-Both-Buch kommt heraus und schlägt auf, auf seiner ersten Seite der Name mit Papa Fuchs und seinem Kind auf dem o. Noch
-          nirgends auf der Seite zu sehen, nur hier. Gestochen scharf in 1920 × 1080 bei 60 Bildern pro Sekunde macht es <code>bun run video intro</code> im
-          Projekt, Bild für Bild.
+          Das Bücherregal, das Buch „Little Steps to Grow“ kommt heraus und schlägt auf, auf seiner ersten Seite der Name mit Papa Fuchs und seinem Kind auf dem
+          o von „Grow“. Noch nirgends auf der Seite zu sehen, nur hier. Gestochen scharf in 1920 × 1080 bei 60 Bildern pro Sekunde macht es{" "}
+          <code>bun run video intro</code> im Projekt, Bild für Bild.
         </>
       }
       facts={[
@@ -32,7 +32,7 @@ export function IntroVideo() {
       ]}
       ready={ready}
       loading="Bilder …"
-      fileName={(extension) => `intro-fun-for-both.${extension}`}
+      fileName={(extension) => `intro-little-steps-to-grow.${extension}`}
       // The paper the intro fades in from, so the lead-in before it is not black.
       stageStyle={{ background: "#fffaf0" }}
       play={(onFinished) => <LivePlay seconds={INTRO_SECONDS} scene={scene} schedule={scheduleIntroSound} onFinished={onFinished} />}

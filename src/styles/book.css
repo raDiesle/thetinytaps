@@ -150,7 +150,7 @@
 
 /* ----- Headings: a book's title and chapters, printed, not jumping ----- */
 
-/* The name as on a book's title page (D-16): set in a book face, in ink, the small „for“ in italics. */
+/* The name as on a book's title page (D-16): set in a book face, in ink, the small „to“ in italics. */
 :root .logo {
   align-items: center;
   gap: 0 0.28em;
@@ -167,7 +167,7 @@
   animation: none;
 }
 
-:root .logo-for .logo-letter {
+:root .logo-to .logo-letter {
   color: var(--accent);
   font-size: 0.62em;
   font-style: italic;
@@ -599,7 +599,6 @@
 /* ----- Buttons, labels and panels: paper too, nothing glossy or app-like ----- */
 
 /* A printed book's pictures don't move by themselves: the sun's rays and the clouds stand still. */
-:root .sky-sun-rays,
 :root .sky-cloud {
   animation: none;
 }

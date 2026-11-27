@@ -2628,8 +2628,8 @@
   transform: rotate(calc(var(--tm-side) * 24deg));
 }
 
-/* Layers on keyframes written for the run (the Block House's cursor, the Treasure Tunnel's pickaxe, Up to the Moon's
-   fox, the Marble Jar's marbles), nested where a way is across, up and down and a size; what waits its turn wiggles a
+/* Layers on keyframes written for the run (the Block House's cursor, the Treasure Tunnel's pickaxe, the Lift's door
+   and flag, the Marble Jar's marbles), nested where a way is across, up and down and a size; what waits its turn wiggles a
    second at a time (`.tm-hop-wait`). At the end each stands where it landed. */
 .tm-hop {
   will-change: transform;
@@ -3058,484 +3058,56 @@
   opacity: 1;
 }
 
-/* Up to the Moon (H-127, jump.tsx): a world many screens tall (`.tm-jump-world`) moved up and down as one layer by
-   its camera's keyframes, written for the run (`.tm-hop`); inside it the fox rides on three more such layers (across,
-   up and down, its turn), going on at an even pace the whole run and floating gently once a second as it goes; the
-   cable car's basket and the lift's cabin ride on keyframes of their own along with it. Small layers by `transform`
-   alone. */
-.tm-jump-sky {
-  position: absolute;
-  inset: 0;
+/* Lift to the Top (H-127, lift.tsx): the tower many screens tall (`.tm-lift-world`) slides down as one layer on its
+   keyframes written for the run (`.tm-hop`) behind the cabin standing still; the top door's two halves ride in it on
+   keyframes of their own. The display's arrow scrolls up a dot at a time while the lift goes and the pulley on the
+   cabin's roof turns with it. Small layers by `transform` alone. */
+.tm-lift-arrow-box {
+  overflow: hidden;
 }
 
-.tm-jump-turn {
+.tm-lift-arrow {
   position: absolute;
-  inset: 0;
-}
-
-/* Its body squashing and stretching on every hop like a rubber ball, at its feet (keyframes written for the run). */
-.tm-jump-squash {
-  position: absolute;
-  inset: 0;
-  transform-origin: 50% 100%;
-}
-
-.tm-jump-bob {
-  position: absolute;
-  inset: 0;
-  transform-origin: 50% 100%;
+  inset: 0 0 -100%;
   will-change: transform;
-  animation: tm-jump-bob 1s infinite;
+  animation: tm-lift-arrow 1s steps(7, end) infinite;
 }
 
-.tm-jump-bob > svg,
-.tm-jump-star > svg,
-.tm-jump-carried > svg {
+.tm-lift-arrow > svg {
   display: block;
   width: 100%;
   height: 100%;
-  overflow: visible;
 }
 
-@keyframes tm-jump-bob {
-  0%,
-  100% {
-    transform: none;
-  }
-  50% {
-    transform: translateY(-3%);
-  }
-}
-
-/* The fox (jumpFox.tsx): one pose shown at a time (`.tm-jump-pose`, coming and going by `.tm-jump-fade`), each made of
-   still parts (`.tm-jump-part`: body, head) and the arms and legs it moves, each a small layer turning at its shoulder or
-   hip between `--tm-limb-a` and `--tm-limb-b` once a second (`.tm-jump-limb`), and the jetpack's flames flickering. */
-.tm-jump-pose,
-.tm-jump-part {
-  position: absolute;
-  inset: 0;
-}
-
-.tm-jump-part > svg {
-  display: block;
-  width: 100%;
-  height: 100%;
-  overflow: visible;
-}
-
-.tm-jump-limb {
-  will-change: transform;
-  animation: tm-jump-limb 0.5s ease-in-out infinite alternate;
-}
-
-@keyframes tm-jump-limb {
+@keyframes tm-lift-arrow {
   from {
-    transform: rotate(var(--tm-limb-a));
-  }
-  to {
-    transform: rotate(var(--tm-limb-b));
-  }
-}
-
-.tm-jump-flame {
-  transform-origin: 50% 81%;
-  will-change: transform;
-  animation: tm-jump-flame 0.2s ease-in-out infinite alternate;
-}
-
-@keyframes tm-jump-flame {
-  from {
-    transform: scaleY(0.8);
-  }
-  to {
-    transform: scaleY(1.12);
-  }
-}
-
-/* The cable car's basket and the lift's cabin: each a layer behind the fox and one over it, on the same keyframes. */
-.tm-jump-car > svg {
-  display: block;
-  width: 100%;
-  height: 100%;
-  overflow: visible;
-}
-
-/* The fox's poses, what it holds (the balloons, the parachute) and what waits for it (the balloons on the skyscraper's
-   roof, the jetpack on the highest cloud) come and go by `opacity` on keyframes written for the run; at the end each is
-   as the run leaves it (`--tm-end-o`). */
-.tm-jump-carried {
-  position: absolute;
-}
-
-.tm-jump-fade {
-  will-change: opacity;
-  animation: var(--tm-anim) var(--tm-ms) linear both;
-}
-
-.tm-done .tm-jump-fade {
-  animation: none;
-  opacity: var(--tm-end-o);
-  transform: none;
-}
-
-/* What lives round the fox while it climbs (user request, November 2026): the tree's crown swaying in the wind, birds
-   flapping across, puffs of wind drifting by, the stars of space twinkling and turning, a shooting star now and then,
-   fish swimming to and fro and bubbles rising in the lake – each a small layer on a loop of its own by `transform` and
-   `opacity` (durations and delays set inline), standing still once the run is done. */
-.tm-jump-life {
-  inset: 0;
-}
-
-.tm-jump-crown {
-  animation: tm-jump-sway 4.5s ease-in-out infinite alternate;
-}
-
-@keyframes tm-jump-sway {
-  from {
-    transform: rotate(-1.4deg);
-  }
-  to {
-    transform: rotate(1.4deg);
-  }
-}
-
-.tm-jump-bird {
-  animation: tm-jump-bird 30s linear infinite;
-}
-
-@keyframes tm-jump-bird {
-  0% {
-    transform: translate(0, 0);
-  }
-  25% {
-    transform: translate(calc(var(--tm-dx) * 0.25), -60%);
-  }
-  50% {
-    transform: translate(calc(var(--tm-dx) * 0.5), 20%);
-  }
-  75% {
-    transform: translate(calc(var(--tm-dx) * 0.75), -40%);
-  }
-  100% {
-    transform: translate(var(--tm-dx), 0);
-  }
-}
-
-.tm-jump-wing {
-  position: absolute;
-  inset: 0;
-  animation: tm-jump-flap 0.45s ease-in-out infinite alternate;
-}
-
-.tm-jump-wing > svg {
-  display: block;
-  width: 100%;
-  height: 100%;
-  overflow: visible;
-}
-
-@keyframes tm-jump-flap {
-  from {
-    transform: scaleY(1);
-  }
-  to {
-    transform: scaleY(-0.5);
-  }
-}
-
-.tm-jump-wind {
-  opacity: 0;
-  animation: tm-jump-wind 12s ease-in-out infinite;
-}
-
-@keyframes tm-jump-wind {
-  0% {
-    opacity: 0;
-    transform: translateX(0);
-  }
-  20% {
-    opacity: 0.7;
-  }
-  70% {
-    opacity: 0.7;
-  }
-  100% {
-    opacity: 0;
-    transform: translateX(110%);
-  }
-}
-
-.tm-jump-twinkle {
-  animation: tm-jump-twinkle 6s ease-in-out infinite;
-}
-
-@keyframes tm-jump-twinkle {
-  0% {
-    opacity: 1;
-    transform: rotate(0) scale(1);
-  }
-  50% {
-    opacity: 0.55;
-    transform: rotate(45deg) scale(0.55);
-  }
-  100% {
-    opacity: 1;
-    transform: rotate(90deg) scale(1);
-  }
-}
-
-.tm-jump-comet {
-  opacity: 0;
-  animation: tm-jump-comet 13s ease-in infinite 3s;
-}
-
-@keyframes tm-jump-comet {
-  0% {
-    opacity: 0;
-    transform: translate(0, 0);
-  }
-  1% {
-    opacity: 1;
-  }
-  8% {
-    opacity: 0;
-    transform: translate(400%, 380%);
-  }
-  100% {
-    opacity: 0;
-    transform: translate(400%, 380%);
-  }
-}
-
-.tm-jump-fish {
-  transform: scaleX(var(--tm-face));
-  animation: tm-jump-fish 16s linear infinite;
-}
-
-@keyframes tm-jump-fish {
-  0% {
-    transform: translateX(0) scaleX(var(--tm-face));
-  }
-  46% {
-    transform: translateX(var(--tm-dx)) scaleX(var(--tm-face));
-  }
-  50% {
-    transform: translateX(var(--tm-dx)) scaleX(calc(-1 * var(--tm-face)));
-  }
-  96% {
-    transform: translateX(0) scaleX(calc(-1 * var(--tm-face)));
-  }
-  100% {
-    transform: translateX(0) scaleX(var(--tm-face));
-  }
-}
-
-.tm-jump-bubble {
-  opacity: 0;
-  animation: tm-jump-bubble 8s ease-in infinite;
-}
-
-@keyframes tm-jump-bubble {
-  0% {
-    opacity: 0;
     transform: translateY(0);
   }
-  10% {
-    opacity: 0.9;
-  }
-  90% {
-    opacity: 0.9;
-  }
-  100% {
-    opacity: 0;
-    transform: translateY(var(--tm-dy));
-  }
-}
-
-/* The lake's water lying over the fox while it swims, so it is plainly under water. */
-.tm-jump-water {
-  background: rgb(116 192 252 / 0.32);
-}
-
-/* A star is caught on the way (`--tm-at`) as in a platform game: it pops up turning like a coin (its width going to
-   nothing and back, seen edge on) and shrinks away at the top, while its burst – a ring of light and six sparkles drawn
-   as one svg (`Burst`) – grows out of its middle, turning a little, and fades. Two small layers by `transform` and
-   `opacity`, never a layer per sparkle. */
-.tm-jump-star,
-.tm-jump-burst {
-  position: absolute;
-  inset: 0;
-}
-
-.tm-jump-burst {
-  inset: -100%;
-  animation: tm-jump-burst 0.55s ease-out var(--tm-at) both;
-}
-
-.tm-jump-burst > svg {
-  display: block;
-  width: 100%;
-  height: 100%;
-  overflow: visible;
-}
-
-@keyframes tm-jump-burst {
-  0% {
-    opacity: 0;
-    transform: scale(0.15) rotate(0);
-  }
-  12% {
-    opacity: 1;
-  }
-  55% {
-    opacity: 1;
-  }
-  100% {
-    opacity: 0;
-    transform: scale(1) rotate(25deg);
-  }
-}
-
-.tm-jump-star {
-  animation: tm-jump-caught 0.7s linear var(--tm-at) both;
-}
-
-@keyframes tm-jump-caught {
-  0% {
-    opacity: 1;
-    transform: none;
-    animation-timing-function: cubic-bezier(0.2, 0.8, 0.4, 1);
-  }
-  14% {
-    transform: translateY(-40%) scale(1.3);
-  }
-  30% {
-    transform: translateY(-85%) scale(0.06, 1.25);
-  }
-  46% {
-    transform: translateY(-115%) scale(1.15);
-  }
-  62% {
-    opacity: 1;
-    transform: translateY(-135%) scale(0.06, 1.1);
-  }
-  78% {
-    opacity: 1;
-    transform: translateY(-145%) scale(0.9);
-    animation-timing-function: ease-in;
-  }
-  100% {
-    opacity: 0;
-    transform: translateY(-150%) scale(0);
-  }
-}
-
-/* The cake: as the fox drops into it, the whole cake and its cherry give way to the smashed one, and its pieces
-   fly out in all directions (`CakeBits`) – each once, in an arc from the cake's top to its own place, turning as it
-   goes, then still. Shown only at the end. */
-.tm-jump-cake-smashed {
-  opacity: 0;
-}
-
-.tm-done .tm-jump-cake-smashed {
-  opacity: 1;
-}
-
-.tm-done .tm-jump-cake-whole,
-.tm-done .tm-jump-cherry {
-  opacity: 0;
-}
-
-.tm-jump-bits {
-  position: absolute;
-  inset: 0;
-  display: none;
-}
-
-.tm-done .tm-jump-bits {
-  display: block;
-}
-
-.tm-jump-bit-x,
-.tm-jump-bit-y,
-.tm-jump-bit-spin {
-  position: absolute;
-  inset: 0;
-}
-
-.tm-jump-bit-spin > svg {
-  display: block;
-  width: 100%;
-  height: 100%;
-  overflow: visible;
-}
-
-.tm-done .tm-jump-bit-x {
-  animation: tm-jump-bit-x var(--tm-fly) linear var(--tm-delay) both;
-}
-
-.tm-done .tm-jump-bit-y {
-  animation: tm-jump-bit-y var(--tm-fly) linear var(--tm-delay) both;
-}
-
-.tm-done .tm-jump-bit-spin {
-  animation: tm-jump-bit-spin var(--tm-fly) ease-out var(--tm-delay) both;
-}
-
-@keyframes tm-jump-bit-x {
-  from {
-    transform: translateX(var(--fx));
-  }
   to {
-    transform: none;
+    transform: translateY(-50%);
   }
 }
 
-@keyframes tm-jump-bit-y {
-  0% {
-    transform: translateY(var(--fy));
-    animation-timing-function: cubic-bezier(0.2, 0.7, 0.4, 1);
-  }
-  42% {
-    transform: translateY(var(--py));
-    animation-timing-function: cubic-bezier(0.6, 0, 0.8, 0.4);
-  }
-  100% {
-    transform: none;
-  }
+.tm-lift-pulley {
+  will-change: transform;
+  animation: tm-lift-pulley 1s ease-in-out var(--tm-pulley-turns, 1);
 }
 
-@keyframes tm-jump-bit-spin {
-  from {
-    transform: rotate(0deg) scale(0.4);
-  }
+@keyframes tm-lift-pulley {
   to {
-    transform: rotate(calc(var(--spin) + var(--rest))) scale(1);
+    transform: rotate(90deg);
   }
 }
 
-.tm-done .tm-jump-bob,
-.tm-done .tm-jump-star,
-.tm-done .tm-jump-burst,
-.tm-done .tm-jump-limb,
-.tm-done .tm-jump-flame,
-.tm-done .tm-jump-crown,
-.tm-done .tm-jump-bird,
-.tm-done .tm-jump-wing,
-.tm-done .tm-jump-fish,
-.tm-done .tm-jump-bubble,
-.tm-done .tm-jump-wind,
-.tm-done .tm-jump-twinkle,
-.tm-done .tm-jump-comet {
+.tm-done .tm-lift-pulley,
+.tm-done .tm-lift-arrow {
   animation: none;
 }
 
-.tm-done .tm-jump-star,
-.tm-done .tm-jump-burst,
-.tm-done .tm-jump-bubble,
-.tm-done .tm-jump-wind,
-.tm-done .tm-jump-comet {
-  visibility: hidden;
+.tm-lift-left .tm-left-glow {
+  inset: 0 6%;
+  border-radius: 40%;
+  background: radial-gradient(closest-side, rgb(255 246 190 / 0.9), rgb(255 230 140 / 0.5) 70%, transparent);
 }
 
 /* The bar along the bottom (`TimeBar`, user request, 22 November 2026): a paper track over nearly the whole width,
@@ -3641,9 +3213,9 @@
 }
 
 .tm-play[data-picture="jump"] .tm-bar {
-  --tm-bar-a: #d0ebff;
-  --tm-bar-b: #4c6ef5;
-  --tm-bar-flag: #f783ac;
+  --tm-bar-a: #ffe3e3;
+  --tm-bar-b: #e03131;
+  --tm-bar-flag: #fab005;
 }
 
 .tm-play[data-picture="caterpillar"] .tm-bar {

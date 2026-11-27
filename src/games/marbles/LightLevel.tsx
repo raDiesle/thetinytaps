@@ -43,7 +43,7 @@ import {
 } from "./light";
 import { clamp01, deg, easeOut, lerp, seg, hump } from "./machineKit";
 import { MachineStage, type Seen } from "./MachineStage";
-import { BAR_COLORS, type ScreenAt, STAR_POINTS, still } from "./parts";
+import { BAR_COLORS, type ScreenAt, Sprite, STAR_POINTS, still } from "./parts";
 import type { Pt } from "./path";
 import { INK, Picture, Sparkles } from "./scenery";
 
@@ -73,11 +73,12 @@ interface Hole {
 const disco = (t: number, seen: Seen) => (seen(DISCO.x - 760, DISCO.x + 760) ? t : 0);
 
 /**
- * The lava lamp's time, with its carousel and the shadows on the wall: once the camera has left them behind, the time the
- * paper bird landed on the globe, so blobs, carousel and shadows stand still off screen instead of going round to the end
- * (perf, A-36). Before they are reached `t` is earlier than that anyway.
+ * The lava lamp's time, with its carousel, the warm air and the shadows on the wall: from the moment the camera has left
+ * them behind for good on this screen (`lampRest`), they stand still instead of going round to the end. With `seen`'s
+ * half a screen to spare they kept going a screen away, and the machine's svg was painted again in every frame while
+ * the lighthouse swept the wall (A-36, A-42).
  */
-const lamp = (light: Light, t: number, seen: Seen) => (seen(LAVA.x - SHADOW.sweep - 300, LAVA.x + SHADOW.sweep + 300) ? t : Math.min(t, light.tGlobe));
+const lamp = (light: Light, t: number, seen: Seen) => Math.min(t, light.lampRest(seen.wide));
 
 /**
  * Level 8: the light chain (R-10). A dark children's room; one tap switches
@@ -111,6 +112,7 @@ export function LightLevel(props: LevelProps) {
       start={{ x: TORCH.x0 + 85, y: TORCH.lens.y, r: 100 }}
       over={(t, at, seen) => (
         <>
+          <GlobeTurning light={light} t={t} at={at} />
           <NightVeil light={light} t={t} at={at} />
           <DiscoSpots light={light} t={disco(t, seen)} at={at} />
           <LighthouseBeam light={light} t={t} at={at} />
@@ -128,17 +130,24 @@ export function LightLevel(props: LevelProps) {
               <StickerGlow light={light} t={t} green={`${ids}-green`} />
               <Rainbow light={light} t={t} />
               <StickLight light={light} t={t} green={`${ids}-green`} />
-              <LanternLight light={light} t={t} glow={`${ids}-glow`} />
               <LampLight light={light} t={t} glow={`${ids}-glow`} />
               <PaperBird light={light} t={t} />
-              <Fireflies light={light} t={t} glow={`${ids}-glow`} />
-              <LanternBars />
               <Sparkles x={LAMP.x} y={DOME_Y - 140} age={t - light.tLamp - 0.6} n={12} spread={300} />
               <Sparkles x={OWL.x} y={OWL.y - 40} age={t - light.tOwl} n={8} spread={140} />
             </>
           ),
         },
       ]}
+      top={(t, at) => (
+        <>
+          <StickersWaking light={light} t={t} at={at} green={`${ids}-green`} />
+          <LanternLight light={light} t={t} at={at} glow={`${ids}-glow`} />
+          <Fireflies light={light} t={t} at={at} glow={`${ids}-glow`} />
+          <Sprite at={at} x={LANTERN.x} y={LANTERN.y} pad={LANTERN.ry + 4}>
+            <LanternBars />
+          </Sprite>
+        </>
+      )}
       {...props}
     >
       {(t, seen) => (
@@ -675,44 +684,80 @@ const LANDS = [
   { lon: 4.9, lat: -0.55, s: 22 },
 ];
 
-/** The globe on its foot: dark until the paper bird presses the button, then it shines, wobbles and turns. */
+/**
+ * The globe on its foot: dark until the paper bird presses the button, then it shines, wobbles and turns. While it
+ * turns (`globeMoving`) its ball is a `Sprite` under the night (`GlobeTurning`), drawn here again once it stands:
+ * turning in the machine's svg it had the phone raster the band round it in every frame for eight seconds (A-42).
+ */
 function Globe({ light, t }: { light: Light; t: number }) {
+  return (
+    <>
+      <GlobeFoot press={light.globeButton(t)} />
+      {!light.globeMoving(t) && (
+        <g transform={`translate(${GLOBE.x} ${GLOBE.y})`}>
+          <GlobeBall glow={light.globeGlow(t)} turn={light.globeTurn(t)} wobble={light.globeWobble(t)} />
+        </g>
+      )}
+    </>
+  );
+}
+
+/** The globe's ball while it turns, a small layer of its own under the night (`over`, before `NightVeil`). */
+function GlobeTurning({ light, t, at }: { light: Light; t: number; at: ScreenAt }) {
+  if (!light.globeMoving(t)) return null;
+  return (
+    <Sprite at={at} x={GLOBE.x} y={GLOBE.y} pad={GLOBE_PAD}>
+      <GlobeBall glow={light.globeGlow(t)} turn={light.globeTurn(t)} wobble={light.globeWobble(t)} />
+    </Sprite>
+  );
+}
+
+/** Half the globe sprite's side: the ball, its brass meridian and the meridian's line. */
+const GLOBE_PAD = GLOBE.r + 24;
+
+/** The globe's stand, plinth and button, which never turn. */
+const GlobeFoot = still(function GlobeFoot({ press }: { press: number }) {
   const { x, y, r } = GLOBE;
-  const g = light.globeGlow(t);
-  const turn = light.globeTurn(t);
   const plinth = DESK.top - 24;
   return (
     <g>
       <rect x={x - 6} y={y + r} width="12" height={plinth - y - r} fill="#ffb703" stroke={INK} strokeWidth="3" />
       <rect x={x - 60} y={plinth} width="120" height="24" rx="8" fill="#8a5a2b" stroke={INK} strokeWidth="4" />
-      <ellipse cx={GLOBE_BUTTON.x} cy={GLOBE_BUTTON.y - 2 + 4 * light.globeButton(t)} rx="10" ry="6" fill="#ff5d73" stroke={INK} strokeWidth="3" />
-      <g transform={`rotate(${23 + light.globeWobble(t)} ${x} ${y})`}>
-        <circle cx={x} cy={y} r={r} fill="#34508f" />
-        <circle cx={x} cy={y} r={r} fill="#7fdcff" opacity={g} />
-        {LANDS.map((l, i) => {
-          const lon = l.lon + turn;
-          const front = Math.cos(lon);
-          if (front <= 0.05) return null;
-          const ring = r * Math.cos(l.lat);
-          return (
-            <ellipse
-              key={i}
-              cx={x + (ring - l.s * 0.3) * Math.sin(lon)}
-              cy={y + r * 0.85 * Math.sin(l.lat)}
-              rx={l.s * front * Math.cos(l.lat)}
-              ry={l.s * 0.6}
-              fill={g > 0.5 ? "#8ee07a" : "#4f7d55"}
-            />
-          );
-        })}
-        <circle cx={x - 26} cy={y - 30} r="12" fill="#fff" opacity={0.3 + 0.4 * g} />
-        <circle cx={x} cy={y} r={r} fill="none" stroke={INK} strokeWidth="4" />
-        <path d={`M${x} ${y + r + 12} A${r + 12} ${r + 12} 0 0 0 ${x} ${y - r - 12}`} fill="none" stroke={INK} strokeWidth="9" />
-        <path d={`M${x} ${y + r + 12} A${r + 12} ${r + 12} 0 0 0 ${x} ${y - r - 12}`} fill="none" stroke="#ffb703" strokeWidth="5" />
-      </g>
+      <ellipse cx={GLOBE_BUTTON.x} cy={GLOBE_BUTTON.y - 2 + 4 * press} rx="10" ry="6" fill="#ff5d73" stroke={INK} strokeWidth="3" />
     </g>
   );
-}
+});
+
+/** The globe's ball and meridian round 0, 0: `glow` how far it shines, `turn` in radians, `wobble` in degrees. */
+const GlobeBall = still(function GlobeBall({ glow: g, turn, wobble }: { glow: number; turn: number; wobble: number }) {
+  const { r } = GLOBE;
+  return (
+    <g transform={`rotate(${23 + wobble})`}>
+      <circle r={r} fill="#34508f" />
+      <circle r={r} fill="#7fdcff" opacity={g} />
+      {LANDS.map((l, i) => {
+        const lon = l.lon + turn;
+        const front = Math.cos(lon);
+        if (front <= 0.05) return null;
+        const ring = r * Math.cos(l.lat);
+        return (
+          <ellipse
+            key={i}
+            cx={(ring - l.s * 0.3) * Math.sin(lon)}
+            cy={r * 0.85 * Math.sin(l.lat)}
+            rx={l.s * front * Math.cos(l.lat)}
+            ry={l.s * 0.6}
+            fill={g > 0.5 ? "#8ee07a" : "#4f7d55"}
+          />
+        );
+      })}
+      <circle cx={-26} cy={-30} r="12" fill="#fff" opacity={0.3 + 0.4 * g} />
+      <circle r={r} fill="none" stroke={INK} strokeWidth="4" />
+      <path d={`M0 ${r + 12} A${r + 12} ${r + 12} 0 0 0 0 ${-r - 12}`} fill="none" stroke={INK} strokeWidth="9" />
+      <path d={`M0 ${r + 12} A${r + 12} ${r + 12} 0 0 0 0 ${-r - 12}`} fill="none" stroke="#ffb703" strokeWidth="5" />
+    </g>
+  );
+});
 
 /** A soft glow round something that shines, over the night. */
 function Halo({ x, y, r, k, glow }: { x: number; y: number; r: number; k: number; glow: string }) {
@@ -791,12 +836,13 @@ const Lighthouse = memo(function Lighthouse() {
 });
 
 /** The thin bars of the lantern's glass, in front of the fireflies flying round inside. */
+/** The lantern's bars in front of the fireflies, round the lantern's middle: a small still layer over them (`top`). */
 const LanternBars = memo(function LanternBars() {
-  const { x, y, rx, ry } = LANTERN;
+  const { rx, ry } = LANTERN;
   return (
     <g stroke={INK} strokeWidth="3">
       {[-rx / 2, 0, rx / 2].map((dx) => (
-        <line key={dx} x1={x + dx} y1={y - ry} x2={x + dx} y2={y + ry} />
+        <line key={dx} x1={dx} y1={-ry} x2={dx} y2={ry} />
       ))}
     </g>
   );
@@ -1069,11 +1115,21 @@ function NightVeil({ light, t, at }: { light: Light; t: number; at: (x: number, 
     if (!c || !box || !ctx) return;
     const w = Math.ceil(box.clientWidth / VEIL_PX);
     const h = Math.ceil(box.clientHeight / VEIL_PX);
+    // What is drawn, in the canvas's own pixels, rounded to a quarter of one (a screen pixel) and the dark to 1/256: the
+    // canvas is drawn again only when that changes, never for a hole that moved by a fraction no one sees (A-42: drawing
+    // it in every frame was the level's biggest piece of script on the old phone).
+    const px = (v: number) => Math.round((4 * v) / VEIL_PX) / 4;
     const a = at(-400, -200);
     const b = at(WORLD_W + 400, VIEW_H + 200);
-    const dark = light.dark(t);
-    const holes = nightHoles(light, t);
-    const key = JSON.stringify([w, h, a, b, dark, holes]);
+    const dark = Math.round(256 * light.dark(t)) / 256;
+    const room = [px(a.x), px(a.y), px(b.x - a.x), px(b.y - a.y)];
+    const fills: [number, number, number, number][] = [];
+    for (const hole of nightHoles(light, t)) {
+      const p = at(hole.x, hole.y);
+      const [x, y, r, k] = [px(p.x), px(p.y), px(hole.r * p.k), Math.round(256 * hole.k) / 256];
+      if (r > 0 && k > 0 && x + r >= 0 && y + r >= 0 && x - r <= w && y - r <= h) fills.push([x, y, r, k]);
+    }
+    const key = JSON.stringify([w, h, room, dark, fills]);
     if (key === drawn.current) return;
     drawn.current = key;
     if (c.width !== w) c.width = w;
@@ -1082,19 +1138,14 @@ function NightVeil({ light, t, at }: { light: Light; t: number; at: (x: number, 
     ctx.clearRect(0, 0, w, h);
     ctx.globalAlpha = dark;
     ctx.fillStyle = NIGHT;
-    ctx.fillRect(a.x / VEIL_PX, a.y / VEIL_PX, (b.x - a.x) / VEIL_PX, (b.y - a.y) / VEIL_PX);
+    ctx.fillRect(room[0], room[1], room[2], room[3]);
     // Each hole takes away from the dark as the svg mask's black circles did: 1 in the middle, 0.85 at 45 %, 0 at the rim.
     ctx.globalCompositeOperation = "destination-out";
     ctx.globalAlpha = 1;
-    for (const hole of holes) {
-      const p = at(hole.x, hole.y);
-      const x = p.x / VEIL_PX;
-      const y = p.y / VEIL_PX;
-      const r = (hole.r * p.k) / VEIL_PX;
-      if (r <= 0 || hole.k <= 0 || x + r < 0 || y + r < 0 || x - r > w || y - r > h) continue;
+    for (const [x, y, r, k] of fills) {
       const g = ctx.createRadialGradient(x, y, 0, x, y, r);
-      g.addColorStop(0, `rgba(0,0,0,${hole.k})`);
-      g.addColorStop(0.45, `rgba(0,0,0,${0.85 * hole.k})`);
+      g.addColorStop(0, `rgba(0,0,0,${k})`);
+      g.addColorStop(0.45, `rgba(0,0,0,${0.85 * k})`);
       g.addColorStop(1, "rgba(0,0,0,0)");
       ctx.fillStyle = g;
       ctx.fillRect(x - r, y - r, 2 * r, 2 * r);
@@ -1271,34 +1322,51 @@ function LampLight({ light, t, glow }: { light: Light; t: number; glow: string }
 }
 
 /** The fireflies: a dark little body with wings, and a tail that glows once they are awake. */
-function Fireflies({ light, t, glow }: { light: Light; t: number; glow: string }) {
+function Fireflies({ light, t, at, glow }: { light: Light; t: number; at: ScreenAt; glow: string }) {
   return (
-    <g>
+    <>
       {Array.from({ length: FIREFLIES }, (_, i) => {
         const f = light.fireflyAt(i, t);
         const awake = f.glow > 0.2;
-        // Wings beat while it flies, and rest while it sits (on the table, on the lamp): beating on, they had an old phone
-        // paint their band of the screen in every frame long after their flight (perf, A-36).
+        // Wings beat while it flies, and rest while it sits (on the table, on the lamp) and while it goes round in the
+        // lantern, small behind its bars: beating on, they had an old phone paint their band of the screen in every frame
+        // long after their flight (perf, A-36), and the six layers in every frame of the lighthouse's sweep (A-42).
         const before = light.fireflyAt(i, t - 1 / 30).pt;
-        const flying = clamp01(Math.hypot(f.pt.x - before.x, f.pt.y - before.y) / 2);
+        const flying = clamp01(Math.hypot(f.pt.x - before.x, f.pt.y - before.y) / 2) * (1 - f.inside);
         const flap = awake ? 18 * flying * Math.sin(Math.min(t, light.duration) * 38 + i) : 0;
         // Small enough to fit six in the jar, big enough to follow on a phone once the lid is open, small again in the
         // lighthouse's lantern, and a bit smaller round the lamp.
         const size = 1.2 + 0.5 * seg(t, light.tLid, light.tLid + 1) - 0.75 * f.inside - 0.3 * seg(t, light.tLamp - 2, light.tLamp);
         return (
-          <g key={i} transform={`translate(${f.pt.x} ${f.pt.y}) scale(${size})`}>
-            <circle r="40" fill={`url(#${glow})`} opacity={f.glow} />
-            <ellipse cx="-4" cy="-10" rx="11" ry="6" transform={`rotate(${-30 - flap} -4 -4)`} fill="#e8f6ff" opacity="0.85" stroke={INK} strokeWidth="1.5" />
-            <ellipse cx="6" cy="-10" rx="11" ry="6" transform={`rotate(${30 + flap} 6 -4)`} fill="#e8f6ff" opacity="0.85" stroke={INK} strokeWidth="1.5" />
-            <circle cx="-9" cy="2" r="10" fill={awake ? "#eaff5c" : "#8b9466"} stroke={INK} strokeWidth="2" />
-            <ellipse cx="5" cy="0" rx="9" ry="7" fill={INK} />
-            <circle cx="14" cy="-2" r="5" fill={INK} />
-          </g>
+          <Sprite key={i} at={at} x={f.pt.x} y={f.pt.y} pad={FIREFLY_PAD}>
+            <Firefly size={size} flap={flap} glow={f.glow} awake={awake} gradient={glow} />
+          </Sprite>
         );
       })}
-    </g>
+    </>
   );
 }
+
+/** Half the side of a firefly's own layer, in world units: its glow (40) at its biggest (1.7 times). */
+const FIREFLY_PAD = 70;
+
+/**
+ * One firefly round its own 0, 0, in a small layer of its own (`Sprite`): drawn in the front svg, six fireflies flying
+ * or going round in the lantern had the phone paint that world-sized svg again in every frame (A-42). `gradient` is the
+ * glow's id, defined with the fairy lights in the front svg of the same page.
+ */
+const Firefly = still(function Firefly({ size, flap, glow, awake, gradient }: { size: number; flap: number; glow: number; awake: boolean; gradient: string }) {
+  return (
+    <g transform={`scale(${size})`}>
+      <circle r="40" fill={`url(#${gradient})`} opacity={glow} />
+      <ellipse cx="-4" cy="-10" rx="11" ry="6" transform={`rotate(${-30 - flap} -4 -4)`} fill="#e8f6ff" opacity="0.85" stroke={INK} strokeWidth="1.5" />
+      <ellipse cx="6" cy="-10" rx="11" ry="6" transform={`rotate(${30 + flap} 6 -4)`} fill="#e8f6ff" opacity="0.85" stroke={INK} strokeWidth="1.5" />
+      <circle cx="-9" cy="2" r="10" fill={awake ? "#eaff5c" : "#8b9466"} stroke={INK} strokeWidth="2" />
+      <ellipse cx="5" cy="0" rx="9" ry="7" fill={INK} />
+      <circle cx="14" cy="-2" r="5" fill={INK} />
+    </g>
+  );
+});
 
 /** How long the lighthouse's band of light is drawn before CSS stretches it to its spot. */
 const BAND_LEN = 1000;
@@ -1378,22 +1446,41 @@ const BeamSpot = memo(function BeamSpot() {
   );
 });
 
-/** The lantern shining with the fireflies' light, and the lens inside turning with the lighthouse. */
-function LanternLight({ light, t, glow }: { light: Light; t: number; glow: string }) {
+/** Half the side of the lantern's light's own layer, in world units: its glow. */
+const LANTERN_GLOW_R = 170;
+
+/**
+ * The lantern shining with the fireflies' light, and the lens inside turning with the lighthouse: a small layer of its
+ * own under the fireflies (`top`), since the lens turning in the front svg had it painted again in every frame (A-42).
+ */
+function LanternLight({ light, t, at, glow }: { light: Light; t: number; at: ScreenAt; glow: string }) {
   const k = light.lanternGlow(t);
   if (k <= 0) return null;
-  const { x, y, rx, ry } = LANTERN;
   const a = light.lighthouseAngle(t);
   return (
-    <g>
-      <circle cx={x} cy={y} r="170" fill={`url(#${glow})`} opacity={k} />
-      <rect x={x - rx} y={y - ry} width={rx * 2} height={ry * 2} rx="8" fill={LIGHT} opacity={0.55 * k} />
-      <ellipse cx={x + 30 * Math.sin(a)} cy={y} rx={4 + 12 * Math.abs(Math.cos(a))} ry={ry - 10} fill="#fff" opacity={0.7 * k} />
-    </g>
+    <Sprite at={at} x={LANTERN.x} y={LANTERN.y} pad={LANTERN_GLOW_R}>
+      <LanternShine k={k} lens={30 * Math.sin(a)} width={4 + 12 * Math.abs(Math.cos(a))} gradient={glow} />
+    </Sprite>
   );
 }
 
-/** The stickers glowing green once the beam has passed over them, and on in the dark. */
+/** `LanternLight`'s drawing round the lantern's middle: how bright (`k`), and where the lens is and how wide it looks. */
+const LanternShine = still(function LanternShine({ k, lens, width, gradient }: { k: number; lens: number; width: number; gradient: string }) {
+  const { rx, ry } = LANTERN;
+  return (
+    <g>
+      <circle r={LANTERN_GLOW_R} fill={`url(#${gradient})`} opacity={k} />
+      <rect x={-rx} y={-ry} width={rx * 2} height={ry * 2} rx="8" fill={LIGHT} opacity={0.55 * k} />
+      <ellipse cx={lens} rx={width} ry={ry - 10} fill="#fff" opacity={0.7 * k} />
+    </g>
+  );
+});
+
+/**
+ * The stickers glowing green once the beam has passed over them, and on in the dark. While one wakes (`stickerWaking`)
+ * it is a `Sprite` over everything whose opacity the compositor fades (`StickersWaking`), and drawn here once it shines
+ * steadily: fading in the front layer, the five had the phone raster the band round them in every frame of the sweep (A-42).
+ */
 function StickerGlow({ light, t, green }: { light: Light; t: number; green: string }) {
   return (
     <g>
@@ -1405,19 +1492,42 @@ function StickerGlow({ light, t, green }: { light: Light; t: number; green: stri
       </defs>
       {STICKERS.map((s, k) => {
         const g = light.stickerGlow(k, t);
-        if (g <= 0) return null;
+        if (g <= 0 || light.stickerWaking(k, t)) return null;
         return (
           <g key={s.x} transform={`translate(${s.x} ${s.y})`} opacity={g}>
-            <circle r="64" fill={`url(#${green})`} opacity="0.6" />
-            <g fill="#c9ffb0" stroke="#5fd35a" strokeWidth="2.5" strokeLinejoin="round">
-              <StickerShape kind={s.kind} />
-            </g>
+            <LitSticker kind={s.kind} green={green} />
           </g>
         );
       })}
     </g>
   );
 }
+
+/** The stickers waking as the beam passes, each a small layer faded by its `opacity` (`top`, A-42). */
+function StickersWaking({ light, t, at, green }: { light: Light; t: number; at: ScreenAt; green: string }) {
+  return STICKERS.map((s, k) =>
+    light.stickerWaking(k, t) ? (
+      <Sprite key={s.x} at={at} x={s.x} y={s.y} pad={STICKER_GLOW_R} opacity={light.stickerGlow(k, t)}>
+        <LitSticker kind={s.kind} green={green} />
+      </Sprite>
+    ) : null,
+  );
+}
+
+/** How far a sticker's glow reaches round it. */
+const STICKER_GLOW_R = 64;
+
+/** A sticker shining, round 0, 0, with its glow (the gradient `green`, defined by `StickerGlow`). */
+const LitSticker = still(function LitSticker({ kind, green }: { kind: (typeof STICKERS)[number]["kind"]; green: string }) {
+  return (
+    <>
+      <circle r={STICKER_GLOW_R} fill={`url(#${green})`} opacity="0.6" />
+      <g fill="#c9ffb0" stroke="#5fd35a" strokeWidth="2.5" strokeLinejoin="round">
+        <StickerShape kind={kind} />
+      </g>
+    </>
+  );
+});
 
 /** The colours of the rainbow, from its top to its bottom. */
 const RAINBOW = ["#ff5d73", "#ff8c42", "#ffd23f", "#3ec300", "#3a86ff", "#8e7dff"];

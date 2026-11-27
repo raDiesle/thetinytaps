@@ -3,7 +3,7 @@ import { showStep, stepIndexInAddress, stepInAddress, stepOf } from "./stepAddre
 
 // A browser whose address only changes in place, as `history.replaceState` does.
 const real = globalThis.window;
-let href = "https://www.funforboth.com/abstillen/?seite=5";
+let href = "https://www.littlestepstogrow.com/abstillen/?seite=5";
 const replaced: string[] = [];
 globalThis.window = {
   location: {
@@ -35,7 +35,7 @@ test("a link's step is followed once, then the game's own steps go into the addr
   // The address already says it: nothing replaced.
   expect(replaced).toEqual([]);
   showStep("/abstillen/", 6);
-  expect(href).toBe("https://www.funforboth.com/abstillen/?seite=6");
+  expect(href).toBe("https://www.littlestepstogrow.com/abstillen/?seite=6");
   expect(stepOf("/abstillen/")).toEqual({ step: "6", count: 2 });
   // Once a step was shown, the address is the game's own: a game coming next doesn't start from it.
   expect(stepInAddress()).toBeUndefined();
@@ -43,7 +43,7 @@ test("a link's step is followed once, then the game's own steps go into the addr
 
 test("leaving takes the step out of the address and keeps it for the page's time", () => {
   showStep("/abstillen/", undefined);
-  expect(href).toBe("https://www.funforboth.com/abstillen/");
+  expect(href).toBe("https://www.littlestepstogrow.com/abstillen/");
   expect(stepOf("/abstillen/")).toEqual({ step: "6", count: 2 });
   expect(stepOf("/zaehne/")).toBeUndefined();
   // Another page counts from 1.

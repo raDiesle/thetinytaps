@@ -1,6 +1,6 @@
 ---
 name: neue-szene
-description: Create a new "Lebendige Bilder" scene (Wimmelbild) for Fun for Both, e.g. Bauernhof, Zoo or Stadt – drawing, items, texts, animations, sounds, keys and checks. Use when the user asks for a new scene/picture, or to add many items to one.
+description: Create a new "Lebendige Bilder" scene (Wimmelbild) for Little Steps to Grow, e.g. Bauernhof, Zoo or Stadt – drawing, items, texts, animations, sounds, keys and checks. Use when the user asks for a new scene/picture, or to add many items to one.
 ---
 
 # New scene for "Lebendige Bilder"

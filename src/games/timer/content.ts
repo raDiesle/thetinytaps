@@ -2,7 +2,7 @@ import type { Localized, Texts } from "@/lib/language";
 import type { TimerPicture, TurnPicture } from "./settings";
 import { BLOCKS_NAME } from "./blocksNames";
 import { TUNNEL_NAME } from "./tunnelNames";
-import { JUMP_NAME } from "./jumpNames";
+import { LIFT_NAME } from "./liftNames";
 import { JAR_NAME } from "./jarNames";
 import { MARBLE_NAME } from "./marbleNames";
 import { RACE_NAME } from "./raceNames";
@@ -39,7 +39,7 @@ export const tomorrowAt = (at: string): Localized => ({
 /** The pictures in their order on the start screen; „Weiter“ at the end goes on with the next, after the last the first. */
 export const PICTURES: { id: TimerPicture; emoji: string; name: Texts }[] = [
   // The order the user asked for (November 2026, last changed 25 November 2026): the red disc Kitas know first, then the
-  // hourglass, the apple tree, the alarm clock (H-70), the flower, Up to the Moon, the pizza, the candle, Tidy Up and
+  // hourglass, the apple tree, the alarm clock (H-70), the flower, Lift to the Top, the pizza, the candle, Tidy Up and
   // the rest; „Abwechseln“ last, in a group of its own on the start screen (`TimerGame`).
   {
     id: "disc",
@@ -54,8 +54,8 @@ export const PICTURES: { id: TimerPicture; emoji: string; name: Texts }[] = [
   { id: "apple", emoji: "🍎", name: { de: "Apfelbaum", en: "Apple Tree", zh: "苹果树", hi: "सेब का पेड़", es: "Manzano", ar: "شجرة التفاح", ru: "Яблоня" } },
   { id: "clock", emoji: "⏰", name: { de: "Wecker", en: "Alarm Clock", zh: "闹钟", hi: "अलार्म घड़ी", es: "Despertador", ar: "المنبّه", ru: "Будильник" } },
   { id: "flower", emoji: "🌸", name: { de: "Blume", en: "Flower", zh: "小花", hi: "फूल", es: "Flor", ar: "الزهرة", ru: "Цветок" } },
-  // Up to the Moon (H-127, rebuilt 23 November 2026; sixth, so it starts the second row of five most screens show, user request, 25 November 2026), a jump-and-run going up: a fox swims, hops up a tree, rides a cable car and a lift and flies from a lake up to the moon, the picture following it, then sails down into a cake.
-  { id: "jump", emoji: "🚀", name: JUMP_NAME },
+  // Lift to the Top (H-127, id `jump`: „Up to the Moon“ until 26 November 2026; sixth, so it starts the second row of five most screens show, user request, 25 November 2026): one tower with a big glass lift riding up, its red dot-matrix display counting the floors up to a hundred, never more than one a second, and the top floor's door opening at the end (its flag taken out, 27 November 2026).
+  { id: "jump", emoji: "🛗", name: LIFT_NAME },
   { id: "pizza", emoji: "🍕", name: { de: "Pizza", en: "Pizza", zh: "披萨", hi: "पिज़्ज़ा", es: "Pizza", ar: "البيتزا", ru: "Пицца" } },
   { id: "candle", emoji: "🕯️", name: { de: "Kerze", en: "Candle", zh: "蜡烛", hi: "मोमबत्ती", es: "Vela", ar: "الشمعة", ru: "Свеча" } },
   // Tidy Up (H-118): a toy crane puts the toys into the box, best at five minutes; written English first, translated on 22 November 2026.

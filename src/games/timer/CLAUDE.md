@@ -25,7 +25,7 @@ request, November 2026; the middle rather than the end, user feedback, November 
 `GameMode.art`): the very drawing of a run (`SceneParts`), cut as for 5 minutes and started half of it ago, every
 animation in it put at that moment and then stopped (`holdAt`, `.tm-card-art.tm-still`), so the menu stands still. The cards come as wide as
 the picture (`ART_ASPECT`). Names are only read out and their tooltip. They stand in the order the user chose (November
-2026, `PICTURES`; last changed 25 November 2026): Rote Scheibe, Sanduhr, Apfelbaum, Wecker, Blume, Up to the Moon (sixth, so it starts the second row where five cards stand in a row, as at 1280×800, 1440×900 and on a tablet), Pizza, Kerze, then Tidy Up, Block House, Treasure Tunnel and the others, the Marble Jar last, on one
+2026, `PICTURES`; last changed 25 November 2026): Rote Scheibe, Sanduhr, Apfelbaum, Wecker, Blume, Lift to the Top (sixth, so it starts the second row where five cards stand in a row, as at 1280×800, 1440×900 and on a tablet), Pizza, Kerze, then Tidy Up, Block House, Treasure Tunnel and the others, the Marble Jar last, on one
 frame with no name; after all of them Abwechseln is a category of its own, named on its frame „Abwechseln (bis 4)“
 (`TURNS_GROUP` in `playersNames.ts`, `GameMode.kind`; user request, 25 November 2026: the menu says that up to four
 children can play): its children's cushions, the lamps and the hourglass, then the Kugelbahn and the Rennstrecke, each
@@ -127,7 +127,8 @@ taken out (user request, November 2026). The pictures:
   sways a little every second. A tap makes the motor whirr and lights the toys still on the floor. Its name and lines
   were written English first and translated into every app language on 22 November 2026 (`tidyNames.ts`, their own
   part in `languageStatus.ts`); its lines wait for their recordings. The
-  Aufräumlied (H-119, a fixed five minutes with a Suno song) is an idea of its own, not built.
+  Aufräumlied (H-119, a fixed five minutes with a Suno song) is an idea of its own, not built; its words („Das Aufräum-Rennen“,
+  one fast song – the calm one is postponed, H-152) wait on `/management/lieder/` (`src/content/songDrafts.ts`).
 - „Block House“ 🧱 (`blocks.tsx`, H-125, user request, 22 November 2026: timers that look like a well-known kind of game
   played by itself, like a video, the first a block-building game for tidying up): on a meadow of square grass a
   jumble of blocks lies in three rows (`JUMBLE`, each a little tilted), beside a house's plan drawn in dashed outlines
@@ -166,70 +167,36 @@ taken out (user request, November 2026). The pictures:
   seconds, a shorter run only faster. A block going cracks, a tap gives the pickaxe's bright tink and
   lights the blocks still standing. Its name and lines (`tunnelNames.ts`) were written English first and translated
   into every app language at once.
-- „Up to the Moon“ 🚀 (`jump.tsx`, H-127: first „Hop to the Flag“ on one screen, 22 November 2026; rebuilt on user
-  request, 23 November 2026, as a climb through a world many screens tall – the old level was too small and simple –
-  and the same day once more with a fox and a world that makes sense): a jump-and-run going **up**, the picture
-  following the fox like a camera. The world (`WORLD_H`, six screens of 900) is one HTML layer moved by a transform on
-  keyframes written for the run (`tm-jump-cam`, `cameraAt`: the feet stand at `ANCHOR`, never looking past the world's
-  top or bottom), never a changing viewBox; its drawings are built once (`memo`). From the bottom: a lake on the left
-  (`SURFACE`, left of `SHORE`) with fish, seaweed and a sandy floor; the meadow (`GROUND`) with a
-  big tree (`TREE`) with wooden steps nailed to its trunk, left and right in turn as for a treehouse (`STEPS`), and the
-  treehouse on its crown (`DECK`, a hatch in its floor, a red roof, a flag), the cake, and the skyscraper (`SKYSCRAPER`)
-  with its glass lift's shaft up its side (`SHAFT`) and an open window; a rope from the treehouse's post to that window
-  for a cable car (`ROPE`); clouds; space with a ringed planet (`PLANET`) and the moon (`MOON`) at the top,
-  the sky's one gradient going from morning to night. Nothing stands in the water (user feedback, 23 November 2026:
-  high-rises in the lake made no sense). Each height has its own way to move (`SPOTS`, each with `by`; `MoveKind`): it
-  **swims** up from the lake's floor with a snorkel and a mermaid's tail (`Fin`, the legs together beating), **walks**
-  out of the water over the meadow to the tree (`walk`, swinging arms and legs), **hops** up the steps two at a time,
-  through the hatch into the treehouse and into the cable car's basket, **rides** the basket along the rope to the
-  skyscraper's window, hops over the sill into the glass lift and **rides it up** (`lift`) to the roof, takes the very
-  balloons waiting there on a wooden stand and **floats** hanging from them from cloud to cloud, floats in front of the
-  jetpack waiting on the highest cloud, which comes up and docks onto its back (`dockFrames`) as it lets the balloons
-  go, and **flies** with it by the planet and once round the moon (`ORBIT`, `ORBIT_R`, its spot's `slow`) before
-  landing on top of it. The figure is a
-  fox child (`jumpFox.tsx`, user request, 23 November 2026: arms it uses, better still a fox, „sehr gute Grafik“) drawn
-  with the shared `MascotHead`, `Arm`, `Foot` and `FoxTail` in a blue T-shirt with a star, with a pose of its own for
-  each kind of move (`FoxPose`, `POSE_OF`): swimming with a mask and snorkel, arms stroking and its fin beating; walking;
-  hopping with its arms
-  flapping; in the basket waving with a paw on the rim; in the lift pointing up; hanging from the balloons and the
-  parachute by both paws (`HANG_PAWS`, where the strings and cords end); flying with the jetpack on its back and its
-  flames; dropping with its arms up. Its arms and legs swing at their own pace as small layers (`.tm-jump-limb`), the
-  poses swap at once by opacity keyframes written for the run (`poseTimeline`, `poseLooks`). The basket and the lift's
-  cabin are cars of their own (`BASKET`, `CABIN`, `carFrames`): each waits where the fox gets in, goes with it step for
-  step and stays where it got out, in a back half behind the fox and a front half over it. The moves follow each other
-  with no wait (`jumpPlan`, `wayOf`, `trackAt`), with something under its feet all the way and the bounce once a
-  second: a hop is quick, `HOP_MS` a leap (user feedback, 23 November 2026: slow leaps looked odd), crouching on the
-  spot for its first `PUSH`, then an arc from point to point (`hopArc`, rising slower to its top and falling from it,
-  `LIFT` over its higher end, `timeShares`), its body squashing as it pushes off and lands and stretching in the air
-  like a rubber ball (`squashFrames`, `.tm-jump-squash` from its feet); the other ways share the time the hops leave by
-  their `PACE` – swimming, the lift, the balloons and the jetpack slowest – while the picture follows at an even pace.
-  It faces the way it goes (`.tm-jump-turn`). Over every move hangs a star, caught halfway (`starAt`) as in a platform
-  game: it pops up turning like a coin and shrinks away while a ring of light widens and six sparkles burst out
-  (`.tm-jump-star`, and `.tm-jump-burst`: ring and sparkles one drawing, `Burst`, never a layer per sparkle), with a bright two-note „ba-ding“ (`playCoin`). Round the way the
-  world lives a little (user request, 23 November 2026: „Luft … drehende bewegende Sterne … Vögel und Fische“): the
-  tree's crown sways in the wind (`TreeCrown`, `.tm-jump-crown`), puffs of wind drift through the sky, three birds flap
-  across behind the houses, the stars of space twinkle and turn, now and then a shooting star, and in the lake two fish
-  swim to and fro and bubbles rise (`SkyLife`, `LakeLife`) – each a small layer on a CSS loop of its own, standing
-  still at the end. The way down is a part of the timer, a fifth of the time (`DIVE_SHARE`): it leaps off the moon,
-  opens a parachute and sails down swaying from side to side (`swingCount`, `swingX`, `SWAY`, `SWING_MS`, tilting by
-  `TILT`) past everything it climbed, slowly enough to see each height go by, lets go above the cake (`RELEASE_Y`) and
-  drops into it spinning once (user feedback, 23 November 2026: the fall straight down in 4.5 s looked like a teleport).
-  The cake on the meadow – the goal seen from the first second – bursts: whole layers swap for a smashed one (a cracked
-  plate, the torn tiers, lumps and drips; `.tm-jump-cake-whole`, `.tm-jump-cake-smashed`) and pieces of cake, cream and
-  cherries fly in every direction over the whole picture and stay where they land, on the meadow, the lake, the tree's
-  trunk and steps and the skyscraper's wall (`BITS`, `BURST`, `.tm-jump-bit-x`/`-y`/`-spin`; user feedback: it should
-  be broken everywhere). What it carries and what waits for it come and go by opacity keyframes written for the run
-  (`gearLooks`, `shownFrames`: every keyframe names every property it changes, since a property left out of one is
-  passed over, not held); what waits is drawn exactly as the fox will hold it (`AsFoxAt`, `ownBox`, `FoxJetpack`), so
-  the two swap within one keyframe (`swapMs`). Every run makes all 24 moves from the lake to the moon (`MAX_MOVES`), a
-  shorter one only quicker. No enemies, no falling off, no count of
-  stars. A star caught plays a bright „ba-ding“ climbing the scale (spaced), the leap off the moon a whoosh, the landing a
-  plop; a tap boings and lights the stars still hanging. Its card shows the fox in the cable car's basket between the
-  treehouse and the skyscraper (`LATER` in `cardArt.tsx`, 0.23 of the run), since its middle is the lift with sky round
-  it and in space the fox is too small to see on a card. Its name and lines (`jumpNames.ts`) were written English first
-  and translated into every app language at once. The way, its stars and the cake stay within x 235–1340 (a tablet's
-  4:3 cut with the paper's margin; `timer.test.ts` checks).
-  **A game-look timer may be big** (user feedback with this rebuild): a world many screens tall or wide that the
+- „Lift to the Top“ 🛗 („Mit dem Aufzug nach oben“, `lift.tsx`, id `jump`, H-127; user request, 26 November 2026:
+  „nur ein Hochhaus mit einem Aufzug … man sieht groß den Aufzug und die Zahlen, die wie bei einem Aufzug langsam rot
+  hochzählen“ – it replaced „Up to the Moon“, a fox's jump-and-run from a lake to the moon, with its fox, cake and
+  recordings): one tall tower (`TOWER`, as many storeys of `STOREY` as the ride has floors, a roof with the lift's
+  machine room – its flagpole and flag taken out, user request, 27 November 2026) with a glass lift shaft up its front
+  (`SHAFT`). The cabin (`CAR`) stands still and big in the picture's
+  middle the whole run, a sunny yellow frame with big glass panes, a handrail and a plant inside, a pulley turning on
+  its roof (`Pulley`); the tower slides down behind it as one HTML layer (`tm-lift-world`, keyframes written
+  for the run by `worldFrames`, never a changing viewBox; the world is top-anchored, `levelOf(k, floors)`, `worldHOf`).
+  Inside it the tower is drawn in pieces of `PIECE` storeys, each its own small svg, and only the pieces near the cabin
+  are there (`Tower`, `piecesNear`, `pieceSpan`, checked every half second on the run's clock): drawn whole, 100
+  storeys were one svg about fifty screens tall in the sliding layer and stuttered six times in eight seconds on the
+  old phone (`bun run perf timer-aufzug`, 27 November 2026) – never draw a world many screens tall as one svg; the
+  long parts (wall, shaft, rails) have side lines only, so no line cuts the tower at a piece's seam. So the landing doors with the floor's number on a plate
+  beside them (`DOOR`, `plateOf`, wider for 100) pass behind the glass, and the clouds pass beside the tower. On the cabin's black panel
+  (`DISPLAY`) red dot-matrix digits (5 × 7 dots, `GLYPHS`, the unlit dots faint, three cells) count the floors from 0
+  up to 100, each turning as the lift is halfway to it (`floorAt`, `floorTurnsAt`) and **never more than one a second**
+  (user request, 27 November 2026: „es soll bis 100 gehen, aber … nicht mehr als ein Stockwerk pro Sekunde“):
+  `liftPlan` rides `MAX_FLOORS` where the time allows (from about two minutes) and else as many as leave
+  `MIN_STOREY_MS` for each (10 seconds: 7 floors) – the one picture whose count follows the time, by the user's wish, and an arrow beside them scrolls up a dot at a time
+  while it goes (`.tm-lift-arrow`, `steps(7)`). React draws only that small display, when the floor changes, on the
+  run's clock (`LiftDisplay`, `displayAt`). The lift starts gently and stops gently (`liftAt`: half a storey speeding up
+  and slowing down, an even pace between) and arrives a little before the end (`liftPlan`: at most `TOP_MS`, at most
+  `TOP_SHARE` of a short run); then the top floor's door slides open on a lit room (`TopDoor`) as the time is up. No
+  flag (a flag hoisted on the roof stood there from 26 to 27 November 2026 and was taken out, user request). Each floor passed plinks softly
+  (spaced), the arrival dings (always), the end twinkles; a tap clicks like a lift's button and lights the shaft still
+  above the cabin (`.tm-lift-left`). Its card is the middle as it is. Its name and lines (`liftNames.ts`) were written
+  English first and translated into every app language at once; they wait for their recordings (Up to the Moon's no
+  longer fit). Cabin, display and plates stay within x 235–1340 and y ≥ 80 (`timer.test.ts`).
+  **A game-look timer may be big** (user feedback with Up to the Moon, 23 November 2026): a world many screens tall or wide that the
   picture follows is welcome where it shows how far the way has come (here the heights), moved as one layer, and a
   long way is told by changing what the figure does on it (swim, hop, ride, float, fly) rather than by more of the
   same. A picture that is too simple or does not make sense (the Road Rug, whose car drove on while toys hopped off its
@@ -344,7 +311,7 @@ taken out (user request, November 2026). The pictures:
   the left it stood where a third mat goes, 25 November 2026). A tap lights the rest of the lap (`tm-race-ahead`, H-51).
   Its card shows the fox child's kart on the bridge (`LATER` 0.82). Only its name is new text (`raceNames.ts`, English
   first, in every app language); it says Abwechseln's lines. The children are the figures doing the run, the one
-  exception to „no fox or bear figure“ besides Up to the Moon (see the rules): fox and bear the shared `Mascot` child
+  exception to „no fox or bear figure“ (see the rules): fox and bear the shared `Mascot` child
   (`Driver` and the screen its `MascotHead`), the rabbit and the frog drawn in `race.tsx` in the same child's style,
   since `Mascot` has only fox and bear (`AnimalKid`, `AnimalHead`: a round head, eyes a little below its middle with a
   warm brown iris and two lights, rosy cheeks, `MASCOT_INK` round everything, `BODY` with chubby arms and round paws,
@@ -369,7 +336,7 @@ Files: `TimerGame.tsx` (start screen: cards, minutes and the own time's slip), `
 run: working out its length, the question when a clock time is past, the clock, the phases `running` →
 `blow` (candle only) → `done`, taps, the end, the sounds of the pieces), `pieces.ts` (how a run is cut into pieces, where
 the apples hang; tested), `SwapPlay.tsx` and `swap.tsx` („Abwechseln“: its turns, and its room,
-lamps and cushions), `players.tsx` (the children's names and photos: the rows behind ⚙️, `PlayerPatch` on their places; `playersNames.ts` its texts and the group's name), `marbleRun.tsx` (the Kugelbahn's run, cups and marbles; `marbleNames.ts` its texts), `race.tsx` (the Rennstrecke's track, kart, start light and children; `raceNames.ts` its name), `apples.tsx`, `caterpillar.tsx`, `clock.tsx`, `disc.tsx`, `flower.tsx`, `sunset.tsx`, `pizza.tsx`, `tidy.tsx`, `blocks.tsx`, `tunnel.tsx`, `jump.tsx`, `jar.tsx` (one picture each, `jumpFox.tsx` its fox's poses; `tidyNames.ts`, `blocksNames.ts`, `tunnelNames.ts`, `jumpNames.ts` and `jarNames.ts` their texts), `pause.tsx` (the run's clock, pause and start over), `keyframes.ts` (keyframes written for a run), `shown.tsx`
+lamps and cushions), `players.tsx` (the children's names and photos: the rows behind ⚙️, `PlayerPatch` on their places; `playersNames.ts` its texts and the group's name), `marbleRun.tsx` (the Kugelbahn's run, cups and marbles; `marbleNames.ts` its texts), `race.tsx` (the Rennstrecke's track, kart, start light and children; `raceNames.ts` its name), `apples.tsx`, `caterpillar.tsx`, `clock.tsx`, `disc.tsx`, `flower.tsx`, `sunset.tsx`, `pizza.tsx`, `tidy.tsx`, `blocks.tsx`, `tunnel.tsx`, `lift.tsx`, `jar.tsx` (one picture each; `tidyNames.ts`, `blocksNames.ts`, `tunnelNames.ts`, `liftNames.ts` and `jarNames.ts` their texts), `pause.tsx` (the run's clock, pause and start over), `keyframes.ts` (keyframes written for a run), `shown.tsx`
 
 („Zeit im Bild“: its choice, the note with digits or tally marks), `scenes.tsx` (the other drawings
 and the shared `Layer`, `Draw`, `LeftGlow`), `timer.css`, `content.ts`
@@ -377,6 +344,10 @@ and the shared `Layer`, `Draw`, `LeftGlow`), `timer.css`, `content.ts`
 
 ## Rules
 
+- **Music in the Timer belongs to a task** (user decision, 26 November 2026): a timer gets a song only as the song of
+  what the child does meanwhile – the Aufräumlied for tidying up (H-119, H-135) –, never a general countdown song
+  played under any picture (H-134, rejected: „allgemeine Timer-Lieder für Kinder sind Quatsch“). A video of a timer is
+  named by its task and length too („5 Minute Clean Up Timer“), the way parents search (study `youtube-timer-themen`).
 - The row of lengths stays one line on a phone on its side (844×390), with the own time's slip too: when it wraps, the
   last row of cards falls off the screen. A new length means narrower slips (`.tm-lengths`), never a second line.
 - **Progress is seen every second** (user feedback, November 2026): every picture moves a step a second that a child
@@ -387,10 +358,11 @@ and the shared `Layer`, `Draw`, `LeftGlow`), `timer.css`, `content.ts`
   grown). Many pieces mean many moments: their sounds are spaced (`PIECE_SOUND_GAP_MS`), never a din.
 - **Every length plays the whole story, only faster or slower** (user request, 24 November 2026): a picture's run is
   the same at 10 seconds as at 3 hours – every block, toy, apple, move and step of it, in the same order – and the
-  length only changes how fast it goes. Never leave a part out for a short time (a house already half built, a climb
+  length only changes how fast it goes – except where the user asks for a speed limit, as for the Lift's floors (at
+  most one a second, so a short time rides fewer; user request, 27 November 2026, `MIN_STOREY_MS`). Never leave a part out for a short time (a house already half built, a climb
   starting further up, fewer toys, a slip that only comes on a long share) nor add parts for a long one; what a step
   takes in fixed milliseconds is capped by its share (`Math.min(X_MS, share * …)`), so it shrinks with it. The counts
-  are constants (`MAX_APPLES`, `MAX_TOYS`, `MAX_BLOCKS`, `MAX_DIG`, `MAX_MOVES`), never worked out from the
+  are constants (`MAX_APPLES`, `MAX_TOYS`, `MAX_BLOCKS`, `MAX_DIG`, `FLOORS`), never worked out from the
   time (`timer.test.ts` checks `TimerPlay`'s scenes), the six candles too (`candlePlan`). What counts real minutes
   or seconds keeps doing so: the ladybug's lap, the caterpillar's bite a second.
 - **A bar along the bottom** (user request, 22 November 2026, H-124; `bar.tsx`): under every picture a paper track
@@ -504,7 +476,7 @@ and the shared `Layer`, `Draw`, `LeftGlow`), `timer.css`, `content.ts`
 - **One drawing for one thing**: a thing two pictures show (the hourglass) is one component both use, never copied and
   drawn again with its own sizes (user request, November 2026; `timer.test.ts` checks the hourglass).
 - **The cards' order is the user's** (November 2026, last changed 25 November 2026: Rote Scheibe, Sanduhr, Apfelbaum,
-  Wecker, Blume, Up to the Moon, Pizza, Kerze, then Tidy Up, Block House, Treasure Tunnel, the Raupe and Sonnenaufgang,
+  Wecker, Blume, Lift to the Top, Pizza, Kerze, then Tidy Up, Block House, Treasure Tunnel, the Raupe and Sonnenaufgang,
   then the Marble Jar; Abwechseln, Kugelbahn and Rennstrecke last): keep it when adding a picture (a new one goes after these, before Abwechseln, unless the
   user says otherwise), and add it to the perf scenarios' list in `tools/perfScenarios.ts`, which taps each card by its
   name (`timer.test.ts` checks the order). Abwechseln is another thing to do than the pictures that run until the time
@@ -516,18 +488,19 @@ and the shared `Layer`, `Draw`, `LeftGlow`), `timer.css`, `content.ts`
   for that moment and no more (`still`). Where the middle shows little (the Sonnenaufgang between moon and sun), the
   card takes a later moment (`LATER`) – look at every card (`timer.test.ts`).
 
-- **A figure on a way moves as it would in life** (user feedback on Up to the Moon, 23 November 2026): every kind of
+- **A figure on a way moves as it would in life** (user feedback on Up to the Moon, 23 November 2026; that picture is
+  gone, the rule stays for the next figure): every kind of
   move has a pose of its own that uses arms and legs for it – stroking and kicking in the water, flapping while it
   hops, holding on where it hangs or rides – and the kinds differ plainly; it goes only where it could in life (wooden
   steps nailed up a trunk, a cable car on a rope, a lift in its shaft, never a house standing in a lake or a hop higher
-  than a fox could leap; `timer.test.ts` checks the steps, the shore and every leap). Coming out of the water it walks
+  than a fox could leap). Coming out of the water it walks
   on the ground before it hops, and its gear fits where it is (a snorkel and a mermaid's tail in the water). A hop is
   quick and bouncy – pushing off from a crouch, the body squashing and stretching like a rubber ball – while gliding
   ways (swimming, a lift, balloons, space) go slowly (user feedback, 23 November 2026: slow hops looked odd).
 - **One thing changes hands, never two at once** (user feedback on Up to the Moon, 23 November 2026: the balloons
   waiting and the balloons held were seen at the same time): what waits for a figure is the very thing it then takes,
   drawn where the figure will hold it and swapped in one keyframe; what docks on (the jetpack) waits until the figure
-  is right in front of it and comes onto it there (`timer.test.ts` checks both).
+  is right in front of it and comes onto it there.
 - **Nothing beside the goal may look like it** (user feedback, 23 November 2026: a grey rock with a flat top looked
   like half a moon next to the moon) – a second thing of the goal's shape and colour goes.
 - **A game-look timer's world may live a little** (user request on Up to the Moon, 23 November 2026): wind, birds,
@@ -541,9 +514,7 @@ and the shared `Layer`, `Draw`, `LeftGlow`), `timer.css`, `content.ts`
   stick, the last candle going out by itself); where it is about the real children (Abwechseln), a thing of theirs
   stands for them (the cushions in the children's colours with their animals' ears, no face, and their names or photos). `timer.test.ts` checks that no picture draws one.
   Tennis, whose players were the shared `Mascot` children, was the one exception and is taken out (21 November 2026).
-  The one exception is Up to the Moon's fox child (`jumpFox.tsx`, user request, 23 November 2026): it is the figure doing
-  the run, never one standing by, drawn with the shared head, arms, feet and tail of `Mascot.tsx` – and the
-  Rennstrecke's children (`race.tsx`, 24 November 2026; fox, bear, rabbit and frog since 25 November 2026), the drivers
+  The one exception is the Rennstrecke's children (`race.tsx`, 24 November 2026; fox, bear, rabbit and frog since 25 November 2026), the drivers
   taking turns at the wheel: those whose turn comes wait on their mats at the line (fox and bear the shared `Mascot`
   child, rabbit and frog `AnimalKid` in its style), and the next hops in as the one before hops out.
 - **What grows, grows as a whole** (user feedback, November 2026): a plant rising gets bigger as it rises – its stalk
@@ -660,4 +631,4 @@ and the shared `Layer`, `Draw`, `LeftGlow`), `timer.css`, `content.ts`
   German and in its translations.
 - Its ideas are the area „Timer“ on `/management/` (`src/content/ideas/h-timer.ts`, H numbers shared with the
   Alltagshelfer): any time to set (H-59 to H-62), pictures that visibly change every second and show where they go,
-  also over long times (H-45, H-63 to H-69), timers like a game played by itself (H-125 to H-133; built so far: blocks, tunnel, jump-and-run – a new one takes a genre the others are not, for variety), and new pictures. A new timer idea goes there, not into the Alltagshelfer.
+  also over long times (H-45, H-63 to H-69), timers like a game played by itself (H-125 to H-133; built so far: blocks, tunnel, a lift ride (the jump-and-run it replaced, 26 November 2026) – a new one takes a genre the others are not, for variety), and new pictures. A new timer idea goes there, not into the Alltagshelfer.

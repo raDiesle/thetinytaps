@@ -45,14 +45,15 @@ export interface MascotStatusRow {
 export const MASCOT_STATUS: MascotStatusRow[] = [
   {
     href: "/timer/",
-    note: "Kein Fuchs und kein Bär mehr im Bild (Feedback November 2026: die gezeichneten Kinder sahen komisch aus). Beim Abwechseln liegen dafür zwei Sitzkissen in Fuchs- und Bärenfarbe, mit Fuchs- und Bärenohren auf dem Boden neben der Sanduhr; die Wippe (H-109), auf deren Sitzen sie lagen, ist wieder raus (Wunsch 25. November 2026). „Tennis“, wo Fuchskind und Bärenkind spielten, ist wieder raus (Wunsch 21. November 2026). Die eine Ausnahme ist „Up to the Moon“: dort ist das Fuchskind die Figur, die den ganzen Weg geht – schwimmt, die Holzstufen am Baum hochhüpft, Seilbahn und Glasaufzug fährt, an Ballons hängt und mit dem Raketenrucksack fliegt (Wunsch 23. November 2026, `jumpFox.tsx` mit dem gemeinsamen Kopf). Ebenso die „Rennstrecke“ (24. November 2026, `race.tsx`): Fuchskind und Bärenkind sind die Fahrer, die sich am Steuer des Karts abwechseln – das eine fährt seine Runde, das andere wartet auf seiner Matte an der Ziellinie und hüpft hinein, wenn das erste aussteigt.",
+    note: "Kein Fuchs und kein Bär mehr im Bild (Feedback November 2026: die gezeichneten Kinder sahen komisch aus). Beim Abwechseln liegen dafür zwei Sitzkissen in Fuchs- und Bärenfarbe, mit Fuchs- und Bärenohren auf dem Boden neben der Sanduhr; die Wippe (H-109), auf deren Sitzen sie lagen, ist wieder raus (Wunsch 25. November 2026). „Tennis“, wo Fuchskind und Bärenkind spielten, ist wieder raus (Wunsch 21. November 2026). „Up to the Moon“, wo das Fuchskind die Figur war, die den ganzen Weg ging (Wunsch 23. November 2026), ist seit dem 26. November 2026 ein Hochhaus mit einem Aufzug ohne Figur (Wunsch). Die eine Ausnahme ist die „Rennstrecke“ (24. November 2026, `race.tsx`): Fuchskind und Bärenkind sind die Fahrer, die sich am Steuer des Karts abwechseln – das eine fährt seine Runde, das andere wartet auf seiner Matte an der Ziellinie und hüpft hinein, wenn das erste aussteigt.",
     tasks: [
       {
-        label: "Fuchskind läuft den Weg bei „Up to the Moon“, mit eigener Haltung für jede Art der Bewegung",
+        label:
+          "Fuchskind läuft den Weg bei „Up to the Moon“, mit eigener Haltung für jede Art der Bewegung (26. November 2026 mit dem Bild ersetzt durch den Aufzug)",
         work: "drawing",
         effort: "M",
         idea: "H-127",
-        state: "done",
+        state: "removed",
       },
       {
         label: "Fuchs- oder Bärenkind, wo es im Bild etwas tut (Erntewagen, Gartenschlauch, Kerze, Abwechseln)",
@@ -539,9 +540,9 @@ export const MASCOT_STATUS: MascotStatusRow[] = [
   },
   {
     href: "/",
-    note: "Cover und Familien neben dem Bücherregal sind Gemini-Bilder (components/bilder) mit Fuchs- und Bärenfamilie – so bleibt es; im Titel „Fun for Both“ ist das o von „Both“ ein Gemini-Bild: Papa Fuchs sitzt auf dem Buchstaben, sein Kind auf dem Schoß, und liest ihm vor; eine große und eine kleine Fußspur führen unter dem Namen zu ihnen.",
+    note: "Cover und Familien neben dem Bücherregal sind Gemini-Bilder (components/bilder) mit Fuchs- und Bärenfamilie – so bleibt es; im Titel „Little Steps to Grow“ ist das o von „Both“ ein Gemini-Bild: Papa Fuchs sitzt auf dem Buchstaben, sein Kind auf dem Schoß, und liest ihm vor; eine große und eine kleine Fußspur führen unter dem Namen zu ihnen.",
     tasks: [
-      { label: "Titel „Fun for Both“ auf Startseite, Cover, Manifest, Suchmaschinen", work: "drawing", effort: "S", idea: "D-16", state: "done" },
+      { label: "Titel „Little Steps to Grow“ auf Startseite, Cover, Manifest, Suchmaschinen", work: "drawing", effort: "S", idea: "D-16", state: "done" },
       { label: "Startseite als Wald mit Fuchsbau und Bärenhöhle, Fuchs oder Bär mit seinem Kind in jeder Welt", work: "drawing", effort: "M", idea: "D-17" },
       {
         label: "Fuchs- oder Bärenkind und sein Großer klatschen am Ende jedes Spiels (GameEnd)",
