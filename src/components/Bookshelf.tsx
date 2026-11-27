@@ -527,10 +527,10 @@ function BookBundle({ volumes, take }: { volumes: ShelfBook[]; take: (book: Shel
  * The Belohnungstafel's calendar (user request, 26 November 2026: one thing instead of three books tied together): a
  * ring-bound desk calendar standing on the board as a tent – its pages leaning back on a cardboard stand behind them,
  * the two meeting in the rings on top like an upside-down V (user request, 26 November 2026: it should stand and look
- * 3D). Its page shows a day's plan under its name „Zeitplan & Belohnungstafel“ with a gear: two of the Tagesplan's
- * pictures side by side and as big as the page allows on a sunny and a sky-blue band, „Morning“ and „Afternoon“ small in
- * each band's bottom left corner, and a small star at the middle of each picture's foot (user requests, 27 November
- * 2026) – no reward, no plain white page (user request, 26 November 2026: small pictures on white paper with the reward
+ * 3D). Its page shows a day's plan under its name „Zeitplan & Belohnungstafel“, set big like the picture books'
+ * titles, with a gear: two of the Tagesplan's pictures side by side and as big as the page allows on a sunny and a
+ * sky-blue band filling the page, a small star at the middle of each picture's foot, and „Morning“ and „Afternoon“ small
+ * in the middle between the two stars (user requests, 27 November 2026) – no reward, no plain white page (user request, 26 November 2026: small pictures on white paper with the reward
  * looked boring). Last on its board, it stands at the right wall, turned to face left into the room, its stand touching
  * the wall and its front page clear of the post
  * (user request, 27 November 2026). One tap takes it out and opens the Zeitplan in
@@ -591,7 +591,9 @@ function ShelfCalendar({ book, onClick }: { book: ShelfBook; onClick: (e: MouseE
         <span className="shelf-book-cover shelf-calendar-sheet">
           <CalendarRings />
           <span className="shelf-calendar-head" aria-hidden>
-            <span className="shelf-calendar-title">{t(CALENDAR_TITLE)}</span>
+            <span className="shelf-calendar-title" style={{ "--len": longestWord(t(CALENDAR_TITLE)) } as CSSProperties}>
+              {t(CALENDAR_TITLE)}
+            </span>
             <CalendarGear />
           </span>
           <span className="shelf-calendar-day">
@@ -651,6 +653,11 @@ const CALENDAR_TITLE: EnglishFirst = {
   ar: "الجدول ولوحة المكافآت",
   ru: "Расписание и награды",
 };
+
+/** How many letters the longest word of a name has: what its size must fit into one line of the calendar's head. */
+function longestWord(name: string): number {
+  return Math.max(...name.split(/\s+/).map((word) => [...word].length));
+}
 
 /** A gear beside the calendar's name, in the band's cream: a tap on the calendar opens the editor to set it up. */
 function CalendarGear() {

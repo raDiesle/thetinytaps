@@ -668,13 +668,15 @@ A game may give it before its end where reaching the goal once is enough (Ketten
   depends on each screen's perspective, so `ShelfCalendar` measures the room before the wall in the page
   (`--wall-room`, `WALL_TOUCH`), never a fixed margin – within the compartment's depth (`--d`) and with its foot on the
   board, so look at it at 844×390, 1024×768, 1280×720 and 1920×1080 after changing them. Its page is never plain white:
-  a red band under the rings with the name „Zeitplan & Belohnungstafel“ and a gear beside it (`CALENDAR_TITLE`,
-  `CalendarGear`), then a sunny and a sky-blue band – one over the other, or side by side where the page grew wide
-  (`.shelf-calendar-day`) – each with two of the Tagesplan's pictures side by side, as big as the page allows
-  (`CALENDAR_PARTS`, `bilder/kalender-*.webp`, cut from `src/games/rewards/bilder/`), „Morning“ and „Afternoon“ small
-  in each band's bottom left corner, never big over the pictures, and at the middle of each picture's foot a small
-  golden star in a round field, half on the picture and half below it (`CalendarStar`, user requests, 27 November
-  2026) – no reward, no names of the pictures (same request: small pictures on white paper looked boring) – one tap takes it out
+  a red band under the rings with the name „Zeitplan & Belohnungstafel“ set as the picture books' titles are – the same
+  letters, weight and size, on two balanced lines, never a small line of its own style (`.shelf-calendar-title`) – and
+  a gear beside it (`CALENDAR_TITLE`, `CalendarGear`), then a sunny and a sky-blue band filling the page with only a
+  thin margin of white – one over the other, or side by side where the page grew wide (`.shelf-calendar-day`) – each
+  with two of the Tagesplan's pictures side by side, as big as the page allows (`CALENDAR_PARTS`,
+  `bilder/kalender-*.webp`, cut from `src/games/rewards/bilder/`), at the middle of each picture's foot a small golden
+  star in a round field, half on the picture and half below it (`CalendarStar`), and „Morning“ and „Afternoon“ small on
+  a tag in the middle between the two stars, on their line – never big over the pictures, nor a row of their own under
+  the stars, which took the pictures' room (user requests, 27 November 2026) – no reward, no names of the pictures (same request: small pictures on white paper looked boring) – one tap takes it out
   and opens the Zeitplan straight in its editor (`calendarHref`, router state `OPEN_EDITOR`), where a quick row reaches
   the other two (`src/games/rewards/CLAUDE.md`); every part's way back puts the calendar back. The single books stand thick enough to hit with a finger on a
   phone (`DAILY_SPINE`, widened again in November 2026 when they were still hard to hit), and lean a little differently, as books do.
