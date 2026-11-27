@@ -4,16 +4,15 @@ import type { TargetLanguage, TargetLanguageId } from "@/content/targetLanguages
 import { type Daytime, type DayLog, dayKey, withoutOldDays } from "@/lib/days";
 import { readStored, writeStored } from "@/lib/storage";
 
-// Brushing in the morning looks different from brushing at night: the sun
-// rises or the moon is out, crumbs from breakfast or pyjamas before bed. The
-// week chart keeps a star for every morning and every evening brushed.
+// Brushing in the morning looks different from brushing at night: breakfast or
+// sweets in the story, pyjamas before bed, a hello and a goodbye of its own. How the
+// sugar grows into monsters is the same at any time of day (user request, November
+// 2026). The week chart keeps a star for every morning and every evening brushed.
 
 /** What is said and shown differently in the morning and the evening, in one language. */
 export interface DaytimeTexts {
   /** Said before the first cue. */
   hello: string;
-  /** Said while the sugar crumbs grow into monsters: over the day before the evening brushing, over the night before the morning one. */
-  grow: string;
   /** Said after spitting out at the end. */
   after: string;
 }
@@ -22,12 +21,10 @@ export interface DaytimeTexts {
 export const DAYTIME: Record<Daytime, DaytimeTexts> = {
   morning: {
     hello: "Guten Morgen!",
-    grow: "In der Nacht wachsen daraus Zuckermonster.",
     after: "Jetzt kann der Tag losgehen!",
   },
   evening: {
     hello: "Bald ist Schlafenszeit.",
-    grow: "Den ganzen Tag über wachsen daraus Zuckermonster.",
     after: "Jetzt ab ins Bett. Gute Nacht!",
   },
 };

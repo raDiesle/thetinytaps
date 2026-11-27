@@ -5,17 +5,17 @@ import type { EnglishFirst, Localized, Texts } from "@/lib/language";
 // recordings (src/content/recordedLines.ts) reads it without loading the game's drawings.
 
 /**
- * Before the clock starts: where the monsters come from, get the brush, toothpaste on, see them in the mirror, roar like
- * a lion beside a lion (X-26, a step of its own), and back in the mirror with the mouth still wide open, so it is open
- * before the song begins.
+ * Before the clock starts: where the monsters come from, get the brush, toothpaste on, then straight to the lion (X-26):
+ * the lion seen beside the child, then roaring with it, a phase of its own (user requests, November 2026); only then the
+ * mirror, the mouth already wide open, and the monsters seen on the teeth before the song begins.
  */
-export type Prelude = "sweets" | "grow" | "brush" | "paste" | "monsters" | "lion" | "roar";
+export type Prelude = "sweets" | "grow" | "brush" | "paste" | "lion" | "roar" | "monsters";
 
 /**
  * What each part before the clock is called (on the progress bar) and what the voice says in it; its timing and sounds
- * are added in TeethPlay.tsx. A part with no `cue` says nothing – but for `grow`, which says the daytime's line.
+ * are added in TeethPlay.tsx. A part with no `cue` says nothing.
  */
-export const PRELUDE_TEXTS: Record<Prelude, { title: Texts; cue?: Localized }> = {
+export const PRELUDE_TEXTS: Record<Prelude, { title: Texts; cue?: Texts }> = {
   sweets: {
     title: {
       de: "🍭 Süßes essen",
@@ -36,6 +36,7 @@ export const PRELUDE_TEXTS: Record<Prelude, { title: Texts; cue?: Localized }> =
       ru: "Ммм, сладкое! Немного сахара остаётся на зубках.",
     },
   },
+  // The same at any time of day (user request, November 2026: before, the night or the day went by).
   grow: {
     title: {
       de: "👾 Zuckermonster wachsen",
@@ -45,6 +46,15 @@ export const PRELUDE_TEXTS: Record<Prelude, { title: Texts; cue?: Localized }> =
       es: "👾 Crecen los monstruos de azúcar",
       ar: "👾 وحوش السكر تكبر",
       ru: "👾 Растут сахарные монстры",
+    },
+    cue: {
+      de: "Aus dem Zucker wachsen kleine Zuckermonster.",
+      en: "The sugar grows into little sugar monsters.",
+      zh: "糖慢慢长成了小小的糖怪兽。",
+      hi: "इस चीनी से छोटे-छोटे चीनी-मॉन्स्टर बन जाते हैं।",
+      es: "El azúcar se convierte en pequeños monstruos de azúcar.",
+      ar: "من السكر تنمو وحوش سكر صغيرة.",
+      ru: "Из сахара вырастают маленькие сахарные монстры.",
     },
   },
   brush: {
@@ -107,9 +117,22 @@ export const PRELUDE_TEXTS: Record<Prelude, { title: Texts; cue?: Localized }> =
       ru: "Ой-ой, вот они! Давай прогоним их щёткой!",
     },
   },
-  // The child roars like a lion, gets a lion costume's mane, and a lion beside it roars along (X-26, written English
-  // first): no voice tells it, the picture and the roars do.
+  // The lion seen close, then the child beside it in a lion costume's mane (X-26, written English first): no voice, the
+  // picture tells it.
   lion: {
+    title: {
+      en: "🦁 Here comes the lion",
+      de: "🦁 Da kommt der Löwe",
+      zh: "🦁 狮子来了",
+      hi: "🦁 शेर आ गया",
+      es: "🦁 Llega el león",
+      ar: "🦁 جاء الأسد",
+      ru: "🦁 Вот и лев",
+    },
+  },
+  // Roaring with the lion, a phase of its own (user request, November 2026): the voice asks the child to roar along,
+  // then three marks fill one after the other and both roar each time one is full (lion.tsx).
+  roar: {
     title: {
       en: "🦁 Roar like a lion",
       de: "🦁 Brüllen wie ein Löwe",
@@ -119,17 +142,14 @@ export const PRELUDE_TEXTS: Record<Prelude, { title: Texts; cue?: Localized }> =
       ar: "🦁 نزأر مثل الأسد",
       ru: "🦁 Рычим, как лев",
     },
-  },
-  // Back in the mirror the mouth is still wide open for 3, 2, 1, and the child in front of it keeps it open too.
-  roar: {
-    title: {
-      en: "🦁 Open wide like a lion",
-      de: "🦁 Mund auf wie ein Löwe",
-      zh: "🦁 像狮子一样张大嘴",
-      hi: "🦁 शेर की तरह मुँह खोलो",
-      es: "🦁 Boca abierta como un león",
-      ar: "🦁 نفتح الفم مثل الأسد",
-      ru: "🦁 Рот пошире, как у львёнка",
+    cue: {
+      en: "Now roar with the lion! Really loud – three times!",
+      de: "Jetzt brüllst du mit dem Löwen! Ganz laut – dreimal!",
+      zh: "现在和狮子一起吼！大声吼——吼三次！",
+      hi: "चलो, शेर के साथ दहाड़ें! ज़ोर से – तीन बार!",
+      es: "¡Ahora ruge con el león! ¡Bien fuerte, tres veces!",
+      ar: "هيّا نزأر مع الأسد! بصوت عالٍ – ثلاث مرات!",
+      ru: "Теперь рычи вместе со львом! Громко – три раза!",
     },
   },
 };

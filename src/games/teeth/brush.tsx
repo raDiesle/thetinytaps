@@ -204,7 +204,10 @@ export interface Fleck {
   kind: "clump" | "bubble" | "dot";
 }
 
-/** The foam's flecks, the first few there at once, the rest coming the longer the child brushes. */
+/**
+ * The foam's flecks, the first two there at once, the rest coming the longer the child brushes – few in all (user
+ * request, November 2026: fewer foam bubbles; twelve were too many).
+ */
 export const FOAM: Fleck[] = [
   { at: [-15, 8, -3], r: 3, kind: "clump" },
   { at: [-3, -9, -2], r: 2, kind: "bubble" },
@@ -213,14 +216,11 @@ export const FOAM: Fleck[] = [
   { at: [2, 2, 1], r: 1.6, kind: "bubble" },
   { at: [-20, -6, -1], r: 2, kind: "clump" },
   { at: [-9, 11, 0], r: 0.9, kind: "dot" },
-  { at: [13, 1, 0], r: 2.6, kind: "clump" },
-  { at: [-12, -1, 1], r: 1.3, kind: "bubble" },
-  { at: [20, 10, -3], r: 1.1, kind: "dot" },
-  { at: [4, -12, -1], r: 1.7, kind: "clump" },
-  { at: [-24, 3, -4], r: 1.5, kind: "bubble" },
 ];
 /** The foam's faint edge, so it still shows on white teeth. */
 export const FOAM_EDGE = "#d6e9f5";
+/** How many of the foam's flecks are there as soon as the brush brushes. */
+export const FOAM_FIRST = 2;
 /** Seconds of brushing until all the foam is there. */
 const FOAM_FULL_S = 30;
 
@@ -404,7 +404,7 @@ export function Brush({
   const order = brushOrder({ u: project.facing(pose.u), w: project.facing(w), b: project.facing(pose.b) });
   const backShows = project.facing(scale(pose.b, -1)) > 0;
   const brushed = (now - since.current) / 1000;
-  const foamCount = Math.min(FOAM.length, 4 + Math.floor(((FOAM.length - 4) * brushed) / FOAM_FULL_S));
+  const foamCount = Math.min(FOAM.length, FOAM_FIRST + Math.floor(((FOAM.length - FOAM_FIRST) * brushed) / FOAM_FULL_S));
   const foam = (
     <g className="brush-foam" opacity={0.85}>
       {FOAM.slice(0, foamCount).map((fleck, i) => {

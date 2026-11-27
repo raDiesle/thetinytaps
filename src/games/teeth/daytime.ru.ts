@@ -5,12 +5,10 @@ import type { DaytimeTexts } from "./daytime";
 export const DAYTIME_RU: Record<Daytime, Partial<DaytimeTexts>> = {
   morning: {
     hello: "Доброе утро!",
-    grow: "За ночь из него вырастают сахарные монстры.",
     after: "Теперь можно начинать день!",
   },
   evening: {
     hello: "Скоро спать.",
-    grow: "За день из него вырастают сахарные монстры.",
     after: "А теперь в кроватку. Спокойной ночи!",
   },
 };

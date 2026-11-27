@@ -47,11 +47,13 @@ test("the foam is a few small bubbles at the gum line, on the gum and a little o
   expect(GUM_FOAM.some((b) => b.down < 0)).toBe(true);
 });
 
-test("how much foam a tooth gets differs clearly from its neighbour, often only one bubble, and few in all", () => {
+// Then fewer bubbles still (user request, November 2026): about one a tooth, some teeth none.
+test("how much foam a tooth gets differs clearly from its neighbour, often one bubble or none, and few in all", () => {
   expect(FOAM_AMOUNTS).toContain(1);
-  expect(Math.max(...FOAM_AMOUNTS)).toBeGreaterThanOrEqual(3);
+  expect(FOAM_AMOUNTS).toContain(0);
+  expect(Math.max(...FOAM_AMOUNTS)).toBeGreaterThanOrEqual(2);
   expect(Math.max(...FOAM_AMOUNTS)).toBeLessThan(GUM_FOAM.length);
-  expect(FOAM_AMOUNTS.reduce((a, b) => a + b, 0) / FOAM_AMOUNTS.length).toBeLessThanOrEqual(2.5);
+  expect(FOAM_AMOUNTS.reduce((a, b) => a + b, 0) / FOAM_AMOUNTS.length).toBeLessThanOrEqual(1.2);
   // Neighbouring teeth take neighbouring entries: never the same amount twice in a row.
   FOAM_AMOUNTS.forEach((n, i) => expect(n).not.toBe(FOAM_AMOUNTS[(i + 1) % FOAM_AMOUNTS.length]));
 });

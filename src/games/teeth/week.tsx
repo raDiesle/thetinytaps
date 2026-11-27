@@ -19,10 +19,11 @@ const SLOTS: { daytime: Daytime; icon: string; label: Localized }[] = [
 ];
 
 /**
- * The week from Monday to Sunday, a sun and a moon for every day. Each
- * brushing finished puts a star there; the one just earned pops in. Today
- * stands out (bigger, „Heute“, coloured for morning or evening) and so does
- * the slot of this brushing, so it is clear which star comes now.
+ * The week from Monday to Sunday, a place for the morning and one for the evening of every day. Brushed or not is seen
+ * at a glance across the room (user request, November 2026): a brushing finished is a gold star on a bright green disc,
+ * one that was missed an empty grey disc with a dashed rim and its sun or moon faint in it, and one still to come only
+ * a faint dotted ring. The star just earned pops in. Today stands out (bigger, „Heute“, coloured for morning or
+ * evening) and so does the place of this brushing, so it is clear which star comes now.
  */
 export function Week({ log, today, now }: { log: WeekLog; today: Date; now: Daytime }) {
   const t = useT();
@@ -46,13 +47,32 @@ export function Week({ log, today, now }: { log: WeekLog; today: Date; now: Dayt
               const star = done.includes(daytime);
               const current = key === todayKey && daytime === now;
               const fresh = star && current;
+              // A brushing whose time is over: a day before today, or this morning while it is evening now.
+              const past = key < todayKey || (key === todayKey && daytime === "morning" && now === "evening");
+              const state = star ? "star" : past ? "missed" : "later";
               return (
                 <span
                   key={daytime}
-                  className={`teeth-slot${star ? " star" : ""}${fresh ? " fresh" : ""}${current ? " now" : ""}`}
-                  aria-label={`${dayNames[i]} ${t(label)}: ${star ? t({ de: "geputzt", en: "brushed", zh: "刷过了", hi: "ब्रश हो गया", es: "cepillado", ar: "تم التنظيف", ru: "почищено" }) : t({ de: "noch nicht", en: "not yet", zh: "还没有", hi: "अभी नहीं", es: "todavía no", ar: "ليس بعد", ru: "ещё нет" })}`}
+                  className={`teeth-slot ${state}${fresh ? " fresh" : ""}${current ? " now" : ""}`}
+                  aria-label={`${dayNames[i]} ${t(label)}: ${t(
+                    state === "star"
+                      ? { de: "geputzt", en: "brushed", zh: "刷过了", hi: "ब्रश हो गया", es: "cepillado", ar: "تم التنظيف", ru: "почищено" }
+                      : state === "missed"
+                        ? {
+                            en: "not brushed",
+                            de: "nicht geputzt",
+                            zh: "没有刷",
+                            hi: "ब्रश नहीं हुआ",
+                            es: "sin cepillar",
+                            ar: "لم يتم التنظيف",
+                            ru: "не почищено",
+                          }
+                        : { de: "noch nicht", en: "not yet", zh: "还没有", hi: "अभी नहीं", es: "todavía no", ar: "ليس بعد", ru: "ещё нет" },
+                  )}`}
                 >
-                  {star ? "⭐" : icon}
+                  <span className="teeth-slot-mark" aria-hidden>
+                    {star ? "⭐" : icon}
+                  </span>
                 </span>
               );
             })}

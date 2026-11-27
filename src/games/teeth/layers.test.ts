@@ -64,11 +64,7 @@ test("every keyframe of the game animates only transform, opacity or filter", ()
   }
 });
 
-test("the story's sky changes by fading skies of its own in, and its monsters sway as HTML", () => {
-  for (const name of ["teeth-origin-sky-noon", "teeth-origin-sky-dusk", "teeth-origin-sky-night", "teeth-origin-sky-dawn"]) {
-    expect(keyframes(name)).toContain("opacity");
-  }
-  expect(origin).toMatch(/className=\{`origin-picture origin-sky-\$\{i\}`\}/);
+test("the story's monsters sway as HTML", () => {
   // The monsters' Piece moves its svg as a whole; the Monster drawn inside stands still (no blink, no sway).
   expect(css).toMatch(/\.origin-monster > svg \{[^}]*animation: teeth-origin-monster-sway/);
   expect(origin).toMatch(/<Monster\b[^>]*\bstill\b/);

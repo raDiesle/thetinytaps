@@ -276,6 +276,12 @@ export const LANGUAGE_STATUS: LanguageStatusRow[] = [
         note: "Morgens isst das Kind in der Geschichte Frühstück statt Süßigkeiten (X-19, 27. November 2026): der Name auf der Leiste und der Satz „Mmm, breakfast! …“ (BREAKFAST_TEXTS in lines.ts), Englisch zuerst und gleich in allen sieben Sprachen. Noch nicht aufgenommen: bis dahin bleibt der Satz morgens stumm (bun run voice make --only zaehne, nur auf Wunsch).",
       },
       {
+        label: "🦁 Mitbrüllen und Zuckermonster-Satz",
+        recorded: true,
+        languages: { de: "text", en: "text", zh: "text", hi: "text", es: "text", ar: "text", ru: "text" },
+        note: "Zwei neue Sätze vor dem Putzen (27. November 2026), gleich in allen sieben Sprachen: der Ruf zum Mitbrüllen mit dem Löwen („Now roar with the lion! …“, Englisch zuerst) und „Aus dem Zucker wachsen kleine Zuckermonster.“, der jetzt für morgens und abends gleich ist (ohne Tag und Nacht; PRELUDE_TEXTS in lines.ts). Noch nicht aufgenommen: bis dahin bleiben beide stumm (bun run voice make --only zaehne, nur auf Wunsch).",
+      },
+      {
         label: "🎵 Zahnputzlied (gesungen)",
         recorded: true,
         languages: { de: "done", en: "done", zh: "done", hi: "done", es: "done", ar: "done", ru: "done", it: "done" },

@@ -1,5 +1,6 @@
 import { describe, expect, test } from "bun:test";
 import { TEETH_PER_SIDE } from "./jaw";
+import { PRELUDE_TEXTS } from "./lines";
 import { FRAMINGS, MOUTH, STORY_TEETH } from "./origin";
 
 // The story's mouth once showed six teeth above and four below, and the face stood small in the middle of a wide
@@ -42,14 +43,15 @@ describe("the story's framings", () => {
     expect(FRAMINGS.face.focus.height).toBeLessThan(FRAMINGS.head.focus.height * 0.85);
   });
 
-  test("on the face's framing the sun or moon starts in the sky, clear of the sweet coming on that side", () => {
-    const { arc, sweets, focus } = FRAMINGS.face;
-    // Where `.origin-sky-body` starts: turned -35° round the point below the top of its arc.
-    const a = (-35 * Math.PI) / 180;
-    const start = { x: 220 + arc.radius * Math.sin(a), y: arc.top + arc.radius * (1 - Math.cos(a)) };
-    expect(start.x).toBeGreaterThan(focus.x);
-    expect(start.y).toBeGreaterThan(focus.y);
-    const left = sweets.filter((s) => s.x < 220);
-    for (const s of left) expect(Math.hypot(s.x - start.x, s.y - start.y)).toBeGreaterThan(70);
+  // The story is the same whatever the time of day (user request, November 2026): no sun or moon crossing its sky,
+  // no sky turning to dusk or night, and the monsters' line „Aus dem Zucker wachsen …“ says nothing of day or night.
+  test("has no sun or moon and one calm sky, whatever the time of day", async () => {
+    const origin = await Bun.file("src/games/teeth/origin.tsx").text();
+    const css = await Bun.file("src/games/teeth/teeth.css").text();
+    for (const framing of Object.values(FRAMINGS)) expect(Object.keys(framing).sort()).toEqual(["focus", "sweets"]);
+    expect(origin).not.toMatch(/SkyBody|origin-sky|STAR_PATH/);
+    expect(css).not.toMatch(/\.origin-(sky|sun|moon)/);
+    expect(css).not.toContain("teeth-origin-sky");
+    for (const text of Object.values(PRELUDE_TEXTS.grow.cue ?? {})) expect(text).not.toMatch(/Nacht|Tag\b|night|day\b/i);
   });
 });

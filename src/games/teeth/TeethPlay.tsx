@@ -8,7 +8,7 @@ import { GO_ON, PAUSE, SPACE_OR_TAP_TO_GO_ON, TAP_TO_GO_ON } from "@/lib/sharedT
 import { useNoBackgroundMusic } from "@/lib/backgroundMusic";
 import { useCommonSettings } from "@/lib/common";
 import { useDevice } from "@/lib/device";
-import { type Localized, type Texts, useAppLanguage, useT, type Spoken, spokenIn } from "@/lib/language";
+import { type Texts, useAppLanguage, useT, type Spoken, spokenIn } from "@/lib/language";
 import { loadRecordings, playChime, playCountNote, playDrumRoll, playRecorded, playSqueak, playTusch } from "@/lib/sfx";
 import { pageMoving, usePageStill } from "@/lib/pageMotion";
 import { finishRoutineStep } from "@/lib/routine";
@@ -23,7 +23,7 @@ import { dirtyFaces } from "./stains";
 import { SUNG_LANGUAGES, songEndMs, sungSteps, useBrushingMusic, useSongLoad } from "./music";
 import type { Cue } from "./cues";
 import { DONE_SAY, type Prelude, PRELUDE_TEXTS, preludeTexts, TIDY_SAY } from "./lines";
-import { Lion, LION_CUES, LION_MS, LION_RECORDINGS, LionSymbol } from "./lion";
+import { Lion, LION_INTRO_MS, LION_RECORDINGS, LionSymbol, ROAR_CUES, ROARING_MS, RoarSymbol } from "./lion";
 import { HoneyBread, Origin, ORIGIN_CUES, ORIGIN_MS, ORIGIN_RECORDINGS } from "./origin";
 import { Scenes, type SceneKind } from "./scenes";
 import { Prep, PREP_CUES, PREP_MS, PREP_RECORDINGS, TIDY_RECORDINGS } from "./prep";
@@ -36,6 +36,7 @@ import { Week } from "./week";
 import voiceFiles from "./stimme/**/*.mp3?glob";
 import "./teeth.css";
 import { useStepAddress } from "@/lib/stepAddress";
+import { DEV } from "@/lib/buildInfo";
 
 /** The recorded voice of the prelude and the end (`bun run voice make`, src/content/recordedLines.ts). */
 const voice = recordedVoice(voiceFiles);
@@ -60,16 +61,12 @@ const GO_MS = 1300;
 /** One beat of the song (112 BPM): the prelude's own parts are counted in them too. */
 const BEAT_MS = 60000 / 112;
 /**
- * The first look in the mirror: the monsters on the teeth and the voice's „Oh no, there they are!“, whose longest
- * recording (English, 4.7 s) ends before the mouth opens.
- */
-const MONSTERS_MS = 9 * BEAT_MS;
-/**
- * Back in the mirror after roaring like a lion (X-26, `lion.tsx`): the mouth there opened wide while the lion's step was
- * on (as slowly as a step's, `MOUTH_MS`), so it comes back open; a bar to see it, then 3, 2, 1 with the mouth still
+ * The look in the mirror after roaring like a lion (X-26, `lion.tsx`): the mouth there opened wide while the lion was on
+ * (as slowly as a step's, `MOUTH_MS`), so the mirror shows it open with the monsters on the teeth, and the voice's
+ * „Oh no, there they are!“ (its longest recording, English, 4.7 s, ends within it); then 3, 2, 1 with the mouth still
  * open, so the song begins on an open mouth and its first verse needs no opening of its own.
  */
-const ROAR_MS = 4 * BEAT_MS;
+const MONSTERS_MS = 9 * BEAT_MS;
 /**
  * After the brushing: two bars of cheering at the clean grin, two of spitting the foam out over the basin (X-18: only
  * spitting, no rinsing of the mouth), then the brush is rinsed and put away, then the buttons. Putting the brush away
@@ -80,6 +77,8 @@ const CHEER_MS = 4290;
 const TIDY_FROM = CHEER_MS + SPIT_MS;
 /** How long the end runs before the buttons: the cheer, and the spitting and tidying where putting the brush away is shown. */
 const endingOf = (tidy: boolean) => (tidy ? TIDY_FROM + PREP_MS.tidy : CHEER_MS);
+/** On the dev server ← and → jump the clock this far back or on, anywhere in the game (user request, November 2026). */
+const DEV_SKIP_MS = 5000;
 /** A video recording ends at least this long after the brush is put away, so the last grin stays a moment. */
 const VIDEO_TAIL_MS = 3000;
 /** After the sung finale has rung out, the recording keeps the still grin this much longer, so the video doesn't end on the last note. */
@@ -107,15 +106,16 @@ type Ending = "cheer" | "spit" | "tidy" | "rest";
  * story eats (`preludeTexts`, `ORIGIN_CUES`: breakfast in the morning). `sounds` play at their moment of the part;
  * titles and lines are in lines.ts.
  */
-export const PRELUDE: Record<Prelude, { ms: number; title: Texts; cue?: Localized; sounds?: Cue[] }> = {
+export const PRELUDE: Record<Prelude, { ms: number; title: Texts; cue?: Texts; sounds?: Cue[] }> = {
   sweets: { ...PRELUDE_TEXTS.sweets, ms: ORIGIN_MS.sweets },
   grow: { ...PRELUDE_TEXTS.grow, ms: ORIGIN_MS.grow },
   brush: { ...PRELUDE_TEXTS.brush, ms: PREP_MS.brush, sounds: PREP_CUES.brush },
   paste: { ...PRELUDE_TEXTS.paste, ms: PREP_MS.paste, sounds: PREP_CUES.paste },
-  monsters: { ...PRELUDE_TEXTS.monsters, ms: MONSTERS_MS },
-  lion: { ...PRELUDE_TEXTS.lion, ms: LION_MS, sounds: LION_CUES },
-  // The countdown's 3, 2, 1 are the last seconds of the prelude, so they follow the open mouth's bar here.
-  roar: { ...PRELUDE_TEXTS.roar, ms: ROAR_MS + COUNTDOWN * 1000 },
+  // The lion's scene runs through both parts: the lion's, then the roaring's with its marks and roars.
+  lion: { ...PRELUDE_TEXTS.lion, ms: LION_INTRO_MS },
+  roar: { ...PRELUDE_TEXTS.roar, ms: ROARING_MS, sounds: ROAR_CUES },
+  // The countdown's 3, 2, 1 are the last seconds of the prelude, so they follow the look in the mirror here.
+  monsters: { ...PRELUDE_TEXTS.monsters, ms: MONSTERS_MS + COUNTDOWN * 1000 },
 };
 
 interface Monster {
@@ -226,17 +226,17 @@ const readClock = (clock: Clock, now: number) => Math.min(clock.banked + (clock.
 const preludeOf = ({ origin, prep }: TeethSettings): Prelude[] => [
   ...(origin ? (["sweets", "grow"] as const) : []),
   ...(prep ? (["brush", "paste"] as const) : []),
-  "monsters",
   "lion",
   "roar",
+  "monsters",
 ];
 
 /** How long the prelude lasts, in ms. */
 const introOf = (prelude: Prelude[]) => prelude.reduce((sum, p) => sum + PRELUDE[p].ms, 0);
 
 /**
- * Where the clock waits while the song is still loading: just before the lion's step, so the brushing never starts
- * without its song and the open mouth, the roars, the open mouth in the mirror and 3, 2, 1 run straight into it.
+ * Where the clock waits while the song is still loading: just before the lion, so the brushing never starts without its
+ * song and the lion, the roars, the open mouth in the mirror and 3, 2, 1 run straight into it.
  */
 const waitAt = (prelude: Prelude[]) => preludeStart(prelude, "lion") - 1;
 
@@ -253,19 +253,18 @@ function preludeAt(prelude: Prelude[], elapsed: number): Prelude {
   return prelude[prelude.length - 1];
 }
 
-/** The phases of the routine the bar shows apart: eating sweets, getting the brush, roaring like a lion, brushing, putting the brush away. */
-type BarPhase = "eat" | "fetch" | "lion" | "tidy";
+/** The phases of the routine the bar shows apart: eating sweets, getting the brush, the lion, roaring with it, brushing, putting the brush away. */
+type BarPhase = "eat" | "fetch" | "lion" | "roar" | "tidy";
 
 /** The symbol of each phase on the bar; the brushing has its frame with the riding brush and the clean tooth instead. */
-const PHASE_SYMBOL: Record<BarPhase, TeethSymbol> = { eat: "bonbon", fetch: "zahnpasta", lion: "loewe", tidy: "becher" };
+const PHASE_SYMBOL: Record<BarPhase, TeethSymbol> = { eat: "bonbon", fetch: "zahnpasta", lion: "loewe", roar: "bruellen", tidy: "becher" };
 /** In the morning the story eats breakfast (X-19), so its phase shows the honey bread instead of the sweet. */
 const symbolOf = (phase: BarPhase, daytime: Daytime): TeethSymbol => (phase === "eat" && daytime === "morning" ? "fruehstueck" : PHASE_SYMBOL[phase]);
 
 /**
- * The prelude's parts as the bar's tiles before the brushing: the story is eating, the sink is getting the brush, and
- * roaring like a lion is a phase of its own with the lion's symbol (user request, November 2026), the open mouth in
- * the mirror and 3, 2, 1 with it. The first look in the mirror ends the tile before it, or begins the lion's when
- * neither eating nor getting the brush is shown.
+ * The prelude's parts as the bar's tiles before the brushing: the story is eating, the sink is getting the brush, the
+ * lion has the lion's symbol, and roaring with it is a phase of its own with the roaring lion's (user requests, November
+ * 2026), the look in the mirror with the mouth open and 3, 2, 1 at its end.
  */
 export function preludeTiles(prelude: Prelude[]): { phase: BarPhase; parts: Prelude[] }[] {
   const tiles: { phase: BarPhase; parts: Prelude[] }[] = [];
@@ -273,8 +272,7 @@ export function preludeTiles(prelude: Prelude[]): { phase: BarPhase; parts: Prel
   const fetch = prelude.filter((p) => p === "brush" || p === "paste");
   if (eat.length) tiles.push({ phase: "eat", parts: eat });
   if (fetch.length) tiles.push({ phase: "fetch", parts: fetch });
-  if (tiles.length) tiles[tiles.length - 1].parts.push("monsters");
-  tiles.push({ phase: "lion", parts: [...(tiles.length ? [] : ["monsters" as const]), "lion", "roar"] });
+  tiles.push({ phase: "lion", parts: ["lion"] }, { phase: "roar", parts: ["roar", "monsters"] });
   return tiles;
 }
 
@@ -290,11 +288,11 @@ function BarSymbol({ name }: { name: TeethSymbol | null }) {
         <HoneyBread />
       </svg>
     );
-  // The lion's phase shows the step's lion's head in the same ink line, until its painted picture comes.
-  if (name === "loewe")
+  // The lion's phases show the scene's lion's head in the same ink line, roaring for the roaring, until their painted pictures come.
+  if (name === "loewe" || name === "bruellen")
     return (
       <svg className="teeth-symbol" viewBox="-40 -42 80 84" aria-hidden>
-        <LionSymbol />
+        {name === "loewe" ? <LionSymbol /> : <RoarSymbol />}
       </svg>
     );
   return <span className="teeth-symbol" aria-hidden />;
@@ -354,10 +352,10 @@ export function TeethPlay({ settings, video, options }: { settings: TeethSetting
   // A fresh set of monsters for every round, and a fresh look at the clock.
   const monsters = useMemo(placeMonsters, [round]);
   const daytime = useMemo(() => video?.daytime ?? daytimeOf(), [round]);
-  /** What the voice says in a part before the brushing: its line, the daytime's while the monsters grow, nothing while the child roars. */
+  /** What the voice says in a part before the brushing: its line, nothing where it has none. */
   const preludeCue = (p: Prelude): Spoken | null => {
     const cue = preludeTexts(p, daytime).cue;
-    return cue ? spokenIn(cue, language) : p === "grow" ? daytimeText(daytime, "grow", language) : null;
+    return cue ? spokenIn(cue, language) : null;
   };
   const perStep = useMemo(() => STEPS.map((_, s) => monsters.filter((m) => m.step === s).length), [monsters]);
   // Taken at the start of each brushing, so the clock never jumps: a phase switched on or off behind ⚙️ while the
@@ -471,7 +469,7 @@ export function TeethPlay({ settings, video, options }: { settings: TeethSetting
   // What to say and play when a new part begins.
   useEffect(() => {
     if (before) {
-      // Back in the mirror with the mouth open after the lion's roar, no chime: the drum roll comes next.
+      // The roaring goes on in the lion's scene: no chime, the voice asks to roar along.
       if (part > 0 && before !== "roar") playChime();
       if (part === 0) say(daytimeText(daytime, "hello", language));
       const line = preludeCue(before);
@@ -584,8 +582,9 @@ export function TeethPlay({ settings, video, options }: { settings: TeethSetting
   // on. Each of their animations belongs to the part shown (`at-<part>`), so all of them are set to where the clock is in it.
   useLayoutEffect(() => {
     // Spitting and the sink at the end (tidying up) are such parts too, reached from the bar's last part.
+    // The lion's scene runs through both its parts, so its animations count from the lion's start.
     const into = before
-      ? elapsed - preludeStart(prelude, before)
+      ? elapsed - preludeStart(prelude, before === "roar" ? "lion" : before)
       : ending === "spit"
         ? brushed - totalMs - CHEER_MS
         : ending === "tidy"
@@ -658,8 +657,22 @@ export function TeethPlay({ settings, video, options }: { settings: TeethSetting
     seek(target);
   };
 
+  // Where the clock is, for the dev server's jumps of five seconds (read when a key is pressed, not with every tick).
+  const elapsedNow = useRef(elapsed);
+  elapsedNow.current = elapsed;
+
   useEffect(() => {
     const onKeyDown = (e: KeyboardEvent) => {
+      // On the dev server ← and → jump five seconds back or on, held too, so any moment can be looked at quickly; ↑ and
+      // ↓ still jump by parts there. For players the arrows jump by parts, as below.
+      if (DEV && (e.key === "ArrowLeft" || e.key === "ArrowRight")) {
+        const end = introMs + totalMs + endingMs;
+        const to = Math.max(0, Math.min(end, elapsedNow.current + (e.key === "ArrowRight" ? DEV_SKIP_MS : -DEV_SKIP_MS)));
+        // Kept at once, so quick presses before the next render each go on from the last one.
+        elapsedNow.current = to;
+        seek(to);
+        return;
+      }
       if (e.repeat) return;
       if (e.key === " " || e.key === "Enter") {
         if (done) again();
@@ -676,9 +689,9 @@ export function TeethPlay({ settings, video, options }: { settings: TeethSetting
   }, [done, ending, part, again, togglePause, jumpTo, seek, introMs, totalMs, endingMs]);
 
   // When the mouth has to open or close, the picture does it slowly and arrows on the lips show the way. Before the
-  // song the mirror's mouth opens wide while the lion's step is on (X-26) and comes back open, so the first step
-  // begins with it open; it needs no arrows, the child roaring has just shown it.
-  const roaring = before === "lion" || before === "roar";
+  // song the mirror's mouth is wide open: it opens while the lion is on (X-26), so the mirror shows it open after the
+  // roaring and the first step begins with it open; it needs no arrows, the child roaring has just shown it.
+  const roaring = before !== null;
   const mouthBefore = phase <= 0 ? "open" : STEPS[phase - 1].mouth;
   const mouthMoves = roaring || (step !== null && step.mouth !== mouthBefore);
   const action: MouthAction | null = roaring
@@ -696,7 +709,7 @@ export function TeethPlay({ settings, video, options }: { settings: TeethSetting
         ? "sink"
         : ending === "spit"
           ? "spit"
-          : before === "lion"
+          : before === "lion" || before === "roar"
             ? "lion"
             : "mirror";
   const target = roaring ? ROAR_VIEW : (step?.view ?? GRIN_VIEW);

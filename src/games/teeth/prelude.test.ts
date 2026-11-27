@@ -8,7 +8,7 @@ import { PRELUDE, preludeTiles } from "./TeethPlay";
 import { PREP_CUES, PREP_MS, PREP_RECORDINGS, TIDY_RECORDINGS } from "./prep";
 import { ORIGIN_CUES, ORIGIN_MS, ORIGIN_RECORDINGS } from "./origin";
 import { SPIT_CUES, SPIT_MS } from "./spit";
-import { COUNT_GAP, LION_CUES, LION_MS, LION_RECORDINGS, ROUNDS } from "./lion";
+import { FILL_BEATS, LION_INTRO_BEATS, LION_INTRO_MS, LION_MS, LION_RECORDINGS, ROAR_CUES, ROARING_MS, ROUNDS } from "./lion";
 
 // The sounds of the prelude and of tidying up at the end fire when the brushing clock passes them, so they must lie inside their part.
 const PARTS = [
@@ -16,7 +16,7 @@ const PARTS = [
   { name: "breakfast", cues: ORIGIN_CUES.morning, ms: ORIGIN_MS.sweets },
   { name: "brush", cues: PREP_CUES.brush, ms: PREP_MS.brush },
   { name: "paste", cues: PREP_CUES.paste, ms: PREP_MS.paste },
-  { name: "lion", cues: LION_CUES, ms: LION_MS },
+  { name: "roar", cues: ROAR_CUES, ms: ROARING_MS },
   { name: "spit", cues: SPIT_CUES, ms: SPIT_MS },
   { name: "tidy", cues: PREP_CUES.tidy, ms: PREP_MS.tidy },
 ];
@@ -49,26 +49,36 @@ test("the morning's breakfast sounds like breakfast", () => {
   expect(ORIGIN_CUES.evening.map((c) => c.play.toString()).join(" ")).toContain("wrapper");
 });
 
-// Roaring like a lion is a phase of its own before the song, with the lion's symbol on the bar (X-26, user requests,
-// November 2026): the lion first, the child beside it in its costume, and three times 3, 2, 1 and both roar together,
-// louder and longer each time. Then the mirror shows the mouth still wide open through 3, 2, 1, so the song begins on
-// an open mouth.
-describe("roaring like a lion before the song", () => {
+// The lion comes right after the toothpaste, before the mirror shows the open mouth (X-26, user requests, November
+// 2026): the lion first, the child beside it in its costume; then roaring with it, a phase of its own, where the voice
+// asks the child to roar and three marks fill one after the other – both roar each time one is full, louder and longer
+// each time. Then the mirror shows the mouth wide open with the monsters and 3, 2, 1, so the song begins on an open mouth.
+describe("the lion and roaring with it before the song", () => {
   const BEAT = 60000 / 112;
 
-  test("the lion's step is ten bars: three rounds of a note on 3, 2 and 1 and both roaring together", () => {
-    expect(LION_MS).toBeCloseTo(40 * BEAT, 3);
-    const expected = ROUNDS.flatMap((r) => [r.count, r.count + COUNT_GAP, r.count + 2 * COUNT_GAP, r.roar]);
-    expect(LION_CUES.map((c) => Math.round(c.at / BEAT))).toEqual(expected);
+  test("the lion's scene is twelve bars: the lion's two, then three rounds of a mark filling to a note on each beat and both roaring", () => {
+    expect(LION_MS).toBeCloseTo(48 * BEAT, 3);
+    expect(LION_INTRO_MS).toBeCloseTo(LION_INTRO_BEATS * BEAT, 3);
+    expect(PRELUDE.lion.ms + PRELUDE.roar.ms).toBeCloseTo(LION_MS, 3);
+    expect(PRELUDE.lion.sounds ?? []).toEqual([]);
+    const expected = ROUNDS.flatMap((r) => [...Array.from({ length: FILL_BEATS }, (_, i) => r.fill + i), r.roar].map((b) => b - LION_INTRO_BEATS));
+    expect(ROAR_CUES.map((c) => Math.round(c.at / BEAT))).toEqual(expected);
     for (const [k, round] of ROUNDS.entries()) {
       // Both at once: the round's lion and child in one cue, nothing said.
-      const roar = LION_CUES[4 * k + 3];
+      const roar = ROAR_CUES[(FILL_BEATS + 1) * k + FILL_BEATS];
       expect(roar.play.toString()).toMatch(/round\.lion/);
       expect(roar.play.toString()).toMatch(/round\.child/);
-      expect(Math.round(roar.at / BEAT)).toBe(round.roar);
+      expect(Math.round(roar.at / BEAT)).toBe(round.roar - LION_INTRO_BEATS);
     }
-    for (const cue of LION_CUES) expect(cue.play.toString()).not.toMatch(/say|speak|Chime/);
+    for (const cue of ROAR_CUES) expect(cue.play.toString()).not.toMatch(/say|speak|Chime/);
     expect(PRELUDE_TEXTS.lion.cue).toBeUndefined();
+  });
+
+  test("the voice asks the child to roar along, in every app language, before the first mark fills", () => {
+    const cue = PRELUDE_TEXTS.roar.cue;
+    for (const language of APP_LANGUAGES) expect({ language, said: Boolean(cue?.[language]) }).toEqual({ language, said: true });
+    // Its longest recording is about 4 s: seven beats leave it room before the first note.
+    expect((ROUNDS[0].fill - LION_INTRO_BEATS) * BEAT).toBeGreaterThan(3500);
   });
 
   test("each roar is a recording from ElevenLabs waiting in the sound queue, with the lion's Freesound roar as stand-in", () => {
@@ -83,21 +93,23 @@ describe("roaring like a lion before the song", () => {
     expect(LION_RECORDINGS).toContain("roar");
   });
 
-  test("is a phase of its own on the bar, with the open mouth and 3, 2, 1 after it", () => {
-    const all = ["sweets", "grow", "brush", "paste", "monsters", "lion", "roar"] as const;
+  test("the lion and the roaring are two phases of their own on the bar, the mirror with the open mouth and 3, 2, 1 at the roaring's end", () => {
+    const all = ["sweets", "grow", "brush", "paste", "lion", "roar", "monsters"] as const;
     expect(preludeTiles([...all])).toEqual([
       { phase: "eat", parts: ["sweets", "grow"] },
-      { phase: "fetch", parts: ["brush", "paste", "monsters"] },
-      { phase: "lion", parts: ["lion", "roar"] },
+      { phase: "fetch", parts: ["brush", "paste"] },
+      { phase: "lion", parts: ["lion"] },
+      { phase: "roar", parts: ["roar", "monsters"] },
     ]);
-    // With nothing before it shown, the first look in the mirror begins the lion's phase.
-    expect(preludeTiles(["monsters", "lion", "roar"])).toEqual([{ phase: "lion", parts: ["monsters", "lion", "roar"] }]);
+    expect(preludeTiles(["lion", "roar", "monsters"])).toEqual([
+      { phase: "lion", parts: ["lion"] },
+      { phase: "roar", parts: ["roar", "monsters"] },
+    ]);
   });
 
-  test("the mirror after it is a bar with the mouth open, then the countdown's three seconds, with no sound", () => {
-    expect(PRELUDE.roar.ms).toBeCloseTo(4 * BEAT + 3000, 3);
-    expect(PRELUDE.roar.sounds ?? []).toEqual([]);
-    expect(PRELUDE_TEXTS.roar.cue).toBeUndefined();
+  test("the mirror after it is the monsters' look with the mouth open, then the countdown's three seconds", () => {
+    expect(PRELUDE.monsters.ms).toBeCloseTo(9 * BEAT + 3000, 3);
+    expect(PRELUDE.monsters.sounds ?? []).toEqual([]);
   });
 
   test("leaves the mouth wide open from the front for the first verse, which opens it no further", () => {
@@ -107,11 +119,11 @@ describe("roaring like a lion before the song", () => {
     expect(STEPS[0].view.open).toBe(ROAR_VIEW.open);
   });
 
-  test("comes right after the first look in the mirror, as the last parts before the brushing", async () => {
+  test("comes right after the toothpaste, before the mirror shows the open mouth", async () => {
     const play = await Bun.file("src/games/teeth/TeethPlay.tsx").text();
-    expect(play).toMatch(/"monsters",\s*"lion",\s*"roar",\s*\];/);
-    // The mirror coming back from the lion opens the mouth at once, with no arrows on the lips.
-    expect(play).toMatch(/const roaring = before === "lion" \|\| before === "roar"/);
+    expect(play).toMatch(/\["brush", "paste"\] as const\) : \[\]\),\s*"lion",\s*"roar",\s*"monsters",\s*\];/);
+    // The mirror is wide open throughout the prelude, so it shows the open mouth after the lion, with no arrows on the lips.
+    expect(play).toMatch(/const roaring = before !== null;/);
     // The first step begins with the mouth open, so it has no arrows and no slow opening of its own.
     expect(play).toMatch(/const mouthBefore = phase <= 0 \? "open"/);
   });

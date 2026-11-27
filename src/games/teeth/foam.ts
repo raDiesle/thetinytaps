@@ -37,10 +37,11 @@ export const GUM_FOAM: GumBubble[] = [
 
 /**
  * How many of `GUM_FOAM`'s bubbles a tooth gets, picked by the tooth: clearly more on one than on its neighbour, often a
- * single bubble, and few in all (user feedback, November 2026: the foam's amount should differ clearly from tooth to
- * tooth and be less overall – a tooth may have just one bubble). Neighbouring teeth take neighbouring entries.
+ * single bubble or none, and few in all (user feedback, November 2026: the foam's amount should differ clearly from
+ * tooth to tooth and be less overall – a tooth may have just one bubble; then, asked again, fewer bubbles still: about
+ * one a tooth, half of before). Neighbouring teeth take neighbouring entries.
  */
-export const FOAM_AMOUNTS = [1, 4, 2, 1, 3, 1, 2];
+export const FOAM_AMOUNTS = [1, 2, 0, 1, 2, 0, 2];
 
 /** How much bigger or smaller a bubble may come out on one tooth than in `GUM_FOAM`. */
 export const GUM_FOAM_SPREAD = 0.25;

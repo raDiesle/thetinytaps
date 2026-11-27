@@ -1,5 +1,5 @@
 import { describe, expect, test } from "bun:test";
-import { BOXES, drawOrder, FOAM, FOAM_EDGE, SIZE, type Facing } from "./brush";
+import { BOXES, drawOrder, FOAM, FOAM_EDGE, FOAM_FIRST, SIZE, type Facing } from "./brush";
 
 // The bristle tufts stand on the bristle side of the head (b above -11), the head, neck and handle behind them.
 const isTuft = (i: number) => BOXES[i].b[0] >= -11;
@@ -70,6 +70,12 @@ describe("the brush's foam", () => {
     expect(new Set(FOAM.map((f) => f.kind))).toEqual(new Set(["clump", "bubble", "dot"]));
     expect(new Set(FOAM.map((f) => f.r)).size).toBeGreaterThanOrEqual(FOAM.length - 2);
     expect(Math.max(...FOAM.map((f) => f.r))).toBeGreaterThanOrEqual(2.5 * Math.min(...FOAM.map((f) => f.r)));
+  });
+
+  // Fewer foam bubbles (user request, November 2026): a few flecks in all, two at first.
+  test("it is only a few flecks", () => {
+    expect(FOAM.length).toBeLessThanOrEqual(7);
+    expect(FOAM_FIRST).toBeLessThanOrEqual(2);
   });
 
   test("it is small and its edge pale", () => {

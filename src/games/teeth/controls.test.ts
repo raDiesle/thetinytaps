@@ -20,11 +20,13 @@ test("the progress bar shows the time before the brushing as its first part", ()
 });
 
 // A sweet at the start and a tooth at the end said nothing of what each part of the bar is (user feedback, November
-// 2026): the bar shows the routine's phases apart – eating sweets, getting the brush, roaring like a lion (a phase of
-// its own, user request, November 2026), the brushing's steps in a frame of their own, and putting the brush away,
+// 2026): the bar shows the routine's phases apart – eating sweets, getting the brush, the lion and roaring with it (two
+// phases of their own, user requests, November 2026), the brushing's steps in a frame of their own, and putting the brush away,
 // which keeps the bar until the brush is back in its cup.
 test("the progress bar marks eating, getting the brush, roaring, brushing and putting the brush away apart", () => {
-  expect(play).toContain('const PHASE_SYMBOL: Record<BarPhase, TeethSymbol> = { eat: "bonbon", fetch: "zahnpasta", lion: "loewe", tidy: "becher" };');
+  expect(play).toContain(
+    'const PHASE_SYMBOL: Record<BarPhase, TeethSymbol> = { eat: "bonbon", fetch: "zahnpasta", lion: "loewe", roar: "bruellen", tidy: "becher" };',
+  );
   expect(play).toMatch(/<div className="teeth-brushing">\s*<div className="teeth-lane teeth-track">\s*\{STEPS\.map/);
   expect(play).toContain('{tidy && <PhaseTile phase="tidy"');
   expect(play).toContain('ending === "rest" ? (');

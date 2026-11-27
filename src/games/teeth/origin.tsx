@@ -1,5 +1,4 @@
 import { useRef, type CSSProperties, type ReactElement, type RefObject } from "react";
-import { STAR_PATH } from "@/components/TapFeedback";
 import { useFigure } from "@/lib/common";
 import { useT } from "@/lib/language";
 import { playCrunch, playGiggle, playMunch, playRecorded, playRustle, playYum } from "@/lib/sfx";
@@ -14,9 +13,9 @@ import { Piece, pictureSpace } from "./piece";
 // Before anything else, a short story of where the sugar monsters come from:
 // a sweet appears in the corner, floats a moment so the child sees what it is,
 // glides into the child's mouth and is chewed; each leaves sugar crumbs on the
-// teeth. Then time goes by in the sky (the sun crosses the day before the
-// evening brushing, the moon crosses the night before the morning one) and the
-// crumbs grow into the same monsters the mirror shows later, while the child
+// teeth. Then the crumbs grow into the same monsters the mirror shows later
+// (no sun or moon crossing the sky: the story is the same whatever the time of
+// day, user request, November 2026), while the child
 // looks worried. The child is happy about each sweet: its eyes follow it and
 // its brows go up, and while it chews its eyes close happily and its cheeks
 // glow. Each sweet flies into the mouth in an arc and crumbles as it is bitten.
@@ -36,17 +35,13 @@ export const ORIGIN_MS: Record<OriginPart, number> = { sweets: 9600, grow: 6000 
 const { width: W } = PICTURE;
 /**
  * How the story is framed before the camera moves in on the mouth: what has to fit between heading and controls (the
- * screen shows more sky round it), where the sweets appear, the arc the sun or the moon crosses and where the morning's
- * sun comes up. On a screen not much wider than tall the whole head fits with the sweets in the corners above it; on a
+ * screen shows more sky round it) and where the sweets appear. On a screen not much wider than tall the whole head fits with the sweets in the corners above it; on a
  * wide one (a phone on its side) the face from the brows to the chin, the sweets beside it at eye level, so the face and
  * its mouth show bigger (user feedback, November 2026: the mouth should show bigger).
  */
 interface Framing {
   focus: Box;
   sweets: { x: number; y: number }[];
-  /** The top of the sun's or moon's arc, and how far below it lies the point it turns round. */
-  arc: { top: number; radius: number };
-  sunrise: { x: number; y: number };
 }
 const HEAD_FRAMING: Framing = {
   focus: { x: 40, y: 34, width: 360, height: 340 },
@@ -55,8 +50,6 @@ const HEAD_FRAMING: Framing = {
     { x: 68, y: 78 },
     { x: 372, y: 78 },
   ],
-  arc: { top: 10, radius: 550 },
-  sunrise: { x: 72, y: 72 },
 };
 const FACE_FRAMING: Framing = {
   focus: { x: -40, y: 112, width: 520, height: 270 },
@@ -65,9 +58,6 @@ const FACE_FRAMING: Framing = {
     { x: 8, y: 212 },
     { x: 432, y: 212 },
   ],
-  // Starts in the top left corner, above the sweet that comes there, and passes behind the hair to the right.
-  arc: { top: 59, radius: 383 },
-  sunrise: { x: 2, y: 150 },
 };
 /** Both framings, for the tests. */
 export const FRAMINGS = { head: HEAD_FRAMING, face: FACE_FRAMING };
@@ -604,38 +594,8 @@ export const ORIGIN_CUES: Record<Daytime, Cue[]> = {
 /** The recordings the story plays, to load before it starts. */
 export const ORIGIN_RECORDINGS = ["yay", "wrapper", "lolly", "munch", "chew", "yum"];
 
-/**
- * The sky's colours as the day goes by while the monsters grow: before the evening brushing a whole day ending at dusk
- * (blue, the afternoon's warm light, dusk), before the morning one a night (dusk, night, the sun coming up). Each is a
- * picture of its own over the one before, fading in as a whole (`.origin-sky-1`, `-2`): the sky's own colour changing
- * had the phone paint the whole screen again in every frame, 60 times a second on the old Android (November 2026).
- */
-const SKY: Record<Daytime, [string, string, string]> = {
-  evening: ["#c4f1ff", "#ffd9a8", "#a49be6"],
-  morning: ["#a49be6", "#2d2a6e", "#ffe0b0"],
-};
-
-/** The sun, or the moon with a star, that crosses the sky while the monsters grow: it stands at the top of its arc
- * (`arc.top`) and turns round the point `arc.radius` below it (`.origin-sky-body`). */
-function SkyBody({ daytime, arc }: { daytime: Daytime; arc: Framing["arc"] }) {
-  const area: Box = { x: W / 2 - 40, y: arc.top - 40, width: 100, height: 72 };
-  return (
-    <Piece area={area} className="origin-sky-body" style={{ transformOrigin: `${W / 2 - area.x}px ${arc.top + arc.radius - area.y}px` }}>
-      <g transform={`translate(0 ${arc.top - 10})`}>
-        {daytime === "evening" ? (
-          <circle cx={W / 2} cy={10} r={30} fill="#ffd23f" stroke={INK} strokeWidth={4} />
-        ) : (
-          <>
-            <path d={`M${W / 2 + 6} -18 a30 30 0 1 0 24 48 a25 25 0 1 1 -24 -48 Z`} fill="#ffe680" stroke={INK} strokeWidth={4} />
-            <g transform={`translate(${W / 2 + 40} -20) scale(0.14)`}>
-              <path d={STAR_PATH} fill="#fff6c2" />
-            </g>
-          </>
-        )}
-      </g>
-    </Piece>
-  );
-}
+/** The sky behind the child: one calm colour, the same in the morning and the evening (user request, November 2026). */
+const SKY = "#c4f1ff";
 
 /** A point of the head (head units round its middle, `face.tsx`) in the story's picture: the head stands straight here. */
 const onStoryHead: HeadMap = (x, y) => ({ x: HEAD.x + x, y: HEAD.y + y });
@@ -757,26 +717,15 @@ export function Origin({
             ru: "Из сахара на зубках вырастают маленькие монстры",
           });
   // The picture is still pictures with small moving ones between them, each moving piece an HTML layer of its own
-  // (Piece): the sky behind (it changes colour as the day goes by), the sun or the moon crossing it, the child, and on
+  // (Piece): the sky behind, the child, and on
   // the child its brows, pupils, cheeks, chewing mouth, the sweets and the bits they crumble into. Something animated inside an svg has the
   // phone paint that svg again in every frame: with all of it in one picture, the story painted more than the budget.
   return (
     <div ref={scene} className={`origin at-${part} ${daytime}`}>
       <div className="origin-camera" style={camera}>
-        {SKY[daytime].map((fill, i) => (
-          <svg key={i} className={`origin-picture origin-sky-${i}`} viewBox={viewBox} aria-hidden>
-            <rect {...frame} fill={fill} />
-          </svg>
-        ))}
-        <div className="teeth-space" style={space}>
-          {/* In the morning the night ends with the sun coming up beside the head. */}
-          {daytime === "morning" && part === "grow" && (
-            <Piece area={{ x: framing.sunrise.x - 30, y: framing.sunrise.y - 30, width: 60, height: 60 }} className="origin-sunrise">
-              <circle cx={framing.sunrise.x} cy={framing.sunrise.y} r={26} fill="#ffd23f" stroke={INK} strokeWidth={4} />
-            </Piece>
-          )}
-          <SkyBody daytime={daytime} arc={framing.arc} />
-        </div>
+        <svg className="origin-picture" viewBox={viewBox} aria-hidden>
+          <rect {...frame} fill={SKY} />
+        </svg>
 
         <svg className="origin-picture" viewBox={viewBox} role="img" aria-label={label} style={FRAME_CLIP}>
           <defs>

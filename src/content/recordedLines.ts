@@ -41,7 +41,7 @@ const once = (lines: (RecordedLine | false | "" | undefined)[]) => {
 
 function teeth(language: TargetLanguageId): RecordedLine[] {
   const daytimes = (["morning", "evening"] as const).map((d) => (language === "de" ? DAYTIME[d] : DAYTIME_TRANSLATIONS[language]?.[d]));
-  const daytime = (key: "hello" | "grow" | "after", kind: RecordedKind) => daytimes.map((d) => d?.[key] && { text: d[key], kind });
+  const daytime = (key: "hello" | "after", kind: RecordedKind) => daytimes.map((d) => d?.[key] && { text: d[key], kind });
   const said = (texts: Texts | undefined, kind: RecordedKind) => {
     const text = texts?.[language];
     return text !== undefined && { text, kind };
@@ -49,7 +49,6 @@ function teeth(language: TargetLanguageId): RecordedLine[] {
   const cue = (step: Step) => (language === "de" ? step.cue : STEP_TRANSLATIONS[language]?.[step.id]?.cue);
   return once([
     ...daytime("hello", "instruction"),
-    ...daytime("grow", "instruction"),
     ...Object.values(PRELUDE_TEXTS).map((p) => said(p.cue, "instruction")),
     said(BREAKFAST_TEXTS.cue, "instruction"),
     said(DONE_SAY, "praise"),
