@@ -268,7 +268,10 @@
   overflow: visible;
 }
 
-/* The paper with the address in the middle, a sheet pinned on like the photos. */
+/*
+ * The sheet in the middle with the site's name: torn from a spiral pad (its holes along the top), faintly squared,
+ * pinned on like the photos – a note of the board's own kind, never a plain card.
+ */
 .vp-note {
   position: absolute;
   box-sizing: border-box;
@@ -276,35 +279,67 @@
   flex-direction: column;
   align-items: center;
   justify-content: center;
-  gap: 18px;
-  padding-top: 24px;
-  background: linear-gradient(175deg, #fffdf6, #fff4dc);
-  border-radius: 4px;
+  padding: 30px 40px 24px;
+  background-color: #fffdf6;
+  background-image: linear-gradient(#7aa7d61f 2px, transparent 2px), linear-gradient(90deg, #7aa7d61f 2px, transparent 2px);
+  background-size: 34px 34px;
+  background-position: 0 40px;
+  border-radius: 3px;
   box-shadow:
     calc(6px + var(--lift) * 18px) calc(10px + var(--lift) * 26px) calc(14px + var(--lift) * 26px) #2a170870,
     0 1px 2px #2a170840;
   color: #3d3045;
+  font-family: var(--font-rounded);
   transform-origin: 50% 50%;
 }
 
+/* The spiral pad's punched holes along the top edge, the cork showing through them. */
+.vp-note-holes {
+  position: absolute;
+  left: 70px;
+  right: 70px;
+  top: 10px;
+  height: 18px;
+  background: radial-gradient(circle at 50% 50%, #9c6a3a 0 7px, #7a4f2a 7.5px 8.5px, transparent 9px) 0 0 / 38px 18px repeat-x;
+}
+
 .vp-note .vp-pin {
-  top: 6px;
+  top: 12px;
   width: 52px;
   height: 52px;
 }
 
+/* The name in one line here: in two, it left no room for the address under it on a sheet between the photos. */
+.vp-scene .vp-note .logo,
+.vp-scene .vp-note .logo-line {
+  align-items: baseline;
+}
+
+.vp-scene .vp-note .logo {
+  flex-direction: row;
+  margin: 70px 0 0;
+  font-size: 84px;
+}
+
+/* The address under the name in the app's clear rounded letters, marked with a highlighter stroke drawn left to right. */
 .vp-address {
-  margin: 0;
-  font-size: 80px;
-  font-weight: 700;
+  margin: 40px 0 0;
+  font-size: 56px;
+  font-weight: 600;
   letter-spacing: 0.01em;
   white-space: nowrap;
 }
 
+.vp-address span {
+  padding: 0 0.18em;
+  background: linear-gradient(176deg, transparent 38%, #ffd84d 40%, #ffd84d 88%, transparent 90%) no-repeat;
+  background-size: calc(var(--mark) * 100%) 100%;
+}
+
 .vp-line {
-  margin: 0;
+  margin: 6px 0 0;
   color: #c0392b;
-  font-size: 50px;
-  font-weight: 700;
+  font-size: 38px;
+  font-weight: 500;
   white-space: nowrap;
 }

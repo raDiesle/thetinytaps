@@ -81,25 +81,81 @@ interface Clip {
   schedule: (ac: BaseAudioContext, out: AudioNode, at: number) => void;
 }
 
-/** The video played live on the recorder's stage: the frame follows the clock, the sound was laid onto the same start. */
+/** Whether a key press belongs to a field being typed in, where Space is a space and pauses nothing. */
+const typing = (target: EventTarget | null) => target instanceof HTMLElement && (target.isContentEditable || /^(INPUT|TEXTAREA|SELECT)$/.test(target.tagName));
+
+/**
+ * The video played live on the recorder's stage: the frame follows the clock, the sound was laid onto the same start.
+ * Space or a click on the picture pauses it and goes on (user request, 27 November 2026, to look at a moment while
+ * testing): the clock stands, and the audio context is suspended with it, so picture and sound stay together.
+ */
 export function LivePlay({ seconds, scene, schedule, onFinished }: Clip & { onFinished: () => void }) {
   const [t, setT] = useState(0);
+  const [paused, setPaused] = useState(false);
   const finished = useRef(onFinished);
   finished.current = onFinished;
   const sound = useRef(schedule);
+  const toggle = useRef<() => void>(() => undefined);
   useEffect(() => {
     const ac = audioContext();
     if (ac) sound.current(ac, speaker(ac), ac.currentTime + SOUND_AHEAD_SECONDS);
-    const start = performance.now() + SOUND_AHEAD_SECONDS * 1000;
+    let start = performance.now() + SOUND_AHEAD_SECONDS * 1000;
+    let pausedAt: number | null = null;
+    toggle.current = () => {
+      const now = performance.now();
+      if (pausedAt === null) {
+        pausedAt = now;
+        void ac?.suspend();
+      } else {
+        start += now - pausedAt;
+        pausedAt = null;
+        void ac?.resume();
+      }
+      setPaused(pausedAt !== null);
+    };
     let frame = requestAnimationFrame(function tick(now) {
+      if (pausedAt !== null) {
+        frame = requestAnimationFrame(tick);
+        return;
+      }
       const second = Math.max(0, (now - start) / 1000);
       setT(Math.min(second, seconds));
       if (second >= seconds) finished.current();
       else frame = requestAnimationFrame(tick);
     });
-    return () => cancelAnimationFrame(frame);
+    return () => {
+      cancelAnimationFrame(frame);
+      if (pausedAt !== null) void ac?.resume();
+    };
   }, [seconds]);
-  return <Fitted>{scene(t)}</Fitted>;
+  useEffect(() => {
+    // Space on a focused button would also press it on its keyup: both are held back while the video plays.
+    const space = (event: KeyboardEvent) => event.code === "Space" && !typing(event.target);
+    const down = (event: KeyboardEvent) => {
+      if (!space(event)) return;
+      event.preventDefault();
+      if (!event.repeat) toggle.current();
+    };
+    const up = (event: KeyboardEvent) => {
+      if (space(event)) event.preventDefault();
+    };
+    window.addEventListener("keydown", down, true);
+    window.addEventListener("keyup", up, true);
+    return () => {
+      window.removeEventListener("keydown", down, true);
+      window.removeEventListener("keyup", up, true);
+    };
+  }, []);
+  return (
+    <div className="vi-live" onPointerDown={() => toggle.current()}>
+      <Fitted>{scene(t)}</Fitted>
+      {paused ? (
+        <p className="vi-paused" aria-live="polite">
+          ⏸ Pause bei {t.toFixed(2)} s – Leertaste oder Klick spielt weiter
+        </p>
+      ) : null}
+    </div>
+  );
 }
 
 /** Renders a schedule of sound without playing it (for the video file): `seconds` long, at 48 kHz in stereo. */

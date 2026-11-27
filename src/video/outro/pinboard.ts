@@ -1,7 +1,8 @@
 // The motion of the outro „Pinnwand“ as plain numbers of its time, like every video's: each frame is a function of its
-// second. A cork board fills the picture; the games' photos are pinned onto it one after another, each pressed on from
-// a little above and held by a pin pushed in last, until the board is full; then the paper with the address is pinned
-// into the middle, and everything stands still long enough to read it.
+// second. A cork board fills the picture with every game's photo already pinned on it from the first frame (user
+// request, 27 November 2026: pinned one after another, the board took too long to fill); a moment later the paper with
+// the site's name is pressed into the middle from a little above and held by its pins, its address is written on, and
+// everything stands still long enough to read it.
 
 import { easeInOut, easeOut, progress } from "../intro/timeline";
 import { PINBOARD } from "./content";
@@ -47,33 +48,19 @@ export const PIN_SLOTS: readonly Slot[] = [
   { x: 1684, y: 884, turn: 3 },
 ];
 
-/** The paper with the address in the middle: its middle, size and turn. */
-export const NOTE = { x: 960, y: 540, width: 1000, height: 300, turn: -1 };
+/** The paper in the middle with the site's name and its address: its middle, size and turn. */
+export const NOTE = { x: 960, y: 540, width: 1020, height: 370, turn: -1 };
 
-/** How long one photo takes from coming to lying flat, and how long after it the next one comes, in seconds. */
-const PRESS = 0.4;
-const EVERY = 0.28;
-
-/** When the first photo comes. */
-const FIRST = 0.5;
-
-/** When things happen, in seconds from the start. */
+/** When things happen, in seconds from the start: every photo hangs from the first frame on (user request, 27 November 2026). */
 export const PINBOARD_BEATS = {
-  /** The board fades in from paper. */
-  fadeIn: [0, 0.4],
-  /** The photos come one after another. */
-  photos: [FIRST, FIRST + EVERY * (PHOTO_COUNT - 1) + PRESS],
-  /** The paper with the address is pinned into the middle once the last photo lies flat. */
-  note: [FIRST + EVERY * (PHOTO_COUNT - 1) + PRESS + 0.25, FIRST + EVERY * (PHOTO_COUNT - 1) + PRESS + 0.75],
-  /** The short line under the address is written on. */
-  line: [FIRST + EVERY * (PHOTO_COUNT - 1) + PRESS + 0.85, FIRST + EVERY * (PHOTO_COUNT - 1) + PRESS + 1.35],
+  /** The paper with the name is pinned into the middle, once the full board has been seen a moment. */
+  note: [0.8, 1.3],
+  /** The address and the short line under the name are written on. */
+  line: [1.4, 1.9],
 } as const satisfies Record<string, readonly [number, number]>;
 
-/** How long this outro lasts: the full board stands still a few seconds, long enough to read the address. */
-export const PINBOARD_SECONDS = Math.ceil((PINBOARD_BEATS.line[1] + 4) * 2) / 2;
-
-/** When the `k`-th photo comes and when it lies flat on the board. */
-export const photoBeat = (k: number): readonly [number, number] => [FIRST + EVERY * k, FIRST + EVERY * k + PRESS];
+/** How long this outro lasts: the full board stands still long enough to read the address. */
+export const PINBOARD_SECONDS = Math.ceil((PINBOARD_BEATS.line[1] + 5) * 2) / 2;
 
 /** When a thing pressed on during `beat` has its pin pushed in: the last third of it. */
 const pinBeat = ([from, to]: readonly [number, number]): readonly [number, number] => [from + (to - from) * 0.62, to];
@@ -87,6 +74,9 @@ export interface PressPose {
   pin: number;
 }
 
+/** A thing lying flat on the board, its pin in: every photo, from the first frame on. */
+export const FLAT: PressPose = { opacity: 1, scale: 1, lift: 0, pin: 1 };
+
 /** A thing pressed onto the board during `beat`, at `t`: it comes from a little above, bigger, and lies down flat. */
 export function pressPose(beat: readonly [number, number], t: number): PressPose {
   const p = easeOut(progress(t, beat));
@@ -94,14 +84,8 @@ export function pressPose(beat: readonly [number, number], t: number): PressPose
   return { opacity: Math.min(1, progress(t, beat) * 3), scale: 1 + 0.14 * (1 - p), lift: 1 - p, pin };
 }
 
-/** The `k`-th photo's pose at `t`. */
-export const photoPose = (k: number, t: number) => pressPose(photoBeat(k), t);
-
-/** The paper with the address's pose at `t`. */
+/** The paper with the name's pose at `t`. */
 export const notePose = (t: number) => pressPose(PINBOARD_BEATS.note, t);
 
-/** How much of the line under the address shows. */
+/** How much of the address and the line under the name shows. */
 export const lineShown = (t: number) => easeOut(progress(t, PINBOARD_BEATS.line));
-
-/** How much of the board shows through the paper it fades in from. */
-export const pinboardFadeIn = (t: number) => easeOut(progress(t, PINBOARD_BEATS.fadeIn));

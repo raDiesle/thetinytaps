@@ -2,7 +2,7 @@ import { expect, test } from "bun:test";
 import { APP_LANGUAGES, pick } from "@/lib/language";
 import { BOARD_LINE, PINBOARD, photoWord } from "./content";
 import { PINBOARD_SOUND_END } from "./outroSound";
-import { FRAME, NOTE, notePose, PHOTO_COUNT, PIN_SLOTS, PINBOARD_BEATS, PINBOARD_SECONDS, photoBeat, photoPose } from "./pinboard";
+import { FRAME, NOTE, notePose, PHOTO_COUNT, PIN_SLOTS, PINBOARD_BEATS, PINBOARD_SECONDS } from "./pinboard";
 
 const FRAME_SECONDS = 1 / 60;
 
@@ -21,31 +21,26 @@ test("every photo has its place on the board, and none lies over the address or 
   }
 });
 
-test("the photos are pinned one after another, and the address only once all lie flat", () => {
-  for (let k = 1; k < PHOTO_COUNT; k++) expect(photoBeat(k)[0]).toBeGreaterThan(photoBeat(k - 1)[0]);
-  expect(notePose(photoBeat(PHOTO_COUNT - 1)[1]).opacity).toBe(0);
-  expect(PINBOARD_BEATS.note[0]).toBeGreaterThan(photoBeat(PHOTO_COUNT - 1)[1]);
+test("the board shows every photo from the first frame, and the sheet with the name only a moment later", () => {
+  // The photos have no time of their own any more: the scene draws them flat and pinned at every second.
+  expect(notePose(0).opacity).toBe(0);
+  expect(PINBOARD_BEATS.note[0]).toBeGreaterThan(0.5);
+  expect(PINBOARD_BEATS.line[0]).toBeGreaterThanOrEqual(PINBOARD_BEATS.note[1]);
 });
 
-test("at the end the whole board stands still, every photo flat and pinned, long enough to read the address", () => {
+test("at the end the whole board stands still long enough to read the address", () => {
   const still = PINBOARD_BEATS.line[1];
   expect(PINBOARD_SECONDS - still).toBeGreaterThanOrEqual(4);
-  for (const t of [still, PINBOARD_SECONDS]) {
-    for (let k = 0; k < PHOTO_COUNT; k++) expect(photoPose(k, t)).toEqual({ opacity: 1, scale: 1, lift: 0, pin: 1 });
-    expect(notePose(t)).toEqual({ opacity: 1, scale: 1, lift: 0, pin: 1 });
-  }
+  for (const t of [still, PINBOARD_SECONDS]) expect(notePose(t)).toEqual({ opacity: 1, scale: 1, lift: 0, pin: 1 });
 });
 
-test("everything moves steadily: no jump from one frame to the next", () => {
-  for (let k = 0; k <= PHOTO_COUNT; k++) {
-    const pose = (t: number) => (k < PHOTO_COUNT ? photoPose(k, t) : notePose(t));
-    let last = pose(0);
-    for (let t = FRAME_SECONDS; t <= PINBOARD_SECONDS; t += FRAME_SECONDS) {
-      const now = pose(t);
-      expect(Math.abs(now.scale - last.scale), `${k} at ${t}`).toBeLessThan(0.03);
-      expect(Math.abs(now.lift - last.lift), `${k} at ${t}`).toBeLessThan(0.2);
-      last = now;
-    }
+test("the sheet moves steadily: no jump from one frame to the next", () => {
+  let last = notePose(0);
+  for (let t = FRAME_SECONDS; t <= PINBOARD_SECONDS; t += FRAME_SECONDS) {
+    const now = notePose(t);
+    expect(Math.abs(now.scale - last.scale), `at ${t}`).toBeLessThan(0.03);
+    expect(Math.abs(now.lift - last.lift), `at ${t}`).toBeLessThan(0.2);
+    last = now;
   }
 });
 
