@@ -61,6 +61,11 @@ describe("the photo of the child on a chart", () => {
     expect([...keys].sort()).toEqual(["foto-c-1", "foto-s-1", "foto-s-2", "foto-t-1"]);
   });
 
+  test("a part's own sign (an own photo for the morning) is kept too", () => {
+    const keys = photoKeysOf([{ partSigns: { morning: { photo: "foto-m-1" }, evening: {} } }]);
+    expect([...keys]).toEqual(["foto-m-1"]);
+  });
+
   test("a card with its own photo is printed as a card of its own, beside the same card without", () => {
     const start = defaultDraft("de");
     if (start.type !== "plan") throw new Error("the wizard starts on a plan");

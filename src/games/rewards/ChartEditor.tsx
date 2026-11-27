@@ -48,11 +48,25 @@ import {
   type PlanView,
   REWARDS,
   type Slot,
+  SLOT_BY_ID,
   TASKS,
   TEMPLATES,
   THEMES,
 } from "./catalog";
-import { DAY_PARTS_CHOICES, DAY_SIGN_SETS, DaySign, type DayParts, type DaySignSet, PARTS_OF } from "./daySigns";
+import {
+  DAY_PARTS_CHOICES,
+  DAY_SIGN_SETS,
+  DaySign,
+  DEFAULT_SIGN_SET,
+  type DayParts,
+  PartSignPic,
+  SLOT_EMOJI,
+  signSetOf,
+  type WithSigns,
+  withPartSign,
+  withSignSet,
+  withSignsShown,
+} from "./daySigns";
 import { RITUALS } from "./rituals";
 import { emptyHistory, type History, record, redo, undo } from "./history";
 import { REWARD_BOOK, SCHEDULE_BOOK, WAIT_BOOK } from "./names";
@@ -218,7 +232,8 @@ type Editing =
   | { what: "add-task" }
   | { what: "big-day" }
   | { what: "night" }
-  | { what: "photo" };
+  | { what: "photo" }
+  | { what: "part-sign"; part: Slot };
 
 /** The names of a month board's looks. */
 const MONTH_LOOK_NAMES: Record<MonthLook, Localized> = {
@@ -236,6 +251,10 @@ const withChartPhoto = (draft: Draft, photo: ChartPhoto | undefined): Draft =>
 
 /** The chart itself of a draft: what changes when anything on it changes (the draft around it is made anew on every render). */
 const chartOf = (draft: Draft): Board | Plan => (draft.type === "board" ? draft.board : draft.plan);
+
+/** The draft with its chart's signs changed alike, a plan's or a board's. */
+const withSigned = (draft: Draft, change: <T extends WithSigns>(chart: T) => T): Draft =>
+  draft.type === "board" ? { type: "board", board: change(draft.board) } : { type: "plan", plan: change(draft.plan) };
 
 /** Letters typed within this time join one change, so ↶ takes back a word, not a letter. */
 const TYPING_MS = 1500;
@@ -421,6 +440,8 @@ export function ChartEditor({
       const own = collectWays(draft.board)[Number(way)];
       if (own) setBoard(withWayGoal(draft.board, own.index, own.goal + Number(by)));
     } else if (edit === "title-mark") setEditing({ what: "title-mark" });
+    else if (edit === "part-sign" && part) setEditing({ what: "part-sign", part: part as Slot });
+    else if (edit === "hide-signs" || edit === "show-signs") onChange(withSigned(draft, (chart) => withSignsShown(chart, edit === "show-signs")));
     else if (edit === "add-photo") pickPhoto();
     else if (edit === "photo") setEditing({ what: "photo" });
     else if (edit === "delete-photo") onChange(withChartPhoto(draft, undefined));
@@ -462,21 +483,11 @@ export function ChartEditor({
   const counts = plan ? counting(plan) : true;
   // „Tageszeiten“ and their signs, chosen once for the whole chart (user feedback, November 2026): a day's plan, a
   // week of rings, and a board of fields – never a reason to collect, which has no days.
-  const parts: { n: DayParts; signs?: DaySignSet; set: (n: DayParts) => void; setSigns: (signs?: DaySignSet) => void } | undefined =
+  const parts: { n: DayParts; set: (n: DayParts) => void } | undefined =
     plan && (plan.view === "day" || (plan.view === "week" && counts))
-      ? {
-          n: dayPartsOf(plan),
-          signs: plan.signs,
-          set: (n) => setPlan(withDayParts(plan, n)),
-          setSigns: (signs) => setPlan({ ...plan, signs }),
-        }
+      ? { n: dayPartsOf(plan), set: (n) => setPlan(withDayParts(plan, n)) }
       : draft.type === "board" && draft.board.kind !== "collect"
-        ? {
-            n: boardDayParts(draft.board),
-            signs: draft.board.signs,
-            set: (n) => setBoard(withBoardDayParts(draft.board, n)),
-            setSigns: (signs) => setBoard({ ...draft.board, signs }),
-          }
+        ? { n: boardDayParts(draft.board), set: (n) => setBoard(withBoardDayParts(draft.board, n)) }
         : undefined;
 
   // The Druckansicht's page: A4 turned as the print panel turns it by default (`orientationOf`, `planOrientation`).
@@ -851,40 +862,6 @@ export function ChartEditor({
                 />
               </span>
             )}
-            {parts && parts.n > 1 && (
-              <span className="rw-opt-group">
-                <span className="rw-opt-name">{t({ de: "Zeichen", en: "Signs", zh: "标志", hi: "चिह्न", es: "Símbolos", ar: "علامات", ru: "Знаки" })}</span>
-                <Segments<DaySignSet | "none">
-                  label={t({
-                    de: "Zeichen der Tageszeiten",
-                    en: "Signs for the times of day",
-                    zh: "时段的标志",
-                    hi: "दिन के समय के चिह्न",
-                    es: "Símbolos de los momentos del día",
-                    ar: "علامات أوقات اليوم",
-                    ru: "Знаки времени суток",
-                  })}
-                  selected={parts.signs ?? "none"}
-                  items={[
-                    { id: "none", label: t({ de: "Ohne", en: "None", zh: "无", hi: "कोई नहीं", es: "Ninguno", ar: "بدون", ru: "Без знаков" }) },
-                    ...DAY_SIGN_SETS.map((set) => ({
-                      id: set.id,
-                      label: t(set.label),
-                      pic: (
-                        <span className="rw-sign-pics" aria-hidden>
-                          {(PARTS_OF[parts.n] as Slot[]).map((part) => (
-                            <span key={part} className="rw-sign-pic">
-                              <DaySign set={set.id} part={part} />
-                            </span>
-                          ))}
-                        </span>
-                      ),
-                    })),
-                  ]}
-                  onPick={(id) => parts.setSigns(id === "none" ? undefined : id)}
-                />
-              </span>
-            )}
           </div>
         </section>
       )}
@@ -980,6 +957,19 @@ export function ChartEditor({
       )}
       {editing && editing.what === "reward" && <RewardDialog draft={draft} way={editing.way} day={day} onChange={onChange} onClose={() => setEditing(null)} />}
       {editing && editing.what === "title-mark" && <TitleMarkDialog draft={draft} onChange={onChange} onClose={() => setEditing(null)} />}
+      {editing && editing.what === "part-sign" && (
+        <SignDialog
+          draft={draft}
+          part={editing.part}
+          onChange={onChange}
+          onOwnPhoto={() => {
+            const { part } = editing;
+            setEditing(null);
+            pickPhoto((now, key) => withSigned(now, (chart) => withPartSign(chart, part, { emoji: SLOT_EMOJI[part], photo: key })));
+          }}
+          onClose={() => setEditing(null)}
+        />
+      )}
       {editing && editing.what === "photo" && (
         <PhotoDialog
           draft={draft}
@@ -1792,6 +1782,84 @@ function RewardDialog({
           selected: item.id === reward?.catalog,
           onPick: () => set(rewardFromCatalog(item.id)),
         }))}
+      />
+    </EditDialog>
+  );
+}
+
+/**
+ * A part's sign tapped (or its ⇄): one list of pictures (`PickGrid`) – an own photo first, then „Ohne Zeichen“, which
+ * hides the signs of every part, then the sets (a set's sign picked: every part follows that set, as a set's signs belong
+ * together), then the day's pictures for this part alone (user request, 27 November 2026).
+ */
+function SignDialog({
+  draft,
+  part,
+  onChange,
+  onOwnPhoto,
+  onClose,
+}: {
+  draft: Draft;
+  part: Slot;
+  onChange: (draft: Draft) => void;
+  onOwnPhoto: () => void;
+  onClose: () => void;
+}) {
+  const t = useT();
+  const chart = chartOf(draft);
+  const own = chart.partSigns?.[part];
+  const set = signSetOf(chart.signs);
+  const done = (change: <T extends WithSigns>(chart: T) => T) => {
+    onChange(withSigned(draft, change));
+    onClose();
+  };
+  const name = SLOT_BY_ID.get(part);
+  const items: PickItem[] = [
+    ...DAY_SIGN_SETS.map(
+      (sets): PickItem => ({
+        id: `set-${sets.id}`,
+        label: t(sets.label),
+        picture: <DaySign set={sets.id} part={part} />,
+        selected: !own && sets.id === set,
+        onPick: () => done((c) => withSignSet(c, sets.id)),
+      }),
+    ),
+    ...OFFERED.map(
+      (item): PickItem => ({
+        id: item.id,
+        label: t(item.label),
+        picture: <ItemPic item={{ emoji: item.emoji, catalog: item.id }} />,
+        selected: !own?.photo && own?.catalog === item.id,
+        onPick: () => done((c) => withPartSign(c, part, { emoji: item.emoji, catalog: item.id })),
+      }),
+    ),
+  ];
+  return (
+    <EditDialog
+      title={
+        <>
+          <span className="rw-edit-dialog-pic" aria-hidden>
+            <PartSignPic chart={{ ...chart, signs: set ?? DEFAULT_SIGN_SET }} part={part} />
+          </span>{" "}
+          {name ? t(name.label) : ""}
+        </>
+      }
+      wide
+      onClose={onClose}
+    >
+      <PickGrid
+        lead={
+          <>
+            <OwnPhotoPicks item={own ?? { emoji: SLOT_EMOJI[part] }} onChoose={onOwnPhoto} onRemove={() => done((c) => withPartSign(c, part, undefined))} />
+            <Pick
+              selected={!set}
+              onClick={() => done((c) => withSignsShown(c, false))}
+              emoji="∅"
+              label={t({ en: "No signs", de: "Ohne Zeichen", zh: "不要标志", hi: "बिना चिह्न", es: "Sin símbolos", ar: "بدون علامات", ru: "Без знаков" })}
+            />
+          </>
+        }
+        items={items}
       />
     </EditDialog>
   );

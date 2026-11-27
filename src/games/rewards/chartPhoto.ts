@@ -64,6 +64,8 @@ interface WithPhotos {
   tasks?: readonly { photo?: string }[];
   /** A plan's cards day by day; a board's `days` are weekday numbers and hold none. */
   days?: readonly unknown[];
+  /** The parts' own signs (`daySigns.tsx`), which may be own photos too. */
+  partSigns?: Partial<Record<string, { photo?: string }>>;
 }
 
 /** The own photo's key of a plan's card, if it has one. */
@@ -71,7 +73,7 @@ const stepPhoto = (step: unknown): string[] =>
   step && typeof step === "object" && "photo" in step && typeof step.photo === "string" && step.photo ? [step.photo] : [];
 
 /**
- * The keys of the photos on these charts – the child's and every task's or card's own – everything else in the store
+ * The keys of the photos on these charts – the child's, every task's or card's own and the parts' own signs – everything else in the store
  * belongs to nothing and is deleted.
  */
 export const photoKeysOf = (charts: readonly WithPhotos[]): Set<string> =>
@@ -80,5 +82,6 @@ export const photoKeysOf = (charts: readonly WithPhotos[]): Set<string> =>
       ...(chart.photo?.key ? [chart.photo.key] : []),
       ...(chart.tasks ?? []).flatMap((task) => (task.photo ? [task.photo] : [])),
       ...(chart.days ?? []).flatMap((day) => (Array.isArray(day) ? day.flatMap(stepPhoto) : [])),
+      ...Object.values(chart.partSigns ?? {}).flatMap((sign) => (sign?.photo ? [sign.photo] : [])),
     ]),
   );

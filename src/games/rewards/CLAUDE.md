@@ -51,19 +51,30 @@ without a Zähler) – nothing the sheet already does with a tap (user feedback,
 2026: the Zähler, a 🎁 Belohnung switch, „Tag aufteilen?“ and „Anzahl Karten“ stood there twice and went), and the
 **Tageszeiten** – „Ganzer Tag“ (default), „Früh & Abend“ or „Früh, Mittag & Abend“, one, two or three lines (or a
 board's fields per day) for the whole chart (`Plan.dayParts`, `withDayParts`; a board's from its tasks' slots,
-`withBoardDayParts`) – with, from two parts on, their **Zeichen**: „Ohne“ (default, the lines told apart by their tints),
-a drawn sky, the Tagesplan's pictures, sun and moon, a landscape, or cock, plate and bed (`daySigns.tsx`, `Plan.signs`,
-`Board.signs`). Parts are never added or taken line by line on the sheet, and a task has no switches of its own for
+`withBoardDayParts`). The band's choices stand left-aligned under their names (user request, 27 November 2026). From two
+parts on each part has its **sign**, the Tagesplan's pictures by default (`DEFAULT_SIGN_SET`, `signSetOf`), changed
+only on the sheet, never in the band (same request: the one real choice is shown or not): 🗑️ under a sign hides every
+sign (`Plan.signs`/`Board.signs` `"none"`, `withSignsShown`; the lines then told apart by their tints) and a pale
+„＋ Zeichen“ in its place brings them back; ⇄ „Tauschen“ or a tap on a sign (also a board's small `rw-slot` on a field,
+a week's row head) opens `SignDialog`, one `PickGrid`: an own photo first, „Ohne Zeichen“, then the sets – a drawn sky,
+the pictures, sun and moon, a landscape, cock, plate and bed, which every part follows (`withSignSet`) – and then any
+picture of the catalogue for this part alone (`Plan.partSigns`, `withPartSign`; an own photo's key joins
+`photoKeysOf`; `daySigns.tsx`). Parts are never added or taken line by line on the sheet, and a task has no switches of its own for
 them (user feedback, November 2026: one layout option instead). On the
-sheet (`edit` on `PlanSheet` / `BoardSheet`, never on paper) every card and the reward carry ⚙️ in their top left
-corner and 🗑️ in their top right (`SheetAction.tsx`): ⚙️ (or a tap on the card) opens its window, which only swaps it for another card –
+sheet (`edit` on `PlanSheet` / `BoardSheet`, never on paper) every card carries its 🗑️ „Löschen“ as a tab in the
+frame's colour growing out of the frame above its top left corner, and ⇄ „Bild austauschen“ on its picture's top right
+corner, part of the picture (`SheetAction.tsx`, `CardPicture`): ⇄ (or a tap on the card) opens its window, which only swaps it for another card –
 its stars are its − ＋, its place is where it was put, 🗑️ takes it at once (↶ brings it back): never a second way in
 the window to do what the sheet already does (user feedback, November 2026: „Früher / Später“, „Entfernen“, „Sterne“ and
-„Jeden Tag / Nur Freitag“ went); the reward's ⚙️ (or a tap on it) opens the rewards, with no 🗑️: „Ohne
-Belohnung“ is the first of them, a reward like any other, with Tapsi in confetti as its picture (below). A new card comes from a small ＋ on a card's edge
-(`InsertCard`, `withInserted`): the first card carries two, before and after it, every other card one after it (user
-request, 27 November 2026: the two ＋ belong to the first card, never the last), left and right in a line, above and
-below in a week's column – under the mouse a blue bar shows where it goes, in that card's part. No empty ＋ card keeps a place:
+„Jeden Tag / Nur Freitag“ went); the reward's ⇄ „Belohnung ändern“ (or a tap on it) opens the rewards, with no 🗑️: „Ohne
+Belohnung“ is the first of them, a reward like any other, with Tapsi in confetti as its picture (below). A new card comes from a tab „＋ Schritt hinzufügen“
+growing out of a card's frame (`InsertCard`, `InsertTab`, `withInserted`; user request, 27 November 2026: merged with the
+frame, never a loose round ＋): the first card carries two, before and after it, every other card one after it (the two
+belong to the first card, never the last), left and right in a line with its words running down the tab, above and
+below in a week's column across it – under the mouse a blue bar shows where it goes, in that card's part. Where a card
+or a week's row head is too small for the words (a phone on its side) the tab keeps only its ＋, the words in its
+tooltip (container queries in `planner.css`); a counting week's rows part a tab's height while it is made, its row's
+🗑️ tab on the left and the ＋ tab under the row above on the right. No empty ＋ card keeps a place:
 the cards always take the best layout, and are set out anew when one comes (user feedback, November 2026); only an
 empty day, line or column shows a ＋ place. A board of days shows its tasks as a strip of cards over the sheet (`EditTasks`): a
 tap swaps one, its 🗑️ takes it (never the last), ＋ adds one in the board's times of day; a collecting board has no
@@ -85,7 +96,7 @@ card's middle between them – the ghost below has an unseen twin before the fir
 request, 27 November 2026: a single field stood left of the middle); under the mouse ＋ shows the next
 field pale and − pales the last – that field keeps its room unseen all the time (`visibility`, never `display`), so
 nothing jumps under the mouse (user feedback, November 2026). A plain plan's card has a small „＋⭐“, which makes it
-count (without a reward). A part's sign, where one is chosen, stands big for its whole line (`PartName`). Cards are not
+count (without a reward). A part's sign stands big for its whole line (`PartName`), its ⇄ and 🗑️ under it. Cards are not
 numbered unless „Karten nummerieren“ under „Weitere Einstellungen“ says so (`Plan.numbers`, user feedback, November 2026). The wizard starts on **„Mein Tag“**
 (`defaultDraft`): its cards in one line („Ganzer Tag“), no signs, a Zähler of 1 and no reward; a Zeitraum keeps
 name, colours and reward (`draftInSpan`; the Woche with a Zähler is the board Vorlage „woche“'s tasks, the same every
@@ -191,7 +202,8 @@ targets) – keep it that way.
 - `BoardScreen.tsx` – the sheet on screen and the star flow (below).
 - `Editor.tsx` – „✏️ Gestalten“ (and `SlotChips`, how often a day a task gets a star); `PrintPanel.tsx` – „🖨️ Drucken“
   with the preview and the print pages; `openEditor.ts` – `OPEN_EDITOR`, the router state of the shelf's calendar;
-  `ChartEditor.tsx` – the one editor of „＋ Neu“ and „Gestalten“ (above), `SheetAction.tsx` – its ⚙️ / 🗑️ in a corner, `Wizard.tsx` – „＋ Neu“ around it; `Review.tsx` – „📜 Rückblick“ (and
+  `ChartEditor.tsx` – the one editor of „＋ Neu“ and „Gestalten“ (above), `SheetAction.tsx` – its actions with their
+  words (🗑️ „Löschen“, ⇄ „Bild austauschen“, ⚙️ „Ändern“) and the drawn `PlusSign`, `Wizard.tsx` – „＋ Neu“ around it; `Review.tsx` – „📜 Rückblick“ (and
   `usePeriodLabel`, „Letzte Woche“, shared with the ‹ › on top); `Certificate.tsx` – „🏅 Urkunde“ (below);
   `RewardsGame.tsx` – the page for boards and plans
   (above). There is no „ℹ️ Über die Tafel“ or „Über den Plan“ (removed with every menu's „Über das Spiel“, user
@@ -250,8 +262,8 @@ all tasks at once with the band's „Tageszeiten“ (`withBoardDayParts`; a new 
 still per task with `SlotChips` under „Weitere Einstellungen“. A catalogue task has no times of its own; the Vorlage
 „Zähne-Woche“ brushes morning and evening (`Template.slots`). The week grid
 gives such a task a row per time under one head, the month and day views put its fields side by side; every such
-field carries the sign of its time on its edge, filled or not, on screen and on paper – the board's chosen set
-(`Board.signs`), none by default. A day is full with every time.
+field carries the sign of its time on its edge, filled or not, on screen and on paper – the board's set
+(`Board.signs`, the pictures by default, or a part's own `partSigns`), none where 🗑️ hid them. A day is full with every time.
 A day always runs in its order – the morning's fields first, then the day's (midday or once a day), then the
 evening's (`dayFields`, `weekRows`) – each part on its own tint (`--rw-tint-morning`, `-day`, `-evening`, grey on a
 black-and-white print) where a sheet has more than one.
@@ -339,7 +351,7 @@ sharp format (`blurriest`, `largestSharp`), and a drawn child's room shows the p
   gallery of Vorlagen or a „🧩 Vorlagen“ button (user request, 26 November 2026): the Zeitraum and the quick choice of
   the three kinds are the ways to another chart, and the chart keeps the page's width (`rewards.test.ts`).
 - The editor's order is fixed (user request, 26 November 2026): the quick choice of the three kinds on top, then the
-  edit bar, then the Zeitraum (with the colours), then the band with the Tageszeiten and their Zeichen, then the sheet.
+  edit bar, then the Zeitraum (with the colours), then the band with the Tageszeiten, then the sheet.
   A new option joins the band, never above the Zeitraum. The quick choice's names are the shelf's names of the three
   (`names.ts`, all seven languages, `rewards.test.ts`).
 - The wizard and „Gestalten“ are one editor (`ChartEditor`), the chart itself changed in place: a new choice joins
@@ -363,10 +375,17 @@ sharp format (`blurriest`, `largestSharp`), and a drawn child's room shows the p
 - While a chart is made and in the Druckansicht its circles are empty, also on a chart with stars or examples
   (`ticks`/`stars` `undefined` in `ChartEditor`): a star is stuck on or coloured in, never printed (user request, 27
   November 2026); the stars are seen on the chart itself.
-- Delete and change are drawn icons in a thing's corners (`SheetAction`: a bin and a gear in a white disc, the bin red),
-  never an emoji in a ring, which cut through the bin; under the mouse each says its question („„Anziehen“ löschen?“)
-  and a 🗑️ marks in red what it would take. A new thing that can be removed or changed on the sheet gets the same pair
-  with a `data-edit` of its own in `ChartEditor`, not a button somewhere else.
+- **Every action on the sheet says in a few small words what it does** (user request, 27 November 2026): a drawn sign
+  with its words beside it on a small pill (`SheetAction`: 🗑️ „Löschen“, ⇄ „Bild austauschen“, ⚙️ „Ändern“, or a
+  `label` of its own such as „Belohnung ändern“; an add „＋ Schritt hinzufügen“, „＋ Foto“, „＋ Zeichen“), never an
+  emoji in a ring, which cut through the bin; under the mouse each still says its question („„Anziehen“ löschen?“) and
+  a 🗑️ marks in red what it would take. Each sits on what it acts on: a card's 🗑️ as a tab joined to its frame at the
+  top left, a picture's ⇄ on the picture's top right corner. A new thing that can be removed or changed on the sheet
+  gets the same with a `data-edit` of its own in `ChartEditor`, not a button somewhere else. Where words don't fit
+  they are left out whole (the ＋ stays, the words in the tooltip), never cut to „Schri…“.
+- **Every ＋ and − to tap while a chart is made is the drawn `PlusSign`** (user feedback, 27 November 2026: a typed ＋
+  sat off the middle of its button): strokes in the middle of their box, in the sheet's corner place, the child's
+  portrait's badge, the insert tabs, the stars' and ways' − ＋ alike.
 - `.rw-field` (`rewards.css`) loads after `planner.css` on the dev server: a plan rule that hides or shows a star field
   needs more weight than it (`.pl-star.pl-star-ghost`), and a size in `padding: %` resolves against the card, not the
   action – size with `var(--rw-act)`.

@@ -2,7 +2,7 @@ import { type CSSProperties, useEffect, useState } from "react";
 import { type Texts, useT } from "@/lib/language";
 import { type ChartPhoto, frameRatio, type PhotoPlace, photoPlaceOf } from "./chartPhoto";
 import { photoUrl } from "./photoStore";
-import { SheetAction } from "./SheetAction";
+import { PlusSign, SheetAction } from "./SheetAction";
 
 /** „Foto des Kindes“: the photo's name, its window's heading and what a screen reader says of it. */
 export const PHOTO_NAME: Texts = {
@@ -115,6 +115,7 @@ export function ChildPhoto({ photo, editing }: { photo: ChartPhoto | undefined; 
     return (
       <span className="rw-portrait-add" data-edit="add-photo" role="button" tabIndex={0} title={add} aria-label={add}>
         <PortraitSign />
+        <span className="rw-add-text">{t({ en: "Photo", de: "Foto", zh: "照片", hi: "फ़ोटो", es: "Foto", ar: "صورة", ru: "Фото" })}</span>
       </span>
     );
   }
@@ -132,6 +133,7 @@ export function ChildPhoto({ photo, editing }: { photo: ChartPhoto | undefined; 
           <SheetAction
             act="configure"
             ask={t({ en: "Change photo", de: "Foto ändern", zh: "更改照片", hi: "फ़ोटो बदलें", es: "Cambiar la foto", ar: "تغيير الصورة", ru: "Изменить фото" })}
+            label={t({ en: "Change", de: "Ändern", zh: "修改", hi: "बदलें", es: "Cambiar", ar: "تغيير", ru: "Изменить" })}
             data={{ "data-edit": "photo" }}
           />
           <SheetAction
@@ -155,15 +157,22 @@ export function ChildPhoto({ photo, editing }: { photo: ChartPhoto | undefined; 
   );
 }
 
-/** A small drawn portrait – head and shoulders in a frame with a ＋ – for the pale place where a photo can go. */
+/**
+ * A small drawn portrait – head and shoulders in a frame – with a ＋ in a round badge on its corner, for the pale place
+ * where a photo can go (user feedback, 27 November 2026: the ＋ drawn into the frame's corner looked off).
+ */
 function PortraitSign() {
   return (
-    <svg viewBox="0 0 24 24" aria-hidden>
-      <rect x="2.5" y="3.5" width="15" height="17" rx="1.6" />
-      <circle cx="10" cy="10" r="3" />
-      <path d="M4.8 19.6c.9-3.2 2.8-4.8 5.2-4.8s4.3 1.6 5.2 4.8" />
-      <path className="rw-portrait-plus" d="M20 3v6M17 6h6" />
-    </svg>
+    <span className="rw-portrait-add-sign" aria-hidden>
+      <svg viewBox="0 0 24 24">
+        <rect x="4" y="3" width="16" height="18" rx="1.8" />
+        <circle cx="12" cy="10" r="3.2" />
+        <path d="M6.4 20.4c1-3.4 3-5.1 5.6-5.1s4.6 1.7 5.6 5.1" />
+      </svg>
+      <span className="rw-portrait-add-badge">
+        <PlusSign />
+      </span>
+    </span>
   );
 }
 

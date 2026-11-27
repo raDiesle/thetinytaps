@@ -3,7 +3,7 @@ import type { TargetLanguageId } from "@/content/targetLanguages";
 import { pick } from "@/lib/language";
 import { type BoardReward, cellKey, type LinkedDays, newId, type StarLog, weekday } from "./board";
 import { type LinkedGame, type PlanTemplate, type PlanView, type Slot, STEP_BY_ID } from "./catalog";
-import { type DayParts, type DaySignSet, PARTS_OF } from "./daySigns";
+import { type ChartSigns, type DayParts, PARTS_OF, type PartSign } from "./daySigns";
 import { ritualOf } from "./rituals";
 import type { ChartPhoto } from "./chartPhoto";
 
@@ -101,8 +101,13 @@ export interface Plan {
    * parts (`dayPartsOf`).
    */
   dayParts?: DayParts;
-  /** The signs of the parts (`DAY_SIGN_SETS`); missing: none, the rows told apart by their tints. */
-  signs?: DaySignSet;
+  /**
+   * The signs of the parts (`DAY_SIGN_SETS`), or `"none"` where 🗑️ hid them, the parts then told apart by their tints;
+   * missing: the Tagesplan's pictures (`DEFAULT_SIGN_SET`).
+   */
+  signs?: ChartSigns;
+  /** A part's own sign (a picture or an own photo), swapped on the sheet in place of the set's. */
+  partSigns?: Partial<Record<Slot, PartSign>>;
 }
 
 /** How a counting week is drawn: a card per row, or a picture over every day's circles. */

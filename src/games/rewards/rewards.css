@@ -524,7 +524,7 @@
 .rw-options-band {
   display: flex;
   flex-direction: column;
-  align-items: center;
+  align-items: flex-start;
   gap: 10px;
   padding: 12px 14px;
   border: 3px solid var(--ink);
@@ -592,7 +592,7 @@
   display: flex;
   flex-wrap: wrap;
   align-items: center;
-  justify-content: center;
+  justify-content: flex-start;
   gap: 8px 16px;
 }
 
@@ -1489,15 +1489,39 @@
   line-height: 1;
 }
 
-.rw-title-mark-none {
-  display: inline-grid;
-  place-items: center;
-  width: 1em;
-  height: 1em;
+/*
+ * The places of what a chart has not got yet, while it is made – the heading's sign, the child's photo: pale dashed
+ * slips, each with its drawn ＋ (or portrait) and a word, centred in one line (user feedback, 27 November 2026: the
+ * typed ＋ sat off the middle of its circle).
+ */
+.rw-title-mark-none,
+.rw-portrait-add {
+  display: inline-flex;
+  flex: none;
+  align-items: center;
+  gap: 0.3em;
+  box-sizing: border-box;
+  height: 1.9em;
+  padding: 0 0.6em 0 0.35em;
   border: max(2px, 0.35cqmin) dashed color-mix(in srgb, var(--rw-ink) 55%, transparent);
-  border-radius: 50%;
-  color: color-mix(in srgb, var(--rw-ink) 60%, transparent);
-  font-size: 4.4cqmin;
+  border-radius: 999px;
+  color: color-mix(in srgb, var(--rw-ink) 70%, transparent);
+  font-family: var(--font-rounded);
+  font-size: max(11px, 2.6cqmin);
+  font-weight: 700;
+  line-height: 1;
+  white-space: nowrap;
+}
+
+.rw-title-mark-none > .rw-plus-sign {
+  width: 1.3em;
+  height: 1.3em;
+}
+
+.rw-title-mark-none:hover,
+.rw-title-mark-none:focus-visible {
+  background: var(--rw-main);
+  color: var(--rw-ink);
 }
 
 .rw-title {
@@ -1632,21 +1656,16 @@
 }
 
 /* Without a photo, while the chart is made: a pale place for one beside the heading's sign, never on paper. */
-.rw-portrait-add {
-  display: inline-grid;
+.rw-portrait-add-sign {
+  position: relative;
+  display: block;
   flex: none;
-  place-items: center;
-  width: 1.15em;
-  height: 1.15em;
-  padding: 0.08em;
-  box-sizing: border-box;
-  border: max(2px, 0.35cqmin) dashed color-mix(in srgb, var(--rw-ink) 55%, transparent);
-  border-radius: 0.2em;
-  color: color-mix(in srgb, var(--rw-ink) 60%, transparent);
-  font-size: 5.4cqmin;
+  width: 1.4em;
+  height: 1.4em;
 }
 
-.rw-portrait-add > svg {
+.rw-portrait-add-sign > svg {
+  display: block;
   width: 100%;
   height: 100%;
   fill: none;
@@ -1654,6 +1673,25 @@
   stroke-width: 1.8;
   stroke-linecap: round;
   stroke-linejoin: round;
+}
+
+.rw-portrait-add-badge {
+  position: absolute;
+  top: -0.2em;
+  right: -0.3em;
+  display: grid;
+  place-items: center;
+  width: 0.75em;
+  height: 0.75em;
+  border-radius: 50%;
+  background: currentColor;
+}
+
+.rw-portrait-add-badge > .rw-plus-sign {
+  width: 0.6em;
+  height: 0.6em;
+  color: #fff;
+  stroke-width: 4;
 }
 
 .rw-portrait-add:hover,
@@ -2108,6 +2146,24 @@
   font-weight: 700;
 }
 
+/* A drawn ＋ in a slip with words: in the words' line, a little bigger than them. */
+.rw-way-add,
+.rw-edit-add {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.35em;
+}
+
+:is(.rw-way-add, .rw-edit-add) > .rw-plus-sign {
+  width: 1.2em;
+  height: 1.2em;
+}
+
+.rw-way-step > .rw-plus-sign {
+  width: 62%;
+  height: 62%;
+}
+
 /* ＋ − between the last ring and the reward: on the way itself, where a ring comes or goes. */
 .rw-way-count {
   position: absolute;
@@ -2313,6 +2369,11 @@
 }
 
 /* The time of day of a field, on its edge, in the set chosen in the band (`Board.signs`); none without one. */
+/* While a board is made a sign on a field's edge is a tap: its part's signs (`data-edit="part-sign"`). */
+.rw-editing .rw-slot[data-edit] {
+  cursor: pointer;
+}
+
 .rw-slot {
   position: absolute;
   top: -8%;
@@ -3140,22 +3201,30 @@
 
 /* ---------- While a chart is made: ⚙️ and 🗑️ in the corners of what they act on (`SheetAction`) ---------- */
 
-/* Drawn signs in a white ring, sized by `--rw-act` where they sit; its question shows under the mouse. */
+/*
+ * A drawn sign in a white pill with its few words beside it, always seen (user request, 27 November 2026), sized by
+ * `--rw-act` where it sits; its whole question shows under the mouse.
+ */
 .rw-act {
   position: absolute;
   z-index: 3;
   top: 4px;
-  display: block;
+  display: inline-flex;
+  align-items: center;
+  gap: calc(var(--rw-act, 30px) * 0.12);
   box-sizing: border-box;
-  width: var(--rw-act, 30px);
   height: var(--rw-act, 30px);
-  /* Not a percentage: that would be of the card around it. */
-  padding: calc(var(--rw-act, 30px) * 0.14);
+  padding: 0 calc(var(--rw-act, 30px) * 0.32) 0 calc(var(--rw-act, 30px) * 0.1);
   border: 2px solid var(--rw-ink, var(--ink));
-  border-radius: 50%;
+  border-radius: 999px;
   background: #fff;
   color: var(--rw-ink, var(--ink));
   box-shadow: 0 2px 0 color-mix(in srgb, var(--rw-ink, var(--ink)) 30%, transparent);
+  font-family: var(--font-rounded);
+  font-size: max(10px, calc(var(--rw-act, 30px) * 0.4));
+  font-weight: 700;
+  line-height: 1;
+  white-space: nowrap;
   cursor: pointer;
 }
 
@@ -3167,7 +3236,14 @@
   right: 4px;
 }
 
-.rw-act > svg {
+.rw-act-sign {
+  display: grid;
+  flex: none;
+  width: calc(var(--rw-act, 30px) * 0.66);
+  height: calc(var(--rw-act, 30px) * 0.66);
+}
+
+.rw-act-sign > svg {
   display: block;
   width: 100%;
   height: 100%;
@@ -3188,8 +3264,8 @@
   color: #c62828;
 }
 
-.rw-act-configure:hover,
-.rw-act-configure:focus-visible {
+.rw-act:is(.rw-act-configure, .rw-act-swap):hover,
+.rw-act:is(.rw-act-configure, .rw-act-swap):focus-visible {
   background: var(--rw-main, var(--sunshine));
 }
 
@@ -3197,6 +3273,17 @@
 .rw-act-delete:focus-visible {
   background: #c62828;
   color: #fff;
+}
+
+/* A drawn ＋ or − (`PlusSign`): two strokes in the very middle of its box, as big as the box's font. */
+.rw-plus-sign {
+  display: block;
+  width: 1em;
+  height: 1em;
+  fill: none;
+  stroke: currentColor;
+  stroke-width: 3.2;
+  stroke-linecap: round;
 }
 
 /* Its question („„Abends“ löschen?“), under it and towards the thing it acts on. */
