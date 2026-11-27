@@ -7,8 +7,10 @@ import {
   glideStretch,
   insideBy,
   lerpView,
+  lipSideOnly,
   midLine,
   MIN_FACING,
+  MOUTH_WIDE,
   NO_STRETCH,
   openCorners,
   projectors,
@@ -211,5 +213,38 @@ describe("a tipped row goes back into the mouth", () => {
       return Math.hypot(b.x - a.x, b.y - a.y);
     };
     expect(scale(TEETH_PER_SIDE - 1)).toBeLessThan(0.97 * scale(0));
+  });
+});
+
+// Tipped as far as it must be to show its chewing surfaces, the lower row rose in a deep U up the sides, with wide bands
+// of cheek between its back teeth and the lips' corners (user feedback, November 2026): the tipped rows lie flatter.
+describe("a row tipped to show its chewing surfaces", () => {
+  const chewing = STEPS.filter((s) => s.surface === "top");
+
+  test.each(chewing.map((s) => [s.id, s] as const))("%s: its back teeth rise only a little above the front teeth", (_, step) => {
+    const jaw = step.view.tilt.lower > 0 ? "lower" : "upper";
+    const model = buildMouth(step.view.open);
+    const all = projectors(step.view);
+    const at = (side: "left" | "right", n: number) => all[jaw].point(model.teeth.find((t) => t.key === toothKey({ jaw, side, n }))!.center);
+    const [front, left, right] = [at("left", 0), at("left", TEETH_PER_SIDE - 1), at("right", TEETH_PER_SIDE - 1)];
+    // Without flattening the back teeth rose by more than a quarter of the row's width.
+    expect(Math.abs(front.y - left.y) / Math.abs(right.x - left.x)).toBeLessThan(0.21);
+  });
+
+  // A band of lighter gum lay between the lower teeth and the tongue like a second row (user feedback, November 2026).
+  test("shows no gum on the tongue side of its teeth", () => {
+    const model = buildMouth(1);
+    // How far out from the mouth's middle a point lies, along the arch.
+    const out = (p: readonly number[]) => Math.hypot(p[0] / MOUTH_WIDE, p[2]);
+    for (const gum of model.gums) {
+      const shown = lipSideOnly(gum);
+      expect(shown.faces.map((f) => f.kind)).toEqual(["outer", "top"]);
+      expect(shown.rims.inner).toEqual([]);
+      const tongueSide = model.teeth.find((t) => t.key === gum.key)!.faces.find((f) => f.kind === "inner")!;
+      const innermost = Math.min(...tongueSide.points.map(out));
+      expect({ gum: gum.key, past: Math.min(...gum.bite.points.map(out)) < innermost - 0.01 }).toEqual({ gum: gum.key, past: false });
+      // The whole gum's top does reach past the tooth, so the inner steps still show it.
+      expect(Math.min(...gum.faces.find((f) => f.kind === "top")!.points.map(out))).toBeLessThan(innermost - 2);
+    }
   });
 });
