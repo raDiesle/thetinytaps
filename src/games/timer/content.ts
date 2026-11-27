@@ -54,7 +54,7 @@ export const PICTURES: { id: TimerPicture; emoji: string; name: Texts }[] = [
   { id: "apple", emoji: "🍎", name: { de: "Apfelbaum", en: "Apple Tree", zh: "苹果树", hi: "सेब का पेड़", es: "Manzano", ar: "شجرة التفاح", ru: "Яблоня" } },
   { id: "clock", emoji: "⏰", name: { de: "Wecker", en: "Alarm Clock", zh: "闹钟", hi: "अलार्म घड़ी", es: "Despertador", ar: "المنبّه", ru: "Будильник" } },
   { id: "flower", emoji: "🌸", name: { de: "Blume", en: "Flower", zh: "小花", hi: "फूल", es: "Flor", ar: "الزهرة", ru: "Цветок" } },
-  // Lift to the Top (H-127, id `jump`: „Up to the Moon“ until 26 November 2026; sixth, so it starts the second row of five most screens show, user request, 25 November 2026): one tower with a big glass lift riding up, its red dot-matrix display counting the floors, and a flag hoisted on the roof at the end.
+  // Lift to the Top (H-127, id `jump`: „Up to the Moon“ until 26 November 2026; sixth, so it starts the second row of five most screens show, user request, 25 November 2026): one tower with a big glass lift riding up, its red dot-matrix display counting the floors up to a hundred, never more than one a second, and the top floor's door opening at the end (its flag taken out, 27 November 2026).
   { id: "jump", emoji: "🛗", name: LIFT_NAME },
   { id: "pizza", emoji: "🍕", name: { de: "Pizza", en: "Pizza", zh: "披萨", hi: "पिज़्ज़ा", es: "Pizza", ar: "البيتزا", ru: "Пицца" } },
   { id: "candle", emoji: "🕯️", name: { de: "Kerze", en: "Candle", zh: "蜡烛", hi: "मोमबत्ती", es: "Vela", ar: "الشمعة", ru: "Свеча" } },

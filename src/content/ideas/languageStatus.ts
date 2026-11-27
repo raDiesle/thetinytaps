@@ -101,7 +101,7 @@ export const LANGUAGE_STATUS: LanguageStatusRow[] = [
         label: "🛗 Lift to the Top",
         languages: { de: "text", en: "text", zh: "text", hi: "text", es: "text", ar: "text", ru: "text" },
         recorded: true,
-        note: "Ein Hochhaus mit einem großen gläsernen Aufzug, der Stockwerk für Stockwerk nach oben fährt, während rote Punktziffern wie in einem echten Aufzug die Stockwerke hochzählen; oben geht die Tür auf und auf dem Dach wird eine Fahne gehisst (H-127, lift.tsx, Wunsch 26. November 2026, statt „Up to the Moon“ mit dem Fuchskind). Englisch zuerst geschrieben und gleich in alle Sprachen übersetzt: sein Name „Lift to the Top“ („Mit dem Aufzug nach oben“) und seine zwei Sätze am Anfang und am Ende (liftNames.ts). Die Sätze warten auf ihre Aufnahmen (die von „Up to the Moon“ passen nicht mehr). Die Texte für Suchmaschinen nennen es in allen sieben Sprachen.",
+        note: "Ein Hochhaus mit einem großen gläsernen Aufzug, der Stockwerk für Stockwerk nach oben fährt, während rote Punktziffern wie in einem echten Aufzug die Stockwerke hochzählen; oben geht die Tür auf (H-127, lift.tsx, Wunsch 26. November 2026, statt „Up to the Moon“ mit dem Fuchskind; seit 27. November 2026 bis zu 100 Stockwerke, höchstens eins pro Sekunde, und ohne Fahne – der Schlusssatz sagt jetzt „die Tür geht auf“ statt „die Fahne weht“). Englisch zuerst geschrieben und gleich in alle Sprachen übersetzt: sein Name „Lift to the Top“ („Mit dem Aufzug nach oben“) und seine zwei Sätze am Anfang und am Ende (liftNames.ts). Die Sätze warten auf ihre Aufnahmen (die von „Up to the Moon“ passen nicht mehr). Die Texte für Suchmaschinen nennen es in allen sieben Sprachen.",
         files: ["src/games/timer/liftNames.ts"],
       },
       {
