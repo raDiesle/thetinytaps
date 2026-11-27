@@ -6,7 +6,7 @@ import type { Cue } from "./cues";
 import { useFigure } from "@/lib/common";
 import type { Daytime } from "@/lib/days";
 import { PyjamaPattern, topFill } from "./clothes";
-import { fitBox, FrameStroke, INK, screenFrame, SKIN, useRoom, type Box } from "./mouth";
+import { fitBox, FRAME_CLIP, FrameStroke, INK, screenFrame, SKIN, useRoom, type Box } from "./mouth";
 import { Piece, pictureSpace } from "./piece";
 
 // Before brushing, at the sink: the toothbrush wiggles in its cup until a
@@ -470,11 +470,8 @@ export function Prep({ part, daytime, free }: { part: PrepPart; daytime: Daytime
           });
   return (
     <div ref={scene} className={`prep at-${part}`}>
-      <svg className="prep-picture" viewBox={viewBox} role="img" aria-label={label}>
+      <svg className="prep-picture" viewBox={viewBox} role="img" aria-label={label} style={FRAME_CLIP}>
         <defs>
-          <clipPath id="prep-frame">
-            <rect {...frame} />
-          </clipPath>
           <pattern id="prep-tiles" width={55} height={55} patternUnits="userSpaceOnUse">
             <rect width={55} height={55} fill="#e6f7ff" />
             <path d="M0 0.5 H55 M0.5 0 V55" stroke="#b8e2f5" strokeWidth={3} />
@@ -500,7 +497,7 @@ export function Prep({ part, daytime, free }: { part: PrepPart; daytime: Daytime
           </linearGradient>
         </defs>
 
-        <g clipPath="url(#prep-frame)">
+        <g>
           <rect {...box} fill="url(#prep-tiles)" />
           <WindowSky daytime={daytime} />
           {/* The counter's shade on the wall just above it. */}

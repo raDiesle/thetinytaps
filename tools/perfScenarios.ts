@@ -43,9 +43,9 @@ export const BUDGET: Budget = { p95: 34, stuttersPerS: 0.5, busy: 0.6, rasterScr
 
 /**
  * Zähne putzen: back to the start of the end's cheer, wherever the jumps before left the brushing: ← once if the end is
- * on (its address says „ende“; → there only skips to the buttons), then → until the cheer's dazzled monster is there,
- * one step at a time and waiting for each step's address – on the slow phone a press before the last had landed went
- * past the cheer.
+ * on (its address says „ende“; → there only skips to the buttons), then → until the address says „ende“ again, one
+ * step at a time and waiting for each step's address – on the slow phone a press before the last had landed went past
+ * the cheer.
  */
 const TO_THE_END = `(async () => {
   const pause = (ms) => new Promise((r) => setTimeout(r, ms));
@@ -56,7 +56,7 @@ const TO_THE_END = `(async () => {
     await pause(300);
   };
   if (location.search.includes("ende")) await press("ArrowLeft");
-  for (let i = 0; i < 12 && !document.querySelector(".dazzle-body"); i++) await press("ArrowRight");
+  for (let i = 0; i < 12 && !location.search.includes("ende"); i++) await press("ArrowRight");
 })()`;
 
 /** Lebendige Bilder: the items of the picture, and a finger landing on one (an `eval` step defines `tapItem` with it). */
@@ -206,7 +206,7 @@ export const SCENARIOS: Scenario[] = [
       { label: "Putzen: springen", ms: 12000, type: { keys: ["ArrowRight"], every: 2000 } },
       // The jumps above run on into the end and skip it to the buttons, so until November 2026 this stretch measured
       // only the still grin (X-18): it goes back to the cheer's start first and watches cheer, spitting and tidying whole.
-      { label: "Ende, Ausspucken und Aufräumen", before: [{ eval: TO_THE_END }, { waitFor: ".dazzle-body" }], ms: 17500 },
+      { label: "Ende, Ausspucken und Aufräumen", before: [{ eval: TO_THE_END }], ms: 17500 },
     ],
   },
   {

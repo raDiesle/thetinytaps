@@ -58,12 +58,12 @@ export const teethIdeas: IdeaArea = {
       id: "X-18",
       emoji: "💦",
       title: "Ausspucken, nicht ausspülen",
-      text: "Am Ende, vor dem Ausspülen der Bürste, zeigt der Spiegel das Gesicht über dem Waschbecken: die Lippen gespitzt, ein Klecks Schaum fällt ins Becken, ein leises „Ptü“. Kein Becher Wasser zum Mundspülen. Ein Bild mit zwei Takten, ohne Worte im Bild. Der Schaum auf den Lippen (X-31) bleibt dann bis hierher und geht mit dem Ausspucken weg (heute blendet er beim Jubel aus, `foamStage` in foam.ts).",
+      text: "Am Ende, vor dem Ausspülen der Bürste, zeigt der Spiegel das Gesicht über dem Waschbecken: die Lippen gespitzt, ein Klecks Schaum fällt ins Becken, ein leises „Ptü“. Kein Becher Wasser zum Mundspülen. Ein Bild mit zwei Takten, ohne Worte im Bild. Der Schaum am Zahnfleisch (X-31) bleibt dann bis hierher und geht mit dem Ausspucken weg (heute ist er beim Jubel weg, `foamyTeeth` in foam.ts).",
       why: "Empfohlen wird, den Schaum nur auszuspucken und nicht mit Wasser nachzuspülen, damit das Fluorid an den Zähnen bleibt. Kinder machen nach, was sie sehen – und Ausspucken üben viele Zweijährige erst.",
       effort: "S",
       done: true,
       partial:
-        "Umgesetzt (27. November 2026): Nach dem Jubel fährt die Kamera vom Spiegel hinunter zum Kind über dem Waschbecken (zwei Takte): es beugt sich vor, spitzt die Lippen, der Schaum an den Lippen verschwindet, ein Klecks fällt ins Becken und liegt dort flach, mit einem leisen synthetischen „Ptü“. Dann hinunter zum Ausspülen der Bürste, der Klecks liegt noch im Becken und wird weggespült. Kein Becher, keine Worte. Das Ende ist dadurch 17 s lang; beim Hindi-Lied (Finale 14 s) laufen die letzten Sekunden des Aufräumens ohne Lied.",
+        "Umgesetzt (27. November 2026): Der Schaum am Zahnfleisch bleibt jetzt durch den Jubel. Danach fährt die Kamera vom Spiegel hinunter zum Kind über dem Waschbecken (zwei Takte): es beugt sich vor, spitzt die Lippen, ein Klecks Schaum kommt heraus und fällt ins Becken, wo er flach liegt, mit einem leisen synthetischen „Ptü“; im Spiegel ist der Schaum dann weg. Dann hinunter zum Ausspülen der Bürste, der Klecks liegt noch im Becken und wird weggespült. Kein Becher, keine Worte. Das Ende ist dadurch 17 s lang; beim Hindi-Lied (Finale 14 s) laufen die letzten Sekunden des Aufräumens ohne Lied.",
     },
     {
       id: "X-19",
@@ -165,12 +165,12 @@ export const teethIdeas: IdeaArea = {
       id: "X-31",
       emoji: "🫧",
       title: "Schaum, der mit dem Putzen wächst",
-      text: "Im Spiegel bildet sich beim Putzen nach und nach weißer Zahnpastaschaum: erst ein paar Bläschen an den Borsten, dann ein Rand Schaum an den Mundwinkeln und auf der Unterlippe, so wie bei echtem Putzen. Er bleibt bis zum Ausspucken (X-18) und verschwindet dann. Leise und ruhig, keine Blasen, die aufsteigen oder platzen.",
+      text: "Im Spiegel bildet sich beim Putzen nach und nach weißer Zahnpastaschaum: erst ein paar Bläschen an den Borsten, dann weißer Schaum zwischen Lippen und Zähnen, auf dem Zahnfleisch der Zähne, die schon geputzt sind, so wie bei echtem Putzen. Er bleibt bis zum Ausspucken (X-18) und verschwindet dann. Leise und ruhig, keine Blasen, die aufsteigen oder platzen.",
       why: "Kinder sehen am eigenen Mund im echten Spiegel Schaum und erkennen sich im Spiel wieder. Und mancher Zweijährige erschrickt beim ersten Schaum im Mund – sieht er ihn vorher beim Kind im Spiel, ist er etwas ganz Normales.",
       effort: "S",
       done: true,
       partial:
-        "Umgesetzt (26. November 2026): Die Bläschen an den Borsten gab es schon; nach 20 s Putzen kommt Schaum in beide Mundwinkel, nach 40 s auf die Mitte der Unterlippe, nach 65 s mehr davon zu den Winkeln hin – jeder Klecks blendet in zwei Schlägen sanft ein. Seit X-18 bleibt er durch den Jubel und wird dann ausgespuckt.",
+        "Umgesetzt (26. November 2026): Die Bläschen an den Borsten gab es schon; nach 20 s Putzen kommt Schaum in beide Mundwinkel, nach 40 s auf die Mitte der Unterlippe, nach 65 s mehr davon zu den Winkeln hin – jeder Klecks blendet in zwei Schlägen sanft ein. Da es das Ausspucken (X-18) noch nicht gibt, ist der Schaum beim Jubel am Ende weg; kommt X-18, bleibt er bis zum Ausspucken. Am 27. November 2026 auf Wunsch geändert („der Schaum ist auf der Lippe und sieht komisch aus“): kein Schaum mehr auf den Lippen und in den Mundwinkeln, sondern ein paar kleine Blasen auf dem Zahnfleisch zwischen Lippe und Zahn, nur an den Zähnen, die schon geputzt sind oder gerade geputzt werden – so wächst er mit der Bürste mit. Seit X-18 (27. November 2026) bleibt er durch den Jubel und wird dann ausgespuckt.",
     },
     {
       id: "X-32",

@@ -502,22 +502,38 @@
    * looked out of the shelf); the stand shows at its right as the V's other leg – further, the tent reached through
    * the compartment's back wall (`--d`) or its foot over the board's edge.
    */
-  --turn: -16deg;
+  --turn: -32deg;
+  /* Brought forward on the board, so turned its left side keeps clear of the back wall (at 1920×1080 it went through). */
+  --forward: calc(var(--sh) * 0.1);
   /* How far the tent reaches back on the board: twice its pages' height times sin(--tilt). */
   --tent: calc(var(--sh) * 0.97 * 0.35);
   /* Where the rings' line stands: half the tent back, and more for the turn, so the pages' foot keeps on the board. */
   --ridge: calc(var(--tent) * -0.5 - var(--sh) * 0.12);
   position: relative;
   display: block;
-  /* As wide as three books, and the room up to the wall on top of that (`--grow`), the books left of it keeping theirs. */
+  /*
+   * As wide as three books, and the room up to the wall on top of that (`--grow`), the books left of it keeping theirs –
+   * but never wider than `--wide` of its height (user request, 27 November 2026: grown to the wall it was too wide): what
+   * is left stays free left of it (`margin-left: auto`), and it keeps standing at the board's right end.
+   */
+  --wide: 0.95;
   flex: var(--spines) 1 var(--grow, 0px);
   min-width: 0;
+  max-width: calc(var(--sh) * 0.97 * var(--wide));
+  margin-left: auto;
+  /*
+   * Room before the right wall: turned, its stand behind swings out to the right, so this much keeps it just touching
+   * the wall while the page in front stays clear of it – never cut off by the post (user request, 27 November 2026).
+   * How much that is depends on the shelf's perspective, so `ShelfCalendar` measures it in the page (`--wall-room`);
+   * this is only its first guess. Look at it at 844×390, 1024×768, 1280×720 and 1920×1080 after changing `--turn`.
+   */
+  margin-right: var(--wall-room, calc(var(--sh) * 0.12));
   height: calc(var(--sh) * 0.97);
   color: var(--ink);
   text-decoration: none;
   transform-style: preserve-3d;
   transform-origin: 50% 100%;
-  transform: rotateY(var(--turn));
+  transform: translateZ(var(--forward)) rotateY(var(--turn));
   transition: transform 0.35s cubic-bezier(0.3, 0.7, 0.4, 1.2);
   -webkit-tap-highlight-color: transparent;
 }
@@ -533,13 +549,13 @@
 
 @media (hover: hover) {
   .shelf-calendar:hover {
-    transform: translateZ(calc(var(--d) * 0.12)) translateY(-2%) rotateY(var(--turn));
+    transform: translateZ(calc(var(--forward) + var(--d) * 0.12)) translateY(-2%) rotateY(var(--turn));
   }
 }
 
 .shelf-calendar:focus-visible {
   outline: none;
-  transform: translateZ(calc(var(--d) * 0.12)) translateY(-2%) rotateY(var(--turn));
+  transform: translateZ(calc(var(--forward) + var(--d) * 0.12)) translateY(-2%) rotateY(var(--turn));
 }
 
 .shelf-calendar:focus-visible .shelf-calendar-sheet {
@@ -615,7 +631,8 @@
 }
 
 /*
- * Its page: warm paper with a red band along the top, under the rings, and the day's two parts below it, filling the
+ * Its page: warm paper with a red band along the top, under the rings, holding its name (`.shelf-calendar-head`), and
+ * the day's two parts below it, filling the
  * page – what is on it sized by the page (`cqw`, `cqh`), its own padding in %, since container units on the container
  * itself measure the next one up.
  */
@@ -624,12 +641,11 @@
   flex-direction: column;
   align-items: stretch;
   gap: 0;
-  padding: 13% 5% 5%;
+  /* Thin margins, so the bands fill the page and little of its white shows (user request, 27 November 2026). */
+  padding: 0 2.5% 2.5%;
   overflow: visible;
   border-radius: 3px;
-  background:
-    linear-gradient(#d9483b, #c23a30) top / 100% 11% no-repeat,
-    linear-gradient(122deg, #fffdf6 0 30%, #f8efda);
+  background: linear-gradient(122deg, #fffdf6 0 30%, #f8efda);
   box-shadow:
     inset 0 0 0 1px #3d304540,
     0 0 0 2px #fff6dccc,
@@ -646,8 +662,51 @@
 }
 
 /*
- * The day's two parts, one over the other – or, where the calendar grew wide up to the wall (`--grow`), side by side,
- * so their pictures stay big instead of flat bands across a wide page.
+ * The calendar's head: the red band under the rings, with its name – „Zeitplan & Belohnungstafel“, what the three
+ * books were called before (user request, 27 November 2026) – and a gear beside it, since a tap opens the editor.
+ */
+.shelf-calendar-head {
+  display: flex;
+  flex: none;
+  gap: 2cqw;
+  justify-content: center;
+  align-items: center;
+  margin: 0 -2.6cqw;
+  padding: 9cqh 3cqw 1.6cqh;
+  border-radius: 3px 3px 0 0;
+  background: linear-gradient(#d9483b, #c23a30);
+  box-shadow: inset 0 -0.5cqh 0 #00000026;
+}
+
+/*
+ * Its name set as the picture books' titles are (`.shelf-book-title`): the same rounded letters, weight and size, on two
+ * balanced lines, printed into the band – much bigger than the small line it was (user request, 27 November 2026).
+ * Never bigger than its longest word (`--len`, its letters, each about `--letter` em wide) lets it stand in one line.
+ */
+.shelf-calendar-title {
+  min-width: 0;
+  font-size: min(10cqh, 12cqw, 84cqw / (var(--len) * var(--letter, 0.58)));
+  font-weight: 700;
+  line-height: 1.05;
+  text-align: center;
+  text-wrap: balance;
+  text-shadow: 0 0.06em 0 #00000040;
+  color: #fff6dc;
+}
+
+:root[lang="ru"] .shelf-calendar-title {
+  --letter: 0.7;
+}
+
+.shelf-calendar-gear {
+  flex: none;
+  width: min(9cqh, 9cqw);
+  height: min(9cqh, 9cqw);
+}
+
+/*
+ * The day's two parts, one over the other – or, where the page is wide (a phone on its side), side by side, so their
+ * pictures stay big instead of flat bands across a wide page.
  */
 .shelf-calendar-day {
   display: flex;
@@ -668,17 +727,23 @@
   }
 }
 
-/* A part of the day: its name on a band of its colour, its two pictures side by side under it, as big as they fit. */
+/*
+ * A part of the day on a band of its colour, as big as the page allows: its two pictures side by side, as big as they
+ * fit, each with its star on its bottom edge, and the part's name small in the middle between the two stars, on their
+ * line – never a row of its own under them (user requests, 27 November 2026: big and centred over the pictures it took
+ * their room, then in the bottom left corner under the stars it took a row).
+ */
 .shelf-calendar-part {
   --band: linear-gradient(#ffe48a, #ffd257);
   --edge: #e3a91f;
+  --star: 8.5cqh;
+  position: relative;
   display: flex;
   flex: 1 1 0;
   flex-direction: column;
-  gap: 1.5cqh;
   min-height: 0;
-  margin-top: 2.5cqh;
-  padding: 1.5cqh 3cqw 3cqh;
+  margin-top: 1.5cqh;
+  padding: 1.5cqh 2cqw calc(var(--star) / 2 + 1.2cqh);
   border-radius: 4cqw;
   background: var(--band);
   box-shadow: inset 0 0 0 max(1px, 0.8cqw) var(--edge);
@@ -690,11 +755,20 @@
 }
 
 .shelf-calendar-label {
+  position: absolute;
+  bottom: calc(var(--star) / 2 + 1.2cqh);
+  left: 50%;
+  /* A small tag of the band's colour over the pictures' inner corners, between the two stars. */
+  z-index: 1;
+  padding: 0.5cqh 1.6cqw;
+  border-radius: 99px;
+  background: var(--band);
+  box-shadow: inset 0 0 0 max(1px, 0.5cqw) var(--edge);
+  transform: translate(-50%, 50%);
   font-family: var(--font-display, inherit);
-  font-size: 9.5cqh;
+  font-size: min(4.2cqh, 4.6cqw);
   font-weight: 800;
   line-height: 1;
-  text-align: center;
   white-space: nowrap;
   color: #4a2d1a;
 }
@@ -714,7 +788,7 @@
   position: relative;
   flex: 1 1 0;
   min-width: 0;
-  padding: 1.5cqw;
+  padding: 1.5cqw 1.5cqw calc(var(--star) / 2);
   border-radius: 3cqw;
   background: #fffdf8;
   box-shadow: 0 0.6cqh 0 #00000026;
@@ -728,25 +802,17 @@
 }
 
 /*
- * Each picture's star, its round field sitting on the picture's top edge, half above it and half on it (user request,
- * 27 November 2026); the band's gap under the name is half the star high, so the star never covers the name.
+ * Each picture's star, small, its round field sitting in the middle of the picture's bottom edge, half on it and half
+ * below it (user requests, 27 November 2026: first on the top edge, then smaller and at the bottom).
  */
 .shelf-calendar-star {
   position: absolute;
-  top: 0;
+  top: 100%;
   left: 50%;
   width: var(--star);
   height: var(--star);
   transform: translate(-50%, -50%);
   filter: drop-shadow(0 0.4cqh 0 #0000002e);
-}
-
-.shelf-calendar-part {
-  --star: 15cqh;
-}
-
-.shelf-calendar-part > .shelf-calendar-cards {
-  margin-top: calc(var(--star) / 2 - 1.5cqh);
 }
 
 /* Taken out (bookTravel.ts), only the page flies: the stand and the pages beneath stay behind. */

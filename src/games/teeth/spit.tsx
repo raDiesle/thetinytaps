@@ -16,8 +16,8 @@ import { Piece, pictureSpace } from "./piece";
 //
 // The child is the story's child, drawn with the same parts in the same place (`origin.tsx`, `face.tsx`); the basin
 // lies in front of it at the bottom. As everywhere in this game the picture is still and every moving thing an HTML
-// layer of its own (`Piece`): the child leaning (one layer with its lips and the foam on them), and the dab of foam
-// falling into the basin. Its keyframes are `teeth-spit-…` in teeth.css, as long as SPIT_MS.
+// layer of its own (`Piece`): the child leaning (one layer with its lips on it), and the dab of foam falling into the
+// basin. The foam shows only as that dab, never on the lips (the mirror keeps it between lips and teeth, `foam.ts`). Its keyframes are `teeth-spit-…` in teeth.css, as long as SPIT_MS.
 
 /** How long the spitting lasts: two bars of the song (8 beats at 112 BPM). */
 export const SPIT_MS = 4290;
@@ -42,8 +42,6 @@ const LANDS_AT = BASIN.y + 4;
 const CHILD: Box = { x: -10, y: 0, width: 460, height: COUNTER + 40 };
 /** The pursed lips' layer, round where the lips meet. */
 const PUCKER: Box = { x: LIPS.x - 32, y: LIPS.y - 26, width: 64, height: 54 };
-/** The foam on the lips before the spit: in both corners and on the lower lip, as the mirror showed it. */
-const LIP_FOAM: Box = { x: 150, y: 250, width: 140, height: 60 };
 /** The dab of foam, where it peeks out of the pursed lips once the child has leaned down. */
 const BLOB: Box = { x: LIPS.x - 15, y: LIPS.y + LEAN - 10, width: 30, height: 30 };
 /** How far the dab drops from the lips into the bowl, in picture units (`teeth-spit-blob`'s last keyframes). */
@@ -74,18 +72,6 @@ function Pucker() {
         strokeWidth={2}
         strokeLinecap="round"
       />
-    </g>
-  );
-}
-
-/** A soft clump of foam: a few bubbles merged into one white cloud with a light blue rim. */
-function FoamClump({ x, y, k = 1 }: { x: number; y: number; k?: number }) {
-  return (
-    <g fill="#fff" stroke="#9fd8ef" strokeWidth={2}>
-      <circle cx={x - 6 * k} cy={y + 1 * k} r={6 * k} />
-      <circle cx={x + 6 * k} cy={y + 1 * k} r={5.5 * k} />
-      <circle cx={x} cy={y - 3 * k} r={7 * k} />
-      <circle cx={x + 2 * k} cy={y - 2 * k} r={5 * k} stroke="none" />
     </g>
   );
 }
@@ -131,14 +117,9 @@ export function Spit({ daytime, free }: { daytime: Daytime; free: RefObject<HTML
           className="spit-child"
           over={
             <>
-              {/* The smile closes, the lips purse round the foam and push it out, then the smile comes back. */}
+              {/* The smile closes, the lips purse and push the foam out, then the smile comes back. */}
               <Piece area={CLOSED_AREA} within={CHILD} className="spit-smile">
                 <ClosedMouth />
-              </Piece>
-              <Piece area={LIP_FOAM} within={CHILD} pivot={LIPS} className="spit-lip-foam">
-                <FoamClump x={172} y={268} />
-                <FoamClump x={268} y={268} k={0.9} />
-                <FoamClump x={222} y={292} k={0.8} />
               </Piece>
               <Piece area={PUCKER} within={CHILD} pivot={LIPS} className="spit-pucker">
                 <Pucker />

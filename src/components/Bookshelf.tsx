@@ -527,10 +527,12 @@ function BookBundle({ volumes, take }: { volumes: ShelfBook[]; take: (book: Shel
  * The Belohnungstafel's calendar (user request, 26 November 2026: one thing instead of three books tied together): a
  * ring-bound desk calendar standing on the board as a tent – its pages leaning back on a cardboard stand behind them,
  * the two meeting in the rings on top like an upside-down V (user request, 26 November 2026: it should stand and look
- * 3D). Its page shows a day's plan: „Morning“ and „Afternoon“ written over two of the Tagesplan's pictures each, side by
- * side and as big as the page allows, on a sunny and a sky-blue band, each picture with its star on its top edge (user
- * request, 27 November 2026) – no reward, no names, no plain white page (same request: small pictures on white paper
- * with the reward looked boring). Last on its board, it grows up to the right wall and faces left into the room
+ * 3D). Its page shows a day's plan under its name „Zeitplan & Belohnungstafel“, set big like the picture books'
+ * titles, with a gear: two of the Tagesplan's pictures side by side and as big as the page allows on a sunny and a
+ * sky-blue band filling the page, a small star at the middle of each picture's foot, and „Morning“ and „Afternoon“ small
+ * in the middle between the two stars (user requests, 27 November 2026) – no reward, no plain white page (user request, 26 November 2026: small pictures on white paper with the reward
+ * looked boring). Last on its board, it stands at the right wall, turned to face left into the room, its stand touching
+ * the wall and its front page clear of the post
  * (user request, 27 November 2026). One tap takes it out and opens the Zeitplan in
  * its editor, whose quick access reaches the other two parts. Its page is the cover that swings open as it flies
  * (`.shelf-book-cover`, bookTravel.ts; the tent's other parts stay behind). Still, like everything on the shelf, and
@@ -538,8 +540,36 @@ function BookBundle({ volumes, take }: { volumes: ShelfBook[]; take: (book: Shel
  */
 function ShelfCalendar({ book, onClick }: { book: ShelfBook; onClick: (e: MouseEvent<HTMLAnchorElement>) => void }) {
   const t = useT();
+  const link = useRef<HTMLAnchorElement>(null);
+  // Turned to face left, its stand swings out to the right by as much as the shelf's perspective makes of it, which
+  // differs with every screen: so the room before the right wall is measured in the page, until the stand's right edge
+  // meets the wall's inner face (`WALL_TOUCH`) – touching it, never cut off by the post (user request, 27 November 2026).
+  // Measured again when the compartment changes size.
+  useLayoutEffect(() => {
+    const calendar = link.current;
+    const cell = calendar?.closest<HTMLElement>(".shelf-cell");
+    const wall = cell?.querySelector<HTMLElement>(".shelf-wall.right");
+    const stand = calendar?.querySelector<HTMLElement>(".shelf-calendar-stand");
+    if (!calendar || !cell || !wall || !stand) return;
+    const fit = () => {
+      // A few steps, since the room taken from the right moves the calendar's page and so its perspective too.
+      for (let step = 0; step < 3; step++) {
+        const scale = cell.getBoundingClientRect().width / cell.offsetWidth || 1;
+        const face = wall.getBoundingClientRect();
+        const over = (stand.getBoundingClientRect().right - (face.left + face.width * WALL_TOUCH)) / scale;
+        if (Math.abs(over) < 0.5) break;
+        const room = parseFloat(getComputedStyle(calendar).marginRight) || 0;
+        calendar.style.setProperty("--wall-room", `${Math.max(0, room + over)}px`);
+      }
+    };
+    fit();
+    const observer = new ResizeObserver(fit);
+    observer.observe(cell);
+    return () => observer.disconnect();
+  }, []);
   return (
     <Link
+      ref={link}
       to={book.href}
       state={book.state}
       className="shelf-calendar"
@@ -560,6 +590,12 @@ function ShelfCalendar({ book, onClick }: { book: ShelfBook; onClick: (e: MouseE
         <span className="shelf-calendar-pages" aria-hidden />
         <span className="shelf-book-cover shelf-calendar-sheet">
           <CalendarRings />
+          <span className="shelf-calendar-head" aria-hidden>
+            <span className="shelf-calendar-title" style={{ "--len": longestWord(t(CALENDAR_TITLE)) } as CSSProperties}>
+              {t(CALENDAR_TITLE)}
+            </span>
+            <CalendarGear />
+          </span>
           <span className="shelf-calendar-day">
             {CALENDAR_PARTS.map((part) => (
               <span key={part.id} className="shelf-calendar-part" data-part={part.id} aria-hidden>
@@ -599,8 +635,49 @@ const CALENDAR_PARTS: { id: string; name: EnglishFirst; cards: string[] }[] = [
 ];
 
 /**
- * The star a picture's step earned, as the Tagesplan gives one: a golden star in a round field sitting on the picture's
- * top edge, half above it and half on it (user request, 27 November 2026).
+ * Where on the right wall's inner face, seen from the room, the calendar's stand ends: as a share of the face's width
+ * from its back edge, so the stand, a little behind the page, meets the wall instead of going into it.
+ */
+const WALL_TOUCH = 0.3;
+
+/**
+ * The name on the calendar's red band: what its books were called before it (user request, 27 November 2026), the
+ * Zeitplan first, since a tap opens its editor.
+ */
+const CALENDAR_TITLE: EnglishFirst = {
+  en: "Schedule & Reward Chart",
+  de: "Zeitplan & Belohnungstafel",
+  zh: "时间表和奖励表",
+  hi: "समय-सारणी और इनाम चार्ट",
+  es: "Horario y tabla de premios",
+  ar: "الجدول ولوحة المكافآت",
+  ru: "Расписание и награды",
+};
+
+/** How many letters the longest word of a name has: what its size must fit into one line of the calendar's head. */
+function longestWord(name: string): number {
+  return Math.max(...name.split(/\s+/).map((word) => [...word].length));
+}
+
+/** A gear beside the calendar's name, in the band's cream: a tap on the calendar opens the editor to set it up. */
+function CalendarGear() {
+  const teeth = 8;
+  return (
+    <svg className="shelf-calendar-gear" viewBox="0 0 40 40" aria-hidden>
+      <g fill="#fff6dc" stroke="#8f2a22" strokeWidth={1.2} strokeLinejoin="round">
+        {Array.from({ length: teeth }, (_, i) => (
+          <rect key={i} x={16.5} y={2.5} width={7} height={9} rx={1.6} transform={`rotate(${(i * 360) / teeth} 20 20)`} />
+        ))}
+        <circle cx={20} cy={20} r={12.5} />
+      </g>
+      <circle cx={20} cy={20} r={5} fill="#c23a30" stroke="#8f2a22" strokeWidth={1.2} />
+    </svg>
+  );
+}
+
+/**
+ * The star a picture's step earned, as the Tagesplan gives one: a small golden star in a round field sitting in the
+ * middle of the picture's bottom edge, half on it and half below it (user requests, 27 November 2026).
  */
 function CalendarStar() {
   return (

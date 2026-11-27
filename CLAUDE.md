@@ -656,19 +656,27 @@ A game may give it before its end where reaching the goal once is enough (Ketten
   three small ribbons (user feedback, November 2026). The Belohnungstafel's three parts („Zeitplan“, „Belohnungstafel“,
   „Wie lange warten?“) no longer stand as such books but as **one ring-bound calendar** right of Aufs Töpfchen
   (`Game.calendar`, `ShelfCalendar`, user request, 26 November 2026), as wide as the three books were
-  (`CALENDAR_SPINES`) and, last on the board, wider still: it grows up to the compartment's right wall, never leaving
-  that room to books only filling the shelf (`endsFor`'s `fills`, `--grow`; user request, 27 November 2026). It stands
-  on the board as a desk calendar does, a tent: its pages lean back from the board's front onto a cardboard stand a
-  little bigger than them, the two meeting in the rings like an upside-down V, turned a little with its right side
-  forwards, so from the board's right end it faces left into the room – never out towards the wall (`--tilt`, `--turn`,
-  `--ridge`; user requests, 26 and 27 November 2026: it should look 3D and stand) – within the compartment's depth
-  (`--d`) and with its foot on the board, so look at it at 844×390, 1024×768, 1280×720 and 1920×1080 after changing
-  them. Its page is never plain white: a red band under the rings, then „Morning“ and „Afternoon“ written on a sunny
-  and a sky-blue band – one over the other, or side by side where the page grew wide (`.shelf-calendar-day`) – each over
-  two of the Tagesplan's pictures side by side, as big as the page allows (`CALENDAR_PARTS`, `bilder/kalender-*.webp`,
-  cut from `src/games/rewards/bilder/`), and on each picture's top edge its star, a golden star in a round field half
-  above the picture and half on it (`CalendarStar`, user request, 27 November 2026) – no reward, no names (same
-  request: small pictures on white paper looked boring) – one tap takes it out
+  (`CALENDAR_SPINES`), last on the board and standing at its right wall: the board's room is given to it
+  (`endsFor`'s `fills`, `--grow`), never to books only filling the shelf, yet it is no wider than its height allows
+  (`--wide`, user request, 27 November 2026: grown to the wall it was too wide) and pushed to the right
+  (`margin-left: auto`). It stands on the board as a desk calendar does, a tent: its pages lean back from the board's
+  front onto a cardboard stand a little bigger than them, the two meeting in the rings like an upside-down V, turned
+  clearly with its right side forwards (`--turn` about -32°, brought forward by `--forward` so its left edge stays out
+  of the back wall), so from the board's right end it faces left into the room – never out towards the wall (`--tilt`,
+  `--turn`, `--ridge`; user requests, 26 and 27 November 2026: it should look 3D and stand). Its stand behind touches
+  the right wall while its front page stays clear of the post – never cut off by it: how far the turned stand swings out
+  depends on each screen's perspective, so `ShelfCalendar` measures the room before the wall in the page
+  (`--wall-room`, `WALL_TOUCH`), never a fixed margin – within the compartment's depth (`--d`) and with its foot on the
+  board, so look at it at 844×390, 1024×768, 1280×720 and 1920×1080 after changing them. Its page is never plain white:
+  a red band under the rings with the name „Zeitplan & Belohnungstafel“ set as the picture books' titles are – the same
+  letters, weight and size, on two balanced lines, never a small line of its own style (`.shelf-calendar-title`) – and
+  a gear beside it (`CALENDAR_TITLE`, `CalendarGear`), then a sunny and a sky-blue band filling the page with only a
+  thin margin of white – one over the other, or side by side where the page grew wide (`.shelf-calendar-day`) – each
+  with two of the Tagesplan's pictures side by side, as big as the page allows (`CALENDAR_PARTS`,
+  `bilder/kalender-*.webp`, cut from `src/games/rewards/bilder/`), at the middle of each picture's foot a small golden
+  star in a round field, half on the picture and half below it (`CalendarStar`), and „Morning“ and „Afternoon“ small on
+  a tag in the middle between the two stars, on their line – never big over the pictures, nor a row of their own under
+  the stars, which took the pictures' room (user requests, 27 November 2026) – no reward, no names of the pictures (same request: small pictures on white paper looked boring) – one tap takes it out
   and opens the Zeitplan straight in its editor (`calendarHref`, router state `OPEN_EDITOR`), where a quick row reaches
   the other two (`src/games/rewards/CLAUDE.md`); every part's way back puts the calendar back. The single books stand thick enough to hit with a finger on a
   phone (`DAILY_SPINE`, widened again in November 2026 when they were still hard to hit), and lean a little differently, as books do.
@@ -1044,7 +1052,11 @@ src/lib/                 speech, sfx (synthesized + recorded sounds), storage, d
   A tap on a book takes it out (`takeOutBook`, `bookTravel.ts`): it comes off its board, into the middle, its cover swings open
   to the left, and its left page, the next menu printed on it, comes close until it is the screen – **no page turns on
   the way into a book**. Back to the shelf (`useTurnPage("/")` → `putBookBack`) is the same backwards: the book closes
-  and goes back into its own gap (`shelfBookOf`, `bookTravel.test.ts`). The grown-ups' options on the shelf's page are
+  and goes back into its own gap (`shelfBookOf`, `bookTravel.test.ts`). The screen is copied onto the book's page both ways (`seenCopy`), and the
+  copy gets ids of its own (`ownIds`, its `url(#…)` and `href` following them): with the page's ids each stood twice in
+  the document, and Zähne putzen's face, clipped by one of them, vanished but for its eyes and mouth (user feedback,
+  November 2026, reported twice; `bookTravel.test.ts`). A picture as big as the screen is cut to its frame by CSS
+  (`clip-path: inset(…)`), not by an svg `<clipPath>` found by its id. The grown-ups' options on the shelf's page are
   things one finds on a bookshelf, standing in its own narrow compartments beside the books, never buttons and never
   loose around the room (`RoomOptions.tsx`, user feedback, October 2026), on a wide screen all in one column at the
   shelf's right, one compartment over the other (`SIDE_COLUMN`, user decision, November 2026): on top, in the tallest,

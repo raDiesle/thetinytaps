@@ -34,12 +34,19 @@ test("the child leans and the dab drops as far as the picture says, moved only b
     });
   }
   // What moves is an HTML layer of its own (`Piece`), never something inside an svg.
-  for (const layer of ["spit-child", "spit-smile", "spit-lip-foam", "spit-pucker", "spit-blob"])
-    expect(spit).toMatch(new RegExp(`<Piece[^>]*className="${layer}"`));
+  for (const layer of ["spit-child", "spit-smile", "spit-pucker", "spit-blob"]) expect(spit).toMatch(new RegExp(`<Piece[^>]*className="${layer}"`));
 });
 
 test("it comes between the cheer and rinsing the brush, with no words on the picture", () => {
   expect(play).toMatch(/const TIDY_FROM = CHEER_MS \+ SPIT_MS;/);
   expect(play).toMatch(/after < CHEER_MS \? "cheer" : after < TIDY_FROM \? "spit"/);
   expect(spit).not.toMatch(/<text\b/);
+});
+
+test("the foam on the gum stays through the cheer and goes with the spitting, never drawn on the lips", async () => {
+  const mouth = await Bun.file("src/games/teeth/mouth.tsx").text();
+  expect(play).toContain('spat={ending === "tidy" || ending === "rest"}');
+  expect(mouth).toContain("const foamy = happy && spat ? new Set<string>() : foamyTeeth(dirty, reached);");
+  // The spit picture shows the foam only as the dab leaving the pursed lips (user feedback on lip foam, November 2026).
+  expect(spit).not.toMatch(/LIP_FOAM|lip-foam|FoamClump/);
 });

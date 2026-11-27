@@ -8,7 +8,7 @@ import type { Daytime } from "@/lib/days";
 import { clothesOf, PyjamaPattern, topFill } from "./clothes";
 import { PICTURE, TOOTH_ARCS } from "./jaw";
 import { BROW, Ear, EyeBall, EyeLid, eyeOpening, FACE, HAIR, Hair, type HeadMap, INK, Iris, LASHES, LIP, Nose, SKIN_SHADE, SkinGradient } from "./face";
-import { fitBox, FrameStroke, Monster, screenFrame, STAIN, STAIN_FILLS, useRoom, type Box } from "./mouth";
+import { fitBox, FRAME_CLIP, FrameStroke, Monster, screenFrame, STAIN, STAIN_FILLS, useRoom, type Box } from "./mouth";
 import { Piece, pictureSpace } from "./piece";
 
 // Before anything else, a short story of where the sugar monsters come from:
@@ -668,16 +668,13 @@ export function Origin({
           <SkyBody daytime={daytime} arc={framing.arc} />
         </div>
 
-        <svg className="origin-picture" viewBox={viewBox} role="img" aria-label={label}>
+        <svg className="origin-picture" viewBox={viewBox} role="img" aria-label={label} style={FRAME_CLIP}>
           <defs>
-            <clipPath id="origin-frame">
-              <rect {...frame} />
-            </clipPath>
             <PyjamaPattern id="origin-pyjama" figure={figure} />
             <SkinGradient id="origin-skin" head={HEAD} />
           </defs>
 
-          <g clipPath="url(#origin-frame)">
+          <g>
             {/* Shoulders in the boy's or the girl's T-shirt, or pyjamas in the evening (`clothes.tsx`), down to the screen's bottom. */}
             <path
               d={`M20 ${Math.max(480, bottom + 20)} V440 C20 395 110 365 ${W / 2} 365 C330 365 420 395 420 440 V${Math.max(480, bottom + 20)} Z`}
@@ -824,7 +821,6 @@ export function Origin({
                           <Monster
                             color={c.color}
                             variant={i % 3}
-                            active={false}
                             still
                             gone={false}
                             scared={false}
