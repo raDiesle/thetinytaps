@@ -135,6 +135,10 @@ late in the video. A new thing shown beside the picture (a control, a chart, a b
   (`leanOn`, at most to `MIN_LEAN`), so it clings to the tooth – upright they looked as if they flew before the teeth
   (user feedback, November 2026). The lean is a transform of its `Sprite` (or its group while waiting), never a
   drawing of its own.
+- The story's face, the sink and the mirror are cut to the frame by CSS (`FRAME_CLIP` in `mouth.tsx`, `clip-path:
+  inset(…)` on the picture's svg), never by an svg `<clipPath>` found by its id: while the book opened, the screen's
+  copy on its page held the same ids, and the whole face hanging on that clip vanished – only the eyes and the mouth,
+  layers of their own, were left (user feedback, November 2026, reported twice; `layers.test.ts`).
 - The story is short (about 15 s): it explains, the brushing is the game.
 - Every picture before the brushing flows into the next (`Scenes`): no cut, the camera slides or zooms (two beats, `SCENE_MS`).
 - The end must say „you did it“ without reading: a picture of success (grin, cheer, the trophy handed over) right when the brushing ends, then the routine is finished as at home (spit out, rinse the brush, put it back in its cup) before the buttons come. Keep the end about as long as the prelude parts, not longer than the sung finale.

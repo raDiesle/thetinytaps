@@ -145,6 +145,14 @@ export function fitBox(room: Room | null, focus: Box): { box: Box; unit: number 
 /** The mirror's frame along the screen's edge, in px; it keeps its thickness however far the picture zooms. */
 const FRAME_PX = { inset: 6, radius: 36, ink: 12, color: 6 };
 
+/**
+ * The inside of the frame (`screenFrame`) as a CSS clip of a picture as big as the stage: the face, the sink and the
+ * mirror are cut there by CSS, never by an svg `<clipPath>` found by its id. While a book opens, the screen is copied
+ * onto its page, and a whole picture hanging on one id vanished – only the eyes and the mouth, layers of their own,
+ * were left (user feedback, November 2026).
+ */
+export const FRAME_CLIP: CSSProperties = { clipPath: `inset(${FRAME_PX.inset}px round ${FRAME_PX.radius}px)` };
+
 /** A frame at the edge of `box`, see FRAME_PX. */
 export function screenFrame(box: Box, unit: number) {
   const inset = FRAME_PX.inset * unit;
@@ -782,20 +790,15 @@ export function Mouth({ view, zone, monsters, dirty, brush, happy, action, glidi
   // lay in one the size of the screen, and each time the phone painted the screen anew 50 times a second.
   return (
     <>
-      <svg ref={svg} className="mouth" viewBox={viewBox} role="img" aria-label={pictureLabel}>
+      <svg ref={svg} className="mouth" viewBox={viewBox} role="img" aria-label={pictureLabel} style={FRAME_CLIP}>
         <defs>
-          <clipPath id="mirror">
-            <rect {...frame} />
-          </clipPath>
           <clipPath id="mouth-inside">
             <path d={lipsPath} />
           </clipPath>
         </defs>
         <rect {...frame} fill="#dff6ff" />
-        <g clipPath="url(#mirror)">
-          {still}
-          {gliding && lipsAndWaiting}
-        </g>
+        {still}
+        {gliding && lipsAndWaiting}
       </svg>
 
       {shownStains.length > 0 && (

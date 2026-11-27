@@ -1,6 +1,6 @@
 import { expect, test } from "bun:test";
 import { CATEGORIES, categoryHref, listedGames, shelfVolumes } from "@/content/games";
-import { putBookBack, shelfBookOf } from "./bookTravel";
+import { putBookBack, renameIdRefs, shelfBookOf } from "./bookTravel";
 
 // The way back puts the book into its own gap (a shelf book's `data-book` is its category's id): every page in a book
 // finds it – the category's page and each of its games. A game standing apart has a book of its own; one still being
@@ -88,4 +88,22 @@ test("a way back that fails still goes back and leaves the next book free to tra
       else delete (globalThis as Record<string, unknown>)[name];
     });
   }
+});
+
+// While a book flies, the screen is copied onto its page: with the page's own ids the document held each id twice, and
+// the brushing's story lost the clip its face hangs on – only the eyes and the mouth were left (user feedback, November
+// 2026). The copy's ids get a tag, and every reference in the copy follows them.
+test("a copy of the screen points its references at its own ids", () => {
+  const ids = new Set(["origin-skin", "label"]);
+  expect(renameIdRefs("url(#origin-skin)", ids, "--copy1", "fill")).toBe("url(#origin-skin--copy1)");
+  expect(renameIdRefs('fill: url("#origin-skin"); stroke: url(#other)', ids, "--copy1", "style")).toBe('fill: url("#origin-skin--copy1"); stroke: url(#other)');
+  expect(renameIdRefs("#origin-skin", ids, "--copy1", "href")).toBe("#origin-skin--copy1");
+  expect(renameIdRefs("/zaehne/#top", ids, "--copy1", "href")).toBe("/zaehne/#top");
+  expect(renameIdRefs("label other", ids, "--copy1", "aria-labelledby")).toBe("label--copy1 other");
+  expect(renameIdRefs("#fff", ids, "--copy1", "fill")).toBe("#fff");
+});
+
+test("every copy of the screen gets ids of its own", async () => {
+  const source = await Bun.file("src/lib/bookTravel.ts").text();
+  expect(/function seenCopy[\s\S]*?\n}/.exec(source)?.[0]).toContain("ownIds(copy)");
 });
