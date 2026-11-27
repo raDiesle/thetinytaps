@@ -202,7 +202,7 @@ test("a canvas surprise keeps its sparks few and ends before its surprise is rem
   }
 });
 
-// A bag may hold a kind more than once (Zaubertasten's fireworks), yet never shows the same kind twice in a row.
+// A bag may hold a kind more than once (Tippzauber's fireworks), yet never shows the same kind twice in a row.
 test("a bag with kinds listed several times never brings one twice in a row", () => {
   const kinds = [...SURPRISE_KINDS, ...FIREWORK_KINDS, ...FIREWORK_KINDS];
   let last: Kind | undefined = "firework";

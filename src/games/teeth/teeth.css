@@ -2214,6 +2214,39 @@
   pointer-events: auto;
 }
 
+/* Toothpaste foam on the lips (X-31, mouth.tsx `FoamClump`): each clump a small layer of its own that fades in calmly
+   over two beats as the brushing goes on, and away over two beats once all is clean – no bubbles that rise or burst. */
+.lip-foam {
+  pointer-events: none;
+}
+
+.lip-foam > div {
+  will-change: opacity;
+  animation: teeth-foam-in 1.07s ease-out both;
+}
+
+.lip-foam.gone > div {
+  animation: teeth-foam-away 1.07s ease-in forwards;
+}
+
+@keyframes teeth-foam-in {
+  from {
+    opacity: 0;
+  }
+  to {
+    opacity: 1;
+  }
+}
+
+@keyframes teeth-foam-away {
+  from {
+    opacity: 1;
+  }
+  to {
+    opacity: 0;
+  }
+}
+
 .monster-sprite .monster-body,
 .monster-sprite .sugar-monster.scared .monster-body,
 .monster-sprite .sugar-monster.tickled .monster-body,
@@ -2385,6 +2418,7 @@
 
 .teeth-play.paused .sprite-body,
 .teeth-play.paused .sprite-glow,
+.teeth-play.paused .lip-foam > div,
 .teeth-play.paused .monster-dust > i,
 .teeth-play.paused .lip-arrow {
   animation-play-state: paused;
@@ -2394,6 +2428,14 @@
   .sprite-body,
   .sprite-glow {
     animation: none;
+  }
+
+  .lip-foam > div {
+    animation: none;
+  }
+
+  .lip-foam.gone {
+    display: none;
   }
 
   /* Still, a brushed monster goes: it only fades. */

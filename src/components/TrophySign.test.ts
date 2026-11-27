@@ -31,3 +31,53 @@ test("the trophy sign is a wooden board in the corner with three nails", () => {
   const nails = css.match(/\.shelf-trophy-sign::before \{([^}]*)\}/)?.[1] ?? "";
   expect(nails.match(/var\(--head\)/g)?.length).toBe(3);
 });
+
+// On a wide shelf the sign is nailed into the top left corner of the speaker's compartment, so the speaker below it can
+// stand big (user request, 26 November 2026), its nails on the wood: placed at the middles of the post and the board
+// above, it moves up and left by exactly its nails' distance from its corner (user feedback, 26 November 2026).
+test("on a wide shelf the trophy sign is nailed onto the post and the board above the speaker", () => {
+  const top = css.match(/\.shelf-trophy-sign\[data-from="top"\] \{([^}]*)\}/)?.[1] ?? "";
+  expect(top).toMatch(/translate: calc\(var\(--nail-at\) \* -1\) calc\(var\(--nail-at\) \* -1\);/);
+  const sign = css.match(/\.shelf-trophy-sign \{([^}]*)\}/)?.[1] ?? "";
+  const nails = css.match(/\.shelf-trophy-sign::before \{([^}]*)\}/)?.[1] ?? "";
+  // `--nail-at` is the nails' inset plus half a nail.
+  const inset = nails.match(/inset: calc\(var\(--trophy-sign\) \* ([\d.]+)\);/)?.[1];
+  expect(sign).toContain(`--nail-at: calc(var(--trophy-sign) * ${inset} + var(--nail) / 2);`);
+  const shelf = readFileSync(new URL("./Bookshelf.tsx", import.meta.url), "utf8");
+  expect(shelf).toMatch(/left: post \? post\.x \+ post\.w \/ 2/);
+  expect(shelf).toMatch(/top: board \? board\.y \+ board\.h \/ 2/);
+  expect(css).not.toMatch(/shelf-trophy-sign ~ \.shelf-box \.shelf-cell\.music/);
+});
+
+// The speaker stands with its right side flush against the shelf's right wall (user feedback, 26 November 2026): its
+// front's right edge is the svg's right edge, nothing drawn right of it, and its left side and top go back, seen from
+// the room's middle.
+test("the speaker's front ends at its svg's right edge, against the wall", () => {
+  const options = readFileSync(new URL("./RoomOptions.tsx", import.meta.url), "utf8");
+  const svg = options.slice(options.indexOf("export function RoomSpeaker"), options.indexOf("export function RoomHourglass"));
+  const width = Number(svg.match(/<svg viewBox="0 0 ([\d.]+) /)?.[1]);
+  const front = svg.match(/<rect className="room-speaker-box" x="([\d.]+)" y="[\d.]+" width="([\d.]+)"/);
+  expect(front).not.toBeNull();
+  const right = Number(front?.[1]) + Number(front?.[2]);
+  // Half its outline's stroke (2.2) beyond the edge still lies inside the svg.
+  expect(width - right).toBeGreaterThanOrEqual(1.1);
+  expect(width - right).toBeLessThanOrEqual(1.4);
+  expect(svg).toContain('className="room-speaker-top"');
+  expect(css).toMatch(/\.room-scene\[data-plan="wide"\] \.shelf-cell\.music \.shelf-thing \{\s*justify-content: flex-end;\s*\}/);
+});
+
+// The ♀ and ♂ on the stickers in the back panel sit at the heads' top right: at their right side the wall cut them off.
+test("the stickers' signs on the back panel sit above the heads' right", () => {
+  const sign = css.match(/\.shelf-back-stuck \.room-sticker-sign \{([^}]*)\}/)?.[1] ?? "";
+  expect(sign).toMatch(/top: calc\(var\(--s\) \* -[\d.]+\);/);
+  expect(sign).toContain("translate: none;");
+});
+
+// „Wer spielt?“ on the stickers' right wall runs across it in lines: written down the slanted wall its letters came out
+// a few pixels thin, and a padding in cq units on the wall – itself a container – measured the room and left no width.
+test("„Wer spielt?“ runs across the right wall, never down it", () => {
+  const wall = css.match(/\.shelf-ask-wall \{([^}]*)\}/)?.[1] ?? "";
+  const words = css.match(/\.shelf-ask-wall \.shelf-figure-ask \{([^}]*)\}/)?.[1] ?? "";
+  expect(words).not.toContain("writing-mode");
+  expect(wall).not.toMatch(/padding[^;]*cq/);
+});

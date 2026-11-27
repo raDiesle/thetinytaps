@@ -20,6 +20,13 @@ export const TOOL_GROUPS: { title: string; pages: ToolPage[] }[] = [
       { to: "/management/recherchen/", emoji: "🔍", label: "Recherchen", about: "alles, was nachgeschaut wurde, nach Thema geordnet, mit Quellen" },
       { to: "/management/bilder/", emoji: "🖼️", label: "Alle Bilder", about: "jedes Bild der App auf einer Seite, nach Spiel und Geschichte" },
       {
+        to: "/management/lieder/",
+        emoji: "🎶",
+        label: "Lieder für Suno",
+        about: "Liedtexte für den Timer zum Lesen und Einfügen in Suno: das schnelle Aufräumlied",
+        ideas: ["H-119"],
+      },
+      {
         to: `${MUSEUM_PATH}?${ALL_TROPHIES}`,
         emoji: "🏆",
         label: "Alle Pokale",

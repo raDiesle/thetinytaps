@@ -3,6 +3,7 @@ import { tmpdir } from "node:os";
 import { join } from "node:path";
 import { type Cdp, evaluate, launchChrome, open, siteUrl, sleep } from "./chrome";
 import { type Budget, BUDGET, DEVICES, type Device, type Part, SCENARIOS, type Scenario, type Step } from "./perfScenarios";
+import { type ChromeFrames, chromeFrames, rasteredPixels, type TraceEvent } from "./perfTrace";
 
 // `bun run perf`: plays every game in headless Chrome as an old Android phone would (a slow CPU, a small screen
 // with many pixels) and measures how smoothly its animations run, in the Chrome on the computer (tools/chrome.ts).
@@ -87,6 +88,8 @@ interface Measurement {
    * drawn anew every frame costs 60 (120 on a phone showing 120 frames a second) however fast this computer is.
    */
   rasterScreensPerS: number;
+  /** Chrome's own count of the stretch's frames, from its trace: a second opinion beside `fps` and `stutters` (A-57). */
+  chrome: ChromeFrames;
   /** Style recalculations and layouts per second: a lot of them usually means something moves through layout. */
   stylesPerS: number;
   layoutsPerS: number;
@@ -253,20 +256,9 @@ const percentile = (values: number[], p: number) => {
   return sorted[Math.min(sorted.length - 1, Math.floor(sorted.length * p))];
 };
 
-interface TraceEvent {
-  name: string;
-  ph: string;
-  dur?: number;
-  tid: number;
-  args?: {
-    tileData?: { tileId?: { id_ref?: string } };
-    snapshot?: { active_tiles?: { id?: string; content_rect?: number[] }[] };
-  };
-}
-
 /**
  * Records Chrome's trace while `during` runs: where painting (main thread) and rastering (its helper threads) take time,
- * and how many pixels were rastered anew (each raster task's tile, its size from the compositor's tile snapshots).
+ * and how many pixels were rastered anew (`rasteredPixels`).
  */
 async function traced(cdp: Cdp, during: () => Promise<void>, keep?: string) {
   const events: TraceEvent[] = [];
@@ -290,17 +282,7 @@ async function traced(cdp: Cdp, during: () => Promise<void>, keep?: string) {
   off();
   if (keep) writeFileSync(keep, JSON.stringify({ traceEvents: events }));
   const total = (names: string[]) => events.filter((e) => e.ph === "X" && names.includes(e.name)).reduce((sum, e) => sum + (e.dur ?? 0), 0) / 1000;
-  const tileArea = new Map<string, number>();
-  for (const e of events) {
-    for (const tile of e.args?.snapshot?.active_tiles ?? []) {
-      const [, , w = 0, h = 0] = tile.content_rect ?? [];
-      if (tile.id) tileArea.set(tile.id.replace(/^.*\//, ""), w * h);
-    }
-  }
-  const rastered = events
-    .filter((e) => e.name === "RasterTask" && (e.ph === "X" || e.ph === "B"))
-    .reduce((sum, e) => sum + (tileArea.get(e.args?.tileData?.tileId?.id_ref ?? "") ?? 0), 0);
-  return { paintMs: total(["Paint"]), rasterMs: total(["RasterTask"]), rasteredPixels: rastered };
+  return { paintMs: total(["Paint"]), rasterMs: total(["RasterTask"]), rasteredPixels: rasteredPixels(events), chrome: chromeFrames(events) };
 }
 
 /** What the page's frame counter saw: every frame's time since the one before, and the long frames with their scripts. */
@@ -316,7 +298,7 @@ async function measure(cdp: Cdp, scenario: Scenario, part: Part, budget: Budget,
   let wall = 0;
   let after = before;
   let frames: Frames | null = null;
-  const { paintMs, rasterMs, rasteredPixels } = await traced(
+  const { paintMs, rasterMs, rasteredPixels, chrome } = await traced(
     cdp,
     async () => {
       const play = async () => {
@@ -365,6 +347,7 @@ async function measure(cdp: Cdp, scenario: Scenario, part: Part, budget: Budget,
     paintMsPerS: Math.round(paintMs / wall),
     rasterMsPerS: Math.round(rasterMs / wall),
     rasterScreensPerS: Math.round((rasteredPixels / (device.width * device.height * device.scale ** 2) / wall) * 10) / 10,
+    chrome,
     stylesPerS: Math.round(spent("RecalcStyleCount")),
     layoutsPerS: Math.round(spent("LayoutCount")),
     culprits,
@@ -396,7 +379,7 @@ function median(values: number[]) {
 }
 
 /**
- * One stretch's runs as one: each number the median of its runs, the lists (slowest scripts, stutters' times, hot
+ * One stretch's runs as one: each number the median of its runs (Chrome's frame counts too), the lists (slowest scripts, stutters' times, hot
  * functions) from the run in the middle by how busy it was, and the spread of the main numbers beside them.
  */
 function medianOf(runs: Measurement[], scenario: Scenario, part: Part): Measurement {
@@ -407,6 +390,11 @@ function medianOf(runs: Measurement[], scenario: Scenario, part: Part): Measurem
     const values = runs.map((r) => r[key]);
     m.spread![key] = [Math.min(...values), Math.max(...values)];
   }
+  m.chrome = {
+    presented: median(runs.map((r) => r.chrome.presented)),
+    partial: median(runs.map((r) => r.chrome.partial)),
+    dropped: median(runs.map((r) => r.chrome.dropped)),
+  };
   const leads = runs.flatMap((r) => (r.lead ? [r.lead.ms] : []));
   if (middle.lead && leads.length) m.lead = { name: middle.lead.name, ms: Math.round(median(leads)) };
   judge(m, scenario, part, BUDGET);
@@ -415,7 +403,7 @@ function medianOf(runs: Measurement[], scenario: Scenario, part: Part): Measurem
 
 interface ProfileNode {
   id: number;
-  callFrame: { functionName: string; url: string; lineNumber: number };
+  callFrame: { functionName: string; url: string; lineNumber: number; columnNumber: number };
 }
 
 /** The JavaScript profiler's sampling interval with --profile, in µs. */
@@ -452,9 +440,11 @@ async function profiled(cdp: Cdp, during: () => Promise<void>): Promise<string[]
   const nodes = new Map(profile.nodes.map((n) => [n.id, n]));
   const self = new Map<string, number>();
   profile.samples.forEach((id, i) => {
-    const { functionName, url, lineNumber } = nodes.get(id)!.callFrame;
+    const { functionName, url, lineNumber, columnNumber } = nodes.get(id)!.callFrame;
     if (["(idle)", "(program)", "(garbage collector)"].includes(functionName) || !url) return;
-    const name = `${functionName || "(anonymous)"} ${url.split("/").pop()?.split("?")[0]}:${lineNumber + 1}`;
+    // With its column: a built chunk is one line, so „(anonymous) LightLevel.js:1“ alone named no function (A-42); the
+    // column finds it in `out/static/` (`cut -c<column>-<column + 200>` of the chunk).
+    const name = `${functionName || "(anonymous)"} ${url.split("/").pop()?.split("?")[0]}:${lineNumber + 1}:${columnNumber + 1}`;
     self.set(name, (self.get(name) ?? 0) + profile.timeDeltas[i] / 1000);
   });
   return [...self]
@@ -479,6 +469,9 @@ function printRow(m: Measurement) {
       `      over ${m.runs} runs: ${range("fps")} fps, ${range("stutters")} stutters, p95 ${range("p95")} ms, busy ${range("busy", (v) => `${Math.round(v * 100)}`)} %, raster ${range("rasterScreensPerS")} screens/s`,
     );
   }
+  const { presented, partial, dropped } = m.chrome;
+  // Chrome's own count beside the page's: a stretch whose frames Chrome dropped while the page counted none is one to doubt.
+  if (dropped || partial) console.log(`      Chrome's count: ${presented} shown, ${partial} in part, ${dropped} dropped`);
   if (m.lead) console.log(`      ${m.lead.name}: ${m.lead.ms} ms, the stretch starts after it`);
   if (m.over.length && m.culprits.length) console.log(`      slowest scripts in long frames: ${m.culprits.join(" · ")}`);
   if (m.over.length && m.stutterAt.length) console.log(`      stutters at: ${m.stutterAt.map((t) => `${t}s`).join(" ")}`);

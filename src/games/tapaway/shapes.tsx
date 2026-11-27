@@ -1,4 +1,4 @@
-// The bright shapes of „Magic Keys“, drawn by the app itself, never emojis (as Frei tippen's surprises): a press where no
+// The bright shapes of „Tap Magic“, drawn by the app itself, never emojis (as Frei tippen's surprises): a press where no
 // surprise may come yet still brings something to see.
 
 /** The kinds of shape. */
