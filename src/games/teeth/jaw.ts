@@ -619,6 +619,14 @@ export type Projector = ReturnType<typeof projector>;
 
 const TIPPED_OFFSET = 30;
 const TIPPED_GROWTH = 0.15;
+/**
+ * How much a tipped jaw's row goes back into the mouth with perspective (1 over the eye's distance, in model units):
+ * seen from the front a jaw is projected flat, but tipped to show its chewing or tongue side the back teeth lie much
+ * further from the eye, and drawn as big as the front teeth the row ran straight down the sides like a flat horseshoe.
+ * With perspective the back teeth grow smaller and bend in towards the mouth's middle – up for the upper row seen from
+ * below, down for the lower one seen from above – as if they went away into the mouth (user feedback, November 2026).
+ */
+export const TIPPED_PERSPECTIVE = 1 / 260;
 
 /** One projector for the face and lips, and one for each jaw, tipped about the middle of its chewing surface. */
 export function projectors(view: View): { face: Projector } & Record<Jaw, Projector> {
@@ -634,13 +642,85 @@ export function projectors(view: View): { face: Projector } & Record<Jaw, Projec
     const tipped = projector({ ...view, pitch: view.pitch + tilt, look: anchor, zoom: view.zoom * (1 + TIPPED_GROWTH * k) });
     const dx = at.x - PICTURE.width / 2;
     const dy = at.y + (middle - at.y) * k - PICTURE.height / 2;
+    // The perspective's middle is the arch's middle, and the front teeth keep their size: only what lies further back
+    // than them shrinks towards it, growing in with the tip so nothing jumps as the jaw starts to tip.
+    const front = tipped.point([0, anchor[1], ARCH[jaw].b]).depth;
+    const far = TIPPED_PERSPECTIVE * k;
+    const mid = { x: PICTURE.width / 2, y: PICTURE.height / 2 };
     return {
       ...tipped,
       point: (p: Vec3) => {
         const q = tipped.point(p);
-        return { x: q.x + dx, y: q.y + dy, depth: q.depth };
+        const f = 1 / (1 + far * Math.max(0, front - q.depth));
+        return { x: mid.x + (q.x - mid.x) * f + dx, y: mid.y + (q.y - mid.y) * f + dy, depth: q.depth };
       },
     };
   };
   return { face, upper: forJaw("upper"), lower: forJaw("lower") };
+}
+
+/**
+ * From how far open the mouth shows its dark between the rows, and with it the cheek's folds beside the last teeth
+ * (`cheekFolds`): with the teeth together only cheek shows round them.
+ */
+export const DARK_FROM = 0.3;
+
+/** A fold of the cheek beside the last teeth of one jaw, on one side: its outline in picture units. */
+export interface CheekFold {
+  jaw: Jaw;
+  side: Side;
+  ring: { x: number; y: number }[];
+}
+
+/** How far the fold reaches past the gum's end along the lips, up and down, in model units. */
+const FOLD_REACH = 10;
+
+/**
+ * Where the open mouth's cheek, stretched between the lips' corners, lies over the gum's end behind each jaw's last
+ * molar (user feedback, November 2026): the gum runs on behind the molar into the mouth and disappears under the
+ * cheek beside the lips, never standing in front of it as a tongue of lighter pink out in the dark of the mouth. Each
+ * fold is the outline round that end of the gum (the part behind the molar, `GUM_BEHIND`), the molar's outer back
+ * corner and the stretch of the lips beside them; the mirror fills it with the cheek's pink over the gum, leaving the
+ * teeth out, and the dark of the mouth stays between the two rows' folds.
+ */
+export function cheekFolds(model: MouthModel, all: ReturnType<typeof projectors>, lips: { x: number; y: number }[], open: number): CheekFold[] {
+  if (open <= DARK_FROM) return [];
+  const last = TEETH.length - 1;
+  const back = TEETH[last].to;
+  return JAWS.flatMap((jaw) =>
+    SIDES.flatMap((side) => {
+      const s = side === "left" ? -1 : 1;
+      const project = all[jaw];
+      const molar = model.teeth.find((t) => t.id.jaw === jaw && t.id.side === side && t.id.n === last)!;
+      const gum = model.gums.find((g) => g.key === molar.key)!;
+      // How far round the arch a point lies, in degrees from the front (the arch's ellipse taken as a circle).
+      const angle = ([x, , z]: Vec3) => (Math.atan2(Math.abs(x) / MOUTH_WIDE, z) * 180) / Math.PI;
+      const behind = [...gum.rims.outer, ...gum.rims.inner].filter((p) => angle(p) > back - 0.5);
+      const corner = molar.faces.find((f) => f.kind === "top")!.points.reduce((a, b) => (s * b[0] > s * a[0] ? b : a));
+      const points = [...behind, corner].map(project.point);
+      const reach = FOLD_REACH * project.zoom;
+      const top = Math.min(...points.map((p) => p.y)) - reach;
+      const bottom = Math.max(...points.map((p) => p.y)) + reach;
+      const middle = points.reduce((a, p) => a + p.x, 0) / points.length;
+      const beside = lips.filter((p) => s * p.x > s * middle && p.y > top && p.y < bottom);
+      return beside.length > 0 ? [{ jaw, side, ring: convexHullOf([...points, ...beside]) }] : [];
+    }),
+  );
+}
+
+/** The smallest convex outline round `points` (Andrew's monotone chain). */
+export function convexHullOf<P extends { x: number; y: number }>(points: P[]): P[] {
+  const sorted = [...points].sort((a, b) => a.x - b.x || a.y - b.y);
+  if (sorted.length < 3) return sorted;
+  const cross = (o: P, a: P, b: P) => (a.x - o.x) * (b.y - o.y) - (a.y - o.y) * (b.x - o.x);
+  const half = (list: P[]) => {
+    const out: P[] = [];
+    for (const p of list) {
+      while (out.length >= 2 && cross(out[out.length - 2], out[out.length - 1], p) <= 0) out.pop();
+      out.push(p);
+    }
+    out.pop();
+    return out;
+  };
+  return [...half(sorted), ...half([...sorted].reverse())];
 }

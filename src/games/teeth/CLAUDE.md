@@ -52,6 +52,17 @@ late in the video. A new thing shown beside the picture (a control, a chart, a b
   (`CHEEK_INSIDE`), the gum rounds off behind the last molar up to the chewing plane (`GUM_BEHIND` in `jaw.ts`), and
   the open mouth's dark goes on round to the lips there, leaving only a narrow band of cheek along them
   (`CAVITY_LIP_GAP`, `cavityPath`).
+  That corner is an outline of its own from the two back molars to the lips, never part of one convex outline round
+  the rows: a tipped row bends in at its back, and one outline round all reached down beside its gum as a wedge of
+  dark. The gum's end behind each jaw's last molar goes under the cheek stretched beside the lips, never in front of
+  it as a lighter tongue out in the dark (user feedback, November 2026): the open mouth draws the cheek's pink over it
+  (`cheekFolds` in `jaw.ts`, `CheekFoldShape`), leaving the crowns out, so the dark stays between the two rows'
+  folds; no foam lies on a fold. `jaw.test.ts` checks the gum's end lies under its fold in every tipped step.
+- A jaw tipped to show its chewing or tongue side goes back into the mouth with perspective (`TIPPED_PERSPECTIVE` in
+  `projectors`): its back teeth come out smaller and bend in towards the mouth's middle, the further back the more –
+  drawn as big as the front teeth the row ran down the sides like a flat horseshoe (user feedback, November 2026). The
+  front teeth keep their size and the effect grows with the tip, so nothing jumps as a jaw starts to tip
+  (`jaw.test.ts`).
 - The brush's foam is faint and varied (user feedback, November 2026: even white balls with a thick blue ring were too
   loud): small clumps, clear bubbles with a light and tiny dots, of different sizes, with a pale edge, and slightly
   see-through (`FOAM`, `FoamFleck` in `brush.tsx`; `brush.test.ts`). Never a row of equal balls, never so much that it hides
@@ -70,10 +81,13 @@ late in the video. A new thing shown beside the picture (a control, a chart, a b
   (`FOAM` in `brush.tsx`), and white foam on the gum of each tooth brushed – between the lips and the teeth, along the
   tooth's gum line, never on the lips (clumps on the lips' corners and middle looked odd, user feedback, November 2026)
   and only on the teeth brushed already or being brushed now (`foamyTeeth` in `foam.ts`: a face no longer stained, or a
-  tooth the brush has reached in this step, `reachedTeeth`), so it spreads with the brush. Each tooth's foam is a few
-  small bubbles, faint and unlike each other – big beside tiny, one left out and the rest sized apart on each tooth, a
-  pale edge, a little see-through (user feedback, November 2026: subtler and more varied) – (`GUM_FOAM`,
-  `GUM_FOAM_SPREAD`, `gumFoam`, `FoamBubbles`) starting at the gum's edge and going down towards the lip, kept
+  tooth the brush has reached in this step, `reachedTeeth`), so it spreads with the brush. The foam lies only at the
+  gum line, on the gum and a little up on the tooth, as the brush pushes it there (user feedback, November 2026), and
+  little of it: clearly more on one tooth than on its neighbour, often a single bubble, never the same row of bubbles on
+  every tooth (`FOAM_AMOUNTS`: one to four next to each other of `GUM_FOAM`, from a place of each tooth's own). Its
+  bubbles are faint and unlike each other – big beside tiny, sized apart on each tooth, a pale edge, a little
+  see-through (user feedback, November 2026: subtler and more varied) – (`GUM_FOAM`, `GUM_FOAM_SPREAD`, `gumFoam`,
+  `FoamBubbles`), kept
   only where the lip opening shows them, so the lips lie over the rest. The teeth brushed before carry it in the still
   picture; those of the step running now each in a small HTML layer under the lips (`.mouth-foam`, `GumFoam`,
   `.gum-foam`) that fades in once – quiet and still, no bubbles that rise, burst or bob, and no sound. When all is clean

@@ -2,6 +2,7 @@ import { describe, expect, test } from "bun:test";
 import {
   brushedPoints,
   buildMouth,
+  cheekFolds,
   CHEWING_DEPTHS,
   cornerStretch,
   glideStretch,
@@ -13,6 +14,7 @@ import {
   openCorners,
   projectors,
   stretchLips,
+  TEETH_PER_SIDE,
   TOOTH_CLEAR,
   profileOf,
   toothKey,
@@ -198,5 +200,55 @@ describe("the mouth seen from the side", () => {
       if (jaw === "upper") expect(lip[1]).toBeGreaterThan(Math.max(...points.map((p) => p[1])) + 4);
       else expect(lip[1]).toBeLessThan(Math.min(...points.map((p) => p[1])) - 4);
     }
+  });
+});
+
+// A jaw tipped to show its chewing or tongue side ran straight down the sides like a flat horseshoe (user feedback,
+// November 2026): with perspective its back teeth shrink and bend in, as if the row went back into the mouth.
+describe("a tipped row goes back into the mouth", () => {
+  const tipped = STEPS.filter((s) => Math.abs(s.view.tilt.upper) + Math.abs(s.view.tilt.lower) > 0);
+  test.each(tipped.map((s) => [s.id, s] as const))("%s: the back teeth come out smaller than the front teeth", (_, step) => {
+    const model = buildMouth(step.view.open);
+    const all = projectors(step.view);
+    const jaw = Math.abs(step.view.tilt.upper) > 0 ? "upper" : "lower";
+    // How long one unit across the face comes out at a tooth: tipping the jaw back or forth never shortens it, so
+    // without perspective it would be the same at every tooth.
+    const scale = (n: number) => {
+      const [x, y, z] = model.teeth.find((t) => t.key === toothKey({ jaw, side: "left", n }))!.center;
+      const a = all[jaw].point([x, y, z]);
+      const b = all[jaw].point([x + 1, y, z]);
+      return Math.hypot(b.x - a.x, b.y - a.y);
+    };
+    expect(scale(TEETH_PER_SIDE - 1)).toBeLessThan(0.97 * scale(0));
+  });
+
+  // The gum ran on behind the last molar as a tongue of lighter pink out in the dark of the mouth (user feedback,
+  // November 2026): it goes under the cheek beside the lips instead.
+  test.each(tipped.map((s) => [s.id, s] as const))("%s: the gum's end behind the last molars lies under the cheek's fold", (_, step) => {
+    const model = buildMouth(step.view.open);
+    const all = projectors(step.view);
+    const plain = viewedLips(model.lips, step.view).map(all.face.point);
+    const lips = stretchLips(plain, cornerStretch(plain, brushedPoints(model, all, step), TOOTH_CLEAR));
+    const folds = cheekFolds(model, all, lips, step.view.open);
+    for (const jaw of ["upper", "lower"] as const) {
+      for (const side of ["left", "right"] as const) {
+        const gum = model.gums.find((g) => g.key === toothKey({ jaw, side, n: TEETH_PER_SIDE - 1 }))!;
+        // The gum's end: the middle of its rims' points furthest back.
+        const rims = [...gum.rims.outer, ...gum.rims.inner];
+        const back = Math.min(...rims.map((p) => p[2]));
+        const end = rims.filter((p) => p[2] < back + 3).map(all[jaw].point);
+        const middle = { x: end.reduce((a, p) => a + p.x, 0) / end.length, y: end.reduce((a, p) => a + p.y, 0) / end.length };
+        const fold = folds.find((f) => f.jaw === jaw && f.side === side);
+        expect(fold).toBeDefined();
+        expect(insideBy(middle, fold!.ring, 0)).toBe(true);
+      }
+    }
+  });
+
+  test("with the teeth together there are no folds", () => {
+    const view = STEPS.find((s) => s.view.open === 0)!.view;
+    const model = buildMouth(0);
+    const all = projectors(view);
+    expect(cheekFolds(model, all, viewedLips(model.lips, view).map(all.face.point), 0)).toEqual([]);
   });
 });

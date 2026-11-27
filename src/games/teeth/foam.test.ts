@@ -1,5 +1,5 @@
 import { expect, test } from "bun:test";
-import { foamyTeeth, GUM_FOAM, GUM_FOAM_SPREAD } from "./foam";
+import { FOAM_AMOUNTS, foamyTeeth, GUM_FOAM, GUM_FOAM_SPREAD } from "./foam";
 import { toothKey } from "./jaw";
 import { dirtyFaces } from "./stains";
 import { STEPS } from "./steps";
@@ -28,15 +28,32 @@ test("no foam before the brushing; then only on the teeth brushed or being brush
   }
 });
 
-test("the foam is a few small bubbles along the gum line, between it and the lip", () => {
+// Foam only at the gum and a little on the tooth, clearly more on one tooth than another, less in all, and sometimes a
+// single bubble on a tooth (user feedback, November 2026).
+test("the foam is a few small bubbles at the gum line, on the gum and a little on the tooth", () => {
   for (const b of GUM_FOAM) {
     expect(b.along).toBeGreaterThanOrEqual(0);
     expect(b.along).toBeLessThanOrEqual(1);
-    // Down from the gum's edge towards the lip, never up onto the tooth.
-    expect(b.down - b.r).toBeGreaterThanOrEqual(-1);
+    // Each bubble lies at the gum's edge: reaching at most a little past it either way.
+    expect(b.down - b.r).toBeLessThanOrEqual(2);
+    expect(b.down + b.r).toBeGreaterThanOrEqual(-2);
+    // And reaches only a little up onto the tooth, a sixth of it at most.
+    expect(b.down - b.r).toBeGreaterThanOrEqual(-5);
     // Small next to the teeth (about 30 tall) and under half the lip's thickness, so the lip covers what reaches under it.
     expect(b.r * (1 + GUM_FOAM_SPREAD)).toBeLessThanOrEqual(5);
   }
+  // Some on the gum, some up on the tooth.
+  expect(GUM_FOAM.some((b) => b.down > 0)).toBe(true);
+  expect(GUM_FOAM.some((b) => b.down < 0)).toBe(true);
+});
+
+test("how much foam a tooth gets differs clearly from its neighbour, often only one bubble, and few in all", () => {
+  expect(FOAM_AMOUNTS).toContain(1);
+  expect(Math.max(...FOAM_AMOUNTS)).toBeGreaterThanOrEqual(3);
+  expect(Math.max(...FOAM_AMOUNTS)).toBeLessThan(GUM_FOAM.length);
+  expect(FOAM_AMOUNTS.reduce((a, b) => a + b, 0) / FOAM_AMOUNTS.length).toBeLessThanOrEqual(2.5);
+  // Neighbouring teeth take neighbouring entries: never the same amount twice in a row.
+  FOAM_AMOUNTS.forEach((n, i) => expect(n).not.toBe(FOAM_AMOUNTS[(i + 1) % FOAM_AMOUNTS.length]));
 });
 
 // Rows of even white bubbles with a blue ring were too loud (user feedback, November 2026): the foam is faint, big
@@ -49,7 +66,7 @@ test("the foam's bubbles are unlike each other and faint", async () => {
   const bubbles = mouth.match(/function FoamBubbles[\s\S]*?\n\}/)?.[0] ?? "";
   expect(bubbles).toMatch(/<g opacity=\{0\.[0-9]+\}>/);
   expect(bubbles).not.toContain("#bde0fe");
-  expect(mouth).toMatch(/if \(n === seed % GUM_FOAM\.length\) return \[\];/);
+  expect(mouth).toMatch(/FOAM_AMOUNTS\[seed % FOAM_AMOUNTS\.length\]/);
 });
 
 test("the foam is drawn under the lips, in the still picture or a layer of its own that only fades", async () => {

@@ -61,7 +61,7 @@ test("the stain of a tooth being brushed fades as an HTML layer of its own", () 
   const stain = mouth.slice(mouth.indexOf("const ToothStain"));
   expect(stain).not.toContain("<filter");
   // The still picture is built anew only when a step's teeth are done, never with every tick while they are brushed.
-  expect(mouth).toMatch(/\}, \[view, all, model, painted, lipPoints, lipsPath, stillDirty, stillFoam, side, happy\]\);/);
+  expect(mouth).toMatch(/\}, \[view, all, model, painted, lipPoints, lipsPath, stillDirty, stillFoam, side, happy, folds\]\);/);
 });
 
 test("in the story the sugar stains the teeth while the monsters grow, as a layer of its own", () => {
