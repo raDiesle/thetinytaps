@@ -139,7 +139,7 @@ export const teethIdeas: IdeaArea = {
       effort: "S",
       done: true,
       partial:
-        "Gebaut: zuerst als Mund, der im Spiegel aufgeht und leise brüllt; dann (Wunsch des Nutzers, November 2026) ein eigener Schritt „Brüllen wie ein Löwe“ vor dem Spiegel: das Gesicht des Kindes groß, der Mund weit auf, es brüllt; dann bekommt es eine Löwenmähne als Kostüm, ein Löwe (vorerst SVG, später vielleicht ein Gemini-Bild) kommt daneben und beide brüllen gleichzeitig. Danach zeigt der Spiegel den Mund schon offen durch 3, 2, 1 bis in den ersten Schritt. Das Brüllen des Kindes ist bis zur Aufnahme synthetisiert; die echte Aufnahme wartet in der Geräusche-Liste für Claude Cloud.",
+        "Gebaut: zuerst als Mund, der im Spiegel aufgeht und leise brüllt; dann (Wunsch des Nutzers, November 2026) ein eigener Schritt „Brüllen wie ein Löwe“ vor dem Spiegel: das Gesicht des Kindes groß, der Mund weit auf, es brüllt; dann bekommt es eine Löwenmähne als Kostüm, ein Löwe (vorerst SVG, später vielleicht ein Gemini-Bild) kommt daneben und beide brüllen gleichzeitig. Danach zeigt der Spiegel den Mund schon offen durch 3, 2, 1 bis in den ersten Schritt. Dann (Wunsch des Nutzers, 27. November 2026) eine eigene Phase auf der Leiste mit Löwen-Symbol: zuerst der Löwe allein, dann daneben das Kind gleich im Kostüm, und dreimal 3, 2, 1, dann brüllen beide zusammen, jedes Mal lauter und etwas länger. Die sechs Brüller (Löwe und Kind je Runde) warten in der Geräusche-Liste für Claude Cloud (ElevenLabs); bis dahin brüllt der Löwe mit roar.mp3 und das Kind synthetisiert, beide Runde für Runde lauter. Das gemalte Löwen-Symbol wartet bei den offenen Bildern, bis dahin ist es gezeichnet.",
     },
     {
       id: "X-27",

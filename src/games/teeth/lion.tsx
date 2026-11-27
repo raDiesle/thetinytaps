@@ -2,8 +2,7 @@ import { type CSSProperties, memo, type ReactNode, type RefObject, useRef } from
 import { useFigure } from "@/lib/common";
 import type { Daytime } from "@/lib/days";
 import { useT } from "@/lib/language";
-import { playRoar } from "@/lib/realSounds";
-import { playLittleRoar, playRecorded } from "@/lib/sfx";
+import { playCountNote, playLittleRoar, playRecorded, playRoar } from "@/lib/sfx";
 import type { Cue } from "./cues";
 import { EyeBall, EyeLid, INK, Iris, LIP } from "./face";
 import { fitBox, FrameStroke, screenFrame, useRoom, type Box } from "./mouth";
@@ -11,45 +10,73 @@ import { CLOSED_AREA, ClosedMouth, HEAD } from "./origin";
 import { Piece, pictureSpace } from "./piece";
 import { StoryHead, StoryShoulders } from "./storyChild";
 
-// Roaring like a lion (X-26), a step of its own before the song (user request, November 2026): the story's child fills
-// the screen, opens its mouth wide and roars like a little lion; a lion costume's mane grows round its face; the camera
-// draws back and a lion walks in beside it, opens its mouth too, and both roar together. The child's mouth stays open
-// to the end, so the mirror after it shows the mouth already wide open for the first verse.
+// Roaring like a lion (X-26), a phase of its own before the song, with the lion's symbol on the bar (user requests,
+// November 2026): first the lion is seen close up; the camera draws back to the story's child beside it, already in
+// its lion costume (the mane is on from the start, never grown in); then 3, 2, 1 is counted down big and both roar
+// together – three times, each roar louder and a little longer than the one before, each a recording of its own. The
+// child's mouth stays open after the last roar, so the mirror after it shows the mouth already wide open for the first verse.
 //
 // As everywhere in this game the picture is still and every moving thing an HTML layer of its own (`Piece`): the
-// camera, the costume's mane, the child's mouths, the lion walking in and its mouths. Its keyframes are `teeth-lion-…`
-// in teeth.css, all as long as LION_MS. The lion is drawn here in SVG; a painted one may take its place later.
+// camera, the child's mouths, the lion and its mouths, and the countdown's three numbers over the picture. Their
+// keyframes are `teeth-lion-…` in teeth.css, all as long as LION_MS. The lion is drawn here in SVG; a painted one may
+// take its place later.
 
 /** One beat of the song (112 BPM). */
 const BEAT_MS = 60000 / 112;
-/** How long the lion's step lasts: four bars of the song (16 beats, 6.25 % each in teeth.css). */
-export const LION_MS = 16 * BEAT_MS;
-/** The beat the child roars on, its mouth just wide open (`teeth-lion-kid-roar` at 18.75 %). */
-export const KID_ROAR_BEAT = 3;
-/** The beat both roar together, the lion's mouth just wide open (`teeth-lion-jaw` at 68.75 %). */
-export const BOTH_ROAR_BEAT = 11;
+/** How many beats the lion's step lasts: ten bars, 2.5 % each in teeth.css. */
+export const LION_BEATS = 40;
+/** How long the lion's step lasts. */
+export const LION_MS = LION_BEATS * BEAT_MS;
+/** When the camera has drawn back from the lion alone to the lion and the child (`teeth-lion-camera` at 12.5 %). */
+export const BOTH_SEEN_BEAT = 5;
 
-/** The child's roar: its recording once it is made (src/content/soundQueue.ts), till then a synthesized one. */
-const LITTLE_ROAR = "littleroar";
-const littleRoar = () => playRecorded(LITTLE_ROAR, playLittleRoar);
+/** One round of roaring: 3, 2, 1, two beats apart, then both roar. */
+export interface RoarRound {
+  /** The beat „3“ comes on; „2“ and „1“ follow two beats apart each (`COUNT_GAP`). */
+  count: number;
+  /** The beat both roar on, their mouths just wide open; two beats after „1“. */
+  roar: number;
+  /** How many beats the mouths stay wide open after it: longer round by round. */
+  open: number;
+  /** How loud both roars are played: louder round by round, the last at full loudness. */
+  gain: number;
+  /** The lion's roar of this round, a recording from ElevenLabs (waiting in src/content/soundQueue.ts). */
+  lion: string;
+  /** The child's roar of this round, a recording from ElevenLabs too. */
+  child: string;
+}
 
-/** The child roars alone, then the lion and the child together. */
-export const LION_CUES: Cue[] = [
-  { at: KID_ROAR_BEAT * BEAT_MS, play: littleRoar },
-  {
-    at: BOTH_ROAR_BEAT * BEAT_MS,
-    play: () => {
-      playRoar();
-      littleRoar();
-    },
-  },
+/** The beats between the countdown's numbers, and between „1“ and the roar. */
+export const COUNT_GAP = 2;
+
+/** The three rounds, each roar louder and a little longer than the one before (user request, November 2026). */
+export const ROUNDS: RoarRound[] = [
+  { count: 5, roar: 11, open: 3, gain: 0.5, lion: "lion-roar-1", child: "child-roar-1" },
+  { count: 15, roar: 21, open: 4, gain: 0.72, lion: "lion-roar-2", child: "child-roar-2" },
+  { count: 26, roar: 32, open: 5, gain: 1, lion: "lion-roar-3", child: "child-roar-3" },
 ];
 
-/** The recordings the step plays, loaded before the prelude: the child's roar and the lion's (`roar.mp3`). */
-export const LION_RECORDINGS = [LITTLE_ROAR, "roar"];
+/**
+ * Both roars of a round at once: the round's own recordings at the round's loudness. Until a recording is made, the
+ * lion's falls back to the lion's Freesound roar (`roar.mp3`) and the child's to a synthesized one, both at that
+ * loudness and the child's longer round by round.
+ */
+const roarTogether = (round: RoarRound, k: number) => () => {
+  playRecorded(round.lion, () => playRecorded("roar", playRoar, round.gain), round.gain);
+  playRecorded(round.child, () => playLittleRoar(k / (ROUNDS.length - 1)), round.gain);
+};
 
-/** The child's face with the costume's mane: what the camera shows first. */
-const FOCUS_CHILD: Box = { x: 0, y: 0, width: 440, height: 450 };
+/** Each round: a soft note on 3, 2 and 1, a little higher each, then both roar together. No voice, no chime over the roars. */
+export const LION_CUES: Cue[] = ROUNDS.flatMap((round, k) => [
+  ...[0, 1, 2].map((i) => ({ at: (round.count + i * COUNT_GAP) * BEAT_MS, play: () => playCountNote(i) })),
+  { at: round.roar * BEAT_MS, play: roarTogether(round, k) },
+]);
+
+/** The recordings the step plays, loaded before the prelude: each round's two roars, and the lion's stand-in. */
+export const LION_RECORDINGS = [...ROUNDS.flatMap((r) => [r.lion, r.child]), "roar"];
+
+/** The lion alone: what the camera shows first. */
+const FOCUS_LION: Box = { x: 440, y: 10, width: 480, height: 470 };
 /** The child and the lion beside it: what the camera draws back to. */
 const FOCUS_BOTH: Box = { x: -20, y: 0, width: 920, height: 480 };
 
@@ -193,6 +220,29 @@ function LionHead() {
   );
 }
 
+/**
+ * The lion's head as the bar's symbol of its phase (centred on 0, about 80 wide), drawn like the step's lion in the same
+ * ink line, until its painted picture comes (queued in src/games/potty/symbolPictures.ts). Flat fills, no ids.
+ */
+export function LionSymbol() {
+  return (
+    <g strokeLinejoin="round">
+      <Tufts x={0} y={0} r={27} size={12} count={14} fill={MANE_DARK} stroke />
+      <Tufts x={0} y={0} r={23} size={10} count={14} fill={MANE_LIGHT} />
+      {([-1, 1] as const).map((s) => (
+        <circle key={s} cx={s * 15} cy={-18} r={6} fill={LION_FUR} stroke={INK} strokeWidth={3} />
+      ))}
+      <circle cx={0} cy={0} r={21} fill={LION_FUR} stroke={INK} strokeWidth={3} />
+      {([-1, 1] as const).map((s) => (
+        <circle key={s} cx={s * 8} cy={-5} r={3} fill={INK} />
+      ))}
+      <ellipse cx={-5} cy={7} rx={7} ry={5} fill="#fff0d2" stroke={INK} strokeWidth={2} />
+      <ellipse cx={5} cy={7} rx={7} ry={5} fill="#fff0d2" stroke={INK} strokeWidth={2} />
+      <path d="M-4 1 Q0 -1 4 1 Q2 5 0 5 Q-2 5 -4 1 Z" fill="#6b3226" stroke={INK} strokeWidth={1.5} />
+    </g>
+  );
+}
+
 /** The lion's muzzle and nose, over its mouths. */
 function Muzzle() {
   const { x } = LION;
@@ -255,25 +305,25 @@ export const Lion = memo(function Lion({ daytime, free }: { daytime: Daytime; fr
   const viewBox = `${box.x.toFixed(1)} ${box.y.toFixed(1)} ${box.width.toFixed(1)} ${box.height.toFixed(1)}`;
   const space = pictureSpace(box, unit);
   const figure = useFigure();
-  // The camera starts close on the child and draws back to both: the whole picture is scaled as an HTML layer, which
+  // The camera starts close on the lion and draws back to both: the whole picture is scaled as an HTML layer, which
   // the browser moves without painting it again, from showing `close` to showing `box`.
-  const close = fitBox(room, FOCUS_CHILD);
+  const close = fitBox(room, FOCUS_LION);
   const camera = {
     "--zoom": (unit / close.unit).toFixed(4),
     "--zoom-x": `${((box.x - close.box.x) / close.unit).toFixed(1)}px`,
     "--zoom-y": `${((box.y - close.box.y) / close.unit).toFixed(1)}px`,
   } as CSSProperties;
   const label = t({
-    en: "The child roars like a lion, and a lion roars along",
-    de: "Das Kind brüllt wie ein Löwe, und ein Löwe brüllt mit",
-    zh: "孩子像狮子一样吼，一只狮子也跟着吼",
-    hi: "बच्चा शेर की तरह दहाड़ता है, और एक शेर भी साथ में दहाड़ता है",
-    es: "El niño ruge como un león, y un león ruge con él",
-    ar: "الطفل يزأر مثل الأسد، وأسد يزأر معه",
-    ru: "Ребёнок рычит, как лев, и лев рычит вместе с ним",
+    en: "A lion, and the child in a lion costume beside it: 3, 2, 1 – both roar, three times, louder each time",
+    de: "Ein Löwe und daneben das Kind im Löwenkostüm: 3, 2, 1 – beide brüllen, dreimal, jedes Mal lauter",
+    zh: "一只狮子，旁边是穿着狮子服的孩子：3、2、1——一起吼，吼三次，一次比一次响",
+    hi: "एक शेर, और उसके पास शेर की पोशाक में बच्चा: 3, 2, 1 – दोनों दहाड़ते हैं, तीन बार, हर बार और ज़ोर से",
+    es: "Un león y, a su lado, el niño disfrazado de león: 3, 2, 1, los dos rugen, tres veces, cada vez más fuerte",
+    ar: "أسد، وبجانبه الطفل في زيّ الأسد: 3، 2، 1 – يزأران معًا ثلاث مرات، وكل مرة أعلى من سابقتها",
+    ru: "Лев, а рядом ребёнок в костюме льва: 3, 2, 1 – оба рычат, три раза, каждый раз громче",
   });
   return (
-    <div ref={scene} className={`lion ${daytime}`}>
+    <div ref={scene} className={`lion-scene ${daytime}`}>
       <div className="lion-camera" style={camera}>
         {/* A warm sky over a sunny savanna, and the child's shoulders. */}
         <svg className="lion-picture" viewBox={viewBox} role="img" aria-label={label}>
@@ -294,14 +344,14 @@ export const Lion = memo(function Lion({ daytime, free }: { daytime: Daytime; fr
         </svg>
 
         <div className="teeth-space" style={space}>
-          {/* The costume's mane grows in round the face, behind the head and over the shoulders. */}
-          <Piece area={MANE_AREA} pivot={MANE} className="lion-mane">
+          {/* The costume's mane round the face, behind the head and over the shoulders: on from the start. */}
+          <Piece area={MANE_AREA} className="lion-still">
             <CostumeMane />
           </Piece>
           <Piece area={{ x: -50, y: 0, width: 540, height: 400 }} className="lion-still">
             <StoryHead id="lion" figure={figure} />
           </Piece>
-          {/* The smile gives way to the mouth wide open, which roars once alone and once with the lion. */}
+          {/* The smile gives way to the mouth wide open in each round, and after the last roar the mouth stays open. */}
           <Piece area={CLOSED_AREA} className="lion-kid-smile">
             <ClosedMouth />
           </Piece>
@@ -309,7 +359,7 @@ export const Lion = memo(function Lion({ daytime, free }: { daytime: Daytime; fr
             <KidRoar />
           </Piece>
 
-          {/* The lion walks in from the side, opens its mouth and roars along. */}
+          {/* The lion beside the child, seen first; it leans into each roar a little more. */}
           <Piece
             area={LION_AREA}
             pivot={{ x: LION.x, y: 480 }}
@@ -345,6 +395,14 @@ export const Lion = memo(function Lion({ daytime, free }: { daytime: Daytime; fr
       <svg className="lion-frame" viewBox={viewBox} aria-hidden>
         <FrameStroke frame={frame} unit={unit} />
       </svg>
+
+      {/* 3, 2, 1 before each roar, big over the picture and the same in every language: each number an HTML layer of its
+          own that comes in all three rounds (`teeth-lion-count-3` …), so a jump on the bar finds it where the clock is. */}
+      {[3, 2, 1].map((n) => (
+        <span key={n} className={`lion-count lion-count-${n}`} aria-hidden>
+          {n}
+        </span>
+      ))}
     </div>
   );
 });

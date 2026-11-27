@@ -197,8 +197,11 @@ export function playLoop(
   };
 }
 
-/** Plays the recording `name`, slightly higher or lower each time; `synth` while it is still loading or if there is none. */
-export function playRecorded(name: string, synth: () => void) {
+/**
+ * Plays the recording `name`, slightly higher or lower each time; `synth` while it is still loading or if there is none.
+ * `volume` (1 by default) plays it quieter, where a sound grows from round to round (Zähne putzen's roars).
+ */
+export function playRecorded(name: string, synth: () => void, volume = 1) {
   const ac = audio();
   const buffer = loaded.get(name);
   if (!ac || !buffer) {
@@ -206,18 +209,18 @@ export function playRecorded(name: string, synth: () => void) {
     synth();
     return;
   }
-  playBuffer(buffer);
+  playBuffer(buffer, volume);
 }
 
 /** Plays a recording loaded elsewhere (`loadSound`) as a sound effect, slightly higher or lower each time. */
-export function playBuffer(buffer: AudioBuffer) {
+export function playBuffer(buffer: AudioBuffer, volume = 1) {
   const ac = audio();
   if (!ac) return;
   const source = ac.createBufferSource();
   source.buffer = buffer;
   source.playbackRate.value = 0.96 + Math.random() * 0.08;
   const gain = ac.createGain();
-  gain.gain.value = effect(1);
+  gain.gain.value = effect(volume);
   source.connect(gain).connect(speaker(ac));
   source.start();
 }

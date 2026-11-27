@@ -23,7 +23,7 @@ import { dirtyFaces } from "./stains";
 import { SUNG_LANGUAGES, songEndMs, sungSteps, useBrushingMusic, useSongLoad } from "./music";
 import type { Cue } from "./cues";
 import { DONE_SAY, type Prelude, PRELUDE_TEXTS, preludeTexts, TIDY_SAY } from "./lines";
-import { Lion, LION_CUES, LION_MS, LION_RECORDINGS } from "./lion";
+import { Lion, LION_CUES, LION_MS, LION_RECORDINGS, LionSymbol } from "./lion";
 import { HoneyBread, Origin, ORIGIN_CUES, ORIGIN_MS, ORIGIN_RECORDINGS } from "./origin";
 import { Scenes, type SceneKind } from "./scenes";
 import { Prep, PREP_CUES, PREP_MS, PREP_RECORDINGS, TIDY_RECORDINGS } from "./prep";
@@ -253,26 +253,28 @@ function preludeAt(prelude: Prelude[], elapsed: number): Prelude {
   return prelude[prelude.length - 1];
 }
 
-/** The phases of the routine the bar shows apart: eating sweets, getting the brush, brushing, putting the brush away. */
-type BarPhase = "eat" | "fetch" | "ready" | "tidy";
+/** The phases of the routine the bar shows apart: eating sweets, getting the brush, roaring like a lion, brushing, putting the brush away. */
+type BarPhase = "eat" | "fetch" | "lion" | "tidy";
 
 /** The symbol of each phase on the bar; the brushing has its frame with the riding brush and the clean tooth instead. */
-const PHASE_SYMBOL: Record<BarPhase, TeethSymbol | null> = { eat: "bonbon", fetch: "zahnpasta", ready: null, tidy: "becher" };
+const PHASE_SYMBOL: Record<BarPhase, TeethSymbol> = { eat: "bonbon", fetch: "zahnpasta", lion: "loewe", tidy: "becher" };
 /** In the morning the story eats breakfast (X-19), so its phase shows the honey bread instead of the sweet. */
-const symbolOf = (phase: BarPhase, daytime: Daytime): TeethSymbol | null => (phase === "eat" && daytime === "morning" ? "fruehstueck" : PHASE_SYMBOL[phase]);
+const symbolOf = (phase: BarPhase, daytime: Daytime): TeethSymbol => (phase === "eat" && daytime === "morning" ? "fruehstueck" : PHASE_SYMBOL[phase]);
 
 /**
- * The prelude's parts as the bar's tiles before the brushing: the story is eating, the sink is getting the brush. The
- * first look in the mirror, roaring like a lion, the open mouth and 3, 2, 1 end the tile before them, or stand alone when neither is shown.
+ * The prelude's parts as the bar's tiles before the brushing: the story is eating, the sink is getting the brush, and
+ * roaring like a lion is a phase of its own with the lion's symbol (user request, November 2026), the open mouth in
+ * the mirror and 3, 2, 1 with it. The first look in the mirror ends the tile before it, or begins the lion's when
+ * neither eating nor getting the brush is shown.
  */
-function preludeTiles(prelude: Prelude[]): { phase: BarPhase; parts: Prelude[] }[] {
+export function preludeTiles(prelude: Prelude[]): { phase: BarPhase; parts: Prelude[] }[] {
   const tiles: { phase: BarPhase; parts: Prelude[] }[] = [];
   const eat = prelude.filter((p) => p === "sweets" || p === "grow");
   const fetch = prelude.filter((p) => p === "brush" || p === "paste");
   if (eat.length) tiles.push({ phase: "eat", parts: eat });
   if (fetch.length) tiles.push({ phase: "fetch", parts: fetch });
-  if (tiles.length) tiles[tiles.length - 1].parts.push("monsters", "lion", "roar");
-  else tiles.push({ phase: "ready", parts: ["monsters", "lion", "roar"] });
+  if (tiles.length) tiles[tiles.length - 1].parts.push("monsters");
+  tiles.push({ phase: "lion", parts: [...(tiles.length ? [] : ["monsters" as const]), "lion", "roar"] });
   return tiles;
 }
 
@@ -286,6 +288,13 @@ function BarSymbol({ name }: { name: TeethSymbol | null }) {
     return (
       <svg className="teeth-symbol" viewBox="-40 -42 80 84" aria-hidden>
         <HoneyBread />
+      </svg>
+    );
+  // The lion's phase shows the step's lion's head in the same ink line, until its painted picture comes.
+  if (name === "loewe")
+    return (
+      <svg className="teeth-symbol" viewBox="-40 -42 80 84" aria-hidden>
+        <LionSymbol />
       </svg>
     );
   return <span className="teeth-symbol" aria-hidden />;
@@ -583,7 +592,7 @@ export function TeethPlay({ settings, video, options }: { settings: TeethSetting
           ? brushed - totalMs - TIDY_FROM
           : null;
     if (!jumps || into === null) return;
-    const picture = stage.current?.querySelector(":scope > .teeth-scene:last-child :is(.origin, .prep, .lion, .spit)");
+    const picture = stage.current?.querySelector(":scope > .teeth-scene:last-child :is(.origin, .prep, .lion-scene, .spit)");
     for (const animation of picture?.getAnimations({ subtree: true }) ?? []) animation.currentTime = into;
   }, [jumps]);
 
