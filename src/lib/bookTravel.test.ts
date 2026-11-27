@@ -1,6 +1,6 @@
 import { expect, test } from "bun:test";
-import { CATEGORIES, categoryHref, listedGames } from "@/content/games";
-import { halfwayAt, putBookBack, shelfBookOf } from "./bookTravel";
+import { CATEGORIES, categoryHref, listedGames, shelfVolumes } from "@/content/games";
+import { halfwayAt, putBookBack, renameIdRefs, shelfBookOf } from "./bookTravel";
 
 // The way back puts the book into its own gap (a shelf book's `data-book` is its category's id): every page in a book
 // finds it – the category's page and each of its games. A game standing apart has a book of its own; one still being
@@ -12,8 +12,10 @@ test("every category's page and every game finds its book on the shelf", () => {
     if (!category.apart) expect(shelfBookOf(categoryHref(category))).toBe(category.id);
     for (const game of category.games.filter((g) => g.unfinished === true)) expect(shelfBookOf(game.href), game.href).toBeUndefined();
     for (const game of listedGames(category)) {
-      // A bundle of volumes: the game's own address is the volume of that address, wherever it stands in the bundle.
-      const own = game.volumes?.find((v) => v.href === game.href)?.href ?? game.volumes?.[0].href ?? game.href;
+      // A bundle of volumes: the game's own address is the volume of that address, wherever it stands in the bundle; a
+      // calendar (`Game.calendar`) is one thing, found by the game's own address.
+      const volumes = shelfVolumes(game);
+      const own = volumes?.find((v) => v.href === game.href)?.href ?? volumes?.[0].href ?? game.href;
       expect(shelfBookOf(game.href)).toBe(category.apart ? own.replaceAll("/", "") : category.id);
     }
   }
@@ -26,8 +28,9 @@ test("the games standing apart are books of their own, each found by its pages",
   for (const game of apart.filter((g) => !g.volumes)) for (const href of game.also ?? []) expect(shelfBookOf(href)).toBe(shelfBookOf(game.href));
 });
 
-// A game standing as several books (Belohnungstafel & Zeitplan) has a book for each of its addresses: going back from a part puts
-// that part's book back, not its neighbour.
+// A game standing as several books has a book for each of its addresses: going back from a part puts that part's book
+// back, not its neighbour. A game standing as one calendar (Belohnungstafel & Zeitplan, `Game.calendar`) goes back into
+// that calendar's gap from every part.
 test("each of a game's volumes is found by its own address", () => {
   const games = CATEGORIES.flatMap((c) => c.games).filter((g) => g.volumes);
   expect(games.length).toBeGreaterThan(0);
@@ -35,7 +38,7 @@ test("each of a game's volumes is found by its own address", () => {
     const volumes = game.volumes ?? [];
     expect(volumes.map((v) => v.href).sort()).toEqual([game.href, ...(game.also ?? [])].sort());
     // A volume still being built is no book on the shelf (`shelfVolumes`): its page belongs to its game's book.
-    for (const v of volumes) expect(shelfBookOf(v.href), v.href).toBe((v.unfinished ? game.href : v.href).replaceAll("/", ""));
+    for (const v of volumes) expect(shelfBookOf(v.href), v.href).toBe((game.calendar || v.unfinished ? game.href : v.href).replaceAll("/", ""));
   }
 });
 
@@ -95,4 +98,22 @@ test("the cover's faces swap where its turn has gone half the way", () => {
   // The cover's turn eases out longer than it eases in: half open a little before half its time.
   expect(halfwayAt([0.5, 0, 0.35, 1])).toBeGreaterThan(0.4);
   expect(halfwayAt([0.5, 0, 0.35, 1])).toBeLessThan(0.5);
+});
+
+// While a book flies, the screen is copied onto its page: with the page's own ids the document held each id twice, and
+// the brushing's story lost the clip its face hangs on – only the eyes and the mouth were left (user feedback, November
+// 2026). The copy's ids get a tag, and every reference in the copy follows them.
+test("a copy of the screen points its references at its own ids", () => {
+  const ids = new Set(["origin-skin", "label"]);
+  expect(renameIdRefs("url(#origin-skin)", ids, "--copy1", "fill")).toBe("url(#origin-skin--copy1)");
+  expect(renameIdRefs('fill: url("#origin-skin"); stroke: url(#other)', ids, "--copy1", "style")).toBe('fill: url("#origin-skin--copy1"); stroke: url(#other)');
+  expect(renameIdRefs("#origin-skin", ids, "--copy1", "href")).toBe("#origin-skin--copy1");
+  expect(renameIdRefs("/zaehne/#top", ids, "--copy1", "href")).toBe("/zaehne/#top");
+  expect(renameIdRefs("label other", ids, "--copy1", "aria-labelledby")).toBe("label--copy1 other");
+  expect(renameIdRefs("#fff", ids, "--copy1", "fill")).toBe("#fff");
+});
+
+test("every copy of the screen gets ids of its own", async () => {
+  const source = await Bun.file("src/lib/bookTravel.ts").text();
+  expect(/function seenCopy[\s\S]*?\n}/.exec(source)?.[0]).toContain("ownIds(copy)");
 });

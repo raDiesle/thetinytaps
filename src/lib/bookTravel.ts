@@ -68,7 +68,48 @@ function seenCopy(original: HTMLElement) {
   const copy = original.cloneNode(true) as HTMLElement;
   copy.removeAttribute("id");
   for (const unseen of copy.querySelectorAll("[hidden], [data-below-fold], .seo-text")) unseen.remove();
+  ownIds(copy);
   return copy;
+}
+
+/** How many copies got ids of their own, so each copy's are new. */
+let copies = 0;
+
+/** Attributes naming other elements by their ids, separated by spaces. */
+const ID_LISTS = ["for", "aria-labelledby", "aria-describedby", "aria-controls", "aria-owns", "aria-activedescendant"];
+
+/**
+ * `value` with every reference to one of `ids` – `url(#id)` in a fill, clip, mask, filter or style, `#id` in an href –
+ * turned to that id with `tag` added.
+ */
+export function renameIdRefs(value: string, ids: ReadonlySet<string>, tag: string, name: string): string {
+  if (ID_LISTS.includes(name))
+    return value
+      .split(/\s+/)
+      .map((id) => (ids.has(id) ? `${id}${tag}` : id))
+      .join(" ");
+  if (!value.includes("#")) return value;
+  if ((name === "href" || name === "xlink:href") && value.startsWith("#")) return ids.has(value.slice(1)) ? `${value}${tag}` : value;
+  return value.replace(/url\(\s*(["']?)#([^"')\s]+)\1\s*\)/g, (all, quote: string, id: string) => (ids.has(id) ? `url(${quote}#${id}${tag}${quote})` : all));
+}
+
+/**
+ * Gives every id in the copy `copy` a name of its own and points the copy's references at them. A copy keeping the
+ * page's ids put each id in the document twice while the book flew: a picture whose clip, gradient or pattern is found
+ * by its id could then lose it, and the brushing's story showed only the child's eyes and mouth, the rest of the face
+ * gone (user feedback, November 2026). With ids of its own the copy draws from its own defs, and the page from its.
+ */
+function ownIds(copy: HTMLElement) {
+  const named = copy.querySelectorAll("[id]");
+  if (!named.length) return;
+  const tag = `--copy${++copies}`;
+  const ids = new Set([...named].map((element) => element.id));
+  for (const element of named) element.id += tag;
+  for (const element of copy.querySelectorAll("*"))
+    for (const attribute of element.attributes) {
+      const renamed = renameIdRefs(attribute.value, ids, tag, attribute.name);
+      if (renamed !== attribute.value) attribute.value = renamed;
+    }
 }
 
 /** A still copy of everything the app shows, as big as the screen, to be printed on the book's left page. */

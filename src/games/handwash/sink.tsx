@@ -35,12 +35,66 @@ export const SPOUT = { x: 800, y: 332 };
 export const AREAS = {
   left: { x: 440, y: 240, width: 340, height: 700 },
   right: { x: 820, y: 240, width: 340, height: 700 },
-  lever: { x: 740, y: 140, width: 120, height: 110 },
+  lever: { x: 706, y: 104, width: 120, height: 110 },
   stream: { x: SPOUT.x - 26, y: SPOUT.y - 4, width: 52, height: 370 },
   splash: { x: SPOUT.x - 70, y: 664, width: 140, height: 70 },
   pumpHead: { x: 500, y: 110, width: 150, height: 100 },
   towelWrap: { x: 1180, y: 150, width: 380, height: 520 },
 } satisfies Record<string, Box>;
+
+/** A point in picture units. */
+type Pt = readonly [number, number];
+
+/** A point on the cubic curve a–b–c–d at t. */
+const cubic = (a: Pt, b: Pt, c: Pt, d: Pt, t: number): Pt => {
+  const u = 1 - t;
+  const k = [u * u * u, 3 * u * u * t, 3 * u * t * t, t * t * t];
+  return [k[0] * a[0] + k[1] * b[0] + k[2] * c[0] + k[3] * d[0], k[0] * a[1] + k[1] * b[1] + k[2] * c[1] + k[3] * d[1]];
+};
+
+/** The gooseneck's middle line, from the foot up the column, over its arch and down to the outlet over the basin. */
+const NECK: Pt[] = (() => {
+  const points: Pt[] = [];
+  for (let i = 0; i <= 8; i++) points.push([786, 214 - (i / 8) * 76]);
+  const arch: [Pt, Pt, Pt, Pt] = [
+    [786, 138],
+    [786, 78],
+    [824, 62],
+    [830, 112],
+  ];
+  const down: [Pt, Pt, Pt, Pt] = [
+    [830, 112],
+    [836, 168],
+    [804, 250],
+    [800, SPOUT.y - 12],
+  ];
+  for (let i = 1; i <= 24; i++) points.push(cubic(...arch, i / 24));
+  for (let i = 1; i <= 24; i++) points.push(cubic(...down, i / 24));
+  return points;
+})();
+
+/** How wide the tube is at a share of its length: slim at the back, wider as it comes towards the eye. */
+const neckWidth = (share: number) => 30 + 22 * share * share;
+
+/** A strip along the gooseneck between two sides of its middle line (-0.5 its left edge, 0.5 its right), as a path. */
+function neckStrip(from: number, to: number): string {
+  const side = (at: number) =>
+    NECK.map((p, i) => {
+      const q = NECK[Math.min(i + 1, NECK.length - 1)];
+      const o = NECK[Math.max(i - 1, 0)];
+      const dx = q[0] - o[0];
+      const dy = q[1] - o[1];
+      const length = Math.hypot(dx, dy) || 1;
+      const w = neckWidth(i / (NECK.length - 1)) * at;
+      return `${(p[0] - (dy / length) * w).toFixed(1)} ${(p[1] + (dx / length) * w).toFixed(1)}`;
+    });
+  return `M${side(from).join(" L")} L${side(to).reverse().join(" L")} Z`;
+}
+
+/** The gooseneck's outline, its shaded side and its long light, worked out once. */
+const NECK_BODY = neckStrip(-0.5, 0.5);
+const NECK_SHADE = neckStrip(0.12, 0.5);
+const NECK_LIGHT = neckStrip(-0.34, -0.14);
 
 const CHROME_STOPS = (
   <>
@@ -133,14 +187,20 @@ export const SinkPicture = memo(function SinkPicture({ daytime, label }: { dayti
       {[-10, 0, 10].map((d) => (
         <path key={d} d={`M${786} ${704 + d} H${814}`} stroke="#5d6874" strokeWidth={4} strokeLinecap="round" />
       ))}
-      {/* The mixer tap: its foot with the cold and warm dots, its body and the spout reaching out over the basin. */}
-      <ellipse cx={804} cy={226} rx={82} ry={30} fill="#6f7b88" opacity={0.3} filter="url(#hw-blur)" />
-      <ellipse cx={800} cy={212} rx={74} ry={28} fill="url(#hw-chrome)" stroke="#6f7b88" strokeWidth={3} />
-      <circle cx={752} cy={214} r={8} fill="#f05a4a" stroke="#b33a2e" strokeWidth={2} />
-      <circle cx={848} cy={214} r={8} fill="#3d8ff0" stroke="#2862a8" strokeWidth={2} />
-      <path d="M774 214 L774 300 Q774 336 800 336 Q826 336 826 300 L826 214 Z" fill="url(#hw-chrome)" stroke="#6f7b88" strokeWidth={3} />
-      <ellipse cx={800} cy={328} rx={20} ry={9} fill="#5d6874" />
-      <path d="M786 232 L786 298" stroke="#fff" strokeWidth={6} strokeLinecap="round" opacity={0.8} />
+      {/* The mixer tap: its round foot with the warm and cold dots, a slim column rising from it and the gooseneck
+          arching over and coming down towards the eye, wider as it comes nearer, its outlet right over the basin. Its
+          shadow falls on the counter; the lever is a layer of its own on the column's side. */}
+      <ellipse cx={800} cy={232} rx={70} ry={22} fill="#6f7b88" opacity={0.3} filter="url(#hw-blur)" />
+      <path d={NECK_BODY} fill="#5d6874" opacity={0.18} filter="url(#hw-blur)" transform="translate(14 26)" />
+      <ellipse cx={792} cy={218} rx={70} ry={21} fill="#7d8996" />
+      <ellipse cx={792} cy={212} rx={70} ry={21} fill="url(#hw-chrome)" stroke="#6f7b88" strokeWidth={3} />
+      <circle cx={740} cy={214} r={7} fill="#f05a4a" stroke="#b33a2e" strokeWidth={2} />
+      <circle cx={848} cy={212} r={7} fill="#3d8ff0" stroke="#2862a8" strokeWidth={2} />
+      <path d={NECK_BODY} fill="#c3ccd5" stroke="#6f7b88" strokeWidth={3} strokeLinejoin="round" />
+      <path d={NECK_SHADE} fill="#7d8996" opacity={0.55} />
+      <path d={NECK_LIGHT} fill="#fff" opacity={0.85} />
+      <ellipse cx={800} cy={SPOUT.y - 8} rx={26} ry={10} fill="#c3ccd5" stroke="#6f7b88" strokeWidth={3} />
+      <ellipse cx={800} cy={SPOUT.y - 6} rx={17} ry={6} fill="#4c5660" />
       {/* The soap bottle on the left, its head with the nozzle lying over it. */}
       <ellipse cx={546} cy={324} rx={74} ry={20} fill="#6f5f4e" opacity={0.28} filter="url(#hw-blur)" />
       <rect x={476} y={188} width={124} height={136} rx={34} fill="url(#hw-soap)" stroke="#c0628f" strokeWidth={3} />

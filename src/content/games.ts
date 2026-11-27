@@ -21,7 +21,7 @@ import {
   WORDS_BLURB,
   WORDS_TITLE,
 } from "@/games/letters/names";
-import { WAIT_BOOK } from "@/games/rewards/names";
+import { REWARD_BOOK, SCHEDULE_BOOK, WAIT_BOOK } from "@/games/rewards/names";
 import { SHADOWS_BLURB, SHADOWS_TITLE } from "@/games/shadows/names";
 import { TOGETHER_BLURB, TOGETHER_TITLE } from "@/games/together/names";
 import type { Texts } from "@/lib/language";
@@ -40,6 +40,12 @@ export interface Game {
    * (`also`), each with its own name on its spine.
    */
   volumes?: Volume[];
+  /**
+   * On the shelf its volumes stand as one ring-bound calendar instead of books tied together (user request, 26 November
+   * 2026: the Belohnungstafel's three books): a picture of a day's plan with its reward on its page and the volumes'
+   * names under it, one tap opening the game's first part to make (`Volume` first in `volumes`, see `calendarHref`).
+   */
+  calendar?: true;
   /**
    * Still being built: it stands neither on the shelf nor in its book and is in no search result or sitemap; only the
    * management page links to it, and its way back leads there (user decision, November 2026). Drop the mark to publish it.
@@ -77,7 +83,7 @@ export interface Category {
   apart?: boolean;
   /**
    * A toy standing on the shelf instead of a book (user request, 24 November 2026): its one game is opened by tapping the
-   * toy – a poster from „Magic Keys“ stuck on the back panel over the board (`ShelfToy` in Bookshelf.tsx; a toy keyboard in front of it
+   * toy – a poster from „Tap Magic“ stuck on the back panel over the board (`ShelfToy` in Bookshelf.tsx; a toy keyboard in front of it
    * looked like a till and was taken out, user feedback, 24 November 2026) –, with no book to take out, no cover and no
    * page of its own; its way back is the shelf.
    */
@@ -190,7 +196,7 @@ export const CATEGORIES: Category[] = [
         blurb: HAIR_STORY_BLURB,
       },
       {
-        // The book „Bed“ (named „Big Bed“ until 24 November 2026) beside „Hair Washing“ (idea H-106, 21 November 2026):
+        // The book „Sleep Tight“ (named „Big Bed“ until 24 November 2026, „Bed“ until 26 November 2026) beside „Hair Washing“ (idea H-106, 21 November 2026):
         // „Tapsi's Big Bed“, a story in chapters along the steps the guides give for moving a small child from the cot
         // into a bed of its own (src/games/bedstory), English first. Its pictures were made on 21 November 2026, and it
         // was published on the user's word on 23 November 2026.
@@ -243,28 +249,14 @@ export const CATEGORIES: Category[] = [
       {
         href: "/belohnungstafel/",
         also: ["/tagesplan/", "/wie-lange-warten/"],
-        // On the shelf books tied together, each opening its own part (user feedback, November 2026): „Wie lange
-        // warten?“ (a Countdown to a big day, H-05), then the Zeitplan, then the Belohnungstafel, which stays bound in gold.
+        // On the shelf one ring-bound calendar (user request, 26 November 2026; before, three books tied together):
+        // a tap opens the Zeitplan's editor, whose quick access reaches the other two parts. Its page names all three,
+        // the Zeitplan first: „Wie lange warten?“ is the Countdown to a big day (H-05).
+        calendar: true,
         volumes: [
+          { href: "/tagesplan/", emoji: "🗓️", title: SCHEDULE_BOOK },
+          { href: "/belohnungstafel/", emoji: "🌟", title: REWARD_BOOK },
           { href: "/wie-lange-warten/", emoji: "🌙", title: WAIT_BOOK },
-          {
-            href: "/tagesplan/",
-            emoji: "🗓️",
-            title: { de: "Zeitplan", en: "Schedule", zh: "时间表", hi: "समय-सारणी", es: "Horario", ar: "الجدول الزمني", ru: "Расписание" },
-          },
-          {
-            href: "/belohnungstafel/",
-            emoji: "🌟",
-            title: {
-              de: "Belohnungstafel",
-              en: "Reward chart",
-              zh: "奖励表",
-              hi: "इनाम चार्ट",
-              es: "Tabla de premios",
-              ar: "لوحة المكافآت",
-              ru: "Таблица наград",
-            },
-          },
         ],
         emoji: "📅",
         title: {
@@ -289,7 +281,7 @@ export const CATEGORIES: Category[] = [
     ],
   },
   {
-    // „Magic Keys“ (user request, 24 November 2026): a toy for banging on keys, mouse or screen, in no book – it stands
+    // „Tap Magic“ (user request, 24 November 2026): a toy for banging on keys, mouse or screen, in no book – it stands
     // as its poster (`toy`) first on the picture books' board, at its left: at its right end the trophy sign hangs, which
     // hid it.
     id: "drauflos",
@@ -535,6 +527,8 @@ export const listedGames = (category: Category) => category.games.filter((game) 
  * then stands as the game's own book, untied.
  */
 export function shelfVolumes(game: Game): Volume[] | undefined {
+  // A calendar is one thing on the shelf, opened at its first volume: no book of its own for each.
+  if (game.calendar) return undefined;
   const volumes = game.volumes?.filter((volume) => !volume.unfinished);
   return volumes && volumes.length > 1 ? volumes : undefined;
 }
@@ -564,6 +558,9 @@ export interface ShelfEntry {
   /** The game, for a game's own book. */
   game?: Game;
 }
+
+/** Where a game standing as a calendar opens (`Game.calendar`): its first volume, the Zeitplan's editor for the Belohnungstafel. */
+export const calendarHref = (game: Game) => game.volumes?.[0]?.href ?? game.href;
 
 /** The id of a game's own book, or of one of its volumes: its address without slashes. */
 export const bookIdOf = (href: string) => href.replaceAll("/", "");

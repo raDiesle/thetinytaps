@@ -3,6 +3,7 @@ import { tmpdir } from "node:os";
 import { join } from "node:path";
 import { type Cdp, evaluate, launchChrome, open, siteUrl, sleep } from "./chrome";
 import { type Budget, BUDGET, DEVICES, type Device, type Part, SCENARIOS, type Scenario, type Step } from "./perfScenarios";
+import { type ChromeFrames, chromeFrames, rasteredPixels, type TraceEvent } from "./perfTrace";
 
 // `bun run perf`: plays every game in headless Chrome as an old Android phone would (a slow CPU, a small screen
 // with many pixels) and measures how smoothly its animations run, in the Chrome on the computer (tools/chrome.ts).
@@ -18,6 +19,9 @@ import { type Budget, BUDGET, DEVICES, type Device, type Part, SCENARIOS, type S
 //                                      Performance panel (what painted, laid out or ran in each long frame)
 //   bun run perf --profile             also list the functions that took the most time in each stretch (on a build that
 //                                      keeps its names)
+//   bun run perf --repeat 3            play each scenario 3 times and judge each stretch by the median of its runs, with
+//                                      the spread beside it (a stretch's raster swung from 21 to 39 screens/s on the
+//                                      same code, so one run alone can't tell whether a change helped)
 //
 // For each measured stretch it prints the frames per second the page drew, how many frames took too long
 // (over 50 ms is a stutter a child sees), the longest one, and how busy the main thread was (script, style,
@@ -30,9 +34,11 @@ const option = (name: string) => {
   const i = args.indexOf(`--${name}`);
   return i >= 0 ? args[i + 1] : undefined;
 };
-const optionValues = new Set(["url", "device", "json"].map((n) => option(n)).filter(Boolean));
+const optionValues = new Set(["url", "device", "json", "repeat"].map((n) => option(n)).filter(Boolean));
 const filters = args.filter((a) => !a.startsWith("--") && !optionValues.has(a));
 const device: Device = DEVICES[option("device") ?? "oldAndroid"] ?? DEVICES.oldAndroid;
+/** How often each scenario is played (`--repeat`); above 1 a stretch is judged by the median of its runs. */
+const repeat = Math.max(1, Math.round(Number(option("repeat") ?? 1)) || 1);
 
 /** In the page: counts frames and long animation frames until `__perfStop()`. */
 const FRAME_COUNTER = `(() => {
@@ -82,6 +88,8 @@ interface Measurement {
    * drawn anew every frame costs 60 (120 on a phone showing 120 frames a second) however fast this computer is.
    */
   rasterScreensPerS: number;
+  /** Chrome's own count of the stretch's frames, from its trace: a second opinion beside `fps` and `stutters` (A-57). */
+  chrome: ChromeFrames;
   /** Style recalculations and layouts per second: a lot of them usually means something moves through layout. */
   stylesPerS: number;
   layoutsPerS: number;
@@ -93,8 +101,33 @@ interface Measurement {
   hot: string[];
   /** Where the stretch waited for its motion (`Part.startWhen`): the ms from the finger landing to the first frame of it. */
   lead?: { name: string; ms: number };
+  /** With --repeat: how many runs the median above is made of, and the lowest and highest value of the main numbers. */
+  runs?: number;
+  spread?: Partial<Record<SpreadKey, [number, number]>>;
   over: string[];
 }
+
+/** The numbers whose spread over the runs is shown with --repeat. */
+type SpreadKey = "fps" | "stutters" | "p95" | "busy" | "rasterScreensPerS";
+const SPREAD_KEYS: SpreadKey[] = ["fps", "stutters", "p95", "busy", "rasterScreensPerS"];
+/** The numbers a median of several runs is taken of: each on its own, so the median stretch may mix runs. */
+const MEDIAN_KEYS = [
+  "seconds",
+  "fps",
+  "stutters",
+  "longest",
+  "p95",
+  "busy",
+  "script",
+  "style",
+  "layout",
+  "other",
+  "paintMsPerS",
+  "rasterMsPerS",
+  "rasterScreensPerS",
+  "stylesPerS",
+  "layoutsPerS",
+] as const satisfies readonly (keyof Measurement)[];
 
 /**
  * The middle of the first element matching `selector`, scrolled into the window first, or null. A card below a phone's
@@ -223,20 +256,9 @@ const percentile = (values: number[], p: number) => {
   return sorted[Math.min(sorted.length - 1, Math.floor(sorted.length * p))];
 };
 
-interface TraceEvent {
-  name: string;
-  ph: string;
-  dur?: number;
-  tid: number;
-  args?: {
-    tileData?: { tileId?: { id_ref?: string } };
-    snapshot?: { active_tiles?: { id?: string; content_rect?: number[] }[] };
-  };
-}
-
 /**
  * Records Chrome's trace while `during` runs: where painting (main thread) and rastering (its helper threads) take time,
- * and how many pixels were rastered anew (each raster task's tile, its size from the compositor's tile snapshots).
+ * and how many pixels were rastered anew (`rasteredPixels`).
  */
 async function traced(cdp: Cdp, during: () => Promise<void>, keep?: string) {
   const events: TraceEvent[] = [];
@@ -260,17 +282,7 @@ async function traced(cdp: Cdp, during: () => Promise<void>, keep?: string) {
   off();
   if (keep) writeFileSync(keep, JSON.stringify({ traceEvents: events }));
   const total = (names: string[]) => events.filter((e) => e.ph === "X" && names.includes(e.name)).reduce((sum, e) => sum + (e.dur ?? 0), 0) / 1000;
-  const tileArea = new Map<string, number>();
-  for (const e of events) {
-    for (const tile of e.args?.snapshot?.active_tiles ?? []) {
-      const [, , w = 0, h = 0] = tile.content_rect ?? [];
-      if (tile.id) tileArea.set(tile.id.replace(/^.*\//, ""), w * h);
-    }
-  }
-  const rastered = events
-    .filter((e) => e.name === "RasterTask" && (e.ph === "X" || e.ph === "B"))
-    .reduce((sum, e) => sum + (tileArea.get(e.args?.tileData?.tileId?.id_ref ?? "") ?? 0), 0);
-  return { paintMs: total(["Paint"]), rasterMs: total(["RasterTask"]), rasteredPixels: rastered };
+  return { paintMs: total(["Paint"]), rasterMs: total(["RasterTask"]), rasteredPixels: rasteredPixels(events), chrome: chromeFrames(events) };
 }
 
 /** What the page's frame counter saw: every frame's time since the one before, and the long frames with their scripts. */
@@ -286,7 +298,7 @@ async function measure(cdp: Cdp, scenario: Scenario, part: Part, budget: Budget,
   let wall = 0;
   let after = before;
   let frames: Frames | null = null;
-  const { paintMs, rasterMs, rasteredPixels } = await traced(
+  const { paintMs, rasterMs, rasteredPixels, chrome } = await traced(
     cdp,
     async () => {
       const play = async () => {
@@ -335,6 +347,7 @@ async function measure(cdp: Cdp, scenario: Scenario, part: Part, budget: Budget,
     paintMsPerS: Math.round(paintMs / wall),
     rasterMsPerS: Math.round(rasterMs / wall),
     rasterScreensPerS: Math.round((rasteredPixels / (device.width * device.height * device.scale ** 2) / wall) * 10) / 10,
+    chrome,
     stylesPerS: Math.round(spent("RecalcStyleCount")),
     layoutsPerS: Math.round(spent("LayoutCount")),
     culprits,
@@ -342,36 +355,96 @@ async function measure(cdp: Cdp, scenario: Scenario, part: Part, budget: Budget,
     hot,
     over: [],
   };
+  if (part.startWhen && leadMs !== undefined) m.lead = { name: part.startWhen.lead, ms: leadMs };
+  judge(m, scenario, part, budget);
+  return m;
+}
+
+/** Fills `m.over` with each limit of the budget (and the scenario's and stretch's own) the numbers of `m` break. */
+function judge(m: Measurement, scenario: Scenario, part: Part, budget: Budget) {
   const limits = { ...budget, ...scenario.budget, ...part.budget };
+  m.over = [];
   if (m.p95 > limits.p95) m.over.push(`p95 ${m.p95} > ${limits.p95} ms`);
-  if (m.stutters / wall > limits.stuttersPerS) m.over.push(`${m.stutters} stutters`);
+  if (m.stutters / Math.max(m.seconds, 0.1) > limits.stuttersPerS) m.over.push(`${m.stutters} stutters`);
   if (m.busy > limits.busy) m.over.push(`busy ${Math.round(m.busy * 100)} % > ${Math.round(limits.busy * 100)} %`);
   if (m.rasterScreensPerS > limits.rasterScreensPerS) m.over.push(`raster ${m.rasterScreensPerS} > ${limits.rasterScreensPerS} screens/s`);
-  if (part.startWhen && leadMs !== undefined) {
-    m.lead = { name: part.startWhen.lead, ms: leadMs };
-    if (leadMs > part.startWhen.within) m.over.push(`${part.startWhen.lead} ${leadMs} > ${part.startWhen.within} ms`);
+  if (part.startWhen && m.lead && m.lead.ms > part.startWhen.within) m.over.push(`${part.startWhen.lead} ${m.lead.ms} > ${part.startWhen.within} ms`);
+}
+
+/** The middle value; of an even number the mean of the two middle ones. */
+function median(values: number[]) {
+  const sorted = [...values].sort((a, b) => a - b);
+  const mid = sorted.length >> 1;
+  return sorted.length % 2 ? sorted[mid] : (sorted[mid - 1] + sorted[mid]) / 2;
+}
+
+/**
+ * One stretch's runs as one: each number the median of its runs (Chrome's frame counts too), the lists (slowest scripts, stutters' times, hot
+ * functions) from the run in the middle by how busy it was, and the spread of the main numbers beside them.
+ */
+function medianOf(runs: Measurement[], scenario: Scenario, part: Part): Measurement {
+  const middle = [...runs].sort((a, b) => a.busy - b.busy)[(runs.length - 1) >> 1];
+  const m: Measurement = { ...middle, runs: runs.length, spread: {}, over: [] };
+  for (const key of MEDIAN_KEYS) m[key] = median(runs.map((r) => r[key]));
+  for (const key of SPREAD_KEYS) {
+    const values = runs.map((r) => r[key]);
+    m.spread![key] = [Math.min(...values), Math.max(...values)];
   }
+  m.chrome = {
+    presented: median(runs.map((r) => r.chrome.presented)),
+    partial: median(runs.map((r) => r.chrome.partial)),
+    dropped: median(runs.map((r) => r.chrome.dropped)),
+  };
+  const leads = runs.flatMap((r) => (r.lead ? [r.lead.ms] : []));
+  if (middle.lead && leads.length) m.lead = { name: middle.lead.name, ms: Math.round(median(leads)) };
+  judge(m, scenario, part, BUDGET);
   return m;
 }
 
 interface ProfileNode {
   id: number;
-  callFrame: { functionName: string; url: string; lineNumber: number };
+  callFrame: { functionName: string; url: string; lineNumber: number; columnNumber: number };
 }
 
-/** Runs `during` under the JavaScript profiler and returns the functions that took the most time themselves. */
-async function profiled(cdp: Cdp, during: () => Promise<void>): Promise<string[]> {
+/** The JavaScript profiler's sampling interval with --profile, in µs. */
+const SAMPLING_US = 200;
+/** The name of the profile kept running through a whole scenario with --profile, see `warmProfiler`. */
+const WARM_PROFILE = "perf-warm";
+
+/**
+ * Starts the JavaScript profiler once a scenario's page is open, before its first stretch, and keeps it running: starting
+ * it makes V8 log all code there is, which held the page up for a frame or more, and with the profiler started at each
+ * stretch every stretch showed a stutter in its first 0.2–0.4 s that came from the profiler, not the game (Kettenreaktion,
+ * 26 November 2026, A-47). A stretch's own profile then joins the running profiler, which costs nothing of the kind.
+ */
+async function warmProfiler(cdp: Cdp) {
   await cdp.send("Profiler.enable");
-  await cdp.send("Profiler.setSamplingInterval", { interval: 200 });
+  await cdp.send("Profiler.setSamplingInterval", { interval: SAMPLING_US });
+  await evaluate(cdp, `console.profile(${JSON.stringify(WARM_PROFILE)})`);
+}
+
+/** Ends the profile `warmProfiler` started, so the profiler stops between scenarios. */
+async function coolProfiler(cdp: Cdp) {
+  await evaluate(cdp, `console.profileEnd(${JSON.stringify(WARM_PROFILE)})`).catch(() => {});
+  await cdp.send("Profiler.disable").catch(() => {});
+}
+
+/**
+ * Runs `during` under the JavaScript profiler and returns the functions that took the most time themselves. The profiler
+ * already runs (`warmProfiler`), so starting this profile doesn't hold up the stretch's first frames.
+ */
+async function profiled(cdp: Cdp, during: () => Promise<void>): Promise<string[]> {
   await cdp.send("Profiler.start");
   await during();
   const { profile } = await cdp.send<{ profile: { nodes: ProfileNode[]; samples: number[]; timeDeltas: number[] } }>("Profiler.stop");
   const nodes = new Map(profile.nodes.map((n) => [n.id, n]));
   const self = new Map<string, number>();
   profile.samples.forEach((id, i) => {
-    const { functionName, url, lineNumber } = nodes.get(id)!.callFrame;
+    const { functionName, url, lineNumber, columnNumber } = nodes.get(id)!.callFrame;
     if (["(idle)", "(program)", "(garbage collector)"].includes(functionName) || !url) return;
-    const name = `${functionName || "(anonymous)"} ${url.split("/").pop()?.split("?")[0]}:${lineNumber + 1}`;
+    // With its column: a built chunk is one line, so „(anonymous) LightLevel.js:1“ alone named no function (A-42); the
+    // column finds it in `out/static/` (`cut -c<column>-<column + 200>` of the chunk).
+    const name = `${functionName || "(anonymous)"} ${url.split("/").pop()?.split("?")[0]}:${lineNumber + 1}:${columnNumber + 1}`;
     self.set(name, (self.get(name) ?? 0) + profile.timeDeltas[i] / 1000);
   });
   return [...self]
@@ -387,13 +460,29 @@ function printRow(m: Measurement) {
   console.log(
     `  ${mark} ${m.label.padEnd(34)} ${String(m.fps).padStart(5)} fps  ${String(m.stutters).padStart(3)} stutters  longest ${String(m.longest).padStart(4)} ms  p95 ${String(m.p95).padStart(3)} ms  busy ${pct(m.busy)} % (script ${pct(m.script)}, style ${pct(m.style)}, layout ${pct(m.layout)}, other ${pct(m.other)})  paint ${String(m.paintMsPerS).padStart(3)}  raster ${String(m.rasterMsPerS).padStart(4)} ms/s ${String(m.rasterScreensPerS).padStart(5)} screens/s${m.over.length ? `  ← ${m.over.join(", ")}` : ""}`,
   );
+  if (m.spread) {
+    const range = (key: SpreadKey, show: (v: number) => string = String) => {
+      const [low, high] = m.spread![key] ?? [0, 0];
+      return show(low) === show(high) ? show(low) : `${show(low)}–${show(high)}`;
+    };
+    console.log(
+      `      over ${m.runs} runs: ${range("fps")} fps, ${range("stutters")} stutters, p95 ${range("p95")} ms, busy ${range("busy", (v) => `${Math.round(v * 100)}`)} %, raster ${range("rasterScreensPerS")} screens/s`,
+    );
+  }
+  const { presented, partial, dropped } = m.chrome;
+  // Chrome's own count beside the page's: a stretch whose frames Chrome dropped while the page counted none is one to doubt.
+  if (dropped || partial) console.log(`      Chrome's count: ${presented} shown, ${partial} in part, ${dropped} dropped`);
   if (m.lead) console.log(`      ${m.lead.name}: ${m.lead.ms} ms, the stretch starts after it`);
   if (m.over.length && m.culprits.length) console.log(`      slowest scripts in long frames: ${m.culprits.join(" · ")}`);
   if (m.over.length && m.stutterAt.length) console.log(`      stutters at: ${m.stutterAt.map((t) => `${t}s`).join(" ")}`);
   if (m.hot.length) console.log(`      most time in: ${m.hot.join(" · ")}`);
 }
 
-async function runScenario(cdp: Cdp, base: string, scenario: Scenario, shotsDir: string | null): Promise<Measurement[]> {
+/**
+ * Plays `scenario` once and pushes each stretch's measurement into `results` as it comes, so the stretches measured
+ * before a step that fails are kept. `run` names the run with --repeat (its files and its rows).
+ */
+async function runScenario(cdp: Cdp, base: string, scenario: Scenario, shotsDir: string | null, results: Measurement[], run?: number) {
   // Every scenario starts as a first visit would after the cover: fresh storage, the book already opened, in German.
   await open(cdp, `${base}/`);
   await evaluate(
@@ -401,16 +490,16 @@ async function runScenario(cdp: Cdp, base: string, scenario: Scenario, shotsDir:
     `localStorage.clear(); localStorage.setItem("tinytaps.book.opened", "1"); localStorage.setItem("tinytaps.applanguage.v1", "de"); ${scenario.storage ?? ""}`,
   );
   await open(cdp, `${base}${scenario.path}`);
+  if (flag("profile")) await warmProfiler(cdp);
   await sleep(1500);
   // On a phone the first tap of a visit goes to the fullscreen hint (ScreenHint), as a parent's would.
   await runStep(cdp, { tap: ".screen-hint-button", optional: true });
   await sleep(500);
-  const results: Measurement[] = [];
   for (const part of scenario.parts) {
     if (part.startWhen) await evaluate(cdp, leadWatcher(part.startWhen.holds));
     for (const step of part.before ?? []) await runStep(cdp, step);
     const leadMs = part.startWhen ? await leadTime(cdp, part) : undefined;
-    const file = (ext: string) => join(shotsDir ?? "", `${scenario.name}-${part.label}.${ext}`.replace(/[^\w.-]+/g, "_"));
+    const file = (ext: string) => join(shotsDir ?? "", `${scenario.name}-${part.label}${run ? `-run${run}` : ""}.${ext}`.replace(/[^\w.-]+/g, "_"));
     const m = await measure(cdp, scenario, part, BUDGET, leadMs, shotsDir && flag("trace") ? file("json") : undefined);
     results.push(m);
     printRow(m);
@@ -419,7 +508,7 @@ async function runScenario(cdp: Cdp, base: string, scenario: Scenario, shotsDir:
       writeFileSync(file("png"), Buffer.from(data, "base64"));
     }
   }
-  return results;
+  if (flag("profile")) await coolProfiler(cdp);
 }
 
 async function main() {
@@ -442,10 +531,28 @@ async function main() {
     );
     for (const scenario of scenarios) {
       console.log(`\n${scenario.name}`);
-      try {
-        all.push(...(await runScenario(cdp, site.url, scenario, shotsDir)));
-      } catch (error) {
-        console.log(`  ! ${(error as Error).message}`);
+      const runs: Measurement[][] = [];
+      for (let run = 1; run <= repeat; run++) {
+        if (repeat > 1) console.log(`  run ${run} of ${repeat}`);
+        const results: Measurement[] = [];
+        runs.push(results);
+        try {
+          await runScenario(cdp, site.url, scenario, shotsDir, results, repeat > 1 ? run : undefined);
+        } catch (error) {
+          console.log(`  ! ${(error as Error).message}`);
+        }
+      }
+      if (repeat === 1) {
+        all.push(...runs[0]);
+        continue;
+      }
+      console.log(`  median of ${repeat} runs`);
+      for (const part of scenario.parts) {
+        const measured = runs.flatMap((results) => results.filter((m) => m.label === part.label));
+        if (!measured.length) continue;
+        const m = medianOf(measured, scenario, part);
+        all.push(m);
+        printRow(m);
       }
     }
   } finally {
@@ -453,7 +560,7 @@ async function main() {
     site.stop();
   }
   const over = all.filter((m) => m.over.length);
-  console.log(`\n${all.length - over.length} of ${all.length} stretches within budget.`);
+  console.log(`\n${all.length - over.length} of ${all.length} stretches within budget${repeat > 1 ? ` (each the median of ${repeat} runs)` : ""}.`);
   if (shotsDir) console.log(`${flag("trace") ? "Traces" : "Screenshots"}: ${shotsDir}`);
   const json = option("json");
   if (json) writeFileSync(json, `${JSON.stringify({ date: new Date().toISOString(), device, measurements: all }, null, 2)}\n`);

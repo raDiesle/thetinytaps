@@ -358,7 +358,8 @@
    already, and fades away in a beat once the brush has taken its monsters off – a beat, since the step's last tooth is
    done only a moment before the head turns on. Then the tooth sparkles once, a little glint coming up and going over
    four beats, as calm as the end's. Only the layers' opacity and transform change. */
-.mouth-stains {
+.mouth-stains,
+.mouth-foam {
   position: absolute;
   inset: 0;
   pointer-events: none;
@@ -413,49 +414,6 @@
 .teeth-play.paused .tooth-stain.clean,
 .teeth-play.paused .tooth-glint.brushed > div {
   animation-play-state: paused;
-}
-
-/* The end's surprise (mouth.tsx, DazzledMonster), eight beats as long as the cheer: three beats while the head glides
-   to its grin, the monster rises at the mirror's bottom edge in two, squints, the sunglasses drop onto its nose in one,
-   and at the end it sinks back. Body and glasses are layers of their own moved by transform. */
-/* It rises from behind the mirror's bottom edge: its box ends there and hides what is below. */
-.dazzled-monster {
-  overflow: hidden;
-}
-
-.dazzle-body {
-  animation: teeth-dazzle-peek 4.29s ease-in-out both;
-}
-
-@keyframes teeth-dazzle-peek {
-  0%,
-  37% {
-    transform: translateY(100%);
-  }
-  50%,
-  88% {
-    transform: translateY(26%);
-  }
-  100% {
-    transform: translateY(100%);
-  }
-}
-
-.dazzle-glasses {
-  animation: teeth-dazzle-glasses 4.29s ease-in both;
-}
-
-@keyframes teeth-dazzle-glasses {
-  0%,
-  62% {
-    opacity: 0;
-    transform: translateY(-45%);
-  }
-  75%,
-  100% {
-    opacity: 1;
-    transform: translateY(0);
-  }
 }
 
 /* Pause button and progress bar sit above the pause screen, so a grown-up can jump around while paused. They lie
@@ -831,8 +789,7 @@
   }
 }
 
-/* Pause: brush, monsters and glow stand still under a big button that goes on. */
-.teeth-play.paused .monster-glow,
+/* Pause: brush and monsters stand still under a big button that goes on. */
 .teeth-play.paused .monster-body {
   animation-play-state: paused;
 }
@@ -936,8 +893,7 @@
 
   .monster-body,
   .origin-monster > svg,
-  .teeth-shine,
-  .monster-glow {
+  .teeth-shine {
     animation: none;
   }
 
@@ -953,29 +909,6 @@
 }
 
 /* ---------- More life: blinking, brows, scared monsters, arrows on the lips ---------- */
-
-/* The monsters to brush now glow. */
-.monster-glow {
-  pointer-events: none;
-  transform-box: fill-box;
-  transform-origin: center;
-  animation: glow-breathe 1.07s ease-in-out infinite alternate;
-}
-
-.sugar-monster.gone .monster-glow {
-  animation: fade-out 0.3s ease-out forwards;
-}
-
-@keyframes glow-breathe {
-  from {
-    transform: scale(0.8);
-    opacity: 0.7;
-  }
-  to {
-    transform: scale(1.1);
-    opacity: 1;
-  }
-}
 
 .monster-eyes {
   transform-box: fill-box;
@@ -2182,7 +2115,7 @@
 
 /* A monster being brushed or an arrow on the lips: a small layer of its own over the mirror (Sprite in mouth.tsx).
    What moves in it moves the HTML round its svg, never something inside the svg, so a phone moves it without painting:
-   swaying, trembling and the glow breathing are the svg ones (above) done on the sprite's own elements. */
+   swaying and trembling are the svg ones (above) done on the sprite's own elements. */
 .mouth-sprites {
   position: absolute;
   inset: 0;
@@ -2197,9 +2130,6 @@
 }
 
 .mouth-sprite > *,
-.dazzle-body > svg,
-.dazzle-glasses,
-.dazzle-glasses > svg,
 .sprite-body > svg,
 .lip-arrow-sprite > div > svg {
   position: absolute;
@@ -2212,6 +2142,36 @@
 
 .mouth-sprite .monster-body {
   pointer-events: auto;
+}
+
+/* Toothpaste foam on the gum between the lips and the teeth being brushed (X-31, mouth.tsx `GumFoam`): each tooth's
+   a small layer of its own under the lips that fades in calmly over two beats as the brush reaches it – no bubbles
+   that rise or burst. */
+.gum-foam {
+  position: absolute;
+  left: 50%;
+  top: 50%;
+}
+
+.gum-foam > svg {
+  display: block;
+  width: 100%;
+  height: 100%;
+  overflow: visible;
+}
+
+.gum-foam.fades {
+  will-change: opacity;
+  animation: teeth-foam-in 1.07s ease-out both;
+}
+
+@keyframes teeth-foam-in {
+  from {
+    opacity: 0;
+  }
+  to {
+    opacity: 1;
+  }
 }
 
 .monster-sprite .monster-body,
@@ -2366,33 +2326,19 @@
   }
 }
 
-/* The glow of svg's monster-glow (r 21 round 3 units above the middle), as a soft round light behind the monster:
-   only just round it, so it stays on the tooth – a wider one lay over the gum like a second frame (user feedback,
-   November 2026). */
-.sprite-glow {
-  top: 14.7%;
-  left: 19.1%;
-  width: 61.8%;
-  height: 61.8%;
-  border-radius: 50%;
-  background: radial-gradient(closest-side, #fffbd1 50%, #ffd23ff2 72%, #ffb70300);
-  animation: glow-breathe 1.07s ease-in-out infinite alternate;
-}
-
-.monster-sprite.gone .sprite-glow {
-  animation: fade-out 0.3s ease-out forwards;
-}
-
 .teeth-play.paused .sprite-body,
-.teeth-play.paused .sprite-glow,
+.teeth-play.paused .gum-foam,
 .teeth-play.paused .monster-dust > i,
 .teeth-play.paused .lip-arrow {
   animation-play-state: paused;
 }
 
 @media (prefers-reduced-motion: reduce) {
-  .sprite-body,
-  .sprite-glow {
+  .sprite-body {
+    animation: none;
+  }
+
+  .gum-foam {
     animation: none;
   }
 

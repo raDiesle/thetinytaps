@@ -652,7 +652,6 @@ export function TeethPlay({ settings, video }: { settings: TeethSettings; video?
               dirty={dirty}
               brush={step && { stops: inStep.map((m) => ({ tooth: m.tooth, spot: m.spot })), at: brushStop, surface: step.surface, motion: step.motion }}
               happy={done}
-              dazzled={ending === "cheer"}
               action={action}
               gliding={gliding}
               glide={{ to: target, k: glided }}

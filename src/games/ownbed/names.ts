@@ -16,7 +16,7 @@ export const OWN_BED_TITLE: EnglishFirst = {
 };
 
 /**
- * Its name in the book „Bed“'s choice of stories (`BedStoryGame.tsx` in src/games/bedstory), over its title: where the
+ * Its name in the book „Sleep Tight“'s choice of stories (`BedStoryGame.tsx` in src/games/bedstory), over its title: where the
  * child moves from, beside „From the cot“ – out of Mama and Papa's bed into a bed of its own.
  */
 export const OWN_BED_KIND: EnglishFirst = {

@@ -4,7 +4,7 @@ import { type Cast, type Light, OWN_BED_PAGES, type OwnBedPage, type Place } fro
 // The pictures of „Tapsi's Own Bed“ (`ownBed.ts`), as the picture queue takes them until they are made (`/bild-erzeugen`,
 // made in a Claude cloud session: Zscaler blocks Gemini on the Mac). Tapsi's home is the one of the other chapter books:
 // the living room is drawn from Abstillen's first picture, Tapsi's room from „Tapsi's Big Bed“'s made bed („bett-machen“,
-// with its rail and its moon night light), so both stories of the book „Bed“ show one room and one bed. Mama and Papa's
+// with its rail and its moon night light), so both stories of the book „Sleep Tight“ show one room and one bed. Mama and Papa's
 // bedroom is new: drawn once from the fox family on the story's first page (`FIRST`), and every other page there from
 // that one, so the room stays the same – the queue holds those pages back until it is made. Plain data, no picture
 // imports. A made picture goes on `MADE`, so it leaves the queue; the prompts stay here, so a picture can be drawn again.
