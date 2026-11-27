@@ -200,7 +200,9 @@ export const SCENARIOS: Scenario[] = [
       { label: "Geschichte: Monster wachsen", ms: 5500 },
       { label: "Hinunter zum Waschbecken", ms: 6000 },
       { label: "Waschbecken", ms: 8000 },
-      { label: "Hinauf in den Spiegel, Countdown", ms: 5000 },
+      { label: "Hinauf in den Spiegel", ms: 5000 },
+      // X-26: the mouth glides wide open like a little lion's and roars, then 3, 2, 1 with it open.
+      { label: "Mund auf wie ein Löwe, Countdown", ms: 7600 },
       { label: "Putzen: Los!", ms: 6000 },
       { label: "Putzen: Monster antippen", ms: 6000, tap: { selector: ".monster-body", every: 700 } },
       { label: "Putzen: springen", ms: 12000, type: { keys: ["ArrowRight"], every: 2000 } },
