@@ -513,6 +513,9 @@ export const allGamesIdeas: IdeaArea = {
       text: "Recherche vom 27. November 2026: Die Maschinen der Kettenreaktion lassen in jedem Bild React die Maschine durchgehen (A-38, A-44, A-45, A-50). Üblich und von den Machern von Motion empfohlen: eine `requestAnimationFrame`-Schleife hält die Bewegung in einfachen Objekten und schreibt `style.transform` der bewegten Ebenen direkt über Refs (oder spielt Bewegungen, die vorher feststehen, mit `element.animate()` ab); React zeichnet nur, wenn etwas erscheint oder verschwindet. Lösung: an einem Level (Raketenstart) bauen, mit `bun run perf ketten-space --profile` vorher und nachher messen, dann auf `MachineStage` übertragen. Gemessen am 27. November 2026 vor dem Umbau (Raketenstart, Mitte, 10 s im nachgebildeten alten Handy, `--trace`): JavaScript samt React 1,5 s (15 %), dagegen Ebenen-Aufbau (`Layerize`) 0,84 s, Malen 0,80 s, Übergabe an den Compositor (`Commit`) 0,45 s und Stil 0,44 s; insgesamt 53–61 % beschäftigt. Der Umbau spart also höchstens einen Teil der 15 % (die Wege über die Zeichnung blieben, und jede bewegte Ebene kostet weiter Aufbau und Übergabe), bei einem Umbau aller 21 Level – erst lohnend, wenn die übrigen Kosten (A-50) gesenkt sind oder ein Level vor allem an React hängt.",
       why: "Weniger Arbeit pro Bild für den Prozessor, gerade in den Leveln, die jetzt noch über 60 % beschäftigt sind.",
       effort: "L",
+      rejected: true,
+      partial:
+        "Verworfen vom Nutzer am 27. November 2026, nach der Messung oben: React ist nur etwa 15 % der Zeit, der Umbau aller 21 Level lohnt dafür nicht; die größeren Kosten (Ebenen-Aufbau, Malen) behandelt A-50.",
     },
     {
       id: "A-57",
