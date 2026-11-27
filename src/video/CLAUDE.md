@@ -35,7 +35,7 @@ the management page's contents by `TOOL_GROUPS`), never a link from the shelf or
   white frames, each with a word for what it shows on its frame (the game's name, or a short `word` where that is a
   whole question), each held by a pushpin with a tap; then a paper pinned into the middle with only „www.funforboth.com“
   and „Alltagshelfer & Lernspiele“ (`BOARD_LINE`) – no card, no signs, no code after it. Which photos hang there is the
-  user's choice (they pick from `/management/bilder/`); a photo swapped keeps its place, and the board stays one
+  user's choice (they pick from `/management/bilder/`; the twelve there now were chosen on 27 November 2026); a photo swapped keeps its place, and the board stays one
   picture to take in at a glance, never a run of pictures again.
   „Bilder aus den Spielen“ (`gallery.ts`, `GalleryScene`, `scheduleGallerySound`, about 17 s; user request, November
   2026: show the games' pictures big, not the books) opens on the two
