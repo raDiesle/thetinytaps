@@ -11,6 +11,7 @@ const css = await Bun.file("src/games/teeth/teeth.css").text();
 const origin = await Bun.file("src/games/teeth/origin.tsx").text();
 const prep = await Bun.file("src/games/teeth/prep.tsx").text();
 const mouth = await Bun.file("src/games/teeth/mouth.tsx").text();
+const playFile = await Bun.file("src/games/teeth/TeethPlay.tsx").text();
 
 /** The classes of a picture (`origin`, `prep`) that teeth.css animates: those named last in a rule that sets an animation. */
 const animatedClasses = (prefix: string) =>
@@ -82,16 +83,21 @@ test("the story's animations per sweet are set on HTML layers too", () => {
   }
 });
 
-test("the end's shine breathes as a layer of its own, and the dazzled monster moves its HTML, not inside an svg", () => {
+test("the end's shine breathes as a layer of its own", () => {
   // The shine is an svg of its own over the mirror whose animation changes only its opacity.
   expect(mouth).toMatch(/<svg className="mouth mouth-moving teeth-shine"/);
   for (const name of ["teeth-shine-in", "teeth-shine-breathe"]) {
     expect(keyframes(name)).toContain("opacity");
     expect(keyframes(name)).not.toMatch(/transform|fill|stroke|filter/);
   }
-  // The monster's body and glasses are divs round their svgs.
-  expect(mouth).toMatch(/<div className="dazzle-body">\s*<svg/);
-  expect(mouth).toMatch(/<div className="dazzle-glasses">\s*<svg/);
+});
+
+// The end's surprise, a last monster peeking in and putting on sunglasses, was taken out (user feedback, November
+// 2026): the clean, shining teeth are the end, with no monster left in the picture.
+test("no monster comes back at the end", () => {
+  expect(mouth).not.toMatch(/dazzle|sunglasses/i);
+  expect(css).not.toMatch(/dazzle/);
+  expect(playFile).not.toContain("dazzled");
 });
 
 test("the mirror's glass and frame are drawn in screen px, so a turning head does not paint them again", () => {
@@ -165,13 +171,14 @@ test("the side view's outline never runs across the mouth between the lips", () 
 });
 
 // The teeth to brush once had a pulsing gold frame (user feedback, November 2026: the yellow glow is too much, the grey
-// stain is enough): their stain and monsters mark them, and the monsters' glow stays only just round them.
-test("no gold frame or glow marks the teeth to brush", () => {
+// stain is enough), and later the monsters lost their glow too (user feedback, November 2026): their stain and the
+// monsters themselves mark the teeth to brush.
+test("no gold frame or glow marks the teeth to brush or their monsters", () => {
   expect(mouth).not.toContain("zone-glow");
   expect(mouth).not.toMatch(/zone-tooth-|stroke="#ffd23f"/);
   expect(css).not.toContain("zone-glow");
-  expect(Number(mouth.match(/className="monster-glow" cy=\{-3\} r=\{(\d+)\}/)?.[1])).toBeLessThanOrEqual(22);
-  expect(Number(css.match(/\.sprite-glow \{[^}]*width: ([\d.]+)%/)?.[1])).toBeLessThanOrEqual(64);
+  expect(mouth).not.toMatch(/monster-glow|sprite-glow/);
+  expect(css).not.toMatch(/monster-glow|sprite-glow|glow-breathe/);
 });
 
 // The monsters cling to their teeth, a little sticky (user feedback, November 2026): drips under their foot and paws

@@ -823,7 +823,6 @@ export function Origin({
                           <Monster
                             color={c.color}
                             variant={i % 3}
-                            active={false}
                             still
                             gone={false}
                             scared={false}
