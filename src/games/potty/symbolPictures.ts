@@ -22,19 +22,8 @@ export const symbol = (folder: "potty" | "teeth", id: string, use: string, what:
   date: DATE,
 });
 
-/** The symbols waiting to be made (the first sixteen made on 21 November 2026, Zähne putzen's tube and cup on 23 November 2026; the breakfast, the lion and the roaring asked for on 27 November 2026). */
+/** The symbols waiting to be made (the first sixteen made on 21 November 2026, Zähne putzen's tube and cup on 23 November 2026; the lion and the roaring asked for on 27 November 2026). */
 export const SYMBOL_PICTURE_QUEUE: QueuedPicture[] = [
-  {
-    ...symbol(
-      "teeth",
-      "fruehstueck",
-      "Zähne putzen: Symbol der Leiste für „Frühstück essen“ morgens (X-19), statt des Bonbons am Abend",
-      "A slice of bread spread with golden honey, the honey running over its brown crust in two drips.",
-    ),
-    date: "2026-11-27",
-    after:
-      "Take the drawn stand-in for „fruehstueck“ out of `BarSymbol` in src/games/teeth/TeethPlay.tsx (the HoneyBread svg) and its import there, if nothing else uses it.",
-  },
   {
     ...symbol(
       "teeth",

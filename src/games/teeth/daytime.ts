@@ -4,10 +4,9 @@ import type { TargetLanguage, TargetLanguageId } from "@/content/targetLanguages
 import { type Daytime, type DayLog, dayKey, withoutOldDays } from "@/lib/days";
 import { readStored, writeStored } from "@/lib/storage";
 
-// Brushing in the morning looks different from brushing at night: breakfast or
-// sweets in the story, pyjamas before bed, a hello and a goodbye of its own. How the
-// sugar grows into monsters is the same at any time of day (user request, November
-// 2026). The week chart keeps a star for every morning and every evening brushed.
+// Brushing in the morning looks different from brushing at night: pyjamas before
+// bed, a hello and a goodbye of its own. The story – what is eaten and how the sugar
+// grows into monsters – is the same at any time of day (user request, November 2026). The week chart keeps a star for every morning and every evening brushed.
 
 /** What is said and shown differently in the morning and the evening, in one language. */
 export interface DaytimeTexts {

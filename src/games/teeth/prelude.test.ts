@@ -12,8 +12,7 @@ import { FILL_BEATS, LION_INTRO_BEATS, LION_INTRO_MS, LION_MS, LION_RECORDINGS, 
 
 // The sounds of the prelude and of tidying up at the end fire when the brushing clock passes them, so they must lie inside their part.
 const PARTS = [
-  { name: "sweets", cues: ORIGIN_CUES.evening, ms: ORIGIN_MS.sweets },
-  { name: "breakfast", cues: ORIGIN_CUES.morning, ms: ORIGIN_MS.sweets },
+  { name: "sweets", cues: ORIGIN_CUES, ms: ORIGIN_MS.sweets },
   { name: "brush", cues: PREP_CUES.brush, ms: PREP_MS.brush },
   { name: "paste", cues: PREP_CUES.paste, ms: PREP_MS.paste },
   { name: "roar", cues: ROAR_CUES, ms: ROARING_MS },
@@ -41,12 +40,15 @@ test("the toothpaste gets no twinkle, seen or heard", async () => {
   expect(PREP_CUES.paste.some((c) => c.play.toString().includes("Twinkle"))).toBe(false);
 });
 
-// In the morning the story eats breakfast, not sweets (X-19): nothing is unwrapped and no hard candy crunches.
-test("the morning's breakfast sounds like breakfast", () => {
-  const played = ORIGIN_CUES.morning.map((c) => c.play.toString()).join(" ");
-  expect(played).not.toContain("wrapper");
-  expect(played).not.toContain("lolly");
-  expect(ORIGIN_CUES.evening.map((c) => c.play.toString()).join(" ")).toContain("wrapper");
+// The story eats the same at any time of day (user request, November 2026): an apple, a banana and a lollipop – never
+// breakfast in the morning and sweets in the evening again; nothing in it is unwrapped.
+test("the story eats an apple, a banana and a lollipop, morning and evening alike", async () => {
+  const origin = await Bun.file("src/games/teeth/origin.tsx").text();
+  expect(origin).toContain("const TREATS: (() => ReactElement)[] = [Apple, Banana, Lollipop];");
+  expect(origin).not.toMatch(/Record<Daytime, (Cue|string|\(\(\) => ReactElement\))/);
+  expect(ORIGIN_CUES.map((c) => c.play.toString()).join(" ")).not.toContain("wrapper");
+  const lines = await Bun.file("src/games/teeth/lines.ts").text();
+  expect(lines).not.toMatch(/BREAKFAST|Daytime/);
 });
 
 // The lion comes right after the toothpaste, before the mirror shows the open mouth (X-26, user requests, November

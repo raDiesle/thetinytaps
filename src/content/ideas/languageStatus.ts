@@ -270,10 +270,10 @@ export const LANGUAGE_STATUS: LanguageStatusRow[] = [
         note: "Was vor dem Putzen und am Ende gesagt wird, von ElevenLabs gesprochen (Tapsis Stimme, 30. Oktober 2026); die Putzschritte auch, für den Fall, dass das Lied nicht lädt.",
       },
       {
-        label: "🥣 Frühstück am Morgen",
+        label: "🍎 Essen am Anfang",
         recorded: true,
         languages: { de: "text", en: "text", zh: "text", hi: "text", es: "text", ar: "text", ru: "text" },
-        note: "Morgens isst das Kind in der Geschichte Frühstück statt Süßigkeiten (X-19, 27. November 2026): der Name auf der Leiste und der Satz „Mmm, breakfast! …“ (BREAKFAST_TEXTS in lines.ts), Englisch zuerst und gleich in allen sieben Sprachen. Noch nicht aufgenommen: bis dahin bleibt der Satz morgens stumm (bun run voice make --only zaehne, nur auf Wunsch).",
+        note: "Die Geschichte isst zu jeder Tageszeit dasselbe, einen Apfel, eine Banane und einen Lolli (27. November 2026): der Name auf der Leiste „🍎 Essen“ und der neue Satz „Mmh, lecker! Ein bisschen Zucker bleibt an den Zähnen.“ (PRELUDE_TEXTS.sweets in lines.ts), gleich in allen sieben Sprachen. Noch nicht aufgenommen: bis dahin bleibt der Satz stumm (bun run voice make --only zaehne, nur auf Wunsch).",
       },
       {
         label: "🦁 Mitbrüllen und Zuckermonster-Satz",

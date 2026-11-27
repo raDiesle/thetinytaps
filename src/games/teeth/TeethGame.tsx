@@ -49,13 +49,13 @@ export function TeethGame() {
               <Toggle
                 icon={<PhaseIcon name="bonbon" />}
                 label={t({
-                  en: "Eating sweets: where the sugar monsters come from",
-                  de: "Süßes essen: woher die Zuckermonster kommen",
-                  zh: "吃甜食：糖怪兽从哪里来",
-                  hi: "मीठा खाना: चीनी-मॉन्स्टर कहाँ से आते हैं",
-                  es: "Comer dulces: de dónde vienen los monstruos de azúcar",
-                  ar: "أكل الحلوى: من أين تأتي وحوش السكر",
-                  ru: "Едим сладкое: откуда берутся сахарные монстры",
+                  en: "Eating: where the sugar monsters come from",
+                  de: "Essen: woher die Zuckermonster kommen",
+                  zh: "吃东西：糖怪兽从哪里来",
+                  hi: "कुछ खाना: चीनी-मॉन्स्टर कहाँ से आते हैं",
+                  es: "Comer: de dónde vienen los monstruos de azúcar",
+                  ar: "الأكل: من أين تأتي وحوش السكر",
+                  ru: "Едим: откуда берутся сахарные монстры",
                 })}
                 checked={settings.origin}
                 onChange={(origin) => update({ origin })}

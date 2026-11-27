@@ -12,7 +12,7 @@ import { GOOD_NIGHT } from "@/components/GoodNight";
 import { translationOf } from "@/games/elevator/phrases";
 import { DAYTIME, DAYTIME_TRANSLATIONS } from "@/games/teeth/daytime";
 import { type Step, STEP_TRANSLATIONS, STEPS } from "@/games/teeth/steps";
-import { BREAKFAST_TEXTS, DONE_SAY, PRELUDE_TEXTS, TIDY_SAY } from "@/games/teeth/lines";
+import { DONE_SAY, PRELUDE_TEXTS, TIDY_SAY } from "@/games/teeth/lines";
 
 /** How a line is said: the recording script puts an audio tag for it in front. */
 export type RecordedKind = "instruction" | "praise" | "calm";
@@ -50,7 +50,6 @@ function teeth(language: TargetLanguageId): RecordedLine[] {
   return once([
     ...daytime("hello", "instruction"),
     ...Object.values(PRELUDE_TEXTS).map((p) => said(p.cue, "instruction")),
-    said(BREAKFAST_TEXTS.cue, "instruction"),
     said(DONE_SAY, "praise"),
     said(TIDY_SAY, "instruction"),
     ...daytime("after", "calm"),
