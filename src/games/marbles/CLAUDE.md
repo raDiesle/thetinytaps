@@ -256,6 +256,13 @@ Then a second part past the tree (`PART2`, `acornAt`, `beeAt`, `kiteAt`; a pure 
     a boolean (dark while `seen` says it is off the screen), a stretch of smoke a `t` held outside the seconds it shows.
     Drawn with `t` itself, the Raketenstart's whole machine went through React in every frame while only a few
     attributes changed: 71–78 % busy on the old phone, 61–62 % once its parts were still and its flying things sprites (A-38).
+    The Baustelle is drawn alike (A-45): its level works out each part's numbers once per frame (`exc`, `roller`, `jack` …
+    in `BuildingLevel`), and smoke and dust are `Puffs` beside their machine, given a list of puffs made once (`smoke`,
+    the same array in every frame) and `puffClock` – the clock while a puff shows, `NaN` otherwise –, never a list of
+    `{ x, y, age }` built per frame, which no comparison one level deep finds equal. What flies only for a moment (the
+    splash, the sparkles) gets the clock only then and `-1` before and after. `decay.test.ts` fails on a part of it
+    taking `{ machine, t }`. Script went from 18 to 8–10 % of the old phone's time, busy from 52–53 to 40–47 % (`main`
+    measured the same day without `--profile`); what is left is painting the one thing moving in the machine's svg.
     The Hatschi-Kette is drawn alike (A-44): each animal, the tree, its falling leaves and the feather are `still`,
     the tree's wobble and the leaves' fall held once they rest (`wobbleSeconds`), the feather by its numbers, never by
     the ref the level counts in; and each thing past the tree gets the second part's clock `u` only inside its spans
