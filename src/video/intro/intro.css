@@ -8,6 +8,29 @@
   background: #fffaf0;
 }
 
+/* The live play on the recorder's stage: a click on it pauses (`LivePlay`). */
+.vi-live {
+  position: absolute;
+  inset: 0;
+  cursor: pointer;
+}
+
+/* While paused, a slip at the stage's foot says so, only for whoever tests: it is gone again once the play goes on. */
+.vi-paused {
+  position: absolute;
+  left: 50%;
+  bottom: 12px;
+  translate: -50% 0;
+  margin: 0;
+  padding: 6px 14px;
+  border-radius: 8px;
+  background: #3d3045e6;
+  color: #fff;
+  font: 600 15px / 1.3 var(--font-rounded);
+  white-space: nowrap;
+  pointer-events: none;
+}
+
 .vi-render {
   position: fixed;
   top: 0;
