@@ -22,28 +22,5 @@ export const symbol = (folder: "potty" | "teeth", id: string, use: string, what:
   date: DATE,
 });
 
-/** The symbols waiting to be made (the first sixteen made on 21 November 2026, Zähne putzen's tube and cup on 23 November 2026; the lion and the roaring asked for on 27 November 2026). */
-export const SYMBOL_PICTURE_QUEUE: QueuedPicture[] = [
-  {
-    ...symbol(
-      "teeth",
-      "loewe",
-      "Zähne putzen: Symbol der Leiste für die Phase „Da kommt der Löwe“ (X-26), gleich nach der Zahnpasta",
-      "A friendly young lion's head seen from the front, its round face golden, a fluffy orange-brown mane all round it, two small round ears, its mouth closed in a calm smile.",
-    ),
-    date: "2026-11-27",
-    after:
-      "Take the drawn stand-in for „loewe“ out of `BarSymbol` in src/games/teeth/TeethPlay.tsx (the LionSymbol svg there; `LionSymbol` stays in src/games/teeth/lion.tsx, whose roar marks draw it).",
-  },
-  {
-    ...symbol(
-      "teeth",
-      "bruellen",
-      "Zähne putzen: Symbol der Leiste für die Phase „Brüllen wie ein Löwe“ (X-26), nach dem Löwen und vor dem Spiegel",
-      "The same friendly young lion's head seen from the front, golden face and fluffy orange-brown mane, its mouth wide open in a big happy roar, with three curved sound lines going out on each side of its mouth.",
-    ),
-    date: "2026-11-27",
-    after:
-      "Take the drawn stand-in for „bruellen“ out of `BarSymbol` in src/games/teeth/TeethPlay.tsx (the RoarSymbol svg) and the `RoarSymbol` export in src/games/teeth/lion.tsx, if nothing else uses it.",
-  },
-];
+/** The symbols waiting to be made (the first sixteen made on 21 November 2026, Zähne putzen's tube and cup on 23 November 2026, its lion and roaring lion on 27 November 2026); a new one comes in with `symbol(…)`. */
+export const SYMBOL_PICTURE_QUEUE: QueuedPicture[] = [];

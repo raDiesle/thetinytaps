@@ -83,8 +83,7 @@ describe("the lion and roaring with it before the song", () => {
     expect((ROUNDS[0].fill - LION_INTRO_BEATS) * BEAT).toBeGreaterThan(3500);
   });
 
-  test("each roar is a recording from ElevenLabs waiting in the sound queue, with the lion's Freesound roar as stand-in", () => {
-    expect(existsSync("src/lib/sounds/roar.mp3")).toBe(true);
+  test("each roar is a recording of its own from ElevenLabs, made or waiting in the sound queue, and loaded before the prelude", () => {
     const queued = new Set(SOUND_QUEUE.map((sound) => sound.file));
     for (const round of ROUNDS)
       for (const name of [round.lion, round.child]) {
@@ -92,7 +91,6 @@ describe("the lion and roaring with it before the song", () => {
         const file = `src/lib/sounds/${name}.mp3`;
         expect({ name, there: existsSync(file) || queued.has(file) }).toEqual({ name, there: true });
       }
-    expect(LION_RECORDINGS).toContain("roar");
   });
 
   test("the lion and the roaring are two phases of their own on the bar, the mirror with the open mouth and 3, 2, 1 at the roaring's end", () => {

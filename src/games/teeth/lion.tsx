@@ -69,26 +69,25 @@ export const ROUNDS: RoarRound[] = [
 ];
 
 /**
- * Both roars of a round at once: the round's own recordings at the round's loudness. Until a recording is made, the
- * lion's falls back to the lion's Freesound roar (`roar.mp3`) and the child's to a synthesized one, both at that
- * loudness and the child's longer round by round.
+ * Both roars of a round at once: the round's own ElevenLabs recordings at the round's loudness, loaded before the
+ * prelude (synthesized roars only where a recording could not load).
  */
-const roarTogether = (round: RoarRound, k: number) => () => {
-  playRecorded(round.lion, () => playRecorded("roar", playRoar, round.gain), round.gain);
-  playRecorded(round.child, () => playLittleRoar(k / (ROUNDS.length - 1)), round.gain);
+const roarTogether = (round: RoarRound) => () => {
+  playRecorded(round.lion, playRoar, round.gain);
+  playRecorded(round.child, playLittleRoar, round.gain);
 };
 
 /**
  * The roaring part's sounds, in ms from its start: in each round a soft note on every beat its mark fills, a little
  * higher each, then both roar together. No voice and no chime over the roars.
  */
-export const ROAR_CUES: Cue[] = ROUNDS.flatMap((round, k) => [
+export const ROAR_CUES: Cue[] = ROUNDS.flatMap((round) => [
   ...Array.from({ length: FILL_BEATS }, (_, i) => ({ at: (round.fill + i - LION_INTRO_BEATS) * BEAT_MS, play: () => playCountNote(i) })),
-  { at: (round.roar - LION_INTRO_BEATS) * BEAT_MS, play: roarTogether(round, k) },
+  { at: (round.roar - LION_INTRO_BEATS) * BEAT_MS, play: roarTogether(round) },
 ]);
 
-/** The recordings the step plays, loaded before the prelude: each round's two roars, and the lion's stand-in. */
-export const LION_RECORDINGS = [...ROUNDS.flatMap((r) => [r.lion, r.child]), "roar"];
+/** The recordings the step plays, loaded before the prelude: each round's two roars. */
+export const LION_RECORDINGS = ROUNDS.flatMap((r) => [r.lion, r.child]);
 
 /** The lion alone: what the camera shows first. */
 const FOCUS_LION: Box = { x: 440, y: 10, width: 480, height: 470 };
@@ -250,8 +249,8 @@ function LionHead() {
 }
 
 /**
- * The lion's head as the bar's symbol of its phase (centred on 0, about 80 wide), drawn like the step's lion in the same
- * ink line, until its painted picture comes (queued in src/games/potty/symbolPictures.ts). Flat fills, no ids.
+ * The lion's head (centred on 0, about 80 wide), drawn like the step's lion in the same ink line, for the marks of the
+ * roaring's rounds (the bar shows its painted symbols). Flat fills, no ids.
  */
 export function LionSymbol({ roaring = false }: { roaring?: boolean }) {
   return (
@@ -270,21 +269,6 @@ export function LionSymbol({ roaring = false }: { roaring?: boolean }) {
       <ellipse cx={-5} cy={7} rx={7} ry={5} fill="#fff0d2" stroke={INK} strokeWidth={2} />
       <ellipse cx={5} cy={7} rx={7} ry={5} fill="#fff0d2" stroke={INK} strokeWidth={2} />
       <path d="M-4 1 Q0 -1 4 1 Q2 5 0 5 Q-2 5 -4 1 Z" fill="#6b3226" stroke={INK} strokeWidth={1.5} />
-    </g>
-  );
-}
-
-/**
- * The roaring's phase on the bar (centred on 0, about 80 wide): the lion's head roaring with waves going out on both
- * sides, drawn until its painted picture comes (queued in src/games/potty/symbolPictures.ts).
- */
-export function RoarSymbol() {
-  return (
-    <g>
-      <g transform="scale(0.8)">
-        <LionSymbol roaring />
-      </g>
-      <RoarArcs x={0} y={4} from={28} gap={8} count={2} width={3.5} />
     </g>
   );
 }

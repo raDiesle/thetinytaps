@@ -7,6 +7,7 @@ import type { PictureId } from "./steps";
 // them, so they fit the child's own hands of the close-up and need not be painted twice for a boy and a girl. The
 // bathroom is described as the close-up draws it (`sink.tsx`: the pink pump left of the basin, the chrome mixer tap
 // with its blue and red dot, the teal towel with a white and a yellow stripe on the right). Plain data, no picture imports.
+// A made sheet goes on `MADE`, so it leaves the queue.
 
 const DIR = "src/games/handwash/bilder";
 
@@ -30,7 +31,10 @@ const PANELS: Record<PictureId, string> = {
 /** The order of the panels on the sheet. */
 const ORDER: PictureId[] = ["ruf", "bad", "hocker", "essen"];
 
-/** The four pictures, one sheet of four panels. */
+/** The pictures made (all four on 27 November 2026); the prompts stay here, so a picture can be made again from them. */
+const MADE = new Set(["haende-ruf"]);
+
+/** The four pictures, one sheet of four panels, while they are not made. */
 export const HANDWASH_PICTURE_QUEUE: QueuedPicture[] = [
   {
     id: "haende-ruf",
@@ -45,4 +49,4 @@ export const HANDWASH_PICTURE_QUEUE: QueuedPicture[] = [
       "Look at the four pictures in the dev server (`/haende-waschen/?seite=call`, `?seite=stool`, `?seite=run`): the child must not be seen (only its feet on the stool), only ONE Mama, the bathroom as the close-up draws it. Then `bun run previews /haende-waschen/`.",
     date: "2026-11-25",
   },
-];
+].filter((p) => !MADE.has(p.id));

@@ -141,14 +141,23 @@ ffmpeg -ss 0.3 -t 1.05 -i raw.mp3 -af "highpass=f=60,afade=t=in:d=0.01,afade=t=o
 A fly's buzz asked for quietly („a housefly buzzing“) came back as faint noise; asked for loud and close it worked.
 Not yet heard by ear (Claude checked only spectrum and loudness): listen to them before building more on them.
 
-| File            | Prompt (ElevenLabs sound effects, November 2026)                                                          | Cut         |
-| --------------- | --------------------------------------------------------------------------------------------------------- | ----------- |
-| `fly.mp3`       | Loud close-up buzzing of a big fly flying around the microphone, clear bzzz, nothing else (1.5 s, 0.8)    | 0.50–1.45 s |
-| `hamster.mp3`   | A pet hamster squeaking, a few tiny high-pitched squeaks, close up, clean recording, no background noise  | 0.30–1.35 s |
-| `moose.mp3`     | A moose calling, one long deep nasal bellow, close up, clean recording, no background noise (2 s)         | 0.25–1.65 s |
-| `otter.mp3`     | A river otter chirping and squeaking, close up, clean recording, no water, no background noise            | 0.05–1.35 s |
-| `peep.mp3`      | A single baby chick peeping, close up, clean recording, no background noise (1.5 s, 0.6)                  | 0.00–1.25 s |
-| `polarbear.mp3` | A single polar bear growling once, a deep grumbling growl, close up, clean recording, no background noise | 0.00–1.70 s |
+| File               | Prompt (ElevenLabs sound effects, November 2026)                                                                                                                                      | Cut         |
+| ------------------ | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- | ----------- |
+| `fly.mp3`          | Loud close-up buzzing of a big fly flying around the microphone, clear bzzz, nothing else (1.5 s, 0.8)                                                                                | 0.50–1.45 s |
+| `hamster.mp3`      | A pet hamster squeaking, a few tiny high-pitched squeaks, close up, clean recording, no background noise                                                                              | 0.30–1.35 s |
+| `moose.mp3`        | A moose calling, one long deep nasal bellow, close up, clean recording, no background noise (2 s)                                                                                     | 0.25–1.65 s |
+| `otter.mp3`        | A river otter chirping and squeaking, close up, clean recording, no water, no background noise                                                                                        | 0.05–1.35 s |
+| `peep.mp3`         | A single baby chick peeping, close up, clean recording, no background noise (1.5 s, 0.6)                                                                                              | 0.00–1.25 s |
+| `polarbear.mp3`    | A single polar bear growling once, a deep grumbling growl, close up, clean recording, no background noise                                                                             | 0.00–1.70 s |
+| `lion-roar-1.mp3`  | A friendly lion roaring, a short, gentle roar that swells from a low growl into an open 'rooaar' and fades out, warm and playful for small children, not scary (1.5 s, 0.7), −18 LUFS | 0.05–1.30 s |
+| `lion-roar-2.mp3`  | The same, a bigger, longer roar (2 s, 0.7), −18 LUFS                                                                                                                                  | 0.08–1.65 s |
+| `lion-roar-3.mp3`  | The same, the biggest and longest, proud and full roar (2.6 s, 0.7), −18 LUFS                                                                                                         | 0.10–2.35 s |
+| `child-roar-1.mp3` | A small child playfully roaring like a little lion, a short, gentle 'rooaah' that opens from a short growl into a long 'aah', happy and gentle, not scary (1.5 s, 0.7), −20 LUFS      | 0.05–1.25 s |
+| `child-roar-2.mp3` | The same, a bigger, longer 'rooaah' (2 s, 0.7), −20 LUFS                                                                                                                              | 0.08–1.65 s |
+| `child-roar-3.mp3` | The same, the biggest and longest, proud and full 'rooaah' (2.6 s, 0.7), −20 LUFS                                                                                                     | 0.08–2.35 s |
+
+The six roars of Zähne putzen's lion phase (X-26, `src/games/teeth/lion.tsx`, 27 November 2026) were checked by loudness
+and spectrum only (the child's centred near 2 kHz, the lion's near 1 kHz), not yet by ear.
 
 The animal calls added for „Wer macht das Geräusch?“ in Was gehört zum Tier? (November 2026) were picked by their
 pages and levels, not yet by ear: `llama.mp3` is an alpaca, `boar.mp3` a domestic pig's rough grunt,
