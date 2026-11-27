@@ -91,7 +91,7 @@ export function Spit({ daytime, free }: { daytime: Daytime; free: RefObject<HTML
     ru: "Ребёнок наклоняется над раковиной и сплёвывает пену",
   });
   return (
-    <div ref={scene} className="spit">
+    <div ref={scene} className="spit-scene">
       {/* The bathroom's wall behind the child, the same tiles as at the sink. */}
       <svg className="spit-picture" viewBox={viewBox} role="img" aria-label={label}>
         <defs>

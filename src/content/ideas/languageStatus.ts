@@ -273,13 +273,13 @@ export const LANGUAGE_STATUS: LanguageStatusRow[] = [
         label: "🍎 Essen am Anfang",
         recorded: true,
         languages: { de: "text", en: "text", zh: "text", hi: "text", es: "text", ar: "text", ru: "text" },
-        note: "Die Geschichte isst zu jeder Tageszeit dasselbe, einen Apfel, eine Banane und einen Lolli (27. November 2026): der Name auf der Leiste „🍎 Essen“ und der neue Satz „Mmh, lecker! Ein bisschen Zucker bleibt an den Zähnen.“ (PRELUDE_TEXTS.sweets in lines.ts), gleich in allen sieben Sprachen. Noch nicht aufgenommen: bis dahin bleibt der Satz stumm (bun run voice make --only zaehne, nur auf Wunsch).",
+        note: "Die Geschichte isst zu jeder Tageszeit dasselbe, einen Apfel und einen Lolli (27. November 2026, die Banane ging, damit die Geschichte kürzer ist): der Name auf der Leiste „🍎 Essen“ und der neue Satz „Mmh, lecker! Ein bisschen Zucker bleibt an den Zähnen.“ (PRELUDE_TEXTS.sweets in lines.ts), gleich in allen sieben Sprachen. Aufnahme bestellt (voiceQueue.ts, zaehne-loewe), bis dahin bleibt der Satz stumm.",
       },
       {
-        label: "🦁 Mitbrüllen und Zuckermonster-Satz",
+        label: "🦁 Brüllen mit dem Löwen und Zuckermonster-Satz",
         recorded: true,
         languages: { de: "text", en: "text", zh: "text", hi: "text", es: "text", ar: "text", ru: "text" },
-        note: "Zwei neue Sätze vor dem Putzen (27. November 2026), gleich in allen sieben Sprachen: der Ruf zum Mitbrüllen mit dem Löwen („Now roar with the lion! …“, Englisch zuerst) und „Aus dem Zucker wachsen kleine Zuckermonster.“, der jetzt für morgens und abends gleich ist (ohne Tag und Nacht; PRELUDE_TEXTS in lines.ts). Noch nicht aufgenommen: bis dahin bleiben beide stumm (bun run voice make --only zaehne, nur auf Wunsch).",
+        note: "Neue Sätze vor dem Putzen (27. November 2026), gleich in allen sieben Sprachen, Englisch zuerst: „Before we brush, let's roar like a lion – three times!“ zu Beginn der einen Löwen-Phase, dann vor jedem der drei Brüller ein Ruf, wann gebrüllt wird („Open wide – and roar!“, „Once more – even louder!“, „And one last time – really loud!“; LION_CALLS in lines.ts), und „Aus dem Zucker wachsen kleine Zuckermonster.“ (PRELUDE_TEXTS). Aufnahme bestellt (voiceQueue.ts, zaehne-loewe), bis dahin bleiben sie stumm.",
       },
       {
         label: "🎵 Zahnputzlied (gesungen)",

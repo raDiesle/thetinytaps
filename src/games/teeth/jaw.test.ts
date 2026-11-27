@@ -2,7 +2,6 @@ import { describe, expect, test } from "bun:test";
 import {
   brushedPoints,
   buildMouth,
-  cheekFolds,
   CHEWING_DEPTHS,
   cornerStretch,
   glideStretch,
@@ -81,10 +80,8 @@ describe("the teeth being brushed", () => {
 // Gaps of dark mouth showed between the gum and the lips, most of all seen from the side (user feedback, November 2026):
 // the gum's cheek-side wall reaches past the lips, which cut it off, so the gum always runs into them. Round a jaw
 // tipped into the open mouth, and beside the arch seen from the side, the inside of the cheek shows (CHEEK_INSIDE in
-// mouth.tsx, the gum's own pink), never the dark of the mouth.
+// mouth.tsx), never the dark of the mouth.
 describe("the gum runs into the lips", () => {
-  /** A wall at least this tall (model units) is one standing at full height, not the rounded end behind the last molar. */
-  const FULL_WALL = 100;
   const views: [string, View, (typeof STEPS)[number] | null][] = [
     ["grin", GRIN_VIEW, null],
     ["roar", ROAR_VIEW, null],
@@ -100,15 +97,9 @@ describe("the gum runs into the lips", () => {
       const wall = gum.faces.find((f) => f.kind === "outer")!;
       // A jaw tipped to show its top or tongue side lies in the open mouth like a model, with cheek round it.
       if (Math.abs(view.tilt[gum.jaw]) >= 0.01 || all[gum.jaw].facing(wall.normal) <= MIN_FACING) return [];
-      // The wall's points: its rim along the tooth, then its foot back the other way. Behind the last molar the wall
-      // rounds off up to its rim; the cheek round it there is the gum's own pink, so only its full height must reach out.
-      const half = wall.points.length / 2;
-      const rims = wall.points.slice(0, half).reverse();
-      const feet = wall.points.slice(half).filter((p, i) => Math.abs(p[1] - rims[i][1]) > FULL_WALL);
-      return feet
-        .map(all[gum.jaw].point)
-        .filter((p) => insideBy(p, lips, 0))
-        .map(() => gum.key);
+      // The wall's points: its rim along the tooth, then its foot back the other way.
+      const feet = wall.points.slice(wall.points.length / 2).map(all[gum.jaw].point);
+      return feet.filter((p) => insideBy(p, lips, 0)).map(() => gum.key);
     });
     expect(inside).toEqual([]);
   });
@@ -220,35 +211,5 @@ describe("a tipped row goes back into the mouth", () => {
       return Math.hypot(b.x - a.x, b.y - a.y);
     };
     expect(scale(TEETH_PER_SIDE - 1)).toBeLessThan(0.97 * scale(0));
-  });
-
-  // The gum ran on behind the last molar as a tongue of lighter pink out in the dark of the mouth (user feedback,
-  // November 2026): it goes under the cheek beside the lips instead.
-  test.each(tipped.map((s) => [s.id, s] as const))("%s: the gum's end behind the last molars lies under the cheek's fold", (_, step) => {
-    const model = buildMouth(step.view.open);
-    const all = projectors(step.view);
-    const plain = viewedLips(model.lips, step.view).map(all.face.point);
-    const lips = stretchLips(plain, cornerStretch(plain, brushedPoints(model, all, step), TOOTH_CLEAR));
-    const folds = cheekFolds(model, all, lips, step.view.open);
-    for (const jaw of ["upper", "lower"] as const) {
-      for (const side of ["left", "right"] as const) {
-        const gum = model.gums.find((g) => g.key === toothKey({ jaw, side, n: TEETH_PER_SIDE - 1 }))!;
-        // The gum's end: the middle of its rims' points furthest back.
-        const rims = [...gum.rims.outer, ...gum.rims.inner];
-        const back = Math.min(...rims.map((p) => p[2]));
-        const end = rims.filter((p) => p[2] < back + 3).map(all[jaw].point);
-        const middle = { x: end.reduce((a, p) => a + p.x, 0) / end.length, y: end.reduce((a, p) => a + p.y, 0) / end.length };
-        const fold = folds.find((f) => f.jaw === jaw && f.side === side);
-        expect(fold).toBeDefined();
-        expect(insideBy(middle, fold!.ring, 0)).toBe(true);
-      }
-    }
-  });
-
-  test("with the teeth together there are no folds", () => {
-    const view = STEPS.find((s) => s.view.open === 0)!.view;
-    const model = buildMouth(0);
-    const all = projectors(view);
-    expect(cheekFolds(model, all, viewedLips(model.lips, view).map(all.face.point), 0)).toEqual([]);
   });
 });

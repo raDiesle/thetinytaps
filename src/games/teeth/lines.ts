@@ -5,17 +5,17 @@ import type { Localized, Texts } from "@/lib/language";
 
 /**
  * Before the clock starts: where the monsters come from, get the brush, toothpaste on, then straight to the lion (X-26):
- * the lion seen beside the child, then roaring with it, a phase of its own (user requests, November 2026); only then the
- * mirror, the mouth already wide open, and the monsters seen on the teeth before the song begins.
+ * the lion seen beside the child and roaring with it, one phase (user requests, November 2026); only then the mirror,
+ * the mouth already wide open, and the monsters seen on the teeth before the song begins.
  */
-export type Prelude = "sweets" | "grow" | "brush" | "paste" | "lion" | "roar" | "monsters";
+export type Prelude = "sweets" | "grow" | "brush" | "paste" | "lion" | "monsters";
 
 /**
  * What each part before the clock is called (on the progress bar) and what the voice says in it; its timing and sounds
  * are added in TeethPlay.tsx. A part with no `cue` says nothing.
  */
 export const PRELUDE_TEXTS: Record<Prelude, { title: Texts; cue?: Texts }> = {
-  // An apple, a banana and a lollipop, the same at any time of day (user request, November 2026: before, the morning had
+  // An apple and a lollipop, the same at any time of day (user request, November 2026: before, the morning had
   // breakfast and the evening sweets).
   sweets: {
     title: {
@@ -118,22 +118,10 @@ export const PRELUDE_TEXTS: Record<Prelude, { title: Texts; cue?: Texts }> = {
       ru: "Ой-ой, вот они! Давай прогоним их щёткой!",
     },
   },
-  // The lion seen close, then the child beside it in a lion costume's mane (X-26, written English first): no voice, the
-  // picture tells it.
+  // The lion seen close, then the child beside it in a lion costume's mane, and roaring with it – one phase (X-26,
+  // written English first; user requests, November 2026: the lion's and the roaring's phases became one). The voice
+  // tells the child what comes; before each round a call of its own (`LION_CALLS`) says to roar (lion.tsx).
   lion: {
-    title: {
-      en: "🦁 Here comes the lion",
-      de: "🦁 Da kommt der Löwe",
-      zh: "🦁 狮子来了",
-      hi: "🦁 शेर आ गया",
-      es: "🦁 Llega el león",
-      ar: "🦁 جاء الأسد",
-      ru: "🦁 Вот и лев",
-    },
-  },
-  // Roaring with the lion, a phase of its own (user request, November 2026): the voice asks the child to roar along,
-  // then three marks fill one after the other and both roar each time one is full (lion.tsx).
-  roar: {
     title: {
       en: "🦁 Roar like a lion",
       de: "🦁 Brüllen wie ein Löwe",
@@ -144,15 +132,61 @@ export const PRELUDE_TEXTS: Record<Prelude, { title: Texts; cue?: Texts }> = {
       ru: "🦁 Рычим, как лев",
     },
     cue: {
-      en: "Now roar with the lion! Really loud – three times!",
-      de: "Jetzt brüllst du mit dem Löwen! Ganz laut – dreimal!",
-      zh: "现在和狮子一起吼！大声吼——吼三次！",
-      hi: "चलो, शेर के साथ दहाड़ें! ज़ोर से – तीन बार!",
-      es: "¡Ahora ruge con el león! ¡Bien fuerte, tres veces!",
-      ar: "هيّا نزأر مع الأسد! بصوت عالٍ – ثلاث مرات!",
-      ru: "Теперь рычи вместе со львом! Громко – три раза!",
+      en: "Before we brush, let's roar like a lion – three times!",
+      de: "Bevor wir putzen, brüllen wir dreimal wie ein Löwe!",
+      zh: "刷牙之前，我们像狮子一样吼三次！",
+      hi: "ब्रश करने से पहले, चलो शेर की तरह तीन बार दहाड़ें!",
+      es: "Antes de cepillarnos, ¡vamos a rugir como un león, tres veces!",
+      ar: "قبل أن ننظّف أسناننا، هيّا نزأر مثل الأسد – ثلاث مرات!",
+      ru: "Прежде чем чистить зубы, давай три раза зарычим, как лев!",
     },
   },
+};
+
+/**
+ * What the voice calls before each round of roaring with the lion (lion.tsx's `ROUNDS`, said `CALL_BEATS` before the
+ * roar), so the child knows when to roar (user request, November 2026: explained by the voice, never by marks on the
+ * picture). Written English first.
+ */
+export const LION_CALLS: Texts[] = [
+  {
+    en: "Open wide – and roar!",
+    de: "Mund weit auf – und brüllen!",
+    zh: "嘴巴张大——吼！",
+    hi: "चलो, मुँह पूरा खोलें – और दहाड़ें!",
+    es: "¡Abre bien la boca… y ruge!",
+    ar: "هيّا نفتح فمنا جيدًا – ونزأر!",
+    ru: "Открой рот пошире – и рычи!",
+  },
+  {
+    en: "Once more – even louder!",
+    de: "Noch einmal – noch lauter!",
+    zh: "再来一次——更大声！",
+    hi: "एक बार और – और भी ज़ोर से!",
+    es: "¡Otra vez, todavía más fuerte!",
+    ar: "مرة أخرى – بصوت أعلى!",
+    ru: "Ещё раз – ещё громче!",
+  },
+  {
+    en: "And one last time – really loud!",
+    de: "Und ein letztes Mal – ganz laut!",
+    zh: "最后一次——超大声！",
+    hi: "और आख़िरी बार – ख़ूब ज़ोर से!",
+    es: "¡Y una última vez, muy fuerte!",
+    ar: "ومرة أخيرة – بصوت عالٍ جدًا!",
+    ru: "И последний раз – очень громко!",
+  },
+];
+
+/** The name of spitting's phase on the bar (its tooltip), a phase of its own after the song (user request, November 2026). */
+export const SPIT_TITLE: Texts = {
+  en: "Spit out the foam",
+  de: "Schaum ausspucken",
+  zh: "把泡沫吐出来",
+  hi: "झाग थूकना",
+  es: "Escupir la espuma",
+  ar: "بصق الرغوة",
+  ru: "Выплёвываем пену",
 };
 
 /** Said at the end, before the daytime's goodbye (unless the sung finale sings it). */

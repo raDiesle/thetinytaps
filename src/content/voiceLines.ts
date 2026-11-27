@@ -70,7 +70,7 @@ import { BED_STORY } from "@/games/bedstory/bedStory";
 import { OWN_BED_STORY } from "@/games/ownbed/ownBed";
 import { MILK_CHAIN } from "@/games/milkchain/milkChain";
 import { PACIFIER_STORY } from "@/games/pacifierstory/pacifierStory";
-import { DONE_SAY, TIDY_SAY } from "@/games/teeth/lines";
+import { DONE_SAY, LION_CALLS, TIDY_SAY } from "@/games/teeth/lines";
 import { PRELUDE } from "@/games/teeth/TeethPlay";
 import { PICTURE_LINES, SOON_LINE, TURN_LINES } from "@/games/timer/voice";
 import { caseLetters, SMALL_PROMPT } from "@/games/letters/CasePlay";
@@ -530,7 +530,7 @@ function teeth(): VoiceGroup[] {
   return [
     {
       label: "Vor dem Putzen",
-      lines: once([...daytimes.map((d) => d.hello), ...Object.values(PRELUDE).map((p) => p.cue?.de)]),
+      lines: once([...daytimes.map((d) => d.hello), ...Object.values(PRELUDE).map((p) => p.cue?.de), ...LION_CALLS.map((call) => call.de)]),
     },
     { label: "Am Ende", lines: once([DONE_SAY.de, TIDY_SAY.de, ...daytimes.map((d) => d.after)]) },
     { label: "Putzschritte", lines: once(TEETH_STEPS.map((s) => s.cue)), note: "Nur wenn das Lied nicht lädt: sonst singt das Lied die Schritte." },

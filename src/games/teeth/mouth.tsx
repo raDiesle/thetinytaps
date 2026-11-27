@@ -6,10 +6,8 @@ import {
   alongFace,
   brushedPoints,
   buildMouth,
-  cheekFolds,
   convexHullOf,
   DARK_FROM,
-  type CheekFold,
   cornerStretch,
   glideStretch,
   insideBy,
@@ -17,7 +15,6 @@ import {
   NO_STRETCH,
   projectors,
   stretchLips,
-  TEETH_PER_SIDE,
   TOOTH_CLEAR,
   toothKey,
   type Face,
@@ -66,15 +63,20 @@ const GUM_FILLS: Record<FaceKind, string> = { outer: "#ff8fab", top: "#ffa6bc", 
 /** The gum's edge round each tooth. */
 const GUM_RIM = "#e2577c";
 /**
- * The inside of the cheeks and lips round the teeth: the gum's own pink, so the gum runs on into it right up to the
- * lips, round as they are. A darker pink there showed the gum's walls ending in a straight edge beside the last teeth,
- * like a strip stretched from the upper lip to the lower (user feedback, November 2026).
+ * The inside of the cheeks and lips round the teeth, a little darker than the gum: beside the last teeth of an open
+ * mouth it is stretched from the upper row to the lower like a band (`cavityPath`).
  */
-const CHEEK_INSIDE = GUM_FILLS.outer;
+const CHEEK_INSIDE = "#f27e9c";
 /** The dark of the mouth behind the teeth, seen only between the rows of an open mouth. */
 const MOUTH_DARK = "#5c1430";
-/** How far inside the lips' middle line the dark opening keeps beside the last teeth: half the lip and a thin band of cheek. */
-const CAVITY_LIP_GAP = 17 + 9;
+/**
+ * How far the dark opening bulges out beside the last teeth, as a share of the way from the upper row's end to the
+ * lower's: the cheek stretched between them stays taut, only a little round, never a straight cut (user feedback,
+ * November 2026).
+ */
+const CAVITY_BULGE = 0.14;
+/** How round the opening's corners are, in picture units. */
+const CAVITY_ROUND = 22;
 /** Monsters still waiting for a later step only show where their side of the tooth clearly faces out of the mouth. */
 const WAITING_FACING = 0.25;
 /** Small enough that a monster sits on its tooth rather than covering it and its neighbours. */
@@ -575,9 +577,6 @@ export function Mouth({ view, zone, monsters, dirty, brush, happy, spat = false,
     return profileParts(lips3d, lipPoints, all.face, front, profile);
   }, [profile, model, lips3d, lipPoints, all]);
 
-  // The open mouth's cheek beside the last teeth lies over the gum's end behind them (`cheekFolds`).
-  const folds = useMemo(() => cheekFolds(model, all, lipPoints, view.open), [model, all, lipPoints, view.open]);
-
   const svg = useRef<SVGSVGElement>(null);
   const room = useRoom(svg, free);
   // At the end the camera zooms out from the lips to the whole laughing head, along with the head's glide to the grin.
@@ -689,7 +688,7 @@ export function Mouth({ view, zone, monsters, dirty, brush, happy, spat = false,
           {ofJaw
             .filter(({ tooth: t }) => foamOn.has(t.key))
             .map(({ tooth: t, gum, project }) => (
-              <FoamBubbles key={t.key} bubbles={gumFoam(t.id, gum, project, lipPoints, side, folds)} />
+              <FoamBubbles key={t.key} bubbles={gumFoam(t.id, gum, project, lipPoints, side)} />
             ))}
         </g>,
       ];
@@ -702,17 +701,14 @@ export function Mouth({ view, zone, monsters, dirty, brush, happy, spat = false,
         <KidFace project={all.face} head={all.face.point(HEAD_MIDDLE)} happy={happy} open={view.open} lips={lipPoints} />
         <g clipPath="url(#mouth-inside)">
           <path d={lipsPath} fill={CHEEK_INSIDE} />
-          {view.open > DARK_FROM && <path d={cavityPath(model, all, lipPoints)} fill={MOUTH_DARK} />}
+          {view.open > DARK_FROM && <path d={cavityPath(model, all)} fill={MOUTH_DARK} />}
           {tongueUp && <path d={smoothPath(model.tongue.map(all.lower.point))} fill="#ff6f91" stroke="#d94f74" strokeWidth={3} />}
           {palateDown && <path d={smoothPath(model.palate.map(all.upper.point))} fill="#c94a6e" />}
           {jawParts}
-          {folds.map((fold) => (
-            <CheekFoldShape key={`${fold.jaw}-${fold.side}`} fold={fold} teeth={painted.filter((p) => p.tooth.id.side === fold.side && p.tooth.id.n >= 2)} />
-          ))}
         </g>
       </>
     );
-  }, [view, all, model, painted, lipPoints, lipsPath, stillDirty, stillFoam, side, happy, folds]);
+  }, [view, all, model, painted, lipPoints, lipsPath, stillDirty, stillFoam, side, happy]);
 
   // The stains on the teeth being brushed now, each a small layer of its own over the still picture that fades away
   // as its tooth's monsters are brushed off: a fade inside the picture's svg would have the phone paint the screen
@@ -848,7 +844,7 @@ export function Mouth({ view, zone, monsters, dirty, brush, happy, spat = false,
         <div className="mouth-foam">
           {layerFoam.map((k) => {
             const p = painted.find((q) => q.tooth.key === k)!;
-            const bubbles = gumFoam(p.tooth.id, p.gum, p.project, lipPoints, side, folds);
+            const bubbles = gumFoam(p.tooth.id, p.gum, p.project, lipPoints, side);
             if (bubbles.length === 0) return null;
             const box = bubblesBox(bubbles);
             const at = onScreen(box, 1);
@@ -991,69 +987,22 @@ export function Mouth({ view, zone, monsters, dirty, brush, happy, spat = false,
 }
 
 /**
- * The cheek's fold over the gum's end beside a jaw's last teeth (`cheekFolds`): the cheek's own pink, round at its
- * corners, with the crowns of the back teeth left out of it, so they stand in front of it while the gum goes behind.
- */
-function CheekFoldShape({ fold, teeth }: { fold: CheekFold; teeth: { tooth: MouthModel["teeth"][number]; project: Project }[] }) {
-  const id = `cheek-fold-${fold.jaw}-${fold.side}`;
-  return (
-    <>
-      <mask id={id} maskUnits="userSpaceOnUse" x={-2000} y={-2000} width={4000} height={4000}>
-        <path d={roundedPath(fold.ring, 10)} fill="#fff" />
-        {teeth.flatMap(({ tooth, project }) =>
-          shownFaces(tooth, project).map((f, j) => (
-            <path key={`${tooth.key}-${j}`} d={facePath(f, project, faceRadius(f))} fill="#000" stroke="#000" strokeWidth={2.2} />
-          )),
-        )}
-      </mask>
-      <path d={roundedPath(fold.ring, 10)} fill={CHEEK_INSIDE} mask={`url(#${id})`} />
-    </>
-  );
-}
-
-/**
  * The opening into the mouth between the two rows of teeth: the outline round every chewing surface of both jaws,
  * each seen through its own (perhaps tipped) projector. Dark behind the tongue and palate; outside it the cheeks show.
+ * Beside the last teeth the cheek is stretched from one row's end to the other's, taut as a band but a little round
+ * (`CAVITY_BULGE`, `CAVITY_ROUND`): the opening once went on round to the lips there, with folds of cheek over the gum's
+ * end, and the gap between the rows looked odd (user feedback, November 2026).
  */
-function cavityPath(model: MouthModel, all: ReturnType<typeof projectors>, lips: { x: number; y: number }[]): string {
+function cavityPath(model: MouthModel, all: ReturnType<typeof projectors>): string {
   const rows = (["upper", "lower"] as const).map((jaw) =>
     model.teeth.filter((t) => t.id.jaw === jaw).flatMap((t) => surfaceFace(t.faces, "top").points.map(all[jaw].point)),
   );
-  // Beside the last teeth the opening goes on round to the lips, keeping only a narrow band of cheek along them: cut
-  // off straight from one row's end to the other's, the cheek between looked like a stretched strip of gum (user
-  // feedback, November 2026). Only between the two rows' ends, so no dark shows beside a row's gum.
-  // Each corner is an outline of its own from the two back molars to the lips: a tipped row bends in at its back
-  // (`TIPPED_PERSPECTIVE`), and one convex outline round rows and corner then reached down beside the row's gum.
-  const ring = insetRing(lips, CAVITY_LIP_GAP);
-  const last = TEETH_PER_SIDE - 1;
-  const corners = (["left", "right"] as const).map((side) => {
-    const s = side === "left" ? -1 : 1;
-    const [up, down] = (["upper", "lower"] as const).map((jaw) => {
-      const molar = model.teeth.find((t) => t.id.jaw === jaw && t.id.side === side && t.id.n === last)!;
-      return surfaceFace(molar.faces, "top")
-        .points.map(all[jaw].point)
-        .reduce((a, b) => (s * b.x > s * a.x ? b : a));
-    });
-    const past = s < 0 ? Math.min(up.x, down.x) : Math.max(up.x, down.x);
-    const beside = ring.filter((p) => s * p.x > s * past && p.y > up.y && p.y < down.y);
-    return beside.length > 0 ? roundedPath(convexHullOf([up, down, ...beside]), 10) : "";
+  const sides = ([-1, 1] as const).map((s) => {
+    const [up, down] = rows.map((row) => row.reduce((a, b) => (s * b.x > s * a.x ? b : a)));
+    const gap = Math.hypot(down.x - up.x, down.y - up.y);
+    return { x: (up.x + down.x) / 2 + s * CAVITY_BULGE * gap, y: (up.y + down.y) / 2 };
   });
-  return [roundedPath(convexHullOf(rows.flat()), 10), ...corners].join(" ");
-}
-
-/** The closed outline `points` moved `by` inwards along its normals (an outline in screen order either way round). */
-function insetRing(points: { x: number; y: number }[], by: number) {
-  const n = points.length;
-  const middle = { x: points.reduce((a, p) => a + p.x, 0) / n, y: points.reduce((a, p) => a + p.y, 0) / n };
-  return points.map((p, i) => {
-    const a = points[(i - 1 + n) % n];
-    const b = points[(i + 1) % n];
-    const length = Math.hypot(b.x - a.x, b.y - a.y) || 1;
-    let nx = -(b.y - a.y) / length;
-    let ny = (b.x - a.x) / length;
-    if (nx * (middle.x - p.x) + ny * (middle.y - p.y) < 0) [nx, ny] = [-nx, -ny];
-    return { x: p.x + nx * by, y: p.y + ny * by };
-  });
+  return roundedPath(convexHullOf([...rows.flat(), ...sides]), CAVITY_ROUND);
 }
 
 /**
@@ -1319,10 +1268,10 @@ interface Bubble {
 
 /**
  * The bubbles of foam at a tooth's gum line (`GUM_FOAM`), in picture units: along it on the cheek side, on the gum and
- * a little on the tooth. Only where that gum faces us, inside the lips (they cover the rest), outside the cheek's folds
- * and, in a profile, on the near side of the face's front.
+ * a little on the tooth. Only where that gum faces us, inside the lips (they cover the rest) and, in a
+ * profile, on the near side of the face's front.
  */
-function gumFoam(id: ToothId, gum: MouthModel["gums"][number], project: Project, lips: Point2[], side: ProfileParts | null, folds: CheekFold[]): Bubble[] {
+function gumFoam(id: ToothId, gum: MouthModel["gums"][number], project: Project, lips: Point2[], side: ProfileParts | null): Bubble[] {
   if (project.facing(surfaceFace(gum.faces, "outer").normal) <= MIN_FACING) return [];
   const rim = gum.rims.outer;
   const towardLip = id.jaw === "lower" ? -1 : 1;
@@ -1339,7 +1288,7 @@ function gumFoam(id: ToothId, gum: MouthModel["gums"][number], project: Project,
     const i = Math.min(rim.length - 2, Math.floor(k));
     const on = lerp3(rim[i], rim[i + 1], k - i);
     const at = project.point([on[0], on[1] + towardLip * down, on[2]]);
-    if (!insideBy(at, lips, 0) || (side && insideBy(at, side.ring, 0)) || folds.some((f) => insideBy(at, f.ring, 0))) return [];
+    if (!insideBy(at, lips, 0) || (side && insideBy(at, side.ring, 0))) return [];
     return [{ x: Math.round(at.x * 10) / 10, y: Math.round(at.y * 10) / 10, r: Math.round(r * project.zoom * 10) / 10 }];
   });
 }

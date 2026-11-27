@@ -586,13 +586,14 @@
   --fill: #b9a4f5;
 }
 
-/* The lion and roaring with it: the lion's mane's warm orange. */
-.teeth-segment.lion,
-.teeth-segment.roar {
+/* Roaring with the lion: the lion's mane's warm orange. */
+.teeth-segment.lion {
   --fill: #f2a24e;
 }
 
+/* The sink's blue: getting the brush, spitting into the basin and putting the brush away. */
 .teeth-segment.fetch,
+.teeth-segment.spit,
 .teeth-segment.tidy {
   --fill: #8fc9f2;
 }
@@ -1039,14 +1040,14 @@
   pointer-events: auto;
 }
 
-/* The camera: from the head to the mouth while the monsters grow (origin.tsx sets where), 4 beats from beat 4.
-   It moves the picture as a whole, an HTML layer, so the phone doesn't paint it again in every frame. */
+/* The camera: from the head to the mouth while the monsters grow (origin.tsx sets where), 4 beats from beat 2
+   (the grow part is short, user feedback, November 2026: the eating took too long). It moves the picture as a whole, an HTML layer, so the phone doesn't paint it again in every frame. */
 .origin-camera {
   transform-origin: 0 0;
 }
 
 .origin.at-grow .origin-camera {
-  animation: teeth-origin-zoom 2.14s ease-in-out 2.14s forwards;
+  animation: teeth-origin-zoom 2.14s ease-in-out 1.07s forwards;
 }
 
 @keyframes teeth-origin-zoom {
@@ -1887,7 +1888,7 @@
 
 /* ---------- Spitting out, not rinsing (X-18, spit.tsx): two bars, 8 beats of 12.5 % (SPIT_MS) ---------- */
 
-.spit {
+.spit-scene {
   position: absolute;
   inset: 0;
   overflow: hidden;
@@ -2005,8 +2006,8 @@
   }
 }
 
-/* ---------- Roaring like a lion (X-26, lion.tsx): twelve bars, 48 beats (LION_MS); the lion's part (LION_INTRO_BEATS), then
-   the roaring's (ROUNDS) ---------- */
+/* ---------- Roaring like a lion (X-26, lion.tsx): one phase of 37 beats (LION_MS), the lion and the first line, then
+   three rounds (ROUNDS) ---------- */
 
 .lion-scene {
   position: absolute;
@@ -2033,19 +2034,19 @@
 }
 
 /* The camera starts close on the lion (lion.tsx sets where) and draws back to the lion and the child in its costume on
-   beats 3–5. It moves the picture as a whole, an HTML layer, so the phone doesn't paint it again. */
+   beats 2–3 (the lion alone only briefly, user feedback, November 2026). It moves the picture as a whole, an HTML layer, so the phone doesn't paint it again. */
 .lion-camera {
   transform-origin: 0 0;
   transform: translate(var(--zoom-x), var(--zoom-y)) scale(var(--zoom));
-  animation: teeth-lion-camera 25.714s ease-in-out forwards;
+  animation: teeth-lion-camera 19.821s ease-in-out forwards;
 }
 
 @keyframes teeth-lion-camera {
   0%,
-  6.25% {
+  2.7027% {
     transform: translate(var(--zoom-x), var(--zoom-y)) scale(var(--zoom));
   }
-  10.4167%,
+  8.1081%,
   100% {
     transform: translate(0, 0) scale(1);
   }
@@ -2053,98 +2054,98 @@
 
 /* The child's smile gives way to its mouth wide open in each round, and is gone after the last roar. */
 .lion-kid-smile {
-  animation: teeth-lion-kid-smile 25.714s ease-in-out forwards;
+  animation: teeth-lion-kid-smile 19.821s ease-in-out forwards;
 }
 
 @keyframes teeth-lion-kid-smile {
   0%,
-  37.5% {
+  32.4324% {
     opacity: 1;
   }
-  38.3333%,
-  46.875% {
+  33.5135%,
+  44.5946% {
     opacity: 0;
   }
-  47.9167%,
-  56.25% {
+  45.9459%,
+  54.0541% {
     opacity: 1;
   }
-  57.0833%,
-  67.7083% {
+  55.1351%,
+  68.9189% {
     opacity: 0;
   }
-  68.75%,
-  77.0833% {
+  70.2703%,
+  78.3784% {
     opacity: 1;
   }
-  77.9167%,
+  79.4595%,
   100% {
     opacity: 0;
   }
 }
 
-/* Wide open a beat before each roar (ROAR_CUES, ROUNDS' `roar`), bulging a little more each round and open longer;
+/* Wide open on each roar (ROAR_CUES, ROUNDS' `roar`), bulging a little more each round and open longer;
    after the last roar it stays open to the end, as it comes back in the mirror. */
 .lion-kid-roar {
   opacity: 0;
-  animation: teeth-lion-kid-roar 25.714s ease-in-out forwards;
+  animation: teeth-lion-kid-roar 19.821s ease-in-out forwards;
 }
 
 @keyframes teeth-lion-kid-roar {
   0%,
-  37.5% {
+  32.4324% {
     transform: scale(0.4, 0.2);
     opacity: 0;
   }
-  38.125% {
+  33.2432% {
     opacity: 1;
   }
-  39.5833% {
+  35.1351% {
     transform: scale(1);
     opacity: 1;
   }
-  40.8333% {
+  36.7568% {
     transform: scale(1.03, 1.06);
   }
-  45.8333% {
+  43.2432% {
     transform: scale(1);
     opacity: 1;
   }
-  47.9167%,
-  56.25% {
+  45.9459%,
+  54.0541% {
     transform: scale(0.4, 0.2);
     opacity: 0;
   }
-  56.875% {
+  54.8649% {
     opacity: 1;
   }
-  58.3333% {
+  56.7568% {
     transform: scale(1);
     opacity: 1;
   }
-  59.5833% {
+  58.3784% {
     transform: scale(1.05, 1.1);
   }
-  66.6667% {
+  67.5676% {
     transform: scale(1);
     opacity: 1;
   }
-  68.75%,
-  77.0833% {
+  70.2703%,
+  78.3784% {
     transform: scale(0.4, 0.2);
     opacity: 0;
   }
-  77.7083% {
+  79.1892% {
     opacity: 1;
   }
-  79.1667% {
+  81.0811% {
     transform: scale(1);
     opacity: 1;
   }
-  80.4167% {
+  82.7027% {
     transform: scale(1.07, 1.14);
   }
-  89.5833%,
+  94.5946%,
   100% {
     transform: scale(1);
     opacity: 1;
@@ -2153,32 +2154,32 @@
 
 /* The lion stands beside the child from the start and leans into each roar, a little more each round. */
 .lion-lion {
-  animation: teeth-lion-lean 25.714s ease-in-out forwards;
+  animation: teeth-lion-lean 19.821s ease-in-out forwards;
 }
 
 @keyframes teeth-lion-lean {
   0%,
-  39.5833% {
+  35.1351% {
     transform: scale(1);
   }
-  40.8333% {
+  36.7568% {
     transform: scale(1.02);
   }
-  45.8333%,
-  58.3333% {
+  43.2432%,
+  56.7568% {
     transform: scale(1);
   }
-  59.5833% {
+  58.3784% {
     transform: scale(1.04);
   }
-  66.6667%,
-  79.1667% {
+  67.5676%,
+  81.0811% {
     transform: scale(1);
   }
-  80.4167% {
+  82.7027% {
     transform: scale(1.06);
   }
-  89.5833%,
+  94.5946%,
   100% {
     transform: scale(1);
   }
@@ -2186,35 +2187,35 @@
 
 /* Its mouth opens with the child's in each round and closes again after the last roar. */
 .lion-lion-shut {
-  animation: teeth-lion-shut 25.714s ease-in-out forwards;
+  animation: teeth-lion-shut 19.821s ease-in-out forwards;
 }
 
 @keyframes teeth-lion-shut {
   0%,
-  37.5% {
+  32.4324% {
     opacity: 1;
   }
-  38.3333%,
-  46.875% {
+  33.5135%,
+  44.5946% {
     opacity: 0;
   }
-  47.9167%,
-  56.25% {
+  45.9459%,
+  54.0541% {
     opacity: 1;
   }
-  57.0833%,
-  67.7083% {
+  55.1351%,
+  68.9189% {
     opacity: 0;
   }
-  68.75%,
-  77.0833% {
+  70.2703%,
+  78.3784% {
     opacity: 1;
   }
-  77.9167%,
-  90.625% {
+  79.4595%,
+  95.9459% {
     opacity: 0;
   }
-  91.6667%,
+  97.2973%,
   100% {
     opacity: 1;
   }
@@ -2222,68 +2223,68 @@
 
 .lion-lion-jaw {
   opacity: 0;
-  animation: teeth-lion-jaw 25.714s ease-in-out forwards;
+  animation: teeth-lion-jaw 19.821s ease-in-out forwards;
 }
 
 @keyframes teeth-lion-jaw {
   0%,
-  37.5% {
+  32.4324% {
     transform: scale(0.4, 0.2);
     opacity: 0;
   }
-  38.125% {
+  33.2432% {
     opacity: 1;
   }
-  39.5833% {
+  35.1351% {
     transform: scale(1);
     opacity: 1;
   }
-  40.8333% {
+  36.7568% {
     transform: scale(1.03, 1.06);
   }
-  45.8333% {
+  43.2432% {
     transform: scale(1);
     opacity: 1;
   }
-  47.9167%,
-  56.25% {
+  45.9459%,
+  54.0541% {
     transform: scale(0.4, 0.2);
     opacity: 0;
   }
-  56.875% {
+  54.8649% {
     opacity: 1;
   }
-  58.3333% {
+  56.7568% {
     transform: scale(1);
     opacity: 1;
   }
-  59.5833% {
+  58.3784% {
     transform: scale(1.05, 1.1);
   }
-  66.6667% {
+  67.5676% {
     transform: scale(1);
     opacity: 1;
   }
-  68.75%,
-  77.0833% {
+  70.2703%,
+  78.3784% {
     transform: scale(0.4, 0.2);
     opacity: 0;
   }
-  77.7083% {
+  79.1892% {
     opacity: 1;
   }
-  79.1667% {
+  81.0811% {
     transform: scale(1);
     opacity: 1;
   }
-  80.4167% {
+  82.7027% {
     transform: scale(1.07, 1.14);
   }
-  89.5833% {
+  94.5946% {
     transform: scale(1);
     opacity: 1;
   }
-  91.6667%,
+  97.2973%,
   100% {
     transform: scale(0.4, 0.2);
     opacity: 0;
@@ -2293,204 +2294,56 @@
 /* The roar seen: soft arcs going out from both mouths while they are open, one calm swell a round. */
 .lion-waves {
   opacity: 0;
-  animation: teeth-lion-waves 25.714s ease-out forwards;
+  animation: teeth-lion-waves 19.821s ease-out forwards;
 }
 
 @keyframes teeth-lion-waves {
   0%,
-  39.5833% {
+  35.1351% {
     transform: scale(0.75);
     opacity: 0;
   }
-  40.4167% {
+  36.2162% {
     transform: scale(0.9);
     opacity: 1;
   }
-  45.8333% {
+  43.2432% {
     transform: scale(1.25);
     opacity: 0;
   }
-  46.25%,
-  58.3333% {
+  43.7838%,
+  56.7568% {
     transform: scale(0.75);
     opacity: 0;
   }
-  59.1667% {
+  57.8378% {
     transform: scale(0.9);
     opacity: 1;
   }
-  66.6667% {
+  67.5676% {
     transform: scale(1.25);
     opacity: 0;
   }
-  67.0833%,
-  79.1667% {
+  68.1081%,
+  81.0811% {
     transform: scale(0.75);
     opacity: 0;
   }
-  80% {
+  82.1622% {
     transform: scale(0.9);
     opacity: 1;
   }
-  89.5833%,
+  94.5946%,
   100% {
     transform: scale(1.25);
     opacity: 0;
-  }
-}
-
-/* When and how often to roar, instead of 3, 2, 1 (user request, November 2026): three round marks between the heads
-   come with the roaring's part; in each round the next one fills with the mane's orange from its middle, a soft note
-   on each beat, and when it is full both roar and it turns into a roaring lion's face, which stays. */
-.lion-mark {
-  opacity: 0;
-  animation: teeth-lion-marks 25.714s ease-out forwards;
-}
-
-@keyframes teeth-lion-marks {
-  0%,
-  16.6667% {
-    opacity: 0;
-  }
-  18.75%,
-  100% {
-    opacity: 1;
-  }
-}
-
-.lion-mark-fill-1 {
-  opacity: 0;
-  animation: teeth-lion-mark-fill-1 25.714s linear forwards;
-}
-
-.lion-mark-lit-1 {
-  opacity: 0;
-  animation: teeth-lion-mark-lit-1 25.714s ease-out forwards;
-}
-
-@keyframes teeth-lion-mark-fill-1 {
-  0%,
-  31.25% {
-    transform: scale(0);
-    opacity: 0;
-  }
-  31.4583% {
-    opacity: 1;
-  }
-  39.5833%,
-  100% {
-    transform: scale(1);
-    opacity: 1;
-  }
-}
-
-@keyframes teeth-lion-mark-lit-1 {
-  0%,
-  39.375% {
-    transform: scale(1);
-    opacity: 0;
-  }
-  39.5833% {
-    transform: scale(1.15);
-    opacity: 1;
-  }
-  41.6667%,
-  100% {
-    transform: scale(1);
-    opacity: 1;
-  }
-}
-
-.lion-mark-fill-2 {
-  opacity: 0;
-  animation: teeth-lion-mark-fill-2 25.714s linear forwards;
-}
-
-.lion-mark-lit-2 {
-  opacity: 0;
-  animation: teeth-lion-mark-lit-2 25.714s ease-out forwards;
-}
-
-@keyframes teeth-lion-mark-fill-2 {
-  0%,
-  50% {
-    transform: scale(0);
-    opacity: 0;
-  }
-  50.2083% {
-    opacity: 1;
-  }
-  58.3333%,
-  100% {
-    transform: scale(1);
-    opacity: 1;
-  }
-}
-
-@keyframes teeth-lion-mark-lit-2 {
-  0%,
-  58.125% {
-    transform: scale(1);
-    opacity: 0;
-  }
-  58.3333% {
-    transform: scale(1.15);
-    opacity: 1;
-  }
-  60.4167%,
-  100% {
-    transform: scale(1);
-    opacity: 1;
-  }
-}
-
-.lion-mark-fill-3 {
-  opacity: 0;
-  animation: teeth-lion-mark-fill-3 25.714s linear forwards;
-}
-
-.lion-mark-lit-3 {
-  opacity: 0;
-  animation: teeth-lion-mark-lit-3 25.714s ease-out forwards;
-}
-
-@keyframes teeth-lion-mark-fill-3 {
-  0%,
-  70.8333% {
-    transform: scale(0);
-    opacity: 0;
-  }
-  71.0417% {
-    opacity: 1;
-  }
-  79.1667%,
-  100% {
-    transform: scale(1);
-    opacity: 1;
-  }
-}
-
-@keyframes teeth-lion-mark-lit-3 {
-  0%,
-  78.9583% {
-    transform: scale(1);
-    opacity: 0;
-  }
-  79.1667% {
-    transform: scale(1.15);
-    opacity: 1;
-  }
-  81.25%,
-  100% {
-    transform: scale(1);
-    opacity: 1;
   }
 }
 
 /* Important for the same reason as the story's: `.prep.at-paste .prep-tube-squeeze` outranks it. */
 .teeth-play.paused .teeth-count,
 .teeth-play.paused .prep *,
-.teeth-play.paused .spit *,
+.teeth-play.paused .spit-scene *,
 .teeth-play.paused .lion-scene *,
 .teeth-play.paused .lip-arrow {
   animation-play-state: paused !important;

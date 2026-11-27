@@ -20,8 +20,9 @@ import { Piece, pictureSpace } from "./piece";
 // its brows go up, and while it chews its eyes close happily and its cheeks
 // glow. Each sweet flies into the mouth in an arc and crumbles as it is bitten.
 // What it eats is the same at any time of day (user request, November 2026): an
-// apple, a banana and a lollipop, so the child sees that everyday food leaves
-// sugar on the teeth too, not only sweets.
+// apple and a lollipop, so the child sees that everyday food leaves sugar on the
+// teeth too, not only sweets – two, one right after the other, never a third or a
+// pause between them (user feedback, November 2026: the eating took too long).
 // All of it is CSS animation (teeth.css), calm enough to go with the music;
 // ARRIVE_MS here sets when each sweet reaches the mouth, and ORIGIN_CUES the
 // sounds that go with it (cheering, unwrapping, biting, chewing, „Mmmh“).
@@ -29,7 +30,7 @@ import { Piece, pictureSpace } from "./piece";
 export type OriginPart = "sweets" | "grow";
 
 /** How long each part lasts: the sweets one until the last is chewed, the grow one until the monsters are there. */
-export const ORIGIN_MS: Record<OriginPart, number> = { sweets: 9600, grow: 6000 };
+export const ORIGIN_MS: Record<OriginPart, number> = { sweets: 6400, grow: 4500 };
 
 const { width: W } = PICTURE;
 /**
@@ -48,7 +49,6 @@ const HEAD_FRAMING: Framing = {
   sweets: [
     { x: 440, y: 110 },
     { x: 0, y: 110 },
-    { x: 440, y: 110 },
   ],
 };
 const FACE_FRAMING: Framing = {
@@ -56,14 +56,13 @@ const FACE_FRAMING: Framing = {
   sweets: [
     { x: 432, y: 212 },
     { x: 8, y: 212 },
-    { x: 432, y: 212 },
   ],
 };
 /** Both framings, for the tests. */
 export const FRAMINGS = { head: HEAD_FRAMING, face: FACE_FRAMING };
 /**
  * How far a sweet reaches round its point while it is seen there, in picture units: grown to 1.5, floating up, turned,
- * and lifted before it flies (`teeth-origin-sweet`) – the widest of the apple, the banana and the lollipop.
+ * and lifted before it flies (`teeth-origin-sweet`) – the widest of the apple and the lollipop.
  */
 export const SWEET_REACH = { left: 56, right: 56, up: 82, down: 88 };
 /** Room kept between a sweet and the edge of the free room, in screen px: the mirror's frame lies there (`FRAME_PX`). */
@@ -333,8 +332,11 @@ export function ClosedMouth() {
   );
 }
 
-/** When each sweet reaches the mouth (ms into the sweets part); it shows a while before, then the mouth chews. */
-const ARRIVE_MS = [2300, 5000, 7700];
+/**
+ * When each sweet reaches the mouth (ms into the sweets part); it shows a while before, then the mouth chews. The next
+ * appears as the one before reaches the mouth, on the other side, so no pause lies between them.
+ */
+const ARRIVE_MS = [2300, 4600];
 /** How long the mouth chews each sweet; the crumbs show when it opens again. */
 const CHEW_MS = 1200;
 /** How long a sweet shows before it reaches the mouth: growing, floating and gliding in (`.origin-sweet` in teeth.css). */
@@ -384,14 +386,16 @@ const DELIGHT = perSweet(
 const CRUMBS = [
   { tooth: 2, upper: true, sweet: 0 },
   { tooth: 5, upper: false, sweet: 0 },
-  { tooth: 7, upper: true, sweet: 1 },
+  { tooth: 7, upper: true, sweet: 0 },
   { tooth: 2, upper: false, sweet: 1 },
-  { tooth: 5, upper: true, sweet: 2 },
-  { tooth: 7, upper: false, sweet: 2 },
+  { tooth: 5, upper: true, sweet: 1 },
+  { tooth: 7, upper: false, sweet: 1 },
 ];
 
-/** Each crumb's colour, that of what it comes from: the apple's, the banana's and the lollipop's. */
-const CRUMB_COLORS = ["#ef5a5f", "#8bd346", "#f0cf4a", "#e3bd52", "#ff7bd0", "#ff7bd0"];
+/** Each crumb's colour, that of what it comes from: the apple's (its skin and leaf) and the lollipop's. */
+const CRUMB_COLORS = ["#ef5a5f", "#8bd346", "#ef5a5f", "#ff7bd0", "#ffb3e6", "#ff7bd0"];
+/** When each crumb's monster starts to grow, in ms into the grow part: one after the other, the last done by its end. */
+const growAt = (i: number) => 600 + i * 450;
 
 /** A tooth's place in the picture, where a crumb lies and its monster grows. */
 function crumbAt(c: (typeof CRUMBS)[number]) {
@@ -420,31 +424,6 @@ function Lollipop() {
   );
 }
 
-/**
- * A banana with its peel pulled half down: the pale fruit standing up out of it, the yellow peel hanging in two flaps
- * with brown tips, and its little brown stalk at the bottom – the way a child holds one to bite.
- */
-function Banana() {
-  return (
-    <g stroke={INK} strokeWidth={3} strokeLinejoin="round" strokeLinecap="round">
-      {/* The fruit, a little bent, standing out of the peel. */}
-      <path d="M-9 10 C-11 -8 -8 -24 -1 -33 C1 -35 4 -34 5 -31 C9 -20 10 -6 9 10 Z" fill="#fff6d6" />
-      <path d="M2 -26 C5 -16 6 -6 5 4" fill="none" stroke="#ead38e" strokeWidth={2.5} />
-      {/* The back flap of the peel, behind the peel's body. */}
-      <path d="M-2 6 C2 -2 8 -10 13 -12 C15 -6 12 4 7 12 Z" fill="#e9b10f" />
-      {/* The peel's body down to the stalk. */}
-      <path d="M-12 8 C-13 24 -9 40 -4 48 L4 48 C9 40 13 24 12 8 C6 12 -6 12 -12 8 Z" fill="#ffd23f" />
-      <path d="M-4 48 L-3 56 L3 56 L4 48 Z" fill="#8a5a2b" />
-      <path d="M6 16 C7 26 5 36 2 44" fill="none" stroke="#fff3b0" strokeWidth={3} opacity={0.9} />
-      {/* The two side flaps hanging out and down, with brown tips. */}
-      <path d="M-12 8 C-20 6 -28 12 -32 24 C-31 27 -28 27 -27 25 C-23 18 -17 15 -9 15 Z" fill="#ffd23f" />
-      <path d="M-32 24 C-31 27 -28 27 -27 25 L-29 22 Z" fill="#8a5a2b" strokeWidth={2} />
-      <path d="M12 8 C20 6 28 12 32 24 C31 27 28 27 27 25 C23 18 17 15 9 15 Z" fill="#ffd23f" />
-      <path d="M32 24 C31 27 28 27 27 25 L29 22 Z" fill="#8a5a2b" strokeWidth={2} />
-    </g>
-  );
-}
-
 /** A round red apple with the dip at its top, a brown stalk, a green leaf and a soft light on its cheek. */
 function Apple() {
   return (
@@ -459,8 +438,8 @@ function Apple() {
   );
 }
 
-/** What the child eats, the same at any time of day (user request, November 2026): an apple, a banana and a lollipop. */
-const TREATS: (() => ReactElement)[] = [Apple, Banana, Lollipop];
+/** What the child eats, the same at any time of day (user request, November 2026): an apple and a lollipop. */
+const TREATS: (() => ReactElement)[] = [Apple, Lollipop];
 
 /**
  * The eyes follow each sweet: up to its corner while it floats, down to the mouth as it glides in, and back to rest
@@ -478,10 +457,9 @@ const BITE = { x: MID, y: 284 };
 const BITE_MS = 90;
 
 /** The colours a sweet crumbles into, and whether its bits are hard shards (candy, apple) or soft crumbs (cake,
- * bread, banana). */
+ * bread). */
 const CRUMBLE: { colors: string[]; shards: boolean }[] = [
   { colors: ["#fff3d6", "#ef4b4f", "#fff3d6"], shards: true },
-  { colors: ["#fff6d6", "#ffd23f", "#fff6d6"], shards: false },
   { colors: ["#ff7bd0", "#fff", "#ff7bd0"], shards: true },
 ];
 
@@ -508,22 +486,20 @@ const BITS = CRUMBLE.flatMap(({ colors, shards }, sweet) =>
 );
 
 /**
- * What the child hears: a cheer when the food comes, the apple's crunch, a soft bite into the banana, the lollipop's
- * crunch, chewing after each, and „Mmmh“ at the end.
+ * What the child hears: a cheer when the food comes, the apple's crunch, the lollipop's crunch, chewing after each,
+ * and „Mmmh“ at the end.
  */
 export const ORIGIN_CUES: Cue[] = [
   { at: APPEAR_MS[0] + 500, play: () => playRecorded("yay", playGiggle) },
   { at: ARRIVE_MS[0] + 300, play: () => playRecorded("chew", playCrunch) },
   { at: ARRIVE_MS[0] + 600, play: () => playRecorded("chew", playMunch) },
-  { at: ARRIVE_MS[1] + 300, play: () => playRecorded("munch", playMunch) },
+  { at: ARRIVE_MS[1] + 300, play: () => playRecorded("lolly", playCrunch) },
   { at: ARRIVE_MS[1] + 600, play: () => playRecorded("chew", playMunch) },
-  { at: ARRIVE_MS[2] + 300, play: () => playRecorded("lolly", playCrunch) },
-  { at: ARRIVE_MS[2] + 600, play: () => playRecorded("chew", playMunch) },
-  { at: ARRIVE_MS[2] + CHEW_MS + 150, play: () => playRecorded("yum", playYum) },
+  { at: ARRIVE_MS[1] + CHEW_MS + 150, play: () => playRecorded("yum", playYum) },
 ].sort((a, b) => a.at - b.at);
 
 /** The recordings the story plays, to load before it starts. */
-export const ORIGIN_RECORDINGS = ["yay", "lolly", "munch", "chew", "yum"];
+export const ORIGIN_RECORDINGS = ["yay", "lolly", "chew", "yum"];
 
 /** The sky behind the child: one calm colour, the same in the morning and the evening (user request, November 2026). */
 const SKY = "#c4f1ff";
@@ -622,13 +598,13 @@ export function Origin({
   const label =
     part === "sweets"
       ? t({
-          de: "Ein Kind isst einen Apfel, eine Banane und einen Lolli",
-          en: "A child eats an apple, a banana and a lollipop",
-          zh: "一个孩子在吃苹果、香蕉和棒棒糖",
-          hi: "एक बच्चा सेब, केला और लॉलीपॉप खा रहा है",
-          es: "Un niño come una manzana, un plátano y una piruleta",
-          ar: "طفل يأكل تفاحة وموزة ومصاصة",
-          ru: "Ребёнок ест яблоко, банан и леденец на палочке",
+          de: "Ein Kind isst einen Apfel und einen Lolli",
+          en: "A child eats an apple and a lollipop",
+          zh: "一个孩子在吃苹果和棒棒糖",
+          hi: "एक बच्चा सेब और लॉलीपॉप खा रहा है",
+          es: "Un niño come una manzana y una piruleta",
+          ar: "طفل يأكل تفاحة ومصاصة",
+          ru: "Ребёнок ест яблоко и леденец на палочке",
         })
       : t({
           de: "Aus dem Zucker auf den Zähnen wachsen kleine Monster",
@@ -780,7 +756,7 @@ export function Origin({
                       area={{ x: x - 9, y: y - 6, width: 17, height: 15 }}
                       within={MOUTH_AREA}
                       className="origin-crumb"
-                      style={{ "--crumb": `${ARRIVE_MS[c.sweet] + CHEW_MS - 200}ms`, "--grow": `${600 + i * 700}ms` } as CSSProperties}
+                      style={{ "--crumb": `${ARRIVE_MS[c.sweet] + CHEW_MS - 200}ms`, "--grow": `${growAt(i)}ms` } as CSSProperties}
                     >
                       <circle cx={x - 5} cy={y + 2} r={3.8} fill={color} stroke={INK} strokeWidth={1.3} />
                       <circle cx={x + 5} cy={y - 2} r={3} fill={color} stroke={INK} strokeWidth={1.3} />
@@ -798,7 +774,7 @@ export function Origin({
                         area={{ x: x - 11, y: y - 18, width: 22, height: 27.5 }}
                         within={MOUTH_AREA}
                         className={`origin-monster${tickled === FIRST_ID + i ? " tickled" : ""}`}
-                        style={{ "--grow": `${600 + i * 700}ms` } as CSSProperties}
+                        style={{ "--grow": `${growAt(i)}ms` } as CSSProperties}
                       >
                         <g transform={`translate(${x.toFixed(1)} ${y.toFixed(1)}) scale(0.63)`}>
                           <Monster

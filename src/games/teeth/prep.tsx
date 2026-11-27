@@ -28,8 +28,11 @@ const SINK = 300;
 const FOCUS: Box = { x: 20, y: 24, width: 400, height: 356 };
 const WINDOW = { x: 176, y: 34, width: 112, height: 112 };
 
-/** How long each part lasts, as long as its animation in teeth.css. */
-export const PREP_MS: Record<PrepPart, number> = { brush: 7000, paste: 8000, tidy: 8570 };
+/**
+ * How long each part lasts: its animation in teeth.css and only a moment after it – the brush and the toothpaste once
+ * waited 2.5 s each with nothing to see (user feedback, November 2026: getting the brush took too long).
+ */
+export const PREP_MS: Record<PrepPart, number> = { brush: 4800, paste: 5800, tidy: 8570 };
 
 /** The sounds of each part, in ms from its start, matching the animations in teeth.css. */
 export const PREP_CUES: Record<PrepPart, Cue[]> = {
