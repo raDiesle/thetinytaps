@@ -99,6 +99,13 @@ export const wobble = (age: number, amp: number, freq: number, damp: number) => 
   return left < WOBBLE_REST ? 0 : amp * left * Math.sin(age * freq);
 };
 
+/**
+ * Seconds after its hit until a `wobble` with this `damp` is 0 for good: how long a part that wobbles is a layer of its
+ * own (`stirring` in `trackPieces.tsx`). Asking whether the wobble is 0 instead would switch the layer at every swing
+ * through the middle.
+ */
+export const wobbleSeconds = (damp: number) => Math.min(SETTLE_S, Math.log(1 / WOBBLE_REST) / damp);
+
 /** True while a camera (or anything gliding after a target) is still visibly on its way, in world units. */
 export const gliding = (from: number, to: number) => Math.abs(to - from) > 0.1;
 

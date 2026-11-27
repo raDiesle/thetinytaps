@@ -1,7 +1,7 @@
 import type { StoryChapter } from "@/components/ChapterBook";
 
 // „Tapsi's Own Bed“ (idea H-148, user request, 24 November 2026: „eine weitere Geschichte … soll davon gehen, dass das
-// kind im eigenen bett und nicht mehr im elternbett schlafen soll“): the second story of the book „Bed“, beside „Tapsi's
+// kind im eigenen bett und nicht mehr im elternbett schlafen soll“): the second story of the book „Sleep Tight“, beside „Tapsi's
 // Big Bed“ (src/games/bedstory, from the cot into a big bed). Here Tapsi already has a bed in Tapsi's own room but sleeps
 // between Mama and Papa in their big bed, and moves out of it into the own bed. Its chapters follow what the guides
 // advise for leaving the family bed (`OWN_BED_STEPS`, research „grosses-bett“): no change together with another big one,
@@ -15,7 +15,7 @@ import type { StoryChapter } from "@/components/ChapterBook";
 //
 // The same fox family and home as the other chapter books; Tapsi's room is the one of „Tapsi's Big Bed“ with the made
 // bed, its rail and its moon night light. English first (root CLAUDE.md), translated into every app language, German too
-// (`<language>.ts`). Played at `/grosses-bett/eigenes-bett/`, a story of the book „Bed“ (`ChapterBook`, `first="en"`);
+// (`<language>.ts`). Played at `/grosses-bett/eigenes-bett/`, a story of the book „Sleep Tight“ (`ChapterBook`, `first="en"`);
 // its pictures come from Gemini (`ownBedPictures.ts`).
 
 /** A step of moving a small child out of its parents' bed, as the guides give it; each has a chapter of its own. */

@@ -3,6 +3,7 @@
 
 import type { Research } from "./types";
 import { svgAnimationLeistung } from "./svg-animation-leistung";
+import { youtubeTimerThemen } from "./youtube-timer-themen";
 import { tinyfingersMarke } from "./tinyfingers-marke";
 import { nachtsAbstillen } from "./nachts-abstillen";
 import { flascheAbgewoehnen } from "./flasche-abgewoehnen";
@@ -38,6 +39,7 @@ export type { Research, ResearchArea, ResearchDomain, ResearchExclusion, Researc
 
 export const RESEARCH: Research[] = [
   svgAnimationLeistung,
+  youtubeTimerThemen,
   tinyfingersMarke,
   nachtsAbstillen,
   flascheAbgewoehnen,

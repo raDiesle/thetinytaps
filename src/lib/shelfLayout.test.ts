@@ -60,20 +60,22 @@ describe("the bookshelf", () => {
     expect(cells.flatMap((c) => c.things ?? []).sort()).toEqual([...SHELF_THINGS].sort());
     for (const cell of cells) {
       expect(Boolean(cell.books || cell.things?.length)).toBe(true);
-      // Among books there are only the stickers, on the compartment's wall: the other things stand on a board of their own.
-      if (cell.books) expect(cell.things?.filter((t) => t !== "figure") ?? []).toEqual([]);
+      // Never among books: on a wide shelf the stickers left the helpers' wall for the column at the right (user request,
+      // 26 November 2026), where they took the books' room.
+      if (cell.books) expect(cell.things ?? []).toEqual([]);
     }
   });
 
   // The stickers of the child's figure are stuck on a compartment's right wall, the globe in a compartment of its own
-  // (user feedback, October 2026): on an upright shelf the shelf's right side; on a wide one the right wall of the big
-  // compartment on top, beside the everyday helpers, where they are seen better (user feedback, November 2026).
+  // (user feedback, October 2026): on an upright shelf the shelf's right side; on a wide one in a compartment of their
+  // own under the hourglass at the right (user request, 26 November 2026).
   test.each(ROOMS)("the stickers are on the right wall of their compartment, the globe apart from them, in a %i × %i room", (width, height) => {
     const { cells, frame, width: w, upright } = planShelf(width, height, BOOKS);
     const figure = cells.find((c) => c.things?.includes("figure"));
     const globe = cells.find((c) => c.things?.includes("language"));
-    if (upright) expect(figure && figure.x + figure.w).toBeCloseTo(w - frame.post);
-    else expect(figure).toEqual(cells.find((c) => c.books));
+    expect(figure && figure.x + figure.w).toBeCloseTo(w - frame.post);
+    expect(figure?.things).toEqual(["figure"]);
+    if (!upright) expect(figure?.y).toBeGreaterThan(cells.find((c) => c.things?.includes("playtime"))?.y ?? 0);
     expect(globe).not.toEqual(figure);
   });
 
@@ -86,9 +88,11 @@ describe("the bookshelf", () => {
       const { cells, frame, width: w } = planShelf(width, height, BOOKS);
       const things = cells.filter((c) => c.things && !c.books);
       for (const cell of things) expect(cell.x + cell.w).toBeCloseTo(w - frame.post);
-      expect(things.map((c) => c.things)).toEqual([["playtime"], ["language"], ["music"]]);
-      // Narrow: at 12 % of the room the three compartments were too wide (user request, 25 November 2026).
+      expect(things.map((c) => c.things)).toEqual([["playtime"], ["figure"], ["language"], ["music"]]);
+      // Narrow: at 12 % of the room the three compartments were too wide (user request, 25 November 2026), and on a
+      // phone narrower still (user request, 26 November 2026).
       expect(things[0].w).toBeLessThanOrEqual(Math.max(60, Math.min(150, width * 0.1)));
+      if (height < 600) expect(things[0].w).toBeLessThanOrEqual(Math.max(50, width * 0.07) + 0.01);
       expect(things[0].y).toBeCloseTo(frame.crown);
       expect(things[0].h).toBe(Math.max(...things.map((c) => c.h)));
     },
@@ -289,6 +293,17 @@ describe("the bookshelf", () => {
     expect(css).not.toMatch(/upright"\] \.shelf-offline/);
   });
 
+  // The shelf's box lets taps through (`pointer-events: none`) and only what it lists takes them again: the ring calendar,
+  // not on that list, took no tap (November 2026). Every link to take on the shelf is listed there.
+  test("every book or thing to take on the shelf takes a tap", () => {
+    const css = readFileSync(new URL("../styles/bookshelf.css", import.meta.url), "utf8");
+    const tsx = readFileSync(new URL("../components/Bookshelf.tsx", import.meta.url), "utf8");
+    const listed = css.match(/\n\.shelf-box :is\(([^)]*)\) \{\s*pointer-events: auto;/)?.[1] ?? "";
+    const links = [...tsx.matchAll(/<Link\s[^>]*?className="([\w -]+)"/g)].map((m) => m[1].split(" ").at(-1) ?? "");
+    expect(links.length).toBeGreaterThan(2);
+    for (const name of links) expect(listed).toContain(`.${name}`);
+  });
+
   // Spread over a wide board, the books stood with big empty room between them and looked lost on a big monitor (user
   // feedback, November 2026): they stand together in the middle, BOOK_GAP apart, and books spine out fill the ends.
   test("the books of a board stand together in the middle, not spread over it", () => {
@@ -327,7 +342,7 @@ describe("the bookshelf", () => {
   });
 });
 
-// Zaubertasten's poster stands among the picture books but is no learning game: the rail of „Lernspiele“ runs only
+// Tippzauber's poster stands among the picture books but is no learning game: the rail of „Lernspiele“ runs only
 // under the books (user feedback, 25 November 2026).
 test("the rail of a group's sign leaves a toy among its books out", () => {
   const spans = [1, TOY_SPAN, 1, 1];

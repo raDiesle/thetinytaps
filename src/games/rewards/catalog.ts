@@ -484,11 +484,11 @@ export interface Template {
   title?: Localized;
   /** Times of day of a task (Zähne-Woche brushes morning and evening); without: once a day, the board's default. */
   slots?: Record<string, Slot[]>;
-  /** One line for grown-ups under its picture in the gallery and the wizard. */
+  /** One line for grown-ups about what it is for. */
   hint: Localized;
 }
 
-/** Shown in the gallery of Vorlagen and the wizard, in the order of KINDS; the first is the board a new visitor sees. */
+/** The ready-made boards in the order of KINDS: the first of a kind is where the wizard's Zeitraum starts that kind (`draftInSpan`). */
 export const TEMPLATES: Template[] = [
   {
     id: "zaehne-woche",
@@ -1003,7 +1003,7 @@ const MORNING_AND_EVENING: PlanTemplatePart[] = [
   { slot: "evening", steps: ["zaehne", "vorlesen", "schlafen"] },
 ];
 
-/** The gallery of the Zeitplan in the order of its views; the first is the plan whose pictures the wizard shows first. */
+/** The ready-made plans in the order of their views: the first of a view is where the wizard's Zeitraum starts it (`draftInSpan`). */
 export const PLAN_TEMPLATES: PlanTemplate[] = [
   {
     id: "mein-tag",

@@ -1,5 +1,5 @@
 // Frei tippen's canvas surprises (user request, November 2026: more effects drawn by the app itself, not emojis, and
-// fireworks of many kinds; more fireworks for Zaubertasten, 25 November 2026). Each is a small canvas only as big as its sparks fly, drawn by its own animation frame
+// fireworks of many kinds; more fireworks for Tippzauber, 25 November 2026). Each is a small canvas only as big as its sparks fly, drawn by its own animation frame
 // loop – never by React – which stops by itself once the effect is over. Everything is in the surprise's CSS pixels
 // with (0, 0) at the spot; `size` is the surprise's size there.
 

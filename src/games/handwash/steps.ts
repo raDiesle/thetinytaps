@@ -5,8 +5,9 @@ import type { EnglishFirst } from "@/lib/language";
 // hand and spread with the other everywhere (palm on palm, over each back, between the fingers), water on and feel how
 // warm it is, rinse, water off, into the towel, and off to eat. Until the song is made (idea H-142, with Suno, in the
 // same style as the Zahnputzlied, H-140) the steps last a fixed number of beats at the Zahnputzlied's tempo, 112 BPM,
-// and a placeholder tune plays along: the rubbing lasts 40 beats, about 21 seconds – the 20 seconds of soap that hand
-// washing asks for. Once the song is there, its .json of verse starts takes the place of `beats`.
+// and a placeholder tune plays along. Each step takes its time, so a small child can watch and copy it (user feedback,
+// 26 November 2026: the steps went by too quickly): the rubbing lasts 56 beats, 30 seconds – more than the 20 seconds of
+// soap that hand washing asks for. Once the song is there, its .json of verse starts takes the place of `beats`.
 
 /** One beat of the song to come, in ms (112 BPM, the tempo every sing-along helper shares, H-140). */
 export const BEAT_MS = 60_000 / 112;
@@ -38,7 +39,7 @@ export const RUB_STEPS: readonly StepId[] = ["palms", "backs", "backs2", "betwee
 export const STEPS: readonly Step[] = [
   {
     id: "call",
-    beats: 8,
+    beats: 12,
     pictures: ["ruf"],
     name: {
       en: "Dinner's nearly ready – wash your hands!",
@@ -52,7 +53,7 @@ export const STEPS: readonly Step[] = [
   },
   {
     id: "stool",
-    beats: 8,
+    beats: 12,
     pictures: ["bad", "hocker"],
     name: {
       en: "Into the bathroom, up on the stool",
@@ -66,12 +67,12 @@ export const STEPS: readonly Step[] = [
   },
   {
     id: "sleeves",
-    beats: 4,
+    beats: 8,
     name: { en: "Sleeves up", de: "Ärmel hoch", zh: "卷起袖子", hi: "बाँहें ऊपर करो", es: "Arriba las mangas", ar: "نرفع الأكمام", ru: "Рукава вверх" },
   },
   {
     id: "soap",
-    beats: 6,
+    beats: 10,
     name: {
       en: "Soap into one hand",
       de: "Seife in eine Hand",
@@ -84,7 +85,7 @@ export const STEPS: readonly Step[] = [
   },
   {
     id: "palms",
-    beats: 12,
+    beats: 16,
     name: {
       en: "Palm to palm",
       de: "Handflächen aneinander reiben",
@@ -97,7 +98,7 @@ export const STEPS: readonly Step[] = [
   },
   {
     id: "backs",
-    beats: 8,
+    beats: 12,
     name: {
       en: "Over the back of one hand",
       de: "Über den einen Handrücken",
@@ -110,7 +111,7 @@ export const STEPS: readonly Step[] = [
   },
   {
     id: "backs2",
-    beats: 8,
+    beats: 12,
     name: {
       en: "Over the back of the other hand",
       de: "Über den anderen Handrücken",
@@ -123,7 +124,7 @@ export const STEPS: readonly Step[] = [
   },
   {
     id: "between",
-    beats: 12,
+    beats: 16,
     name: {
       en: "Between the fingers",
       de: "Zwischen den Fingern",
@@ -136,7 +137,7 @@ export const STEPS: readonly Step[] = [
   },
   {
     id: "water",
-    beats: 10,
+    beats: 16,
     name: {
       en: "Water on – feel how warm",
       de: "Wasser an – fühlen, wie warm",
@@ -149,17 +150,17 @@ export const STEPS: readonly Step[] = [
   },
   {
     id: "rinse",
-    beats: 10,
+    beats: 16,
     name: { en: "Rinse off", de: "Abspülen", zh: "冲干净", hi: "धो डालो", es: "Enjuagamos", ar: "نشطف", ru: "Смываем" },
   },
   {
     id: "off",
-    beats: 4,
+    beats: 6,
     name: { en: "Water off", de: "Wasser aus", zh: "关水", hi: "पानी बंद", es: "Cerramos el agua", ar: "نغلق الماء", ru: "Выключаем воду" },
   },
   {
     id: "towel",
-    beats: 10,
+    beats: 14,
     name: {
       en: "Into the towel",
       de: "Ins Handtuch",
@@ -172,7 +173,7 @@ export const STEPS: readonly Step[] = [
   },
   {
     id: "run",
-    beats: 8,
+    beats: 10,
     pictures: ["essen"],
     name: { en: "Off to eat!", de: "Ab zum Essen!", zh: "去吃饭啦！", hi: "चलो खाना खाने!", es: "¡A comer!", ar: "هيّا نأكل!", ru: "Бежим кушать!" },
   },

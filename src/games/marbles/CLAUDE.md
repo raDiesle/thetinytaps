@@ -97,7 +97,8 @@ Eleven Rube Goldberg machines: one tap, and for about a minute one thing sets of
 - „Baustelle" (`building.ts`, `BuildingLevel.tsx`, 8520 wide, about 60 s): the cement mixer tips the marble onto a spirit level, down the chute and up the conveyor belt to knock over a cone, which lets the wrecking ball smash the brick tower; the tower bumps a cable drum along the scaffold into a sand pile, and the drum bonks the excavator awake. The excavator digs, swings round, tips the sand in front of the road roller and pats its roof; the roller presses the heap into a road and bumps the jackhammer, whose last hop presses the generator's start button. The generator puffs, a spark runs along its cable to the pile driver, which thumps a post into the ground three times, deeper each time; the last thump makes a concrete pipe jump off its chocks, it rolls through a puddle (splash) against the ladder's foot, the ladder's top lifts the cement sack's overhang off the brick stack, the sack tips onto the winch's crank, and the tower crane lowers the roof onto the house.
 - „Zirkus" (`circus.ts`, `CircusLevel.tsx`, 8760 × 900, about 59 s): the marble drops out of the magician's top hat, drums down three drums onto the cymbal and the trampoline, onto the seal's nose and down a chute over the elephant's head; the trunk flings it up to a monkey on a trapeze, who catches it with its feet, swings higher and drops it into the mane of a dozing lion. The lion wakes, roars, leaps onto the next pedestal and shakes the marble into the basket of a bear acrobat on a unicycle, who rides the high wire through a ring of paper flames and pulls the cannon's ribbon: the clown doll flies into the net. The net throws the doll with a somersault onto a big blue starry ball; treading it (a rising note per stride) the clown rolls it onto the pad of a high striker, the puck shoots up and rings, the box on top flips open and three balloons rise to the swing of a dozing red parrot under the roof, bumping its bar; the parrot wakes with a squawk, flies a loop, grips the curtain's cord and pulls it: the curtain opens („Bravo“), the clown hops off onto its spot in front of the stage, bows to a tusch and claps under the two spotlights.
 - „Raketenstart" (`space.ts`, `SpaceLevel.tsx`, 8350 × 900, about 61 s): the marble drops out of the satellite dish, through the glowing rings and the zigzag pipe onto the robot's button; the robot pushes the moon buggy over the hills, and its bumper presses the red button of an intercom on a post (lamp, chime). In a glass dome a space kangaroo in a bubble helmet dozing on a cushion pricks its ears, the hatch slides up, it comes out through the tunnel and makes three floaty hops, the last onto the green pedal of a radio mast; the mast's three lamps light bottom up, its antenna sends three radio-wave arcs to a sleeping satellite, which wakes, unfolds its solar wings and lets go of a capsule whose striped parachute opens; the capsule lands between mast and mobile and a puff from its nozzle drifts to the planet mobile and turns it, whose earth bonks the telescope. The telescope swings to the sky, and from where it points a UFO with a little alien floats in, beams up a moon rock, drops it onto the switch and zooms off. The magnet lets go, the iron ball drops into the countdown board, and after „3, 2, 1“ the rocket lifts off; as a coda it lands, small and far, on top of the moon, which wakes smiling, and a little flag pops out.
-- „Licht-Kette" (`light.ts`, `LightLevel.tsx`, R-10, 7100 wide, about 59 s): light instead of noise, in a dark children's room – the torch's beam bounces off a mirror onto the disco ball, a golden spot wakes the fireflies in their jar, they fly along the fairy lights down to a lava lamp and switch it on; its warm air turns a paper carousel whose rabbit and bird throw big shadows over the wall, until the paper bird flutters onto the button of a globe, which lights up and turns. Its glow calls the fireflies into the lantern of a toy lighthouse; their light becomes its beam, the lighthouse turns and its spot sweeps twice over the wall, waking glow-in-the-dark stickers as it passes, then rests on a prism in the starlit window; the prism throws a rainbow onto a solar flower, which dances, sways and bows until its face snaps a glow stick; the stick's green glow calls the fireflies over the roof to the star lamp, which throws stars all over the room and wakes the toy owl. Its line „Look, a rainbow!“ is new (22 November 2026). The night is a dark veil over the room, a small canvas (`NightVeil`) with soft holes wherever something shines (`nightHoles`); every new light needs its hole there, and what shines is drawn in the `front` layer over the veil.
+- „Licht-Kette" (`light.ts`, `LightLevel.tsx`, R-10, 7100 wide, about 59 s): light instead of noise, in a dark children's room – the torch's beam bounces off a mirror onto the disco ball, a golden spot wakes the fireflies in their jar, they fly along the fairy lights down to a lava lamp and switch it on; its warm air turns a paper carousel whose rabbit and bird throw big shadows over the wall, until the paper bird flutters onto the button of a globe, which lights up and turns. Its glow calls the fireflies into the lantern of a toy lighthouse; their light becomes its beam, the lighthouse turns and its spot sweeps twice over the wall, waking glow-in-the-dark stickers as it passes, then rests on a prism in the starlit window; the prism throws a rainbow onto a solar flower, which dances, sways and bows until its face snaps a glow stick; the stick's green glow calls the fireflies over the roof to the star lamp, which throws stars all over the room and wakes the toy owl. Its line „Look, a rainbow!“ is new (22 November 2026). The night is a dark veil over the room, a small canvas (`NightVeil`) with soft holes wherever something shines (`nightHoles`); every new light needs its hole there, and what shines is drawn in the `front` layer over the veil, or, while it moves
+  or fades, as a `Sprite` in `top` (lantern, fireflies, waking stickers).
 - „Badezimmer" (`bath.ts`, `BathLevel.tsx`, R-05, about 7700 wide, about 59 s): the red button on the toothpaste tube is the first thing to tap; a blob tips the toothbrush into the tooth mug, the mug topples onto the squeaky duck (it wears a sailor's hat, so it isn't the Wasserbahn's), the duck bonks the bath tap's lever, and the tub – drawn cut open, so the child sees it fill – foams over. The wave carries the duck onto a bar of soap on the floor; the soap slides off with the duck riding it and bumps a plunger on its cup, which falls with its knob onto the pull handle of a high cistern's chain: the toilet flushes, water runs down the pipe, the lid bursts open and knocks the toilet roll off its holder, which rolls away unrolling a paper ribbon into the wind-up whale's key. The whale waddles off and its spout arcs over the rim of a washing machine onto its start button: it fills, tumbles a sock and a shirt, spins and walks on its feet until its side presses the hair dryer's switch, and the dryer blows the shower cap onto the ceiling lamp and soap bubbles out of the bubble wand, which pop one by one at the lamp. Its line „The washing machine walks off!“ is new (22 November 2026).
 - „Bauernhof" (`farm.ts`, `FarmLevel.tsx`, R-06, 9080 × 900, about 60 s): every link is an animal – the rooster crows, the pig jumps into the puddle, the mud wakes the cat, her ball of wool rolls onto the cow's nose, the moo wakes the goat, who butts the milk can (the first time it only wobbles) into the kennel. The barking dog rouses a turkey, which gobbles and fans its tail into seven feathers; the last tips over a grain sack, a rolling grain wakes the hen in her nest with three chicks, she pecks along four grains onto the tractor's mudguard and pecks the bulb horn; the fox farmer (`CabDriver`, only his straw hat shows) drives off to the pond, a second honk wakes the goose, who jumps into the pond and honks the ducks up onto the donkey's back; the donkey brays and kicks the barn, which throws the ducks onto the roof; a swallow darts out of her nest and turns the latch on the left door's edge, the doors swing open and the animals sing one after the other, then all together. Every call is a real recording from `src/lib/sounds/` (goat, heehaw, gobble, peep, goose and the tractor's engine among them), loaded when the level opens (`FARM_SOUNDS`), the synthesized call until then.
 - „Gute-Nacht-Maschine" (`night.ts`, `NightLevel.tsx`, R-07, 4650 × 900, about 61 s): the calm one – a children's room at dusk; the music box's crank nudges a golden star ball down a zigzag gutter into a basket, the basket sinks and its cord over two ceiling pulleys draws the curtain, and the curtain tips the rocking chair until its backrest taps the cuckoo clock's pendulum. The sleepy cuckoo calls a soft „kuckuck“ and yawns, and its beak pushes the arc lamp's pull chain: click, the light goes out. The camera turns to a hamster cage on a chest of drawers; the hamster wakes (`hamster.mp3`), drinks two sips, climbs into its wheel and runs; the wheel's axle drives a small cable car whose red cabin rides slowly up the rope to the round window and bumps the wooden shutter with a crescent cut-out; the shutter swings open, the moon rises, and a soft beam of moonlight slides down to the teddy, which yawns. Teddy, moon, cuckoo, star and the carousel sheep fall asleep („z z z“) while the camera glides back to the music box, and the hamster curls up asleep in its wheel. The room gets dark as a plain veil, and what is outside or glows is drawn over it. Slow pace and soft sounds only: no background song while it plays and its end plays `playLullaby` instead of the cheerful tune.
@@ -181,6 +182,15 @@ Then a second part past the tree (`PART2`, `acornAt`, `beeAt`, `kiteAt`; a pure 
     `opacity` animation (`marble-twinkle`), never each star's opacity set per frame.
   - A darkness with holes of light (the Licht-Kette's night) is a small canvas stretched over the picture
     (`NightVeil`, `VEIL_PX`), never an svg mask over the whole world, which repainted the whole room in every frame.
+    The canvas itself costs nearly nothing to raster (A-42, `--trace`); its cost is drawing it, so it is drawn again
+    only when what it shows changes, rounded to its own pixels and to 1/256 of darkness, never for a change no one sees.
+  - **Something that moves only for a while is a layer only for that while** (A-42): the Licht-Kette's globe is drawn
+    in the machine's svg, and only while it turns (`globeMoving`) its ball is a `Sprite` in `over`, under the night; a
+    sticker waking is a `Sprite` in `top` faded by the sprite's `opacity` (the compositor fades it, nothing is painted)
+    while `stickerWaking`, and drawn lit in `front` once it rests. `top` is `MachineStage`'s slot over `front`, for
+    sprites that must lie over what `front` draws (fireflies over the fairy lights, the lantern's light). A part's
+    numbers stay exactly the same outside its moving window (`light.test.ts`) – a `-0` against `0` once kept a
+    `still` part drawing (`+ 0` turns it into `0`).
   - A machine's backdrop (room, sky, fence, tent) goes into `back`, never into the machine's svg, and its parts that
     change only now and then are `still(…)` with numbers as props, never `t` itself (perf, 23 November 2026: the
     Baustelle and the Zirkus were 70–82 % busy drawing their rooms in every frame).
@@ -201,10 +211,17 @@ Then a second part past the tree (`PART2`, `acornAt`, `beeAt`, `kiteAt`; a pure 
     times that rate, and the mobile turned by fractions of a pixel for 30 s, to the level's end, with the phone
     painting the machine for it (A-49; `space.test.ts`).
     `TIMES=30,40` scans those seconds, `ALL=1` lists every change rather than the first eight.
+    **Beside the screen counts too**: a phone rasters the big svg half a screen and more beside what it shows, so what
+    swings or rocks on there for long (Gute Nacht's pendulum and rocking chair while the camera stays with the hamster
+    and the moon) is rastered as if on the screen – it was two thirds of that level's middle (A-43). `seen` counts that
+    room as near on purpose; what only swings on after its job holds a fixed moment unless `seen.shown(x0, x1)` (on the
+    screen itself, with `wide`), with a margin round its box, so the jump back to its real moment happens off the screen.
     Something that keeps turning or wobbling only as an echo of the moment it was set off – a globe still spinning
     behind the lighthouse, wings flapping on a firefly that sits still – comes to rest once its job is done (`GLOBE_SPIN`,
-    the fireflies' `flying`), and what turns only while it is on screen (the Licht-Kette's lamp, carousels and shadows,
-    `lamp()`) takes a still time while it is not.
+    the fireflies' `flying`, and their wings rest while they sit in the lantern), and what turns only while it is on
+    screen (the Licht-Kette's lamp, carousels and shadows, `lamp()`) takes a still time once it is left behind for good
+    (`lampRest`): `seen` counts half a view beside the screen as near, so it needs `seen.wide`, how far a screen wider
+    than 16 : 9 really shows – the lamp kept turning far off the screen, half the Licht-Kette's middle (A-42).
   - A long thing sweeping across the world (the Licht-Kette's lighthouse beam) is never drawn into a world-sized svg,
     where each frame rasters the whole band it crosses: it is a few small sprites in `over`, a band stretched by
     `scaleX`, its spot and its glare each moved by a transform (`LighthouseBeam`).
@@ -224,14 +241,29 @@ Then a second part past the tree (`PART2`, `acornAt`, `beeAt`, `kiteAt`; a pure 
     - over a darkened room (Gute Nacht's `dark`) each sprite carries a shade of its own shape in `NIGHT` at `dark`'s
       opacity (`RopeRunning`'s `shade(r)`), never a square shade over its whole box;
     - a thing that starts hidden behind a part of the svg (the clown in the cannon) is drawn in the svg until it comes
-      out (`tFire`) and only then as a sprite (`BallAndClown`).
+      out (`tFire`) and only then as a sprite (`BallAndClown`);
+    - a thing that moves behind a part that stands still in front of it (the hamster wheel behind its cage's bars) takes
+      that part's piece with it into a sprite on top, clipped to the thing (a disk round the wheel), while the svg leaves
+      the same piece out with a clip of the opposite shape (`BarsHole`); the clip's edge lies on ink (the wheel's rim),
+      so no seam shows. Laid over the veil, sprites that show more than a dot take the darkness as a colour matrix
+      (`Veiled`, exactly what `NIGHT` at `dark`'s opacity does to each pixel, half-clear ones too) rather than a shade
+      drawn after them. Gute Nacht's wheel, hamster, bars and cable car are such sprites only while the rope runs
+      (`ropeMoving`, A-43): the middle went from 41 to 13 screens a second.
   - **A machine's parts never take the clock**: each is `still(…)` and gets only the numbers it draws (an angle, a
     glow, which lamp is on, `-1` for „none“), worked out from `t` where the level draws its machine or in a small
     `…Now` wrapper beside the part (`RobotNow`, `UfoNow`, `CountdownNow` in `SpaceLevel.tsx`), so React skips every part
     whose numbers stay the same in a frame. A glow that dies away passes its `decay` (exactly 0 at rest), a blinking lamp
     a boolean (dark while `seen` says it is off the screen), a stretch of smoke a `t` held outside the seconds it shows.
     Drawn with `t` itself, the Raketenstart's whole machine went through React in every frame while only a few
-    attributes changed: 71–78 % busy on the old phone, 61–62 % once its parts were still and its flying things sprites (A-38). Props are compared one level deep, so a list of things
+    attributes changed: 71–78 % busy on the old phone, 61–62 % once its parts were still and its flying things sprites (A-38).
+    The Hatschi-Kette is drawn alike (A-44): each animal, the tree, its falling leaves and the feather are `still`,
+    the tree's wobble and the leaves' fall held once they rest (`wobbleSeconds`), the feather by its numbers, never by
+    the ref the level counts in; and each thing past the tree gets the second part's clock `u` only inside its spans
+    (`PART2_SPANS`, `held`), between them the moment its last span ended – a new thing there gets its spans, and
+    `sneezeStill.test.tsx` checks that every held moment draws exactly what the moment itself would (a span ending too
+    early would freeze a thing mid-move). Tap ages pass capped at 1 s, or every part tapped once was drawn again in
+    every frame. Drawn with `t` and `u` themselves, every animal and thing went through React in every frame: 56 % /
+    66 % busy (script 23 / 25 %), now 43 % / 46–53 % (script 9–11 %). Props are compared one level deep, so a list of things
     that move (radio waves) is a row of `still` parts, never an array of objects. What flies or bobs on its own across
     the sky (the Raketenstart's satellite, capsule and radio waves, its UFO with its beam and the moon rock it carries),
     and what drives or turns for seconds (its moon buggy, its planet mobile), is a `Sprite` in `over` (`SkyFall`,
@@ -252,7 +284,11 @@ Then a second part past the tree (`PART2`, `acornAt`, `beeAt`, `kiteAt`; a pure 
     number seems too good (A-36) Which seconds of a level a stretch measured is what its `--shots` picture shows, never worked out
     from the scenario's waits: collecting a trace between two stretches takes seconds, and the Raketenstart's „Mitte“
     lay at about 40–50 s (the UFO) while A-49 was written for 24–37 s (the capsule). `KETTEN_SCAN=1 LEVELS=<id>
-    TIMES=…` then lists what still changes in the machine's svg at those seconds.
+    TIMES=…` then lists what still changes in the machine's svg at those seconds. `--trace` tells which layer is
+    rastered how much: a tile is found by its address and layer (`tools/perfTrace.ts`), since Chrome
+    reuses a tile's address in every layer – counted by address alone, the Licht-Kette's night looked like the cost
+    (A-42) and the runs' start swung from 21 to 39 (A-41). `--profile` names each function with its line and column in the built chunk
+    (one long line in `out/static/`), so a function of the level is found there by its column.
 
 ## Working on machines
 
@@ -414,9 +450,13 @@ takes a `look`); other things keep their look and an animal looks out for them.
   too. A piece only mounted while it shows (puffs, drops, the rainbow's flash) needs no `rest`; `trackPieces.test.ts`
   fails on a piece with neither. A piece is a portal, and React sends a portal's events up
   through the tree it was written in: never put it inside a `data-tap` group, or one tap sets its cue off twice – give
-  the piece its own `data-tap` beside the group. A wobbling part still drawn in the big svg (the seesaw, the funnel, the
-  walls' bumpers, A-39) costs about 100 ms of painting a second on the old phone while it moves: turn it into a piece
-  when `bun run perf ketten-<run>` finds its stretch over.
+  the piece its own `data-tap` beside the group. The parts the first rows hit are pieces while they stir (A-41, 26
+  November 2026): the spots' bell (swinging round its hook) and funnel (shaking by `scale`), the walls' bumpers and the
+  seesaw's plank – each a wobble or glide that painted the whole wall in every frame of the run's start. A wobble's
+  piece rests once the wobble is exactly 0, `wobbleSeconds(damp)` after the hit (`level.ts`), never at a guessed
+  number of seconds, or it switches back to the wall while still moving and the wall paints again. A wobbling part
+  still drawn in the big svg costs about 100 ms of painting a second on the old phone while it moves: turn it into a
+  piece when `bun run perf ketten-<run>` finds its stretch over.
 - `track.css`: its styles (classes `run-`). While it is on, the background music is off (the run
   plays its own notes and scales).
 - Shared with the machines: `path.ts` (line, quad, arc), `parts.tsx` (Ball, Rail, BAR_COLORS) and `level.ts` (useFrames,

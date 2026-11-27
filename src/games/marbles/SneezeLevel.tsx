@@ -43,12 +43,14 @@ import {
   VIEW_H,
   VIEW_W,
   wobble,
+  wobbleSeconds,
   worldHint,
   type LevelProps,
   decay,
 } from "./level";
 import { TapHint } from "@/components/TapHint";
 import { deg, easeIn, easeInOut, easeOut, lerp } from "./machineKit";
+import { still } from "./parts";
 import type { Pt } from "./path";
 import { INK } from "./scenery";
 import {
@@ -164,6 +166,56 @@ const PART2_SOUNDS: [string, number, () => void][] = [
   ["laugh2", PART2.laugh + 0.8, playGiggle],
   ["trumpet", PART2.laugh + 1.1, playTrumpet],
 ];
+
+/** The seconds of the second part while everyone past the tree laughs, and a little after. */
+const LAUGHING = [PART2.laugh, PART2.laugh + LAUGH_S + 0.1] as const;
+
+/**
+ * When each thing past the tree changes, in seconds into the second part (A-44): outside these spans its drawing stays
+ * exactly the same, so it is drawn with a held moment (`held`) and React skips it. Drawn with `u` itself, every thing of
+ * the second part went through React in every frame, also all through the first part, and the level was 66 % busy on
+ * the old phone. `sneezeStill.test.tsx` checks that the held moment draws exactly what `u` itself would.
+ */
+export const PART2_SPANS = {
+  squirrel: [[PART2.chatter, PART2.puff + 0.6], LAUGHING],
+  acorn: [[PART2.slip, PART2.puff + 0.6]],
+  puffball: [[PART2.puff, PART2.puff + 1.1]],
+  spores: [[PART2.puff, PART2.sniff + 0.6]],
+  tortoise: [[PART2.sniff, PART2.land + 1.1], LAUGHING],
+  hive: [[PART2.land, PART2.land + 3.1]],
+  dandelions: [[PART2.flowers[0], PART2.flowers[3] + 3.1]],
+  bees: [[PART2.bees, PART2.flowers[3] + 1.2 + 0.25 * BEES + 0.1]],
+  seeds: [[PART2.flowers[0], PART2.cloud + 1.5]],
+  cloud: [[PART2.wake - 0.4, PART2.cloud + 1.6], LAUGHING],
+  gust: [[PART2.cloud, PART2.lift + 0.5]],
+  // The kite's tail keeps fluttering once it flies, to the level's end.
+  kite: [[PART2.lift, Infinity]],
+  // With his hat flying off and landing again and the straw flying out of his sleeves.
+  scarecrow: [[PART2.tickle, PART2.hat + 0.1], LAUGHING],
+} satisfies Record<string, readonly (readonly [number, number])[]>;
+
+/** The parts of the second part that hold their moment. */
+export type Part2Thing = keyof typeof PART2_SPANS;
+
+/** Before the second part, and before a thing's first span, its moment is held at this. */
+const BEFORE = -100;
+
+/** `u` where it lies in one of `spans`; else the end of the span before it, or `BEFORE` before the first (A-44). */
+export function held(u: number, spans: readonly (readonly [number, number])[]) {
+  let at = BEFORE;
+  for (const [a, b] of spans) {
+    if (u < a) return at;
+    if (u <= b) return u;
+    at = b;
+  }
+  return at;
+}
+
+/** A tap's age as a thing draws it: every tap's hop, wobble or happy eyes are over after a second. */
+const tapAge = (seconds: number) => Math.min(1, seconds);
+
+/** When the tree has stopped shaking after the elephant's sneeze, in seconds. */
+const TREE_REST = wobbleSeconds(2.2);
 
 /** What each animal says when the sneeze before it hits it, or when it is tapped while it is still waiting. */
 const VOICE: Record<AnimalId, () => void> = {
@@ -354,6 +406,8 @@ export function SneezeLevel({ sound, say, onDone }: LevelProps) {
   const row = useMemo(() => layOutRow(pickAnimals()), []);
   const feather = useMemo(() => FEATHERS[Math.floor(Math.random() * FEATHERS.length)], []);
   const leaves = useMemo(() => leavesOf(row.tree), [row]);
+  /** When the last leaf lies in the grass. */
+  const fallen = useMemo(() => Math.max(...leaves.map((leaf) => leaf.fall)), [leaves]);
   const travel = useMemo(() => row.seats.map((seat, i) => travelSeconds(noseOf(seat), targetOf(row, i))), [row]);
   const beasts = useRef<Beast[]>(
     row.seats.map(() => ({ hitT: Infinity, haT: Infinity, ha2: false, sneezeT: Infinity, arriveT: Infinity, tapT: -Infinity, tapKind: "hello", taps: 0 })),
@@ -572,18 +626,21 @@ export function SneezeLevel({ sound, say, onDone }: LevelProps) {
       </svg>
       <svg className="marble-camera" viewBox={`0 0 ${row.worldW} ${VIEW_H}`} style={cameraStyle} aria-label={label}>
         <g>
-          <TreeDrawing tree={row.tree} age={t - leavesT.current}>
-            <Squirrel x={X + SQUIRREL.x} y={SQUIRREL.y} u={u} startled={t - leavesT.current} tapped={tapped("squirrel")} />
-          </TreeDrawing>
+          {/* Each part gets only the numbers it draws, held while it rests, so React skips what doesn't change (A-44). */}
+          <TreeDrawing
+            tree={row.tree}
+            age={t < leavesT.current ? -1 : Math.min(TREE_REST, t - leavesT.current)}
+            squirrel={{ u: held(u, PART2_SPANS.squirrel), woken: t >= leavesT.current, tap: tapAge(tapped("squirrel")) }}
+          />
           {row.seats.map((seat, i) => (
             <Animal key={i} index={i} seat={seat} pose={poseAt(beasts.current[i], seat.kind, t, laughT + i * 0.07)} />
           ))}
           {row.seats.map((seat, i) => (
             <Puff key={i} row={row} i={i} b={beasts.current[i]} t={t} travel={travel[i]} size={sizeOf(seat.kind)} />
           ))}
-          <Feather seat={row.seats[0]} b={beasts.current[0]} t={t} color={feather} />
-          <FallingLeaves leaves={leaves} age={t - leavesT.current} />
-          <PastTheTree x={X} u={u} tapped={tapped} />
+          <Feather seat={row.seats[0]} {...featherTimes(beasts.current[0], t)} color={feather} />
+          <FallingLeaves leaves={leaves} age={t < leavesT.current ? -1 : Math.min(fallen, t - leavesT.current)} />
+          <PastTheTree x={X} u={u} tapped={(thing) => tapAge(tapped(thing))} />
         </g>
       </svg>
       {t < 0 && (
@@ -730,8 +787,12 @@ function Meadow({ worldW, cloudsTo, gradient }: { worldW: number; cloudsTo: numb
   );
 }
 
-/** The big tree at the end of the row; `age` seconds after the elephant's sneeze reached it, it shakes and its crown is gone. */
-function TreeDrawing({ tree, age, children }: { tree: Tree; age: number; children: ReactNode }) {
+/**
+ * The big tree at the end of the row; `age` seconds after the elephant's sneeze reached it, it shakes and its crown is
+ * gone. The squirrel sits on a branch, hidden by the crown until the leaves fly; it comes as numbers, not as an
+ * element, so the tree is drawn again only when it or the squirrel changes.
+ */
+const TreeDrawing = still(function TreeDrawing({ tree, age, squirrel }: { tree: Tree; age: number; squirrel: { u: number; woken: boolean; tap: number } }) {
   const { x, crown, r } = tree;
   const shake = age >= 0 ? wobble(age, 4, 14, 2.2) : 0;
   const leafy = age < 0 ? 1 : Math.max(0, 1 - age / 0.25);
@@ -758,7 +819,7 @@ function TreeDrawing({ tree, age, children }: { tree: Tree; age: number; childre
         </g>
       ))}
       {/* What sits on a branch, hidden by the crown until the leaves fly */}
-      {children}
+      <Squirrel x={x + SQUIRREL.x} y={SQUIRREL.y} {...squirrel} />
       {leafy > 0 && (
         <g opacity={leafy}>
           {[
@@ -778,10 +839,10 @@ function TreeDrawing({ tree, age, children }: { tree: Tree; age: number; childre
       )}
     </g>
   );
-}
+});
 
 /** The leaves blown off the tree, `age` seconds after: up in a whirl, then see-sawing down until they lie still in the grass. */
-function FallingLeaves({ leaves, age }: { leaves: Leaf[]; age: number }) {
+const FallingLeaves = still(function FallingLeaves({ leaves, age }: { leaves: Leaf[]; age: number }) {
   if (age < 0) return null;
   return (
     <g>
@@ -799,31 +860,36 @@ function FallingLeaves({ leaves, age }: { leaves: Leaf[]; age: number }) {
       })}
     </g>
   );
-}
+});
 
 /* ---------- The feather and the sneezes ---------- */
 
 /** Where the feather hangs in the air before the tap: right above the first animal. */
 const featherStart = (seat: Seat) => ({ x: seat.x + 110, y: FLOOR - 330 });
 
+/** The moments the feather draws from: held before the tap and once it lies in the grass, so it is drawn only while it moves. */
+const featherTimes = (b: Beast, t: number) => ({ t: t < 0 ? -1 : Math.min(t, b.haT + FEATHER_DROP_S), hitT: b.hitT, haT: b.haT });
+/** How long the feather takes to drop from the nose to the grass, in seconds. */
+const FEATHER_DROP_S = 1.1;
+
 /** The feather: still in the air before the tap, then floating down onto the mouse's nose, tickling it, and dropping to the grass. */
-function Feather({ seat, b, t, color }: { seat: Seat; b: Beast; t: number; color: string }) {
+const Feather = still(function Feather({ seat, t, hitT, haT, color }: { seat: Seat; t: number; hitT: number; haT: number; color: string }) {
   const start = featherStart(seat);
   const nose = noseOf(seat);
   const onNose = { x: nose.x + 14, y: nose.y - 8 };
   let at: Pt;
   let turn: number;
-  if (t < 0 || b.hitT === Infinity) {
+  if (t < 0 || hitT === Infinity) {
     const k = Math.max(0, t) / FEATHER_S;
     const swing = Math.sin(k * 3 * Math.PI) * 70 * (1 - k);
     at = { x: lerp(start.x, onNose.x, easeInOut(k)) + swing, y: lerp(start.y, onNose.y, easeInOut(k)) };
     turn = 30 + 35 * Math.sin(k * 3 * Math.PI);
-  } else if (t < b.haT) {
-    const tickle = Math.sin((t - b.hitT) * 30);
+  } else if (t < haT) {
+    const tickle = Math.sin((t - hitT) * 30);
     at = { x: onNose.x + 6 * tickle, y: onNose.y - 2 * Math.abs(tickle) };
     turn = -15 + 18 * tickle;
   } else {
-    const k = Math.min(1, (t - b.haT) / 1.1);
+    const k = Math.min(1, (t - haT) / FEATHER_DROP_S);
     at = { x: lerp(onNose.x, seat.x + 90, k) + 20 * Math.sin(k * 2 * Math.PI) * (1 - k), y: lerp(onNose.y, FLOOR + 18, easeIn(k)) };
     turn = lerp(-15, 75, k);
   }
@@ -836,7 +902,7 @@ function Feather({ seat, b, t, color }: { seat: Seat; b: Beast; t: number; color
       </g>
     </g>
   );
-}
+});
 
 /**
  * The sneeze of animal `i`: a little cloud with whoosh lines and a few
@@ -911,7 +977,7 @@ function Puff({ row, i, b, t, travel, size }: { row: Row; i: number; b: Beast; t
  * standing on y 0) and scaled to its size. Strokes are set on the group in
  * the animal's units, so every animal gets the same line width in the picture.
  */
-function Animal({ index, seat, pose }: { index: number; seat: Seat; pose: Pose }) {
+const Animal = still(function Animal({ index, seat, pose }: { index: number; seat: Seat; pose: Pose }) {
   const { kind, x, s } = seat;
   const lw = 3.6 / s;
   const H = -kind.head.y;
@@ -934,7 +1000,7 @@ function Animal({ index, seat, pose }: { index: number; seat: Seat; pose: Pose }
       </g>
     </g>
   );
-}
+});
 
 /** Body, feet, tail and whatever an animal has on it (wings, wool, spots). */
 function Body({ kind, lw, pose }: { kind: AnimalKind; lw: number; pose: Pose }) {
@@ -1278,39 +1344,76 @@ function StillThings({ x }: { x: number }) {
   );
 }
 
-/** Everything past the tree, `u` seconds into the second part; `tapped` says how long ago a thing was tapped. */
-function PastTheTree({ x, u, tapped }: { x: number; u: number; tapped: (thing: Thing) => number }) {
-  const laugh = u - PART2.laugh;
-  const acorn = acornAt(u);
-  const kite = kiteAt(u);
-  const hat = hatAt(u);
-  const seated = u < PART2.scarecrow || u >= PART2.hat;
+/**
+ * Everything past the tree, `u` seconds into the second part; `tapped` says how long ago a thing was tapped (at most a
+ * second). Each thing is a `still` part drawn at its own held moment (`PART2_SPANS`), so only what moves goes through
+ * React; with `hold` false each is drawn at `u` itself, which the test compares it with.
+ */
+export function PastTheTree({ x, u, tapped, hold = true }: { x: number; u: number; tapped: (thing: Thing) => number; hold?: boolean }) {
+  const at = (thing: Part2Thing) => (hold ? held(u, PART2_SPANS[thing]) : u);
   return (
     <g>
-      <Puffball x={x + PUFFBALL.x} age={u - PART2.puff} tap={tapped("puffball")} />
-      {u >= PART2.slip && (
-        <g transform={`translate(${x + acorn.x} ${acorn.y})`}>
-          <Acorn turn={acorn.turn} />
-        </g>
-      )}
-      <Spores x={x} u={u} />
-      <Tortoise x={x} u={u} laugh={laugh} tap={tapped("tortoise")} />
-      <Hive x={x} u={u} tap={tapped("hive")} />
-      <Dandelions x={x} u={u} />
+      <Puffball x={x + PUFFBALL.x} age={at("puffball") - PART2.puff} tap={tapped("puffball")} />
+      <FallingAcorn x={x} u={at("acorn")} />
+      <Spores x={x} u={at("spores")} />
+      <Tortoise x={x} u={at("tortoise")} tap={tapped("tortoise")} />
+      <Hive x={x} u={at("hive")} tap={tapped("hive")} />
+      <Dandelions x={x} u={at("dandelions")} />
+      <Bees x={x} u={at("bees")} />
+      <SleepyCloud x={x} u={at("cloud")} tap={tapped("cloud")} />
+      <Seeds x={x} u={at("seeds")} />
+      <Gust x={x} u={at("gust")} />
+      <ScarecrowAndHat x={x} u={at("scarecrow")} tap={tapped("scarecrow")} />
+      <Kite x={x} u={at("kite")} tap={tapped("kite")} />
+    </g>
+  );
+}
+
+/** The acorn once it has slipped from the squirrel's paws: bouncing into the puffball. */
+const FallingAcorn = still(function FallingAcorn({ x, u }: { x: number; u: number }) {
+  if (u < PART2.slip) return null;
+  const acorn = acornAt(u);
+  return (
+    <g transform={`translate(${x + acorn.x} ${acorn.y})`}>
+      <Acorn turn={acorn.turn} />
+    </g>
+  );
+});
+
+/** The bees out of the hive, each flying the way it looks. */
+const Bees = still(function Bees({ x, u }: { x: number; u: number }) {
+  return (
+    <g>
       {Array.from({ length: BEES }, (_, j) => {
         const at = beeAt(j, u);
         const ahead = beeAt(j, u + 0.05);
         return at && <Bee key={j} x={x + at.x} y={at.y} dir={ahead && ahead.x < at.x ? -1 : 1} u={u} />;
       })}
-      <SleepyCloud x={x} u={u} laugh={laugh} tap={tapped("cloud")} />
+    </g>
+  );
+});
+
+/** The dandelions' seeds, from their clocks up under the cloud and away with its sneeze. */
+const Seeds = still(function Seeds({ x, u }: { x: number; u: number }) {
+  return (
+    <g>
       {FLOWERS.map((_, i) =>
         Array.from({ length: SEEDS_EACH }, (_, n) => {
           const seed = seedAt(i, n, u);
           return seed && seed.fade > 0 && <Seed key={`${i}-${n}`} x={x + seed.x} y={seed.y} fade={seed.fade} />;
         }),
       )}
-      <Gust x={x} u={u} />
-      <Scarecrow x={x} u={u} laugh={laugh} tap={tapped("scarecrow")}>
+    </g>
+  );
+});
+
+/** The scarecrow with his hat, on his head or flying, and the straw his sneeze blows out of his sleeves. */
+const ScarecrowAndHat = still(function ScarecrowAndHat({ x, u, tap }: { x: number; u: number; tap: number }) {
+  const hat = hatAt(u);
+  const seated = u < PART2.scarecrow || u >= PART2.hat;
+  return (
+    <g>
+      <Scarecrow x={x} u={u} laugh={u - PART2.laugh} tap={tap}>
         {seated && <Hat x={x + hat.x} y={hat.y} turn={hat.turn} />}
       </Scarecrow>
       {!seated && <Hat x={x + hat.x} y={hat.y} turn={hat.turn} />}
@@ -1325,10 +1428,9 @@ function PastTheTree({ x, u, tapped }: { x: number; u: number; tapped: (thing: T
           )
         );
       })}
-      <Kite x={x} u={u} kite={kite} tap={tapped("kite")} />
     </g>
   );
-}
+});
 
 /** An acorn with its cap, its middle at 0 0, turned as it rolls. */
 function Acorn({ turn }: { turn: number }) {
@@ -1346,9 +1448,9 @@ function Acorn({ turn }: { turn: number }) {
  * `x y`: startled, it scolds the row, its acorn slips, and it laughs along
  * at the end.
  */
-function Squirrel({ x, y, u, startled, tapped }: { x: number; y: number; u: number; startled: number; tapped: number }) {
-  const pose = facePose(u, null, u - PART2.laugh, tapped);
-  const scared = startled >= 0 && u < PART2.chatter;
+function Squirrel({ x, y, u, woken, tap }: { x: number; y: number; u: number; woken: boolean; tap: number }) {
+  const pose = facePose(u, null, u - PART2.laugh, tap);
+  const scared = woken && u < PART2.chatter;
   const scolding = u >= PART2.chatter && u < PART2.slip;
   const watching = u >= PART2.slip && u < PART2.puff + 0.6;
   if (scared || watching) {
@@ -1407,7 +1509,7 @@ function Squirrel({ x, y, u, startled, tapped }: { x: number; y: number; u: numb
 }
 
 /** The puffball on the grass: it squashes when the acorn bumps it (`age` seconds after) or a finger taps it. */
-function Puffball({ x, age, tap }: { x: number; age: number; tap: number }) {
+const Puffball = still(function Puffball({ x, age, tap }: { x: number; age: number; tap: number }) {
   const bump = (a: number, amp: number) => (a >= 0 && a < 1 ? amp * decay(a * 4) * Math.cos(a * 16) : 0);
   const squash = bump(age, 0.22) + bump(tap, 0.12);
   const { r } = PUFFBALL;
@@ -1426,10 +1528,10 @@ function Puffball({ x, age, tap }: { x: number; age: number; tap: number }) {
       <ellipse cx="0" cy={-2 * r + 9} rx="8" ry="4" fill="#8a7a55" strokeWidth="3" />
     </g>
   );
-}
+});
 
 /** The cloud of spores from the puffball, drifting to the tortoise's nose. */
-function Spores({ x, u }: { x: number; u: number }) {
+const Spores = still(function Spores({ x, u }: { x: number; u: number }) {
   const cloud = sporesAt(u);
   if (!cloud) return null;
   return (
@@ -1441,14 +1543,15 @@ function Spores({ x, u }: { x: number; u: number }) {
       })}
     </g>
   );
-}
+});
 
 /**
  * The tortoise, seen from the side and looking back at the puffball: the
  * spores make it sniff and go „ha… ha…“, it pulls its head in and sneezes
  * inside its shell, which hops, turning once, against the beehive's stool.
  */
-function Tortoise({ x, u, laugh, tap }: { x: number; u: number; laugh: number; tap: number }) {
+const Tortoise = still(function Tortoise({ x, u, tap }: { x: number; u: number; tap: number }) {
+  const laugh = u - PART2.laugh;
   const shell = shellAt(u);
   const between = (a: number, b: number) => Math.min(1, Math.max(0, (u - a) / (b - a)));
   const tuck = u < PART2.land + 0.4 ? between(PART2.hide, PART2.hide + 0.3) : 1 - between(PART2.land + 0.4, PART2.land + 0.8);
@@ -1498,10 +1601,10 @@ function Tortoise({ x, u, laugh, tap }: { x: number; u: number; laugh: number; t
       <rect x="-98" y="-22" width="196" height="14" rx="7" fill="#c9a36a" />
     </g>
   );
-}
+});
 
 /** The straw beehive on its stool: it rocks when the tortoise's shell lands against the stool, and the bees come out. */
-function Hive({ x, u, tap }: { x: number; u: number; tap: number }) {
+const Hive = still(function Hive({ x, u, tap }: { x: number; u: number; tap: number }) {
   const hx = x + HIVE.x;
   const base = FLOOR - HIVE.stool;
   const landed = u - PART2.land;
@@ -1531,7 +1634,7 @@ function Hive({ x, u, tap }: { x: number; u: number; tap: number }) {
       </g>
     </g>
   );
-}
+});
 
 /** A bee, flying towards `dir` (1 right, -1 left), its wings beating. */
 function Bee({ x, y, dir, u }: { x: number; y: number; dir: 1 | -1; u: number }) {
@@ -1549,7 +1652,7 @@ function Bee({ x, y, dir, u }: { x: number; y: number; dir: 1 | -1; u: number })
 }
 
 /** The dandelions: white clocks until a bee flies through them, then bare, their stems swaying. */
-function Dandelions({ x, u }: { x: number; u: number }) {
+const Dandelions = still(function Dandelions({ x, u }: { x: number; u: number }) {
   return (
     <g>
       {FLOWERS.map((f, i) => {
@@ -1589,7 +1692,7 @@ function Dandelions({ x, u }: { x: number; u: number }) {
       })}
     </g>
   );
-}
+});
 
 /** A dandelion seed floating on its little umbrella. */
 function Seed({ x, y, fade }: { x: number; y: number; fade: number }) {
@@ -1608,7 +1711,8 @@ function Seed({ x, y, fade }: { x: number; y: number; fade: number }) {
  * The cloud sleeping over the meadow: the seeds tickle it awake, it goes
  * „ha… ha…“, swelling up, and sneezes a gust down onto the kite.
  */
-function SleepyCloud({ x, u, laugh, tap }: { x: number; u: number; laugh: number; tap: number }) {
+const SleepyCloud = still(function SleepyCloud({ x, u, tap }: { x: number; u: number; tap: number }) {
+  const laugh = u - PART2.laugh;
   const pose = facePose(u, { hit: PART2.wake, ha: PART2.cloudHa, sneeze: PART2.cloud }, laugh, tap);
   if (u < PART2.wake && !(tap >= 0 && tap < 0.8)) {
     // Asleep: eyes shut, a little smile; the seeds arriving make its face twitch.
@@ -1640,10 +1744,10 @@ function SleepyCloud({ x, u, laugh, tap }: { x: number; u: number; laugh: number
       </g>
     </g>
   );
-}
+});
 
 /** The gust the cloud sneezes down onto the kite: whoosh lines round a little swirl. */
-function Gust({ x, u }: { x: number; u: number }) {
+const Gust = still(function Gust({ x, u }: { x: number; u: number }) {
   const gust = gustAt(u);
   if (!gust) return null;
   const from = { x: x + CLOUD.x + CLOUD.rx * 0.7, y: CLOUD.y + CLOUD.ry * 0.6 };
@@ -1663,10 +1767,11 @@ function Gust({ x, u }: { x: number; u: number }) {
       <path d={`M${at.x + 14} ${at.y} A14 14 0 1 1 ${at.x} ${at.y - 14} A8 8 0 1 1 ${at.x - 4} ${at.y + 2}`} />
     </g>
   );
-}
+});
 
 /** The kite: lying in the grass tied to its stake, then lifted by the gust; its tail tickles the scarecrow's nose. */
-function Kite({ x, u, kite, tap }: { x: number; u: number; kite: ReturnType<typeof kiteAt>; tap: number }) {
+const Kite = still(function Kite({ x, u, tap }: { x: number; u: number; tap: number }) {
+  const kite = kiteAt(u);
   const turn = kite.turn + (tap >= 0 && tap < 1 ? wobble(tap, 12, 14, 4) : 0);
   const squash = 1 - 0.7 * kite.flat;
   const r = (turn * Math.PI) / 180;
@@ -1707,7 +1812,7 @@ function Kite({ x, u, kite, tap }: { x: number; u: number; kite: ReturnType<type
       </g>
     </g>
   );
-}
+});
 
 /** The straw hat, its brim's middle at `x y`. */
 function Hat({ x, y, turn }: { x: number; y: number; turn: number }) {

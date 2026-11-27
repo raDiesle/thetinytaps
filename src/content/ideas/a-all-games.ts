@@ -347,7 +347,7 @@ export const allGamesIdeas: IdeaArea = {
       id: "A-39",
       emoji: "🐢",
       title: "Leistung: Murmelbahnen – die bewegten Teile oben als eigene Ebenen",
-      text: "Messung vom 26. November 2026: die Baustellen-Bahn ist in der Mitte zu 57–68 % beschäftigt (`bun run perf ketten-sitetrack`), die anderen Bahnen 40–57 %. Ursache: die gemeinsamen Teile der Bahnen in `src/games/marbles/trackParts.tsx` – Trommeln, Glockenspiel, Wand-Puffer, Looping, Wippe, Trichter, Weiche, Tor, Glocke und Trampolin – wackeln, leuchten oder drehen sich im großen svg der Bahn, und jedes Bild wird dann das ganze svg neu gemalt. Lösung wie bei Xylophon-Stäben und Schaufelrad: jedes als `Piece` (`src/games/marbles/trackPieces.tsx`) in die Ebene der Bahn legen, das Gezeichnete darin von Bild zu Bild gleich lassen und nur mit `turn` drehen oder wachsen lassen; im Vorschaufenster bei 844×390 prüfen, dass jedes Teil vor oder hinter den Murmeln liegt wie vorher. Alle sechs Bahnen messen (`bun run perf ketten-track`, `-colortrack`, `-snowtrack`, `-spacetrack`, `-slidetrack`, `-sitetrack`). Ändert dieselbe Datei wie A-40: nicht gleichzeitig umsetzen. Rahmen von `bun run perf`: höchstens 60 % beschäftigt, höchstens 30 Bildschirme pro Sekunde neu gemalt, langsamstes Zwanzigstel ≤ 34 ms. Vorher `main` am selben Tag gleich messen (die Zahlen schwanken), danach die Regeln in `src/games/marbles/CLAUDE.md` nachführen.",
+      text: "Messung vom 26. November 2026: die Baustellen-Bahn ist in der Mitte zu 57–68 % beschäftigt (`bun run perf ketten-sitetrack`; nach A-41 noch 62 %), die anderen Bahnen 40–57 %. Wand-Puffer, Wippe, Trichter und Glocke sind seit A-41 schon eigene Ebenen, solange sie sich bewegen. Ursache: die übrigen gemeinsamen Teile der Bahnen in `src/games/marbles/trackParts.tsx` – Trommeln, Glockenspiel, Looping, Weiche, Tor und Trampolin – wackeln, leuchten oder drehen sich im großen svg der Bahn, und jedes Bild wird dann das ganze svg neu gemalt. Lösung wie bei Xylophon-Stäben und Schaufelrad: jedes als `Piece` (`src/games/marbles/trackPieces.tsx`) in die Ebene der Bahn legen, das Gezeichnete darin von Bild zu Bild gleich lassen und nur mit `turn` drehen oder wachsen lassen; im Vorschaufenster bei 844×390 prüfen, dass jedes Teil vor oder hinter den Murmeln liegt wie vorher. Alle sechs Bahnen messen (`bun run perf ketten-track`, `-colortrack`, `-snowtrack`, `-spacetrack`, `-slidetrack`, `-sitetrack`). Ändert dieselbe Datei wie A-40: nicht gleichzeitig umsetzen. Rahmen von `bun run perf`: höchstens 60 % beschäftigt, höchstens 30 Bildschirme pro Sekunde neu gemalt, langsamstes Zwanzigstel ≤ 34 ms. Vorher `main` am selben Tag gleich messen (die Zahlen schwanken), danach die Regeln in `src/games/marbles/CLAUDE.md` nachführen.",
       why: "Kleinkinder spielen oft auf alten Handys der Eltern; dort sehen sie das Spiel ruckeln.",
       effort: "M",
     },
@@ -369,6 +369,9 @@ export const allGamesIdeas: IdeaArea = {
       text: "Messung vom 26. November 2026: im Abschnitt „Anfang“ malen die sechs Bahnen 30–39 Bildschirme pro Sekunde neu (Rahmen 30), mit großen Unterschieden von Messung zu Messung (21–39 bei gleichem Code). Dort rollen die drei Dinge vom Regal los, und die Kamera folgt ihnen. Lösung: mit `bun run perf ketten-track --trace` (und den anderen Bahnen) nachsehen, welche Ebene am Anfang wie oft und wie groß gemalt wird – das Regal, die Dinge, der Hintergrund-svg oder die Kamera-Ebene – und das Gefundene in eine kleine eigene Ebene legen oder still stellen; erst dreimal messen, um zu sehen, ob die Spitzen echte Arbeit oder Zufall sind. Rahmen von `bun run perf`: höchstens 60 % beschäftigt, höchstens 30 Bildschirme pro Sekunde neu gemalt, langsamstes Zwanzigstel ≤ 34 ms. Vorher `main` am selben Tag gleich messen (die Zahlen schwanken), danach die Regeln in `src/games/marbles/CLAUDE.md` nachführen.",
       why: "Kleinkinder spielen oft auf alten Handys der Eltern; dort sehen sie das Spiel ruckeln.",
       effort: "S",
+      done: true,
+      partial:
+        "Umgesetzt am 26. November 2026. Das starke Schwanken kam zum größten Teil vom Messwerkzeug: Chrome nennt eine gemalte Kachel nur bei ihrer Speicheradresse und gibt diese Adresse der nächsten Kachel einer anderen Ebene und Größe weiter (in zehn Sekunden standen 152 von 239 Adressen für mehrere Kacheln), so dass `bun run perf` die Kachel einer Murmel als ganzen Bildstreifen zählte und umgekehrt – die Holzbahn kam am Anfang auf 20 statt wirklich 36 Bildschirme pro Sekunde. Jetzt sucht es eine Kachel nach Adresse und Ebene (`tools/perfTrace.ts`, `src/perfTrace.test.ts`); ältere Zahlen in `tools/perf-history/` sind damit nicht vergleichbar. Mit dem richtigen Zählen malte der Anfang wirklich zu viel: die ersten Reihen ließen bei jedem Treffer die ganze Wand neu malen – die Glocke im Platz, der wackelnde Trichter, die Puffer an den Wänden und die Wippe. Sie sind jetzt `Piece`s, eigene Ebenen nur, solange sie sich bewegen (`wobbleSeconds` in `level.ts` sagt, wann ein Wackeln genau 0 ist). Messung gegen `main` am selben Tag mit dem neuen Zählen (beschäftigt % / Bildschirme pro Sekunde, Anfang · Mitte · Unten): Holzbahn dreimal 49–53/28–41 · 48–61/9–35 · 48–51/6–13 → 40–49/6–15 · 46–53/3–11 · 42–48/2–6; Farbenbahn 52/48 · 52/14 · 45/19 → 44/19 · 40/5 · 46/14; Schneebahn 51/46 · 63/15 · 49/10 → 51/16 · 49/4 · 42/5; Weltraumbahn 53/32 · 57/11 · 42/10 → 56/17 · 49/5 · 36/2; Rutsche 58/48 · 53/9 · 57/23 → 44/21 · 59/4 · 43/5; Baustelle 63/41 · 67/27 · 58/6 → 48/15 · 62/11 · 53/2. Alle Abschnitte liegen im Rahmen außer der Mitte der Baustelle mit 62 % beschäftigt (A-39).",
     },
     {
       id: "A-42",
@@ -377,6 +380,9 @@ export const allGamesIdeas: IdeaArea = {
       text: "Messung vom 26. November 2026: die Licht-Kette malt in der Mitte 53 Bildschirme pro Sekunde neu (`bun run perf ketten-light`), sonst ist sie im Rahmen. Die Nacht ist ein Canvas in Viertelauflösung (`NightVeil`, `VEIL_PX = 4` in `src/games/marbles/LightLevel.tsx`), den das Messwerkzeug bei jedem Neuzeichnen vermutlich als ganzen Bildschirm zählt, obwohl er nur ein Sechzehntel der Punkte hat. Zuerst prüfen (`--trace`, Malereignisse und ihre Fläche), ob das echte Arbeit ist: wenn nicht, das Messwerkzeug (`tools/perf.ts`) die Fläche eines Canvas richtig zählen lassen; wenn doch, den Schleier seltener neu zeichnen (nur wenn ein Licht an- oder ausgeht oder sich die Kamera bewegt) oder die Lichter als ausgesparte Ebenen über einen festen Schleier legen. Lavalampe und Karussell enger abseits des Bildschirms zu stoppen brachte am 24. November nichts. Rahmen von `bun run perf`: höchstens 60 % beschäftigt, höchstens 30 Bildschirme pro Sekunde neu gemalt, langsamstes Zwanzigstel ≤ 34 ms. Vorher `main` am selben Tag gleich messen (die Zahlen schwanken), danach die Regeln in `src/games/marbles/CLAUDE.md` nachführen.",
       why: "Kleinkinder spielen oft auf alten Handys der Eltern; dort sehen sie das Spiel ruckeln.",
       effort: "S",
+      done: true,
+      partial:
+        "Umgesetzt am 26. November 2026: die Spur (`--trace`) zeigt, dass der Canvas der Nacht beim Rastern nichts kostet. Dafür zählte das Messwerkzeug falsch: Chrome gibt die Nummer einer Kachel an Kacheln anderer Ebenen weiter, und `tools/perf.ts` nahm für eine Kachel die Größe einer anderen Ebene (392 statt 332 Bildschirme gezählt) – am selben Tag in A-41 behoben (`tools/perfTrace.ts`); hier kam dazu, dass `--profile` zu jeder Funktion auch die Spalte im gebauten Chunk nennt. Teuer waren in Wahrheit: Lavalampe, Karussell und Schatten, die sich hinter der Kamera weiterdrehten (`lampRest` mit `seen.wide`: sie bleiben stehen, sobald sie für immer links vom Bildschirm sind), der Globus, der sich bis etwa 37 s im großen Maschinen-svg drehte, und das Aufleuchten der Leuchtsticker im vorderen svg – beide sind jetzt eigene Ebenen (`Sprite`, die Sticker über `opacity` vom Compositor eingeblendet) nur solange sie sich ändern; die Glühwürmchen schlagen im Leuchtturm nicht mehr mit den Flügeln, und der Schleier wird nur neu gezeichnet, wenn sich gerundet etwas an ihm ändert. Messung (Bildschirme pro Sekunde neu gemalt, je Ebene gezählt): Mitte 52 auf `main` → 27,5–35 (meist unter 30), Anfang 28 → 26–27. Beschäftigt ist der Anfang wie auf `main` bei etwa 61 % (der Mac war beim Messen stark ausgelastet, die Mitte bei 56–65 %) – das ist A-52.",
     },
     {
       id: "A-43",
@@ -385,6 +391,9 @@ export const allGamesIdeas: IdeaArea = {
       text: "Messung vom 24. November 2026: Gute Nacht malt in der Mitte 40 Bildschirme pro Sekunde neu (`bun run perf ketten-night`), nachdem Seilknoten und Umlenkrolle schon eigene Ebenen wurden (vorher 47). Übrig sind die Gondel, die am Seil fährt, und das Hamsterrad, die sich beide im großen Maschinen-svg bewegen (`src/games/marbles/NightLevel.tsx`). Lösung: beide als kleine eigene Ebenen (`Sprite`, eine Drehung oder Verschiebung per CSS-transform) aus dem großen svg nehmen, mit `--trace` nachsehen, was danach noch oft gemalt wird. Rahmen von `bun run perf`: höchstens 60 % beschäftigt, höchstens 30 Bildschirme pro Sekunde neu gemalt, langsamstes Zwanzigstel ≤ 34 ms. Vorher `main` am selben Tag gleich messen (die Zahlen schwanken), danach die Regeln in `src/games/marbles/CLAUDE.md` nachführen.",
       why: "Kleinkinder spielen oft auf alten Handys der Eltern; dort sehen sie das Spiel ruckeln.",
       effort: "S",
+      done: true,
+      partial:
+        "Umgesetzt am 26. November 2026: solange das Seil läuft (`ropeMoving`), sind Hamsterrad mit der Rolle an seiner Achse, der rennende Hamster, die Gitterstäbe vor dem Rad und die Gondel eigene kleine Ebenen über dem Raum (`WheelRunning`); Rad und Gondel bewegt nur ihre Transformation, nur die kleine Ebene des Hamsters wird für seine trippelnden Füße neu gemalt. Die Dunkelheit liegt auf ihnen als Farbmatrix (`Veiled`), genau wie der Schleier über dem Raum; davor und danach stehen sie still im großen svg. `--trace` zeigte danach, dass der größte Rest gar nicht im Bild lag: Pendel und Schaukelstuhl der Leseecke schwangen neben dem Bildschirm weiter, und ein Handy rastert den Raum dort mit. Sie halten jetzt still, solange sie nicht auf dem Bildschirm sind (`seen.shown`, `tCornerStill`). Messung (beschäftigt % / Bildschirme pro Sekunde, Anfang · Mitte): vorher 43/29 · 45/41, nachher 45–55/29 · 45/13.",
     },
     {
       id: "A-44",
@@ -393,6 +402,9 @@ export const allGamesIdeas: IdeaArea = {
       text: "Messung vom 24. und 26. November 2026: die Hatschi-Kette ist zu 66–72 % beschäftigt (`bun run perf ketten-sneeze`, Rahmen 60 %), malt aber nicht zu viel neu – die Zeit geht also in Skript statt ins Malen. Lösung: mit `--profile` nachsehen, welche Funktionen kosten (`src/games/marbles/SneezeLevel.tsx`); oft ist es React, das jedes Bild große feste Teile neu zeichnet (dann `memo` oder die feste Hintergrundebene `back`, wie für den Raketenstart in A-38), oder eine Rechnung je Bild, die einmal reichen würde (`useMemo`). Unter `--profile` zeigt jeder Abschnitt in den ersten 0,2–0,4 s einen Hänger, der vom Profiler kommt, nicht vom Spiel. Rahmen von `bun run perf`: höchstens 60 % beschäftigt, höchstens 30 Bildschirme pro Sekunde neu gemalt, langsamstes Zwanzigstel ≤ 34 ms. Vorher `main` am selben Tag gleich messen (die Zahlen schwanken), danach die Regeln in `src/games/marbles/CLAUDE.md` nachführen.",
       why: "Kleinkinder spielen oft auf alten Handys der Eltern; dort sehen sie das Spiel ruckeln.",
       effort: "S",
+      done: true,
+      partial:
+        "Umgesetzt am 27. November 2026: `--profile` zeigte fast nur React – in jedem Bild gingen alle acht Tiere, der Baum, seine Blätter und jedes Ding hinter dem Baum durch React, auch während sie still standen, und die Dinge des zweiten Teils schon im ganzen ersten Teil, weil die Zeit seit dem letzten Tippen jedes Bild wuchs. Jetzt ist jedes Tier, der Baum, die fallenden Blätter, die Feder und jedes Ding hinter dem Baum ein `still`-Teil, das nur die Zahlen bekommt, die es zeichnet: das Wackeln des Baums und der Fall der Blätter werden festgehalten, sobald sie ruhen, die Feder bekommt ihre Zeiten statt des Zählers, und die Dinge hinter dem Baum bekommen die Uhr des zweiten Teils nur in ihren Zeitfenstern (`PART2_SPANS`, `held`), dazwischen den letzten Augenblick davor; das Alter eines Tippens endet bei 1 s. `sneezeStill.test.tsx` zeichnet den ganzen zweiten Teil alle 20 ms einmal mit festgehaltener und einmal mit echter Zeit und verlangt dasselbe Bild. Messung (`bun run perf ketten-sneeze`, beschäftigt / davon Skript, Anfang · Mitte): `main` am selben Tag 56/23 · 66/25 %, nachher 43/11 · 46–53/9–11 %. Die Mitte malt wie auf `main` um 30 Bildschirme pro Sekunde neu (24–31), während der Drachen steigt – das ist A-53.",
     },
     {
       id: "A-45",
@@ -414,7 +426,7 @@ export const allGamesIdeas: IdeaArea = {
       id: "A-47",
       emoji: "🐢",
       title: "Leistung: Messwerkzeug – Anlaufhänger und schwankende Abschnitte",
-      text: "Beim Messen der Kettenreaktion am 26. November 2026 fielen zwei Schwächen von `bun run perf` auf (`tools/perf.ts`, `tools/perfScenarios.ts`): (1) Mit `--profile` zeigt jeder Abschnitt in seinen ersten 0,2–0,4 s einen Hänger, der vom Anlaufen des Profilers kommt, nicht vom Spiel – er verfälscht „Hänger über 50 ms“ und das langsamste Zwanzigstel. Lösung: den Profiler vor dem Abschnitt starten oder diese erste Zeit nicht zählen. (2) Abschnitte wie der Anfang der Murmelbahnen malen bei gleichem Code einmal 21 und einmal 39 Bildschirme pro Sekunde neu, so dass eine Messung allein nicht sagt, ob eine Änderung hilft. Lösung: verrauschte Abschnitte mehrmals messen und den Median zeigen (eine Option wie `--repeat 3`), und das in `CLAUDE.md` bei „bun run perf“ beschreiben.",
+      text: "Beim Messen der Kettenreaktion am 26. November 2026 fielen zwei Schwächen von `bun run perf` auf (`tools/perf.ts`, `tools/perfScenarios.ts`): (1) Mit `--profile` zeigt jeder Abschnitt in seinen ersten 0,2–0,4 s einen Hänger, der vom Anlaufen des Profilers kommt, nicht vom Spiel – er verfälscht „Hänger über 50 ms“ und das langsamste Zwanzigstel. Lösung: den Profiler vor dem Abschnitt starten oder diese erste Zeit nicht zählen. (2) Abschnitte wie der Anfang der Murmelbahnen malen bei gleichem Code einmal 21 und einmal 39 Bildschirme pro Sekunde neu, so dass eine Messung allein nicht sagt, ob eine Änderung hilft. Der größte Teil davon war ein Fehler beim Zählen der Kacheln, behoben mit A-41; gleiche Messungen schwanken danach noch etwa um ein Viertel (Holzbahn-Anfang auf `main` 28, 41 und 37). Lösung: verrauschte Abschnitte mehrmals messen und den Median zeigen (eine Option wie `--repeat 3`), und das in `CLAUDE.md` bei „bun run perf“ beschreiben.",
       why: "Kleinkinder spielen oft auf alten Handys der Eltern; dort sehen sie das Spiel ruckeln.",
       effort: "S",
     },
@@ -456,13 +468,29 @@ export const allGamesIdeas: IdeaArea = {
     {
       id: "A-52",
       emoji: "🐢",
+      title: "Leistung: Licht-Kette – der Anfang ist zu etwa 61 % beschäftigt",
+      text: "Nach A-42 (26. November 2026) malt die Licht-Kette im Rahmen neu (Anfang 26–27, Mitte meist unter 30 Bildschirme pro Sekunde), ist am Anfang aber wie auf `main` zu etwa 61 % beschäftigt (`bun run perf ketten-light`, Rahmen 60 %). `--profile` nennt als größten Posten das Zeichnen des Schleiers (`NightVeil` in `src/games/marbles/LightLevel.tsx`, sein `useLayoutEffect`): in den ersten 20 s bewegen sich Taschenlampe, Diskokugel und Glühwürmchen in jedem Bild, so dass der Canvas jedes Bild neu gezeichnet wird, etwa 0,8 ms je Bild auf dem alten Handy (rund 480 ms je Abschnitt). Zu prüfen: die Löcher billiger zeichnen (ein vorbereitetes Bild eines weichen Lochs mit `drawImage` statt eines neuen Verlaufs je Loch), den Schleier nur jedes zweite Bild zeichnen, solange er sich nur wenig ändert, oder kleine bewegte Lichter als ausgesparte Ebenen über einen festen Schleier legen. Rahmen von `bun run perf`: höchstens 60 % beschäftigt, höchstens 30 Bildschirme pro Sekunde neu gemalt, langsamstes Zwanzigstel ≤ 34 ms. Vorher `main` am selben Tag gleich messen, und nicht während der Mac anderweitig ausgelastet ist.",
+      why: "Kleinkinder spielen oft auf alten Handys der Eltern; dort sehen sie das Spiel ruckeln.",
+      effort: "S",
+    },
+    {
+      id: "A-53",
+      emoji: "🐢",
+      title: "Leistung: Hatschi-Kette – Drachen und Schnur als eigene Ebene",
+      text: "Nach A-44 (27. November 2026) ist die Hatschi-Kette im Rahmen beschäftigt (Anfang 43 %, Mitte 46–53 %), malt in der Mitte aber um 30 Bildschirme pro Sekunde neu (30–31,3; auf `main` 24–31), während der Drachen steigt und die Vogelscheuche kitzelt (`bun run perf ketten-sneeze`, Rahmen 30). Drachen, lange Schnur und Schwanz bewegen sich im großen svg der Tiere (`Kite` in `src/games/marbles/SneezeLevel.tsx`), so dass das Handy einen großen Teil davon jedes Bild neu rastert. Lösung: Drachen mit Schwanz als kleine eigene Ebene (`Sprite`, wie der Raketenstart seine fliegenden Dinge in `SkyFall` zeigt), die Schnur als eigene schmale Ebene oder nur in Schritten neu gezeichnet; mit `--trace` nachsehen, was danach noch oft gemalt wird. Rahmen von `bun run perf`: höchstens 60 % beschäftigt, höchstens 30 Bildschirme pro Sekunde neu gemalt, langsamstes Zwanzigstel ≤ 34 ms. Vorher `main` am selben Tag gleich messen, danach die Regeln in `src/games/marbles/CLAUDE.md` nachführen.",
+      why: "Kleinkinder spielen oft auf alten Handys der Eltern; dort sehen sie das Spiel ruckeln.",
+      effort: "S",
+    },
+    {
+      id: "A-54",
+      emoji: "🐢",
       title: "Leistung: Keyframes mit `translate`, `rotate` oder `scale` in einem svg auf `transform` umstellen",
       text: "Recherche vom 27. November 2026 (Studie „SVG-Animationen schneller machen“): Chrome legt eine `transform`-Animation eines Teils *in* einem svg auf die Grafikkarte, aber nie eine mit den einzelnen Eigenschaften `translate`, `rotate` oder `scale` – die malt das ganze svg in jedem Bild neu. Etwa 30 Keyframes nutzen sie: as-sway-a/b (Tiere), pl-night-count, pl-tick-in, pl-twinkle (Zeitplan), rw-land, rw-twinkle (Belohnungstafel), elf in Socken-Paare (sock-…), tg-carry, tg-pop-arrive (Was gehört zusammen?), dazu twinkle, moon-rise, sleep-breathe, zzz-float (Spielzeit), breathe, spin, letter-hop, book-corner-lift, play-options-glow/-intro, screen-hint-turn. Lösung: für jede nachsehen, ob sie auf einem Element *in* einem svg läuft (dann auf `transform: …` umstellen, wo kein anderes `transform` des Elements im Weg ist, oder das Teil zur eigenen HTML-Ebene machen); auf HTML-Elementen dürfen sie bleiben. Danach Socken-Paare und den Zeitplan mit `bun run perf` messen, vorher `main` am selben Tag.",
       why: "Ein Wort im CSS entscheidet, ob ein altes Handy ein kleines Teil oder das ganze Bild neu malt.",
       effort: "S",
     },
     {
-      id: "A-53",
+      id: "A-55",
       emoji: "🐢",
       title: "Leistung: Schatten und Weichzeichner auf Ebenen, die sich bewegen",
       text: "Recherche vom 27. November 2026: liegt ein CSS-`filter` (`drop-shadow`, `blur`) auf einer eigenen Ebene, rechnet die Grafikkarte ihn in jedem Bild neu, solange sich die Ebene bewegt – auch wenn er gleich bleibt. Das CSS hat 47 solcher Filter. Lösung: mit `bun run perf <spiel> --trace` die Ebenen finden, die sich mit Filter bewegen, und dort den Schatten in die Zeichnung legen (eine dunkle Form unter der Figur) oder als eigene, stille Ebene darunter; nur was den Rahmen sprengt, ändern.",
@@ -470,7 +498,7 @@ export const allGamesIdeas: IdeaArea = {
       effort: "S",
     },
     {
-      id: "A-54",
+      id: "A-56",
       emoji: "🐢",
       title: "Leistung: Kettenreaktion – der Uhrtakt ohne React",
       text: "Recherche vom 27. November 2026: Die Maschinen der Kettenreaktion lassen in jedem Bild React die Maschine durchgehen (A-38, A-44, A-45, A-50). Üblich und von den Machern von Motion empfohlen: eine `requestAnimationFrame`-Schleife hält die Bewegung in einfachen Objekten und schreibt `style.transform` der bewegten Ebenen direkt über Refs (oder spielt Bewegungen, die vorher feststehen, mit `element.animate()` ab); React zeichnet nur, wenn etwas erscheint oder verschwindet. Lösung: an einem Level (Raketenstart) bauen, mit `bun run perf ketten-space --profile` vorher und nachher messen, dann auf `MachineStage` übertragen.",
@@ -478,7 +506,7 @@ export const allGamesIdeas: IdeaArea = {
       effort: "L",
     },
     {
-      id: "A-55",
+      id: "A-57",
       emoji: "📏",
       title: "Messwerkzeug: Chromes eigene Zählung verworfener Bilder dazunehmen",
       text: "Recherche vom 27. November 2026: Chrome schreibt für jedes Bild ein `PipelineReporter`-Ereignis in die Aufzeichnung, ob es gezeigt, verworfen oder nur teilweise gezeigt wurde und warum (Chromium-Doku „debug-janks“). `bun run perf` (`tools/perf.ts`) könnte das neben seiner eigenen Zählung ausgeben, als Gegenprobe für „das Werkzeug sagt gut, das Handy ruckelt“ (vgl. A-47).",
@@ -486,7 +514,7 @@ export const allGamesIdeas: IdeaArea = {
       effort: "S",
     },
     {
-      id: "A-56",
+      id: "A-58",
       emoji: "📱",
       title: "Ruckeln auf echten Geräten erfahren",
       text: "Recherche vom 27. November 2026: Chrome meldet Bilder über 50 ms mit der „Long Animation Frames“-Schnittstelle (`PerformanceObserver`, Typ `long-animation-frame`), samt ob Skript oder Malen schuld war; Safari kann das nicht, dort zählt man Lücken zwischen `requestAnimationFrame`-Aufrufen. Vorschlag: pro Besuch einer Spielseite nur im Speicher zählen und beim Verlassen ein einziges grobes Umami-Ereignis senden (Spiel, „ruckelt nicht / etwas / stark“), nur für etwa jeden zehnten Besuch, damit das Monatskontingent reicht. Braucht deine Entscheidung und eine Zeile in der Datenschutzerklärung.",
@@ -494,15 +522,15 @@ export const allGamesIdeas: IdeaArea = {
       effort: "M",
     },
     {
-      id: "A-57",
+      id: "A-59",
       emoji: "⚛️",
       title: "React Compiler ausprobieren",
-      text: "Recherche vom 27. November 2026: Der React Compiler (stabil seit Oktober 2025) setzt `memo`/`useMemo` selbst; Meta maß bis zu 2,5-mal schnellere Interaktionen. Für Bun gibt es keinen offiziellen Weg, aber `oxc-transform-react` (seit August 2026, mit `reactCompiler`) ließe sich im Bun-Plugin `tools/appPlugin.ts` für `.tsx` aufrufen. Lösung: in einem Zweig einbauen, `bun run perf` über alle Spiele vor und nach vergleichen und nur behalten, wenn es messbar hilft (Paketregeln in `bunfig.toml` beachten). Hilft nicht beim Uhrtakt der Kettenreaktion (A-54), wo sich wirklich jedes Bild etwas ändert.",
+      text: "Recherche vom 27. November 2026: Der React Compiler (stabil seit Oktober 2025) setzt `memo`/`useMemo` selbst; Meta maß bis zu 2,5-mal schnellere Interaktionen. Für Bun gibt es keinen offiziellen Weg, aber `oxc-transform-react` (seit August 2026, mit `reactCompiler`) ließe sich im Bun-Plugin `tools/appPlugin.ts` für `.tsx` aufrufen. Lösung: in einem Zweig einbauen, `bun run perf` über alle Spiele vor und nach vergleichen und nur behalten, wenn es messbar hilft (Paketregeln in `bunfig.toml` beachten). Hilft nicht beim Uhrtakt der Kettenreaktion (A-56), wo sich wirklich jedes Bild etwas ändert.",
       why: "Könnte in vielen Spielen unnötiges Neuzeichnen sparen, ohne jedes von Hand zu ändern.",
       effort: "M",
     },
     {
-      id: "A-58",
+      id: "A-60",
       emoji: "🐢",
       title: "Leistung: die nächste Seite vorbereiten, ohne dass es hakt",
       text: 'Recherche vom 27. November 2026: Der letzte Hänger beim Buch-Herausnehmen (67–100 ms, das Bild, in dem die neue Seite das Zimmer ersetzt) und beim Bildwechsel in Gefühle kommt vom Aufbau einer großen Seite auf einmal. React 19.2 kann einen Teil versteckt und mit niedriger Vorfahrt schon vorher zeichnen (`<Activity mode="hidden">`), und großer Aufbau lässt sich mit `scheduler.yield()` in Häppchen teilen (Chrome; in Safari mit `setTimeout` als Ersatz, `requestIdleCallback` fehlt dort). Lösung: an einer Stelle ausprobieren (nächste Szene in Gefühle oder das nächste Level nach „Weiter“) und mit `bun run perf` messen.',
@@ -510,10 +538,10 @@ export const allGamesIdeas: IdeaArea = {
       effort: "M",
     },
     {
-      id: "A-59",
+      id: "A-61",
       emoji: "📱",
       title: "Leistung auf dem iPad prüfen",
-      text: "Recherche vom 27. November 2026: Safari legt Teile *in* einem svg nie auf die Grafikkarte – seine neue SVG-Technik (LBSE) ist noch nicht eingeschaltet –, jede Animation dort malt das ganze svg neu. `bun run perf` misst nur Chrome. Zum Prüfen durch dich: die Spiele, in denen sich noch etwas in einem großen svg bewegt (z. B. Socken-Paare, der Zeitplan, siehe A-52), auf einem iPad spielen und sagen, wo es ruckelt; später ließe sich das Werkzeug um WebKit erweitern.",
+      text: "Recherche vom 27. November 2026: Safari legt Teile *in* einem svg nie auf die Grafikkarte – seine neue SVG-Technik (LBSE) ist noch nicht eingeschaltet –, jede Animation dort malt das ganze svg neu. `bun run perf` misst nur Chrome. Zum Prüfen durch dich: die Spiele, in denen sich noch etwas in einem großen svg bewegt (z. B. Socken-Paare, der Zeitplan, siehe A-54), auf einem iPad spielen und sagen, wo es ruckelt; später ließe sich das Werkzeug um WebKit erweitern.",
       why: "Viele Familien spielen auf einem iPad, und dort hilft das, was Chrome rettet, nicht.",
       effort: "S",
     },

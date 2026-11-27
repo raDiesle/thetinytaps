@@ -1,10 +1,13 @@
-# Zaubertasten („Magic Keys“)
+# Tippzauber („Tap Magic“, first „Zaubertasten“)
 
 Route `/drauflos/`, idea L-24 (user request, 24 November 2026). A toy for banging on the keyboard, clicking the mouse
 or patting the screen, in the spirit of the keyboard smash toys parents search for – never named after one of them, not
 even hidden in a metatag (root `CLAUDE.md`, Search engines). Nothing to find or learn, no card, no end.
 It was „Tap Away“ / „Drauflos tippen“ at first; with its poster it got a name (`names.ts`, all seven languages), while
-its address stays `/drauflos/`.
+its address stays `/drauflos/`. That name was „Magic Keys“ / „Zaubertasten“ until 26 November 2026, when the user found
+it made little sense where most play it – on a phone or tablet, with no keys: **its name says what both do**, tapping the
+screen and pressing keys („Tippzauber“, as „tippen“ is both; „Tap Magic“, touches and presses in the other languages),
+never a name about the keyboard alone, nor search titles only about it.
 
 ## How it plays
 

@@ -62,7 +62,7 @@ export interface Board {
   mark: string;
   /** Catalogue theme id. */
   theme: string;
-  /** The ready-made board it was made from: picking it in the gallery again selects this board. */
+  /** The ready-made board it was made from (its tab's name and emoji until it has a heading). */
   template?: string;
   /** Shows example stars (Monday and Tuesday filled), so a new board looks like one in use; gone with the first real star. */
   examples?: boolean;
@@ -206,7 +206,7 @@ export function isTemplateTitle(title: string, templateTitle: Localized | undefi
 }
 
 /**
- * A board made from a ready-made one, its heading in `language` (the default boards and the gallery's pictures are
+ * A board made from a ready-made one, its heading in `language` (the default boards are
  * made before a language is known; their German heading shows in the app language anyway, see `isTemplateTitle`). Its tasks keep their catalogue ids (unique within a template), so
  * the default board, made anew on every load until something is saved, finds its stars again.
  */
