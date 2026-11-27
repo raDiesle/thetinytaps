@@ -47,18 +47,18 @@
 @keyframes screen-hint-turn {
   0%,
   25% {
-    rotate: 0deg;
+    transform: rotate(0deg);
   }
   65%,
   100% {
-    rotate: 90deg;
+    transform: rotate(90deg);
   }
 }
 
 @media (prefers-reduced-motion: reduce) {
   .screen-hint-turn {
     animation: none;
-    rotate: 90deg;
+    transform: rotate(90deg);
   }
 }
 

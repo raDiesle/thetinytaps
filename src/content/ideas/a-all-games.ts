@@ -523,6 +523,8 @@ export const allGamesIdeas: IdeaArea = {
       text: "Recherche vom 27. November 2026: Chrome meldet Bilder über 50 ms mit der „Long Animation Frames“-Schnittstelle (`PerformanceObserver`, Typ `long-animation-frame`), samt ob Skript oder Malen schuld war; Safari kann das nicht, dort zählt man Lücken zwischen `requestAnimationFrame`-Aufrufen. Vorschlag: pro Besuch einer Spielseite nur im Speicher zählen und beim Verlassen ein einziges grobes Umami-Ereignis senden (Spiel, „ruckelt nicht / etwas / stark“), nur für etwa jeden zehnten Besuch, damit das Monatskontingent reicht. Braucht deine Entscheidung und eine Zeile in der Datenschutzerklärung.",
       why: "Bisher kennen wir nur ein nachgebildetes altes Handy; so sähen wir, welches Spiel bei echten Familien ruckelt.",
       effort: "M",
+      rejected: true,
+      partial: "Verworfen vom Nutzer am 27. November 2026: kein Messen auf den Geräten der Familien.",
     },
     {
       id: "A-59",
@@ -553,6 +555,8 @@ export const allGamesIdeas: IdeaArea = {
       text: "Recherche vom 27. November 2026: Safari legt Teile *in* einem svg nie auf die Grafikkarte – seine neue SVG-Technik (LBSE) ist noch nicht eingeschaltet –, jede Animation dort malt das ganze svg neu. `bun run perf` misst nur Chrome. Zum Prüfen durch dich: die Spiele, in denen sich noch etwas in einem großen svg bewegt (z. B. Socken-Paare, der Zeitplan, siehe A-54), auf einem iPad spielen und sagen, wo es ruckelt; später ließe sich das Werkzeug um WebKit erweitern.",
       why: "Viele Familien spielen auf einem iPad, und dort hilft das, was Chrome rettet, nicht.",
       effort: "S",
+      rejected: true,
+      partial: "Verworfen vom Nutzer am 27. November 2026.",
     },
   ],
 };

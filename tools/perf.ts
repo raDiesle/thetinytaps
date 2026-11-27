@@ -3,7 +3,7 @@ import { tmpdir } from "node:os";
 import { join } from "node:path";
 import { type Cdp, evaluate, launchChrome, open, siteUrl, sleep } from "./chrome";
 import { type Budget, BUDGET, DEVICES, type Device, type Part, SCENARIOS, type Scenario, type Step } from "./perfScenarios";
-import { rasteredPixels, type TraceEvent } from "./perfTrace";
+import { type ChromeFrames, chromeFrames, rasteredPixels, type TraceEvent } from "./perfTrace";
 
 // `bun run perf`: plays every game in headless Chrome as an old Android phone would (a slow CPU, a small screen
 // with many pixels) and measures how smoothly its animations run, in the Chrome on the computer (tools/chrome.ts).
@@ -83,6 +83,8 @@ interface Measurement {
    * drawn anew every frame costs 60 (120 on a phone showing 120 frames a second) however fast this computer is.
    */
   rasterScreensPerS: number;
+  /** Chrome's own count of the stretch's frames, from its trace: a second opinion beside `fps` and `stutters` (A-57). */
+  chrome: ChromeFrames;
   /** Style recalculations and layouts per second: a lot of them usually means something moves through layout. */
   stylesPerS: number;
   layoutsPerS: number;
@@ -250,7 +252,7 @@ async function traced(cdp: Cdp, during: () => Promise<void>, keep?: string) {
   off();
   if (keep) writeFileSync(keep, JSON.stringify({ traceEvents: events }));
   const total = (names: string[]) => events.filter((e) => e.ph === "X" && names.includes(e.name)).reduce((sum, e) => sum + (e.dur ?? 0), 0) / 1000;
-  return { paintMs: total(["Paint"]), rasterMs: total(["RasterTask"]), rasteredPixels: rasteredPixels(events) };
+  return { paintMs: total(["Paint"]), rasterMs: total(["RasterTask"]), rasteredPixels: rasteredPixels(events), chrome: chromeFrames(events) };
 }
 
 /** What the page's frame counter saw: every frame's time since the one before, and the long frames with their scripts. */
@@ -266,7 +268,7 @@ async function measure(cdp: Cdp, scenario: Scenario, part: Part, budget: Budget,
   let wall = 0;
   let after = before;
   let frames: Frames | null = null;
-  const { paintMs, rasterMs, rasteredPixels } = await traced(
+  const { paintMs, rasterMs, rasteredPixels, chrome } = await traced(
     cdp,
     async () => {
       const play = async () => {
@@ -315,6 +317,7 @@ async function measure(cdp: Cdp, scenario: Scenario, part: Part, budget: Budget,
     paintMsPerS: Math.round(paintMs / wall),
     rasterMsPerS: Math.round(rasterMs / wall),
     rasterScreensPerS: Math.round((rasteredPixels / (device.width * device.height * device.scale ** 2) / wall) * 10) / 10,
+    chrome,
     stylesPerS: Math.round(spent("RecalcStyleCount")),
     layoutsPerS: Math.round(spent("LayoutCount")),
     culprits,
@@ -369,6 +372,9 @@ function printRow(m: Measurement) {
   console.log(
     `  ${mark} ${m.label.padEnd(34)} ${String(m.fps).padStart(5)} fps  ${String(m.stutters).padStart(3)} stutters  longest ${String(m.longest).padStart(4)} ms  p95 ${String(m.p95).padStart(3)} ms  busy ${pct(m.busy)} % (script ${pct(m.script)}, style ${pct(m.style)}, layout ${pct(m.layout)}, other ${pct(m.other)})  paint ${String(m.paintMsPerS).padStart(3)}  raster ${String(m.rasterMsPerS).padStart(4)} ms/s ${String(m.rasterScreensPerS).padStart(5)} screens/s${m.over.length ? `  ← ${m.over.join(", ")}` : ""}`,
   );
+  const { presented, partial, dropped } = m.chrome;
+  // Chrome's own count beside the page's: a stretch whose frames Chrome dropped while the page counted none is one to doubt.
+  if (dropped || partial) console.log(`      Chrome's count: ${presented} shown, ${partial} in part, ${dropped} dropped`);
   if (m.lead) console.log(`      ${m.lead.name}: ${m.lead.ms} ms, the stretch starts after it`);
   if (m.over.length && m.culprits.length) console.log(`      slowest scripts in long frames: ${m.culprits.join(" · ")}`);
   if (m.over.length && m.stutterAt.length) console.log(`      stutters at: ${m.stutterAt.map((t) => `${t}s`).join(" ")}`);

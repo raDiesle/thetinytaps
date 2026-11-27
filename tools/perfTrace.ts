@@ -9,6 +9,7 @@ export interface TraceEvent {
   dur?: number;
   tid: number;
   args?: {
+    frame_reporter?: { state?: string; affects_smoothness?: boolean };
     tileData?: { tileId?: { id_ref?: string }; layerId?: number };
     snapshot?: { active_tiles?: { id?: string; layer_id?: number; content_rect?: number[] }[] };
   };
@@ -47,4 +48,32 @@ export function rasteredPixels(events: readonly TraceEvent[]): number {
     pixels += (list.find((s) => s.ts >= at) ?? list[list.length - 1]).area;
   }
   return pixels;
+}
+
+/** How Chrome itself saw the frames of a trace (`chromeFrames`). */
+export interface ChromeFrames {
+  /** Frames shown whole. */
+  presented: number;
+  /** Frames shown with part of an update missing (the main thread came too late for them). */
+  partial: number;
+  /** Frames Chrome dropped where the eye would see it (`affects_smoothness`). */
+  dropped: number;
+}
+
+/**
+ * Chrome's own count of the frames in a trace: each frame's `PipelineReporter` says whether it was shown, shown in part
+ * or dropped, and whether that touched what moves (Chromium's docs/speed/debug-janks.md). `bun run perf` counts frames
+ * itself in the page; this is a second count that doesn't depend on it, since the tool was blind once before (November
+ * 2026) – where the two disagree, doubt the tool first (A-57).
+ */
+export function chromeFrames(events: readonly TraceEvent[]): ChromeFrames {
+  const frames: ChromeFrames = { presented: 0, partial: 0, dropped: 0 };
+  for (const e of events) {
+    const report = e.name === "PipelineReporter" && e.ph === "b" ? e.args?.frame_reporter : undefined;
+    if (!report) continue;
+    if (report.state === "STATE_PRESENTED_ALL") frames.presented++;
+    else if (report.state === "STATE_PRESENTED_PARTIAL") frames.partial++;
+    else if (report.state === "STATE_DROPPED" && report.affects_smoothness) frames.dropped++;
+  }
+  return frames;
 }
