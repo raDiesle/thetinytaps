@@ -14,15 +14,18 @@ export const PACIFIER_STORY_TITLE: Localized = {
   ru: "Тапси и фея пустышек",
 };
 
-/** The name of its book on the shelf, among the Alltagshelfer beside „Abstillen“: what parents look for. */
+/**
+ * The name of its book on the shelf, among the Alltagshelfer beside „Abstillen“: what parents look for. Named for what
+ * it helps with, not for the fairy, since it holds the pacifier tree too (user request, 28 November 2026).
+ */
 export const PACIFIER_STORY_BOOK: Localized = {
-  de: "Schnullerfee",
-  en: "Pacifier Fairy",
-  zh: "奶嘴仙子",
-  hi: "चुसनी परी",
-  es: "Hada del chupete",
-  ar: "جنية اللهاية",
-  ru: "Фея пустышек",
+  de: "Schnuller abgewöhnen",
+  en: "Goodbye Pacifier",
+  zh: "戒奶嘴",
+  hi: "चुसनी छुड़ाना",
+  es: "Dejar el chupete",
+  ar: "وداعًا للهاية",
+  ru: "Прощай, пустышка",
 };
 
 /** Its line for grown-ups. */

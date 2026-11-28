@@ -29,20 +29,29 @@ the management page's contents by `TOOL_GROUPS`), never a link from the shelf or
   in the video's description (`VIDEO_PAGES`, `youtubeTexts.ts`). Nothing in it may depend on the video it follows.
   It comes in three variants (choice „Variante“ on the page, `--variante bilder` or `--variante regal` for the tool):
   „Pinnwand“, the default, „Bilder aus den Spielen“ and the shelf one above.
-  „Pinnwand“ (`pinboard.ts`, `PinboardScene`, `schedulePinboardSound`, 7 s; user request, 27 November 2026: the
+  „Pinnwand“ (`pinboard.ts`, `PinboardScene`, `schedulePinboardSound`, 10 s; user request, 27 November 2026: the
   pictures one after another went by too fast and gave no overview) is one single picture: a cork board filling the
   screen with the games' photos (`PINBOARD` in `content.ts`, places in `PIN_SLOTS`) in white frames, each with a word
-  for what it shows on its frame (the game's name, or a short `word` where that is a whole question), each held by a
-  pushpin – **all of them there from the first frame** (user request, 27 November 2026: pinned one after another the
-  board took too long), and only then a sheet torn from a spiral pad (its holes along the top, faintly squared, two
-  pins) pressed into the middle with the site's name as the app prints it (`Logo` in one line, Papa Fox and his child
-  on the o, the paw tracks) and under it „www.littlestepstogrow.com“ in the app's rounded letters, marked by a
-  highlighter stroke drawn on, and „Alltagshelfer & Lernspiele“ (`BOARD_LINE`) – no card, no signs, no code after it.
+  for what it shows on its frame (the game's name, or a short `word` where that wouldn't say it), each held by a
+  pushpin, and in the middle a small sheet torn from a spiral pad (its holes along the top, faintly squared, two pins)
+  with **only the address** „www.littlestepstogrow.com“ in the app's rounded letters, Papa Fox and his child sitting on
+  the o of „.com“ as on the title's o (`FOX_O` from `Logo`) – **all of it there from the first frame** (user requests,
+  27 and 28 November 2026: pinned one after another it took too long, and the sheet came too late; the site's name over
+  the address and the line under it were taken out). Then the address is marked by a highlighter stroke drawn on, the
+  paw tracks appear under it one print after another up to the foxes, each with a soft pat, a warm chord as they
+  arrive, and the board stands still for over six seconds (`pinboard.test.ts`). No card, no signs, no code.
   Its words are in the board's own style, never a bold serif on a plain card (user feedback, 27 November 2026), and
-  every word stays inside its sheet in every language: the address once ran out over the photos beside it – look at
-  a frame (`--shots 6`) in a long language (es) after changing the sheet. Which photos hang there is the user's choice
-  (they pick from `/management/bilder/`; the twelve there now were chosen on 27 November 2026); a photo swapped keeps
-  its place, and the board stays one picture to take in at a glance, never a run of pictures again.
+  every word stays inside its sheet or frame in every language – look at a frame (`--shots 6`) in a long language (es)
+  after changing them, and at the foxes on the o magnified: they sit on the letter, never float above it.
+  Which photos hang there is the user's choice (picked on `/management/bilder/` and in the games, changed on 28
+  November 2026), so a photo swapped keeps its place and the board stays one picture to take in at a glance, never a
+  run of pictures again. A photo is a game's painted picture (whole, or the part `crop` names: Abstillen's first page
+  cut to the child and Mama on the sofa), a menu's picture (Bewegungsabenteuer's treasure island card, the whole screen
+  with 6:44 to go), or one of the board's own in `outro/pinnwand/`, made by `bun run previews --pinnwand` (`PIN_PHOTOS`):
+  Zähne putzen's mouth from the side, the Timer's red disc a quarter round, the animal and campfire rounds the menu shows
+  (the same seed, `SEEDS`, without their words), and Gefühle's first day at its second page with its two choices –
+  their names stay, so it has a photo per language (`byLanguage`). Run it against the dev server (`--url`): only there
+  can the treasure island jump to its moment.
   „Bilder aus den Spielen“ (`gallery.ts`, `GalleryScene`, `scheduleGallerySound`, about 17 s; user request, November
   2026: show the games' pictures big, not the books) opens on the two
   categories side by side, „Alltagshelfer“ and „Lernspiele“, each with a picture of its games and its name under it;

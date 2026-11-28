@@ -9,6 +9,8 @@ export function DevTag({ code, id }: { code: string; id?: string }) {
   if (!DEV) return null;
   return (
     <div
+      // Named, so `bun run previews` hides it like every overlay when it pictures the dev server's games.
+      className="dev-tag"
       aria-hidden="true"
       style={{
         position: "fixed",

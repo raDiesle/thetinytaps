@@ -13,6 +13,7 @@ import gamePictures from "../games/*/bilder/**/*.webp?glob";
 import gamePreviews from "../games/*/vorschau/*.webp?glob";
 import gameGirlPreviews from "../games/*/vorschau-maedchen/*.webp?glob";
 import videoPictures from "../video/*/bilder/*.webp?glob";
+import videoPins from "../video/*/pinnwand/*.webp?glob";
 
 /** One picture file. */
 export interface GalleryPicture {
@@ -78,12 +79,12 @@ export const PICTURE_SOURCES: Record<string, PictureSource> = {
   components: { title: "Regal, Buchdeckel und Menüs", hrefs: ["/"] },
   timer: { title: "Timer", hrefs: ["/timer/"] },
   milkchain: { title: "Abstillen", hrefs: ["/abstillen/"] },
-  pacifierstory: { title: "Schnullerfee", hrefs: ["/schnullerfee/"] },
+  pacifierstory: { title: "Schnuller abgewöhnen: Schnullerfee", hrefs: ["/schnullerfee/"] },
   kitastory: { title: "Kita-Start", hrefs: ["/kita/"] },
   hairstory: { title: "Haare waschen", hrefs: ["/haare-waschen/"] },
   nightmilk: { title: "Abstillen: nachts", hrefs: ["/abstillen/nachts/"] },
   milkgoodbye: { title: "Abstillen: Noch dreimal schlafen", hrefs: ["/abstillen/abschied/"] },
-  pacifiertree: { title: "Schnullerfee: Schnullerbaum", hrefs: ["/schnullerfee/baum/"] },
+  pacifiertree: { title: "Schnuller abgewöhnen: Schnullerbaum", hrefs: ["/schnullerfee/baum/"] },
   hairshower: { title: "Haare waschen: Dusche", hrefs: ["/haare-waschen/dusche/"] },
   childminder: { title: "Kita-Start: Tagesmutter", hrefs: ["/kita/tagesmutter/"] },
   bottlestory: { title: "Fläschchen", hrefs: ["/flaeschchen/"] },
@@ -136,7 +137,8 @@ export function allPictures(): GalleryPicture[] {
       const parts = path.split("/");
       const source = parts[1] === "components" ? "components" : parts[2];
       const girl = parts.includes("vorschau-maedchen");
-      const kind: PictureKind = parts.includes("teile") ? "teile" : girl || parts.includes("vorschau") ? "vorschau" : "bilder";
+      // The outro's pin board photos (`pinnwand/`) are cut from the games by `bun run previews`, as the menus' are.
+      const kind: PictureKind = parts.includes("teile") ? "teile" : girl || parts.includes("vorschau") || parts.includes("pinnwand") ? "vorschau" : "bilder";
       const stem = (parts.at(-1) as string).replace(/\.webp$/, "");
       found.push({ path, url, source, kind, stem: girl ? `${stem}${GIRL_SUFFIX}` : stem });
     }
@@ -148,6 +150,7 @@ export function allPictures(): GalleryPicture[] {
   add(gamePreviews, "src/games");
   add(gameGirlPreviews, "src/games");
   add(videoPictures, "src/video");
+  add(videoPins, "src/video");
   return found.sort((a, b) => a.path.localeCompare(b.path));
 }
 

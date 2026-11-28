@@ -214,7 +214,9 @@ A caption, big or on a card, always shows whole: it takes a second line, never �
 **Layout (user's choice, November 2026):** one grid (`.story-play`): the scene, then the text, then (at a pass's end)
 „Nochmal“ and „Weiter“. The scene is as big as the room above the text allows while it is told and shown. While the
 child chooses (`data-stage="choose"`) it is small on top (left out on a phone), the cards A (not-so-good, left) and B
-(good, right) below it, upright one above the other, each with its caption small under it.
+(good, right) below it, upright one above the other, each with its caption under it – set exactly like the sentence
+under the pictures (the book's serif at `--caption-size`, its ink, never smaller or paler; user request, 28 November
+2026: at 0.85rem the choices were hard to read), and `--cap` keeps two such lines free.
 **No room is wasted** (user feedback, November 2026, asked a second time): on a wide screen a 4:3 picture leaves room
 at its sides anyway, so ◀ stands in a narrow column of its own on the left and ▶ with the loudspeaker right above it on
 the right (`--side`), the dots lie on the picture's top edge instead of a row of their own, and the pictures and the text

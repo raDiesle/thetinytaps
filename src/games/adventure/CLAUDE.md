@@ -60,7 +60,9 @@ for the catch; in front for the hello, the hooray and the goodbye. Kiki has a pl
 out of the picture or under the box for longer than a moment (user feedback, November 2026: Kiki flew through the house
 and hovered behind the bell's post). `fireRescue.test.ts` checks whole goes, lengths, one kitten per go, where the lines
 hang and the gate's height. The card's and the trophy's picture show Tapsi spraying on Robo (`PLAYS` in
-`tools/previews.ts`; every story's picture is a station in play, without the dancer's box or the route, `HIDE_ALSO`).
+`tools/previews.ts`; every story's picture is a station in play, without the dancer's box or the route, `HIDE_ALSO`). Die Schatzinsel's card is the whole screen's width at the moment 6:44 are left (user request, 28 November 2026:
+the same picture hangs on the videos' outro), reached by `__adventure.seek`, which only the dev server has: run
+`bun run previews --url <dev server> adventure` for it, else the card is kept as it is.
 
 ## Nothing goes into Tapsi
 

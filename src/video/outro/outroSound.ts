@@ -1,7 +1,7 @@
 import { COVERS } from "../intro/IntroScene";
 import { A5, bell, C4, C5, C6, D5, E5, G5, knock, rush } from "../sound";
 import { GALLERY_BEATS, HELPER_COUNT, PICTURE_COUNT, STEP } from "./gallery";
-import { PINBOARD_BEATS } from "./pinboard";
+import { PAW_PRINTS, PINBOARD_BEATS, pawLands } from "./pinboard";
 import { type CardBeats, OUTRO_BEATS } from "./timeline";
 
 /** Two notes below C5 the gallery's games rise from. */
@@ -92,21 +92,29 @@ export function scheduleGallerySound(ac: BaseAudioContext, out: AudioNode, at: n
 /** The last moment any of the gallery outro's sounds still rings, in seconds from its start. */
 export const GALLERY_SOUND_END = cardSoundEnd(GALLERY_BEATS);
 
+/** How many soft pats the paw tracks make as they walk to the foxes: a patter, never one per print (90 would be a din). */
+const PAW_PATS = 8;
+
 /**
- * Lays the sound of the outro „Pinnwand“ onto `ac`: the photos hang from the first frame, so it begins with the sheet
- * in the middle – a soft swish of paper and the taps of its two pins going into the cork – then the card's sound, Fun –
- * for – Both as the sheet is pinned and a warm chord with the address.
+ * Lays the sound of the outro „Pinnwand“ onto `ac`: board and sheet stand from the first frame, so Fun – for – Both
+ * rings at once while the address is marked, the paws pat along the tracks as they appear, the big one lower, the small
+ * one higher, and a warm chord sounds as the last print reaches Papa Fox and his child on the o.
  */
 export function schedulePinboardSound(ac: BaseAudioContext, out: AudioNode, at: number) {
-  const [from, to] = PINBOARD_BEATS.note;
-  rush(ac, out, at + from, (to - from) * 0.7, 2400, 900, 0.03, 0.8);
-  knock(ac, out, at + to - 0.04, 820, 180, 0.2, 0.06);
-  knock(ac, out, at + to + 0.06, 700, 180, 0.2, 0.06);
+  for (let i = 0; i < PAW_PATS; i++) {
+    const big = i % 2 === 0;
+    const k = Math.round((i * (PAW_PRINTS.length - 1)) / (PAW_PATS - 1));
+    knock(ac, out, at + pawLands(k) + 0.08, big ? 330 : 480, big ? 220 : 330, 0.12, 0.06);
+  }
   cardSound(ac, out, at, PINBOARD_CARD);
 }
 
-/** When the pin board's card sound plays: its bells as the address is pinned, its chord with the line. */
-const PINBOARD_CARD: CardBeats = { card: [PINBOARD_BEATS.note[0] - 0.2, PINBOARD_BEATS.note[1]], signs: PINBOARD_BEATS.line, code: PINBOARD_BEATS.line };
+/** When the pin board's card sound plays: its bells from the first frame, its chord as the paws reach the foxes. */
+const PINBOARD_CARD: CardBeats = {
+  card: [0, PINBOARD_BEATS.mark[1]],
+  signs: PINBOARD_BEATS.paws,
+  code: [PINBOARD_BEATS.paws[1] - 0.1, PINBOARD_BEATS.paws[1]],
+};
 
 /** The last moment any of the pin board outro's sounds still rings, in seconds from its start. */
 export const PINBOARD_SOUND_END = cardSoundEnd(PINBOARD_CARD);

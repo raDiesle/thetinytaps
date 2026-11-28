@@ -171,7 +171,7 @@ export const LANGUAGE_STATUS: LanguageStatusRow[] = [
   },
   {
     href: "/schnullerfee/",
-    note: "Das Buch „Schnullerfee“ mit zwei Geschichten in Kapiteln, jede ganz und als Kurzfassung (StoryChoice, 23. November 2026), die Tapsis Stimme vorliest; unten rechts über ▶ schaltet ein Lautsprecher sie für Erwachsene aus, die selbst vorlesen. Die Wörter des Buchs selbst (Kapitel, Weiter, die Wahl) kommen aus ChapterBook und StoryChoice.",
+    note: "Das Buch „Schnuller abgewöhnen“ mit zwei Geschichten in Kapiteln, jede ganz und als Kurzfassung (StoryChoice, 23. November 2026), die Tapsis Stimme vorliest; unten rechts über ▶ schaltet ein Lautsprecher sie für Erwachsene aus, die selbst vorlesen. Die Wörter des Buchs selbst (Kapitel, Weiter, die Wahl) kommen aus ChapterBook und StoryChoice.",
     parts: [
       {
         label: "🧚 Tapsi und die Schnullerfee",

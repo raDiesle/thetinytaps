@@ -2,7 +2,8 @@
 
 Route `/schnullerfee/` · idea H-11 · research „schnullerfee-kapitel“.
 
-The book „Schnullerfee“ among the Alltagshelfer, right of „Abstillen“ (`PACIFIER_STORY_BOOK`, a spine book of its own,
+The book „Schnuller abgewöhnen“ (until 28 November 2026 „Schnullerfee“; renamed on the user's request, since it
+holds the pacifier tree too) among the Alltagshelfer, right of „Abstillen“ (`PACIFIER_STORY_BOOK`, a spine book of its own,
 playing at once): a story about saying goodbye to the pacifier, in chapters like „Abstillen“ (user request, 10 November
 2026: „ähnlich wie wir es im Stil gemacht haben zu Abstillen“), read by a grown-up with the child. A first, played
 Schnullerfee (SVG, one room, box or balloon) was deleted for it on the user's request the same day.
@@ -28,7 +29,7 @@ pacifiers go („With the pacifier fairy“, `PACIFIER_FAIRY_KIND`; „At the pa
 - `en.ts`, `zh.ts`, `hi.ts`, `es.ts`, `ar.ts`, `ru.ts`: the chapters' titles and the pages' sentences in each language
   (translated on request, 10 November 2026), imported only by `src/content/texts/texts-<lang>.ts` and read with
   `byLanguage` (`pacifierStory`), passed to `ChapterBook` as `translations`.
-- `names.ts`: the book's name on the shelf („Schnullerfee“), the story's title and its blurb in every language.
+- `names.ts`: the book's name on the shelf („Schnuller abgewöhnen“), the story's title and its blurb in every language.
 
 ## Rules
 

@@ -1,10 +1,24 @@
 import type { CSSProperties } from "react";
-import { Logo } from "@/components/Logo";
+import { FOX_O } from "@/components/Logo";
 import type { SeoLanguage } from "@/content/seo";
 import { pick } from "@/lib/language";
 import { CANVAS } from "../canvas";
-import { BOARD_ADDRESS, BOARD_LINE, PINBOARD, photoWord } from "./content";
-import { FLAT, FRAME, lineShown, NOTE, notePose, PHOTO, PIN_COLORS, PIN_SLOTS, type PressPose, type Slot } from "./pinboard";
+import { BOARD_ADDRESS, PINBOARD, type PinnedPhoto, photoWord } from "./content";
+import {
+  FLAT,
+  FRAME,
+  markShown,
+  NOTE,
+  PAW_PRINTS,
+  PHOTO,
+  PIN_COLORS,
+  PIN_SLOTS,
+  pawShown,
+  type PressPose,
+  type Slot,
+  TRACK_TILE,
+  TRACK_TILES,
+} from "./pinboard";
 
 /** A thing pressed onto the board at `slot`, `width` × `height`, as `pose` says: higher, it is bigger and its shadow longer. */
 function pressedStyle(slot: Slot, width: number, height: number, pose: PressPose): CSSProperties {
@@ -43,17 +57,69 @@ function Pin({ color, pose, left = "50%" }: { color: string; pose: PressPose; le
   );
 }
 
+/** A paw print of the app's tracks (`.logo-tracks`), its toes pointing along them. */
+const PAW = "M-9 4C-9-4-3-6 0-6S9-4 9 4 4 10 0 9-9 9-9 4Z";
+const TOES: readonly (readonly [number, number, number, number])[] = [
+  [-10.5, -8, 3.3, 4.3],
+  [-3.8, -13.5, 3.3, 4.6],
+  [3.8, -13.5, 3.3, 4.6],
+  [10.5, -8, 3.3, 4.3],
+];
+
 /**
- * One frame of the outro „Pinnwand“ at second `t` (user requests, 27 November 2026): a cork board filling the picture
- * with every game's photo pinned on it from the first frame, each in a white frame with a word for what it is; then a
- * sheet torn from a spiral pad is pinned into the middle with the site's name as the app prints it (`Logo`, Papa Fox
- * and his child on the o) and under it the address, marked with a highlighter, and a short line on what the site holds
- * – one picture to take in, in `language`.
+ * The paw tracks under the address at `t`: a big and a small track walking from its first letter up to the o of „.com“,
+ * one print after another, each coming a little bigger and settling – as in the app's title, where they lead to Papa
+ * Fox and his child.
+ */
+function Tracks({ t }: { t: number }) {
+  return (
+    <svg className="vp-tracks" viewBox={`0 0 ${TRACK_TILES * TRACK_TILE} 36`} aria-hidden style={{ "--tiles": TRACK_TILES } as CSSProperties}>
+      {PAW_PRINTS.map((paw, k) => {
+        const shown = pawShown(k, t);
+        if (shown <= 0) return null;
+        const size = (paw.big ? 0.55 : 0.38) * (1 + 0.5 * (1 - shown));
+        return (
+          <g
+            key={k}
+            opacity={Math.min(1, shown * 1.6).toFixed(3)}
+            fill={paw.big ? "#d9692a" : "#e8914f"}
+            transform={`translate(${paw.x} ${paw.y}) rotate(90) scale(${size.toFixed(4)})`}
+          >
+            <path d={PAW} />
+            {TOES.map(([cx, cy, rx, ry]) => (
+              <ellipse key={cx} cx={cx} cy={cy} rx={rx} ry={ry} />
+            ))}
+          </g>
+        );
+      })}
+    </svg>
+  );
+}
+
+/** Where the o of „.com“ stands in the address: Papa Fox and his child sit on it. */
+const O_AT = BOARD_ADDRESS.lastIndexOf("o");
+
+/** A photo's picture: whole, or only the part `crop` names (a page's sofa, not the whole room). */
+function PhotoPicture({ photo }: { photo: PinnedPhoto }) {
+  const { width, height } = PHOTO.picture;
+  if (!photo.crop) return <img src={photo.picture} alt="" style={{ width, height }} />;
+  const { x, y, width: w } = photo.crop;
+  const scale = width / w;
+  return (
+    <span className="vp-crop" style={{ width, height }}>
+      <img src={photo.picture} alt="" style={{ width: photo.crop.of * scale, left: -x * scale, top: -y * scale }} />
+    </span>
+  );
+}
+
+/**
+ * One frame of the outro „Pinnwand“ at second `t` (user requests, 27 and 28 November 2026): a cork board filling the
+ * picture with every game's photo pinned on it, each in a white frame with a word for what it is, and in the middle a
+ * sheet torn from a spiral pad with only the address, Papa Fox and his child sitting on the o of „.com“ – all of it
+ * there from the first frame. Then the address is marked with a highlighter and the paw tracks walk along under it up
+ * to the foxes, one print after another – one picture to take in, its words in `language`.
  */
 export function PinboardScene({ t, language }: { t: number; language: SeoLanguage }) {
-  const note = notePose(t);
-  const shown = lineShown(t);
-  const line = pick(BOARD_LINE, language);
   return (
     <div className="vi-scene vp-scene" style={{ width: CANVAS.width, height: CANVAS.height }}>
       <svg width="0" height="0" aria-hidden className="vp-defs">
@@ -66,30 +132,40 @@ export function PinboardScene({ t, language }: { t: number; language: SeoLanguag
       <div className="vp-cork" />
       {PINBOARD.map((photo, k) => (
         <div key={photo.href} className="vp-photo" style={pressedStyle(PIN_SLOTS[k]!, FRAME.width, FRAME.height, FLAT)}>
-          <img src={photo.picture} alt="" style={{ width: PHOTO.picture.width, height: PHOTO.picture.height }} />
+          <PhotoPicture photo={pictureIn(photo, language)} />
           <p className="vp-word" style={{ fontSize: fitted(pick(photoWord(photo), language), 34, 15) }}>
             {pick(photoWord(photo), language)}
           </p>
           <Pin color={PIN_COLORS[k % PIN_COLORS.length]!} pose={FLAT} />
         </div>
       ))}
-      {note.opacity > 0.005 ? (
-        <div className="vp-note" style={pressedStyle(NOTE, NOTE.width, NOTE.height, note)}>
-          <div className="vp-note-holes" />
-          <Logo />
-          <p className="vp-address" style={{ opacity: Math.min(1, shown * 2) }}>
-            <span style={{ "--mark": shown.toFixed(3) } as CSSProperties}>{BOARD_ADDRESS}</span>
-          </p>
-          <p className="vp-line" style={{ opacity: shown, fontSize: fitted(line, 38, 44) }}>
-            {line}
-          </p>
-          <Pin color={PIN_COLORS[0]} pose={note} left="7%" />
-          <Pin color={PIN_COLORS[2]} pose={note} left="93%" />
-        </div>
-      ) : null}
+      <div className="vp-note" style={pressedStyle(NOTE, NOTE.width, NOTE.height, FLAT)}>
+        <div className="vp-note-holes" />
+        <p className="vp-address">
+          <span className="vp-mark" style={{ "--mark": markShown(t).toFixed(3) } as CSSProperties}>
+            {BOARD_ADDRESS.slice(0, O_AT)}
+            <span className="vp-o">
+              o
+              <span className="vp-o-anchor">
+                <Tracks t={t} />
+                <img src={FOX_O} alt="" />
+              </span>
+            </span>
+            {BOARD_ADDRESS.slice(O_AT + 1)}
+          </span>
+        </p>
+        <Pin color={PIN_COLORS[0]} pose={FLAT} left="7%" />
+        <Pin color={PIN_COLORS[2]} pose={FLAT} left="93%" />
+      </div>
     </div>
   );
 }
 
+/** A photo with its picture in `language`, where its picture has words in it (Gefühle's page with its choices). */
+const pictureIn = (photo: PinnedPhoto, language: SeoLanguage): PinnedPhoto =>
+  photo.byLanguage ? { ...photo, picture: photo.byLanguage[language] ?? photo.picture } : photo;
+
 /** Every picture this outro shows, so it can wait until all are decoded before its first frame. */
-export const PINBOARD_PICTURES = PINBOARD.map((photo) => photo.picture).filter((url): url is string => !!url);
+export const PINBOARD_PICTURES = [...PINBOARD.flatMap((photo) => [photo.picture, ...Object.values(photo.byLanguage ?? {})]), FOX_O].filter(
+  (url): url is string => !!url,
+);

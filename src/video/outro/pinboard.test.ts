@@ -1,10 +1,15 @@
 import { expect, test } from "bun:test";
+import { readdirSync } from "node:fs";
+import { join } from "node:path";
+import sharp from "sharp";
 import { APP_LANGUAGES, pick } from "@/lib/language";
-import { BOARD_LINE, PINBOARD, photoWord } from "./content";
+import { read } from "@/testSources";
+import { PINBOARD, photoWord } from "./content";
 import { PINBOARD_SOUND_END } from "./outroSound";
-import { FRAME, NOTE, notePose, PHOTO_COUNT, PIN_SLOTS, PINBOARD_BEATS, PINBOARD_SECONDS } from "./pinboard";
+import { FRAME, markShown, NOTE, PAW_PRINTS, PHOTO, PHOTO_COUNT, PIN_SLOTS, PINBOARD_BEATS, PINBOARD_SECONDS, pawShown } from "./pinboard";
 
 const FRAME_SECONDS = 1 / 60;
+const ROOT = join(import.meta.dir, "../../..");
 
 test("every photo has its place on the board, and none lies over the address or leaves the picture", () => {
   expect(PIN_SLOTS.length).toBe(PHOTO_COUNT);
@@ -21,36 +26,69 @@ test("every photo has its place on the board, and none lies over the address or 
   }
 });
 
-test("the board shows every photo from the first frame, and the sheet with the name only a moment later", () => {
-  // The photos have no time of their own any more: the scene draws them flat and pinned at every second.
-  expect(notePose(0).opacity).toBe(0);
-  expect(PINBOARD_BEATS.note[0]).toBeGreaterThan(0.5);
-  expect(PINBOARD_BEATS.line[0]).toBeGreaterThanOrEqual(PINBOARD_BEATS.note[1]);
+test("the sheet with the address is there from the first frame, never coming later (user request, 28 November 2026)", () => {
+  // The scene draws photos and sheet flat and pinned at every second: nothing of them has a time of its own.
+  const scene = read(join(import.meta.dir, "PinboardScene.tsx"));
+  expect(scene).toContain('className="vp-note" style={pressedStyle(NOTE, NOTE.width, NOTE.height, FLAT)}');
+  expect(markShown(0)).toBe(0);
+  expect(PINBOARD_BEATS.mark[1]).toBeLessThanOrEqual(1);
+});
+
+test("the paw prints appear one after another, each growing steadily, all there once the tracks reach the foxes", () => {
+  const [from, to] = PINBOARD_BEATS.paws;
+  for (const [k] of PAW_PRINTS.entries()) {
+    expect(pawShown(k, from - 0.01), `print ${k}`).toBe(0);
+    expect(pawShown(k, to), `print ${k}`).toBe(1);
+    let last = 0;
+    for (let t = from; t <= to; t += FRAME_SECONDS) {
+      const now = pawShown(k, t);
+      expect(now, `print ${k} at ${t}`).toBeGreaterThanOrEqual(last);
+      // Each comes within a few frames, one after another: never all at once.
+      if (k > 0) expect(now <= pawShown(k - 1, t), `print ${k} before ${k - 1}`).toBe(true);
+      last = now;
+    }
+  }
+  expect(pawShown(PAW_PRINTS.length - 1, (from + to) / 2)).toBe(0);
 });
 
 test("at the end the whole board stands still long enough to read the address", () => {
-  const still = PINBOARD_BEATS.line[1];
-  expect(PINBOARD_SECONDS - still).toBeGreaterThanOrEqual(4);
-  for (const t of [still, PINBOARD_SECONDS]) expect(notePose(t)).toEqual({ opacity: 1, scale: 1, lift: 0, pin: 1 });
-});
-
-test("the sheet moves steadily: no jump from one frame to the next", () => {
-  let last = notePose(0);
-  for (let t = FRAME_SECONDS; t <= PINBOARD_SECONDS; t += FRAME_SECONDS) {
-    const now = notePose(t);
-    expect(Math.abs(now.scale - last.scale), `at ${t}`).toBeLessThan(0.03);
-    expect(Math.abs(now.lift - last.lift), `at ${t}`).toBeLessThan(0.2);
-    last = now;
-  }
+  // User request, 28 November 2026: show it a little longer before the video ends.
+  expect(PINBOARD_SECONDS - PINBOARD_BEATS.paws[1]).toBeGreaterThanOrEqual(6);
 });
 
 test("the sound rings out before the outro ends", () => {
   expect(PINBOARD_SOUND_END).toBeLessThan(PINBOARD_SECONDS);
 });
 
-test("each photo's word and the line under the address are there in every app language", () => {
+test("each photo's word is there in every app language, and a photo with words has its picture in each", () => {
   for (const language of APP_LANGUAGES) {
-    for (const photo of PINBOARD) expect(pick(photoWord(photo), language), `${photo.href} in ${language}`).toBeTruthy();
-    expect(BOARD_LINE[language], language).toBeTruthy();
+    for (const photo of PINBOARD) {
+      expect(pick(photoWord(photo), language), `${photo.href} in ${language}`).toBeTruthy();
+      if (photo.byLanguage) expect((photo.byLanguage as Record<string, string>)[language], `${photo.href}'s picture in ${language}`).toBeString();
+    }
+  }
+  for (const photo of PINBOARD) expect(photo.picture, photo.href).toBeString();
+});
+
+test("a cut photo keeps the board's 3 : 2 and stays inside its picture", async () => {
+  const ratio = PHOTO.picture.width / PHOTO.picture.height;
+  for (const photo of PINBOARD.filter((p) => p.crop)) {
+    const { x, y, width, of } = photo.crop!;
+    const path = decodeURIComponent(new URL(photo.picture!, "file:///").pathname);
+    const file = path.startsWith(ROOT) ? path : join(ROOT, path.replace(/^\/_src\//, "src/"));
+    const meta = await sharp(file).metadata();
+    expect(meta.width, photo.href).toBe(of);
+    expect(x + width, photo.href).toBeLessThanOrEqual(of);
+    expect(y + width / ratio, photo.href).toBeLessThanOrEqual(meta.height!);
+  }
+});
+
+test("bun run previews --pinnwand makes every photo of the board's own folder", () => {
+  const tool = read(join(ROOT, "tools/previews.ts"));
+  for (const name of readdirSync(join(import.meta.dir, "pinnwand"))) {
+    const id = name.replace(/\.webp$/, "");
+    const language = /^gefuehle-(\w+)$/.exec(id)?.[1];
+    if (language) expect(tool, name).toContain(`const LANGUAGES = [`);
+    else expect(tool, name).toContain(`${id.includes("-") ? `"${id}"` : id}: { href:`);
   }
 });

@@ -774,6 +774,10 @@ A game may give it before its end where reaching the goal once is enough (Ketten
   later moment or a key there (`CUTS`, `WAITS`, `PLAYS`), as Kettenreaktion's big worlds and the keyboard games needed;
   what a game lays over its picture (key letters, a count, a backpack, sentences, its buttons) goes into
   `HIDE_OVERLAYS`, or the cut finds it as the busiest part; a new menu adds its folder to `MENUS` (`previews.test.ts`).
+  A cut never cuts off what the round is about (user feedback, 28 November 2026: the animals' heads and Erkennen's fire
+  were cut off): a picture whose round is drawn at random gets a fixed seed (`SEEDS`), so a run makes the same round
+  every time, and is looked at whole (`WHOLE`) where a cut would lose its top. A play that jumps inside a game uses keys
+  or the game's own handle, never a tap on its controls, which may be hidden by then: the tap lands on the picture.
   The emoji stays only where no picture is yet (a card „bald“).
 - Nothing to read between a menu's title and its cards, on any screen: no line under the title, no „Was spielen
   wir?“, no tagline under the home logo (all removed, October 2026) – the cards say enough. Only the „level“ row of

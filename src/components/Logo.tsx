@@ -3,8 +3,11 @@ import { SITE_NAME } from "@/content/seo";
 import { BRIGHT_COLORS } from "./TapFeedback";
 import pictures from "./bilder/*.webp?glob";
 
-/** Papa Fox and his child (Gemini, `bilder/`), drawn sitting on Georgia's bold o, which was then cut out of the picture. */
-const FOX_O = pictures["logo-fuchs-o.webp"];
+/**
+ * Papa Fox and his child (Gemini, `bilder/`), drawn sitting on Georgia's bold o, which was then cut out of the picture;
+ * the outro's pin board seats them on the o of „.com“ too.
+ */
+export const FOX_O = pictures["logo-fuchs-o.webp"];
 
 /**
  * The name's two lines, „Little Steps“ over „to Grow“: in one line the longer name made the sign over the shelf half as

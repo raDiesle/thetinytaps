@@ -11,10 +11,12 @@ import { type Cdp, evaluate, launchChrome, open, siteUrl, sleep } from "./chrome
 //
 //   bun run previews                   build, then picture every card of every menu below
 //   bun run previews marbles           only the menus whose folder or address contains "marbles"
-//   bun run previews --url http://…    picture a server that already runs (the dev server shows its DevTag: avoid it)
+//   bun run previews --url http://…    picture a server that already runs (the dev server's DevTag is hidden like every overlay;
+//                                      Die Schatzinsel's card needs it, to jump to its moment with `__adventure`)
 //   bun run previews --no-build        picture the out/ that is there
 //   bun run previews --shots <dir>     also keep each whole window there, to see why a cut lies where it does
 //   bun run previews --video           the big pictures of the games the videos' outro shows (`VIDEO_GAMES`)
+//   bun run previews --pinnwand        the photos of the outro „Pinnwand“ that are no menu's picture (`PIN_PHOTOS`)
 //   bun run previews plakat            only the posters of the shelf's toys (`POSTERS`)
 //
 // Look at every new picture before committing it: a card whose game starts with a dark screen, a loading slip or a
@@ -33,6 +35,8 @@ const option = (name: string) => {
 const filters = args.filter((a, i) => !a.startsWith("--") && !["--url", "--shots"].includes(args[i - 1]));
 /** Only the videos' big pictures (`VIDEO_GAMES`), not the menus'. */
 const video = flag("video");
+/** Only the outro „Pinnwand“'s own photos (`PIN_PHOTOS`). */
+const pinboard = flag("pinnwand");
 /** Where to keep each whole window pictured too, to see why a cut lies where it does. */
 const shots = option("shots");
 
@@ -121,6 +125,42 @@ const VIDEO_DIR = "src/video/outro/bilder";
 /** The videos' pictures: 3 : 2 like the menus', as big as the outro shows them on its 1920 × 1080 canvas. */
 const VIDEO_SIZE = { width: 1200, height: 800 };
 
+/** A photo of the outro „Pinnwand“ made here (`PIN_PHOTOS`). */
+interface PinPhoto {
+  href: string;
+  /** The menu's line it repeats, by `keyOf` („components/tiere“): its seed, its cut and its play; else its own key, „pinnwand/<name>“. */
+  key?: string;
+  /** What else lies over it and is hidden. */
+  hide?: string;
+  /** What `HIDE_OVERLAYS` hides that stays here (Gefühle's choices keep their names, so each language has its photo). */
+  show?: string;
+  /** The app language it is pictured in (German by default). */
+  language?: string;
+}
+
+/** The app languages, `APP_LANGUAGES` in src/lib/language.ts (`pinboard.test.ts` checks the outro has a photo in each). */
+const LANGUAGES = ["de", "en", "zh", "hi", "es", "ar", "ru"];
+
+/**
+ * The photos of the outro „Pinnwand“ that are no menu's picture (`PINBOARD` in src/video/outro/content.ts, chosen by the
+ * user on 28 November 2026), by their file in `PIN_DIR`, cut round all they show (`WHOLE`) at `PIN_SIZE`: Zähne
+ * putzen's mouth seen from the side, the Timer's red disc a quarter round, Gefühle's first day at its second page with
+ * the two choices (one photo per language, their names stay), and the animal and campfire rounds of the menus' pictures
+ * (the same seed) without their words. A play of its own is `PLAYS["pinnwand/<name>"]`.
+ */
+const PIN_PHOTOS: Record<string, PinPhoto> = {
+  "zaehne-seite": { href: "/zaehne/", hide: ".teeth-controls, .teeth-progress" },
+  "timer-scheibe": { href: "/timer/disc/", hide: ".tm-shown, .tm-bar, .tm-pause-button" },
+  ...Object.fromEntries(
+    LANGUAGES.map((language) => [`gefuehle-${language}`, { href: "/gefuehle/tag-1/?seite=2", key: "pinnwand/gefuehle", show: ".fg-caption", language }]),
+  ),
+  tiere: { href: "/tiere/", key: "components/tiere", hide: ".ap-name, .ap-topic" },
+  zusammen: { href: "/zusammen/", key: "components/zusammen", hide: ".tg-topic, .tg-name" },
+};
+const PIN_DIR = "src/video/outro/pinnwand";
+/** Twice the size a photo is shown on the board (312 × 208 of the 1920 × 1080 canvas), so it stays sharp. */
+const PIN_SIZE = { width: 624, height: 416 };
+
 /**
  * The posters of the shelf's toys (`ToyPoster` in Bookshelf.tsx, user request, 24 November 2026), by the file they
  * go to: a big square picture of the game in the middle of play, in a window of `POSTER_WINDOW` cut to the play area's
@@ -206,6 +246,8 @@ const CUTS: Record<string, { x: number; y: number; size: number }> = {
   "components/socken": { x: 0.39, y: 0.2, size: 0.58 },
   // The shelf with its red, yellow and blue marble, what the child picks from, rather than the run's empty middle.
   "marbles/colortrack": { x: 0.28, y: 0.25, size: 0.5 },
+  // Die Schatzinsel's card is the whole screen at its moment (`PLAYS`), as the outro's board shows it too.
+  "adventure/schatzinsel": { x: 0.5, y: 0.5, size: SCREEN.width / ASPECT / SCREEN.height },
 };
 
 /**
@@ -221,7 +263,33 @@ const WHOLE = new Set([
   "components/mitmachen",
   "components/gross-klein",
   "components/tiere",
+  // The families' heads by the campfire, and the fire whose shadow is shown, whole (user feedback, 28 November 2026).
+  "components/zusammen",
+  "components/schatten",
 ]);
+
+/**
+ * A seed for `Math.random` by `keyOf`, where a game deals its round at random: the same round at every run, so a
+ * menu's picture stays the one the user saw and the outro's board can show that very round (user request, 28 November
+ * 2026; found by trying seeds one after another until the round came).
+ */
+const SEEDS: Record<string, number> = {
+  // The hen, with honey and corn to choose from.
+  "components/tiere": 78,
+  // The fox and bear families by the campfire, the flame to light it among the choices.
+  "components/zusammen": 20,
+  // The fire's shadow.
+  "components/schatten": 204,
+};
+
+/** Makes `Math.random` start from `seed` in every page opened from now on (mulberry32); returns what ends it. */
+async function seedRandom(cdp: Cdp, seed: number | undefined): Promise<() => Promise<void>> {
+  if (seed === undefined) return async () => {};
+  const { identifier } = await cdp.send<{ identifier: string }>("Page.addScriptToEvaluateOnNewDocument", {
+    source: `(() => { let a = ${seed} >>> 0; Math.random = () => { a = (a + 0x6d2b79f5) >>> 0; let t = a; t = Math.imul(t ^ (t >>> 15), t | 1); t ^= t + Math.imul(t ^ (t >>> 7), t | 61); return ((t ^ (t >>> 14)) >>> 0) / 4294967296; }; })()`,
+  });
+  return async () => void (await cdp.send("Page.removeScriptToEvaluateOnNewDocument", { identifier }));
+}
 
 /**
  * A part of the window shown alone, by `keyOf`, in CSS pixels: cut out and set into a blurred copy of itself widened
@@ -237,7 +305,7 @@ const ALONE: Record<string, Area> = {
  * What a child does before the picture, by `keyOf`: the keyboard games wait for a key on an empty page („Drück eine
  * Taste!“), and only then show what they are about; others show their best only after playing a while.
  */
-const PLAYS: Record<string, (cdp: Cdp) => Promise<void>> = {
+const PLAYS: Record<string, (cdp: Cdp) => Promise<void | false>> = {
   "components/buchstaben": async (cdp) => {
     await press(cdp, "a");
     await sleep(2000);
@@ -273,7 +341,9 @@ const PLAYS: Record<string, (cdp: Cdp) => Promise<void>> = {
   },
   // The other stories likewise show a station in the middle of play, not their empty opening: Tapsi paddling on Ole
   // (Die Schatzinsel's fourth step), Tapsi on Wolle tapping the balloons (Die Wolkenreise's fourth).
-  "adventure/schatzinsel": (cdp) => stepInto(cdp, 3),
+  // Die Schatzinsel: the whole screen with 6:44 still to come (user request, 28 November 2026: the card and the outro's
+  // board show this moment). Only the dev server has `__adventure` to jump there: a built site keeps the card's picture.
+  "adventure/schatzinsel": (cdp) => storyAt(cdp, "−6:44"),
   "adventure/wolkenreise": (cdp) => stepInto(cdp, 3),
   // Fire Rescue: Tapsi on Robo spraying the smoky windows with the hose, not the empty house of the opening (the fifth
   // step, after the pump).
@@ -288,7 +358,43 @@ const PLAYS: Record<string, (cdp: Cdp) => Promise<void>> = {
   // Many pairs on the line (user feedback, November 2026): three washes hung whole, so the game takes the child to
   // four pairs with patterns, and of those all but one.
   "components/socken": (cdp) => hangSocks(cdp, 3),
+  // The open mouth from the side at the outer side of the teeth, the brush in the middle of them.
+  // The mouth from the side, halfway along the left outside's teeth: ↓ jumps a part on, never a tap, which would land
+  // on the picture (the controls are hidden by then) and pause it.
+  "pinnwand/zaehne-seite": async (cdp) => {
+    for (let k = 0; k < 12 && !(await evaluate<boolean>(cdp, `!!document.querySelector(".teeth-segment.outer.now")`)); k++) {
+      await press(cdp, "ArrowDown");
+      await sleep(600);
+    }
+    await until(cdp, `parseFloat(document.querySelector(".teeth-segment.outer.now > span")?.style.getPropertyValue("--done") ?? "0") >= 0.5`, 30_000);
+  },
+  // The red disc a quarter round, still: every long animation of the run stands at a quarter of it.
+  "pinnwand/timer-scheibe": async (cdp) => {
+    await evaluate(
+      cdp,
+      `(() => { for (const a of document.getAnimations()) { const t = a.effect.getTiming(); if (typeof t.duration === "number" && t.duration > 30000) { a.currentTime = (t.delay || 0) + t.duration * 0.25; a.pause(); } } return true; })()`,
+    );
+    await sleep(500);
+  },
+  // The day's second page told: the small scene on top and the two choices under it.
+  "pinnwand/gefuehle": async (cdp) => {
+    await evaluate(cdp, `document.querySelector(".fg-next")?.dispatchEvent(new PointerEvent("pointerdown", { bubbles: true })); true`);
+    await sleep(3500);
+  },
 };
+
+/**
+ * Jumps a Bewegungsabenteuer story to where `left` („−6:44“) is still to come and holds it there; false on a built site,
+ * which has no `__adventure`.
+ */
+async function storyAt(cdp: Cdp, left: string): Promise<false | undefined> {
+  const [minutes = 0, seconds = 0] = left.replace("−", "").split(":").map(Number);
+  if (!(await evaluate<boolean>(cdp, "!!window.__adventure"))) return false;
+  await evaluate(cdp, `(() => { const p = window.__adventure; p.seek(p.duration - ${minutes * 60 + seconds} + 0.5); p.paused = true; return true; })()`);
+  await sleep(2500);
+  const shown = await evaluate<string>(cdp, `document.querySelector(".adventure-time-left")?.textContent ?? ""`);
+  if (shown.trim() !== left) throw new Error(`The story shows ${shown}, not ${left}`);
+}
 
 /** Skips a Bewegungsabenteuer story `steps` steps on (⏭) and waits until Tapsi is in the middle of the movement. */
 async function stepInto(cdp: Cdp, steps: number) {
@@ -472,12 +578,16 @@ const QUALITY = 70;
  * Pictures what the window shows now into `file`: the cut CUTS says, or the busiest part of `area` (by default the
  * window), `size` big; `key` names the cut where the file's own name doesn't (the videos' pictures).
  */
-async function picture(cdp: Cdp, file: string, area?: Area | null, { key = keyOf(file), size = SIZE } = {}) {
+async function picture(cdp: Cdp, file: string, area?: Area | null, { key = keyOf(file), size = SIZE, show = "" } = {}) {
   // A video's picture fills much of a television: no blocks of the encoding may show there.
   const quality = size === SIZE ? QUALITY : 85;
-  await PLAYS[key]?.(cdp);
+  if ((await PLAYS[key]?.(cdp)) === false) {
+    console.log(`  ${file} kept: its moment needs the dev server (--url)`);
+    return;
+  }
   await evaluate(cdp, HIDE_OVERLAYS);
   if (HIDE_ALSO[key.split("/")[0]]) await evaluate(cdp, hideAlso(HIDE_ALSO[key.split("/")[0]]));
+  if (show) await evaluate(cdp, hideAlso(show).replace("hidden !important", "visible !important"));
   await sleep(150);
   mkdirSync(file.slice(0, file.lastIndexOf("/")), { recursive: true });
   const cut = CUTS[key];
@@ -511,7 +621,8 @@ async function picture(cdp: Cdp, file: string, area?: Area | null, { key = keyOf
     const shot = await cdp.send<{ data: string }>("Page.captureScreenshot", { format: "png", clip: { ...area, scale: 1 } });
     const png = Buffer.from(shot.data, "base64");
     if (shots) await Bun.write(join(shots, `${key.replace("/", "-")}.png`), png);
-    const rect = await bestCut(png, WHOLE.has(key) ? { smallest: ZOOMED.smallest, biggest: 1 } : isBook(file) ? ZOOMED : WIDE);
+    const whole = WHOLE.has(key) || key.startsWith("pinnwand/");
+    const rect = await bestCut(png, whole ? { smallest: ZOOMED.smallest, biggest: 1 } : isBook(file) ? ZOOMED : WIDE);
     await sharp(png).extract(rect).resize(size.width, size.height).webp({ quality }).toFile(file);
   } else {
     const height = cut.size * SCREEN.height;
@@ -580,14 +691,34 @@ async function pictureBook(cdp: Cdp, base: string, book: string, dir = BOOK_DIR,
  */
 async function pictureGame(cdp: Cdp, base: string, href: string, file: string, size = SIZE, hide?: string) {
   const key = keyOf(join(BOOK_DIR, `${href.replaceAll("/", "")}.webp`));
-  await open(cdp, `${base}${href}`);
-  await sleep(2000);
-  const first = (await cardIds(cdp))[0];
-  if (first) await evaluate(cdp, `document.querySelector('[data-mode="${first}"]')?.click()`);
-  await sleep(WAITS[key] ?? WAIT);
-  if (hide) await evaluate(cdp, hideAlso(hide));
-  const prepare = MENUS.find((menu) => menu.path === href)?.prepare;
-  await picture(cdp, file, prepare && !CUTS[key] ? await evaluate<Area | null>(cdp, prepare) : null, { key, size });
+  const unseed = await seedRandom(cdp, SEEDS[key]);
+  try {
+    await open(cdp, `${base}${href}`);
+    await sleep(2000);
+    const first = (await cardIds(cdp))[0];
+    if (first) await evaluate(cdp, `document.querySelector('[data-mode="${first}"]')?.click()`);
+    await sleep(WAITS[key] ?? WAIT);
+    if (hide) await evaluate(cdp, hideAlso(hide));
+    const prepare = MENUS.find((menu) => menu.path === href)?.prepare;
+    await picture(cdp, file, prepare && !CUTS[key] ? await evaluate<Area | null>(cdp, prepare) : null, { key, size });
+  } finally {
+    await unseed();
+  }
+}
+
+/** One photo of the outro „Pinnwand“ (`PIN_PHOTOS`) into `PIN_DIR`, in its language. */
+async function picturePin(cdp: Cdp, base: string, name: string, { href, key = `pinnwand/${name}`, hide, show, language = "de" }: PinPhoto) {
+  const unseed = await seedRandom(cdp, SEEDS[key]);
+  try {
+    await evaluate(cdp, `localStorage.setItem("tinytaps.applanguage.v1", ${JSON.stringify(language)}); true`);
+    await open(cdp, `${base}${href}`);
+    await sleep(WAIT);
+    if (hide) await evaluate(cdp, hideAlso(hide));
+    await picture(cdp, join(PIN_DIR, `${name}.webp`), null, { key, size: PIN_SIZE, show });
+  } finally {
+    await unseed();
+    await evaluate(cdp, `localStorage.setItem("tinytaps.applanguage.v1", "de"); true`);
+  }
 }
 
 /**
@@ -652,16 +783,23 @@ try {
       await pictureGame(cdp, site.url, href, join(VIDEO_DIR, `${name}.webp`), VIDEO_SIZE, hide);
     }
   }
-  for (const book of BOOKS.filter((b) => !video && wanted(`${b} ${BOOK_DIR}`))) {
+  if (pinboard) {
+    for (const [name, photo] of Object.entries(PIN_PHOTOS).filter(([name, { href }]) => wanted(`${name} ${href}`))) {
+      console.log(`${photo.href} (Pinnwand)`);
+      await picturePin(cdp, site.url, name, photo);
+    }
+  }
+  const menus = !video && !pinboard;
+  for (const book of BOOKS.filter((b) => menus && wanted(`${b} ${BOOK_DIR}`))) {
     console.log(`/spiele/${book}/`);
     await pictureBook(cdp, site.url, book);
   }
-  for (const menu of MENUS.filter((m) => !video && wanted(`${m.path} ${m.dir}`))) {
+  for (const menu of MENUS.filter((m) => menus && wanted(`${m.path} ${m.dir}`))) {
     console.log(menu.path);
     await pictureMenu(cdp, site.url, menu);
   }
-  if (!video) await pictureGirls(cdp, site.url, wanted);
-  if (!video) await picturePosters(cdp, site.url, wanted);
+  if (menus) await pictureGirls(cdp, site.url, wanted);
+  if (menus) await picturePosters(cdp, site.url, wanted);
 } finally {
   stop();
   site.stop();

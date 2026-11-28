@@ -245,6 +245,21 @@
   border-radius: 1px;
 }
 
+/* A photo cut to a part of its picture (`crop`): the picture moved inside a window of the photo's size. */
+.vp-crop {
+  position: relative;
+  display: block;
+  overflow: hidden;
+  border-radius: 1px;
+}
+
+.vp-crop img {
+  position: absolute;
+  max-width: none;
+  height: auto;
+  object-fit: fill;
+}
+
 /* The word on the photo's frame, what it shows, as written on a print's white margin. */
 .vp-word {
   margin: 0;
@@ -309,37 +324,52 @@
   height: 52px;
 }
 
-/* The name in one line here: in two, it left no room for the address under it on a sheet between the photos. */
-.vp-scene .vp-note .logo,
-.vp-scene .vp-note .logo-line {
-  align-items: baseline;
-}
-
-.vp-scene .vp-note .logo {
-  flex-direction: row;
-  margin: 70px 0 0;
-  font-size: 84px;
-}
-
-/* The address under the name in the app's clear rounded letters, marked with a highlighter stroke drawn left to right. */
+/*
+ * Only the address on the sheet (user request, 28 November 2026), in the app's clear rounded letters, marked with a
+ * highlighter stroke drawn left to right; Papa Fox and his child sit on the o of „.com“ as on the o of the title, and
+ * the paw tracks walk along under the address up to them.
+ */
 .vp-address {
-  margin: 40px 0 0;
-  font-size: 56px;
+  margin: 56px 0 0;
+  font-size: 62px;
   font-weight: 600;
   letter-spacing: 0.01em;
   white-space: nowrap;
 }
 
-.vp-address span {
+.vp-mark {
   padding: 0 0.18em;
   background: linear-gradient(176deg, transparent 38%, #ffd84d 40%, #ffd84d 88%, transparent 90%) no-repeat;
   background-size: calc(var(--mark) * 100%) 100%;
 }
 
-.vp-line {
-  margin: 6px 0 0;
-  color: #c0392b;
-  font-size: 38px;
-  font-weight: 500;
-  white-space: nowrap;
+.vp-o {
+  position: relative;
+  display: inline-block;
+}
+
+.vp-o-anchor {
+  position: relative;
+  display: inline-block;
+  width: 0;
+  height: 0;
+}
+
+/* The foxes as in the title (`.logo-o img`), moved to sit on this rounder, lighter o. */
+.vp-o img {
+  position: absolute;
+  right: -0.07em;
+  bottom: -0.2em;
+  width: 0.92em;
+  max-width: none;
+}
+
+/* The tracks end under the o, as the title's do (`.logo-tracks`); their width is `TRACK_TILES` tiles of 0.8em. */
+.vp-tracks {
+  position: absolute;
+  top: 0.08em;
+  right: 0.34em;
+  height: 0.32em;
+  width: calc(var(--tiles) * 0.8em);
+  overflow: visible;
 }

@@ -1,8 +1,8 @@
 // The motion of the outro „Pinnwand“ as plain numbers of its time, like every video's: each frame is a function of its
-// second. A cork board fills the picture with every game's photo already pinned on it from the first frame (user
-// request, 27 November 2026: pinned one after another, the board took too long to fill); a moment later the paper with
-// the site's name is pressed into the middle from a little above and held by its pins, its address is written on, and
-// everything stands still long enough to read it.
+// second. A cork board fills the picture with every game's photo and the sheet with the address pinned on it from the
+// first frame (user requests, 27 and 28 November 2026: pinned one after another, the board took too long to fill, and
+// the sheet came too late); then the address is marked, the paw tracks walk along under it one print after another up
+// to Papa Fox and his child on the o of „.com“, and everything stands still long enough to read it.
 
 import { easeInOut, easeOut, progress } from "../intro/timeline";
 import { PINBOARD } from "./content";
@@ -48,24 +48,70 @@ export const PIN_SLOTS: readonly Slot[] = [
   { x: 1684, y: 884, turn: 3 },
 ];
 
-/** The paper in the middle with the site's name and its address: its middle, size and turn. */
-export const NOTE = { x: 960, y: 540, width: 1020, height: 370, turn: -1 };
+/** The paper in the middle with the address: its middle, size and turn – smaller than the name and address took (28 November 2026). */
+export const NOTE = { x: 960, y: 540, width: 900, height: 300, turn: -1 };
 
-/** When things happen, in seconds from the start: every photo hangs from the first frame on (user request, 27 November 2026). */
+/** When things happen, in seconds from the start: the photos and the sheet hang from the first frame on. */
 export const PINBOARD_BEATS = {
-  /** The paper with the name is pinned into the middle, once the full board has been seen a moment. */
-  note: [0.8, 1.3],
-  /** The address and the short line under the name are written on. */
-  line: [1.4, 1.9],
+  /** The highlighter stroke is drawn across the address. */
+  mark: [0.3, 0.9],
+  /** The paw prints appear one after another under the address, from its start up to the foxes on the o. */
+  paws: [1, 3.4],
 } as const satisfies Record<string, readonly [number, number]>;
 
-/** How long this outro lasts: the full board stands still long enough to read the address. */
-export const PINBOARD_SECONDS = Math.ceil((PINBOARD_BEATS.line[1] + 5) * 2) / 2;
+/** How long this outro lasts: the whole board stands still long enough to read the address (10 s, user request, 28 November 2026: a little longer). */
+export const PINBOARD_SECONDS = 10;
 
-/** When a thing pressed on during `beat` has its pin pushed in: the last third of it. */
-const pinBeat = ([from, to]: readonly [number, number]): readonly [number, number] => [from + (to - from) * 0.62, to];
+/** One print of the paw tracks: where it stands along them (0 at their start, 1 at the o), big (the grown-up's) or small (the child's). */
+export interface PawPrint {
+  /** Its middle along the tracks, in the tracks' units (`TRACK_TILE` a tile). */
+  x: number;
+  /** Its middle across them, in the same units: the big tracks run above the small ones. */
+  y: number;
+  big: boolean;
+}
 
-/** A thing pressed onto the board: how much it shows, how much bigger than flat it still is, how high it still is (0 flat). */
+/** One tile of the app's paw tracks (`.logo-tracks` in menus.css), 90 × 36 units: two big prints and four small ones. */
+const TILE: readonly PawPrint[] = [
+  { x: 10, y: 28, big: false },
+  { x: 22, y: 9, big: true },
+  { x: 32, y: 31, big: false },
+  { x: 55, y: 28, big: false },
+  { x: 67, y: 13, big: true },
+  { x: 78, y: 31, big: false },
+];
+
+/** A tile's width in units. */
+export const TRACK_TILE = 90;
+
+/** How many tiles the tracks under the address take, from its first letter up to the o of „.com“ (measured in the font, `TRACK_EMS`). */
+export const TRACK_TILES = 14;
+
+/** Every print of the tracks, in the order they appear: from the address's start towards the o. */
+export const PAW_PRINTS: readonly PawPrint[] = Array.from({ length: TRACK_TILES }, (_, tile) =>
+  TILE.map((paw) => ({ ...paw, x: paw.x + tile * TRACK_TILE })),
+).flat();
+
+/** How far print `k` of `PAW_PRINTS` has appeared at `t`: 0 not yet, 1 there. Each comes quickly, one after another. */
+export function pawShown(k: number, t: number): number {
+  const [from, to] = PINBOARD_BEATS.paws;
+  const step = (to - from - PAW_APPEAR) / (PAW_PRINTS.length - 1);
+  return easeOut(progress(t, [from + k * step, from + k * step + PAW_APPEAR]));
+}
+
+/** How long one print takes to appear, in seconds. */
+const PAW_APPEAR = 0.16;
+
+/** When print `k` lands, in seconds: its sound. */
+export const pawLands = (k: number) => {
+  const [from, to] = PINBOARD_BEATS.paws;
+  return from + (k * (to - from - PAW_APPEAR)) / (PAW_PRINTS.length - 1);
+};
+
+/** How much of the highlighter stroke across the address is drawn. */
+export const markShown = (t: number) => easeInOut(progress(t, PINBOARD_BEATS.mark));
+
+/** A thing lying on the board: how much it shows, how much bigger than flat it is, how high it is (0 flat). */
 export interface PressPose {
   opacity: number;
   scale: number;
@@ -74,18 +120,5 @@ export interface PressPose {
   pin: number;
 }
 
-/** A thing lying flat on the board, its pin in: every photo, from the first frame on. */
+/** A thing lying flat on the board, its pin in: every photo and the sheet, from the first frame on. */
 export const FLAT: PressPose = { opacity: 1, scale: 1, lift: 0, pin: 1 };
-
-/** A thing pressed onto the board during `beat`, at `t`: it comes from a little above, bigger, and lies down flat. */
-export function pressPose(beat: readonly [number, number], t: number): PressPose {
-  const p = easeOut(progress(t, beat));
-  const pin = easeInOut(progress(t, pinBeat(beat)));
-  return { opacity: Math.min(1, progress(t, beat) * 3), scale: 1 + 0.14 * (1 - p), lift: 1 - p, pin };
-}
-
-/** The paper with the name's pose at `t`. */
-export const notePose = (t: number) => pressPose(PINBOARD_BEATS.note, t);
-
-/** How much of the address and the line under the name shows. */
-export const lineShown = (t: number) => easeOut(progress(t, PINBOARD_BEATS.line));

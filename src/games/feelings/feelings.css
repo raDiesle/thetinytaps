@@ -21,9 +21,10 @@
   --top: calc(max(4px, env(safe-area-inset-top)) + 34px);
   /* Round a picture: a chosen one's ring (10px), its tick or cross half outside it. */
   --ring: 14px;
-  /* The caption under a card: the ring and shadow below it, a gap and two lines. */
-  --cap-font: 0.85rem;
-  --cap: calc(18px + 2.6 * var(--cap-font));
+  /* The caption under a card: the ring and shadow below it, a gap and two lines – at the size of the sentence under
+     the pictures, so grown-ups read both alike (user request, 28 November 2026: 0.85rem was too small). */
+  --cap-font: var(--caption-size);
+  --cap: calc(18px + 2.7 * var(--cap-font));
   /* The letter's circle and the ring stand out of a card; between the two cards the rings keep clear room. */
   --out: 14px;
   --between: calc(var(--gap) + 18px);
@@ -499,7 +500,8 @@
   }
 }
 
-/* A card's caption under it, never on it: small, in the book's serif. */
+/* A card's caption under it, never on it: set like the sentence under the pictures (`.fg-words`), the book's serif at
+   `--caption-size` in its ink. */
 .story-choices .fg-choice .fg-caption {
   position: static;
   max-width: 100%;
@@ -508,9 +510,10 @@
   border-radius: 0;
   background: none;
   font-family: Georgia, "Times New Roman", serif;
+  color: var(--ink);
   font-size: var(--cap-font);
   font-weight: 400;
-  opacity: 0.85;
+  line-height: 1.35;
   translate: none;
   text-wrap: balance;
 }
