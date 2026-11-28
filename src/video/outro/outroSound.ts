@@ -98,7 +98,8 @@ const PAW_PATS = 8;
 /**
  * Lays the sound of the outro „Pinnwand“ onto `ac`: board and sheet stand from the first frame, so Fun – for – Both
  * rings at once while the address is marked, the paws pat along the tracks as they appear, the big one lower, the small
- * one higher, and a warm chord sounds as the last print reaches Papa Fox and his child on the o.
+ * one higher, a warm chord sounds as the last print reaches Papa Fox and his child on the o, and the red stamp lands
+ * with a dull thud.
  */
 export function schedulePinboardSound(ac: BaseAudioContext, out: AudioNode, at: number) {
   for (let i = 0; i < PAW_PATS; i++) {
@@ -106,6 +107,10 @@ export function schedulePinboardSound(ac: BaseAudioContext, out: AudioNode, at: 
     const k = Math.round((i * (PAW_PRINTS.length - 1)) / (PAW_PATS - 1));
     knock(ac, out, at + pawLands(k) + 0.08, big ? 330 : 480, big ? 220 : 330, 0.12, 0.06);
   }
+  // The stamp: a soft rush as it comes down, a dull thud as it lands on the sheet.
+  const [stampFrom, stampLands] = PINBOARD_BEATS.stamp;
+  rush(ac, out, at + stampFrom, stampLands - stampFrom, 900, 300, 0.05);
+  knock(ac, out, at + stampLands, 150, 70, 0.32, 0.16);
   cardSound(ac, out, at, PINBOARD_CARD);
 }
 

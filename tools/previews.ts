@@ -343,7 +343,8 @@ const PLAYS: Record<string, (cdp: Cdp) => Promise<void | false>> = {
   // (Die Schatzinsel's fourth step), Tapsi on Wolle tapping the balloons (Die Wolkenreise's fourth).
   // Die Schatzinsel: the whole screen with 6:44 still to come (user request, 28 November 2026: the card and the outro's
   // board show this moment). Only the dev server has `__adventure` to jump there: a built site keeps the card's picture.
-  "adventure/schatzinsel": (cdp) => storyAt(cdp, "−6:44"),
+  // 0.75 s into that second: Tapsi's arm out to the side, waving to Kiki, as on the picture the user chose.
+  "adventure/schatzinsel": (cdp) => storyAt(cdp, "−6:44", 0.75),
   "adventure/wolkenreise": (cdp) => stepInto(cdp, 3),
   // Fire Rescue: Tapsi on Robo spraying the smoky windows with the hose, not the empty house of the opening (the fifth
   // step, after the pump).
@@ -384,13 +385,13 @@ const PLAYS: Record<string, (cdp: Cdp) => Promise<void | false>> = {
 };
 
 /**
- * Jumps a Bewegungsabenteuer story to where `left` („−6:44“) is still to come and holds it there; false on a built site,
- * which has no `__adventure`.
+ * Jumps a Bewegungsabenteuer story to where `left` („−6:44“) is still to come, `into` seconds into that second, and holds
+ * it there; false on a built site, which has no `__adventure`.
  */
-async function storyAt(cdp: Cdp, left: string): Promise<false | undefined> {
+async function storyAt(cdp: Cdp, left: string, into = 0.5): Promise<false | undefined> {
   const [minutes = 0, seconds = 0] = left.replace("−", "").split(":").map(Number);
   if (!(await evaluate<boolean>(cdp, "!!window.__adventure"))) return false;
-  await evaluate(cdp, `(() => { const p = window.__adventure; p.seek(p.duration - ${minutes * 60 + seconds} + 0.5); p.paused = true; return true; })()`);
+  await evaluate(cdp, `(() => { const p = window.__adventure; p.paused = true; p.seek(p.duration - ${minutes * 60 + seconds} + ${into}); return true; })()`);
   await sleep(2500);
   const shown = await evaluate<string>(cdp, `document.querySelector(".adventure-time-left")?.textContent ?? ""`);
   if (shown.trim() !== left) throw new Error(`The story shows ${shown}, not ${left}`);
@@ -470,11 +471,60 @@ const HIDE_OVERLAYS = `(() => {
 /**
  * What else to hide in the cuts of one game's levels, by the folder of `keyOf`: a Bewegungsabenteuer story's card and
  * trophy show a scene of the story, never the dark dancer in its box nor the row of steps under it (user feedback,
- * November 2026: the trophies showed the skeleton). The game's own card keeps the dancer, its `ALONE` cut.
+ * November 2026: the trophies showed the skeleton). The game's own card keeps the dancer, its `ALONE` cut, and Die
+ * Schatzinsel's card shows it smaller in its corner (`INSETS`).
  */
 const HIDE_ALSO: Record<string, string> = {
   adventure: ".adventure-outline, .adventure-route",
 };
+
+/**
+ * An overlay cut out of the window at the same moment as the picture and set back smaller into its bottom right corner,
+ * by `keyOf`: what it is (`selector`), its width as a share of the picture's, and its corners' radius in CSS pixels.
+ * Die Schatzinsel's card and the outro's board show the dark dancer in its box so (user request, 28 November 2026: the
+ * picture with the dancer, a little smaller than in the game), while `HIDE_ALSO` keeps it out of the cut itself.
+ */
+const INSETS: Record<string, { selector: string; share: number; radius: number }> = {
+  "adventure/schatzinsel": { selector: ".adventure-outline", share: 0.2, radius: 28 },
+};
+
+/** The overlay `INSETS` names for `key`, cut out of the window now as a png with its rounded corners clear; null if it isn't shown. */
+async function cutInset(cdp: Cdp, key: string): Promise<Buffer | null> {
+  const inset = INSETS[key];
+  if (!inset) return null;
+  const area = await evaluate<Area | null>(
+    cdp,
+    `(() => { const e = document.querySelector(${JSON.stringify(inset.selector)}); if (!e || getComputedStyle(e).opacity === "0") return null; const r = e.getBoundingClientRect(); return { x: r.x, y: r.y, width: r.width, height: r.height }; })()`,
+  );
+  if (!area) throw new Error(`${key}: ${inset.selector} is not shown at its moment`);
+  const shot = await cdp.send<{ data: string }>("Page.captureScreenshot", { format: "png", clip: { ...area, scale: 1 } });
+  const png = Buffer.from(shot.data, "base64");
+  const { width = 1, height = 1 } = await sharp(png).metadata();
+  const r = inset.radius * (width / area.width);
+  const mask = Buffer.from(
+    `<svg xmlns="http://www.w3.org/2000/svg" width="${width}" height="${height}"><rect width="100%" height="100%" rx="${r}" ry="${r}"/></svg>`,
+  );
+  return sharp(png)
+    .ensureAlpha()
+    .composite([{ input: mask, blend: "dest-in" }])
+    .png()
+    .toBuffer();
+}
+
+/** `png` with `inset` set into its bottom right corner at `share` of its width, a small margin from the edges. */
+async function withInset(png: Buffer, inset: Buffer, share: number): Promise<Buffer> {
+  const { width = 1, height = 1 } = await sharp(png).metadata();
+  const small = await sharp(inset)
+    .resize(Math.round(width * share))
+    .png()
+    .toBuffer();
+  const { width: w = 1, height: h = 1 } = await sharp(small).metadata();
+  const margin = Math.round(width * 0.02);
+  return sharp(png)
+    .composite([{ input: small, left: width - w - margin, top: height - h - margin }])
+    .png()
+    .toBuffer();
+}
 
 /** A script that hides what `selectors` name. */
 const hideAlso = (selectors: string) =>
@@ -586,6 +636,7 @@ async function picture(cdp: Cdp, file: string, area?: Area | null, { key = keyOf
     return;
   }
   await evaluate(cdp, HIDE_OVERLAYS);
+  const inset = await cutInset(cdp, key);
   if (HIDE_ALSO[key.split("/")[0]]) await evaluate(cdp, hideAlso(HIDE_ALSO[key.split("/")[0]]));
   if (show) await evaluate(cdp, hideAlso(show).replace("hidden !important", "visible !important"));
   await sleep(150);
@@ -632,8 +683,9 @@ async function picture(cdp: Cdp, file: string, area?: Area | null, { key = keyOf
     const y = Math.max(0, Math.min(cut.y * SCREEN.height - height / 2, SCREEN.height - height));
     const clip = { x, y, width, height, scale: 1 };
     const shot = await cdp.send<{ data: string }>("Page.captureScreenshot", { format: "png", clip });
-    if (shots) await Bun.write(join(shots, `${key.replace("/", "-")}.png`), Buffer.from(shot.data, "base64"));
-    await sharp(Buffer.from(shot.data, "base64")).resize(size.width, size.height).webp({ quality }).toFile(file);
+    const png = inset ? await withInset(Buffer.from(shot.data, "base64"), inset, INSETS[key]!.share) : Buffer.from(shot.data, "base64");
+    if (shots) await Bun.write(join(shots, `${key.replace("/", "-")}.png`), png);
+    await sharp(png).resize(size.width, size.height).webp({ quality }).toFile(file);
   }
   console.log(`  ${file}`);
 }

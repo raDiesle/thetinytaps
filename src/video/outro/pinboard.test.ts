@@ -2,11 +2,28 @@ import { expect, test } from "bun:test";
 import { readdirSync } from "node:fs";
 import { join } from "node:path";
 import sharp from "sharp";
+import { SEO_LANGUAGES } from "@/content/seo";
 import { APP_LANGUAGES, pick } from "@/lib/language";
 import { read } from "@/testSources";
 import { PINBOARD, photoWord } from "./content";
 import { PINBOARD_SOUND_END } from "./outroSound";
-import { FRAME, markShown, NOTE, PAW_PRINTS, PHOTO, PHOTO_COUNT, PIN_SLOTS, PINBOARD_BEATS, PINBOARD_SECONDS, pawShown } from "./pinboard";
+import { BOARD_ADDRESS, boardLine, FREE } from "./content";
+import {
+  FRAME,
+  markShown,
+  NOTE,
+  PAW_PRINTS,
+  PHOTO,
+  PHOTO_COUNT,
+  PIN_SLOTS,
+  PINBOARD_BEATS,
+  PINBOARD_SECONDS,
+  pawShown,
+  stampPose,
+  TRACK_DEPTH,
+  TRACK_EMS,
+  TRACK_UNITS,
+} from "./pinboard";
 
 const FRAME_SECONDS = 1 / 60;
 const ROOT = join(import.meta.dir, "../../..");
@@ -51,9 +68,39 @@ test("the paw prints appear one after another, each growing steadily, all there 
   expect(pawShown(PAW_PRINTS.length - 1, (from + to) / 2)).toBe(0);
 });
 
+test("the paw prints are few and big, their feet set apart, filling the room under the address (user request, 28 November 2026)", () => {
+  // Once 84 prints of a few pixels in one thin band, hardly seen.
+  expect(PAW_PRINTS.length).toBeLessThanOrEqual(36);
+  for (const paw of PAW_PRINTS) {
+    expect(paw.x).toBeGreaterThan(0);
+    expect(paw.x).toBeLessThan(TRACK_EMS * TRACK_UNITS);
+    expect(paw.y).toBeGreaterThan(0);
+    expect(paw.y).toBeLessThan(TRACK_DEPTH * TRACK_UNITS);
+  }
+  const rows = (big: boolean) => new Set(PAW_PRINTS.filter((p) => p.big === big).map((p) => p.y)).size;
+  expect(rows(true)).toBe(2);
+  expect(rows(false)).toBe(2);
+  // Quick: the whole track in little more than a second.
+  expect(PINBOARD_BEATS.paws[1] - PINBOARD_BEATS.paws[0]).toBeLessThanOrEqual(1.4);
+});
+
+test("the address shows each word's capital, the line under it says what the site holds, and the free stamp lands and stays", () => {
+  // A capital at each word's start, so the address reads as words (user request, 28 November 2026).
+  expect(BOARD_ADDRESS.toLowerCase()).toBe("www.littlestepstogrow.com");
+  expect(BOARD_ADDRESS.match(/[A-Z]/g)).toEqual(["L", "S", "T", "G"]);
+  for (const language of SEO_LANGUAGES) {
+    expect(boardLine(language), language).toContain(" & ");
+    expect(pick(FREE, language), language).toBeTruthy();
+  }
+  const [from, lands] = PINBOARD_BEATS.stamp;
+  expect(stampPose(from - 0.01).opacity).toBe(0);
+  expect(from).toBeGreaterThanOrEqual(PINBOARD_BEATS.paws[1]);
+  for (let t = lands + 0.2; t <= PINBOARD_SECONDS; t += 0.5) expect(stampPose(t)).toEqual({ opacity: 1, scale: 1 });
+});
+
 test("at the end the whole board stands still long enough to read the address", () => {
   // User request, 28 November 2026: show it a little longer before the video ends.
-  expect(PINBOARD_SECONDS - PINBOARD_BEATS.paws[1]).toBeGreaterThanOrEqual(6);
+  expect(PINBOARD_SECONDS - PINBOARD_BEATS.stamp[1]).toBeGreaterThanOrEqual(6);
 });
 
 test("the sound rings out before the outro ends", () => {

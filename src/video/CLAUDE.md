@@ -33,13 +33,18 @@ the management page's contents by `TOOL_GROUPS`), never a link from the shelf or
   pictures one after another went by too fast and gave no overview) is one single picture: a cork board filling the
   screen with the games' photos (`PINBOARD` in `content.ts`, places in `PIN_SLOTS`) in white frames, each with a word
   for what it shows on its frame (the game's name, or a short `word` where that wouldn't say it), each held by a
-  pushpin, and in the middle a small sheet torn from a spiral pad (its holes along the top, faintly squared, two pins)
-  with **only the address** „www.littlestepstogrow.com“ in the app's rounded letters, Papa Fox and his child sitting on
-  the o of „.com“ as on the title's o (`FOX_O` from `Logo`) – **all of it there from the first frame** (user requests,
-  27 and 28 November 2026: pinned one after another it took too long, and the sheet came too late; the site's name over
-  the address and the line under it were taken out). Then the address is marked by a highlighter stroke drawn on, the
-  paw tracks appear under it one print after another up to the foxes, each with a soft pat, a warm chord as they
-  arrive, and the board stands still for over six seconds (`pinboard.test.ts`). No card, no signs, no code.
+  pushpin, and in the middle a low sheet torn from a spiral pad (its holes along the top, faintly squared, two pins)
+  with the address „www.LittleStepsToGrow.com“ in the app's rounded letters – each word's first letter a capital in the
+  book's red, so the long run of letters reads as words (`BOARD_ADDRESS`, `.vp-capital`) –, Papa Fox and his child
+  sitting on the o of „.com“ as on the title's o (`FOX_O` from `Logo`), and under it one line of what the site holds,
+  „Alltagshelfer & Lernspiele“ (`boardLine`, the shelf's two groups) – **all of it there from the first frame** (user
+  requests, 27 and 28 November 2026: pinned one after another it took too long, and the sheet came too late; the
+  site's name over the address was taken out, and the sheet made lower). Then the address is marked by a highlighter
+  stroke drawn on, the paw tracks appear under it quickly one print after another up to the foxes – few and big, the
+  grown-up's long steps above the child's short ones, each foot set apart and turned a little, filling the room under
+  the address (`PAW_PRINTS`; 84 tiny prints in one thin band were hardly seen) – with a soft patter and a warm chord as
+  they arrive, then a red rubber stamp „Kostenlos“ (`FREE`) comes down before that line with a thud (`stampPose`), and
+  the board stands still for over six seconds (`pinboard.test.ts`). No card, no signs, no code.
   Its words are in the board's own style, never a bold serif on a plain card (user feedback, 27 November 2026), and
   every word stays inside its sheet or frame in every language – look at a frame (`--shots 6`) in a long language (es)
   after changing them, and at the foxes on the o magnified: they sit on the letter, never float above it.
@@ -47,7 +52,8 @@ the management page's contents by `TOOL_GROUPS`), never a link from the shelf or
   November 2026), so a photo swapped keeps its place and the board stays one picture to take in at a glance, never a
   run of pictures again. A photo is a game's painted picture (whole, or the part `crop` names: Abstillen's first page
   cut to the child and Mama on the sofa), a menu's picture (Bewegungsabenteuer's treasure island card, the whole screen
-  with 6:44 to go), or one of the board's own in `outro/pinnwand/`, made by `bun run previews --pinnwand` (`PIN_PHOTOS`):
+  0.75 s after 6:44 to go, with the dark dancer of that moment cut out and set back a little smaller into its bottom
+  right corner, `INSETS`), or one of the board's own in `outro/pinnwand/`, made by `bun run previews --pinnwand` (`PIN_PHOTOS`):
   Zähne putzen's mouth from the side, the Timer's red disc a quarter round, the animal and campfire rounds the menu shows
   (the same seed, `SEEDS`, without their words), and Gefühle's first day at its second page with its two choices –
   their names stay, so it has a photo per language (`byLanguage`). Run it against the dev server (`--url`): only there

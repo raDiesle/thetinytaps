@@ -2,7 +2,8 @@
 // second. A cork board fills the picture with every game's photo and the sheet with the address pinned on it from the
 // first frame (user requests, 27 and 28 November 2026: pinned one after another, the board took too long to fill, and
 // the sheet came too late); then the address is marked, the paw tracks walk along under it one print after another up
-// to Papa Fox and his child on the o of „.com“, and everything stands still long enough to read it.
+// to Papa Fox and his child on the o of „.com“, a red „Free“ stamp comes down beside the line under them, and
+// everything stands still long enough to read it.
 
 import { easeInOut, easeOut, progress } from "../intro/timeline";
 import { PINBOARD } from "./content";
@@ -48,49 +49,63 @@ export const PIN_SLOTS: readonly Slot[] = [
   { x: 1684, y: 884, turn: 3 },
 ];
 
-/** The paper in the middle with the address: its middle, size and turn – smaller than the name and address took (28 November 2026). */
-export const NOTE = { x: 960, y: 540, width: 900, height: 300, turn: -1 };
+/**
+ * The paper in the middle with the address: its middle, size and turn – smaller than the name and address took, and
+ * lower again once only the address, its tracks and one line under them were left (user requests, 28 November 2026).
+ */
+export const NOTE = { x: 960, y: 540, width: 900, height: 262, turn: -1 };
 
 /** When things happen, in seconds from the start: the photos and the sheet hang from the first frame on. */
 export const PINBOARD_BEATS = {
   /** The highlighter stroke is drawn across the address. */
   mark: [0.3, 0.9],
-  /** The paw prints appear one after another under the address, from its start up to the foxes on the o. */
-  paws: [1, 3.4],
+  /** The paw prints appear one after another under the address, from its start up to the foxes on the o – quickly (user request, 28 November 2026). */
+  paws: [0.9, 2.1],
+  /** The red „Free“ stamp comes down onto the sheet and lands. */
+  stamp: [2.3, 2.5],
 } as const satisfies Record<string, readonly [number, number]>;
 
 /** How long this outro lasts: the whole board stands still long enough to read the address (10 s, user request, 28 November 2026: a little longer). */
 export const PINBOARD_SECONDS = 10;
 
-/** One print of the paw tracks: where it stands along them (0 at their start, 1 at the o), big (the grown-up's) or small (the child's). */
+/** One print of the paw tracks: where it stands, big (the grown-up's) or small (the child's), and how far it is turned. */
 export interface PawPrint {
-  /** Its middle along the tracks, in the tracks' units (`TRACK_TILE` a tile). */
+  /** Its middle along the tracks, in the tracks' units (`TRACK_UNITS` an em of the address). */
   x: number;
   /** Its middle across them, in the same units: the big tracks run above the small ones. */
   y: number;
   big: boolean;
+  /** Degrees off the tracks' direction, as a foot is set down a little out or in. */
+  turn: number;
 }
 
-/** One tile of the app's paw tracks (`.logo-tracks` in menus.css), 90 × 36 units: two big prints and four small ones. */
-const TILE: readonly PawPrint[] = [
-  { x: 10, y: 28, big: false },
-  { x: 22, y: 9, big: true },
-  { x: 32, y: 31, big: false },
-  { x: 55, y: 28, big: false },
-  { x: 67, y: 13, big: true },
-  { x: 78, y: 31, big: false },
-];
+/** The tracks' units in an em of the address. */
+export const TRACK_UNITS = 100;
 
-/** A tile's width in units. */
-export const TRACK_TILE = 90;
+/** How long the tracks are, in ems of the address: from its first letter up to the o of „.com“ (measured in the font). */
+export const TRACK_EMS = 12.2;
 
-/** How many tiles the tracks under the address take, from its first letter up to the o of „.com“ (measured in the font, `TRACK_EMS`). */
-export const TRACK_TILES = 14;
+/** How deep the tracks are under the address, in ems of it: room for both tracks' feet set apart. */
+export const TRACK_DEPTH = 1;
 
-/** Every print of the tracks, in the order they appear: from the address's start towards the o. */
-export const PAW_PRINTS: readonly PawPrint[] = Array.from({ length: TRACK_TILES }, (_, tile) =>
-  TILE.map((paw) => ({ ...paw, x: paw.x + tile * TRACK_TILE })),
-).flat();
+/**
+ * The prints of one walker along the tracks: a step every `step` units from `start`, its feet set down by turns at `y`
+ * (left) and `y + spread` (right), each foot turned a little outwards, with a touch of each step's own.
+ */
+const walk = (big: boolean, start: number, step: number, y: number, spread: number, turn: number): PawPrint[] =>
+  Array.from({ length: Math.floor((TRACK_EMS * TRACK_UNITS - 30 - start) / step) + 1 }, (_, k) => ({
+    x: start + k * step,
+    y: y + (k % 2) * spread,
+    big,
+    turn: (k % 2 ? turn : -turn) + ((k * 7) % 5) - 2,
+  }));
+
+/**
+ * Every print of the tracks, in the order they appear: from the address's start towards the o. Few and big, the feet
+ * set clearly apart and filling the room under the address (user request, 28 November 2026: the many small prints in
+ * one thin band were hardly seen) – the grown-up's long steps above, the child's short ones below.
+ */
+export const PAW_PRINTS: readonly PawPrint[] = [...walk(true, 34, 104, 22, 26, 7), ...walk(false, 66, 68, 70, 20, 10)].sort((a, b) => a.x - b.x);
 
 /** How far print `k` of `PAW_PRINTS` has appeared at `t`: 0 not yet, 1 there. Each comes quickly, one after another. */
 export function pawShown(k: number, t: number): number {
@@ -100,13 +115,26 @@ export function pawShown(k: number, t: number): number {
 }
 
 /** How long one print takes to appear, in seconds. */
-const PAW_APPEAR = 0.16;
+const PAW_APPEAR = 0.12;
 
 /** When print `k` lands, in seconds: its sound. */
 export const pawLands = (k: number) => {
   const [from, to] = PINBOARD_BEATS.paws;
   return from + (k * (to - from - PAW_APPEAR)) / (PAW_PRINTS.length - 1);
 };
+
+/**
+ * The red „Free“ stamp at `t`: nothing before it comes, then falling onto the sheet from above (bigger, nearer the eye)
+ * faster and faster, squashed a little as it lands, then still.
+ */
+export function stampPose(t: number): { opacity: number; scale: number } {
+  const [from, to] = PINBOARD_BEATS.stamp;
+  if (t < from) return { opacity: 0, scale: 2.4 };
+  const fall = progress(t, [from, to]);
+  if (fall < 1) return { opacity: Math.min(1, fall * 2.5), scale: 1 + 1.4 * (1 - fall * fall) };
+  const settle = progress(t, [to, to + 0.12]);
+  return { opacity: 1, scale: 1 - 0.05 * Math.sin(Math.PI * settle) };
+}
 
 /** How much of the highlighter stroke across the address is drawn. */
 export const markShown = (t: number) => easeInOut(progress(t, PINBOARD_BEATS.mark));

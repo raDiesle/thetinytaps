@@ -3,7 +3,7 @@ import { FOX_O } from "@/components/Logo";
 import type { SeoLanguage } from "@/content/seo";
 import { pick } from "@/lib/language";
 import { CANVAS } from "../canvas";
-import { BOARD_ADDRESS, PINBOARD, type PinnedPhoto, photoWord } from "./content";
+import { BOARD_ADDRESS, boardLine, FREE, PINBOARD, type PinnedPhoto, photoWord } from "./content";
 import {
   FLAT,
   FRAME,
@@ -16,8 +16,10 @@ import {
   pawShown,
   type PressPose,
   type Slot,
-  TRACK_TILE,
-  TRACK_TILES,
+  stampPose,
+  TRACK_DEPTH,
+  TRACK_EMS,
+  TRACK_UNITS,
 } from "./pinboard";
 
 /** A thing pressed onto the board at `slot`, `width` × `height`, as `pose` says: higher, it is bigger and its shadow longer. */
@@ -73,17 +75,22 @@ const TOES: readonly (readonly [number, number, number, number])[] = [
  */
 function Tracks({ t }: { t: number }) {
   return (
-    <svg className="vp-tracks" viewBox={`0 0 ${TRACK_TILES * TRACK_TILE} 36`} aria-hidden style={{ "--tiles": TRACK_TILES } as CSSProperties}>
+    <svg
+      className="vp-tracks"
+      viewBox={`0 0 ${TRACK_EMS * TRACK_UNITS} ${TRACK_DEPTH * TRACK_UNITS}`}
+      aria-hidden
+      style={{ "--track-ems": TRACK_EMS, "--track-depth": TRACK_DEPTH } as CSSProperties}
+    >
       {PAW_PRINTS.map((paw, k) => {
         const shown = pawShown(k, t);
         if (shown <= 0) return null;
-        const size = (paw.big ? 0.55 : 0.38) * (1 + 0.5 * (1 - shown));
+        const size = (paw.big ? 1.35 : 0.95) * (1 + 0.5 * (1 - shown));
         return (
           <g
             key={k}
             opacity={Math.min(1, shown * 1.6).toFixed(3)}
             fill={paw.big ? "#d9692a" : "#e8914f"}
-            transform={`translate(${paw.x} ${paw.y}) rotate(90) scale(${size.toFixed(4)})`}
+            transform={`translate(${paw.x} ${paw.y}) rotate(${90 + paw.turn}) scale(${size.toFixed(4)})`}
           >
             <path d={PAW} />
             {TOES.map(([cx, cy, rx, ry]) => (
@@ -95,6 +102,18 @@ function Tracks({ t }: { t: number }) {
     </svg>
   );
 }
+
+/** The address with each word's first capital set apart, so its words can be told apart at a glance. */
+const lettered = (text: string) =>
+  [...text].map((letter, k) =>
+    /[A-Z]/.test(letter) ? (
+      <span key={k} className="vp-capital">
+        {letter}
+      </span>
+    ) : (
+      letter
+    ),
+  );
 
 /** Where the o of „.com“ stands in the address: Papa Fox and his child sit on it. */
 const O_AT = BOARD_ADDRESS.lastIndexOf("o");
@@ -115,9 +134,10 @@ function PhotoPicture({ photo }: { photo: PinnedPhoto }) {
 /**
  * One frame of the outro „Pinnwand“ at second `t` (user requests, 27 and 28 November 2026): a cork board filling the
  * picture with every game's photo pinned on it, each in a white frame with a word for what it is, and in the middle a
- * sheet torn from a spiral pad with only the address, Papa Fox and his child sitting on the o of „.com“ – all of it
- * there from the first frame. Then the address is marked with a highlighter and the paw tracks walk along under it up
- * to the foxes, one print after another – one picture to take in, its words in `language`.
+ * sheet torn from a spiral pad with the address, Papa Fox and his child sitting on the o of „.com“, and under it what the
+ * site holds – all of it there from the first frame. Then the address is marked with a highlighter, the paw tracks
+ * walk along under it up to the foxes, one print after another, and a red „Free“ stamp comes down beside the line
+ * under them – one picture to take in, its words in `language`.
  */
 export function PinboardScene({ t, language }: { t: number; language: SeoLanguage }) {
   return (
@@ -143,7 +163,7 @@ export function PinboardScene({ t, language }: { t: number; language: SeoLanguag
         <div className="vp-note-holes" />
         <p className="vp-address">
           <span className="vp-mark" style={{ "--mark": markShown(t).toFixed(3) } as CSSProperties}>
-            {BOARD_ADDRESS.slice(0, O_AT)}
+            {lettered(BOARD_ADDRESS.slice(0, O_AT))}
             <span className="vp-o">
               o
               <span className="vp-o-anchor">
@@ -154,11 +174,23 @@ export function PinboardScene({ t, language }: { t: number; language: SeoLanguag
             {BOARD_ADDRESS.slice(O_AT + 1)}
           </span>
         </p>
+        <p className="vp-line">
+          <span className="vp-stamp" style={stampStyle(t)}>
+            {pick(FREE, language)}
+          </span>
+          <span style={{ fontSize: fitted(boardLine(language), 40, 30) }}>{boardLine(language)}</span>
+        </p>
         <Pin color={PIN_COLORS[0]} pose={FLAT} left="7%" />
         <Pin color={PIN_COLORS[2]} pose={FLAT} left="93%" />
       </div>
     </div>
   );
+}
+
+/** The stamp's look at `t` (`stampPose`): falling onto the sheet, turned as a stamp is pressed on by hand. */
+function stampStyle(t: number): CSSProperties {
+  const { opacity, scale } = stampPose(t);
+  return { opacity, transform: `rotate(-8deg) scale(${scale.toFixed(4)})` };
 }
 
 /** A photo with its picture in `language`, where its picture has words in it (Gefühle's page with its choices). */

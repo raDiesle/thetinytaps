@@ -10,7 +10,8 @@ import together from "../../games/together/bilder/*.webp?glob";
 import shots from "./bilder/*.webp?glob";
 import pins from "./pinnwand/*.webp?glob";
 import { languagePrefix, type SeoLanguage } from "@/content/seo";
-import { APP_LANGUAGES, type EnglishFirst, type Texts } from "@/lib/language";
+import { APP_LANGUAGES, type EnglishFirst, pick, type Texts } from "@/lib/language";
+import { LEARNING_GAMES } from "@/lib/sharedTexts";
 
 /** The site the outro sends to: its main address (`siteUrl` in tools/build.ts). */
 export const SITE = "https://www.littlestepstogrow.com";
@@ -215,5 +216,15 @@ export const PINBOARD: readonly PinnedPhoto[] = [
 /** The word on a photo's frame: its own, else the game's name on the shelf. */
 export const photoWord = (photo: PinnedPhoto): Texts => photo.word ?? gameTitle(photo);
 
-/** The address in the middle of the board, as people read it off a television: with www, never https or a slash. */
-export const BOARD_ADDRESS = "www.littlestepstogrow.com";
+/**
+ * The address in the middle of the board, as people read it off a television: with www, never https or a slash, and
+ * each word's first letter a capital, so the run of small letters reads as „Little Steps to Grow“ (user request,
+ * 28 November 2026; an address doesn't care for capitals). The scene sets those letters apart in colour too.
+ */
+export const BOARD_ADDRESS = "www.LittleStepsToGrow.com";
+
+/** The line under the address: what the site holds, the shelf's two groups („Alltagshelfer & Lernspiele“). */
+export const boardLine = (language: SeoLanguage) => `${pick(HELPERS_TITLE, language)} & ${pick(LEARNING_GAMES, language)}`;
+
+/** The red stamp beside that line: free, the card's first sign (user request, 28 November 2026: shown apart, as a stamp). */
+export const FREE: EnglishFirst = SIGNS[0]!.text;

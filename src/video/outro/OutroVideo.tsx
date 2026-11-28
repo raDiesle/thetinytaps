@@ -76,15 +76,16 @@ export function OutroVideo() {
       title="Abspann für die Videos"
       about={
         <>
-          „Pinnwand“: Ein Korkbrett mit zwölf Fotos aus den Spielen, alle von Anfang an da, jedes im weißen Rahmen mit einem Wort, was es zeigt; dann wird in
-          die Mitte ein Blatt vom Spiralblock gepinnt mit dem Namen „Little Steps to Grow“ (Papa Fuchs mit Kind auf dem o), darunter gelb markiert
-          www.littlestepstogrow.com und „Alltagshelfer & Lernspiele“ – ein einziges Bild, ohne Karte danach. Leertaste oder Klick ins Bild hält an und spielt
-          weiter. „Bilder aus den Spielen“: erst die zwei Kategorien Alltagshelfer und Lernspiele nebeneinander, dann kommt ein Bild nach dem anderen aus der
-          Tiefe groß in die Mitte, mit dem Namen des Spiels darunter, und fliegt weiter, wenn das nächste kommt. „Regal“: Das Buch klappt zu und geht zurück ins
-          Regal, die anderen Bilderbücher leuchten nacheinander auf. Diese beiden enden mit derselben Karte: littlestepstogrow.com, fünf kleine Zeichen und ein
-          QR-Code zur Startseite – in jedem Video derselbe Abspann, nur in seiner Sprache. Weil YouTube bei Kindervideos keine Links im Abspann zeigt, steht
-          alles im Bild. Gestochen scharf macht es <code>bun run video outro --sprache en</code> im Projekt, Bild für Bild (<code>--variante bilder</code> oder{" "}
-          <code>--variante regal</code> für die anderen).
+          „Pinnwand“: Ein Korkbrett mit zwölf Fotos aus den Spielen, jedes im weißen Rahmen mit einem Wort, was es zeigt, und in der Mitte ein Blatt vom
+          Spiralblock mit www.LittleStepsToGrow.com (die Anfangsbuchstaben rot, Papa Fuchs mit Kind auf dem o) und „Alltagshelfer & Lernspiele“ darunter – alles
+          von Anfang an da. Dann wird die Adresse gelb markiert, Tapsen laufen darunter zu den Füchsen, und ein roter Stempel „Kostenlos“ landet – ein einziges
+          Bild, ohne Karte danach. Leertaste oder Klick ins Bild hält an und spielt weiter. „Bilder aus den Spielen“: erst die zwei Kategorien Alltagshelfer und
+          Lernspiele nebeneinander, dann kommt ein Bild nach dem anderen aus der Tiefe groß in die Mitte, mit dem Namen des Spiels darunter, und fliegt weiter,
+          wenn das nächste kommt. „Regal“: Das Buch klappt zu und geht zurück ins Regal, die anderen Bilderbücher leuchten nacheinander auf. Diese beiden enden
+          mit derselben Karte: littlestepstogrow.com, fünf kleine Zeichen und ein QR-Code zur Startseite – in jedem Video derselbe Abspann, nur in seiner
+          Sprache. Weil YouTube bei Kindervideos keine Links im Abspann zeigt, steht alles im Bild. Gestochen scharf macht es{" "}
+          <code>bun run video outro --sprache en</code> im Projekt, Bild für Bild (<code>--variante bilder</code> oder <code>--variante regal</code> für die
+          anderen).
         </>
       }
       facts={[
@@ -94,7 +95,7 @@ export function OutroVideo() {
         [
           "Ton",
           variant === "pinnwand"
-            ? "eigener Klang (Rascheln und zwei Reißnägel für das Blatt in der Mitte, die drei Glockentöne des Intros, Akkord), noch ohne Stimme"
+            ? "eigener Klang (die drei Glockentöne des Intros, Tapsen, Akkord, ein dumpfer Stempel), noch ohne Stimme"
             : variant === "bilder"
               ? "eigener Klang (zwei Töne für die Kategorien, ein Luftzug und ein steigender Ton je Bild, die drei Glockentöne des Intros, Akkord), noch ohne Stimme"
               : "eigener Klang (Zuklappen, Klopfen, ein Ton je Buch, die drei Glockentöne des Intros, Akkord), noch ohne Stimme",
