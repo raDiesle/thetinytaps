@@ -21,8 +21,8 @@ const SLOTS: { daytime: Daytime; icon: string; label: Localized }[] = [
 /**
  * The week from Monday to Sunday, a place for the morning and one for the evening of every day. Brushed or not is seen
  * at a glance across the room (user request, November 2026): a brushing finished is a gold star on a bright green disc,
- * one that was missed an empty grey disc with a dashed rim and its sun or moon faint in it, and one still to come only
- * a faint dotted ring. The star just earned pops in. Today stands out (bigger, „Heute“, coloured for morning or
+ * one that was missed an empty pale disc with a dashed rim and its sun or moon faint in it, and one still to come only
+ * a faint dotted ring in the colour of its morning or evening. The star just earned pops in. Today stands out (bigger, „Heute“, coloured for morning or
  * evening) and so does the place of this brushing, so it is clear which star comes now.
  */
 export function Week({ log, today, now }: { log: WeekLog; today: Date; now: Daytime }) {
@@ -53,7 +53,7 @@ export function Week({ log, today, now }: { log: WeekLog; today: Date; now: Dayt
               return (
                 <span
                   key={daytime}
-                  className={`teeth-slot ${state}${fresh ? " fresh" : ""}${current ? " now" : ""}`}
+                  className={`teeth-slot ${daytime} ${state}${fresh ? " fresh" : ""}${current ? " now" : ""}`}
                   aria-label={`${dayNames[i]} ${t(label)}: ${t(
                     state === "star"
                       ? { de: "geputzt", en: "brushed", zh: "刷过了", hi: "ब्रश हो गया", es: "cepillado", ar: "تم التنظيف", ru: "почищено" }

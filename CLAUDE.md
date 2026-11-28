@@ -633,7 +633,11 @@ A game may give it before its end where reaching the goal once is enough (Ketten
   px wide at 844×390). A line wastes no room round its picture there either: thin paper round it and its name in one
   line, all names shrunk alike (`fitNames`).
   Only what is drawn of a corner is tapped, never the empty rest of its square, which reaches the first line. No round arrow stands beside the title for it (`MenuTop.test.ts`), the sun or a room's window step aside, and nothing
-  else goes into that corner. Every way back inside a book is that corner: while playing, the ✕ that leaves is the
+  else goes into that corner. A menu deeper in a book (its way back is not the shelf: a game's cards, Lebendige Bilder's
+  pictures) has the book's ribbon too, as high as the corner right beside it (`ShelfRibbon` in `MenuHead`,
+  `.shelf-ribbon`), which closes the book onto the shelf in one tap – never only one page back from there (user
+  request, 28 November 2026); `goBack` steps back over the pages between in the history, so the phone's back button
+  then doesn't lead into the book again (`goBack.test.ts`). Every way back inside a book is that corner: while playing, the ✕ that leaves is the
   same corner at the top left with a ✕ on it (`PageCornerArt`), tapped or held just like the ✕ – held, it lifts further
   instead of a ring filling – alone in that corner; a game's ⚙️ (`PlayOptions`) moves to the top right for it, beside the fullscreen button, and a game's own buttons and signs in the top
   left keep below it with `top: calc(… + var(--corner-clear, 0px))` (Schatten finden's picture choice lay under the ✕,
@@ -750,15 +754,21 @@ A game may give it before its end where reaching the goal once is enough (Ketten
   line of a book's table of contents and every picture's card of Lebendige Bilder shows a 3 : 2 cut of its game as it
   plays (`CardPicture`, `PREVIEW_SIZE`), a small still webp in the game's `vorschau/` folder (`GameShell previews`; the
   books' lines in `src/components/vorschau/<book id>.webp`) made by `bun run previews` in headless Chrome – never the
-  game's own svg drawn into the menu, which would have a phone draw every game at once. The picture is framed like a
-  photo pasted in, and on a table of contents' line
-  a big rounded rectangle as tall as the line, or as wide as it where the line is tall (see the table of contents
-  below) – never over the name, never a small round cut (user feedback, November 2026, three times: round cuts showed
-  too little, then pictures filling the card lay over the words, then one column of flat lines left them far too
-  small). **A card with a picture looks alike in every menu and at every size** (`pictureCard`, user feedback, 25
-  November 2026, from Lebendige Welten's menus): the picture on top, as wide as the card, and the name in one line
-  under it – never beside a small picture on a flat card, never broken into lines, never on the picture (Kettenreaktion's
-  names lay on its pictures in paper boxes, `labelOnPicture`, taken out). `useFitGrid(…, PICTURE_CARDS)` picks the grid
+  game's own svg drawn into the menu, which would have a phone draw every game at once. On a table of contents' line
+  the picture is framed like a photo pasted in, a big rounded rectangle as tall as the line, or as wide as it where the
+  line is tall (see the table of contents below) – never over the name, never a small round cut (user feedback,
+  November 2026, three times: round cuts showed too little, then pictures filling the card lay over the words, then one
+  column of flat lines left them far too small). **A card with a picture looks alike in every menu and at every size**
+  (`pictureCard`): the card *is* the picture, taped onto the page with no paper frame round it, and the name lies in one
+  line on a band of paper across the picture's foot, readable over any picture (user request, 28 November 2026, from
+  Kettenreaktion's and the Timer's menus: the frame took room the picture should have – this replaced the name under the
+  picture of 25 November, which itself had replaced names in paper boxes on the pictures and names beside small
+  pictures) – never a frame of the card's paper round the picture again, never a name broken into lines; the Timer's
+  cards, which are the picture without a name (`GameMode.art`), fill their card alike. Such cards stand closer than other
+  cards (`PICTURE_GAP`), their start screen keeps a small top margin and a smaller title, takes the page's whole width
+  below 1400 px and all but the families' room above it, and the grid leaves cells empty only for clearly bigger
+  pictures (`EMPTY_CELLS_GAIN`). A preview's cut keeps what matters clear of its bottom sixth, where the name lies.
+  `useFitGrid(…, PICTURE_CARDS)` picks the grid
   with the biggest pictures and shrinks all names of a menu alike until the longest fits (`fitNames`, a table of contents' names too: a long name
   never pushes its line off the page); where all cards
   at once would leave pictures too small to make out (`MIN_PICTURE`), the menu scrolls instead (`fitGrid.test.ts`). On a phone or tablet (shorter

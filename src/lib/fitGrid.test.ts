@@ -61,7 +61,8 @@ describe("bestFit", () => {
   test("the Timer's sixteen timed pictures and its three of taking turns fit a tablet's screen", () => {
     // Measured at 1024 × 768: the list 969 px wide, 424 px of room under the head above the families.
     const fit = bestFit(19, 969, 424, false, [16, 3], 1.6);
-    expect(fit).toEqual({ columns: 7, row: 113, reserve: 1 });
+    // The cards stand closer since 28 November 2026 (PICTURE_GAP), so their rows grew from 113 px.
+    expect(fit).toEqual({ columns: 7, row: 123, reserve: 1 });
   });
 
   test("cards with titles keep their wider minimum", () => {
@@ -77,7 +78,7 @@ describe("cards with a preview picture", () => {
     // Bewegungsabenteuer on a tablet: three cards in a row, each picture nearly the card's width.
     const fit = bestFit(3, 969, 450, false, undefined, PICTURE_CARDS);
     expect(fit?.columns).toBe(3);
-    expect(pictureWidth((969 - 2 * 24) / 3, fit?.row ?? 0, false)).toBeGreaterThan(280);
+    expect(pictureWidth((969 - 2 * 14) / 3, fit?.row ?? 0)).toBeGreaterThan(300);
   });
 
   test("take all the room on a phone or tablet, and stop growing only on a big screen", () => {
@@ -87,21 +88,37 @@ describe("cards with a preview picture", () => {
     const big = bestFit(2, 969, 390, false, undefined, PICTURE_CARDS, true);
     expect(tablet?.row).toBe(390);
     expect(big?.row).toBe(280);
-    expect(pictureWidth((969 - 24) / 2, tablet?.row ?? 0, false)).toBeGreaterThan(450);
+    expect(pictureWidth((969 - 14) / 2, tablet?.row ?? 0)).toBeGreaterThan(460);
   });
 
   test("scroll rather than shrink their pictures past recognising", () => {
-    // Kettenreaktion's 21 machines on a phone on its side: all at once only as pictures about 54 px wide.
-    expect(bestFit(21, 805, 222, true, undefined, PICTURE_CARDS)).toBeNull();
+    // Kettenreaktion's 21 machines in 160 px of room: all at once only as pictures about 63 px wide.
+    expect(bestFit(21, 805, 160, true, undefined, PICTURE_CARDS)).toBeNull();
+    // At 844 × 390 they all fit, in three rows of seven, each picture about 95 px wide.
+    expect(bestFit(21, 805, 313, true, undefined, PICTURE_CARDS)?.columns).toBe(7);
   });
 
-  test("keep their name in one line under the picture", () => {
+  // User request, 28 November 2026, from Kettenreaktion's and the Timer's menus: the card is the picture, with no paper
+  // frame round it, and the name lies across its foot on a band of paper, still in one line.
+  test("are the picture itself, with their name in one line across its foot", () => {
     const css = readFileSync("src/styles/book.css", "utf8").replace(/\/\*[\s\S]*?\*\//g, "");
     const name = css.match(/:root \.game-card\.picture-card > \.game-title \{([^}]*)\}/)?.[1] ?? "";
     expect(name).toContain("white-space: nowrap");
-    expect(name).not.toContain("position: absolute");
-    // No rule lays the picture over the card (the name once lay on Kettenreaktion's pictures).
-    expect(css).not.toMatch(/\.picture-card[^{]*\.with-picture\s*\{[^}]*position:\s*absolute/);
+    expect(name).toMatch(/background:/);
+    const card = css.match(/:root \.game-card\.picture-card \{([^}]*)\}/)?.[1] ?? "";
+    expect(card).toMatch(/padding:\s*0;/);
+    expect(card).toMatch(/justify-content:\s*flex-end/);
+    const picture = css.match(/:root \.game-card\.picture-card > \.game-emoji\.with-picture \{([^}]*)\}/)?.[1] ?? "";
+    expect(picture).toMatch(/inset:\s*0/);
+    // The grid reckons the whole card as picture: only its border is not.
+    expect(pictureWidth(304, 204)).toBe(300);
+    // The Timer's cards, which are the picture, fill their card too.
+    expect(css.match(/:root \.mode-art-card > \.mode-art \{([^}]*)\}/)?.[1]).toMatch(/inset:\s*0/);
+  });
+
+  test("leave no cell empty for a picture only a little bigger", () => {
+    // Three cards on a tablet: two over one would make each picture 4 % bigger.
+    expect(bestFit(3, 969, 450, false, undefined, PICTURE_CARDS)?.columns).toBe(3);
   });
 
   test("a table of contents shrinks its names alike rather than letting a long one push its line off the page", () => {

@@ -62,15 +62,18 @@ test("on a wide screen the controls stand at the side, with the bar running from
 });
 
 // On tablets and phones the strip stood off the edge, its left side under the book's paper margin and short of the
-// bottom (user feedback, November 2026): it runs the whole height, one gap from the ✕, the left and the bottom edge.
-test("on a wide screen the strip runs the whole height, the same gap from the ✕, the picture's left and its bottom", () => {
+// bottom (user feedback, November 2026): it runs the screen's whole height, from the top (the ✕'s corner lying on it,
+// user request, 28 November 2026) to the bottom, the same gap from the top, the left and the bottom edge.
+test("on a wide screen the strip runs the screen's whole height, the same gap from its top, left and bottom", () => {
   const wide = css.slice(css.indexOf("@media (orientation: landscape) {\n  .teeth-play {"));
   const rule = wide.slice(wide.indexOf(".teeth-controls {"), wide.indexOf("}", wide.indexOf(".teeth-controls {")));
   expect(rule).not.toContain("max-height");
   expect(rule).not.toMatch(/\bheight:/);
   expect(rule).toContain("align-self: stretch;");
   expect(rule).toContain("--teeth-edge: calc(var(--frame, 0px) + var(--teeth-gap));");
-  expect(rule).toMatch(/margin: calc\(var\(--play-corner, 0px\) \+ var\(--teeth-gap\)/);
+  expect(rule).toMatch(/margin: calc\(var\(--teeth-edge\) - max\(10px, env\(safe-area-inset-top\)\)\)/);
+  // Its buttons start one gap under the ✕'s corner lying on its top.
+  expect(rule).toMatch(/padding: calc\(var\(--play-corner, 0px\) \+ var\(--teeth-gap\) - var\(--teeth-edge\)\)/);
   expect(rule.match(/max\(var\(--teeth-edge\)/g)?.length).toBe(1);
   // On the left it lies at the paper margin even beside a camera's cut-out (user feedback, November 2026).
   expect(rule).toContain("calc(var(--teeth-edge) - max(6px, env(safe-area-inset-left)))");
@@ -88,6 +91,20 @@ test("on a wide screen the brushing's steps get the strip's free height", () => 
 test("the end's week, trophy and „Menü“ lie on a sheet sized by its own width, beside the head on a wide screen", () => {
   expect(css).toMatch(/\.teeth-end \{\s*container-type: inline-size;/);
   expect(css).toMatch(/@media \(orientation: landscape\) \{\s*\.teeth-end \{\s*width: min\(50%/);
+});
+
+// A thin band of days over an empty grey sheet (user feedback, 28 November 2026): beside the head the week fills the
+// sheet's height, as columns or – on a sheet taller than wide – as a row per day, on bright paper in warm tones.
+test("at the end the week fills its sheet, never a band over empty grey paper", () => {
+  const wide = css.slice(css.indexOf("/* On a wide screen the sheet is the right half's height and the week fills it"));
+  expect(wide).toMatch(/\.teeth-end \{\s*container-type: size;/);
+  expect(wide).toMatch(/\.teeth-end \.teeth-week \{\s*container-type: size;\s*flex: 1 1 0;/);
+  expect(wide).toMatch(/\.teeth-end \.teeth-slot \{\s*width: var\(--slot\);\s*height: var\(--slot\);/);
+  expect(wide).toMatch(/@container teeth-end \(aspect-ratio < 0\.9\) \{\s*\.teeth-end \.teeth-week \{\s*flex-direction: column;/);
+  expect(wide).toMatch(/\.teeth-end \.game-end\.inline \{\s*flex: none;/);
+  // Bright paper and warm places, no plain grey disc.
+  expect(css).toMatch(/color-mix\(in srgb, var\(--paper, #fbf4e3\) 40%, #fff\)/);
+  for (const grey of ["#dedede", "#8f8f8f", "#b5b5b5"]) expect(css).not.toContain(grey);
 });
 
 // Beside the sink the week took the picture's room, and beside the first look in the mirror it pushed the face aside,

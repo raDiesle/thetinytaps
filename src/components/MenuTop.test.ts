@@ -237,3 +237,20 @@ test("headings carry no emoji", () => {
   expect(offenders).toEqual([]);
   expect(read("src/components/MenuTop.tsx")).toMatch(/title: string; tools/);
 });
+
+// From a menu deeper in a book (a game's cards) only one page back was reachable (user request, 28 November 2026): its
+// head also draws the book's ribbon, straight onto the shelf, beside the corner and no lower than it.
+test("a menu deeper in a book has the ribbon onto the shelf beside its corner", () => {
+  const menuTop = read("src/components/MenuTop.tsx");
+  const head = menuTop.slice(menuTop.indexOf("export function MenuHead"), menuTop.indexOf("function PageCorner"));
+  expect(head).toContain('{to !== "/" && <ShelfRibbon />}');
+  const ribbon = menuTop.slice(menuTop.indexOf("function ShelfRibbon"));
+  expect(ribbon).toContain('useTurnPage("/", "back")');
+  expect(ribbon).toContain('<PageCornerArt sign="shelf" />');
+  const rule = cssRules().find((r) => r.selector === ":root .shelf-ribbon")?.body ?? "";
+  expect(rule).toMatch(/left:\s*calc\(var\(--page-left\) \+ var\(--corner\)/);
+  expect(rule).toMatch(/height:\s*calc\(var\(--shelf-ribbon\) \* 80 \/ 60\)/);
+  expect(cssRules().find((r) => r.selector === ":root" && r.body.includes("--shelf-ribbon:"))?.body).toMatch(
+    /--shelf-ribbon:\s*calc\(var\(--corner\) \* 0\.74\)/,
+  );
+});

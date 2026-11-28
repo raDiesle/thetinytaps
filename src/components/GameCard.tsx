@@ -18,18 +18,18 @@ export const UNFINISHED_LABEL: Localized = {
 export const PREVIEW_SIZE = { width: 480, height: 320 } as const;
 
 /**
- * The class a card with a preview picture adds: every such card in every menu looks alike – the framed picture on
- * top, as big as the card's room allows, and the name in one line under it, never broken and never on the picture
- * (user feedback, 25 November 2026, from Lebendige Welten's menus: names lay on Kettenreaktion's pictures and broke
- * beside small pictures on a phone). `useFitGrid` shrinks every name of a menu alike until the longest fits.
+ * The class a card with a preview picture adds: every such card in every menu looks alike – the card is the picture,
+ * as big as the card's room allows, with no paper frame round it, and the name lies in one line on a band of paper
+ * across the picture's foot (user request, 28 November 2026, from Kettenreaktion's and the Timer's menus; before, the
+ * name stood under a framed picture). `useFitGrid` shrinks every name of a menu alike until the longest fits.
  */
 export const pictureCard = (picture: string | undefined) => (picture ? " picture-card" : "");
 
 /**
  * The print on a menu's card or line: a cut of the game as it looks (`picture`, from a `vorschau/` folder, made by `bun
  * run previews` as 3 : 2 pictures, `PREVIEW_SIZE`), else its emoji (user request, November 2026: pictures
- * instead of emojis in every menu). The picture is framed like a photo pasted in, above the card's name or beside the
- * table of contents' line's, as big as the room allows and never over the words. It is a small still image, decoded off the main thread, never the game's
+ * instead of emojis in every menu). On a card it is the whole card with the name lying across its foot, on a table of
+ * contents' line framed like a photo pasted in beside the name, as big as the room allows. It is a small still image, decoded off the main thread, never the game's
  * drawing: an svg scene in every card would cost a phone as much as playing them all at once.
  */
 export function CardPicture({ emoji, picture, className = "game-emoji" }: { emoji: string; picture?: string; className?: string }) {
