@@ -704,10 +704,10 @@
     align-self: stretch;
     gap: clamp(5px, 1.2vmin, 10px) clamp(4px, 0.8vmin, 8px);
     width: auto;
-    margin: calc(var(--play-corner, 0px) + var(--teeth-gap) - max(10px, env(safe-area-inset-top))) 0
+    margin: calc(var(--teeth-edge) - max(10px, env(safe-area-inset-top))) 0
       calc(max(var(--teeth-edge), env(safe-area-inset-bottom)) - max(10px, env(safe-area-inset-bottom)))
       calc(var(--teeth-edge) - max(6px, env(safe-area-inset-left)));
-    padding: 6px 6px 6px 3px;
+    padding: calc(var(--play-corner, 0px) + var(--teeth-gap) - var(--teeth-edge)) 6px 6px 3px;
     border-color: #3d304533;
     border-radius: 24px;
     background: var(--paper-grain), color-mix(in srgb, var(--paper, #fbf4e3) 55%, #fff0);
@@ -2399,6 +2399,7 @@
    the sheet on the right; held upright, the sheet lies under the head. */
 .teeth-end {
   container-type: inline-size;
+  container-name: teeth-end;
   flex: none;
   flex-direction: column;
   flex-wrap: nowrap;
@@ -2408,7 +2409,8 @@
   padding: clamp(6px, 2vmin, 22px) clamp(8px, 2vmin, 18px);
   border: 1px solid #3d304533;
   border-radius: 18px;
-  background: var(--paper-grain), color-mix(in srgb, var(--paper, #fbf4e3) 82%, #fff);
+  /* Bright paper, never the grey-beige of a plain sheet (user feedback, November 2026). */
+  background: var(--paper-grain), color-mix(in srgb, var(--paper, #fbf4e3) 40%, #fff);
   box-shadow:
     0 2px 0 #5a3c1f1f,
     0 10px 24px -10px #2a1e5c66;
@@ -2456,21 +2458,114 @@
   max-width: 100%;
 }
 
-/* On a wide screen the sheet is the right half's height, and the trophy sized by the room under the week – plainly
-   seen, yet quiet beside „Menü“ (user feedback, November 2026: first much bigger, then the trophy at every end too
-   loud) – the room is a size container, so the trophy measures it. */
+/* On a wide screen the sheet is the right half's height and the week fills it (user feedback, November 2026: a thin
+   band of days on top and an empty grey sheet under it): the week is a size container taking all the height the
+   trophy and „Menü“ leave, its days tall columns, their sun and moon places sized by that room, today's column the
+   tallest with „Heute“ inside its top. The trophy stays plainly seen, yet quiet beside „Menü“ (user feedback, November
+   2026: first much bigger, then the trophy at every end too loud). */
 @media (orientation: landscape) {
+  /* Inside the book's paper margin (`--frame`) on the right and at the bottom: at the screen's edge the margin lay over
+     the sheet and cut Sunday's column. */
   .teeth-end {
-    height: calc(100% - var(--corner-clear, 0px));
+    container-type: size;
+    height: calc(100% - var(--corner-clear, 0px) - var(--frame, 0px));
+    margin-right: var(--frame, 0px);
+  }
+
+  .teeth-end .teeth-week {
+    container-type: size;
+    flex: 1 1 0;
+    align-self: stretch;
+    align-items: flex-end;
+    gap: 1.4cqw;
+    min-height: 0;
+    padding: 0;
+  }
+
+  .teeth-end .teeth-day {
+    --slot: min(9.4cqw, 24cqh);
+    flex: 1 1 0;
+    justify-content: space-evenly;
+    /* Never narrower than its name: a long one (Arabic's خميس) widens its column. */
+    min-width: max-content;
+    height: 84%;
+    padding: 1cqh 0;
+    font-size: min(4.6cqw, 10cqh);
+  }
+
+  .teeth-end .teeth-day.today {
+    --slot: min(14cqw, 28cqh);
+    flex: 1.5 1 0;
+    height: calc(100% - 1.2cqh);
+    margin: 0 0.6cqw;
+    padding: 1.4cqh 0;
+    translate: none;
+    font-size: min(6.4cqw, 13cqh);
+    outline-width: min(5px, 0.8cqw);
+  }
+
+  /* Inside today's column at its top, so the week needs no strip of room above it. */
+  .teeth-end .teeth-today-tag {
+    position: static;
+    translate: none;
+    padding: 0.1em 0.5em;
+    border-width: 2px;
+    font-size: min(3.4cqw, 6.4cqh);
+  }
+
+  .teeth-end .teeth-slot {
+    width: var(--slot);
+    height: var(--slot);
+    font-size: calc(var(--slot) * 0.62);
   }
 
   .teeth-end .game-end.inline {
-    container-type: size;
-    flex: 1 1 0;
+    flex: none;
     width: 100%;
-    min-height: 0;
     justify-content: center;
-    --trophy-h: min(220px, 32cqw, 70cqh);
+    --trophy-h: min(200px, 30cqw, 24vh);
+  }
+}
+
+/* A sheet taller than wide (a tablet's 4:3, a big monitor) made the columns long white strips with two small discs in
+   each: there every day is a row instead, its name and its sun and moon side by side, today's row the tallest. */
+@media (orientation: landscape) {
+  @container teeth-end (aspect-ratio < 0.9) {
+    .teeth-end .teeth-week {
+      flex-direction: column;
+      align-items: center;
+      gap: 1.2cqh;
+    }
+
+    .teeth-end .teeth-day {
+      --slot: min(9cqh, 20cqw);
+      flex: 1 1 0;
+      flex-direction: row;
+      justify-content: space-evenly;
+      width: 86%;
+      height: auto;
+      padding: 0 2cqw;
+      font-size: min(5.4cqh, 9cqw);
+    }
+
+    .teeth-end .teeth-day.today {
+      --slot: min(11.5cqh, 25cqw);
+      flex: 1.5 1 0;
+      width: calc(100% - 1.2cqw);
+      height: auto;
+      margin: 0.6cqh 0.6cqw;
+      padding: 0 2cqw;
+      font-size: min(7cqh, 12cqw);
+    }
+
+    .teeth-end .teeth-day-name {
+      min-width: 2.4em;
+      text-align: center;
+    }
+
+    .teeth-end .teeth-today-tag {
+      font-size: min(3.6cqh, 6cqw);
+    }
   }
 }
 
@@ -2573,7 +2668,9 @@
 
 /* Brushed or not, seen at a glance across the room (user request, November 2026: the faint sun and moon beside a star
    didn't say it plainly): every place is a disc of the same size, a brushing done a gold star on bright green, one
-   missed an empty grey disc with a dashed rim and its sun or moon faint in it, one still to come only a faint dotted ring. */
+   missed an empty pale disc with a dashed rim and its sun or moon faint in it, one still to come only a faint dotted
+   ring in its morning's yellow or evening's violet – warm tones, never a sheet of grey discs (user feedback, November
+   2026: the end looked grey and empty). */
 .teeth-slot {
   display: grid;
   place-items: center;
@@ -2599,24 +2696,29 @@
 }
 
 .teeth-slot.missed {
-  border: 3px dashed #8f8f8f;
-  background: #dedede;
+  border: 3px dashed #b3a48e;
+  background: #f4eee4;
 }
 
 .teeth-slot.missed .teeth-slot-mark {
   font-size: 0.7em;
-  opacity: 0.35;
+  opacity: 0.3;
   filter: grayscale(1);
 }
 
 .teeth-slot.later {
-  border: 2px dotted #b5b5b5;
+  border: 2px dotted #e0b93f;
+  background: #fff8dc;
+}
+
+.teeth-slot.later.evening:not(.now) {
+  border-color: #a99be6;
+  background: #f1eeff;
 }
 
 .teeth-slot.later .teeth-slot-mark {
   font-size: 0.7em;
-  opacity: 0.3;
-  filter: grayscale(1);
+  opacity: 0.45;
 }
 
 /* The place of this brushing: a strong ring round it, white until its star comes. */
