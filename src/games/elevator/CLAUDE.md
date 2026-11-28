@@ -21,6 +21,18 @@ Picture adventures of a few minutes for 2–3-year-olds. Three kinds, picked on 
 
 Picture stories of about two minutes in a house in cross-section with four floors and a lift. A thought bubble above the child shows what it needs next (the same drawing as the thing in the room), and the child rides the lift to that floor – big buttons 1–4 right of the house, a tap on the room, or the number keys and arrows. Nothing in the room is outlined or marked while the child rides there. A wrong floor: the child looks out and shakes its head (pose `shake`: the face slides from side to side so the head seems to turn, with swish lines, frowning brows and pressed lips), a light runs along the outline of the bubble and the right room starts to glow; after a while without a tap the same happens again. In the room the moves happen by themselves. There is no action button: only a move that matters for the story and can clearly be seen is wished for in the bubble, just like a floor, and the number of the floor the child is on lights up to be pressed again (or a tap on the room or the child) – cracking the two eggs, the mixer, each pancake, flushing the toilet, tidying the blocks, putting the boat into the puddle. Another number then: the child shakes its head („Erst hier!“). Three stories (`content.ts`): „Pfannkuchen“ (hungry: chef's hat, eggs from the fridge in the cellar, batter and pancakes in the kitchen, fetch the little brother, his juice, eat together on the roof terrace), „Gute Nacht“ (bath, pyjama, warm milk, brushing teeth, teddy, bed – the house goes dark) and „Pfützen“ (rain: boots, raincoat, umbrella, rain hat, paper boat, jump in the garden puddles until the rainbow comes). The children with their poses and clothes and the thought bubble are in `kid.tsx`, the things in `things.tsx`, the ten rooms in `rooms.tsx`, house, lift and floor buttons in `house.tsx`, sizes in `layout.ts`; the story runs as a script of waits in `ElevatorPlay.tsx`. All drawn in SVG, no emojis, nothing to read.
 
+**The house fills the screen** (user request, November 2026): the chimney's top is the picture's top, the roof is low,
+and no sky stands beside or above the house. The svg covers the whole page inside the book's paper margin
+(`.el-svg`), `ElevatorPlay` measures its shape and `roomWidthFor` makes the rooms as wide as that shape needs
+(never narrower than drawn, `DESIGN_ROOM_W`). The rooms are still drawn in design units (40 to 1040): `rx` of
+`useLayout()` spreads a design x over the real width, and a room's things stand in **groups** that move together with
+`<At x={group}>` (a translate, never a stretch – things keep their size and only stand further apart; walls, stripes,
+boards and railings are drawn over the real `W` of `useRoom()`). The children keep design x too: `KID_ZONES` in
+`rooms.tsx` says which group a spot belongs to, so a child moves with the thing it uses. A new thing in a room goes into
+a group (or a group of its own with its zone), and a new spot lies in the zone of the group it uses –
+`layout.test.ts` fails on a spot far from its group. A thought bubble on the top floor slides down beside the child
+rather than leave the picture (`bubbleShift`).
+
 ## Trail adventures („Weg-Abenteuer“, `trail/`)
 
 A long world seen from the side that scrolls along with the child, a goal that goes away, a backpack of three things, obstacles, friends, forks and stairs: `trail/` holds the level format, the engine (`trail/TrailPlay.tsx`), its layers and one drawing per level.

@@ -1,7 +1,7 @@
-import { createContext, useContext, useId, type CSSProperties, type ReactNode } from "react";
+import { createContext, useContext, useId, type ComponentType, type CSSProperties, type ReactNode } from "react";
 import { INK } from "@/components/drawing";
 import { KidHead, useHero } from "./kid";
-import { ROOM_H, ROOM_L, ROOM_R } from "./layout";
+import { ROOM_H, ROOM_L, useLayout } from "./layout";
 import {
   Bed,
   Block,
@@ -31,8 +31,10 @@ import {
   star,
 } from "./things";
 
-// The rooms. Each one is drawn from ROOM_L to ROOM_R and from -ROOM_H (the ceiling) to 0 (the floor)
-// and is placed on its floor by the house. `playing` is the thing being used right now, `used` the ones
+// The rooms. Each one is drawn from ROOM_L to ROOM_L + DESIGN_ROOM_W and from -ROOM_H (the ceiling) to 0 (the floor)
+// and is placed on its floor by the house. On a wide screen the room is wider than drawn: walls, floors and patterns
+// run its whole real width, and its things stand in groups, each moved by `At` to where the stretched room puts it –
+// what belongs together (a worktop with its bowl, a bed with its pyjama) moves as one, so only the gaps grow. `playing` is the thing being used right now, `used` the ones
 // already done, so a room can show the fridge open or the boots gone from the shelf. `taps` counts what
 // was done by tapping (two eggs cracked, one boot on …) and `task` is the one being tapped now.
 
@@ -54,9 +56,20 @@ export type Weather = "day" | "evening" | "rain";
 /** What the windows and the open rooms show outside. */
 export const WeatherContext = createContext<Weather>("day");
 
-const W = ROOM_R - ROOM_L;
+/** A group of things drawn in design units, moved as one so its design `x` lands where the stretched room puts it. */
+function At({ x, children }: { x: number; children: ReactNode }) {
+  const { rx } = useLayout();
+  return <g transform={`translate(${rx(x) - x} 0)`}>{children}</g>;
+}
+
+/** The room's real width and right edge. */
+const useRoom = () => {
+  const { roomW, roomR } = useLayout();
+  return { W: roomW, ROOM_R: roomR };
+};
 
 function Wall({ colour, children }: { colour: string; children?: ReactNode }) {
+  const { W } = useRoom();
   return (
     <>
       <rect x={ROOM_L} y={-ROOM_H} width={W} height={ROOM_H} fill={colour} />
@@ -67,6 +80,7 @@ function Wall({ colour, children }: { colour: string; children?: ReactNode }) {
 
 /** Thin vertical stripes over the whole wall. */
 function Stripes({ colour, every = 46 }: { colour: string; every?: number }) {
+  const { W } = useRoom();
   return (
     <g fill={colour}>
       {Array.from({ length: Math.ceil(W / every) }, (_, i) => (
@@ -77,9 +91,10 @@ function Stripes({ colour, every = 46 }: { colour: string; every?: number }) {
 }
 
 function Dots({ colour }: { colour: string }) {
+  const { W } = useRoom();
   return (
     <g fill={colour}>
-      {Array.from({ length: 22 }, (_, i) =>
+      {Array.from({ length: Math.ceil(W / 46) }, (_, i) =>
         [0, 1, 2].map((row) => <circle key={`${i}-${row}`} cx={ROOM_L + 24 + i * 46 + (row % 2) * 23} cy={-170 + row * 52} r="6" />),
       )}
     </g>
@@ -87,10 +102,11 @@ function Dots({ colour }: { colour: string }) {
 }
 
 function Floorboards({ colour, line }: { colour: string; line: string }) {
+  const { W } = useRoom();
   return (
     <>
       <rect x={ROOM_L} y="-16" width={W} height="16" fill={colour} />
-      <path d={Array.from({ length: 12 }, (_, i) => `M${ROOM_L + 40 + i * 84} -16 V0`).join(" ")} stroke={line} strokeWidth="2" />
+      <path d={Array.from({ length: Math.ceil((W - 40) / 84) }, (_, i) => `M${ROOM_L + 40 + i * 84} -16 V0`).join(" ")} stroke={line} strokeWidth="2" />
       <rect x={ROOM_L} y="-22" width={W} height="6" fill={line} />
     </>
   );
@@ -208,9 +224,13 @@ function Shelf({ x1, x2, y }: { x1: number; x2: number; y: number }) {
 
 // ---------- Story 1: hungry ----------
 
+/** The fridge's group in the cellar: the children there stand by it. */
+const KELLER_FRIDGE = 300;
+
 /** The cellar with the big fridge, shelves of jars and crates of apples. */
 export function Keller({ playing, used, taps }: RoomProps) {
   const open = playing === "eggs" || playing === "juice";
+  const { W, ROOM_R } = useRoom();
   return (
     <>
       <Wall colour="#d6cdbf">
@@ -218,50 +238,60 @@ export function Keller({ playing, used, taps }: RoomProps) {
           {Array.from({ length: 8 }, (_, row) => (
             <path
               key={row}
-              d={`M${ROOM_L} ${-ROOM_H + row * 26} H${ROOM_R} ${Array.from({ length: 17 }, (_, i) => `M${ROOM_L + i * 64 + (row % 2) * 32} ${-ROOM_H + row * 26} v26`).join(" ")}`}
+              d={`M${ROOM_L} ${-ROOM_H + row * 26} H${ROOM_R} ${Array.from({ length: Math.ceil(W / 64) + 1 }, (_, i) => `M${ROOM_L + i * 64 + (row % 2) * 32} ${-ROOM_H + row * 26} v26`).join(" ")}`}
             />
           ))}
         </g>
       </Wall>
-      <Window x={110} y={-196} w={120} h={50} />
-      <path d="M140 -196 V-146 M170 -196 V-146 M200 -196 V-146" stroke="#495057" strokeWidth="4" />
+      <At x={170}>
+        <Window x={110} y={-196} w={120} h={50} />
+        <path d="M140 -196 V-146 M170 -196 V-146 M200 -196 V-146" stroke="#495057" strokeWidth="4" />
+      </At>
       <rect x={ROOM_L} y="-14" width={W} height="14" fill="#8d8478" />
-      <Bulb x={520} length={30} shade="#adb5bd" />
+      <At x={520}>
+        <Bulb x={520} length={30} shade="#adb5bd" />
+      </At>
       {/* Shelf with jars */}
-      <Shelf x1={590} x2={830} y={-120} />
-      <Shelf x1={590} x2={830} y={-64} />
-      {[
-        [610, -120, "#e03131"],
-        [652, -120, "#fab005"],
-        [694, -120, "#e03131"],
-        [760, -120, "#74b816"],
-        [800, -120, "#fab005"],
-        [620, -64, "#7048e8"],
-        [664, -64, "#7048e8"],
-        [740, -64, "#e8590c"],
-      ].map(([x, y, colour]) => (
-        <g key={`${x}${y}`}>
-          <rect x={Number(x)} y={Number(y) - 34} width="28" height="34" rx="6" fill={String(colour)} opacity="0.85" />
-          <rect x={Number(x) - 2} y={Number(y) - 40} width="32" height="8" rx="2" fill="#ced4da" />
-          <rect x={Number(x) + 6} y={Number(y) - 24} width="16" height="10" fill="#fff" opacity="0.7" />
-        </g>
-      ))}
+      <At x={710}>
+        <Shelf x1={590} x2={830} y={-120} />
+        <Shelf x1={590} x2={830} y={-64} />
+        {[
+          [610, -120, "#e03131"],
+          [652, -120, "#fab005"],
+          [694, -120, "#e03131"],
+          [760, -120, "#74b816"],
+          [800, -120, "#fab005"],
+          [620, -64, "#7048e8"],
+          [664, -64, "#7048e8"],
+          [740, -64, "#e8590c"],
+        ].map(([x, y, colour]) => (
+          <g key={`${x}${y}`}>
+            <rect x={Number(x)} y={Number(y) - 34} width="28" height="34" rx="6" fill={String(colour)} opacity="0.85" />
+            <rect x={Number(x) - 2} y={Number(y) - 40} width="32" height="8" rx="2" fill="#ced4da" />
+            <rect x={Number(x) + 6} y={Number(y) - 24} width="16" height="10" fill="#fff" opacity="0.7" />
+          </g>
+        ))}
+      </At>
       {/* Crates of apples and potatoes */}
-      {[
-        [900, "#fa5252"],
-        [978, "#c9a26b"],
-      ].map(([x, colour]) => (
-        <g key={x}>
-          {[-24, -4, 16, -14, 6].map((dx, i) => (
-            <circle key={dx} cx={Number(x) + dx} cy={i < 3 ? -54 : -66} r="11" fill={String(colour)} />
-          ))}
-          <rect x={Number(x) - 40} y="-56" width="72" height="42" rx="3" fill="#c88b3a" />
-          <path d={`M${Number(x) - 40} -42 h72 M${Number(x) - 40} -28 h72`} stroke="#8d5a2b" strokeWidth="3" />
+      <At x={940}>
+        {[
+          [900, "#fa5252"],
+          [978, "#c9a26b"],
+        ].map(([x, colour]) => (
+          <g key={x}>
+            {[-24, -4, 16, -14, 6].map((dx, i) => (
+              <circle key={dx} cx={Number(x) + dx} cy={i < 3 ? -54 : -66} r="11" fill={String(colour)} />
+            ))}
+            <rect x={Number(x) - 40} y="-56" width="72" height="42" rx="3" fill="#c88b3a" />
+            <path d={`M${Number(x) - 40} -42 h72 M${Number(x) - 40} -28 h72`} stroke="#8d5a2b" strokeWidth="3" />
+          </g>
+        ))}
+      </At>
+      <At x={KELLER_FRIDGE}>
+        <g className={`el-fridge${open ? " open" : ""}`} transform="translate(300 -10)">
+          <Fridge eggs={!count(taps, "eggs") && !used.includes("eggs")} juice={!count(taps, "juice")} />
         </g>
-      ))}
-      <g className={`el-fridge${open ? " open" : ""}`} transform="translate(300 -10)">
-        <Fridge eggs={!count(taps, "eggs") && !used.includes("eggs")} juice={!count(taps, "juice")} />
-      </g>
+      </At>
     </>
   );
 }
@@ -272,6 +302,9 @@ const PAN_X = 627;
 /** The plate for the pancakes, and the mug, on the right worktop. */
 const PLATE_X = 870;
 const MUG_X = 800;
+/** The kitchen's two groups: the left worktop with the bowl and the cooker, and the right worktop with mug and plate. */
+const COOKING = 560;
+const SERVING = 840;
 
 /** The kitchen: the bowl with flour and mixer beside it, the cooker with pan and pot, the mug, the plate and the jam. */
 export function Kueche({ playing, used, task, taps }: RoomProps) {
@@ -285,128 +318,151 @@ export function Kueche({ playing, used, task, taps }: RoomProps) {
   /** The mixer dips into the bowl with the tap, so the eggs, milk and flour stay in sight until then. */
   const mixing = task === "mix" && t("mix") > 0;
   const pouring = (name: string) => task === name && t(name) > 0;
+  const { rx } = useLayout();
+  /** How far each group moves on a wide screen: the tiles run behind both, the pancake flies from one to the other. */
+  const cookingDx = rx(COOKING) - COOKING;
+  const servingDx = rx(SERVING) - SERVING;
   return (
     <>
       <Wall colour="#fff3bf">
         {/* Green tiles, so the white milk and flour stand out in front of them */}
         <g fill="#b2f2bb">
-          {Array.from({ length: 10 }, (_, i) =>
-            [0, 1].map((row) => <rect key={`${i}${row}`} x={300 + i * 60 + row * 30} y={-140 + row * 26} width="26" height="22" rx="3" />),
+          {Array.from({ length: Math.ceil((600 + servingDx - cookingDx) / 60) }, (_, i) =>
+            [0, 1].map((row) => <rect key={`${i}${row}`} x={300 + cookingDx + i * 60 + row * 30} y={-140 + row * 26} width="26" height="22" rx="3" />),
           )}
         </g>
       </Wall>
-      <Window x={100} curtains="#ff8787" />
-      {/* Wall cupboards */}
-      {[300, 425].map((x) => (
-        <g key={x}>
-          <rect x={x} y="-196" width="125" height="56" rx="6" fill="#74c0fc" stroke="#4dabf7" strokeWidth="3" />
-          <circle cx={x === 300 ? 412 : 438} cy="-150" r="4" fill="#fff" />
-        </g>
-      ))}
-      <path d="M620 -200 H700 L720 -168 H600 Z" fill="#ced4da" />
-      <rect x="632" y="-204" width="56" height="8" fill="#adb5bd" />
-      {/* Clock */}
-      <circle cx="820" cy="-166" r="24" fill="#fff" stroke="#ff6b6b" strokeWidth="6" />
-      <path d="M820 -166 V-180 M820 -166 H832" stroke={INK} strokeWidth="3" strokeLinecap="round" />
-      {/* Worktops */}
-      <rect x="300" y="-86" width="290" height="86" fill="#74c0fc" />
-      <rect x="292" y="-94" width="300" height="12" rx="3" fill="#e9b872" />
-      <path d="M445 -80 V0" stroke="#4dabf7" strokeWidth="4" />
-      {[372, 518].map((x) => (
-        <rect key={x} x={x - 14} y="-60" width="28" height="6" rx="3" fill="#fff" />
-      ))}
-      <rect x="738" y="-86" width="200" height="86" fill="#74c0fc" />
-      <rect x="734" y="-94" width="210" height="12" rx="3" fill="#e9b872" />
-      <rect x="826" y="-60" width="28" height="6" rx="3" fill="#fff" />
-      {/* What goes into the bowl stands beside it: the flour, and the eggs and milk brought from the cellar */}
-      {!pouring("flour") && (
-        <g transform="translate(375 -94) scale(0.72)">
-          <FlourBag />
-        </g>
-      )}
-      {playing === "bowl" && (
-        <g transform="translate(430 -94) scale(0.75)">
-          <EggBasket eggs={2 - t("crack")} milk={!t("milk")} />
-        </g>
-      )}
-      <g transform={`translate(${BOWL_X} -94)`}>
-        <Bowl eggs={t("crack")} milk={t("milk") > 0} flour={t("flour")} mixed={t("mix")} poured={t("pour")}>
-          {mixing && (
-            <g transform="translate(0 -8)">
-              <Mixer spinning />
-            </g>
-          )}
-        </Bowl>
-      </g>
-      {!mixing && (
-        <g transform="translate(320 -94)">
-          <Mixer />
-        </g>
-      )}
-      {/* Cracking an egg: the shell breaks open over the bowl and the yolk drops in */}
-      {task === "crack" && t("crack") > 0 && (
-        <g key={t("crack")} transform={`translate(${BOWL_X + (t("crack") === 1 ? -16 : 14)} -172)`}>
-          <path className="el-shell-l" d="M0 -14 Q-12 -14 -12 0 Q-12 10 0 10 L-3 4 L2 -2 L-2 -8 Z" fill="#fff4e6" stroke="#c9a26b" strokeWidth="2" />
-          <path className="el-shell-r" d="M0 -14 Q12 -14 12 0 Q12 10 0 10 L-3 4 L2 -2 L-2 -8 Z" fill="#fff4e6" stroke="#c9a26b" strokeWidth="2" />
-          <ellipse className="el-yolk-drop" cx="0" cy="6" rx="6" ry="5" fill="#fab005" />
-        </g>
-      )}
-      {/* Pouring the milk: the bottle tips over the bowl */}
-      {pouring("milk") && (
-        <g className="el-pop-in">
-          <path d={`M${BOWL_X - 12} -176 Q${BOWL_X - 2} -170 ${BOWL_X - 4} -130`} stroke="#fff" strokeWidth="8" strokeLinecap="round" fill="none" />
-          <g transform={`translate(${BOWL_X - 30} -190) rotate(115)`}>
-            <rect x="-10" y="-38" width="20" height="38" rx="6" fill="#fff" stroke="#495057" strokeWidth="2.5" />
-            <rect x="-10" y="-26" width="20" height="10" fill="#4dabf7" />
+      <At x={165}>
+        <Window x={100} curtains="#ff8787" />
+      </At>
+      <At x={COOKING}>
+        {/* Wall cupboards */}
+        {[300, 425].map((x) => (
+          <g key={x}>
+            <rect x={x} y="-196" width="125" height="56" rx="6" fill="#74c0fc" stroke="#4dabf7" strokeWidth="3" />
+            <circle cx={x === 300 ? 412 : 438} cy="-150" r="4" fill="#fff" />
           </g>
+        ))}
+        <path d="M620 -200 H700 L720 -168 H600 Z" fill="#ced4da" />
+        <rect x="632" y="-204" width="56" height="8" fill="#adb5bd" />
+        {/* Worktop */}
+        <rect x="300" y="-86" width="290" height="86" fill="#74c0fc" />
+        <rect x="292" y="-94" width="300" height="12" rx="3" fill="#e9b872" />
+        <path d="M445 -80 V0" stroke="#4dabf7" strokeWidth="4" />
+        {[372, 518].map((x) => (
+          <rect key={x} x={x - 14} y="-60" width="28" height="6" rx="3" fill="#fff" />
+        ))}
+        {/* What goes into the bowl stands beside it: the flour, and the eggs and milk brought from the cellar */}
+        {!pouring("flour") && (
+          <g transform="translate(375 -94) scale(0.72)">
+            <FlourBag />
+          </g>
+        )}
+        {playing === "bowl" && (
+          <g transform="translate(430 -94) scale(0.75)">
+            <EggBasket eggs={2 - t("crack")} milk={!t("milk")} />
+          </g>
+        )}
+        <g transform={`translate(${BOWL_X} -94)`}>
+          <Bowl eggs={t("crack")} milk={t("milk") > 0} flour={t("flour")} mixed={t("mix")} poured={t("pour")}>
+            {mixing && (
+              <g transform="translate(0 -8)">
+                <Mixer spinning />
+              </g>
+            )}
+          </Bowl>
         </g>
-      )}
-      {/* Pouring the flour: the bag tips over the bowl, and a cloud of flour puffs up */}
-      {pouring("flour") && (
-        <>
+        {!mixing && (
+          <g transform="translate(320 -94)">
+            <Mixer />
+          </g>
+        )}
+        {/* Cracking an egg: the shell breaks open over the bowl and the yolk drops in */}
+        {task === "crack" && t("crack") > 0 && (
+          <g key={t("crack")} transform={`translate(${BOWL_X + (t("crack") === 1 ? -16 : 14)} -172)`}>
+            <path className="el-shell-l" d="M0 -14 Q-12 -14 -12 0 Q-12 10 0 10 L-3 4 L2 -2 L-2 -8 Z" fill="#fff4e6" stroke="#c9a26b" strokeWidth="2" />
+            <path className="el-shell-r" d="M0 -14 Q12 -14 12 0 Q12 10 0 10 L-3 4 L2 -2 L-2 -8 Z" fill="#fff4e6" stroke="#c9a26b" strokeWidth="2" />
+            <ellipse className="el-yolk-drop" cx="0" cy="6" rx="6" ry="5" fill="#fab005" />
+          </g>
+        )}
+        {/* Pouring the milk: the bottle tips over the bowl */}
+        {pouring("milk") && (
           <g className="el-pop-in">
-            <g transform={`translate(${BOWL_X - 44} -176) rotate(120) scale(0.72)`}>
-              <FlourBag />
+            <path d={`M${BOWL_X - 12} -176 Q${BOWL_X - 2} -170 ${BOWL_X - 4} -130`} stroke="#fff" strokeWidth="8" strokeLinecap="round" fill="none" />
+            <g transform={`translate(${BOWL_X - 30} -190) rotate(115)`}>
+              <rect x="-10" y="-38" width="20" height="38" rx="6" fill="#fff" stroke="#495057" strokeWidth="2.5" />
+              <rect x="-10" y="-26" width="20" height="10" fill="#4dabf7" />
             </g>
           </g>
-          <g className="el-dust" fill="#fff" stroke="#dee2e6" strokeWidth="2">
-            {[-30, -10, 12, 30].map((dx, i) => (
-              <circle key={dx} cx={BOWL_X + dx} cy={-156 - (i % 2) * 12} r={11 + (i % 2) * 4} />
-            ))}
-          </g>
-        </>
-      )}
-      {!mugHeld && (
-        <g transform={`translate(${MUG_X} -94) scale(0.9)`}>
-          <Mug steam={t("milkpour") > 0 && t("blow") < 2} empty={!t("milkpour") || used.includes("milk")} spoon={task === "stir"} />
-        </g>
-      )}
-      {/* The plate for the pancakes, and the jam that goes with them */}
-      {!used.includes("bowl") && (
-        <>
-          {t("pour") > 0 && (
-            <g transform={`translate(${PLATE_X} -94) scale(0.9)`}>
-              <Pancakes plain count={flying ? flipped - 1 : flipped} />
+        )}
+        {/* Pouring the flour: the bag tips over the bowl, and a cloud of flour puffs up */}
+        {pouring("flour") && (
+          <>
+            <g className="el-pop-in">
+              <g transform={`translate(${BOWL_X - 44} -176) rotate(120) scale(0.72)`}>
+                <FlourBag />
+              </g>
             </g>
-          )}
-          <g transform="translate(926 -94) scale(0.66)">
-            <JamJar />
+            <g className="el-dust" fill="#fff" stroke="#dee2e6" strokeWidth="2">
+              {[-30, -10, 12, 30].map((dx, i) => (
+                <circle key={dx} cx={BOWL_X + dx} cy={-156 - (i % 2) * 12} r={11 + (i % 2) * 4} />
+              ))}
+            </g>
+          </>
+        )}
+      </At>
+      <At x={SERVING}>
+        {/* Clock */}
+        <circle cx="820" cy="-166" r="24" fill="#fff" stroke="#ff6b6b" strokeWidth="6" />
+        <path d="M820 -166 V-180 M820 -166 H832" stroke={INK} strokeWidth="3" strokeLinecap="round" />
+        {/* Worktop */}
+        <rect x="738" y="-86" width="200" height="86" fill="#74c0fc" />
+        <rect x="734" y="-94" width="210" height="12" rx="3" fill="#e9b872" />
+        <rect x="826" y="-60" width="28" height="6" rx="3" fill="#fff" />
+        {!mugHeld && (
+          <g transform={`translate(${MUG_X} -94) scale(0.9)`}>
+            <Mug steam={t("milkpour") > 0 && t("blow") < 2} empty={!t("milkpour") || used.includes("milk")} spoon={task === "stir"} />
           </g>
-        </>
-      )}
+        )}
+        {/* The plate for the pancakes, and the jam that goes with them */}
+        {!used.includes("bowl") && (
+          <>
+            {t("pour") > 0 && (
+              <g transform={`translate(${PLATE_X} -94) scale(0.9)`}>
+                <Pancakes plain count={flying ? flipped - 1 : flipped} />
+              </g>
+            )}
+            <g transform="translate(926 -94) scale(0.66)">
+              <JamJar />
+            </g>
+          </>
+        )}
+      </At>
       <Floorboards colour="#e9ecef" line="#ced4da" />
-      <g className={cooking ? `el-stove cooking-${cooking}` : "el-stove"} transform="translate(664 0)">
-        <Stove cooking={cooking} pancake={baking} />
-      </g>
-      {flying && (
-        <g key={flipped} className="el-fly" style={{ "--dx": `${PLATE_X - PAN_X}px`, "--dy": `${11 - (flipped - 1) * 8}px` } as CSSProperties}>
-          <ellipse cx={PAN_X} cy="-118" rx="22" ry="6" fill="#d9902f" />
-          <ellipse cx={PAN_X} cy="-121" rx="22" ry="5" fill="#f4b860" />
+      <At x={COOKING}>
+        <g className={cooking ? `el-stove cooking-${cooking}` : "el-stove"} transform="translate(664 0)">
+          <Stove cooking={cooking} pancake={baking} />
         </g>
-      )}
+        {flying && (
+          <g
+            key={flipped}
+            className="el-fly"
+            style={{ "--dx": `${PLATE_X + servingDx - PAN_X - cookingDx}px`, "--dy": `${11 - (flipped - 1) * 8}px` } as CSSProperties}
+          >
+            <ellipse cx={PAN_X} cy="-118" rx="22" ry="6" fill="#d9902f" />
+            <ellipse cx={PAN_X} cy="-121" rx="22" ry="5" fill="#f4b860" />
+          </g>
+        )}
+      </At>
     </>
   );
 }
+
+/** The children's room's groups: the shelf over the rug with the blocks, the toy box, the raincoat's hook, the hat's peg. */
+const PLAY_CORNER = 560;
+const TOY_BOX = 738;
+const COAT_HOOK = 890;
+const HAT_PEG = 985;
 
 /** The children's room: toys on the shelf, the tower of blocks and the raincoat on its hook. */
 export function Kinderzimmer({ playing, taps }: RoomProps) {
@@ -415,94 +471,135 @@ export function Kinderzimmer({ playing, taps }: RoomProps) {
       <Wall colour="#d0ebff">
         <Dots colour="#e7f5ff" />
       </Wall>
-      <Window x={100} curtains="#ffd43b" />
-      <Frame x={320} y={-180} w={80} h={64}>
-        <circle cx="342" cy="-160" r="10" fill="#ffd43b" />
-        <path d="M330 -124 L356 -150 L376 -132 L388 -142 L396 -124 Z" fill="#51cf66" />
-      </Frame>
-      {/* Shelf with a ball, a drum and the paper boat */}
-      <Shelf x1={440} x2={640} y={-118} />
-      <circle cx="470" cy="-138" r="20" fill="#ff6b6b" />
-      <path d="M452 -144 Q470 -132 488 -144" stroke="#fff" strokeWidth="4" fill="none" />
-      <rect x="512" y="-150" width="36" height="32" rx="6" fill="#4dabf7" />
-      <ellipse cx="530" cy="-150" rx="18" ry="5" fill="#e7f5ff" />
-      <path d="M584 -118 L594 -146 H626 L636 -118 Z" fill="#ffd43b" />
-      <circle cx="610" cy="-150" r="8" fill="#fab005" />
-      {/* Rug and the tower of blocks */}
-      <ellipse cx="560" cy="-8" rx="200" ry="14" fill="#ffc9c9" />
-      <ellipse cx="560" cy="-8" rx="150" ry="9" fill="#ffa8a8" />
-      <g className={playing === "tower" ? "el-wobble" : undefined} transform="translate(500 -4)">
-        <Blocks />
-      </g>
-      {/* Toy box */}
-      <rect x="690" y="-62" width="96" height="58" rx="6" fill="#9775fa" />
-      <rect x="684" y="-70" width="108" height="14" rx="5" fill="#845ef7" />
-      <path d="M704 -40 l10 -10 l10 10 l10 -10 l10 10 l10 -10 l10 10" stroke="#fff" strokeWidth="3" fill="none" opacity="0.6" />
-      {/* A sheet of paper on the toy box, for the boat */}
-      {count(taps, "fold") < 2 && (
-        <g transform="translate(738 -70)">
-          <g key={count(taps, "fold")} className="el-pop-in">
-            <PaperFold stage={count(taps, "fold") * 2} />
+      <At x={165}>
+        <Window x={100} curtains="#ffd43b" />
+      </At>
+      <At x={360}>
+        <Frame x={320} y={-180} w={80} h={64}>
+          <circle cx="342" cy="-160" r="10" fill="#ffd43b" />
+          <path d="M330 -124 L356 -150 L376 -132 L388 -142 L396 -124 Z" fill="#51cf66" />
+        </Frame>
+      </At>
+      <At x={PLAY_CORNER}>
+        {/* Shelf with a ball, a drum and the paper boat */}
+        <Shelf x1={440} x2={640} y={-118} />
+        <circle cx="470" cy="-138" r="20" fill="#ff6b6b" />
+        <path d="M452 -144 Q470 -132 488 -144" stroke="#fff" strokeWidth="4" fill="none" />
+        <rect x="512" y="-150" width="36" height="32" rx="6" fill="#4dabf7" />
+        <ellipse cx="530" cy="-150" rx="18" ry="5" fill="#e7f5ff" />
+        <path d="M584 -118 L594 -146 H626 L636 -118 Z" fill="#ffd43b" />
+        <circle cx="610" cy="-150" r="8" fill="#fab005" />
+        {/* Rug and the tower of blocks */}
+        <ellipse cx="560" cy="-8" rx="200" ry="14" fill="#ffc9c9" />
+        <ellipse cx="560" cy="-8" rx="150" ry="9" fill="#ffa8a8" />
+        <g className={playing === "tower" ? "el-wobble" : undefined} transform="translate(500 -4)">
+          <Blocks />
+        </g>
+      </At>
+      <At x={TOY_BOX}>
+        {/* Toy box */}
+        <rect x="690" y="-62" width="96" height="58" rx="6" fill="#9775fa" />
+        <rect x="684" y="-70" width="108" height="14" rx="5" fill="#845ef7" />
+        <path d="M704 -40 l10 -10 l10 10 l10 -10 l10 10 l10 -10 l10 10" stroke="#fff" strokeWidth="3" fill="none" opacity="0.6" />
+        {/* A sheet of paper on the toy box, for the boat */}
+        {count(taps, "fold") < 2 && (
+          <g transform="translate(738 -70)">
+            <g key={count(taps, "fold")} className="el-pop-in">
+              <PaperFold stage={count(taps, "fold") * 2} />
+            </g>
           </g>
-        </g>
-      )}
-      {/* Hook with the raincoat */}
-      <rect x="868" y="-176" width="44" height="10" rx="4" fill="#a0662f" />
-      <circle cx="890" cy="-166" r="5" fill="#868e96" />
-      {!count(taps, "coat") && (
-        <g transform="translate(890 -20) scale(0.95)">
-          <Raincoat />
-        </g>
-      )}
-      {/* Peg with the chef's hat */}
-      <rect x="966" y="-128" width="38" height="8" rx="4" fill="#a0662f" />
-      {!count(taps, "chefhat") && (
-        <g transform="translate(985 -122) scale(0.9)">
-          <ChefHat />
-        </g>
-      )}
+        )}
+      </At>
+      <At x={COAT_HOOK}>
+        {/* Hook with the raincoat */}
+        <rect x="868" y="-176" width="44" height="10" rx="4" fill="#a0662f" />
+        <circle cx="890" cy="-166" r="5" fill="#868e96" />
+        {!count(taps, "coat") && (
+          <g transform="translate(890 -20) scale(0.95)">
+            <Raincoat />
+          </g>
+        )}
+      </At>
+      <At x={HAT_PEG}>
+        {/* Peg with the chef's hat */}
+        <rect x="966" y="-128" width="38" height="8" rx="4" fill="#a0662f" />
+        {!count(taps, "chefhat") && (
+          <g transform="translate(985 -122) scale(0.9)">
+            <ChefHat />
+          </g>
+        )}
+      </At>
       <Floorboards colour="#e9b872" line="#c88b3a" />
     </>
   );
 }
 
+/** The table on the roof terrace: both children sit at it. */
+const TABLE = 640;
+
 /** The roof terrace: open to the sky, a sunshade, plants and the table for the feast. */
 export function Terrasse({ playing, used, taps }: RoomProps) {
   const feast = playing === "feast" || used.includes("feast");
+  const { W, ROOM_R } = useRoom();
+  const { rx } = useLayout();
+  /** The garland hangs in two dips from wall to wall, with a flag every 80 units. */
+  const dip = (W - 40) / 4;
+  const flags = Math.round((W - 60) / 80);
   return (
     <>
       <Outside x={ROOM_L} y={-ROOM_H} w={W} h={ROOM_H} />
-      {/* Roofs of the town far away */}
+      {/* Roofs of the town far away: a far skyline, so it may stretch with the room */}
       <g fill="#b2bec3">
-        <path d={`M${ROOM_L} -60 H140 V-110 L170 -130 L200 -110 V-80 H300 V-120 H360 V-70 H460 V-100 L500 -126 L540 -100 V-60 H${ROOM_R} V0 H${ROOM_L} Z`} />
-        <path d="M720 -60 V-116 H790 V-60 Z M860 -60 V-96 L900 -124 L940 -96 V-60 Z" />
+        <path
+          d={`M${ROOM_L} -60 H${rx(140)} V-110 L${rx(170)} -130 L${rx(200)} -110 V-80 H${rx(300)} V-120 H${rx(360)} V-70 H${rx(460)} V-100 L${rx(500)} -126 L${rx(540)} -100 V-60 H${ROOM_R} V0 H${ROOM_L} Z`}
+        />
+        <path d={`M${rx(720)} -60 V-116 H${rx(790)} V-60 Z M${rx(860)} -60 V-96 L${rx(900)} -124 L${rx(940)} -96 V-60 Z`} />
       </g>
       {/* Railing */}
       <rect x={ROOM_L} y="-92" width={W} height="8" rx="3" fill="#fff" />
-      <path d={Array.from({ length: 26 }, (_, i) => `M${ROOM_L + 20 + i * 40} -84 V-22`).join(" ")} stroke="#fff" strokeWidth="5" />
+      <path d={Array.from({ length: Math.ceil((W - 20) / 40) }, (_, i) => `M${ROOM_L + 20 + i * 40} -84 V-22`).join(" ")} stroke="#fff" strokeWidth="5" />
       {/* Garland of little flags */}
-      <path d="M60 -190 Q300 -140 540 -186 Q780 -140 1020 -190" stroke="#868e96" strokeWidth="2" fill="none" />
-      {Array.from({ length: 12 }, (_, i) => {
-        const x = 90 + i * 80;
-        const y = -178 + Math.sin(((x - 60) / 480) * Math.PI) * 26;
+      <path
+        d={`M${ROOM_L + 20} -190 Q${ROOM_L + 20 + dip} -140 ${ROOM_L + 20 + 2 * dip} -186 Q${ROOM_L + 20 + 3 * dip} -140 ${ROOM_R - 20} -190`}
+        stroke="#868e96"
+        strokeWidth="2"
+        fill="none"
+      />
+      {Array.from({ length: flags }, (_, i) => {
+        const x = ROOM_L + 50 + i * ((W - 100) / Math.max(1, flags - 1));
+        const y = -178 + Math.sin(((x - ROOM_L - 20) / (2 * dip)) * Math.PI) * 26;
         return <path key={i} d={`M${x - 12} ${y} H${x + 12} L${x} ${y + 22} Z`} fill={["#ff6b6b", "#ffd43b", "#51cf66", "#4dabf7"][i % 4]} />;
       })}
       {/* Sunshade */}
-      <path d="M260 0 V-150" stroke="#868e96" strokeWidth="6" />
-      <path d="M150 -140 Q260 -200 370 -140 Z" fill="#ff8787" />
-      <path d="M205 -140 Q240 -186 260 -172 Q280 -186 315 -140 Z" fill="#fff" />
-      <Plant x={110} />
-      <Plant x={970} pot="#1c7ed6" />
-      <Plant x={430} size={0.7} pot="#f08c00" />
+      <At x={260}>
+        <path d="M260 0 V-150" stroke="#868e96" strokeWidth="6" />
+        <path d="M150 -140 Q260 -200 370 -140 Z" fill="#ff8787" />
+        <path d="M205 -140 Q240 -186 260 -172 Q280 -186 315 -140 Z" fill="#fff" />
+      </At>
+      <At x={110}>
+        <Plant x={110} />
+      </At>
+      <At x={970}>
+        <Plant x={970} pot="#1c7ed6" />
+      </At>
+      <At x={430}>
+        <Plant x={430} size={0.7} pot="#f08c00" />
+      </At>
       <Floorboards colour="#c88b3a" line="#a0662f" />
-      <g transform="translate(640 0)">
-        <Table feast={feast} jam={count(taps, "spread")} bites={count(taps, "bite")} open={count(taps, "lid") > 0} />
-      </g>
+      <At x={TABLE}>
+        <g transform="translate(640 0)">
+          <Table feast={feast} jam={count(taps, "spread")} bites={count(taps, "bite")} open={count(taps, "lid") > 0} />
+        </g>
+      </At>
     </>
   );
 }
 
 // ---------- Story 2: bedtime ----------
+
+/** The living room's groups: the sofa with the teddy and the blocks before it, and the toy box under the window. */
+const SOFA = 460;
+const TOY_CHEST = 890;
 
 /** The living room in the evening: sofa with the teddy, a reading lamp and books. */
 export function Wohnzimmer({ used, taps }: RoomProps) {
@@ -513,128 +610,163 @@ export function Wohnzimmer({ used, taps }: RoomProps) {
       <Wall colour="#d3f9d8">
         <Stripes colour="#ebfbee" />
       </Wall>
-      <Window x={840} curtains="#748ffc" />
-      <Frame x={380} y={-186} w={110} h={66}>
-        <path d="M388 -128 Q420 -170 446 -146 Q466 -170 482 -128 Z" fill="#74c0fc" />
-        <circle cx="468" cy="-168" r="9" fill="#ffd43b" />
-      </Frame>
+      <At x={TOY_CHEST}>
+        <Window x={840} curtains="#748ffc" />
+      </At>
       {/* Reading lamp, lit */}
-      <ellipse cx="160" cy="-120" rx="70" ry="80" fill="#fff3bf" opacity="0.6" />
-      <path d="M160 -10 V-150" stroke="#495057" strokeWidth="5" />
-      <ellipse cx="160" cy="-6" rx="26" ry="6" fill="#495057" />
-      <path d="M130 -150 L142 -188 H178 L190 -150 Z" fill="#ffd43b" />
+      <At x={160}>
+        <ellipse cx="160" cy="-120" rx="70" ry="80" fill="#fff3bf" opacity="0.6" />
+        <path d="M160 -10 V-150" stroke="#495057" strokeWidth="5" />
+        <ellipse cx="160" cy="-6" rx="26" ry="6" fill="#495057" />
+        <path d="M130 -150 L142 -188 H178 L190 -150 Z" fill="#ffd43b" />
+      </At>
       {/* Bookshelf */}
-      <rect x="650" y="-170" width="130" height="170" rx="4" fill="#a0662f" />
-      {[-162, -110, -58].map((y) => (
-        <g key={y}>
-          <rect x="658" y={y} width="114" height="44" fill="#8d5a2b" />
-          {["#e03131", "#1c7ed6", "#fab005", "#2f9e44", "#7048e8"].map((colour, i) => (
-            <rect key={colour} x={662 + i * 20 + (y === -110 ? 10 : 0)} y={y + 6 + (i % 2) * 6} width="16" height={38 - (i % 2) * 6} rx="2" fill={colour} />
-          ))}
-        </g>
-      ))}
-      <ellipse cx="460" cy="-8" rx="230" ry="13" fill="#ffd8a8" />
-      {/* Sofa */}
-      <rect x="300" y="-122" width="320" height="70" rx="26" fill="#f06595" />
-      {teddy && (
-        <g transform="translate(520 -58) scale(0.85)">
-          <Teddy />
-        </g>
-      )}
-      <rect x="320" y="-72" width="280" height="42" rx="14" fill="#f783ac" />
-      <path d="M460 -72 V-30" stroke="#e64980" strokeWidth="3" />
-      <rect x="282" y="-96" width="44" height="78" rx="18" fill="#e64980" />
-      <rect x="594" y="-96" width="44" height="78" rx="18" fill="#e64980" />
-      <rect x="300" y="-18" width="14" height="18" fill="#862e9c" />
-      <rect x="606" y="-18" width="14" height="18" fill="#862e9c" />
-      <Plant x={960} />
+      <At x={715}>
+        <rect x="650" y="-170" width="130" height="170" rx="4" fill="#a0662f" />
+        {[-162, -110, -58].map((y) => (
+          <g key={y}>
+            <rect x="658" y={y} width="114" height="44" fill="#8d5a2b" />
+            {["#e03131", "#1c7ed6", "#fab005", "#2f9e44", "#7048e8"].map((colour, i) => (
+              <rect key={colour} x={662 + i * 20 + (y === -110 ? 10 : 0)} y={y + 6 + (i % 2) * 6} width="16" height={38 - (i % 2) * 6} rx="2" fill={colour} />
+            ))}
+          </g>
+        ))}
+      </At>
+      <At x={SOFA}>
+        <Frame x={380} y={-186} w={110} h={66}>
+          <path d="M388 -128 Q420 -170 446 -146 Q466 -170 482 -128 Z" fill="#74c0fc" />
+          <circle cx="468" cy="-168" r="9" fill="#ffd43b" />
+        </Frame>
+        <ellipse cx="460" cy="-8" rx="230" ry="13" fill="#ffd8a8" />
+        {/* Sofa */}
+        <rect x="300" y="-122" width="320" height="70" rx="26" fill="#f06595" />
+        {teddy && (
+          <g transform="translate(520 -58) scale(0.85)">
+            <Teddy />
+          </g>
+        )}
+        <rect x="320" y="-72" width="280" height="42" rx="14" fill="#f783ac" />
+        <path d="M460 -72 V-30" stroke="#e64980" strokeWidth="3" />
+        <rect x="282" y="-96" width="44" height="78" rx="18" fill="#e64980" />
+        <rect x="594" y="-96" width="44" height="78" rx="18" fill="#e64980" />
+        <rect x="300" y="-18" width="14" height="18" fill="#862e9c" />
+        <rect x="606" y="-18" width="14" height="18" fill="#862e9c" />
+      </At>
+      <At x={TOY_CHEST}>
+        <Plant x={960} />
+      </At>
       <Floorboards colour="#c88b3a" line="#a0662f" />
       {/* Blocks on the floor, and the toy box they go into */}
-      {BLOCK_COLOURS.map(
-        (colour, i) =>
-          tidied <= i && (
-            <g key={colour} transform={`translate(${450 + i * 90} -4)`}>
+      <At x={SOFA}>
+        {BLOCK_COLOURS.map(
+          (colour, i) =>
+            tidied <= i && (
+              <g key={colour} transform={`translate(${450 + i * 90} -4)`}>
+                <Block colour={colour} />
+              </g>
+            ),
+        )}
+      </At>
+      <At x={TOY_CHEST}>
+        {BLOCK_COLOURS.slice(0, tidied).map((colour, i) => (
+          <g key={colour} transform={`translate(${850 + i * 20} -44) scale(0.8)`}>
+            <g className="el-drop-in">
               <Block colour={colour} />
             </g>
-          ),
-      )}
-      {BLOCK_COLOURS.slice(0, tidied).map((colour, i) => (
-        <g key={colour} transform={`translate(${850 + i * 20} -44) scale(0.8)`}>
-          <g className="el-drop-in">
-            <Block colour={colour} />
           </g>
-        </g>
-      ))}
-      <rect x="834" y="-56" width="96" height="56" rx="6" fill="#9775fa" />
-      <rect x="828" y="-62" width="108" height="12" rx="5" fill="#845ef7" />
-      <path d="M848 -34 l10 -10 l10 10 l10 -10 l10 10 l10 -10 l10 10 l10 -10 l10 10" stroke="#fff" strokeWidth="3" fill="none" opacity="0.6" />
+        ))}
+        <rect x="834" y="-56" width="96" height="56" rx="6" fill="#9775fa" />
+        <rect x="828" y="-62" width="108" height="12" rx="5" fill="#845ef7" />
+        <path d="M848 -34 l10 -10 l10 10 l10 -10 l10 10 l10 -10 l10 10 l10 -10 l10 10" stroke="#fff" strokeWidth="3" fill="none" opacity="0.6" />
+      </At>
     </>
   );
 }
+
+/** The bathroom's groups: the tub, the washbasin with the tooth cup, the toilet with the towel. */
+const TUB = 330;
+const BASIN = 730;
+const TOILET = 960;
 
 /** The bathroom: bathtub with a duck, the washbasin with the tooth cup, a towel. */
 export function Bad({ playing, task, taps }: RoomProps) {
   const hero = useHero();
   const bathing = playing === "bath";
+  const { W, ROOM_R } = useRoom();
   return (
     <>
       <Wall colour="#e3fafc">
         <path
-          d={`${Array.from({ length: 26 }, (_, i) => `M${ROOM_L + i * 40} -110 V0`).join(" ")} ${Array.from({ length: 3 }, (_, i) => `M${ROOM_L} ${-110 + i * 40} H${ROOM_R}`).join(" ")}`}
+          d={`${Array.from({ length: Math.ceil(W / 40) + 1 }, (_, i) => `M${ROOM_L + i * 40} -110 V0`).join(" ")} ${Array.from({ length: 3 }, (_, i) => `M${ROOM_L} ${-110 + i * 40} H${ROOM_R}`).join(" ")}`}
           stroke="#c5f6fa"
           strokeWidth="4"
         />
         <rect x={ROOM_L} y="-114" width={W} height="6" fill="#66d9e8" />
       </Wall>
-      <circle cx="140" cy="-160" r="34" fill="#fff" />
-      <clipPath id="el-bad-window">
-        <circle cx="140" cy="-160" r="28" />
-      </clipPath>
-      <g clipPath="url(#el-bad-window)">
-        <Outside x={100} y={-200} w={80} h={80} />
-      </g>
-      {/* Washbasin with mirror and tooth cup */}
-      <ellipse cx="730" cy="-164" rx="50" ry="34" fill="#e7f5ff" stroke="#adb5bd" strokeWidth="6" />
-      <path d="M708 -178 L724 -194 M716 -170 L740 -194" stroke="#fff" strokeWidth="5" strokeLinecap="round" />
-      <path d="M690 -94 H770 Q766 -64 730 -64 Q694 -64 690 -94 Z" fill="#fff" stroke="#ced4da" strokeWidth="3" />
-      <rect x="720" y="-64" width="20" height="64" fill="#fff" stroke="#ced4da" strokeWidth="3" />
-      <path d="M730 -94 V-108 H744" stroke="#adb5bd" strokeWidth="6" strokeLinecap="round" fill="none" />
-      <rect x="772" y="-108" width="70" height="8" rx="3" fill="#adb5bd" />
-      <g transform="translate(796 -108) scale(0.8)">
-        <ToothCup brush={playing !== "teeth" || count(taps, "rinse") > 0} />
-      </g>
-      <g className={task === "scrub" ? "el-foam-bits on" : "el-foam-bits"} fill="#fff" stroke="#a5d8ff" strokeWidth="2">
-        {[0, 1, 2].map((i) => (
-          <circle key={i} cx={710 + i * 20} cy={-120 - (i % 2) * 14} r="7" style={{ animationDelay: `${i * 0.3}s` }} />
-        ))}
-      </g>
+      <At x={140}>
+        <circle cx="140" cy="-160" r="34" fill="#fff" />
+        <clipPath id="el-bad-window">
+          <circle cx="140" cy="-160" r="28" />
+        </clipPath>
+        <g clipPath="url(#el-bad-window)">
+          <Outside x={100} y={-200} w={80} h={80} />
+        </g>
+      </At>
+      <At x={BASIN}>
+        {/* Washbasin with mirror and tooth cup */}
+        <ellipse cx="730" cy="-164" rx="50" ry="34" fill="#e7f5ff" stroke="#adb5bd" strokeWidth="6" />
+        <path d="M708 -178 L724 -194 M716 -170 L740 -194" stroke="#fff" strokeWidth="5" strokeLinecap="round" />
+        <path d="M690 -94 H770 Q766 -64 730 -64 Q694 -64 690 -94 Z" fill="#fff" stroke="#ced4da" strokeWidth="3" />
+        <rect x="720" y="-64" width="20" height="64" fill="#fff" stroke="#ced4da" strokeWidth="3" />
+        <path d="M730 -94 V-108 H744" stroke="#adb5bd" strokeWidth="6" strokeLinecap="round" fill="none" />
+        <rect x="772" y="-108" width="70" height="8" rx="3" fill="#adb5bd" />
+        <g transform="translate(796 -108) scale(0.8)">
+          <ToothCup brush={playing !== "teeth" || count(taps, "rinse") > 0} />
+        </g>
+        <g className={task === "scrub" ? "el-foam-bits on" : "el-foam-bits"} fill="#fff" stroke="#a5d8ff" strokeWidth="2">
+          {[0, 1, 2].map((i) => (
+            <circle key={i} cx={710 + i * 20} cy={-120 - (i % 2) * 14} r="7" style={{ animationDelay: `${i * 0.3}s` }} />
+          ))}
+        </g>
+      </At>
       {/* Towel */}
-      <rect x="900" y="-170" width="60" height="8" rx="4" fill="#868e96" />
-      <path d="M906 -166 H954 V-90 Q930 -84 906 -90 Z" fill="#ff8787" />
-      <path d="M906 -104 H954 M906 -116 H954" stroke="#fff" strokeWidth="4" />
+      <At x={TOILET}>
+        <rect x="900" y="-170" width="60" height="8" rx="4" fill="#868e96" />
+        <path d="M906 -166 H954 V-90 Q930 -84 906 -90 Z" fill="#ff8787" />
+        <path d="M906 -104 H954 M906 -116 H954" stroke="#fff" strokeWidth="4" />
+      </At>
       <rect x={ROOM_L} y="-16" width={W} height="16" fill="#99e9f2" />
-      <ellipse cx="560" cy="-8" rx="60" ry="8" fill="#ff8787" opacity="0.7" />
-      <g transform="translate(985 0)">
-        <Toilet flushing={task === "toilet" && count(taps, "toilet") > 0} />
-      </g>
-      <g className={bathing ? "el-tub bathing" : "el-tub"} transform="translate(330 -4)">
-        <Tub
-          soap={count(taps, "soap")}
-          quack={count(taps, "duck")}
-          bather={
-            bathing ? (
-              <g transform="translate(-24 34)">
-                <g className="el-bather">
-                  <KidHead look={hero} />
+      <At x={560}>
+        <ellipse cx="560" cy="-8" rx="60" ry="8" fill="#ff8787" opacity="0.7" />
+      </At>
+      <At x={TOILET}>
+        <g transform="translate(985 0)">
+          <Toilet flushing={task === "toilet" && count(taps, "toilet") > 0} />
+        </g>
+      </At>
+      <At x={TUB}>
+        <g className={bathing ? "el-tub bathing" : "el-tub"} transform="translate(330 -4)">
+          <Tub
+            soap={count(taps, "soap")}
+            quack={count(taps, "duck")}
+            bather={
+              bathing ? (
+                <g transform="translate(-24 34)">
+                  <g className="el-bather">
+                    <KidHead look={hero} />
+                  </g>
                 </g>
-              </g>
-            ) : undefined
-          }
-        />
-      </g>
+              ) : undefined
+            }
+          />
+        </g>
+      </At>
     </>
   );
 }
+
+/** The bed's group: the rug and the slippers before it, the pyjama on it. */
+const BED = 560;
 
 /** The bedroom: the bed with the star blanket, a night light and the moon outside. */
 export function Schlafzimmer({ playing, used, taps }: RoomProps) {
@@ -642,63 +774,74 @@ export function Schlafzimmer({ playing, used, taps }: RoomProps) {
   const sleeping = playing === "bed" || used.includes("bed");
   const dark = count(taps, "light") > 0;
   const slippers = count(taps, "slippers");
+  const { W } = useRoom();
   return (
     <>
       <Wall colour="#e5dbff">
         <g fill="#f3f0ff">
-          {Array.from({ length: 14 }, (_, i) => (
+          {Array.from({ length: Math.ceil((W - 40) / 70) }, (_, i) => (
             <path key={i} d={star(ROOM_L + 40 + i * 70, -160 + (i % 2) * 50, 10)} />
           ))}
         </g>
       </Wall>
-      <Window x={120} curtains="#9775fa" />
+      <At x={185}>
+        <Window x={120} curtains="#9775fa" />
+      </At>
       {/* Night light on the bedside table */}
-      {!dark && <ellipse className="el-night-glow" cx="790" cy="-110" rx="60" ry="50" fill="#fff3bf" opacity="0.7" />}
-      <rect x="750" y="-70" width="80" height="70" rx="6" fill="#c88b3a" />
-      <rect x="760" y="-50" width="60" height="6" rx="3" fill="#8d5a2b" />
-      <path d="M790 -70 V-90" stroke="#868e96" strokeWidth="5" />
-      <path d="M766 -90 Q790 -134 814 -90 Z" fill={dark ? "#868e96" : "#ffd43b"} />
-      {/* Slippers and rug */}
-      <ellipse cx="560" cy="-8" rx="180" ry="12" fill="#b197fc" opacity="0.5" />
-      {slippers < 1 && <ellipse cx="390" cy="-8" rx="16" ry="7" fill="#f783ac" />}
-      {slippers < 2 && <ellipse cx="416" cy="-6" rx="16" ry="7" fill="#f783ac" />}
-      <g transform="translate(560 0)">
-        <Bed
-          sleeper={
-            sleeping ? (
-              <>
-                <g transform="translate(-66 22) scale(0.75)">
-                  <KidHead look={hero} asleep />
-                </g>
-                <g transform="translate(-28 -60) scale(0.45)">
-                  <Teddy />
-                </g>
-              </>
-            ) : undefined
-          }
-        />
-        {sleeping && (
-          <g className="el-zzz" stroke="#5f3dc4" strokeWidth="5" strokeLinecap="round" strokeLinejoin="round" fill="none">
-            {[0, 1, 2].map((i) => (
-              <path
-                key={i}
-                style={{ animationDelay: `${i * 0.7}s` }}
-                d={`M${-50 + i * 26} ${-124 - i * 26} h${14 - i * 2} l${-14 + i * 2} ${16 - i * 2} h${14 - i * 2}`}
-              />
-            ))}
+      <At x={790}>
+        {!dark && <ellipse className="el-night-glow" cx="790" cy="-110" rx="60" ry="50" fill="#fff3bf" opacity="0.7" />}
+        <rect x="750" y="-70" width="80" height="70" rx="6" fill="#c88b3a" />
+        <rect x="760" y="-50" width="60" height="6" rx="3" fill="#8d5a2b" />
+        <path d="M790 -70 V-90" stroke="#868e96" strokeWidth="5" />
+        <path d="M766 -90 Q790 -134 814 -90 Z" fill={dark ? "#868e96" : "#ffd43b"} />
+      </At>
+      <At x={BED}>
+        {/* Slippers and rug */}
+        <ellipse cx="560" cy="-8" rx="180" ry="12" fill="#b197fc" opacity="0.5" />
+        {slippers < 1 && <ellipse cx="390" cy="-8" rx="16" ry="7" fill="#f783ac" />}
+        {slippers < 2 && <ellipse cx="416" cy="-6" rx="16" ry="7" fill="#f783ac" />}
+        <g transform="translate(560 0)">
+          <Bed
+            sleeper={
+              sleeping ? (
+                <>
+                  <g transform="translate(-66 22) scale(0.75)">
+                    <KidHead look={hero} asleep />
+                  </g>
+                  <g transform="translate(-28 -60) scale(0.45)">
+                    <Teddy />
+                  </g>
+                </>
+              ) : undefined
+            }
+          />
+          {sleeping && (
+            <g className="el-zzz" stroke="#5f3dc4" strokeWidth="5" strokeLinecap="round" strokeLinejoin="round" fill="none">
+              {[0, 1, 2].map((i) => (
+                <path
+                  key={i}
+                  style={{ animationDelay: `${i * 0.7}s` }}
+                  d={`M${-50 + i * 26} ${-124 - i * 26} h${14 - i * 2} l${-14 + i * 2} ${16 - i * 2} h${14 - i * 2}`}
+                />
+              ))}
+            </g>
+          )}
+        </g>
+        {!count(taps, "pyjama") && (
+          <g transform="translate(650 -84) scale(0.8)">
+            <Pyjama />
           </g>
         )}
-      </g>
-      {!count(taps, "pyjama") && (
-        <g transform="translate(650 -84) scale(0.8)">
-          <Pyjama />
-        </g>
-      )}
+      </At>
     </>
   );
 }
 
 // ---------- Story 3: puddles ----------
+
+/** The hall's groups: the rain hat's peg with the mirror, and the shoe rack. */
+const HAT_AND_MIRROR = 350;
+const SHOE_RACK = 635;
 
 /** The hall: front door, mirror and the shoe rack with the yellow boots. */
 export function Flur({ task, taps }: RoomProps) {
@@ -709,66 +852,82 @@ export function Flur({ task, taps }: RoomProps) {
         <Stripes colour="#fff4e6" every={40} />
       </Wall>
       {/* Front door */}
-      <rect x="130" y="-190" width="110" height="190" rx="6" fill="#2b8a3e" />
-      <rect x="146" y="-176" width="78" height="64" rx="32" fill="#a5d8ff" />
-      <path d="M185 -176 V-112" stroke="#fff" strokeWidth="5" />
-      <rect x="146" y="-96" width="78" height="80" rx="4" fill="#2f9e44" />
-      <circle cx="226" cy="-96" r="7" fill="#fab005" />
-      {/* Peg with the rain hat */}
-      <rect x="276" y="-182" width="28" height="8" rx="3" fill="#a0662f" />
-      {!count(taps, "hat") && (
-        <g transform="translate(290 -142)">
-          <RainHat />
+      <At x={185}>
+        <rect x="130" y="-190" width="110" height="190" rx="6" fill="#2b8a3e" />
+        <rect x="146" y="-176" width="78" height="64" rx="32" fill="#a5d8ff" />
+        <path d="M185 -176 V-112" stroke="#fff" strokeWidth="5" />
+        <rect x="146" y="-96" width="78" height="80" rx="4" fill="#2f9e44" />
+        <circle cx="226" cy="-96" r="7" fill="#fab005" />
+      </At>
+      <At x={HAT_AND_MIRROR}>
+        {/* Peg with the rain hat */}
+        <rect x="276" y="-182" width="28" height="8" rx="3" fill="#a0662f" />
+        {!count(taps, "hat") && (
+          <g transform="translate(290 -142)">
+            <RainHat />
+          </g>
+        )}
+        {/* Mirror; it sparkles when the child looks in */}
+        <ellipse cx="400" cy="-130" rx="42" ry="56" fill="#e7f5ff" stroke="#c88b3a" strokeWidth="8" />
+        <path d="M380 -150 L396 -170 M384 -132 L410 -164" stroke="#fff" strokeWidth="5" strokeLinecap="round" />
+        {task === "mirror" && count(taps, "mirror") > 0 && (
+          <g key={count(taps, "mirror")} className="el-sparkle" fill="#ffd43b">
+            {[
+              [366, -176, 10],
+              [440, -160, 8],
+              [430, -86, 9],
+              [360, -96, 7],
+            ].map(([x, y, r]) => (
+              <path key={x} d={star(x, y, r)} />
+            ))}
+          </g>
+        )}
+      </At>
+      <At x={SHOE_RACK}>
+        {/* Shoe rack: the boots on top, more shoes below */}
+        <rect x="540" y="-84" width="190" height="10" rx="3" fill="#a0662f" />
+        <rect x="540" y="-40" width="190" height="8" rx="3" fill="#a0662f" />
+        <rect x="544" y="-84" width="10" height="84" fill="#8d5a2b" />
+        <rect x="716" y="-84" width="10" height="84" fill="#8d5a2b" />
+        <g transform="translate(630 -84)">
+          <Boots left={boots < 1} right={boots < 2} />
         </g>
-      )}
-      {/* Mirror; it sparkles when the child looks in */}
-      <ellipse cx="400" cy="-130" rx="42" ry="56" fill="#e7f5ff" stroke="#c88b3a" strokeWidth="8" />
-      <path d="M380 -150 L396 -170 M384 -132 L410 -164" stroke="#fff" strokeWidth="5" strokeLinecap="round" />
-      {task === "mirror" && count(taps, "mirror") > 0 && (
-        <g key={count(taps, "mirror")} className="el-sparkle" fill="#ffd43b">
-          {[
-            [366, -176, 10],
-            [440, -160, 8],
-            [430, -86, 9],
-            [360, -96, 7],
-          ].map(([x, y, r]) => (
-            <path key={x} d={star(x, y, r)} />
-          ))}
-        </g>
-      )}
-      {/* Shoe rack: the boots on top, more shoes below */}
-      <rect x="540" y="-84" width="190" height="10" rx="3" fill="#a0662f" />
-      <rect x="540" y="-40" width="190" height="8" rx="3" fill="#a0662f" />
-      <rect x="544" y="-84" width="10" height="84" fill="#8d5a2b" />
-      <rect x="716" y="-84" width="10" height="84" fill="#8d5a2b" />
-      <g transform="translate(630 -84)">
-        <Boots left={boots < 1} right={boots < 2} />
-      </g>
-      <path d="M570 -40 Q570 -60 590 -60 H604 Q620 -52 630 -48 V-40 Z" fill="#4dabf7" />
-      <path d="M640 -40 Q640 -60 660 -60 H674 Q690 -52 700 -48 V-40 Z" fill="#4dabf7" />
-      <ellipse cx="600" cy="-6" rx="24" ry="8" fill="#f783ac" />
-      <ellipse cx="660" cy="-6" rx="24" ry="8" fill="#f783ac" />
-      <Frame x={820} y={-176} w={70} h={56}>
-        <path d="M826 -126 L846 -150 L862 -134 L884 -158 V-126 Z" fill="#69db7c" />
-      </Frame>
-      <Plant x={960} pot="#1971c2" />
-      <Bulb x={480} />
+        <path d="M570 -40 Q570 -60 590 -60 H604 Q620 -52 630 -48 V-40 Z" fill="#4dabf7" />
+        <path d="M640 -40 Q640 -60 660 -60 H674 Q690 -52 700 -48 V-40 Z" fill="#4dabf7" />
+        <ellipse cx="600" cy="-6" rx="24" ry="8" fill="#f783ac" />
+        <ellipse cx="660" cy="-6" rx="24" ry="8" fill="#f783ac" />
+      </At>
+      <At x={855}>
+        <Frame x={820} y={-176} w={70} h={56}>
+          <path d="M826 -126 L846 -150 L862 -134 L884 -158 V-126 Z" fill="#69db7c" />
+        </Frame>
+      </At>
+      <At x={960}>
+        <Plant x={960} pot="#1971c2" />
+      </At>
+      <At x={480}>
+        <Bulb x={480} />
+      </At>
       <Floorboards colour="#d9a066" line="#a0662f" />
     </>
   );
 }
 
+/** The umbrella stand in the attic: the child stands by it. */
+const UMBRELLA_STAND = 630;
+
 /** The attic under the roof: a chest, the umbrella stand, a rocking horse and a cobweb. */
 export function Dachboden({ taps }: RoomProps) {
+  const { W, ROOM_R } = useRoom();
   return (
     <>
       <Wall colour="#e9c79a">
-        <path d={Array.from({ length: 26 }, (_, i) => `M${ROOM_L + i * 40} ${-ROOM_H} V0`).join(" ")} stroke="#d9a066" strokeWidth="3" />
+        <path d={Array.from({ length: Math.ceil(W / 40) + 1 }, (_, i) => `M${ROOM_L + i * 40} ${-ROOM_H} V0`).join(" ")} stroke="#d9a066" strokeWidth="3" />
       </Wall>
       {/* Slanted roof beams in the corners */}
       <path d={`M${ROOM_L} ${-ROOM_H} H200 L${ROOM_L} -70 Z`} fill="#a0662f" />
-      <path d={`M${ROOM_R} ${-ROOM_H} H880 L${ROOM_R} -70 Z`} fill="#a0662f" />
-      <path d={`M${ROOM_L} -70 L200 ${-ROOM_H} M${ROOM_R} -70 L880 ${-ROOM_H}`} stroke="#8d5a2b" strokeWidth="10" />
+      <path d={`M${ROOM_R} ${-ROOM_H} H${ROOM_R - 160} L${ROOM_R} -70 Z`} fill="#a0662f" />
+      <path d={`M${ROOM_L} -70 L200 ${-ROOM_H} M${ROOM_R} -70 L${ROOM_R - 160} ${-ROOM_H}`} stroke="#8d5a2b" strokeWidth="10" />
       <path
         d="M70 -204 Q90 -180 70 -166 M70 -204 Q60 -186 44 -180 M70 -204 L52 -160 M60 -190 Q66 -186 72 -192"
         stroke="#fff"
@@ -777,88 +936,113 @@ export function Dachboden({ taps }: RoomProps) {
         opacity="0.8"
       />
       {/* Round window */}
-      <circle cx="520" cy="-150" r="40" fill="#a0662f" />
-      <clipPath id="el-attic-window">
-        <circle cx="520" cy="-150" r="32" />
-      </clipPath>
-      <g clipPath="url(#el-attic-window)">
-        <Outside x={480} y={-190} w={80} h={80} />
-      </g>
-      <path d="M520 -182 V-118 M488 -150 H552" stroke="#a0662f" strokeWidth="5" />
-      <Bulb x={360} length={34} shade="#adb5bd" />
-      {/* Boxes */}
-      <rect x="120" y="-60" width="90" height="60" fill="#d9a066" stroke="#a0662f" strokeWidth="3" />
-      <rect x="138" y="-104" width="64" height="44" fill="#e9b872" stroke="#a0662f" strokeWidth="3" />
-      <path d="M120 -40 H210 M138 -88 H202" stroke="#c88b3a" strokeWidth="5" />
-      {/* Chest */}
-      <path d="M260 -62 Q260 -96 330 -96 Q400 -96 400 -62 Z" fill="#a0662f" />
-      <rect x="260" y="-64" width="140" height="64" rx="4" fill="#8d5a2b" />
-      <path d="M290 -96 V0 M370 -96 V0" stroke="#fab005" strokeWidth="6" />
-      <rect x="320" y="-60" width="20" height="18" rx="3" fill="#fab005" />
-      {/* Umbrella stand */}
-      {!count(taps, "umbrella") && (
-        <g transform="translate(620 -40)">
-          <Umbrella />
+      <At x={520}>
+        <circle cx="520" cy="-150" r="40" fill="#a0662f" />
+        <clipPath id="el-attic-window">
+          <circle cx="520" cy="-150" r="32" />
+        </clipPath>
+        <g clipPath="url(#el-attic-window)">
+          <Outside x={480} y={-190} w={80} h={80} />
         </g>
-      )}
-      <path d="M648 -40 V-120 Q648 -132 660 -132" stroke="#495057" strokeWidth="6" strokeLinecap="round" fill="none" />
-      <rect x="596" y="-70" width="68" height="70" rx="6" fill="#868e96" />
-      <path d="M596 -50 H664" stroke="#adb5bd" strokeWidth="5" />
+        <path d="M520 -182 V-118 M488 -150 H552" stroke="#a0662f" strokeWidth="5" />
+      </At>
+      <At x={360}>
+        <Bulb x={360} length={34} shade="#adb5bd" />
+      </At>
+      {/* Boxes */}
+      <At x={165}>
+        <rect x="120" y="-60" width="90" height="60" fill="#d9a066" stroke="#a0662f" strokeWidth="3" />
+        <rect x="138" y="-104" width="64" height="44" fill="#e9b872" stroke="#a0662f" strokeWidth="3" />
+        <path d="M120 -40 H210 M138 -88 H202" stroke="#c88b3a" strokeWidth="5" />
+      </At>
+      {/* Chest */}
+      <At x={330}>
+        <path d="M260 -62 Q260 -96 330 -96 Q400 -96 400 -62 Z" fill="#a0662f" />
+        <rect x="260" y="-64" width="140" height="64" rx="4" fill="#8d5a2b" />
+        <path d="M290 -96 V0 M370 -96 V0" stroke="#fab005" strokeWidth="6" />
+        <rect x="320" y="-60" width="20" height="18" rx="3" fill="#fab005" />
+      </At>
+      <At x={UMBRELLA_STAND}>
+        {/* Umbrella stand */}
+        {!count(taps, "umbrella") && (
+          <g transform="translate(620 -40)">
+            <Umbrella />
+          </g>
+        )}
+        <path d="M648 -40 V-120 Q648 -132 660 -132" stroke="#495057" strokeWidth="6" strokeLinecap="round" fill="none" />
+        <rect x="596" y="-70" width="68" height="70" rx="6" fill="#868e96" />
+        <path d="M596 -50 H664" stroke="#adb5bd" strokeWidth="5" />
+      </At>
       {/* Rocking horse */}
-      <g transform="translate(830 0)">
-        <path d="M-70 -4 Q0 22 70 -4" stroke="#c92a2a" strokeWidth="8" fill="none" />
-        <path d="M-46 -6 L-34 -60 M46 -6 L34 -60" stroke="#fff4e6" strokeWidth="9" strokeLinecap="round" />
-        <ellipse cx="0" cy="-70" rx="52" ry="22" fill="#fff4e6" />
-        <path d="M34 -84 L54 -132 Q76 -136 82 -116 L64 -100 Z" fill="#fff4e6" />
-        <path d="M44 -100 L50 -136 Q36 -124 38 -100 Z" fill="#fab005" />
-        <circle cx="66" cy="-120" r="4" fill={INK} />
-        <path d="M-52 -74 Q-76 -70 -70 -40" stroke="#fab005" strokeWidth="9" strokeLinecap="round" fill="none" />
-        <rect x="-16" y="-96" width="36" height="12" rx="4" fill="#e03131" />
-      </g>
+      <At x={830}>
+        <g transform="translate(830 0)">
+          <path d="M-70 -4 Q0 22 70 -4" stroke="#c92a2a" strokeWidth="8" fill="none" />
+          <path d="M-46 -6 L-34 -60 M46 -6 L34 -60" stroke="#fff4e6" strokeWidth="9" strokeLinecap="round" />
+          <ellipse cx="0" cy="-70" rx="52" ry="22" fill="#fff4e6" />
+          <path d="M34 -84 L54 -132 Q76 -136 82 -116 L64 -100 Z" fill="#fff4e6" />
+          <path d="M44 -100 L50 -136 Q36 -124 38 -100 Z" fill="#fab005" />
+          <circle cx="66" cy="-120" r="4" fill={INK} />
+          <path d="M-52 -74 Q-76 -70 -70 -40" stroke="#fab005" strokeWidth="9" strokeLinecap="round" fill="none" />
+          <rect x="-16" y="-96" width="36" height="12" rx="4" fill="#e03131" />
+        </g>
+      </At>
       <Floorboards colour="#c88b3a" line="#a0662f" />
     </>
   );
 }
+
+/** The big puddle in the garden, with the frog and the rainbow over it: the child jumps and sails there. */
+const BIG_PUDDLE = 600;
 
 /** The garden on the ground: hedge, tree, flowers, the frog and the puddles. */
 export function Garten({ playing, used, task, taps }: RoomProps) {
   const weather = useContext(WeatherContext);
   const splashing = playing === "splash" && (task === null || task === "jump");
   const sailing = count(taps, "sail") > 0;
+  const { W, ROOM_R } = useRoom();
   return (
     <>
       <Outside x={ROOM_L} y={-ROOM_H} w={W} h={ROOM_H} />
       {weather !== "rain" && (
-        <g className="el-rainbow" fill="none" strokeWidth="14">
-          {["#ff6b6b", "#ffa94d", "#ffe066", "#69db7c", "#4dabf7", "#9775fa"].map((colour, i) => (
-            <path key={colour} d={`M${300 + i * 14} -40 A${220 - i * 14} ${150 - i * 14} 0 0 1 ${740 - i * 14} -40`} stroke={colour} />
-          ))}
-        </g>
+        <At x={BIG_PUDDLE}>
+          <g className="el-rainbow" fill="none" strokeWidth="14">
+            {["#ff6b6b", "#ffa94d", "#ffe066", "#69db7c", "#4dabf7", "#9775fa"].map((colour, i) => (
+              <path key={colour} d={`M${300 + i * 14} -40 A${220 - i * 14} ${150 - i * 14} 0 0 1 ${740 - i * 14} -40`} stroke={colour} />
+            ))}
+          </g>
+        </At>
       )}
       {/* Hedge and fence */}
       <g fill="#2f9e44">
-        {Array.from({ length: 21 }, (_, i) => (
+        {Array.from({ length: Math.ceil(W / 50) + 1 }, (_, i) => (
           <circle key={i} cx={ROOM_L + i * 50} cy={-70 - (i % 2) * 10} r="34" />
         ))}
       </g>
       <rect x={ROOM_L} y="-70" width={W} height="60" fill="#2f9e44" />
-      <path d={Array.from({ length: 34 }, (_, i) => `M${ROOM_L + 10 + i * 30} -20 V-60`).join(" ")} stroke="#fff" strokeWidth="9" strokeLinecap="round" />
+      <path
+        d={Array.from({ length: Math.ceil((W - 10) / 30) }, (_, i) => `M${ROOM_L + 10 + i * 30} -20 V-60`).join(" ")}
+        stroke="#fff"
+        strokeWidth="9"
+        strokeLinecap="round"
+      />
       <path d={`M${ROOM_L} -50 H${ROOM_R}`} stroke="#fff" strokeWidth="6" />
       {/* Tree */}
-      <rect x="912" y="-120" width="26" height="110" rx="6" fill="#8d5a2b" />
-      <circle cx="896" cy="-150" r="40" fill="#37b24d" />
-      <circle cx="944" cy="-160" r="44" fill="#40c057" />
-      <circle cx="924" cy="-186" r="30" fill="#51cf66" />
-      {[
-        [890, -150],
-        [950, -170],
-        [930, -132],
-      ].map(([x, y]) => (
-        <circle key={x} cx={x} cy={y} r="7" fill="#fa5252" />
-      ))}
-      {/* Flowers */}
+      <At x={920}>
+        <rect x="912" y="-120" width="26" height="110" rx="6" fill="#8d5a2b" />
+        <circle cx="896" cy="-150" r="40" fill="#37b24d" />
+        <circle cx="944" cy="-160" r="44" fill="#40c057" />
+        <circle cx="924" cy="-186" r="30" fill="#51cf66" />
+        {[
+          [890, -150],
+          [950, -170],
+          [930, -132],
+        ].map(([x, y]) => (
+          <circle key={x} cx={x} cy={y} r="7" fill="#fa5252" />
+        ))}
+      </At>
+      {/* Flowers, in two beds */}
       {[90, 150, 210, 420, 480].map((x, i) => (
-        <g key={x}>
+        <At key={x} x={x < 300 ? 150 : 450}>
           <path d={`M${x} -14 V-44`} stroke="#2b8a3e" strokeWidth="4" />
           {[0, 72, 144, 216, 288].map((a) => (
             <circle
@@ -870,34 +1054,98 @@ export function Garten({ playing, used, task, taps }: RoomProps) {
             />
           ))}
           <circle cx={x} cy="-50" r="5" fill="#fff3bf" />
-        </g>
+        </At>
       ))}
       <rect x={ROOM_L} y="-16" width={W} height="16" fill="#82c91e" />
       <path d={`M${ROOM_L} -16 H${ROOM_R}`} stroke="#66a80f" strokeWidth="4" />
-      <g transform="translate(330 0)">
-        <Puddle width={120} />
-      </g>
-      <g className={splashing ? "el-puddle splashing" : "el-puddle"} transform="translate(600 0)">
-        <Puddle width={240} boat={sailing || used.includes("splash")} drift={sailing ? count(taps, "puff") * 1.5 : 3} />
-      </g>
-      <g transform="translate(820 0)">
-        <Puddle width={110} />
-      </g>
-      {/* Frog */}
-      <g className={playing === "splash" && !task ? "el-frog jumping" : "el-frog"} transform="translate(760 -4)">
-        <g key={count(taps, "frog")} className={count(taps, "frog") ? "el-jump-once" : undefined}>
-          <ellipse cx="0" cy="-16" rx="22" ry="16" fill="#51cf66" />
-          <circle cx="-10" cy="-32" r="9" fill="#51cf66" />
-          <circle cx="10" cy="-32" r="9" fill="#51cf66" />
-          <circle cx="-10" cy="-33" r="4.5" fill="#fff" />
-          <circle cx="10" cy="-33" r="4.5" fill="#fff" />
-          <circle cx="-10" cy="-33" r="2.5" fill={INK} />
-          <circle cx="10" cy="-33" r="2.5" fill={INK} />
-          <path d="M-10 -18 Q0 -10 10 -18" stroke="#2b8a3e" strokeWidth="3" strokeLinecap="round" fill="none" />
-          <ellipse cx="-18" cy="-2" rx="10" ry="4" fill="#40c057" />
-          <ellipse cx="18" cy="-2" rx="10" ry="4" fill="#40c057" />
+      <At x={330}>
+        <g transform="translate(330 0)">
+          <Puddle width={120} />
         </g>
-      </g>
+      </At>
+      <At x={BIG_PUDDLE}>
+        <g className={splashing ? "el-puddle splashing" : "el-puddle"} transform="translate(600 0)">
+          <Puddle width={240} boat={sailing || used.includes("splash")} drift={sailing ? count(taps, "puff") * 1.5 : 3} />
+        </g>
+      </At>
+      <At x={820}>
+        <g transform="translate(820 0)">
+          <Puddle width={110} />
+        </g>
+      </At>
+      <At x={BIG_PUDDLE}>
+        {/* Frog */}
+        <g className={playing === "splash" && !task ? "el-frog jumping" : "el-frog"} transform="translate(760 -4)">
+          <g key={count(taps, "frog")} className={count(taps, "frog") ? "el-jump-once" : undefined}>
+            <ellipse cx="0" cy="-16" rx="22" ry="16" fill="#51cf66" />
+            <circle cx="-10" cy="-32" r="9" fill="#51cf66" />
+            <circle cx="10" cy="-32" r="9" fill="#51cf66" />
+            <circle cx="-10" cy="-33" r="4.5" fill="#fff" />
+            <circle cx="10" cy="-33" r="4.5" fill="#fff" />
+            <circle cx="-10" cy="-33" r="2.5" fill={INK} />
+            <circle cx="10" cy="-33" r="2.5" fill={INK} />
+            <path d="M-10 -18 Q0 -10 10 -18" stroke="#2b8a3e" strokeWidth="3" strokeLinecap="round" fill="none" />
+            <ellipse cx="-18" cy="-2" rx="10" ry="4" fill="#40c057" />
+            <ellipse cx="18" cy="-2" rx="10" ry="4" fill="#40c057" />
+          </g>
+        </g>
+      </At>
     </>
   );
+}
+
+/** A child's design x in a room says which group it stands by: below `until` it moves with the group at `at`. */
+type Zone = [until: number, at: number];
+
+/** Where the children of each room stand: by which group, so on a wide screen they stay right beside what they use. */
+const KID_ZONES = new Map<ComponentType<RoomProps>, Zone[]>([
+  [Keller, [[Infinity, KELLER_FRIDGE]]],
+  [
+    Kueche,
+    [
+      [760, COOKING],
+      [Infinity, SERVING],
+    ],
+  ],
+  [
+    Kinderzimmer,
+    [
+      [620, PLAY_CORNER],
+      [760, TOY_BOX],
+      [860, COAT_HOOK],
+      [Infinity, HAT_PEG],
+    ],
+  ],
+  [Terrasse, [[Infinity, TABLE]]],
+  [
+    Wohnzimmer,
+    [
+      [700, SOFA],
+      [Infinity, TOY_CHEST],
+    ],
+  ],
+  [
+    Bad,
+    [
+      [600, TUB],
+      [800, BASIN],
+      [Infinity, TOILET],
+    ],
+  ],
+  [Schlafzimmer, [[Infinity, BED]]],
+  [
+    Flur,
+    [
+      [600, HAT_AND_MIRROR],
+      [Infinity, SHOE_RACK],
+    ],
+  ],
+  [Dachboden, [[Infinity, UMBRELLA_STAND]]],
+  [Garten, [[Infinity, BIG_PUDDLE]]],
+]);
+
+/** The design x of the group a child standing at design `x` in `room` moves with. */
+export function kidAnchor(room: ComponentType<RoomProps>, x: number): number {
+  const zones = KID_ZONES.get(room);
+  return zones?.find(([until]) => x < until)?.[1] ?? x;
 }
