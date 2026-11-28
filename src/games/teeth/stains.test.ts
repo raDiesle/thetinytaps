@@ -1,7 +1,7 @@
 import { expect, test } from "bun:test";
 import { STAIN_FILLS, TOOTH_FILLS } from "./mouth";
 import { dirtyFaces, faceKey, type MonsterOnTooth } from "./stains";
-import { STEPS, waitingShown } from "./steps";
+import { LEAVE_MS, monsterShown, STEPS } from "./steps";
 
 // The teeth start a little yellow and grey and turn white as they are brushed, tooth by tooth, and the brushed tooth
 // sparkles once (user request, November 2026).
@@ -112,16 +112,27 @@ test("a clean tooth's front is pure white and its other faces a cool white", () 
   }
 });
 
-// Seen from above with the mouth wide open, the monsters waiting on the front teeth crowded the picture before the
-// molars being brushed (user feedback, November 2026): none on the lower front teeth while the lower molars are
-// brushed on top, none on any front tooth while the upper ones are.
-test("the chewing-surface steps show no monsters waiting on the front teeth", () => {
-  const front = (step: (typeof STEPS)[number]) =>
-    MONSTERS.filter((m) => m.step > STEPS.indexOf(step) && m.tooth.n < 3 && waitingShown(step, m.tooth)).map((m) => m.tooth.jaw);
-  const [lowerTop, upperTop] = STEPS;
-  expect(new Set(front(lowerTop))).toEqual(new Set(["upper"]));
-  expect(front(upperTop)).toEqual([]);
-  // The other steps keep every monster in its place, and the molars keep theirs in the chewing steps too.
-  for (const step of STEPS.slice(2)) expect(MONSTERS.every((m) => waitingShown(step, m.tooth))).toBe(true);
-  expect(MONSTERS.filter((m) => m.tooth.n >= 3).every((m) => waitingShown(upperTop, m.tooth))).toBe(true);
+// While brushing only the monsters of the step running now show (user request, November 2026: the ones waiting on
+// other teeth – the green and blue on the lower front teeth while the lower molars were brushed – crowded the picture).
+// Before the brushing all of them sit on the teeth; the others shrink away as the first step begins, and each later
+// step's grow in as it comes.
+test("while brushing only the step's own monsters show", () => {
+  const shown = (phase: number, since: number) => MONSTERS.filter((m) => monsterShown(m.step, phase, since) !== null);
+  expect(shown(-1, 0)).toEqual(MONSTERS);
+  for (let phase = 0; phase < STEPS.length; phase++) {
+    const later = phase === 0 ? LEAVE_MS : 0;
+    expect(shown(phase, later).every((m) => m.step === phase)).toBe(true);
+    expect(shown(phase, later).length).toBeGreaterThan(0);
+  }
+  expect(shown(STEPS.length, 0)).toEqual([]);
+  // As the first step begins the others are still there, shrinking away.
+  expect(MONSTERS.filter((m) => m.step > 0).every((m) => monsterShown(m.step, 0, 0) === "leaving")).toBe(true);
+  expect(MONSTERS.every((m) => monsterShown(m.step, 1, 0) !== "leaving")).toBe(true);
+});
+
+// They grow in and shrink away as a whole HTML layer round the body (`.monster-arrive`), never inside the svg.
+test("a monster grows in and shrinks away by its sprite's layer", () => {
+  expect(css).toMatch(/\.monster-arrive\.grows \{[^}]*animation: teeth-monster-grow/);
+  expect(css).toMatch(/\.monster-arrive\.leaves \{[^}]*animation: teeth-monster-leave/);
+  expect(mouth).toMatch(/className=\{`monster-arrive/);
 });

@@ -240,8 +240,12 @@ export interface MonsterSpot {
   variant: number;
   /** Where in its blink it starts, so they don't all blink at once. */
   blinkMs: number;
-  /** On a tooth that comes later: only shown where it clearly shows. The others move in layers of their own. */
+  /** In the mirror before the brushing, standing still: only shown where it clearly shows. The others move in layers of their own. */
   waiting: boolean;
+  /** On a tooth of a later step as the brushing begins: it shrinks away into the mouth (`.monster-arrive.leaves`). */
+  leaving: boolean;
+  /** Its step has just come: it grows out of its tooth, small to big (`.monster-arrive.grows`). */
+  grows: boolean;
   /** The brush is coming for this one. */
   scared: boolean;
   gone: boolean;
@@ -760,14 +764,15 @@ export function Mouth({ view, zone, monsters, dirty, brush, happy, spat = false,
     const face = toothFace(m.tooth, m.surface);
     const jaw = all[m.tooth.jaw];
     const facing = jaw.facing(face.normal);
-    // The ones being brushed stay even on a steep face. The waiting ones only where nothing hides them:
+    // The ones being brushed stay even on a steep face. The waiting and leaving ones only where nothing hides them:
     // with the teeth together, only the outside of the teeth shows.
-    if (m.waiting ? facing <= WAITING_FACING || (view.open < 0.5 && m.surface !== "outer") : facing <= -0.3) return null;
+    const aside = m.waiting || m.leaving;
+    if (aside ? facing <= WAITING_FACING || (view.open < 0.5 && m.surface !== "outer") : facing <= -0.3) return null;
     const at = jaw.point(lift(alongFace(face, m.spot), face, 4));
     // Back teeth hidden behind the corners of the lips: their monsters would sit on the lip.
     if (!insideBy(at, lipPoints, LIP_EDGE)) return null;
     // Seen from the side nothing past the face's front is seen: a waiting monster there waits out of sight.
-    if (m.waiting && side && insideBy(at, side.ring, 0)) return null;
+    if (aside && side && insideBy(at, side.ring, 0)) return null;
     // The ones being brushed move, so each lies in a layer of its own (Sprite), placed on the screen.
     const spot = m.waiting ? { x: at.x, y: at.y, scale: MONSTER_SIZE * project.zoom } : onScreen(at, MONSTER_SIZE * project.zoom);
     const lean = leanOn(jaw.direction(face.normal), facing);
@@ -781,9 +786,10 @@ export function Mouth({ view, zone, monsters, dirty, brush, happy, spat = false,
         scale={round(spot.scale, 100)}
         lean={lean}
         sprite={!m.waiting}
+        arrive={m.leaving ? "leaves" : m.grows ? "grows" : ""}
         color={m.color}
         variant={m.variant}
-        still={m.waiting}
+        still={m.waiting || m.leaving}
         gone={m.gone}
         squeezeAngle={squeeze?.angle ?? 0}
         squeezeBy={squeeze?.by ?? 1}
@@ -1043,6 +1049,7 @@ const PlacedMonster = memo(function PlacedMonster({
   scale,
   lean,
   sprite,
+  arrive,
   squeezeAngle,
   squeezeBy,
   onTickle,
@@ -1056,6 +1063,8 @@ const PlacedMonster = memo(function PlacedMonster({
   /** How it lies flat on its tooth's face (`leanOn`): a matrix's first four numbers, or "" facing us. */
   lean: string;
   sprite: boolean;
+  /** A sprite growing in as its step comes, or shrinking away into the mouth as the brushing begins; "" staying. */
+  arrive: "" | "grows" | "leaves";
   /** Caught by the brush (`gone`): which way it is squeezed out in its sprite, in degrees, and how far (`squeezedBy`). */
   squeezeAngle: number;
   squeezeBy: number;
@@ -1075,27 +1084,37 @@ const PlacedMonster = memo(function PlacedMonster({
         spot={{ x, y, scale }}
         lean={lean}
         reach={MONSTER_REACH}
-        className={`monster-sprite${gone ? " gone" : ""}${scared ? " scared" : ""}${tickled ? " tickled" : ""}`}
+        className={`monster-sprite${gone ? " gone" : ""}${scared ? " scared" : ""}${tickled ? " tickled" : ""}${arrive === "leaves" ? " leaving" : ""}`}
       >
+        {/* Growing in and shrinking away move this layer round the body, so the body's own dance and dissolve go on
+            inside it. Shrinking, it goes back towards the middle of the mouth, as if into the distance. */}
         <div
-          className="sprite-body"
-          style={
-            gone
-              ? ({
-                  "--squeeze-a": `${squeezeAngle}deg`,
-                  "--squeeze-k": squeezeBy,
-                  "--squeeze-s": round(1 / Math.sqrt(squeezeBy), 100),
-                } as CSSProperties)
-              : undefined
-          }
+          className={`monster-arrive${arrive && ` ${arrive}`}`}
+          style={arrive === "leaves" ? ({ "--away-x": `${round(-x * AWAY)}px`, "--away-y": `${round(-y * AWAY)}px` } as CSSProperties) : undefined}
         >
-          <svg viewBox={spriteBox(MONSTER_REACH)}>{drawn}</svg>
+          <div
+            className="sprite-body"
+            style={
+              gone
+                ? ({
+                    "--squeeze-a": `${squeezeAngle}deg`,
+                    "--squeeze-k": squeezeBy,
+                    "--squeeze-s": round(1 / Math.sqrt(squeezeBy), 100),
+                  } as CSSProperties)
+                : undefined
+            }
+          >
+            <svg viewBox={spriteBox(MONSTER_REACH)}>{drawn}</svg>
+          </div>
         </div>
         {gone && <MonsterDust color={color} />}
       </Sprite>
     );
   return <g transform={`translate(${x} ${y}) scale(${scale})${lean && ` matrix(${lean} 0 0)`}`}>{drawn}</g>;
 });
+
+/** How far a monster shrinking away goes towards the middle of the mouth, a share of its way there. */
+const AWAY = 0.25;
 
 /** How far a monster reaches from its middle across, in its own units (`Monster`, about 30 wide). */
 const MONSTER_HALF = 15;

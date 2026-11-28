@@ -2787,6 +2787,63 @@
   pointer-events: auto;
 }
 
+/* A monster's sprite holds its body in one more layer, which grows it in as its step comes and shrinks it away as the
+   brushing begins (mouth.tsx `PlacedMonster` `arrive`): only the step running now shows its monsters (user request,
+   November 2026). */
+.monster-arrive > * {
+  position: absolute;
+  inset: 0;
+}
+
+/* Out of its tooth, small to big, with a little overshoot: two beats. Its foot stays on the tooth. */
+.monster-arrive.grows {
+  transform-origin: 50% 72%;
+  animation: teeth-monster-grow 1.072s cubic-bezier(0.34, 1.4, 0.64, 1) both;
+}
+
+@keyframes teeth-monster-grow {
+  from {
+    opacity: 0;
+    transform: scale(0.05);
+  }
+  30% {
+    opacity: 1;
+  }
+  to {
+    opacity: 1;
+    transform: scale(1);
+  }
+}
+
+/* Smaller and smaller until gone, drifting back towards the middle of the mouth as if into the distance (--away-x,
+   --away-y), fading only at the very end: two beats (`LEAVE_MS` in steps.ts). It stands still meanwhile. */
+.monster-sprite.leaving .monster-body {
+  pointer-events: none;
+}
+
+.monster-sprite.leaving .sprite-body {
+  animation: none;
+}
+
+.monster-arrive.leaves {
+  transform-origin: 50% 60%;
+  animation: teeth-monster-leave 1.072s ease-in both;
+}
+
+@keyframes teeth-monster-leave {
+  from {
+    opacity: 1;
+    transform: translate(0, 0) scale(1);
+  }
+  70% {
+    opacity: 1;
+  }
+  to {
+    opacity: 0;
+    transform: translate(var(--away-x, 0), var(--away-y, 0)) scale(0.05);
+  }
+}
+
 /* Toothpaste foam on the gum between the lips and the teeth being brushed (X-31, mouth.tsx `GumFoam`): each tooth's
    a small layer of its own under the lips that fades in calmly over two beats as the brush reaches it – no bubbles
    that rise or burst. */
@@ -2970,6 +3027,7 @@
 }
 
 .teeth-play.paused .sprite-body,
+.teeth-play.paused .monster-arrive,
 .teeth-play.paused .gum-foam,
 .teeth-play.paused .monster-dust > i,
 .teeth-play.paused .lip-arrow {
@@ -2983,6 +3041,15 @@
 
   .gum-foam {
     animation: none;
+  }
+
+  /* Still, monsters come and go: they only fade. */
+  .monster-arrive.grows {
+    animation: teeth-monster-show 0.536s ease-out both;
+  }
+
+  .monster-arrive.leaves {
+    animation: fade-out 0.536s ease-out forwards;
   }
 
   /* Still, a brushed monster goes: it only fades. */

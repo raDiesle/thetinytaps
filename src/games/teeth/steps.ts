@@ -28,19 +28,23 @@ export interface Step extends StepTexts {
   teeth: ToothId[];
   motion: Motion;
   view: View;
-  /**
-   * The jaws whose front teeth show no monsters waiting for a later step while this one runs: seen from above with the
-   * mouth wide open, they stood in a row before the molars being brushed and only crowded the picture (user feedback,
-   * November 2026; `waitingShown`).
-   */
-  quietFront?: Jaw[];
 }
 
-/** The teeth in front of the molars, from the middle: what `quietFront` keeps free of waiting monsters. */
-const FRONT_TEETH = 3;
+/** How long the monsters of later steps take to shrink away as the brushing begins: two beats of the song (112 BPM). */
+export const LEAVE_MS = 2 * (60000 / 112);
 
-/** Whether a monster waiting for a later step shows on its tooth while `step` runs (`quietFront`). */
-export const waitingShown = (step: Step | null | undefined, tooth: ToothId) => !(step?.quietFront?.includes(tooth.jaw) && tooth.n < FRONT_TEETH);
+/**
+ * Whether a monster of step `monsterStep` shows while step `phase` runs (-1 the prelude, `STEPS.length` the end),
+ * `sinceStep` ms after that step began: only the monsters of the step running now show (user request, November
+ * 2026: the ones waiting on other teeth crowded the picture). In the mirror before the brushing all of them sit on the
+ * teeth; as the first step begins, the others shrink away (`"leaving"`, `LEAVE_MS`), and each later step's monsters
+ * grow in as it comes.
+ */
+export function monsterShown(monsterStep: number, phase: number, sinceStep: number): "here" | "leaving" | null {
+  if (phase < 0 || monsterStep === phase) return "here";
+  if (phase === 0 && monsterStep > 0 && sinceStep < LEAVE_MS) return "leaving";
+  return null;
+}
 
 const teeth = (jaws: Jaw[], sides: Side[], ns: number[]) => ALL_TEETH.filter((t) => jaws.includes(t.jaw) && sides.includes(t.side) && ns.includes(t.n));
 
@@ -61,7 +65,6 @@ export const STEPS: Step[] = [
     teeth: leftToRight(teeth(["lower"], ["left", "right"], [3, 4])),
     motion: "scrub",
     view: { open: 1, pitch: 0, yaw: 0, look: [0, -10, 100], zoom: 1.2, tilt: { upper: 0, lower: 60 } },
-    quietFront: ["lower"],
   },
   {
     id: "upper-top",
@@ -73,7 +76,6 @@ export const STEPS: Step[] = [
     teeth: leftToRight(teeth(["upper"], ["left", "right"], [3, 4])),
     motion: "scrub",
     view: { open: 1, pitch: 0, yaw: 0, look: [0, 10, 100], zoom: 1.2, tilt: { upper: -60, lower: 0 } },
-    quietFront: ["upper", "lower"],
   },
   {
     id: "outer-left",
