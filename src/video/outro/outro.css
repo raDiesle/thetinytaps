@@ -218,7 +218,7 @@
   background-image:
     url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='320' height='320'%3E%3Cfilter id='c'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='3' seed='7'/%3E%3CfeColorMatrix values='0 0 0 0 0.36 0 0 0 0 0.2 0 0 0 0 0.07 0 0 0 1.6 -0.7'/%3E%3C/filter%3E%3Crect width='320' height='320' filter='url(%23c)'/%3E%3C/svg%3E"),
     url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='260' height='260'%3E%3Cfilter id='l'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.55' numOctaves='2' seed='3'/%3E%3CfeColorMatrix values='0 0 0 0 0.96 0 0 0 0 0.82 0 0 0 0 0.6 0 0 0 1.8 -0.95'/%3E%3C/filter%3E%3Crect width='260' height='260' filter='url(%23l)'/%3E%3C/svg%3E"),
-    radial-gradient(ellipse at 50% 45%, #d9a76c, #b9844f 75%, #a8743f);
+    radial-gradient(ellipse 60% 55% at 50% 50%, #f7d9a466, #0000), radial-gradient(ellipse at 50% 45%, #d9a76c, #b9844f 75%, #9a6637);
   box-shadow:
     inset 0 0 0 26px #8a5a2e,
     inset 0 0 0 30px #6d4320,
@@ -293,8 +293,8 @@
   display: flex;
   flex-direction: column;
   align-items: center;
-  justify-content: center;
-  padding: 30px 40px 24px;
+  justify-content: flex-start;
+  padding: 42px 40px 0;
   background-color: #fffdf6;
   background-image: linear-gradient(#7aa7d61f 2px, transparent 2px), linear-gradient(90deg, #7aa7d61f 2px, transparent 2px);
   background-size: 34px 34px;
@@ -330,8 +330,8 @@
  * the paw tracks walk along under the address up to them, filling the room below it before the line under them.
  */
 .vp-address {
-  /* Room under it for the tracks (`TRACK_DEPTH`), then the line. */
-  margin: 4px 0 1.04em;
+  /* Room under it for the tracks (`TRACK_DEPTH`), then the stamp. */
+  margin: 0 0 0.9em;
   font-size: 62px;
   font-weight: 600;
   letter-spacing: 0.01em;
@@ -381,16 +381,25 @@
   overflow: visible;
 }
 
-/* Under the tracks: what the site holds, with the red „Free“ stamp before it. */
+/* Over the address: what the site holds, between two short strokes in the tracks' orange. */
 .vp-line {
   display: flex;
   align-items: center;
-  gap: 30px;
-  margin: 0;
-  color: #3d3045;
-  font-size: 40px;
-  font-weight: 600;
+  gap: 22px;
+  margin: 0 0 2px;
+  color: #6b4a3a;
+  font-weight: 700;
+  letter-spacing: 0.02em;
   white-space: nowrap;
+}
+
+.vp-line::before,
+.vp-line::after {
+  content: "";
+  width: 56px;
+  height: 5px;
+  border-radius: 3px;
+  background: #e8914f;
 }
 
 /*
@@ -405,7 +414,7 @@
     inset 0 0 0 3px #fffdf6,
     inset 0 0 0 6px #c8202f;
   color: #c8202f;
-  font-size: 42px;
+  font-size: 38px;
   font-weight: 800;
   letter-spacing: 0.08em;
   text-transform: uppercase;
@@ -413,4 +422,51 @@
   mask-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='180' height='180'%3E%3Cfilter id='s'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.8' numOctaves='2' seed='4'/%3E%3CfeColorMatrix values='0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 -2.2 1.9'/%3E%3C/filter%3E%3Crect width='180' height='180' filter='url(%23s)'/%3E%3C/svg%3E");
   mask-size: 180px 180px;
   transform-origin: 50% 50%;
+}
+
+/*
+ * A strip of washi tape: see-through coloured paper with fine stripes, its ends torn in small teeth, a faint shadow
+ * where it lifts off. On a photo it sits on the frame's top middle; on the sheet across its two top corners.
+ */
+.vp-tape {
+  position: absolute;
+  left: 50%;
+  top: 2px;
+  width: 132px;
+  height: 40px;
+  background: repeating-linear-gradient(90deg, #ffffff38 0 7px, #0000 7px 14px), var(--tape);
+  opacity: 0.82;
+  box-shadow: 0 2px 4px #2a170833;
+  clip-path: polygon(
+    0 0,
+    4% 12%,
+    0 25%,
+    4% 37%,
+    0 50%,
+    4% 62%,
+    0 75%,
+    4% 87%,
+    0 100%,
+    100% 100%,
+    96% 87%,
+    100% 75%,
+    96% 62%,
+    100% 50%,
+    96% 37%,
+    100% 25%,
+    96% 12%,
+    100% 0
+  );
+}
+
+.vp-tape-left {
+  left: 18px;
+  top: 16px;
+  width: 150px;
+}
+
+.vp-tape-right {
+  left: calc(100% - 18px);
+  top: 16px;
+  width: 150px;
 }

@@ -84,7 +84,13 @@ test("the paw prints are few and big, their feet set apart, filling the room und
   expect(PINBOARD_BEATS.paws[1] - PINBOARD_BEATS.paws[0]).toBeLessThanOrEqual(1.4);
 });
 
-test("the address shows each word's capital, the line under it says what the site holds, and the free stamp lands and stays", () => {
+test("the address shows each word's capital, the line over it says what the site holds, and the free stamp under it lands and stays", () => {
+  // User request, 28 November 2026: „Alltagshelfer & Lernspiele“ over the address, the stamp under it.
+  const scene = read(join(import.meta.dir, "PinboardScene.tsx"));
+  const [line, address, stamp] = ['className="vp-line"', 'className="vp-address"', 'className="vp-stamp"'].map((c) => scene.indexOf(c));
+  expect(line).toBeGreaterThan(0);
+  expect(line).toBeLessThan(address!);
+  expect(address).toBeLessThan(stamp!);
   // A capital at each word's start, so the address reads as words (user request, 28 November 2026).
   expect(BOARD_ADDRESS.toLowerCase()).toBe("www.littlestepstogrow.com");
   expect(BOARD_ADDRESS.match(/[A-Z]/g)).toEqual(["L", "S", "T", "G"]);

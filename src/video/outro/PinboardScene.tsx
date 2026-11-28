@@ -17,6 +17,8 @@ import {
   type PressPose,
   type Slot,
   stampPose,
+  TAPE_COLORS,
+  TAPED,
   TRACK_DEPTH,
   TRACK_EMS,
   TRACK_UNITS,
@@ -56,6 +58,16 @@ function Pin({ color, pose, left = "50%" }: { color: string; pose: PressPose; le
       <circle r="15" fill="url(#vp-pin-shade)" />
       <ellipse cx="-5" cy="-6" rx="5.5" ry="4" fill="#ffffffb3" />
     </svg>
+  );
+}
+
+/**
+ * A strip of washi tape holding a photo or the sheet: see-through coloured paper with fine stripes and torn ends, at
+ * the top's middle or across a top corner (`at`).
+ */
+function Tape({ color, turn, at = "top" }: { color: string; turn: number; at?: "top" | "left" | "right" }) {
+  return (
+    <span className={`vp-tape vp-tape-${at}`} aria-hidden style={{ "--tape": color, transform: `translate(-50%, -50%) rotate(${turn}deg)` } as CSSProperties} />
   );
 }
 
@@ -134,10 +146,10 @@ function PhotoPicture({ photo }: { photo: PinnedPhoto }) {
 /**
  * One frame of the outro „Pinnwand“ at second `t` (user requests, 27 and 28 November 2026): a cork board filling the
  * picture with every game's photo pinned on it, each in a white frame with a word for what it is, and in the middle a
- * sheet torn from a spiral pad with the address, Papa Fox and his child sitting on the o of „.com“, and under it what the
- * site holds – all of it there from the first frame. Then the address is marked with a highlighter, the paw tracks
- * walk along under it up to the foxes, one print after another, and a red „Free“ stamp comes down beside the line
- * under them – one picture to take in, its words in `language`.
+ * sheet torn from a spiral pad, taped on, with what the site holds over the address and Papa Fox and his child sitting
+ * on the o of „.com“ – all of it there from the first frame. Then the address is marked with a highlighter, the paw
+ * tracks walk along under it up to the foxes, one print after another, and a red „Free“ stamp comes down under them –
+ * one picture to take in, its words in `language`.
  */
 export function PinboardScene({ t, language }: { t: number; language: SeoLanguage }) {
   return (
@@ -156,11 +168,18 @@ export function PinboardScene({ t, language }: { t: number; language: SeoLanguag
           <p className="vp-word" style={{ fontSize: fitted(pick(photoWord(photo), language), 34, 15) }}>
             {pick(photoWord(photo), language)}
           </p>
-          <Pin color={PIN_COLORS[k % PIN_COLORS.length]!} pose={FLAT} />
+          {TAPED.has(k) ? (
+            <Tape color={TAPE_COLORS[k % TAPE_COLORS.length]!} turn={k % 2 ? 5 : -6} />
+          ) : (
+            <Pin color={PIN_COLORS[k % PIN_COLORS.length]!} pose={FLAT} />
+          )}
         </div>
       ))}
       <div className="vp-note" style={pressedStyle(NOTE, NOTE.width, NOTE.height, FLAT)}>
         <div className="vp-note-holes" />
+        <p className="vp-line" style={{ fontSize: fitted(boardLine(language), 34, 34) }}>
+          {boardLine(language)}
+        </p>
         <p className="vp-address">
           <span className="vp-mark" style={{ "--mark": markShown(t).toFixed(3) } as CSSProperties}>
             {lettered(BOARD_ADDRESS.slice(0, O_AT))}
@@ -174,14 +193,11 @@ export function PinboardScene({ t, language }: { t: number; language: SeoLanguag
             {BOARD_ADDRESS.slice(O_AT + 1)}
           </span>
         </p>
-        <p className="vp-line">
-          <span className="vp-stamp" style={stampStyle(t)}>
-            {pick(FREE, language)}
-          </span>
-          <span style={{ fontSize: fitted(boardLine(language), 40, 30) }}>{boardLine(language)}</span>
-        </p>
-        <Pin color={PIN_COLORS[0]} pose={FLAT} left="7%" />
-        <Pin color={PIN_COLORS[2]} pose={FLAT} left="93%" />
+        <span className="vp-stamp" style={stampStyle(t)}>
+          {pick(FREE, language)}
+        </span>
+        <Tape color={TAPE_COLORS[0]} turn={-38} at="left" />
+        <Tape color={TAPE_COLORS[1]} turn={36} at="right" />
       </div>
     </div>
   );
@@ -190,7 +206,7 @@ export function PinboardScene({ t, language }: { t: number; language: SeoLanguag
 /** The stamp's look at `t` (`stampPose`): falling onto the sheet, turned as a stamp is pressed on by hand. */
 function stampStyle(t: number): CSSProperties {
   const { opacity, scale } = stampPose(t);
-  return { opacity, transform: `rotate(-8deg) scale(${scale.toFixed(4)})` };
+  return { opacity, transform: `rotate(-6deg) scale(${scale.toFixed(4)})` };
 }
 
 /** A photo with its picture in `language`, where its picture has words in it (Gefühle's page with its choices). */

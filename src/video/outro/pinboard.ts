@@ -2,7 +2,7 @@
 // second. A cork board fills the picture with every game's photo and the sheet with the address pinned on it from the
 // first frame (user requests, 27 and 28 November 2026: pinned one after another, the board took too long to fill, and
 // the sheet came too late); then the address is marked, the paw tracks walk along under it one print after another up
-// to Papa Fox and his child on the o of „.com“, a red „Free“ stamp comes down beside the line under them, and
+// to Papa Fox and his child on the o of „.com“, a red „Free“ stamp comes down under them, and
 // everything stands still long enough to read it.
 
 import { easeInOut, easeOut, progress } from "../intro/timeline";
@@ -30,6 +30,12 @@ export interface Slot {
 /** The pins' colours, one after another, as a box of pins mixes them. */
 export const PIN_COLORS = ["#d8402f", "#2f7fd8", "#f2b632", "#3aa35a", "#c04fa8"] as const;
 
+/** The photos held by a strip of washi tape instead of a pin, by their place in `PINBOARD`: a board pinned by hand mixes both. */
+export const TAPED: ReadonlySet<number> = new Set([1, 4, 7, 10]);
+
+/** The tapes' colours: soft, like a roll of washi tape. */
+export const TAPE_COLORS = ["#f5c84c", "#7fb8e0", "#f19bb0", "#9fd39a"] as const;
+
 /**
  * Where each photo of `PINBOARD` hangs, in its order: five across the top, one left and one right of the address in
  * the middle, five across the bottom – each a little askew, as pinned by hand.
@@ -51,9 +57,10 @@ export const PIN_SLOTS: readonly Slot[] = [
 
 /**
  * The paper in the middle with the address: its middle, size and turn – smaller than the name and address took, and
- * lower again once only the address, its tracks and one line under them were left (user requests, 28 November 2026).
+ * lower again once only the line over the address, the address, its tracks and the stamp under them were left (user
+ * requests, 28 November 2026).
  */
-export const NOTE = { x: 960, y: 540, width: 900, height: 262, turn: -1 };
+export const NOTE = { x: 960, y: 540, width: 900, height: 300, turn: -1 };
 
 /** When things happen, in seconds from the start: the photos and the sheet hang from the first frame on. */
 export const PINBOARD_BEATS = {
@@ -86,7 +93,7 @@ export const TRACK_UNITS = 100;
 export const TRACK_EMS = 12.2;
 
 /** How deep the tracks are under the address, in ems of it: room for both tracks' feet set apart. */
-export const TRACK_DEPTH = 1;
+export const TRACK_DEPTH = 0.85;
 
 /**
  * The prints of one walker along the tracks: a step every `step` units from `start`, its feet set down by turns at `y`
@@ -105,7 +112,7 @@ const walk = (big: boolean, start: number, step: number, y: number, spread: numb
  * set clearly apart and filling the room under the address (user request, 28 November 2026: the many small prints in
  * one thin band were hardly seen) – the grown-up's long steps above, the child's short ones below.
  */
-export const PAW_PRINTS: readonly PawPrint[] = [...walk(true, 34, 104, 22, 26, 7), ...walk(false, 66, 68, 70, 20, 10)].sort((a, b) => a.x - b.x);
+export const PAW_PRINTS: readonly PawPrint[] = [...walk(true, 34, 104, 18, 24, 7), ...walk(false, 66, 68, 60, 18, 10)].sort((a, b) => a.x - b.x);
 
 /** How far print `k` of `PAW_PRINTS` has appeared at `t`: 0 not yet, 1 there. Each comes quickly, one after another. */
 export function pawShown(k: number, t: number): number {
