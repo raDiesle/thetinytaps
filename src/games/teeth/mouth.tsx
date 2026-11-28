@@ -80,6 +80,12 @@ const WAITING_FACING = 0.25;
 const MONSTER_SIZE = 0.58;
 /** How flat a monster gets at most on a face seen from the side (`leanOn`): flatter, it would no longer be seen as one. */
 const MIN_LEAN = 0.42;
+/**
+ * How thick the lips are drawn: stretched wide open they get thinner, as a child's lips do (user pick, November 2026:
+ * the open mouth's thick lips with a wide ring of pink inside looked heavy). Their ink outline is a little wider.
+ */
+const LIP_STROKE = { closed: 27, open: 22 };
+const lipStroke = (open: number) => LIP_STROKE.closed + (LIP_STROKE.open - LIP_STROKE.closed) * open;
 /** How far inside the lips' outline a monster's middle has to be: past the thick lip (half its stroke) onto the teeth. */
 const LIP_EDGE = 15;
 
@@ -801,8 +807,8 @@ export function Mouth({ view, zone, monsters, dirty, brush, happy, spat = false,
         {/* Two lines, down to the upper lip and on from the lower one: the outline never runs across the mouth between
             the lips, where it lay as a black stroke in front of the teeth (user feedback, November 2026). */}
         <path d={profileOutline(side.line)} fill="none" stroke={INK} strokeWidth={7} strokeLinejoin="round" strokeLinecap="round" />
-        <path d={near} fill="none" stroke={INK} strokeWidth={34} strokeLinejoin="round" strokeLinecap="round" />
-        <path d={near} fill="none" stroke={LIP} strokeWidth={27} strokeLinejoin="round" strokeLinecap="round" />
+        <path d={near} fill="none" stroke={INK} strokeWidth={LIP_STROKE.closed + 7} strokeLinejoin="round" strokeLinecap="round" />
+        <path d={near} fill="none" stroke={LIP} strokeWidth={LIP_STROKE.closed} strokeLinejoin="round" strokeLinecap="round" />
       </g>
     );
   }, [side, lipPoints]);
@@ -813,8 +819,8 @@ export function Mouth({ view, zone, monsters, dirty, brush, happy, spat = false,
   // one screen painted per frame rather than two.
   const lipsAndWaiting = (
     <>
-      <path d={lipsPath} fill="none" stroke={INK} strokeWidth={34} strokeLinejoin="round" />
-      <path d={lipsPath} fill="none" stroke={LIP} strokeWidth={27} strokeLinejoin="round" />
+      <path d={lipsPath} fill="none" stroke={INK} strokeWidth={lipStroke(view.open) + 7 - view.open} strokeLinejoin="round" />
+      <path d={lipsPath} fill="none" stroke={LIP} strokeWidth={lipStroke(view.open)} strokeLinejoin="round" />
       {profileCut}
       {monsters.filter((m) => m.waiting).map(placed)}
     </>

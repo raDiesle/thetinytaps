@@ -65,6 +65,14 @@ late in the video. A new thing shown beside the picture (a control, a chart, a b
   back rising as a hump behind the lower teeth –; the hard palate with a few soft ridges across its front, never lines
   like scratches (`MouthInside` in `inside.tsx`, its colours `INSIDE`). It is part of the still picture built once per
   view, and nothing in it moves.
+  The soft palate's sides reach only part way down beside the throat (`SOFT_PALATE_REACH`), never all the way to the
+  tongue, where they stood as a thick wall of pink, and its lower edge is a little uneven, each side its own
+  (`SOFT_PALATE_BUMPS`) – never ruler-straight, never a wavy line (user pick and feedback, November 2026).
+- An open mouth's lips hug the rows, as a child's do (user pick from six drawn side by side, November 2026): wide open
+  the corners come in close to the last teeth (the lips' `width` in `buildMouth` narrows as the mouth opens, at most
+  1.2 times the outermost tooth wide), the gum shows only as a slim band above and below the teeth, and the lips get
+  thinner stretched open (`LIP_STROKE` in `mouth.tsx`) – never a thick ring of pink round the teeth inside thick lips
+  (`jaw.test.ts`).
 - A jaw tipped to show its chewing or tongue side goes back into the mouth with perspective (`TIPPED_PERSPECTIVE` in
   `projectors`): its back teeth come out smaller and bend in towards the mouth's middle, the further back the more –
   drawn as big as the front teeth the row ran down the sides like a flat horseshoe (user feedback, November 2026). The

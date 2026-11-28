@@ -337,10 +337,12 @@ export function buildMouth(open: number): MouthModel {
   const palate = ring(28, (s) => [MOUTH_WIDE * 82 * Math.cos(s), upperRoof + 4, 22 + 66 * Math.sin(s)]);
 
   // The lips: a wide grin when biting, a big round "Aaah" when open. The corners sit further back.
-  // Wide enough that a band of gum shows above and below the teeth, past the lips' thick outline.
-  const width = MOUTH_WIDE * (150 + 6 * open);
-  const above = 64 + 50 * open;
-  const below = 60 + 48 * open;
+  // Wide enough that a band of gum shows above and below the teeth, past the lips' outline. Open, they hug the rows:
+  // the corners come in close to the last teeth and the gum shows only as a slim band above and below (tall enough for the inner steps' tipped rows), as in a child's
+  // open mouth – a wider opening left a thick wall of pink round the teeth (user pick, November 2026; `jaw.test.ts`).
+  const width = MOUTH_WIDE * (150 - 18 * open);
+  const above = 64 + 44 * open;
+  const below = 60 + 42 * open;
   const boxy = 3.4 - 1 * open;
   const lips = ring(40, (s) => {
     const c = Math.cos(s);

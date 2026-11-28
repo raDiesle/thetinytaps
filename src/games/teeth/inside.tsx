@@ -51,6 +51,38 @@ const CLIP_ID = "mouth-inside-clip";
 const THROAT_ID = "mouth-inside-throat";
 
 /**
+ * How far down the soft palate's sides reach beside the throat, as a share of the way to the tongue: reaching all the
+ * way it stood as a thick wall of pink on both sides of the dark (user pick, November 2026, from six drawn side by side).
+ */
+const SOFT_PALATE_REACH = 0.6;
+/**
+ * Small bumps along the soft palate's lower edge, as shares of the opening's height, one between each two of its
+ * points, outwards (+) or inwards (−): a straight edge looked drawn with a ruler (user feedback, November 2026). Each
+ * side has its own, so the two don't mirror each other; kept small, a soft unevenness, never a wavy line.
+ */
+const SOFT_PALATE_BUMPS = { right: [0.025, -0.02, 0.03, -0.015], left: [-0.02, 0.03, -0.025, 0.02] };
+
+/**
+ * The points with extra points between them, each pushed a little off the straight line across it (`bumps`, shares of
+ * `size`), spread evenly between the points; the points themselves stay where they are.
+ */
+function uneven(points: Point2[], bumps: number[], size: number): Point2[] {
+  const segments = points.length - 1;
+  const per = bumps.length / segments;
+  return points.flatMap((p, i) => {
+    if (i === segments) return [p];
+    const q = points[i + 1];
+    const len = Math.hypot(q.x - p.x, q.y - p.y) || 1;
+    const normal = { x: (q.y - p.y) / len, y: -(q.x - p.x) / len };
+    const extra = bumps.slice(Math.round(i * per), Math.round((i + 1) * per)).map((b, j, all) => {
+      const k = (j + 1) / (all.length + 1);
+      return { x: p.x + (q.x - p.x) * k + normal.x * b * size, y: p.y + (q.y - p.y) * k + normal.y * b * size };
+    });
+    return [p, ...extra];
+  });
+}
+
+/**
  * The inside of the open mouth, in the dark opening between the rows (`cavity`, its outline round the chewing surfaces `around`):
  * the throat at the back with the soft palate and uvula over it, the tongue in front of it and the hard palate's roof.
  * The tongue is the model's, lying on the floor, where the lower jaw is tipped to show it (`tongueUp`); else only its
@@ -87,16 +119,20 @@ export function MouthInside({
 
   // The soft palate: a band at the top whose lower edge arches up over the throat, the uvula hanging from its middle
   // (drawn first, so the band covers its top).
+  const down = (y: number) => top + (y - top) * SOFT_PALATE_REACH;
+  // Its lower edge from the right side over the arch to the left, a little uneven on its way (`SOFT_PALATE_BUMPS`).
+  const right = [
+    { x: x1 + 40, y: down(back + gap * 0.3) },
+    { x: cx + w * 0.36, y: down(back + gap * 0.1) },
+    { x: cx + w * 0.2, y: top + gap * 0.35 },
+  ];
+  const left = right.map((p) => ({ x: 2 * cx - p.x, y: p.y })).reverse();
   const band = smooth([
     { x: x0 - 40, y: top - 60 },
     { x: x1 + 40, y: top - 60 },
-    { x: x1 + 40, y: back + gap * 0.3 },
-    { x: cx + w * 0.36, y: back + gap * 0.1 },
-    { x: cx + w * 0.2, y: top + gap * 0.35 },
+    ...uneven(right, SOFT_PALATE_BUMPS.right, gap),
     { x: cx, y: top + gap * 0.18 },
-    { x: cx - w * 0.2, y: top + gap * 0.35 },
-    { x: cx - w * 0.36, y: back + gap * 0.1 },
-    { x: x0 - 40, y: back + gap * 0.3 },
+    ...uneven(left, SOFT_PALATE_BUMPS.left, gap),
   ]);
   const drop = `M${fmt({ x: cx - uvula, y: top })} C${fmt({ x: cx - uvula, y: top + gap * 0.42 })} ${fmt({ x: cx - uvula * 1.05, y: top + gap * 0.6 })} ${fmt({ x: cx, y: top + gap * 0.62 })} C${fmt({ x: cx + uvula * 1.05, y: top + gap * 0.6 })} ${fmt({ x: cx + uvula, y: top + gap * 0.42 })} ${fmt({ x: cx + uvula, y: top })}Z`;
 

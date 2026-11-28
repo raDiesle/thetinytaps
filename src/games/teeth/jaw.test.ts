@@ -46,12 +46,22 @@ describe("the mouth fills a screen held sideways", () => {
 
   test("wide open, it is still clearly wider than tall", () => {
     const { width, height } = extent(1);
-    expect(width / height).toBeGreaterThan(1.7);
+    // 1.6, not more: the open lips hug the rows (see below), and the inner steps' tipped rows need the opening's height.
+    expect(width / height).toBeGreaterThan(1.6);
   });
 
   test("with the teeth together, it is a broad grin", () => {
     const { width, height } = extent(0);
     expect(width / height).toBeGreaterThan(2.8);
+  });
+
+  // A wide opening left a thick wall of pink between the last teeth and the lips' corners; a child's open lips hug the
+  // rows (user pick from six drawn side by side, November 2026).
+  test("wide open, the lips' corners come in close to the last teeth", () => {
+    const model = buildMouth(1);
+    const lipsOut = Math.max(...model.lips.map((p) => Math.abs(p[0])));
+    const teethOut = Math.max(...model.teeth.flatMap((t) => t.faces.flatMap((f) => f.points.map((p) => Math.abs(p[0])))));
+    expect(lipsOut / teethOut).toBeLessThanOrEqual(1.2);
   });
 });
 
