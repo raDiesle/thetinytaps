@@ -43,6 +43,11 @@ late in the video. A new thing shown beside the picture (a control, a chart, a b
   (`cheekSpots` in `jaw.ts`), and the story's sit beside the eyes, clear of the open mouth's corners even while they
   glow bigger (`CHEEKS`) – they once lay right on the corners and looked odd (user feedback, November 2026;
   `cheeks.test.ts` checks every step and the story).
+- While a chewing-surface step runs, the front teeth show no monsters waiting for a later step: on the lower ones while
+  the lower molars are brushed, on both rows' while the upper ones are (`quietFront` in `steps.ts`, `waitingShown`;
+  user feedback, November 2026: seen from above with the mouth wide open they stood in a row before the molars being
+  brushed and only crowded the picture). Their stains stay; the monsters are there again when their step comes
+  (`stains.test.ts`).
 - The monsters grow only in the story at the start. In the mirror they are already on the teeth: never let them pop up or arrive there (they only fade in softly as a side of the teeth turns into view), that would be a second, illogical origin.
 - The gum always runs into the lips: never a strip or wedge of the mouth's dark between gum and lips, from the front
   or the side (user feedback, November 2026). Round the teeth lies the inside of the cheek, and dark only between the
@@ -84,11 +89,15 @@ late in the video. A new thing shown beside the picture (a control, a chart, a b
 - A row tipped to show its chewing surfaces shows its gum only on the cheek side and between its crowns: never a band of
   gum between the lower teeth and the tongue, nor above the upper ones' tongue side, which looked like a second row
   (`lipSideOnly` in `jaw.ts`, user feedback, November 2026). The inner steps, which brush the tongue side, keep that
-  gum (`jaw.test.ts`).
+  gum (`jaw.test.ts`). Nor does any gum lie over a tooth of such a row: seen tipped, a back molar's cheek side is a
+  narrow strip, and the gum's wall reaching up its foot – deep and swung back over it by the perspective – covered it
+  like flesh lying on the tooth (user feedback, November 2026), so its cheek-side wall is only `GUM_TIPPED` deep and
+  drawn under the crown with the gum's top (`wallsUnder`, `jaw.test.ts`).
 - The brush's foam is faint and varied (user feedback, November 2026: even white balls with a thick blue ring were too
   loud): small clumps, clear bubbles with a light and tiny dots, of different sizes, with a pale edge, and slightly
   see-through (`FOAM`, `FoamFleck` in `brush.tsx`; `brush.test.ts`). Never a row of equal balls, never so much that it hides
-  the brush or the teeth.
+  the brush or the teeth: ten flecks, three at first (twelve were too many, seven then a little too few; user requests,
+  November 2026), drawn in the brush's own layer so they ride on the bristles with every stroke and circle.
 - A brushed monster dissolves, never just pops away (user request, November 2026): body and grains are HTML layers of
   its sprite (`MonsterDust`), moved by transform, opacity and filter, never an animation inside its svg
   (`layers.test.ts`), and the grains are few and calm – sugar and foam of the picture, no stars or confetti.
@@ -106,7 +115,7 @@ late in the video. A new thing shown beside the picture (a control, a chart, a b
   tooth the brush has reached in this step, `reachedTeeth`), so it spreads with the brush. The foam lies only at the
   gum line, on the gum and a little up on the tooth, as the brush pushes it there (user feedback, November 2026), and
   little of it: clearly more on one tooth than on its neighbour, often a single bubble or none, never the same row of bubbles on
-  every tooth (`FOAM_AMOUNTS`: none to two next to each other of `GUM_FOAM`, from a place of each tooth's own, about one a tooth – user request, November 2026: fewer foam bubbles; on the brush only a few flecks, two at first, `FOAM`, `FOAM_FIRST`). Its
+  every tooth (`FOAM_AMOUNTS`: none to two next to each other of `GUM_FOAM`, from a place of each tooth's own, about one a tooth – user request, November 2026: fewer foam bubbles; on the brush only a few flecks, three at first, `FOAM`, `FOAM_FIRST`). Its
   bubbles are faint and unlike each other – big beside tiny, sized apart on each tooth, a pale edge, a little
   see-through (user feedback, November 2026: subtler and more varied) – (`GUM_FOAM`, `GUM_FOAM_SPREAD`, `gumFoam`,
   `FoamBubbles`), kept
@@ -122,6 +131,9 @@ late in the video. A new thing shown beside the picture (a control, a chart, a b
   and on the back teeth' outside its handle comes out of the corner of the mouth towards the viewer (`CHEEK_ANGLE`), so
   it hides as few teeth and monsters as it can: a bigger brush lying along the row covered the molars being brushed
   (user feedback, November 2026, asked twice – the brush was made smaller two times).
+- Circling, the brush turns counter-clockwise on the screen (user request, November 2026): the circle is two swings,
+  the second a quarter ahead (`.brush-move-across`), and `turnLeft` in `brush.tsx` turns the second's direction so the
+  path runs counter-clockwise whatever way the head and the brush lie (`brush.test.ts`).
 - The teeth change size step by step from the back molars to the front teeth: each tooth a little narrower and its
   chewing surface a little shallower than the one behind it (`TEETH`, `CHEWING_DEPTHS` in `jaw.ts`), never two big
   molars and then a row of flat ones alike (user feedback, November 2026; `jaw.test.ts` checks).
@@ -208,8 +220,10 @@ late in the video. A new thing shown beside the picture (a control, a chart, a b
   left most of the screen to an empty palate. On a wide screen nothing lies under or over the mouth: the controls stand
   as a slim strip along the left edge, the end's week, trophy and „Menü“ on a sheet at the right – never a row under the
   picture there, which took a fifth of a phone's height from the teeth. `jaw.test.ts` and `controls.test.ts` check.
-- That strip runs the whole height, from just under the ✕'s corner to the bottom, with one even gap (`--teeth-gap`) to
-  the ✕'s corner, the picture's left edge and its bottom edge – measured inside the book's paper margin (`--frame`),
+- That strip runs the screen's whole height, from the top to the bottom (user request, 28 November 2026: starting under
+  the ✕'s corner it looked short): its paper begins at the top with the same gap (`--teeth-gap`) as at the picture's
+  left and bottom edges, the ✕'s corner lies on its top, and its first row (the buttons) starts one gap under that
+  corner – all measured inside the book's paper margin (`--frame`),
   never from the screen's edge, and never capped in height (user feedback, November 2026: on tablets and phones it stood
   off the edge, its left side under the paper margin and short of the bottom). On the left it lies at the paper margin
   with a small gap even where a camera's cut-out leaves a safe area, as the ✕'s corner does – stepped in by it the
@@ -289,7 +303,12 @@ late in the video. A new thing shown beside the picture (a control, a chart, a b
 - The week chart always makes clear which day it is and whether it is morning or evening. The days' names are a little
   bigger than their sun and moon (`.teeth-day-name`) in broad columns, never small print under them, and today stands
   out at a glance – much bigger, lifted, a strong colour, a broad frame and a big „Heute“ – yet still, never pulsing
-  (user feedback, November 2026, asked twice). Brushed or not is seen across the room (user request, November 2026: a star beside a faint sun or moon didn't say it plainly): a brushing done is a star on a bright filled disc, one missed an empty grey disc, one still to come a faint ring – never told apart only by a faint icon or opacity.
+  (user feedback, November 2026, asked twice). Brushed or not is seen across the room (user request, November 2026: a star beside a faint sun or moon didn't say it plainly): a brushing done is a star on a bright filled disc, one missed an empty pale disc with a dashed rim, one still to come a faint ring in its morning's yellow or evening's violet – never told apart only by a faint icon or opacity.
+  At the end the week fills its sheet, never a thin band of days over empty paper (user feedback, 28 November 2026: much
+  empty grey there): beside the head the week takes all the height the trophy and „Menü“ leave (a size container), on a
+  sheet wider than tall as tall day columns, on one taller than wide (a tablet's 4:3, a big monitor) as a row per day
+  (`@container teeth-end`), its places sized by that room and a column never narrower than its day's name. The sheet is
+  bright paper and the places warm tones, never grey; it lies inside the book's paper margin. `controls.test.ts` checks.
 - Translations are made at once (root `CLAUDE.md`, user decision, 22 November 2026): a new text is written English first and gets every other app language, German too, in the same commit – inline as `{ en: "…", de: "…", … }` (`EnglishFirst`, which `t` and `spokenIn` take); the steps' and daytimes' texts are German in `steps.ts` / `daytime.ts` with the other languages by id beside them, so the first English-first one teaches `stepText` / `daytimeText` a text's first language, with a test, never by writing it German first after all. A changed text of the older German-first ones is changed in its German (`{ de: "…" }`) and in its translations (`steps.<language>.ts` / `daytime.<language>.ts`), never keeping a stale one; what is missing goes into `src/content/ideas/languageStatus.ts`. Every translation is short, warm, present tense, "ты"/tú/तुम, no past tense or gendered words about the child ("Сахарных монстров больше нет", not "убежали"); Hindi uses commands and "let's" (चलो), Arabic "we" (هيّا ن…).
 - Say every line through `spokenIn`/`stepText`/`daytimeText` and `say`, which plays its ElevenLabs recording (`stimme/`, Tapsi's voice, October 2026; where the language has no recording of a line its English one plays, else nothing – `spokenIn` carries the English text as `english`); two lines that may be in different languages are said one after the other (`queue`), never joined into one string. A line that is not queued cuts off what is being said, so an effect that says something only on a change (going on after a pause) must not say it when the game mounts: that once cut off „Guten Morgen!“ before the first cue. A new or changed line is listed for recording by `src/content/recordedLines.ts` and stays silent until `bun run voice make --only zaehne` (only when the user asks).
 - Never switch the song in, or decode it, while brushing: a song that arrives mid-brushing makes the picture stutter on phones. It loads from the start screen on, and the clock waits for it before the countdown (with „Musik lädt …“ and a bar when it is late); the stand-in tune is only for a song that can't load.
@@ -361,10 +380,13 @@ late in the video. A new thing shown beside the picture (a control, a chart, a b
 - A brushed tooth is a beautiful white (user feedback, November 2026): its front pure white, its other faces a cool
   white a breath darker (`TOOTH_FILLS`), never cream. It sparkles only once the brush has reached the next tooth
   (`brushLeft`), after a beat's pause, and then the faces the brush left last sparkle on while the head holds still:
-  one or two glints in the whole view, one small glint a face, faint and slow, coming and going in turn every two bars
+  one or two in the whole view, one small flash a face, coming and going in turn every two bars
   (`SPARKLES_AT_ONCE`, `SPARKLE_SIZE`, `.tooth-glint.brushed`, `teeth-sparkle`) – never one big glint over the tooth,
   nor a flash while the brush still lies on it, where it was hardly seen, nor a glint on every brushed face, which was
-  too much (user feedback, November 2026, twice). `stains.test.ts` checks.
+  too much (user feedback, November 2026, twice). Each is a slim four-pointed flash with curved sides like the trophy
+  sign's glints on the shelf, white with a faint cool edge (`Flash` in `mouth.tsx`), turning as it comes and goes in a
+  short moment and hidden the rest of the time – never the end's star of rays (`Glint`), which was too much while
+  brushing (user request, November 2026). `stains.test.ts` checks.
 - The story's teeth stand close, neighbours nearly touching (`rowOf`, `story.test.ts`): gaps between them looked like
   teeth lost (November 2026).
 - The story shows the mouth as big as it can (user feedback, November 2026: zoom in more, so the child sees more): on a

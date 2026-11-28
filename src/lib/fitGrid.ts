@@ -22,9 +22,9 @@ const CARD_ASPECT = 1.4;
 const FLAT_ROW = 130;
 const FLAT_ASPECT = 2.4;
 /**
- * Cards with a preview picture (`pictureCard`) are always the picture (3 : 2) above a name in one line, never flat:
- * the grid is chosen so the pictures come out biggest. Smaller than this a picture can't be made out, and the menu
- * scrolls instead.
+ * Cards with a preview picture (`pictureCard`) are always the picture (3 : 2) with its name lying across its foot,
+ * never flat: the grid is chosen so the pictures come out biggest. Smaller than this a picture can't be made out, and
+ * the menu scrolls instead.
  */
 const MIN_PICTURE = 120;
 const MIN_PICTURE_PHONE = 84;
@@ -36,24 +36,31 @@ const MIN_PICTURE_PHONE = 84;
 const MAX_PICTURE_ROW = 280;
 /** A screen whose shorter side is below this is a phone's or a tablet's (an iPad Pro is 1024), where cards with a picture are never capped. */
 export const TABLET_SCREEN = 1050;
-/** The card's paper round its picture, on each side; matches `--pic-pad` in `book.css`. */
-const PICTURE_PAD = 8;
-const PICTURE_PAD_PHONE = 6;
-/** The room the name takes under the picture, as part of the row (its font follows the card's height in `book.css`). */
-const NAME_SHARE = 0.17;
-/** `bestFit`'s shape for cards with a preview picture above their name. */
+/** The card's border round its picture, on both sides together; matches `.picture-list .game-card` in `book.css`. */
+const PICTURE_EDGE = 4;
+/** `bestFit`'s shape for cards with a preview picture, their name lying across its foot. */
 export const PICTURE_CARDS = "picture";
 
-/** How wide a picture comes out above its name in a card of this width and height (see `PICTURE_CARDS`). */
-export function pictureWidth(cardWidth: number, row: number, phone: boolean) {
-  const pad = phone ? PICTURE_PAD_PHONE : PICTURE_PAD;
-  const name = Math.min(Math.max(row * NAME_SHARE, 16), 34);
-  return Math.min(cardWidth - 2 * pad, (row - 2 * pad - name) * 1.5);
+/**
+ * How wide a picture comes out in a card of this width and height (see `PICTURE_CARDS`): the whole card, its name lies
+ * on it (user request, 28 November 2026: no paper frame round the picture, no room of its own under it for the name).
+ */
+export function pictureWidth(cardWidth: number, row: number) {
+  return Math.min(cardWidth - PICTURE_EDGE, (row - PICTURE_EDGE) * 1.5);
 }
 
 /** Space between the cards; matches `.game-list.fit` in the styles (smaller on a phone). */
 const GAP = 24;
 const GAP_PHONE = 14;
+/**
+ * Cards that are a picture or show one (`PICTURE_CARDS`, an `aspect`) stand closer: the pictures get that room (user
+ * request, 28 November 2026). Matches `.picture-list` and `.art-list` in `start-screen.css`.
+ */
+const PICTURE_GAP = 14;
+const PICTURE_GAP_PHONE = 10;
+/** The gap between the cards of a list of this shape. */
+const gapFor = (phone: boolean, shape?: number | typeof PICTURE_CARDS) =>
+  shape === undefined ? (phone ? GAP_PHONE : GAP) : phone ? PICTURE_GAP_PHONE : PICTURE_GAP;
 /** Extra room above each line of grouped cards for the group's name; matches `--group-label` in the styles. */
 const LABEL = 12;
 const LABEL_PHONE = 0;
@@ -115,7 +122,7 @@ export function packGroups(sizes: number[], columns: number, reserve = 0): { pla
 /**
  * Columns and row height that give `count` cards the most room; with `groups` (their sizes) every group keeps together.
  * `shape` is how much wider than tall the cards look best, when it isn't the usual (cards that are a picture), or
- * `PICTURE_CARDS` for cards with a preview picture above their name, which get the biggest pictures – on a big screen
+ * `PICTURE_CARDS` for cards with a preview picture, which get the biggest pictures – on a big screen
  * (`bigScreen`) no taller than `MAX_PICTURE_ROW`.
  */
 export function bestFit(
@@ -131,7 +138,7 @@ export function bestFit(
   const aspect = shape;
   const minRow = phone ? MIN_ROW_PHONE : MIN_ROW;
   const minWidth = phone ? MIN_WIDTH_PHONE : aspect ? MIN_PICTURE_WIDTH : MIN_WIDTH;
-  const gap = phone ? GAP_PHONE : GAP;
+  const gap = gapFor(phone, aspect);
   let best: Fit | null = null;
   let bestSize = 0;
   for (let columns = 1; columns <= Math.max(1, count); columns++)
@@ -152,11 +159,17 @@ export function bestFit(
   return best;
 }
 
-/** The grid of `bestFit` for cards with a preview picture above their name: the one with the widest pictures. */
+/**
+ * How much bigger pictures must come out to take a grid that leaves cells empty over one that fills every cell: three
+ * cards as two over one, for 4 % more picture, looked unfinished.
+ */
+const EMPTY_CELLS_GAIN = 1.1;
+
+/** The grid of `bestFit` for cards with a preview picture: the one with the widest pictures. */
 function bestPictureFit(count: number, width: number, height: number, phone: boolean, groups: number[] | undefined, maxRow: number): Fit | null {
-  const gap = phone ? GAP_PHONE : GAP;
+  const gap = gapFor(phone, PICTURE_CARDS);
   let best: Fit | null = null;
-  let bestSize = 0;
+  let bestScore = 0;
   for (let columns = 1; columns <= Math.max(1, count); columns++)
     for (let reserve = 0; reserve < (groups ? columns : 1); reserve++) {
       const lines = groups ? packGroups(groups, columns, reserve).lines : [Math.ceil(count / columns)];
@@ -164,11 +177,13 @@ function bestPictureFit(count: number, width: number, height: number, phone: boo
       const labels = groups ? lines.length * ((phone ? LABEL_PHONE : LABEL) + gap) : 0;
       const cardWidth = (width - (columns - 1) * gap) / columns;
       const row = Math.min((height - labels - (rows - 1) * gap) / rows, maxRow);
-      const size = pictureWidth(cardWidth, row, phone);
+      const size = pictureWidth(cardWidth, row);
       if (size < (phone ? MIN_PICTURE_PHONE : MIN_PICTURE)) continue;
-      // A bigger picture wins; of two alike (within a pixel), the one with fewer empty cells.
-      if (size > bestSize + 1) {
-        bestSize = size;
+      // A bigger picture wins, a grid leaving cells empty only when clearly bigger, and of two alike (within a pixel)
+      // the one with fewer empty cells.
+      const score = rows * columns > count ? size / EMPTY_CELLS_GAIN : size;
+      if (score > bestScore + 1) {
+        bestScore = score;
         best = { columns, row: Math.floor(row), reserve };
       }
     }
@@ -180,7 +195,7 @@ const MIN_NAME_FIT = 0.6;
 
 /**
  * Shrinks the names of a menu's picture cards alike (`--name-fit` on the list), so the longest stands whole in one line
- * under its picture and all names of the menu keep one size (user feedback, 25 November 2026: names broke into two or
+ * on its picture's foot and all names of the menu keep one size (user feedback, 25 November 2026: names broke into two or
  * three lines beside small pictures). A table of contents passes its names (`.toc-title`, up to three lines): there a
  * long word must fit across, and the lines must fit in their room.
  */
@@ -239,7 +254,7 @@ function roomFor(part: HTMLElement, page: HTMLElement) {
  * it waits below the cards until a grown-up scrolls down.
  * With `groups` (the sizes of runs of cards that belong together, in order) each group is kept in one rectangle
  * with its name above it: `places` gives each group's place in the grid. Cards that are a picture (`GameMode.art`) pass
- * its `aspect`, so they come as wide as the picture; cards with a preview picture above their name pass
+ * its `aspect`, so they come as wide as the picture; cards with a preview picture pass
  * `PICTURE_CARDS`, and their names are shrunk alike to stand in one line (`fitNames`).
  */
 export function useFitGrid(count: number, groups?: number[], shape?: number | typeof PICTURE_CARDS) {
@@ -299,7 +314,8 @@ export function useFitGrid(count: number, groups?: number[], shape?: number | ty
   return {
     ref: setList,
     // `picture-list`: every card of the list is sized like a picture card, also one still waiting for its picture.
-    className: [fit && "fit", shape === PICTURE_CARDS && "picture-list"].filter(Boolean).join(" "),
+    // `art-list`: cards that are a picture themselves (`aspect`), standing as close as picture cards.
+    className: [fit && "fit", shape === PICTURE_CARDS && "picture-list", typeof shape === "number" && "art-list"].filter(Boolean).join(" "),
     style: fit ? ({ "--fit-columns": fit.columns, "--fit-row": `${fit.row}px`, gridTemplateRows: rows } as CSSProperties) : undefined,
     places: packed?.places.map(
       (p): CSSProperties => ({ gridColumn: `${p.column + 1} / span ${p.width}`, gridRow: `${p.row + p.line + 1} / span ${p.height + 1}` }),

@@ -1,5 +1,5 @@
 import { describe, expect, test } from "bun:test";
-import { BOXES, drawOrder, FOAM, FOAM_EDGE, FOAM_FIRST, SIZE, type Facing } from "./brush";
+import { BOXES, drawOrder, FOAM, FOAM_EDGE, FOAM_FIRST, SIZE, turnLeft, type Facing } from "./brush";
 
 // The bristle tufts stand on the bristle side of the head (b above -11), the head, neck and handle behind them.
 const isTuft = (i: number) => BOXES[i].b[0] >= -11;
@@ -72,15 +72,54 @@ describe("the brush's foam", () => {
     expect(Math.max(...FOAM.map((f) => f.r))).toBeGreaterThanOrEqual(2.5 * Math.min(...FOAM.map((f) => f.r)));
   });
 
-  // Fewer foam bubbles (user request, November 2026): a few flecks in all, two at first.
-  test("it is only a few flecks", () => {
-    expect(FOAM.length).toBeLessThanOrEqual(7);
-    expect(FOAM_FIRST).toBeLessThanOrEqual(2);
+  // Twelve flecks were too many, seven then a little too few (user requests, November 2026).
+  test("it is a few flecks, a little more than at first", () => {
+    expect(FOAM.length).toBe(10);
+    expect(FOAM_FIRST).toBe(3);
   });
 
   test("it is small and its edge pale", () => {
-    for (const f of FOAM) expect(f.r).toBeLessThanOrEqual(3);
+    for (const f of FOAM) expect(f.r).toBeLessThanOrEqual(3.5);
     const [r, g, b] = [1, 3, 5].map((i) => Number.parseInt(FOAM_EDGE.slice(i, i + 2), 16));
     expect(Math.min(r, g, b)).toBeGreaterThanOrEqual(0xc8);
   });
+});
+
+// On the sides the brush circles counter-clockwise on the screen (user request, November 2026).
+test("the brush circles counter-clockwise on the screen", async () => {
+  const css = await Bun.file("src/games/teeth/teeth.css").text();
+  // The second swing runs a quarter of the circle ahead of the first.
+  expect(css).toMatch(/\.brush-move\.circle > \.brush-move-across \{[^}]*calc\(var\(--brush-s\) \/ -4\)/);
+  const swings = [
+    [
+      { x: 11, y: 0 },
+      { x: 0, y: 6 },
+    ],
+    [
+      { x: 11, y: 0 },
+      { x: 0, y: -6 },
+    ],
+    [
+      { x: -3, y: 9 },
+      { x: 8, y: 2 },
+    ],
+    [
+      { x: 4, y: -7 },
+      { x: 5, y: 3 },
+    ],
+  ];
+  for (const [first, raw] of swings) {
+    const second = turnLeft(first, raw);
+    const at = (t: number) => {
+      const [a, b] = [Math.cos(2 * Math.PI * t), Math.cos(2 * Math.PI * (t + 0.25))];
+      return { x: a * first.x + b * second.x, y: a * first.y + b * second.y };
+    };
+    let area = 0;
+    for (let i = 0; i < 40; i++) {
+      const [p, q] = [at(i / 40), at((i + 1) / 40)];
+      area += p.x * q.y - q.x * p.y;
+    }
+    // With the screen's y pointing down, a counter-clockwise path has a negative area.
+    expect(area).toBeLessThan(0);
+  }
 });

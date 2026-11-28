@@ -1130,13 +1130,45 @@
   height: calc(var(--ribbon) * 80 / 60);
 }
 
+/*
+ * A menu deeper in a book (MenuHead's ShelfRibbon): the same ribbon, as high as the page's corner and right beside it,
+ * so the corner turns one page back and the ribbon closes the book onto the shelf (user request, 28 November 2026). It
+ * hangs no lower than the corner, so the menu's head needs no more room for it. It is no `.page-ribbon`: that one's
+ * rules make the corner and the head bigger for a book's first page.
+ */
+:root {
+  --shelf-ribbon: calc(var(--corner) * 0.74);
+}
+
+:root .shelf-ribbon {
+  display: block;
+  position: absolute;
+  top: calc(var(--page-top) - var(--shelf-ribbon) * 6 / 60);
+  left: calc(var(--page-left) + var(--corner) + 6px);
+  z-index: var(--z-page-corner);
+  width: var(--shelf-ribbon);
+  height: calc(var(--shelf-ribbon) * 80 / 60);
+  -webkit-tap-highlight-color: transparent;
+  pointer-events: none;
+}
+
+:root .shelf-ribbon:focus-visible {
+  outline: 3px solid var(--ocean);
+  outline-offset: 3px;
+}
+
+/* The sun (or a room's window) steps further right, out from under the ribbon too. */
+:root:has(.shelf-ribbon) :is(.sky-sun, .world-window) {
+  left: calc(var(--corner) + var(--shelf-ribbon) + 2px);
+}
+
 /* Only the ribbon and its label are tapped, not the box round them. */
-:root .page-ribbon .page-ribbon-art > :not(.page-ribbon-shadow) {
+:root :is(.page-ribbon, .shelf-ribbon) .page-ribbon-art > :not(.page-ribbon-shadow) {
   pointer-events: visiblePainted;
 }
 
 /* A finger or the mouse on it sways the ribbon from where it comes out of the book; a tap tugs it, as to close the book. */
-:root .page-ribbon .page-ribbon-art {
+:root :is(.page-ribbon, .shelf-ribbon) .page-ribbon-art {
   display: block;
   width: 100%;
   height: 100%;
@@ -1147,11 +1179,11 @@
     translate 0.15s ease-out;
 }
 
-:root .page-ribbon:hover .page-ribbon-art {
+:root :is(.page-ribbon, .shelf-ribbon):hover .page-ribbon-art {
   rotate: -5deg;
 }
 
-:root .page-ribbon:active .page-ribbon-art {
+:root :is(.page-ribbon, .shelf-ribbon):active .page-ribbon-art {
   rotate: -3deg;
   translate: 0 4%;
 }
@@ -1444,6 +1476,10 @@
 
 :root .menu-head {
   margin-left: max(0px, calc(var(--page-left) + var(--corner) + 8px - var(--menu-edge, 20px)));
+}
+
+:root:has(.shelf-ribbon) .menu-head {
+  margin-left: max(0px, calc(var(--page-left) + var(--corner) + 6px + var(--shelf-ribbon) + 8px - var(--menu-edge, 20px)));
 }
 
 @media (max-width: 599.98px), (max-height: 599.98px) {
@@ -1879,39 +1915,55 @@
 }
 
 /*
- * A card with a preview picture (`pictureCard`), in every menu alike and at every size: the framed picture on top, as
- * wide as the card, and the name in one line under it – never broken, never beside a small picture and never on it
- * (user feedback, 25 November 2026, from Lebendige Welten's menus). `useFitGrid` picks the grid that makes the pictures
- * biggest and shrinks all names of the menu alike (`--name-fit`) until the longest fits; past that it ends in „…“.
+ * A card with a preview picture (`pictureCard`), in every menu alike and at every size: the card is the picture, a
+ * photo taped onto the page with no paper frame round it, and its name lies across the picture's foot on a band of
+ * paper, in one line, never broken (user request, 28 November 2026, from Kettenreaktion's and the Timer's menus: the
+ * frame round a picture took room the picture should have; before, the name stood under the picture, 25 November).
+ * `useFitGrid` picks the grid that makes the pictures biggest and shrinks all names of the menu alike (`--name-fit`)
+ * until the longest fits; past that it ends in „…“.
  */
 :root .game-card.picture-card {
-  --pic-pad: 8px;
   flex-direction: column;
-  justify-content: flex-start;
-  align-items: center;
+  justify-content: flex-end;
+  align-items: stretch;
+  height: auto;
+  aspect-ratio: 3 / 2;
   gap: 0;
-  padding: var(--pic-pad) var(--pic-pad) 0;
+  padding: 0;
+  border-radius: 10px 14px 11px 15px / 14px 10px 15px 11px;
+  background: var(--paper);
   text-align: center;
 }
 
+/* The tape holding it to the page: smaller, so the cards may stand close. */
 :root .game-card.picture-card::before {
-  width: min(72px, 42%);
+  top: -8px;
+  width: min(64px, 36%);
+  height: 16px;
 }
 
 :root .game-card.picture-card > .game-emoji.with-picture {
-  flex: none;
+  position: absolute;
+  inset: 0;
   width: 100%;
   max-width: none;
-  height: auto;
-  aspect-ratio: 3 / 2;
+  height: 100%;
+  border: 0;
+  border-radius: inherit;
 }
 
+/* The name on a band of paper across the picture's foot: the picture shows through only a little, so it reads well. */
 :root .game-card.picture-card > .game-title {
+  position: relative;
+  z-index: 1;
   display: block;
   max-width: 100%;
-  padding: 0.15em 2px 0.3em;
+  padding: 0.12em 6px 0.18em;
   overflow: hidden;
-  font-size: calc(var(--name-size, 1.3rem) * var(--name-fit, 1));
+  border-top: 1px solid #3d304533;
+  border-radius: 0 0 9px 13px / 0 0 13px 9px;
+  background: color-mix(in srgb, var(--paper) 88%, #0000);
+  font-size: calc(var(--name-size, 1.1rem) * var(--name-fit, 1));
   line-height: 1.2;
   white-space: nowrap;
   text-overflow: ellipsis;
@@ -1925,26 +1977,26 @@
 }
 
 /*
- * Fitted to the screen: the card is exactly as big as its picture and name need in its grid cell (the cell is the
- * size container, 2px of border on each side), so no empty paper is left beside or under the picture; `bestFit`'s
- * `pictureWidth` reckons alike. Every card of such a menu is as big, also one whose picture is still waiting.
+ * Fitted to the screen: the card is exactly as big as its picture in its grid cell (the cell is the size container,
+ * 2px of border on each side), so no paper is left beside or under it; `bestFit`'s `pictureWidth` reckons alike. Every
+ * card of such a menu is as big, also one whose picture is still waiting.
  */
 :root .game-list.fit.picture-list .game-card {
-  --pic-pad: 8px;
-  /* The name's line: a share of the card's height (`NAME_SHARE` in fitGrid.ts). */
-  --name-room: clamp(16px, 17cqh, 34px);
-  --name-size: calc(var(--name-room) / 1.5);
-  --pic-w: min(calc(100cqw - 2 * var(--pic-pad) - 4px), calc((100cqh - 8px - 2 * var(--pic-pad) - var(--name-room)) * 1.5));
+  /* The name's band: a share of the card's height. */
+  --name-room: clamp(20px, 18cqh, 36px);
+  --name-size: calc(var(--name-room) * 0.64);
+  --pic-w: min(calc(100cqw - 4px), calc((100cqh - 4px) * 1.5));
   align-self: center;
-  width: calc(var(--pic-w) + 2 * var(--pic-pad) + 4px);
-  height: calc(var(--pic-w) / 1.5 + var(--name-room) + 2 * var(--pic-pad) + 4px);
-  padding-bottom: 0;
+  width: calc(var(--pic-w) + 4px);
+  height: calc(var(--pic-w) / 1.5 + 4px);
+  padding: 0;
 }
 
+/* Its line is the band less the band's top border, so a name that fits is never taken as too tall (`fitNames`). */
 :root .game-list.fit .game-card.picture-card > .game-title {
-  height: calc(var(--name-room) + var(--pic-pad));
-  padding: 0 2px;
-  line-height: calc(var(--name-room) + var(--pic-pad));
+  height: var(--name-room);
+  padding: 0 6px;
+  line-height: calc(var(--name-room) - 1px);
 }
 
 :root .game-list.fit .game-card.picture-card .game-note {
@@ -1954,9 +2006,40 @@
 /* A phone's scrolling list (when not all fit): the same cards, several side by side. */
 @media (max-width: 599.98px), (max-height: 599.98px) {
   :root .game-list:not(.fit) .game-card.picture-card {
-    --pic-pad: 6px;
     --name-size: 0.95rem;
+    flex-direction: column;
+    padding: 0;
   }
+}
+
+/*
+ * The Timer's cards, which are the picture itself (`GameMode.art`): alike, no paper frame round the picture – it fills
+ * the card, as big as its cell allows in the picture's shape (`ART_ASPECT`, user request, 28 November 2026).
+ */
+:root .game-card.mode-art-card {
+  padding: 0;
+  border-radius: 10px 14px 11px 15px / 14px 10px 15px 11px;
+  background: var(--paper);
+}
+
+:root .game-card.mode-art-card::before {
+  top: -8px;
+  width: min(64px, 36%);
+  height: 16px;
+}
+
+:root .game-list.fit .game-card.mode-art-card {
+  --art-w: min(100cqw, calc(100cqh * 1.6));
+  align-self: center;
+  width: var(--art-w);
+  height: calc(var(--art-w) / 1.6);
+  padding: 0;
+}
+
+:root .mode-art-card > .mode-art {
+  inset: 0;
+  border: 0;
+  border-radius: inherit;
 }
 
 @media (hover: hover) {
@@ -1978,4 +2061,48 @@
 
 :root :is(.game-emoji, .toc-picture).with-picture::after {
   opacity: 0.3;
+}
+
+/*
+ * A start screen of picture cards (Kettenreaktion, the Timer, Bewegungsabenteuer …) gives the pictures every pixel it
+ * can (user request, 28 November 2026): the page's top margin and the gap under the title are small, the title a
+ * little smaller, and below 1400 px wide (where the families don't stand in the margins beside the cards) the cards
+ * take the page's whole width instead of a 1040 px column. The head still reaches past a book's ribbon
+ * (`--menu-pad` follows the padding).
+ */
+:root .start-screen:has(.game-list:is(.picture-list, .art-list)) {
+  --menu-pad: 10px;
+  gap: 10px;
+  padding-top: max(10px, env(safe-area-inset-top));
+}
+
+/* The head still reaches down past the page's corner (its tip lies at nine tenths of its height), so no card lies under it. */
+:root .start-screen:has(.game-list:is(.picture-list, .art-list)) .menu-head {
+  min-height: max(var(--ribbon-reach, 0px) + 6px - var(--menu-pad), var(--page-top) + var(--corner) * 0.9 - var(--menu-pad));
+}
+
+:root .start-screen:has(.game-list:is(.picture-list, .art-list)) .menu-title {
+  padding-bottom: 0.3em;
+  font-size: clamp(1.5rem, 4vw, 2.4rem);
+}
+
+@media (max-width: 1399.98px) {
+  :root .start-screen:has(.game-list:is(.picture-list, .art-list)) .mode-picker {
+    max-width: none;
+  }
+}
+
+/* On a wide page the cards take all but the families' room beside them (`--cards-w`), the families a little narrower. */
+@media (min-width: 1400px) and (min-height: 640px) {
+  :root .start-screen:has(.game-list:is(.picture-list, .art-list)) {
+    --cards-w: max(1040px, 100vw - 560px);
+  }
+
+  :root .start-screen:has(.game-list:is(.picture-list, .art-list)) .mode-picker {
+    max-width: var(--cards-w);
+  }
+
+  :root .start-screen:has(.game-list:is(.picture-list, .art-list)) .book-family {
+    width: min(300px, calc((100% - var(--cards-w)) / 2 - 20px));
+  }
 }
