@@ -279,4 +279,18 @@ describe("a row tipped to show its chewing surfaces", () => {
       expect(Math.min(...gum.faces.find((f) => f.kind === "top")!.points.map(out))).toBeLessThan(innermost - 2);
     }
   });
+
+  // Seen tipped, a back molar's cheek side is a narrow strip, and the gum reaching up its foot lay on it like flesh
+  // covering the tooth (user feedback, November 2026): its walls lie under the crown, and only a short way deep.
+  test("lays no gum over its teeth", () => {
+    const model = buildMouth(1);
+    for (const gum of model.gums) {
+      const shown = lipSideOnly(gum);
+      expect(shown.wallsUnder).toBe(true);
+      const wall = shown.faces.find((f) => f.kind === "outer")!;
+      const full = gum.faces.find((f) => f.kind === "outer")!;
+      const depth = (f: typeof wall) => Math.max(...f.points.map((p) => p[1])) - Math.min(...f.points.map((p) => p[1]));
+      expect(depth(wall)).toBeLessThan(depth(full) / 4);
+    }
+  });
 });

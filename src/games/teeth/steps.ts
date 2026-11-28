@@ -28,7 +28,19 @@ export interface Step extends StepTexts {
   teeth: ToothId[];
   motion: Motion;
   view: View;
+  /**
+   * The jaws whose front teeth show no monsters waiting for a later step while this one runs: seen from above with the
+   * mouth wide open, they stood in a row before the molars being brushed and only crowded the picture (user feedback,
+   * November 2026; `waitingShown`).
+   */
+  quietFront?: Jaw[];
 }
+
+/** The teeth in front of the molars, from the middle: what `quietFront` keeps free of waiting monsters. */
+const FRONT_TEETH = 3;
+
+/** Whether a monster waiting for a later step shows on its tooth while `step` runs (`quietFront`). */
+export const waitingShown = (step: Step | null | undefined, tooth: ToothId) => !(step?.quietFront?.includes(tooth.jaw) && tooth.n < FRONT_TEETH);
 
 const teeth = (jaws: Jaw[], sides: Side[], ns: number[]) => ALL_TEETH.filter((t) => jaws.includes(t.jaw) && sides.includes(t.side) && ns.includes(t.n));
 
@@ -49,6 +61,7 @@ export const STEPS: Step[] = [
     teeth: leftToRight(teeth(["lower"], ["left", "right"], [3, 4])),
     motion: "scrub",
     view: { open: 1, pitch: 0, yaw: 0, look: [0, -10, 100], zoom: 1.2, tilt: { upper: 0, lower: 60 } },
+    quietFront: ["lower"],
   },
   {
     id: "upper-top",
@@ -60,6 +73,7 @@ export const STEPS: Step[] = [
     teeth: leftToRight(teeth(["upper"], ["left", "right"], [3, 4])),
     motion: "scrub",
     view: { open: 1, pitch: 0, yaw: 0, look: [0, 10, 100], zoom: 1.2, tilt: { upper: -60, lower: 0 } },
+    quietFront: ["upper", "lower"],
   },
   {
     id: "outer-left",

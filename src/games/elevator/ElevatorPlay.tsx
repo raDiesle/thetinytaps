@@ -1,4 +1,4 @@
-import { useCallback, useEffect, useRef, useState, type CSSProperties, type PointerEvent } from "react";
+import { useCallback, useEffect, useLayoutEffect, useMemo, useRef, useState, type CSSProperties, type PointerEvent } from "react";
 import { FeedbackLayer, useTapFeedback } from "@/components/TapFeedback";
 import { loadRecordings, playDing, playKnock, playLift, playLullaby, playMelody, playRandomNote, playSlide } from "@/lib/sfx";
 import { playGiggle } from "@/lib/realSounds";
@@ -7,16 +7,30 @@ import { StoryEnd, nextCard } from "./cards";
 import { STORIES, RECORDINGS, storyLines, texts, type Step, type Story, type Task, type Who } from "./content";
 import { Backdrop, Buttons, CabinBack, CabinFront, Hint, Shaft, Shell, Slabs } from "./house";
 import { BROTHER, Bubble, KID_H, Kid, type Holding, type Outfit, type PicId, type Pose, useHero } from "./kid";
-import { CABIN_L, FLOORS, IN_CABIN, ROOM_H, ROOM_L, ROOM_R, VIEW_H, VIEW_L, VIEW_W, floorLine } from "./layout";
+import {
+  CABIN_L,
+  DESIGN_ROOM_R,
+  DESIGN_ROOM_W,
+  FLOORS,
+  IN_CABIN,
+  LayoutContext,
+  ROOM_H,
+  ROOM_L,
+  VIEW_H,
+  VIEW_L,
+  floorLine,
+  houseLayout,
+  roomWidthFor,
+} from "./layout";
 import { linesReady, loadLines, sayIn } from "./voice";
-import { WeatherContext } from "./rooms";
+import { WeatherContext, kidAnchor } from "./rooms";
 import { useStepAddress } from "@/lib/stepAddress";
 
 /** Time the lift takes per floor. */
 const FLOOR_MS = 1200;
 /** Time the doors take to open or close. */
 const DOOR_MS = 700;
-/** Walking time per SVG unit. */
+/** Walking time per SVG unit of the rooms as drawn; in wider rooms a child walks a little longer and faster. */
 const WALK_MS = 2.6;
 /** While waiting for the right button: the bubble reminds the child, and the button (and, for a ride, the room) glows. */
 const NUDGE_MS = 7000;
@@ -25,6 +39,9 @@ const BEAT_MS = 700;
 /** From the end of a story until „Nochmal“ and „Weiter“ come. */
 const END_MS = 5000;
 const BUDDY_SCALE = 0.8;
+/** How far the thought bubble reaches above the head it stands on (`ThoughtBubble`), and the room it keeps to the picture's top. */
+const BUBBLE_RISE = 196;
+const BUBBLE_MARGIN = 8;
 
 interface Actor {
   floor: number;
@@ -127,6 +144,25 @@ export function ElevatorPlay({
   const viewRef = useRef<View>(START);
   const { effects, ripple } = useTapFeedback();
 
+  // The house is as wide as the picture's room allows, so no sky stands beside it.
+  const svgRef = useRef<SVGSVGElement>(null);
+  const [roomW, setRoomW] = useState(DESIGN_ROOM_W);
+  const layout = useMemo(() => houseLayout(roomW), [roomW]);
+  const layoutRef = useRef(layout);
+  layoutRef.current = layout;
+  useLayoutEffect(() => {
+    const svg = svgRef.current;
+    if (!svg) return;
+    const measure = () => {
+      const { width, height } = svg.getBoundingClientRect();
+      if (width > 0 && height > 0) setRoomW(roomWidthFor(width / height));
+    };
+    measure();
+    const observer = new ResizeObserver(measure);
+    observer.observe(svg);
+    return () => observer.disconnect();
+  }, []);
+
   // A story is a script of waits; starting another one (or leaving) bumps the generation and drops its timers.
   const generation = useRef(0);
   const timers = useRef(new Set<number>());
@@ -189,7 +225,7 @@ export function ElevatorPlay({
   const walk = async (who: Who, x: number) => {
     const a = viewRef.current.actors[who];
     if (!a) return;
-    const ms = Math.abs(x - a.x) * WALK_MS;
+    const ms = Math.abs(x - a.x) * WALK_MS * Math.sqrt(layoutRef.current.stretch);
     if (ms < 1) return;
     actor(who, { x, walk: ms, pose: "walk", face: x > a.x ? 1 : -1, inCabin: false });
     await wait(ms);
@@ -443,68 +479,82 @@ export function ElevatorPlay({
   const weather = story ? (story.weather === "rain" && view.cleared ? "day" : story.weather) : "day";
   const kids: Who[] = ["buddy", "hero"];
 
+  /** Where a child stands on the screen: in the lift by the shaft's edge, in a room beside the group of things it uses there. */
+  const screenX = (a: Actor) => {
+    const room = story?.rooms[a.floor];
+    if (a.x > DESIGN_ROOM_R || !room) return layout.rx(a.x);
+    const anchor = kidAnchor(room, a.x);
+    return a.x + layout.rx(anchor) - anchor;
+  };
+
+  const bubbleHeight = (who: Who) => KID_H * (who === "buddy" ? BUDDY_SCALE : 1);
+  /** On the top floor the chimney's edge of the picture leaves no room above the head: the bubble comes down beside it. */
+  const bubbleShift = (floor: number, height: number) => {
+    const down = Math.max(0, BUBBLE_MARGIN - (floorLine(floor) - height - BUBBLE_RISE));
+    return { transform: `translate(${-down * 1.1}px, ${down}px)`, transitionDuration: `${view.ride}ms` } as CSSProperties;
+  };
+
   /** The floor and walking position of a child, as two nested moving groups. */
   const place = (a: Actor) => ({
     outer: { transform: `translateY(${floorLine(a.floor)}px)`, transitionDuration: `${view.ride}ms` } as CSSProperties,
-    inner: { transform: `translateX(${a.x}px)`, transitionDuration: `${a.walk}ms` } as CSSProperties,
+    inner: { transform: `translateX(${screenX(a)}px)`, transitionDuration: `${a.walk}ms` } as CSSProperties,
   });
 
   return (
     <div className={`elevator-play weather-${weather}`} onPointerDown={(e) => softTap(e.clientX, e.clientY)}>
-      <svg className="el-svg" viewBox={`${VIEW_L} 0 ${VIEW_W - VIEW_L} ${VIEW_H}`} preserveAspectRatio="xMidYMid meet">
-        <WeatherContext.Provider value={weather}>
-          <Backdrop weather={weather} />
-          {story && (
-            <>
-              <Shell />
-              {story.rooms.map((Room, f) => (
-                <g key={`${story.id}${f}`} transform={`translate(0 ${floorLine(f)})`}>
-                  <clipPath id={`el-room-${f}`}>
-                    <rect x={ROOM_L} y={-ROOM_H} width={ROOM_R - ROOM_L} height={ROOM_H} />
-                  </clipPath>
-                  <g clipPath={`url(#el-room-${f})`}>
-                    <Room playing={view.playing} used={view.used} task={view.task} taps={view.taps} />
+      <svg ref={svgRef} className="el-svg" viewBox={`${VIEW_L} 0 ${layout.viewR - VIEW_L} ${VIEW_H}`} preserveAspectRatio="xMidYMin meet">
+        <LayoutContext.Provider value={layout}>
+          <WeatherContext.Provider value={weather}>
+            <Backdrop weather={weather} />
+            {story && (
+              <>
+                <Shell />
+                {story.rooms.map((Room, f) => (
+                  <g key={`${story.id}${f}`} transform={`translate(0 ${floorLine(f)})`}>
+                    <clipPath id={`el-room-${f}`}>
+                      <rect x={ROOM_L} y={-ROOM_H} width={layout.roomW} height={ROOM_H} />
+                    </clipPath>
+                    <g clipPath={`url(#el-room-${f})`}>
+                      <Room playing={view.playing} used={view.used} task={view.task} taps={view.taps} />
+                    </g>
                   </g>
-                </g>
-              ))}
-              <Slabs />
-              <Shaft />
-              <CabinBack floor={view.cabin} ride={view.ride} />
-              <Buttons lit={view.lit ?? view.call} hint={view.hint} onPress={press} />
-              {view.hint !== null && view.call === null && <Hint floor={view.hint} />}
-              {kids.map((who) => {
-                const a = actors[who];
-                if (!a || a.hidden) return null;
-                const { outer, inner } = place(a);
-                return (
-                  <g key={who} className="el-ride" style={outer}>
-                    <g className="el-walker" style={inner}>
-                      <g className={a.hop ? `el-hopper hop-${a.hop % 2}` : "el-hopper"} data-tap onPointerDown={tapKid(who)}>
-                        <g transform={who === "buddy" ? `scale(${BUDDY_SCALE})` : undefined}>
-                          <Kid look={who === "hero" ? hero : BROTHER} pose={a.pose} holding={a.holding} wear={a.wear} face={a.face} />
+                ))}
+                <Slabs />
+                <Shaft />
+                <CabinBack floor={view.cabin} ride={view.ride} />
+                <Buttons lit={view.lit ?? view.call} hint={view.hint} onPress={press} />
+                {view.hint !== null && view.call === null && <Hint floor={view.hint} />}
+                {kids.map((who) => {
+                  const a = actors[who];
+                  if (!a || a.hidden) return null;
+                  const { outer, inner } = place(a);
+                  return (
+                    <g key={who} className="el-ride" style={outer}>
+                      <g className="el-walker" style={inner}>
+                        <g className={a.hop ? `el-hopper hop-${a.hop % 2}` : "el-hopper"} data-tap onPointerDown={tapKid(who)}>
+                          <g transform={who === "buddy" ? `scale(${BUDDY_SCALE})` : undefined}>
+                            <Kid look={who === "hero" ? hero : BROTHER} pose={a.pose} holding={a.holding} wear={a.wear} face={a.face} />
+                          </g>
                         </g>
                       </g>
                     </g>
+                  );
+                })}
+                <CabinFront floor={view.cabin} ride={view.ride} open={view.doors} />
+                {bubble && actors[bubble.who] && !actors[bubble.who]!.hidden && (
+                  <g className="el-ride" style={place(actors[bubble.who]!).outer}>
+                    <g className="el-walker" style={place(actors[bubble.who]!).inner}>
+                      <g className="el-ride" style={bubbleShift(actors[bubble.who]!.floor, bubbleHeight(bubble.who))}>
+                        <Bubble key={`${bubble.who}${bubble.pic}`} pic={bubble.pic} nudge={bubble.nudge} height={bubbleHeight(bubble.who)} />
+                      </g>
+                    </g>
                   </g>
-                );
-              })}
-              <CabinFront floor={view.cabin} ride={view.ride} open={view.doors} />
-              {bubble && actors[bubble.who] && !actors[bubble.who]!.hidden && (
-                <g className="el-ride" style={place(actors[bubble.who]!).outer}>
-                  <g className="el-walker" style={place(actors[bubble.who]!).inner}>
-                    <Bubble
-                      key={`${bubble.who}${bubble.pic}`}
-                      pic={bubble.pic}
-                      nudge={bubble.nudge}
-                      height={KID_H * (bubble.who === "buddy" ? BUDDY_SCALE : 1)}
-                    />
-                  </g>
-                </g>
-              )}
-              <rect className={`el-night${view.night ? " on" : ""}`} x="-4000" y="-4000" width={VIEW_W + 8000} height={VIEW_H + 8000} fill="#0b1340" />
-            </>
-          )}
-        </WeatherContext.Provider>
+                )}
+                <rect className={`el-night${view.night ? " on" : ""}`} x="-4000" y="-4000" width={layout.viewR + 8000} height={VIEW_H + 8000} fill="#0b1340" />
+              </>
+            )}
+          </WeatherContext.Provider>
+        </LayoutContext.Provider>
       </svg>
 
       {view.picking && story && <StoryEnd id={story.id} onPick={onPick} />}

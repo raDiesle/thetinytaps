@@ -1,7 +1,7 @@
 import { expect, test } from "bun:test";
 import { STAIN_FILLS, TOOTH_FILLS } from "./mouth";
 import { dirtyFaces, faceKey, type MonsterOnTooth } from "./stains";
-import { STEPS } from "./steps";
+import { STEPS, waitingShown } from "./steps";
 
 // The teeth start a little yellow and grey and turn white as they are brushed, tooth by tooth, and the brushed tooth
 // sparkles once (user request, November 2026).
@@ -94,8 +94,13 @@ test("brushed teeth sparkle small and softly, only once the brush has moved on",
   expect(mouth).toMatch(/sparkle: project\.point\(onFace\([^)]*\)\),/);
   const sparkle = css.match(/\.tooth-glint\.brushed > div \{\s*animation: ([^;]+);/)?.[1] ?? "";
   expect(sparkle).toMatch(/^teeth-sparkle [\d.]+s ease-in-out calc\(0\.536s \+ var\(--turn\) \* [\d.]+s\) infinite$/);
-  const peak = Math.max(...[...(css.match(/@keyframes teeth-sparkle \{[\s\S]*?\n\}/)?.[0] ?? "").matchAll(/opacity: ([\d.]+)/g)].map((m) => Number(m[1])));
-  expect(peak).toBeLessThanOrEqual(0.55);
+  // Then the end's star of rays while brushing was too much (user request, November 2026): a short, slim flash like
+  // the trophy sign's on the shelf, hidden most of the time.
+  const keyframes = css.match(/@keyframes teeth-sparkle \{[\s\S]*?\n\}/)?.[0] ?? "";
+  const peak = Math.max(...[...keyframes.matchAll(/opacity: ([\d.]+)/g)].map((m) => Number(m[1])));
+  expect(peak).toBeLessThanOrEqual(0.8);
+  expect(keyframes).toMatch(/0%,\s*6\d%\s*\{\s*opacity: 0;/);
+  expect(mouth).toMatch(/className="tooth-glint brushed">[\s\S]{0,200}<Flash \/>/);
 });
 
 // Brushed teeth are a beautiful white (user feedback, November 2026), never cream.
@@ -105,4 +110,18 @@ test("a clean tooth's front is pure white and its other faces a cool white", () 
     const [r, g, b] = [1, 3, 5].map((i) => Number.parseInt(TOOTH_FILLS[kind].slice(i, i + 2), 16));
     expect({ kind, cool: b >= r && b >= g }).toEqual({ kind, cool: true });
   }
+});
+
+// Seen from above with the mouth wide open, the monsters waiting on the front teeth crowded the picture before the
+// molars being brushed (user feedback, November 2026): none on the lower front teeth while the lower molars are
+// brushed on top, none on any front tooth while the upper ones are.
+test("the chewing-surface steps show no monsters waiting on the front teeth", () => {
+  const front = (step: (typeof STEPS)[number]) =>
+    MONSTERS.filter((m) => m.step > STEPS.indexOf(step) && m.tooth.n < 3 && waitingShown(step, m.tooth)).map((m) => m.tooth.jaw);
+  const [lowerTop, upperTop] = STEPS;
+  expect(new Set(front(lowerTop))).toEqual(new Set(["upper"]));
+  expect(front(upperTop)).toEqual([]);
+  // The other steps keep every monster in its place, and the molars keep theirs in the chewing steps too.
+  for (const step of STEPS.slice(2)) expect(MONSTERS.every((m) => waitingShown(step, m.tooth))).toBe(true);
+  expect(MONSTERS.filter((m) => m.tooth.n >= 3).every((m) => waitingShown(upperTop, m.tooth))).toBe(true);
 });

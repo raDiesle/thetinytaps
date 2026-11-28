@@ -67,6 +67,18 @@ test("a way back to a page with a question steps back to the page before it all 
   expect(browser.depth()).toBe(0);
 });
 
+// The ribbon beside a deeper menu's corner goes straight onto the shelf (user request, 28 November 2026): it steps back
+// over the book's pages, so the phone's back button afterwards doesn't lead into the book again.
+test("a way back to a page further back steps back over the pages between", () => {
+  const browser = fakeBrowser();
+  browser.open("/");
+  browser.open("/spiele/spielwelten/");
+  browser.open("/kettenreaktion/");
+  goBack(browser.navigate, "/");
+  expect(browser.shown()).toBe("/");
+  expect(browser.depth()).toBe(0);
+});
+
 test("a way back to a page not just before replaces the page left", () => {
   const browser = fakeBrowser();
   browser.open("/kettenreaktion/");

@@ -437,11 +437,13 @@ const wallFaces = (gum: MouthModel["gums"][number], kind: "outer" | "inner", pro
 
 function GumFaces({ gum, project, top }: { gum: MouthModel["gums"][number]; project: Project; top: boolean }) {
   const p = project.point;
-  const rims = top ? [] : (["outer", "inner"] as const).filter((kind) => wallFaces(gum, kind, project));
+  // A tipped row's walls lie under its crown too (`wallsUnder`), so no gum covers the tooth's side.
+  const here = (kind: FaceKind) => (gum.wallsUnder ? top : (kind === "top") === top);
+  const rims = here("outer") ? (["outer", "inner"] as const).filter((kind) => wallFaces(gum, kind, project)) : [];
   return (
     <>
       {gum.faces
-        .filter((f) => (f.kind === "top") === top && project.facing(f.normal) > MIN_FACING)
+        .filter((f) => here(f.kind) && project.facing(f.normal) > MIN_FACING)
         .map((f, j) => (
           <path key={`gum-${top}-${j}`} d={facePath(f, project)} fill={GUM_FILLS[f.kind]} stroke={GUM_FILLS[f.kind]} strokeWidth={1.5} />
         ))}
@@ -950,7 +952,7 @@ export function Mouth({ view, zone, monsters, dirty, brush, happy, spat = false,
             <Sprite key={g.key} spot={{ x: round(at.x), y: round(at.y), scale: round(at.scale, 1000) }} reach={GLINT_REACH} className="tooth-glint brushed">
               <div style={{ "--turn": 2 * j } as CSSProperties}>
                 <svg viewBox={spriteBox(GLINT_REACH)} aria-hidden>
-                  <Glint />
+                  <Flash />
                 </svg>
               </div>
             </Sprite>
@@ -1281,6 +1283,24 @@ function Glint() {
       </g>
       <circle r={6} fill="#fff" />
     </>
+  );
+}
+
+/**
+ * The flash on a tooth just brushed: a slim four-pointed glint with curved sides, like the trophy sign's on the shelf
+ * (user request, November 2026: the end's star of rays while brushing was too much) – white with a faint cool edge,
+ * never gold, so it shows on the white teeth. Drawn still: its Sprite's HTML flashes it once in a while.
+ */
+function Flash() {
+  return (
+    <path
+      d="M0 -45 C3.6 -13.5 13.5 -3.6 45 0 C13.5 3.6 3.6 13.5 0 45 C-3.6 13.5 -13.5 3.6 -45 0 C-13.5 -3.6 -3.6 -13.5 0 -45 Z"
+      fill="#fff"
+      stroke="#7f9cc0"
+      strokeOpacity={0.8}
+      strokeWidth={3}
+      strokeLinejoin="round"
+    />
   );
 }
 

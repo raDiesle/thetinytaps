@@ -739,11 +739,12 @@ async function keepIfOther(file: string, boyDir: string) {
     console.log(`  ${file} shows no child: not kept`);
     return;
   }
-  const [a, b] = await Promise.all([file, boy].map((f) => sharp(f).greyscale().resize(120, 80).raw().toBuffer()));
+  // In colour: in grey the girl's pink shirt is as light as the boy's, and a small child changed too few pixels.
+  const [a, b] = await Promise.all([file, boy].map((f) => sharp(f).removeAlpha().resize(120, 80).raw().toBuffer()));
   let changed = 0;
-  for (let i = 0; i < a.length; i++) if (Math.abs(a[i] - b[i]) > 24) changed++;
-  // The pigtails and the pink shirt change far more than 1 % of the picture; noise of the encoding none.
-  if (changed < a.length * 0.01) {
+  for (let i = 0; i < a.length; i += 3) if (Math.max(Math.abs(a[i] - b[i]), Math.abs(a[i + 1] - b[i + 1]), Math.abs(a[i + 2] - b[i + 2])) > 24) changed++;
+  // The pigtails and the pink shirt change more than 0.5 % of the picture; noise of the encoding none.
+  if (changed < (a.length / 3) * 0.005) {
     unlinkSync(file);
     console.log(`  ${file} looks like the boy's: not kept`);
   }

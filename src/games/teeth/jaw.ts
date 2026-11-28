@@ -92,6 +92,12 @@ const GUM = 18;
  * always runs into the lips with no dark gap between them, seen from the front or the side (user feedback, November 2026).
  */
 const GUM_CHEEK = 110;
+/**
+ * How deep the cheek-side wall reaches in a row tipped to show its chewing surfaces, which lies in the open mouth like
+ * a model with the cheek round it: no lips to run into, and the full wall, tipped back in perspective, lay over the last
+ * molar's cheek side like a band of flesh (user feedback, November 2026; `jaw.test.ts`).
+ */
+const GUM_TIPPED = 8;
 const SAMPLES = 4;
 /**
  * The gum line, as a share of the tooth's height from its base: the gum
@@ -165,6 +171,17 @@ export interface GumPiece {
    * reaching neither past the tooth towards the tongue nor behind the last molar (`lipSideOnly`).
    */
   bite: Face;
+  /**
+   * The cheek-side wall for a row tipped to show its chewing surfaces (`lipSideOnly`): only `GUM_TIPPED` deep. Tipped
+   * with the perspective, the full wall's far foot swung back over the last molar and covered its cheek side.
+   */
+  tippedOuter: Face;
+  /**
+   * Whether its walls are drawn under its crown with its top (`lipSideOnly`): seen tipped, the cheek side of a back
+   * molar is a narrow strip, and the gum's rim reaching up its foot covered most of it like flesh lying on the tooth
+   * (user feedback, November 2026).
+   */
+  wallsUnder?: boolean;
 }
 
 /** Y of the chewing plane and of the gum line for a jaw. */
@@ -276,6 +293,7 @@ function buildGum(jaw: Jaw, side: Side, n: number, open: number): GumPiece {
   const rim = (t: number) => base + (top - base) * (gumLine(n, Math.abs(t)) + GUM_OVERLAP);
   const outerRim = angles.map((t) => archPoint(jaw, t, -3, rim(t)));
   const outerFoot = angles.map((t) => archPoint(jaw, t, -3, base - dir * GUM_CHEEK));
+  const tippedFoot = angles.map((t) => archPoint(jaw, t, -3, base - dir * GUM_TIPPED));
   const inner = angles.map((t) => innerGumAt(jaw, t, open));
   const innerRim = angles.map((t, i) => archPoint(jaw, t, inner[i].inset, inner[i].rim));
   const innerFoot = angles.map((t, i) => archPoint(jaw, t, inner[i].inset, inner[i].foot));
@@ -294,6 +312,7 @@ function buildGum(jaw: Jaw, side: Side, n: number, open: number): GumPiece {
     center,
     bite,
     rims: { outer: outerRim, inner: innerRim },
+    tippedOuter: face("outer", [...outerRim, ...[...tippedFoot].reverse()]),
     faces: [
       face("outer", [...outerRim, ...[...outerFoot].reverse()]),
       face("top", [...outerRim, ...[...innerRim].reverse()]),
@@ -309,7 +328,7 @@ function buildGum(jaw: Jaw, side: Side, n: number, open: number): GumPiece {
  * teeth and the tongue like a second row.
  */
 export function lipSideOnly(gum: GumPiece): GumPiece {
-  return { ...gum, faces: [gum.faces.find((f) => f.kind === "outer")!, gum.bite], rims: { outer: gum.rims.outer, inner: [] } };
+  return { ...gum, faces: [gum.tippedOuter, gum.bite], rims: { outer: gum.rims.outer, inner: [] }, wallsUnder: true };
 }
 
 export interface MouthModel {

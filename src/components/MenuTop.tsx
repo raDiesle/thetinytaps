@@ -3,7 +3,9 @@ import { createPortal } from "react-dom";
 import { Link } from "react-router";
 import { FullscreenCorner } from "@/components/FullscreenButton";
 import { PageCornerArt } from "@/components/PageCornerArt";
+import { useT } from "@/lib/language";
 import { useTurnPage } from "@/lib/look";
+import { BACK_TO_SHELF } from "@/lib/sharedTexts";
 
 /**
  * The way back from a page that is no book's page (Impressum, Datenschutz, the management page): a big round arrow
@@ -25,7 +27,10 @@ export function MenuTop({ to, back }: { to: string; back: string }) {
 /**
  * The top of a menu: the centred title, the way back as the page's corner in the top left (PageCorner), and the
  * fullscreen button and `tools` (⚙️) as paper notes clipped onto the page's top edge in the top right (`book.css`).
- * `children`, such as a start screen's labelled buttons for grown-ups, go in a row of their own under the title.
+ * A menu deeper in a book (its way back is not the shelf) also has the book's ribbon right beside the corner
+ * (`ShelfRibbon`), straight back onto the shelf in one tap (user request, 28 November 2026: from a game's cards only
+ * one page back was reachable). `children`, such as a start screen's labelled buttons for grown-ups, go in a row of
+ * their own under the title.
  */
 export function MenuHead({ to, back, title, tools, children }: { to: string; back: string; title: string; tools?: ReactNode; children?: ReactNode }) {
   return (
@@ -34,6 +39,7 @@ export function MenuHead({ to, back, title, tools, children }: { to: string; bac
       <h1 className="menu-title">{title}</h1>
       <FullscreenCorner />
       <PageCorner to={to} back={back} />
+      {to !== "/" && <ShelfRibbon />}
       {children}
     </div>
   );
@@ -57,4 +63,22 @@ function PageCorner({ to, back }: { to: string; back: string }) {
   // The ribbon lies on the paper and scrolls with it, placed from the page's top left (`#root`, which the page turns
   // with), never from a menu's own boxes, which some screens position.
   return to === "/" ? createPortal(corner, document.getElementById("root") ?? document.body) : corner;
+}
+
+/**
+ * The book's ribbon beside the page's corner in a menu deeper in a book: the corner turns one page back, the ribbon
+ * closes the book and puts it back onto the shelf at once (`putBookBack`). It is the shelf's ribbon drawn smaller, as
+ * high as the corner, so the cards keep their room (`.shelf-ribbon` in `book.css`); it lies on the paper and scrolls
+ * with it, like the ribbon of a table of contents.
+ */
+function ShelfRibbon() {
+  const t = useT();
+  const turnPage = useTurnPage("/", "back");
+  const back = t(BACK_TO_SHELF);
+  return createPortal(
+    <Link to="/" className="shelf-ribbon" aria-label={back} title={back} onClick={turnPage} data-tap>
+      <PageCornerArt sign="shelf" />
+    </Link>,
+    document.getElementById("root") ?? document.body,
+  );
 }

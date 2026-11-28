@@ -16,15 +16,13 @@
   background: #8d99a6;
 }
 
-/* The picture fills the screen below the exit button; the sky runs on past its edges. */
+/* The picture fills the whole page inside its paper margin: the chimney touches its top edge and the house grows as
+   wide as the screen (`roomWidthFor`), so no band of sky is left above or beside it. */
 .el-svg {
   position: absolute;
-  top: max(56px, env(safe-area-inset-top));
-  right: 1vw;
-  bottom: 1vh;
-  left: 1vw;
-  width: calc(100% - 2vw);
-  height: calc(100% - max(56px, env(safe-area-inset-top)) - 1vh);
+  inset: var(--frame, 0px);
+  width: calc(100% - 2 * var(--frame, 0px));
+  height: calc(100% - 2 * var(--frame, 0px));
   overflow: visible;
   font-family: inherit;
   touch-action: manipulation;
