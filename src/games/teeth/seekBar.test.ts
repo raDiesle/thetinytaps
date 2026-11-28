@@ -25,3 +25,19 @@ test("the sections are the bar's grooves as they are seen, not the parts inside 
   const play = await Bun.file("src/games/teeth/TeethPlay.tsx").text();
   expect(play).toContain("const sectionStarts = segments.map(([start]) => start);");
 });
+
+// A step tapped on the bar while paused showed the one before (user feedback, November 2026): the clock lands on
+// `introMs + start`, and `(introMs + start) - introMs` can come out a hair under `start`, so a phase reached by
+// `brushed >= start` was not reached until the clock ran on. TeethPlay compares on the clock, summed as the bar's
+// sections are, and a paused jump to another picture shows it at once (`sceneAfter` in scenes.tsx).
+test("the part tapped while paused is the part shown", async () => {
+  // Such sums really do lose the start: the reason the comparison is made on the clock.
+  const introMs = 0.7;
+  const start = 0.1;
+  expect(introMs + start - introMs).toBeLessThan(start);
+  const play = await Bun.file("src/games/teeth/TeethPlay.tsx").text();
+  expect(play).toContain("elapsed >= introMs + at");
+  expect(play).toContain("const pastEnd = (at: number) => elapsed >= introMs + totalMs + at;");
+  expect(play).not.toMatch(/brushed >= (at|totalMs)\b/);
+  expect(play).not.toContain("const after = brushed - totalMs");
+});

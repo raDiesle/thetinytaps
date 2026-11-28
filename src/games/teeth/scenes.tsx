@@ -18,10 +18,32 @@ export const SCENE_MS = 1072;
 const wayTo = (from: SceneKind, to: SceneKind) => (to === "sink" || to === "spit" ? "down" : from === "sink" ? "up" : "fade");
 
 /** A picture still sliding out. */
-interface Leaving {
+export interface Leaving {
   key: string;
   node: ReactNode;
   move: string;
+}
+
+/** Which picture is shown, how it comes in, and the pictures still sliding out. */
+export interface SceneState {
+  key: string;
+  move: string;
+  leaving: Leaving[];
+}
+
+/**
+ * The scenes after the picture `id` was asked for, coming the way `way` from the one shown (`last`). While the game is
+ * paused it comes at once, with nothing sliding: a paused slide stands still on its first frame, so a phase tapped on
+ * the bar while paused showed the picture before it until the game went on (user feedback, November 2026).
+ */
+export function sceneAfter(scene: SceneState, id: string, way: string, last: ReactNode, paused: boolean): SceneState {
+  if (paused) return { key: id, move: "", leaving: [] };
+  // Kept in front of the new one in the list, so React never moves its element (that would restart its animations).
+  return {
+    key: id,
+    move: `enter-${way}`,
+    leaving: [...scene.leaving.filter((s) => s.key !== id), { key: scene.key, node: last, move: `leave-${way}` }],
+  };
 }
 
 /**
@@ -31,16 +53,8 @@ interface Leaving {
 export function Scenes({ id, kind, paused, children }: { id: string; kind: SceneKind; paused: boolean; children: ReactNode }) {
   // The picture as it was last shown, to keep showing while it slides out.
   const last = useRef({ kind, node: children });
-  const [scene, setScene] = useState<{ key: string; move: string; leaving: Leaving[] }>({ key: id, move: "", leaving: [] });
-  if (scene.key !== id) {
-    const way = wayTo(last.current.kind, kind);
-    // Kept in front of the new one in the list, so React never moves its element (that would restart its animations).
-    setScene({
-      key: id,
-      move: `enter-${way}`,
-      leaving: [...scene.leaving.filter((s) => s.key !== id), { key: scene.key, node: last.current.node, move: `leave-${way}` }],
-    });
-  }
+  const [scene, setScene] = useState<SceneState>({ key: id, move: "", leaving: [] });
+  if (scene.key !== id) setScene(sceneAfter(scene, id, wayTo(last.current.kind, kind), last.current.node, paused));
   useLayoutEffect(() => {
     last.current = { kind, node: children };
   });

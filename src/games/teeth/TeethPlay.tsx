@@ -353,7 +353,14 @@ export function TeethPlay({ settings, video, options }: { settings: TeethSetting
   /** The clock stands at `until` until the song is there. */
   const waiting = !paused && clock.until !== undefined && elapsed >= clock.until;
   const brushed = elapsed - introMs;
-  const done = brushed >= totalMs;
+  /**
+   * Whether the clock has reached `at` ms after the song's end – compared on the clock, summed as the bar's sections and
+   * jumps sum their starts (`introMs + totalMs + at`), never as `brushed - totalMs >= at`: that difference can come out a
+   * hair under a section's start, and a phase tapped while paused showed the one before until the clock ran on (user
+   * feedback, November 2026). The steps' starts below are compared the same way.
+   */
+  const pastEnd = (at: number) => elapsed >= introMs + totalMs + at;
+  const done = pastEnd(0);
   // Putting the brush away follows ⚙️ until the brushing is done, then stays as it is for this brushing, so switching it
   // on at the end never brings the tidying back after the buttons.
   const [tidy, setTidy] = useState(settings.tidy);
@@ -363,10 +370,9 @@ export function TeethPlay({ settings, video, options }: { settings: TeethSetting
   if (!done && spit !== settings.spit) setSpit(settings.spit);
   const endingMs = endingOf(spit, tidy);
   const tidyAt = tidyFrom(spit);
-  const after = brushed - totalMs;
-  const ending: Ending | null = !done ? null : after >= endingMs ? "rest" : after < CHEER_MS ? "cheer" : after < tidyAt ? "spit" : "tidy";
+  const ending: Ending | null = !done ? null : pastEnd(endingMs) ? "rest" : !pastEnd(CHEER_MS) ? "cheer" : !pastEnd(tidyAt) ? "spit" : "tidy";
   /** -1 during the prelude, STEPS.length when done. */
-  const phase = brushed < 0 ? -1 : done ? STEPS.length : stepStarts.filter((at, k) => k < STEPS.length && brushed >= at).length - 1;
+  const phase = brushed < 0 ? -1 : done ? STEPS.length : stepStarts.filter((at, k) => k < STEPS.length && elapsed >= introMs + at).length - 1;
   const before = brushed < 0 ? preludeAt(prelude, elapsed) : null;
   /** Prelude parts first, then the steps, then the end: what the arrow keys step through. */
   const part = before ? prelude.indexOf(before) : prelude.length + phase;

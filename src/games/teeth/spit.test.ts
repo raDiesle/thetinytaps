@@ -41,7 +41,7 @@ test("the child leans and the dab drops as far as the picture says, moved only b
 // switched off behind ⚙️ (user request, November 2026).
 test("it comes between the cheer and rinsing the brush, can be left out, with no words on the picture", async () => {
   expect(play).toMatch(/const tidyFrom = \(spit: boolean\) => CHEER_MS \+ \(spit \? SPIT_MS : 0\);/);
-  expect(play).toMatch(/after < CHEER_MS \? "cheer" : after < tidyAt \? "spit"/);
+  expect(play).toMatch(/!pastEnd\(CHEER_MS\) \? "cheer" : !pastEnd\(tidyAt\) \? "spit"/);
   expect(play).toContain('{spit && <PhaseTile phase="spit"');
   const settings = await Bun.file("src/games/teeth/settings.ts").text();
   expect(settings).toMatch(/spit: true/);

@@ -238,7 +238,12 @@ late in the video. A new thing shown beside the picture (a control, a chart, a b
   very second under the finger (`sectionStart`, user feedback, November 2026; `seekBar.test.ts`). The sections are the
   bar's grooves as they are seen (`sectionStarts`), never parts hidden inside one: a tap low on the sweets' groove once
   started only the monsters growing (user feedback, November 2026); a drag jumps only when
-  it reaches another section. Everything follows the clock after a jump (user feedback, November 2026). The story's and the sink's pictures are CSS
+  it reaches another section. Everything follows the clock after a jump (user feedback, November 2026), also while
+  paused: the part tapped is the one marked and shown at once (user feedback, November 2026: paused, the one before it
+  stayed). So which part is on is found on the clock, summed as the sections' starts are (`introMs + at`, `pastEnd`),
+  never by subtracting first (`brushed >= at`), which can land a hair under a start; and a paused jump to another
+  picture shows it at once instead of sliding, since a paused slide stands on its first frame (`sceneAfter` in
+  `scenes.tsx`). `seekBar.test.ts` and `scenes.test.ts` check. The story's and the sink's pictures are CSS
   animations that start with their part (`at-<part>`), so after every jump `TeethPlay` sets them to where the clock is
   in it (`jumps`, `getAnimations`); a new animation there belongs to its part too, never runs on from an earlier one. Their pause
   rules are `!important`, since a part's rule with the `animation` shorthand is more specific and kept them running.
