@@ -396,19 +396,21 @@
   animation: teeth-sparkle 4.29s ease-in-out calc(0.536s + var(--turn) * 1.07s) infinite;
 }
 
+/* A short flash like the trophy sign's glints on the shelf, turning as it comes and goes, then a long rest. */
 @keyframes teeth-sparkle {
-  0% {
+  0%,
+  66% {
     opacity: 0;
-    transform: scale(0.2) rotate(-20deg);
+    transform: scale(0.2) rotate(0deg);
   }
-  20% {
-    opacity: 0.5;
-    transform: scale(1) rotate(0deg);
+  74% {
+    opacity: 0.75;
+    transform: scale(1) rotate(45deg);
   }
-  45%,
+  82%,
   100% {
     opacity: 0;
-    transform: scale(0.3) rotate(10deg);
+    transform: scale(0.4) rotate(90deg);
   }
 }
 

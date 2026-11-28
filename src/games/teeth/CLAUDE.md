@@ -43,6 +43,11 @@ late in the video. A new thing shown beside the picture (a control, a chart, a b
   (`cheekSpots` in `jaw.ts`), and the story's sit beside the eyes, clear of the open mouth's corners even while they
   glow bigger (`CHEEKS`) – they once lay right on the corners and looked odd (user feedback, November 2026;
   `cheeks.test.ts` checks every step and the story).
+- While a chewing-surface step runs, the front teeth show no monsters waiting for a later step: on the lower ones while
+  the lower molars are brushed, on both rows' while the upper ones are (`quietFront` in `steps.ts`, `waitingShown`;
+  user feedback, November 2026: seen from above with the mouth wide open they stood in a row before the molars being
+  brushed and only crowded the picture). Their stains stay; the monsters are there again when their step comes
+  (`stains.test.ts`).
 - The monsters grow only in the story at the start. In the mirror they are already on the teeth: never let them pop up or arrive there (they only fade in softly as a side of the teeth turns into view), that would be a second, illogical origin.
 - The gum always runs into the lips: never a strip or wedge of the mouth's dark between gum and lips, from the front
   or the side (user feedback, November 2026). Round the teeth lies the inside of the cheek, and dark only between the
@@ -84,11 +89,15 @@ late in the video. A new thing shown beside the picture (a control, a chart, a b
 - A row tipped to show its chewing surfaces shows its gum only on the cheek side and between its crowns: never a band of
   gum between the lower teeth and the tongue, nor above the upper ones' tongue side, which looked like a second row
   (`lipSideOnly` in `jaw.ts`, user feedback, November 2026). The inner steps, which brush the tongue side, keep that
-  gum (`jaw.test.ts`).
+  gum (`jaw.test.ts`). Nor does any gum lie over a tooth of such a row: seen tipped, a back molar's cheek side is a
+  narrow strip, and the gum's wall reaching up its foot – deep and swung back over it by the perspective – covered it
+  like flesh lying on the tooth (user feedback, November 2026), so its cheek-side wall is only `GUM_TIPPED` deep and
+  drawn under the crown with the gum's top (`wallsUnder`, `jaw.test.ts`).
 - The brush's foam is faint and varied (user feedback, November 2026: even white balls with a thick blue ring were too
   loud): small clumps, clear bubbles with a light and tiny dots, of different sizes, with a pale edge, and slightly
   see-through (`FOAM`, `FoamFleck` in `brush.tsx`; `brush.test.ts`). Never a row of equal balls, never so much that it hides
-  the brush or the teeth.
+  the brush or the teeth: ten flecks, three at first (twelve were too many, seven then a little too few; user requests,
+  November 2026), drawn in the brush's own layer so they ride on the bristles with every stroke and circle.
 - A brushed monster dissolves, never just pops away (user request, November 2026): body and grains are HTML layers of
   its sprite (`MonsterDust`), moved by transform, opacity and filter, never an animation inside its svg
   (`layers.test.ts`), and the grains are few and calm – sugar and foam of the picture, no stars or confetti.
@@ -106,7 +115,7 @@ late in the video. A new thing shown beside the picture (a control, a chart, a b
   tooth the brush has reached in this step, `reachedTeeth`), so it spreads with the brush. The foam lies only at the
   gum line, on the gum and a little up on the tooth, as the brush pushes it there (user feedback, November 2026), and
   little of it: clearly more on one tooth than on its neighbour, often a single bubble or none, never the same row of bubbles on
-  every tooth (`FOAM_AMOUNTS`: none to two next to each other of `GUM_FOAM`, from a place of each tooth's own, about one a tooth – user request, November 2026: fewer foam bubbles; on the brush only a few flecks, two at first, `FOAM`, `FOAM_FIRST`). Its
+  every tooth (`FOAM_AMOUNTS`: none to two next to each other of `GUM_FOAM`, from a place of each tooth's own, about one a tooth – user request, November 2026: fewer foam bubbles; on the brush only a few flecks, three at first, `FOAM`, `FOAM_FIRST`). Its
   bubbles are faint and unlike each other – big beside tiny, sized apart on each tooth, a pale edge, a little
   see-through (user feedback, November 2026: subtler and more varied) – (`GUM_FOAM`, `GUM_FOAM_SPREAD`, `gumFoam`,
   `FoamBubbles`), kept
@@ -122,6 +131,9 @@ late in the video. A new thing shown beside the picture (a control, a chart, a b
   and on the back teeth' outside its handle comes out of the corner of the mouth towards the viewer (`CHEEK_ANGLE`), so
   it hides as few teeth and monsters as it can: a bigger brush lying along the row covered the molars being brushed
   (user feedback, November 2026, asked twice – the brush was made smaller two times).
+- Circling, the brush turns counter-clockwise on the screen (user request, November 2026): the circle is two swings,
+  the second a quarter ahead (`.brush-move-across`), and `turnLeft` in `brush.tsx` turns the second's direction so the
+  path runs counter-clockwise whatever way the head and the brush lie (`brush.test.ts`).
 - The teeth change size step by step from the back molars to the front teeth: each tooth a little narrower and its
   chewing surface a little shallower than the one behind it (`TEETH`, `CHEWING_DEPTHS` in `jaw.ts`), never two big
   molars and then a row of flat ones alike (user feedback, November 2026; `jaw.test.ts` checks).
@@ -361,10 +373,13 @@ late in the video. A new thing shown beside the picture (a control, a chart, a b
 - A brushed tooth is a beautiful white (user feedback, November 2026): its front pure white, its other faces a cool
   white a breath darker (`TOOTH_FILLS`), never cream. It sparkles only once the brush has reached the next tooth
   (`brushLeft`), after a beat's pause, and then the faces the brush left last sparkle on while the head holds still:
-  one or two glints in the whole view, one small glint a face, faint and slow, coming and going in turn every two bars
+  one or two in the whole view, one small flash a face, coming and going in turn every two bars
   (`SPARKLES_AT_ONCE`, `SPARKLE_SIZE`, `.tooth-glint.brushed`, `teeth-sparkle`) – never one big glint over the tooth,
   nor a flash while the brush still lies on it, where it was hardly seen, nor a glint on every brushed face, which was
-  too much (user feedback, November 2026, twice). `stains.test.ts` checks.
+  too much (user feedback, November 2026, twice). Each is a slim four-pointed flash with curved sides like the trophy
+  sign's glints on the shelf, white with a faint cool edge (`Flash` in `mouth.tsx`), turning as it comes and goes in a
+  short moment and hidden the rest of the time – never the end's star of rays (`Glint`), which was too much while
+  brushing (user request, November 2026). `stains.test.ts` checks.
 - The story's teeth stand close, neighbours nearly touching (`rowOf`, `story.test.ts`): gaps between them looked like
   teeth lost (November 2026).
 - The story shows the mouth as big as it can (user feedback, November 2026: zoom in more, so the child sees more): on a

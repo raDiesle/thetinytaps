@@ -29,7 +29,7 @@ import { Scenes, type SceneKind } from "./scenes";
 import { Prep, PREP_CUES, PREP_MS, PREP_RECORDINGS, TIDY_RECORDINGS } from "./prep";
 import { Spit, SPIT_CUES, SPIT_MS } from "./spit";
 import type { TeethSettings } from "./settings";
-import { GRIN_VIEW, ROAR_VIEW, STEPS, stepText } from "./steps";
+import { GRIN_VIEW, ROAR_VIEW, STEPS, stepText, waitingShown } from "./steps";
 import { sungLanguageFor } from "./sung";
 import { type TeethSymbol, teethSymbol } from "./symbols";
 import { Week } from "./week";
@@ -720,8 +720,9 @@ export function TeethPlay({ settings, video, options }: { settings: TeethSetting
   // Every face a step brushes is stained until the brush has taken all of its monsters off: then it turns white.
   const dirty = dirtyFaces(phase, monsters, isGone);
   // Every monster on a tooth not brushed yet, there from the start; the picture shows those whose side of the tooth faces out.
+  // In the chewing-surface steps the front teeth stay free of monsters waiting for later (`quietFront`).
   const spots: MonsterSpot[] = monsters
-    .filter((m) => m.step >= phase)
+    .filter((m) => m.step === phase || (m.step > phase && waitingShown(step, m.tooth)))
     .map((m) => ({
       id: m.id,
       tooth: m.tooth,

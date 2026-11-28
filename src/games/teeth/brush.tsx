@@ -133,6 +133,15 @@ export function squeezeOut(anchor: BrushAnchor, surface: Surface, tooth: ToothId
   return best;
 }
 
+/**
+ * The circle's second swing, turned so the brush circles counter-clockwise on the screen (user request, November 2026).
+ * The second swing runs a quarter ahead (`.brush-move-across` in teeth.css), so from `first` the brush heads towards
+ * minus `second`: with the screen's y pointing down, that turns counter-clockwise when `first` × `second` is positive.
+ */
+export function turnLeft(first: { x: number; y: number }, second: { x: number; y: number }) {
+  return first.x * second.y - first.y * second.x >= 0 ? second : { x: -second.x, y: -second.y };
+}
+
 /** One stroke, circle or wipe takes two beats of the song (112 BPM), calm enough to follow along; `.brush-move` in teeth.css. */
 const STROKE_S = 120 / 112;
 
@@ -205,8 +214,9 @@ export interface Fleck {
 }
 
 /**
- * The foam's flecks, the first two there at once, the rest coming the longer the child brushes – few in all (user
- * request, November 2026: fewer foam bubbles; twelve were too many).
+ * The foam's flecks, the first three there at once, the rest coming the longer the child brushes – ten in all (user
+ * requests, November 2026: twelve were too many, seven then a little too few). Drawn in the brush's own layer, they
+ * ride on the bristles with every stroke and circle.
  */
 export const FOAM: Fleck[] = [
   { at: [-15, 8, -3], r: 3, kind: "clump" },
@@ -216,11 +226,14 @@ export const FOAM: Fleck[] = [
   { at: [2, 2, 1], r: 1.6, kind: "bubble" },
   { at: [-20, -6, -1], r: 2, kind: "clump" },
   { at: [-9, 11, 0], r: 0.9, kind: "dot" },
+  { at: [-11, -1, 1], r: 3.4, kind: "clump" },
+  { at: [12, 2, -1], r: 1.3, kind: "bubble" },
+  { at: [5, -11, -1], r: 1.2, kind: "dot" },
 ];
 /** The foam's faint edge, so it still shows on white teeth. */
 export const FOAM_EDGE = "#d6e9f5";
 /** How many of the foam's flecks are there as soon as the brush brushes. */
-export const FOAM_FIRST = 2;
+export const FOAM_FIRST = 3;
 /** Seconds of brushing until all the foam is there. */
 const FOAM_FULL_S = 30;
 
@@ -419,7 +432,7 @@ export function Brush({
   // across the bristles), wiping goes from the gum to the tip of the tooth.
   const up: Vec3 = tooth.jaw === "lower" ? [0, 1, 0] : [0, -1, 0];
   const first = motion === "wipe" ? onScreen(up, REACH.wipe) : onScreen(pose.u, REACH[motion]);
-  const second = onScreen(across([0, 1, 0], pose.b), REACH.circle);
+  const second = turnLeft(first, onScreen(across([0, 1, 0], pose.b), REACH.circle));
   const glide = project.point(at);
   const offset = { x: (glide.x - middle.x) / unit, y: (glide.y - middle.y) / unit };
   const vars = {
