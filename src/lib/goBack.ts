@@ -56,12 +56,17 @@ export function useHistoryTrail() {
 }
 
 /**
- * Whether the page before this one in the history is `to`, so going back there is a step back. The trail keeps pages
- * by their path, so a `to` with a question (the trophy room opening on a trophy, `?pokal=`) is matched by its path.
+ * How many steps back in the history the page `to` lies – the page just before (1), or one further back where a way
+ * back skips pages between (the book's ribbon in a menu deeper in a book goes straight back onto the shelf, user
+ * request, 28 November 2026) –, or 0 when it isn't there. The trail keeps pages by their path, so a `to` with a question
+ * (the trophy room opening on a trophy, `?pokal=`) is matched by its path.
  */
-const cameFrom = (to: string) => {
+const stepsTo = (to: string) => {
   const idx = place();
-  return idx !== undefined && idx > 0 && trail[idx - 1] === to.replace(/[?#].*$/, "");
+  if (idx === undefined) return 0;
+  const path = to.replace(/[?#].*$/, "");
+  for (let before = idx - 1; before >= 0; before--) if (trail[before] === path) return idx - before;
+  return 0;
 };
 
 /**
@@ -83,15 +88,16 @@ export function backFrom(state: unknown): string | undefined {
 
 /**
  * Goes back to `to`, a page the child came from. It replaces the current page at once, so a page turn sees the new
- * page in the same moment, and where the page before in the history is `to`, it then steps back onto it: the page
- * shown stays the same, and the history ends there, as if the page left had never been opened.
+ * page in the same moment, and where `to` lies before in the history, it then steps back onto it (over the pages
+ * between, where it lies further back): the page shown stays the same, and the history ends there, as if the pages
+ * left had never been opened.
  */
 export function goBack(navigate: NavigateFunction, to: string) {
   // A second tap before the step back has landed would step back twice, out of the app.
   if (stepping) return;
-  const step = cameFrom(to);
+  const steps = stepsTo(to);
   navigate(to, { replace: true });
-  if (!step) return;
+  if (!steps) return;
   stepping = true;
   const landed = () => {
     stepping = false;
@@ -103,5 +109,5 @@ export function goBack(navigate: NavigateFunction, to: string) {
   // not hold every later way back: ✕ and the corner then did nothing until a reload. The page shown is `to` already
   // (replaced above), so nothing is navigated again – by then the child may have gone on from there.
   const lost = setTimeout(landed, STEP_BACK_WAIT_MS);
-  window.history.go(-1);
+  window.history.go(-steps);
 }
